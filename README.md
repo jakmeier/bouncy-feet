@@ -11,10 +11,10 @@ A web app that assists you in learning to shuffle dance.
 
 ## Progress Status
 
-- 11 November 2023: Repository is initialized under the name `bouncy-feet`.
-  Coding hasn't started, yet. The core concepts have been tried out in a
-  [prototype](https://github.com/jakmeier/dance-app-poc-playground). But code
-  architecture and frameworks are still to be decided.
+- 20 Nov 2023: Started using [SvelteKit](https://kit.svelte.dev/).
+- 18 Nov 2023: Initialized repository under the name `bouncy-feet`.
+- Oct - Nov 2023: Tried out the core concepts in a
+  [prototype](https://github.com/jakmeier/dance-app-poc-playground).
 
 # Open-Source Commitment
 
