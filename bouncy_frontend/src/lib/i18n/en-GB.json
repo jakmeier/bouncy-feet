@@ -1,0 +1,19 @@
+{
+    "meta": {
+        "title": "BouncyFeet! Learn Shuffle Dance the Fun Way."
+    },
+    "home": {
+        "title": "Bouncy Feet!",
+        "nav": "Home"
+    },
+    "learn": {
+        "title": "Learn new moves",
+        "nav": "Learn"
+    },
+    "record": {
+        "nav": "Record"
+    },
+    "profile": {
+        "nav": "Profile"
+    }
+}

@@ -1,18 +1,23 @@
 <script>
   import { page } from '$app/stores';
+  import { t } from '$lib/i18n.js';
 
   const tabs = [
-    { label: 'Home',    icon: 'home',            route: '/' },
-    { label: 'Learn',   icon: 'book_5',          route: '/learn' },
-    { label: 'Record',  icon: 'directions_walk', route: '/record' },
-    { label: 'Profile', icon: 'account_circle',  route: '/profile' },
+    { label: $t('home.nav'), icon: 'home', route: '/' },
+    { label: $t('learn.nav'), icon: 'book_5', route: '/learn' },
+    { label: $t('record.nav'), icon: 'directions_walk', route: '/record' },
+    { label: $t('profile.nav'), icon: 'account_circle', route: '/profile' },
   ];
-
 </script>
 
 <nav class="navbar">
   {#each tabs as { label, route, icon }}
-    <a class="tab" class:active-tab={$page.url.pathname === route} href={route} title={label}>
+    <a
+      class="tab"
+      class:active-tab={$page.url.pathname === route}
+      href={route}
+      title={label}
+    >
       <span class="material-symbols-outlined">{icon}</span>
     </a>
   {/each}
@@ -30,7 +35,7 @@
     height: 100px;
   }
 
-  a.tab{
+  a.tab {
     display: grid;
     grid-template-columns: auto;
     justify-content: center;
@@ -49,9 +54,8 @@
   .tab:hover {
     color: var(--theme-accent);
   }
-  
+
   a.active-tab {
     color: var(--theme-accent);
   }
-
 </style>
