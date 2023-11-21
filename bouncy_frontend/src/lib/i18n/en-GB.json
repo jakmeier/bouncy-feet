@@ -11,7 +11,9 @@
         "nav": "Learn"
     },
     "record": {
-        "nav": "Record"
+        "nav": "Record",
+        "start-button": "start",
+        "stop-button": "stop"
     },
     "profile": {
         "nav": "Profile"
