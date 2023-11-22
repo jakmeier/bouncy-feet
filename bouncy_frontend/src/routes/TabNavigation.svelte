@@ -56,6 +56,6 @@
   }
 
   a.active-tab {
-    color: var(--theme-accent);
+    color: var(--theme-accent-light);
   }
 </style>

@@ -30,6 +30,15 @@
       ctx.stroke();
     });
 
+    // torso
+    ctx.fillStyle = '#ffb06e';
+    ctx.beginPath();
+    ctx.moveTo(landmarks[TORSO[0]].x * width, landmarks[TORSO[0]].y * height);
+    TORSO.slice(1).forEach((i) => {
+      ctx.lineTo(landmarks[i].x * width, landmarks[i].y * height);
+    });
+    ctx.fill();
+
     const shoulder = distance2d(
       landmarks[I.LEFT_SHOULDER],
       landmarks[I.RIGHT_SHOULDER]
@@ -45,15 +54,6 @@
       0,
       2 * Math.PI
     );
-    ctx.fill();
-
-    // torso
-    ctx.fillStyle = '#ffb06e';
-    ctx.beginPath();
-    ctx.moveTo(landmarks[TORSO[0]].x * width, landmarks[TORSO[0]].y * height);
-    TORSO.slice(1).forEach((i) => {
-      ctx.lineTo(landmarks[i].x * width, landmarks[i].y * height);
-    });
     ctx.fill();
   }
 </script>

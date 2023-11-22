@@ -4,10 +4,14 @@
   import Canvas from '$lib/Canvas.svelte';
   import Avatar from './Avatar.svelte';
   import { onDestroy, onMount } from 'svelte';
+  import Area from './Area.svelte';
+  import { t } from '$lib/i18n';
 
   let videoElement;
+  let camera;
   let landmarks = [];
   let isModelOn = false;
+  let cameraOn = false;
   let renderer;
   let stop = false;
 
@@ -44,10 +48,47 @@
   });
 </script>
 
-<Camera bind:videoElement />
-<button on:click={startModel}>TEST: start model</button>
-<button on:click={stopModel}>TEST: stop model</button>
-<Canvas width="{300}," height={300}>
-  <Avatar {landmarks} />
-</Canvas>
-<p>[recording settings]</p>
+<div id="outer">
+  <Area width={280}px height={280}px>
+    <Camera bind:videoElement bind:cameraOn bind:this={camera}/>
+  </Area>
+  <Area width={280}px height={280}px>
+    <Canvas width={300} height={400}>
+      <Avatar {landmarks} />
+    </Canvas>
+  </Area>
+  <div>
+    {#if cameraOn}
+      <button on:click={camera.stopCamera}>
+        <span class="material-symbols-outlined"> stop </span>
+        <p>{$t('record.stop-button')}</p>
+      </button>
+    {:else}
+      <button on:click={camera.startCamera}>
+        <span class="material-symbols-outlined"> radio_button_unchecked </span>
+        <p>{$t('record.start-button')}</p>
+      </button>
+    {/if}
+  </div>
+
+  <button on:click={startModel}>TEST: start model</button>
+  <button on:click={stopModel}>TEST: stop model</button>
+
+  <p>[recording settings]</p>
+</div>
+
+<style>
+  #outer {
+    margin: auto;
+    display: grid;
+    justify-items: center;
+  }
+
+  button {
+    width: 152px;
+    height: 95px;
+  }
+  button span {
+    font-size: 55px;
+  }
+</style>
