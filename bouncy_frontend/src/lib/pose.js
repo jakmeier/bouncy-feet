@@ -21,6 +21,7 @@ export class PoseDetection {
     // don't use this directly, always use PoseDetection.new()
     constructor(consumer) {
         this.consumer = consumer;
+        this.tZero = new Date().getTime();
     }
 
     /**
@@ -42,7 +43,7 @@ export class PoseDetection {
      */
     trackVideoFrame(videoElement) {
         if (mp) {
-            mp.detectForVideo(videoElement, videoElement.currentTime, this.resultCallback.bind(this));
+            mp.detectForVideo(videoElement, new Date().getTime() - this.tZero, this.resultCallback.bind(this));
         }
     }
 
@@ -81,3 +82,82 @@ async function initMediaPipeBackend() {
             outputSegmentationMasks: false,
         });
 }
+
+export const I = {
+    NOSE: 0,
+    LEFT_EYE_INNER: 1,
+    LEFT_EYE: 2,
+    LEFT_EYE_OUTER: 3,
+    RIGHT_EYE_INNER: 4,
+    RIGHT_EYE: 5,
+    RIGHT_EYE_OUTER: 6,
+    LEFT_EAR: 7,
+    RIGHT_EAR: 8,
+    MOUTH_LEFT: 9,
+    MOUTH_RIGHT: 10,
+    LEFT_SHOULDER: 11,
+    RIGHT_SHOULDER: 12,
+    LEFT_ELBOW: 13,
+    RIGHT_ELBOW: 14,
+    LEFT_WRIST: 15,
+    RIGHT_WRIST: 16,
+    LEFT_PINKY: 17,
+    RIGHT_PINKY: 18,
+    LEFT_INDEX: 19,
+    RIGHT_INDEX: 20,
+    LEFT_THUMB: 21,
+    RIGHT_THUMB: 22,
+    LEFT_HIP: 23,
+    RIGHT_HIP: 24,
+    LEFT_KNEE: 25,
+    RIGHT_KNEE: 26,
+    LEFT_ANKLE: 27,
+    RIGHT_ANKLE: 28,
+    LEFT_HEEL: 29,
+    RIGHT_HEEL: 30,
+    LEFT_FOOT_INDEX: 31,
+    RIGHT_FOOT_INDEX: 32,
+};
+
+export const TORSO = [
+    I.LEFT_SHOULDER,
+    I.RIGHT_SHOULDER,
+    I.RIGHT_HIP,
+    I.LEFT_HIP,
+];
+
+export const bodyOutlinePairs = [
+    //torso
+    [I.LEFT_SHOULDER, I.RIGHT_SHOULDER],
+    [I.LEFT_SHOULDER, I.LEFT_HIP],
+    [I.RIGHT_SHOULDER, I.RIGHT_HIP],
+    [I.LEFT_HIP, I.RIGHT_HIP],
+
+    // left leg
+    [I.LEFT_HIP, I.LEFT_KNEE],
+    [I.LEFT_KNEE, I.LEFT_ANKLE],
+    [I.LEFT_ANKLE, I.LEFT_FOOT_INDEX],
+    [I.LEFT_ANKLE, I.LEFT_HEEL],
+    [I.LEFT_FOOT_INDEX, I.LEFT_HEEL],
+
+    // right leg
+    [I.RIGHT_HIP, I.RIGHT_KNEE],
+    [I.RIGHT_KNEE, I.RIGHT_ANKLE],
+    [I.RIGHT_ANKLE, I.RIGHT_FOOT_INDEX],
+    [I.RIGHT_ANKLE, I.RIGHT_HEEL],
+    [I.RIGHT_FOOT_INDEX, I.RIGHT_HEEL],
+
+    // left arm
+    [I.LEFT_SHOULDER, I.LEFT_ELBOW],
+    [I.LEFT_ELBOW, I.LEFT_WRIST],
+    [I.LEFT_WRIST, I.LEFT_THUMB],
+    [I.LEFT_WRIST, I.LEFT_PINKY],
+    [I.LEFT_WRIST, I.LEFT_INDEX],
+
+    // right arm
+    [I.RIGHT_SHOULDER, I.RIGHT_ELBOW],
+    [I.RIGHT_ELBOW, I.RIGHT_WRIST],
+    [I.RIGHT_WRIST, I.RIGHT_THUMB],
+    [I.RIGHT_WRIST, I.RIGHT_PINKY],
+    [I.RIGHT_WRIST, I.RIGHT_INDEX],
+];

@@ -4,9 +4,9 @@
   import { onDestroy } from 'svelte';
 
   export let size = '250px';
+  /** @type HTMLVideoElement|null */
+  export let videoElement = null;
   let cameraOn = false;
-  /** @type HTMLVideoElement */
-  let videoElement;
 
   async function startCamera() {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
