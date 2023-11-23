@@ -27,7 +27,7 @@ export class PoseDetection {
     /**
      * Start a detector with a callback that is called on every frame result.
      * 
-     * @param {import('@mediapipe/tasks-vision').PoseLandmarkerCallback} consumer 
+     * @param {(result: import( '@mediapipe/tasks-vision').PoseLandmarkerResult, timestamp: number) => void} consumer 
      * @returns 
      */
     static async new(consumer) {
@@ -39,19 +39,21 @@ export class PoseDetection {
 
     /**
      * 
-     * @param {HTMLVideoElement} videoElement
+     * @param {import('@mediapipe/tasks-vision').ImageSource} videoElement
      */
-    trackVideoFrame(videoElement) {
+    trackFrame(videoElement) {
         if (mp) {
-            mp.detectForVideo(videoElement, new Date().getTime() - this.tZero, this.resultCallback.bind(this));
+            const timestamp = new Date().getTime() - this.tZero;
+            mp.detectForVideo(videoElement, timestamp, ((result) => this.resultCallback(result, timestamp)));
         }
     }
 
     /**
      * @param {import('@mediapipe/tasks-vision').PoseLandmarkerResult} result
+     * @param {number} timestamp in ms
      */
-    resultCallback(result) {
-        this.consumer(result);
+    resultCallback(result, timestamp) {
+        this.consumer(result, timestamp);
     }
 }
 

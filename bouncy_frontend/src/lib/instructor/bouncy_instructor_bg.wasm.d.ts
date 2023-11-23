@@ -1,0 +1,30 @@
+/* tslint:disable */
+/* eslint-disable */
+export const memory: WebAssembly.Memory;
+export function __wbg_get_keypoints_left(a: number): number;
+export function __wbg_set_keypoints_left(a: number, b: number): void;
+export function __wbg_get_keypoints_right(a: number): number;
+export function __wbg_set_keypoints_right(a: number, b: number): void;
+export function __wbg_get_keypointsside_shoulder(a: number): number;
+export function __wbg_set_keypointsside_shoulder(a: number, b: number): void;
+export function __wbg_get_keypointsside_hip(a: number): number;
+export function __wbg_set_keypointsside_hip(a: number, b: number): void;
+export function __wbg_get_keypointsside_knee(a: number): number;
+export function __wbg_set_keypointsside_knee(a: number, b: number): void;
+export function __wbg_get_keypointsside_ankle(a: number): number;
+export function __wbg_set_keypointsside_ankle(a: number, b: number): void;
+export function __wbg_coordinate3d_free(a: number): void;
+export function __wbg_get_coordinate3d_x(a: number): number;
+export function __wbg_set_coordinate3d_x(a: number, b: number): void;
+export function __wbg_get_coordinate3d_y(a: number): number;
+export function __wbg_set_coordinate3d_y(a: number, b: number): void;
+export function __wbg_get_coordinate3d_z(a: number): number;
+export function __wbg_set_coordinate3d_z(a: number, b: number): void;
+export function keypoints_new(a: number, b: number): number;
+export function keypointsside_new(a: number, b: number, c: number, d: number): number;
+export function coordinate3d_new(a: number, b: number, c: number): number;
+export function __wbg_tracker_free(a: number): void;
+export function tracker_new(): number;
+export function tracker_add_keypoints(a: number, b: number, c: number): void;
+export function __wbg_keypointsside_free(a: number): void;
+export function __wbg_keypoints_free(a: number): void;

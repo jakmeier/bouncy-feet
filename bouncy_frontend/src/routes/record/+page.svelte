@@ -1,19 +1,28 @@
 <script>
   import Camera from './Camera.svelte';
-  import { PoseDetection } from '$lib/pose';
+  import { PoseDetection, I } from '$lib/pose';
   import Canvas from '$lib/Canvas.svelte';
   import Avatar from './Avatar.svelte';
   import { onDestroy, onMount } from 'svelte';
   import Area from './Area.svelte';
   import { t } from '$lib/i18n';
 
+  import {
+    Tracker,
+    Keypoints,
+    KeypointsSide,
+    Coordinate3d,
+  } from '$lib/instructor/bouncy_instructor';
+
   let videoElement;
   let camera;
   let landmarks = [];
   let isModelOn = false;
   let cameraOn = false;
-  let renderer;
+  let dataListener;
   let stop = false;
+
+  const tracker = new Tracker();
 
   async function startModel() {
     isModelOn = true;
@@ -24,17 +33,47 @@
   }
 
   function loop() {
-    if (isModelOn && renderer) {
-      renderer.trackVideoFrame(videoElement);
+    if (isModelOn && dataListener) {
+      const start = performance.now();
+      dataListener.trackFrame(videoElement);
+      const t = performance.now() - start;
+      if (t > 20) {
+        console.debug(`loop trackFrame took ${t}ms`);
+      }
     }
     requestAnimationFrame(loop);
   }
 
+  /**
+   *
+   * @param {number} i
+   * @param {import('@mediapipe/tasks-vision').Landmark[]} landmarks
+   */
+  function coordinate(i, landmarks) {
+    return new Coordinate3d(landmarks[i].x, landmarks[i].y, landmarks[i].z);
+  }
+
   onMount(async () => {
-    renderer = await PoseDetection.new((result) => {
+    dataListener = await PoseDetection.new((result, timestamp) => {
       if (result.landmarks && result.landmarks.length >= 1) {
         landmarks = result.landmarks[0];
         // landmarks = result.worldLandmarks[0];
+
+        const data = result.landmarks[0];
+        const left = new KeypointsSide(
+          coordinate(I.LEFT_SHOULDER, data),
+          coordinate(I.LEFT_HIP, data),
+          coordinate(I.LEFT_KNEE, data),
+          coordinate(I.LEFT_ANKLE, data)
+        );
+
+        const right = new KeypointsSide(
+          coordinate(I.RIGHT_SHOULDER, data),
+          coordinate(I.RIGHT_HIP, data),
+          coordinate(I.RIGHT_KNEE, data),
+          coordinate(I.RIGHT_ANKLE, data)
+        );
+        tracker.add_keypoints(new Keypoints(left, right), timestamp);
       }
     });
 
@@ -49,10 +88,10 @@
 </script>
 
 <div id="outer">
-  <Area width={280}px height={280}px>
-    <Camera bind:videoElement bind:cameraOn bind:this={camera}/>
+  <Area width="{280}px" height="{280}px">
+    <Camera bind:videoElement bind:cameraOn bind:this={camera} />
   </Area>
-  <Area width={280}px height={280}px>
+  <Area width="{280}px" height="{280}px">
     <Canvas width={300} height={400}>
       <Avatar {landmarks} />
     </Canvas>
