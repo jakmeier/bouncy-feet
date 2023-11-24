@@ -19,6 +19,17 @@
       return;
     }
     const mainColor = '#382eeb';
+    // Goal: Scale the avatar to fit the canvas height even if it doesn't fill
+    // the camera field.
+    // Note: Something is fishy. I thought landmarks are normalized to [0,1]? So
+    // using 1 instead of 2 below should scale the body beyond what fits in the
+    // frame. But in all testing I've done so far, using 2 looks pretty good. It
+    // scales the figure to fill about 80% of the height. Which makes no sense.
+    // Probably I'm being stupid. For now, use 2 as it produces good results.
+    const scaling =
+      2 / Math.abs(landmarks[I.NOSE].y - landmarks[I.LEFT_FOOT_INDEX].y);
+    const h = height * scaling;
+    const w = width * scaling;
 
     ctx.strokeStyle = mainColor;
     ctx.lineWidth = 10;
@@ -26,17 +37,17 @@
 
     bodyOutlinePairs.forEach(([a, b]) => {
       ctx.beginPath();
-      ctx.moveTo(landmarks[a].x * width, landmarks[a].y * height);
-      ctx.lineTo(landmarks[b].x * width, landmarks[b].y * height);
+      ctx.moveTo(landmarks[a].x * w, landmarks[a].y * h);
+      ctx.lineTo(landmarks[b].x * w, landmarks[b].y * h);
       ctx.stroke();
     });
 
     // torso
     ctx.fillStyle = '#c2bfff';
     ctx.beginPath();
-    ctx.moveTo(landmarks[TORSO[0]].x * width, landmarks[TORSO[0]].y * height);
+    ctx.moveTo(landmarks[TORSO[0]].x * w, landmarks[TORSO[0]].y * h);
     TORSO.slice(1).forEach((i) => {
-      ctx.lineTo(landmarks[i].x * width, landmarks[i].y * height);
+      ctx.lineTo(landmarks[i].x * w, landmarks[i].y * h);
     });
     ctx.fill();
 
@@ -44,13 +55,13 @@
       landmarks[I.LEFT_SHOULDER],
       landmarks[I.RIGHT_SHOULDER]
     );
-    const headRadius = 0.4 * shoulder * width;
+    const headRadius = 0.4 * shoulder * w;
     // head
     ctx.fillStyle = mainColor;
     ctx.beginPath();
     ctx.arc(
-      landmarks[I.NOSE].x * width,
-      landmarks[I.NOSE].y * height,
+      landmarks[I.NOSE].x * w,
+      landmarks[I.NOSE].y * h,
       headRadius,
       0,
       2 * Math.PI

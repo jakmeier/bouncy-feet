@@ -24,14 +24,6 @@
 
   const tracker = new Tracker();
 
-  async function startModel() {
-    isModelOn = true;
-  }
-
-  function stopModel() {
-    isModelOn = false;
-  }
-
   function loop() {
     if (isModelOn && dataListener) {
       const start = performance.now();
@@ -51,6 +43,16 @@
    */
   function coordinate(i, landmarks) {
     return new Coordinate3d(landmarks[i].x, landmarks[i].y, landmarks[i].z);
+  }
+
+  async function startCamera() {
+    await camera.startCamera();
+    isModelOn = true;
+  }
+
+  function stopCamera() {
+    camera.stopCamera();
+    isModelOn = false;
   }
 
   onMount(async () => {
@@ -92,26 +94,23 @@
     <Camera bind:videoElement bind:cameraOn bind:this={camera} />
   </Area>
   <Area width="{280}px" height="{280}px">
-    <Canvas width={300} height={400}>
+    <Canvas width={300} height={300}>
       <Avatar {landmarks} />
     </Canvas>
   </Area>
   <div>
     {#if cameraOn}
-      <button on:click={camera.stopCamera}>
+      <button on:click={stopCamera}>
         <span class="material-symbols-outlined"> stop </span>
         <p>{$t('record.stop-button')}</p>
       </button>
     {:else}
-      <button on:click={camera.startCamera}>
+      <button on:click={startCamera}>
         <span class="material-symbols-outlined"> radio_button_unchecked </span>
         <p>{$t('record.start-button')}</p>
       </button>
     {/if}
   </div>
-
-  <button on:click={startModel}>TEST: start model</button>
-  <button on:click={stopModel}>TEST: stop model</button>
 
   <p>[recording settings]</p>
 </div>
@@ -125,9 +124,10 @@
 
   button {
     width: 152px;
-    height: 95px;
+    height: 80px;
+    margin: 10px;
   }
   button span {
-    font-size: 55px;
+    font-size: 42px;
   }
 </style>
