@@ -18,8 +18,9 @@
     if (landmarks.length === 0) {
       return;
     }
+    const mainColor = '#382eeb';
 
-    ctx.strokeStyle = '#ff701d';
+    ctx.strokeStyle = mainColor;
     ctx.lineWidth = 10;
     ctx.lineCap = 'round';
 
@@ -31,7 +32,7 @@
     });
 
     // torso
-    ctx.fillStyle = '#ffb06e';
+    ctx.fillStyle = '#c2bfff';
     ctx.beginPath();
     ctx.moveTo(landmarks[TORSO[0]].x * width, landmarks[TORSO[0]].y * height);
     TORSO.slice(1).forEach((i) => {
@@ -45,7 +46,7 @@
     );
     const headRadius = 0.4 * shoulder * width;
     // head
-    ctx.fillStyle = '#ff701d';
+    ctx.fillStyle = mainColor;
     ctx.beginPath();
     ctx.arc(
       landmarks[I.NOSE].x * width,
