@@ -2,6 +2,7 @@
 <script>
   import { onDestroy } from 'svelte';
   import Area from './Area.svelte';
+  import { waitForVideoMetaLoaded } from '$lib/promise_util';
 
   /** @type HTMLVideoElement|null */
   export let videoElement = null;
@@ -29,11 +30,7 @@
     videoElement.srcObject =
       await navigator.mediaDevices.getUserMedia(videoConfig);
 
-    await new Promise((resolve) => {
-      videoElement.onloadedmetadata = () => {
-        resolve(videoElement);
-      };
-    });
+    await waitForVideoMetaLoaded(videoElement);
     videoElement.play();
 
     cameraOn = true;

@@ -4,9 +4,10 @@
 
   const tabs = [
     { label: $t('home.nav'), icon: 'home', route: '/' },
-    { label: $t('learn.nav'), icon: 'book_5', route: '/learn' },
+    // { label: $t('learn.nav'), icon: 'book_5', route: '/learn' },
     { label: $t('record.nav'), icon: 'directions_walk', route: '/record' },
     { label: $t('profile.nav'), icon: 'account_circle', route: '/profile' },
+    { label: 'Dev', icon: 'code', route: '/dev' },
   ];
 </script>
 

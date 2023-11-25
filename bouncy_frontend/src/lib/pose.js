@@ -13,9 +13,27 @@
  */
 
 import { PoseLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
+import { Coordinate3d, Keypoints, KeypointsSide } from './instructor/bouncy_instructor';
 
 // some state is owned by the lib because it is heavy to load, we want it to be a singleton
 let mp = null;
+
+export function landmarksToKeypoints(landmarks) {
+    const left = new KeypointsSide(
+        coordinate(I.LEFT_SHOULDER, landmarks),
+        coordinate(I.LEFT_HIP, landmarks),
+        coordinate(I.LEFT_KNEE, landmarks),
+        coordinate(I.LEFT_ANKLE, landmarks)
+    );
+
+    const right = new KeypointsSide(
+        coordinate(I.RIGHT_SHOULDER, landmarks),
+        coordinate(I.RIGHT_HIP, landmarks),
+        coordinate(I.RIGHT_KNEE, landmarks),
+        coordinate(I.RIGHT_ANKLE, landmarks)
+    );
+    return new Keypoints(left, right);
+}
 
 export class PoseDetection {
     // don't use this directly, always use PoseDetection.new()
@@ -83,6 +101,15 @@ async function initMediaPipeBackend() {
             minTrackingConfidence: 0.2,
             outputSegmentationMasks: false,
         });
+}
+
+/**
+ *
+ * @param {number} i
+ * @param {import('@mediapipe/tasks-vision').Landmark[]} landmarks
+ */
+function coordinate(i, landmarks) {
+    return new Coordinate3d(landmarks[i].x, landmarks[i].y, landmarks[i].z);
 }
 
 export const I = {

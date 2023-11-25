@@ -1,6 +1,6 @@
 <script>
   import Camera from './Camera.svelte';
-  import { PoseDetection, I } from '$lib/pose';
+  import { PoseDetection, I, landmarksToKeypoints } from '$lib/pose';
   import Canvas from '$lib/Canvas.svelte';
   import Avatar from './Avatar.svelte';
   import { onDestroy, onMount } from 'svelte';
@@ -36,15 +36,6 @@
     requestAnimationFrame(loop);
   }
 
-  /**
-   *
-   * @param {number} i
-   * @param {import('@mediapipe/tasks-vision').Landmark[]} landmarks
-   */
-  function coordinate(i, landmarks) {
-    return new Coordinate3d(landmarks[i].x, landmarks[i].y, landmarks[i].z);
-  }
-
   async function startCamera() {
     await camera.startCamera();
     isModelOn = true;
@@ -59,23 +50,8 @@
     dataListener = await PoseDetection.new((result, timestamp) => {
       if (result.landmarks && result.landmarks.length >= 1) {
         landmarks = result.landmarks[0];
-        // landmarks = result.worldLandmarks[0];
-
-        const data = result.landmarks[0];
-        const left = new KeypointsSide(
-          coordinate(I.LEFT_SHOULDER, data),
-          coordinate(I.LEFT_HIP, data),
-          coordinate(I.LEFT_KNEE, data),
-          coordinate(I.LEFT_ANKLE, data)
-        );
-
-        const right = new KeypointsSide(
-          coordinate(I.RIGHT_SHOULDER, data),
-          coordinate(I.RIGHT_HIP, data),
-          coordinate(I.RIGHT_KNEE, data),
-          coordinate(I.RIGHT_ANKLE, data)
-        );
-        tracker.add_keypoints(new Keypoints(left, right), timestamp);
+        const kp = landmarksToKeypoints(result.landmarks[0]);
+        tracker.add_keypoints(kp, timestamp);
       }
     });
 
