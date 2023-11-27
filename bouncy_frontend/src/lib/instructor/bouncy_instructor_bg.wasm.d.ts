@@ -1,6 +1,17 @@
 /* tslint:disable */
 /* eslint-disable */
 export const memory: WebAssembly.Memory;
+export function loadPoseFile(a: number, b: number): number;
+export function __wbg_tracker_free(a: number): void;
+export function __wbg_poseapproximation_free(a: number): void;
+export function __wbg_get_poseapproximation_error(a: number): number;
+export function __wbg_set_poseapproximation_error(a: number, b: number): void;
+export function __wbg_get_poseapproximation_timestamp(a: number): number;
+export function __wbg_set_poseapproximation_timestamp(a: number, b: number): void;
+export function tracker_new(): number;
+export function tracker_addKeypoints(a: number, b: number, c: number): void;
+export function tracker_bestFitPosition(a: number, b: number, c: number): number;
+export function poseapproximation_name(a: number, b: number): void;
 export function __wbg_get_keypoints_left(a: number): number;
 export function __wbg_set_keypoints_left(a: number, b: number): void;
 export function __wbg_get_keypoints_right(a: number): number;
@@ -23,15 +34,13 @@ export function __wbg_set_coordinate3d_z(a: number, b: number): void;
 export function keypoints_new(a: number, b: number): number;
 export function keypointsside_new(a: number, b: number, c: number, d: number): number;
 export function coordinate3d_new(a: number, b: number, c: number): number;
-export function loadPoseFile(a: number, b: number): number;
-export function __wbg_tracker_free(a: number): void;
-export function tracker_new(): number;
-export function tracker_addKeypoints(a: number, b: number, c: number): void;
 export function __wbg_keypointsside_free(a: number): void;
 export function __wbg_keypoints_free(a: number): void;
 export function __wbindgen_export_0(a: number, b: number): number;
 export function __wbindgen_export_1(a: number, b: number, c: number, d: number): number;
 export const __wbindgen_export_2: WebAssembly.Table;
 export function __wbindgen_export_3(a: number, b: number, c: number): void;
-export function __wbindgen_export_4(a: number): void;
-export function __wbindgen_export_5(a: number, b: number, c: number, d: number): void;
+export function __wbindgen_add_to_stack_pointer(a: number): number;
+export function __wbindgen_export_4(a: number, b: number, c: number): void;
+export function __wbindgen_export_5(a: number): void;
+export function __wbindgen_export_6(a: number, b: number, c: number, d: number): void;

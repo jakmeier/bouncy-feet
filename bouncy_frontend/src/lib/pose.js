@@ -66,9 +66,13 @@ export class PoseDetection {
      */
     trackFrame(videoElement) {
         if (mp) {
-            const timestamp = new Date().getTime() - this.tZero;
+            const timestamp = this.currentTimestamp();
             mp.detectForVideo(videoElement, timestamp, ((result) => this.resultCallback(result, timestamp)));
         }
+    }
+
+    currentTimestamp() {
+        return new Date().getTime() - this.tZero;
     }
 
     /**

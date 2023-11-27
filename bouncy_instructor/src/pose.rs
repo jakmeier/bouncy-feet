@@ -40,7 +40,7 @@ struct LimbPosition {
     /// index to stored limbs
     limb: usize,
     /// range of angles considered zero error
-    angle: (i16, i16),
+    angle: (f32, f32),
     /// weight used for computing the position error
     weight: f32,
 }
@@ -88,7 +88,7 @@ impl LimbPositionDatabase {
                     }
                     LimbPosition {
                         limb: index,
-                        angle: def.angle,
+                        angle: (def.angle.0 as f32, def.angle.1 as f32),
                         weight: def.weight,
                     }
                 })
@@ -108,6 +108,29 @@ impl LimbPositionDatabase {
             })
             .collect()
     }
+
+    pub(crate) fn fit(&self, angles: &[f32]) -> (f32, usize) {
+        assert!(!self.poses.is_empty());
+
+        let mut best_error = f32::INFINITY;
+        let mut best_i = 0;
+        for (i, pose) in self.poses.iter().enumerate() {
+            let err = pose.error(angles);
+            if err < best_error {
+                best_error = err;
+                best_i = i;
+            }
+        }
+        return (best_error, best_i);
+    }
+
+    pub(crate) fn is_empty(&self) -> bool {
+        self.poses.is_empty()
+    }
+
+    pub(crate) fn pose_name(&self, i: usize) -> &str {
+        &self.names[i]
+    }
 }
 
 impl BodyPoint {
@@ -122,6 +145,27 @@ impl BodyPoint {
             BodyPart::Knee => side.knee,
             BodyPart::Ankle => side.ankle,
         }
+    }
+}
+
+impl Pose {
+    /// Error is between 0.0  and 1.0
+    fn error(&self, angles: &[f32]) -> f32 {
+        let mut err = 0.0;
+        let mut w = 0.0;
+        for limb in &self.limbs {
+            w += limb.weight;
+            let angle = angles[limb.limb];
+            if angle < limb.angle.0 {
+                err += (angle - limb.angle.0).powi(2);
+            } else if angle > limb.angle.1 {
+                err += (angle - limb.angle.1).powi(2);
+            }
+        }
+        // normalize such that 45° away is 1.0
+        let normalized = err / w / (45u32.pow(2) as f32);
+        // anything above 45° is a flat 100% error
+        return normalized.min(1.0);
     }
 }
 

@@ -66,6 +66,21 @@ export class KeypointsSide {
   shoulder: Coordinate3d;
 }
 /**
+* The result of fitting keypoints to poses.
+*/
+export class PoseApproximation {
+  free(): void;
+/**
+*/
+  error: number;
+/**
+*/
+  readonly name: string;
+/**
+*/
+  timestamp: number;
+}
+/**
 */
 export class Tracker {
   free(): void;
@@ -77,4 +92,10 @@ export class Tracker {
 * @param {number} timestamp
 */
   addKeypoints(keypoints: Keypoints, timestamp: number): void;
+/**
+* @param {number} start
+* @param {number} end
+* @returns {PoseApproximation | undefined}
+*/
+  bestFitPosition(start: number, end: number): PoseApproximation | undefined;
 }

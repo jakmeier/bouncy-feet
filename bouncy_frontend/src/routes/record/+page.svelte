@@ -22,6 +22,8 @@
   let dataListener;
   let stop = false;
 
+  let debugT = 0;
+
   const tracker = new Tracker();
 
   function loop() {
@@ -29,8 +31,20 @@
       const start = performance.now();
       dataListener.trackFrame(videoElement);
       const t = performance.now() - start;
-      if (t > 20) {
+      if (t > 50) {
         console.debug(`loop trackFrame took ${t}ms`);
+      }
+
+      const now = new Date().getTime();
+      if (debugT + 1000 < now) {
+        debugT = now;
+        const videoT = dataListener.currentTimestamp();
+        const approximation = tracker.bestFitPosition(videoT - 400, videoT);
+        if (approximation) {
+          console.log(
+            `found ${approximation.name} with an error of ${approximation.error}`
+          );
+        }
       }
     }
     requestAnimationFrame(loop);
