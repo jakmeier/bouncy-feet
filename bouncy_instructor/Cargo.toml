@@ -23,4 +23,4 @@ thiserror = "1.0.50"
 
 [dependencies.web-sys]
 version = "0.3.65"
-features = ['Request', 'Response', 'Window']
+features = ["Request", "Response", "Window", "console"]
