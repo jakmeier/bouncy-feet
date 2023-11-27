@@ -28,8 +28,7 @@ pub struct Pose {
 /// Describes a desired angle of a limb defined by start and end point.
 #[derive(Deserialize)]
 struct LimbPosition {
-    start: BodyPoint,
-    end: BodyPoint,
+    limb: Limb,
     angle: (i16, i16),
     weight: f32,
 }
@@ -38,6 +37,30 @@ struct LimbPosition {
 struct BodyPoint {
     side: BodySide,
     part: BodyPart,
+}
+
+/// Either a pre-defined limb or a custom pair of body points.
+///
+/// Custom points are maximally expressive but also verbose. Any limb that's
+/// used frequently should probably be included in the pre-defined list.
+#[derive(Deserialize)]
+enum Limb {
+    /// knee to ankle
+    LeftShin,
+    /// hip to knee
+    LeftThigh,
+    /// hip to ankle
+    LeftLeg,
+    /// knee to ankle
+    RightShin,
+    /// hip to knee
+    RightThigh,
+    /// hip to ankle
+    RightLeg,
+    Custom {
+        start: BodyPoint,
+        end: BodyPoint,
+    },
 }
 
 #[derive(Deserialize)]
