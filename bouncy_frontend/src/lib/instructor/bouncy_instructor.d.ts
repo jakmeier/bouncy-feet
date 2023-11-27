@@ -1,6 +1,11 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
+* @param {string} url
+* @returns {Promise<void>}
+*/
+export function loadPoseFile(url: string): Promise<void>;
+/**
 */
 export class Coordinate3d {
   free(): void;

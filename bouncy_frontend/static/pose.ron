@@ -1,0 +1,58 @@
+(
+    version: 0,
+    poses: [
+        (
+            name: "stand still",
+            limbs: [
+                (
+                    start: (
+                        side: Left,
+                        part: Knee,
+                    ),
+                    end: (
+                        side: Left,
+                        part: Ankle,
+                    ),
+                    angle: (-5, 5),
+                    weight: 1.0,
+                ),
+                (
+                    start: (
+                        side: Left,
+                        part: Hip,
+                    ),
+                    end: (
+                        side: Left,
+                        part: Knee,
+                    ),
+                    angle: (-5, 5),
+                    weight: 1.0,
+                ),
+                (
+                    start: (
+                        side: Right,
+                        part: Knee,
+                    ),
+                    end: (
+                        side: Right,
+                        part: Ankle,
+                    ),
+                    angle: (-5, 5),
+                    weight: 1.0,
+                ),
+                (
+                    start: (
+                        side: Right,
+                        part: Hip,
+                    ),
+                    end: (
+                        side: Right,
+                        part: Knee,
+                    ),
+                    angle: (-5, 5),
+                    weight: 1.0,
+                ),
+            ]
+        ),
+    ]
+)

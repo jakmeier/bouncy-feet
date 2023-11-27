@@ -13,10 +13,13 @@
  */
 
 import { PoseLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
-import { Coordinate3d, Keypoints, KeypointsSide } from './instructor/bouncy_instructor';
+import { Coordinate3d, Keypoints, KeypointsSide, loadPoseFile } from './instructor/bouncy_instructor';
 
-// some state is owned by the lib because it is heavy to load, we want it to be a singleton
+// Some state is owned by the lib because it is heavy to load, we want it to be
+// a singleton. Not 100% sure what is best practice.
+// TODO: reconsider where this state lives
 let mp = null;
+// let poses = null;
 
 export function landmarksToKeypoints(landmarks) {
     const left = new KeypointsSide(
@@ -51,6 +54,8 @@ export class PoseDetection {
     static async new(consumer) {
         if (mp === null) {
             mp = await initMediaPipeBackend();
+            // poses = await fetch('/pose.ron');
+            loadPoseFile('/pose.ron');
         }
         return new PoseDetection(consumer);
     }

@@ -24,6 +24,13 @@ pub struct Coordinate3d {
     pub z: f32,
 }
 
+/// `Keypoints` define a specific position of a body.
+/// 
+/// This is the live input of the instructor which feeds from a camera or video.
+/// They are normalized 3D coordinates of important body parts.
+/// 
+/// To evaluate `Keypoints`, we calculate angles and compare those to the `Pose`
+/// list which is loaded dynamically.
 #[wasm_bindgen]
 impl Keypoints {
     #[wasm_bindgen(constructor)]
