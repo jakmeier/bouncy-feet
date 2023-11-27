@@ -51,7 +51,7 @@
       if (result.landmarks && result.landmarks.length >= 1) {
         landmarks = result.landmarks[0];
         const kp = landmarksToKeypoints(result.landmarks[0]);
-        tracker.add_keypoints(kp, timestamp);
+        tracker.addKeypoints(kp, timestamp);
       }
     });
 

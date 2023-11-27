@@ -17,10 +17,10 @@ use web_sys::Request;
 /// Singleton internal state, shared between `Tracker` instances that run in the
 /// same JS worker thread.
 struct State {
-    poses: LimbPositionDatabase,
+    db: LimbPositionDatabase,
 }
 thread_local! {
-    static STATE: RefCell<State> = State { poses: Default::default() }.into();
+    static STATE: RefCell<State> = State { db: Default::default() }.into();
 }
 
 #[wasm_bindgen(js_name = loadPoseFile)]
@@ -33,7 +33,7 @@ pub async fn load_pose_file(url: &str) -> Result<(), JsValue> {
     let js_value = JsFuture::from(resp.text()?).await?;
     let text = js_value.as_string().ok_or("Not a string")?;
     let parsed = PoseFile::from_str(&text)?;
-    STATE.with(|state| state.borrow_mut().poses.add(parsed.poses));
+    STATE.with(|state| state.borrow_mut().db.add(parsed.poses));
 
     Ok(())
 }

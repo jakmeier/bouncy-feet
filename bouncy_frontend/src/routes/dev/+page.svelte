@@ -32,7 +32,7 @@
     dataListener = await PoseDetection.new((result, timestamp) => {
       if (result.landmarks && result.landmarks.length >= 1) {
         const kp = landmarksToKeypoints(result.landmarks[0]);
-        tracker.add_keypoints(kp, timestamp);
+        tracker.addKeypoints(kp, timestamp);
       }
     });
   });

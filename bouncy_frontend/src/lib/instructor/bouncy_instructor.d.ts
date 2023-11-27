@@ -76,5 +76,5 @@ export class Tracker {
 * @param {Keypoints} keypoints
 * @param {number} timestamp
 */
-  add_keypoints(keypoints: Keypoints, timestamp: number): void;
+  addKeypoints(keypoints: Keypoints, timestamp: number): void;
 }

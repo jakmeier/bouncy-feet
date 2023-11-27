@@ -3,6 +3,9 @@
 //! Note that some types have a sibling type in [`crate::pose_file`] for
 //! serialization.
 
+use crate::keypoints::Coordinate3d;
+use crate::Keypoints;
+
 /// List of registered poses to recognize during tracking.
 ///
 /// Each pose is a description of a body position. This includes the exact
@@ -92,6 +95,32 @@ impl LimbPositionDatabase {
                 .collect();
             self.poses.push(Pose { limbs });
             self.names.push(pose.name);
+        }
+    }
+
+    pub(crate) fn angles_from_keypoints(&self, kp: &Keypoints) -> Vec<f32> {
+        self.limbs
+            .iter()
+            .map(|l| {
+                let start = l.start.keypoint(kp);
+                let end = l.end.keypoint(kp);
+                start.signed_polar_angle(end)
+            })
+            .collect()
+    }
+}
+
+impl BodyPoint {
+    fn keypoint(&self, kp: &Keypoints) -> Coordinate3d {
+        let side = match self.side {
+            BodySide::Left => kp.left,
+            BodySide::Right => kp.right,
+        };
+        match self.part {
+            BodyPart::Shoulder => side.shoulder,
+            BodyPart::Hip => side.hip,
+            BodyPart::Knee => side.knee,
+            BodyPart::Ankle => side.ankle,
         }
     }
 }
