@@ -55,7 +55,7 @@ export class PoseDetection {
         if (mp === null) {
             mp = await initMediaPipeBackend();
             // poses = await fetch('/pose.ron');
-            loadPoseFile('/pose.ron');
+            await loadPoseFile('/pose.ron').catch((e) => console.error(e));
         }
         return new PoseDetection(consumer);
     }

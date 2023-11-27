@@ -1,11 +1,13 @@
 mod keypoints;
 mod pose;
+mod pose_file;
 mod tracker;
 
 pub use keypoints::{Keypoints, Side as KeypointsSide};
 pub use tracker::Tracker;
 
-use pose::{Pose, PoseFile};
+use pose::LimbPositionDatabase;
+use pose_file::PoseFile;
 use std::cell::RefCell;
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::{JsCast, JsValue};
@@ -15,10 +17,10 @@ use web_sys::Request;
 /// Singleton internal state, shared between `Tracker` instances that run in the
 /// same JS worker thread.
 struct State {
-    poses: Vec<Pose>,
+    poses: LimbPositionDatabase,
 }
 thread_local! {
-    static STATE: RefCell<State> = State { poses: vec![] }.into();
+    static STATE: RefCell<State> = State { poses: Default::default() }.into();
 }
 
 #[wasm_bindgen(js_name = loadPoseFile)]
@@ -31,7 +33,7 @@ pub async fn load_pose_file(url: &str) -> Result<(), JsValue> {
     let js_value = JsFuture::from(resp.text()?).await?;
     let text = js_value.as_string().ok_or("Not a string")?;
     let parsed = PoseFile::from_str(&text)?;
-    STATE.with(|state| state.borrow_mut().poses.extend(parsed.poses));
+    STATE.with(|state| state.borrow_mut().poses.add(parsed.poses));
 
     Ok(())
 }

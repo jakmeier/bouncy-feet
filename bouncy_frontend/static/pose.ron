@@ -2,7 +2,7 @@
     version: 0,
     poses: [
         (
-            name: "stand still",
+            name: "stand-still",
             limbs: [
                 (
                     limb: LeftShin,
