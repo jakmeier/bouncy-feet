@@ -1,8 +1,8 @@
 <script>
   import { Tracker } from '$lib/instructor/bouncy_instructor';
-  import { PoseDetection, landmarksToKeypoints } from '$lib/pose';
+  import { landmarksToKeypoints } from '$lib/pose';
   import { fileToUrl, waitForVideoMetaLoaded } from '$lib/promise_util';
-  import { onMount } from 'svelte';
+  import { getContext, onMount } from 'svelte';
 
   /** @type {HTMLInputElement}  */
   let upload;
@@ -11,6 +11,7 @@
 
   let dataListener;
   const tracker = new Tracker();
+  const poseCtx = getContext('pose');
 
   async function loadVideo(event) {
     if (event.target.files && event.target.files[0]) {
@@ -29,7 +30,7 @@
   }
 
   onMount(async () => {
-    dataListener = await PoseDetection.new((result, timestamp) => {
+    dataListener = await poseCtx.newPoseDetection((result, timestamp) => {
       if (result.landmarks && result.landmarks.length >= 1) {
         const kp = landmarksToKeypoints(result.landmarks[0]);
         tracker.addKeypoints(kp, timestamp);

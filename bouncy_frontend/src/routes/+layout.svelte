@@ -2,6 +2,7 @@
   import TabNavigation from './TabNavigation.svelte';
   import '../app.css';
   import { t } from '$lib/i18n.js';
+  import PoseDetectionContext from './PoseDetectionContext.svelte';
 </script>
 
 <svelte:head>
@@ -9,7 +10,9 @@
 </svelte:head>
 
 <main>
-  <slot />
+  <PoseDetectionContext>
+    <slot />
+  </PoseDetectionContext>
 </main>
 <TabNavigation />
 

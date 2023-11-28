@@ -1,9 +1,9 @@
 <script>
   import Camera from './Camera.svelte';
-  import { PoseDetection, I, landmarksToKeypoints } from '$lib/pose';
+  import { landmarksToKeypoints } from '$lib/pose';
   import Canvas from '$lib/Canvas.svelte';
   import Avatar from './Avatar.svelte';
-  import { onDestroy, onMount } from 'svelte';
+  import { getContext, onDestroy, onMount } from 'svelte';
   import Area from './Area.svelte';
   import { t } from '$lib/i18n';
 
@@ -13,6 +13,8 @@
     KeypointsSide,
     Coordinate3d,
   } from '$lib/instructor/bouncy_instructor';
+
+  const poseCtx = getContext('pose');
 
   let videoElement;
   let camera;
@@ -61,7 +63,7 @@
   }
 
   onMount(async () => {
-    dataListener = await PoseDetection.new((result, timestamp) => {
+    dataListener = await poseCtx.newPoseDetection((result, timestamp) => {
       if (result.landmarks && result.landmarks.length >= 1) {
         landmarks = result.landmarks[0];
         const kp = landmarksToKeypoints(result.landmarks[0]);

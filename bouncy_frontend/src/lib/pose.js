@@ -15,11 +15,6 @@
 import { PoseLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
 import { Coordinate3d, Keypoints, KeypointsSide, loadPoseFile } from './instructor/bouncy_instructor';
 
-// Some state is owned by the lib because it is heavy to load, we want it to be
-// a singleton. Not 100% sure what is best practice.
-// TODO: reconsider where this state lives
-let mp = null;
-// let poses = null;
 
 export function landmarksToKeypoints(landmarks) {
     const left = new KeypointsSide(
@@ -40,24 +35,27 @@ export function landmarksToKeypoints(landmarks) {
 
 export class PoseDetection {
     // don't use this directly, always use PoseDetection.new()
-    constructor(consumer) {
+    /**
+     * @param {(result: import("@mediapipe/tasks-vision").PoseLandmarkerResult, timestamp: number) => void} consumer
+     * @param {PoseLandmarker} mp
+     */
+    constructor(consumer, mp) {
         this.consumer = consumer;
         this.tZero = new Date().getTime();
+        // media pipe `PoseLandmarker`
+        this.mp = mp;
     }
 
     /**
      * Start a detector with a callback that is called on every frame result.
      * 
      * @param {(result: import( '@mediapipe/tasks-vision').PoseLandmarkerResult, timestamp: number) => void} consumer 
-     * @returns 
+     * @returns PoseDetection
      */
     static async new(consumer) {
-        if (mp === null) {
-            mp = await initMediaPipeBackend();
-            // poses = await fetch('/pose.ron');
-            await loadPoseFile('/pose.ron').catch((e) => console.error(e));
-        }
-        return new PoseDetection(consumer);
+        const mp = await initMediaPipeBackend();
+        await loadPoseFile('/pose.ron').catch((e) => console.error(e));
+        return new PoseDetection(consumer, mp);
     }
 
     /**
@@ -65,10 +63,8 @@ export class PoseDetection {
      * @param {import('@mediapipe/tasks-vision').ImageSource} videoElement
      */
     trackFrame(videoElement) {
-        if (mp) {
-            const timestamp = this.currentTimestamp();
-            mp.detectForVideo(videoElement, timestamp, ((result) => this.resultCallback(result, timestamp)));
-        }
+        const timestamp = this.currentTimestamp();
+        this.mp.detectForVideo(videoElement, timestamp, ((result) => this.resultCallback(result, timestamp)));
     }
 
     currentTimestamp() {
@@ -81,6 +77,13 @@ export class PoseDetection {
      */
     resultCallback(result, timestamp) {
         this.consumer(result, timestamp);
+    }
+
+    /**
+     * Call this to clean up resources.
+     */
+    close() {
+        this.mp.close();
     }
 }
 

@@ -11,10 +11,17 @@
  */
 
 /// <reference types="@sveltejs/kit" />
+/// <reference no-default-lib="true"/>
+/// <reference lib="esnext" />
+/// <reference lib="webworker" />
+const sw = /** @type {ServiceWorkerGlobalScope} */ (/** @type {unknown} */ (self));
+
 import { build, files, version } from '$service-worker';
 
 // Create a unique cache name for this deployment
 const VERSIONED_CACHE = `cache-${version}`;
+// CDN hosted files don't change with app version
+const CDN_CACHE = "CDN";
 
 const ASSETS = [
     ...build, // the app itself
@@ -52,17 +59,31 @@ self.addEventListener("fetch", (event) => {
 
     async function respond() {
         const url = new URL(event.request.url);
-        const cache = await caches.open(VERSIONED_CACHE);
 
-        // static files are offline first
-        const isStatic = ASSETS.includes(url.pathname) || CDNS.includes(url.hostname);
-        if (isStatic) {
+        // static files are guaranteed to be in cache, we add them at install time
+        if (ASSETS.includes(url.pathname)) {
+            const cache = await caches.open(VERSIONED_CACHE);
             return cache.match(url.pathname);
         }
 
+        // CDN data should only be loaded once
+        if (CDNS.includes(url.pathname)) {
+            const cdnCache = await caches.open(CDN_CACHE)
+            const offlineData = await cdnCache.match(url.pathname);
+            if (offlineData !== undefined) {
+                return offlineData;
+            } else {
+                const response = await fetch(event.request);
+                if (response.status === 200) {
+                    cdnCache.put(event.request, response.clone());
+                }
+                return response;
+            }
+        }
 
-        // for everything else, network first, only use he cache when offline
+        // for everything else, network first, only use the cache when offline
         try {
+            const cache = await caches.open(VERSIONED_CACHE);
             const response = await fetch(event.request);
 
             if (response.status === 200) {
