@@ -25,6 +25,8 @@
   let stop = false;
 
   let debugT = 0;
+  let debugText = '';
+  let debugError = 0;
 
   const tracker = new Tracker();
 
@@ -43,6 +45,8 @@
         const videoT = dataListener.currentTimestamp();
         const approximation = tracker.bestFitPosition(videoT - 400, videoT);
         if (approximation) {
+          debugError = approximation.error;
+          debugText = approximation.name;
           console.log(
             `found ${approximation.name} with an error of ${approximation.error}`
           );
@@ -102,6 +106,8 @@
         <p>{$t('record.start-button')}</p>
       </button>
     {/if}
+    <p>{debugText}</p>
+    <p>{debugError}</p>
   </div>
 
   <p>[recording settings]</p>
