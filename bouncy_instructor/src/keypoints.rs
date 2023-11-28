@@ -67,12 +67,34 @@ impl Coordinate3d {
 
 impl Coordinate3d {
     /// The polar angle is measured against the y-axis, which goes from the
-    /// ground to the sky. The returned value is between -180° and +180°, with
-    /// 0° pointing to the ground and +90° going parallel to the x-axis.
+    /// ground to the sky.
+    /// 
+    /// The signed polar angle is between -180° and +180°, with 0° pointing to
+    /// the ground. +90° goes towards east from the dancer perspective, which is
+    /// (counter-intuitively) left in a non-mirrored video. But in a mirrored
+    /// video, as usually used, it will be to the right.
     pub(crate) fn signed_polar_angle(&self, other: Coordinate3d) -> f32 {
         let dx = other.x - self.x;
         let dy = other.y - self.y;
-        // let dz = self.z - other.z;
         dx.atan2(dy) * 180.0 / std::f32::consts::PI
+    }
+
+    /// The azimuth is the clock-wise angle to the negative z-axis.
+    ///
+    /// The azimuth is between -180° and 180°. Someone facing the camera has an
+    /// azimuth of 0°, which is also known as north.
+    ///
+    /// Just like in cartography, east is +90° and west is -90° for the dancer.
+    /// However, in mirrored videos, the angles are therefore counter-clock-wise
+    /// as seen by the viewer.
+    /// 
+    /// Note that in the keypoint coordinate system, the positive z-axis faces
+    /// south, not north. But since the camera coordinate system should not be
+    /// of interest beyond the translation to angles, this fact rarely matters.
+    pub(crate) fn azimuth(&self, other: Coordinate3d) -> f32 {
+        let dz = other.z - self.z;
+        // this reversal makes the usually ccw atan2 produce cw angles
+        let dx = self.x - other.x;
+        return (dx.atan2(dz) * 180.0) / std::f32::consts::PI;
     }
 }

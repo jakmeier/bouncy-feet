@@ -1,4 +1,5 @@
 use crate::keypoints::Keypoints;
+use crate::skeleton::Skeleton;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 #[wasm_bindgen]
@@ -7,7 +8,7 @@ pub struct Tracker {
     /// invariant: ordered by timestamp
     history: Vec<(u32, Keypoints)>,
     /// tracked limbs
-    limb_angles: Vec<Vec<f32>>,
+    skeletons: Vec<Skeleton>,
 }
 
 /// The result of fitting keypoints to poses.
@@ -25,7 +26,7 @@ impl Tracker {
         Tracker {
             // order by timestamp satisfied for empty list
             history: vec![],
-            limb_angles: vec![],
+            skeletons: vec![],
         }
     }
 
@@ -38,8 +39,7 @@ impl Tracker {
         }
         // modification preserves timestamp order if it was true before
         self.history.push((timestamp, keypoints));
-        let limbs = super::STATE.with(|state| state.borrow().db.angles_from_keypoints(&keypoints));
-        self.limb_angles.push(limbs);
+        self.skeletons.push(Skeleton::from_keypoints(&keypoints));
     }
 
     #[wasm_bindgen(js_name = bestFitPosition)]
@@ -58,7 +58,7 @@ impl Tracker {
             let mut history_index = 0;
 
             for i in first..last {
-                let (err, pose) = state.db.fit(&self.limb_angles[i]);
+                let (err, pose) = state.db.fit(&self.skeletons[i]);
                 if err < error {
                     error = err;
                     pose_index = pose;

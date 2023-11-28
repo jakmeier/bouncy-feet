@@ -3,6 +3,7 @@ mod pose;
 mod pose_file;
 mod tracker;
 mod web_utils;
+mod skeleton;
 
 pub use keypoints::{Keypoints, Side as KeypointsSide};
 pub use tracker::Tracker;

@@ -4,6 +4,7 @@
 //! serialization.
 
 use crate::keypoints::Coordinate3d;
+use crate::skeleton::Skeleton;
 use crate::Keypoints;
 
 /// List of registered poses to recognize during tracking.
@@ -111,13 +112,13 @@ impl LimbPositionDatabase {
             .collect()
     }
 
-    pub(crate) fn fit(&self, angles: &[f32]) -> (f32, usize) {
+    pub(crate) fn fit(&self, skeleton: &Skeleton) -> (f32, usize) {
         assert!(!self.poses.is_empty());
 
         let mut best_error = f32::INFINITY;
         let mut best_i = 0;
         for (i, pose) in self.poses.iter().enumerate() {
-            let err = pose.error(angles);
+            let err = pose.error(skeleton.angles());
             if err < best_error {
                 best_error = err;
                 best_i = i;
