@@ -4,7 +4,7 @@
 //! serialization.
 
 use crate::keypoints::Coordinate3d;
-use crate::skeleton::Skeleton;
+use crate::skeleton::SkeletonInfo;
 use crate::Keypoints;
 
 /// List of registered poses to recognize during tracking.
@@ -19,7 +19,6 @@ use crate::Keypoints;
 ///
 /// Errors are always between 0 and 1, where 0 is a perfect match.
 /// For now, the error formula is implicitly the same for all limbs.
-#[derive(Default)]
 pub(crate) struct LimbPositionDatabase {
     /// Pose definitions
     poses: Vec<Pose>,
@@ -47,7 +46,7 @@ struct LimbPosition {
 }
 
 #[derive(PartialEq, Eq, Hash)]
-struct Limb {
+pub(crate) struct Limb {
     start: BodyPoint,
     end: BodyPoint,
 }
@@ -70,6 +69,16 @@ enum BodyPart {
     Hip,
     Knee,
     Ankle,
+}
+
+impl Default for LimbPositionDatabase {
+    fn default() -> Self {
+        Self {
+            poses: vec![],
+            names: vec![],
+            limbs: Limb::base_limbs(),
+        }
+    }
 }
 
 impl LimbPositionDatabase {
@@ -112,7 +121,7 @@ impl LimbPositionDatabase {
             .collect()
     }
 
-    pub(crate) fn fit(&self, skeleton: &Skeleton) -> (f32, usize) {
+    pub(crate) fn fit(&self, skeleton: &SkeletonInfo) -> (f32, usize) {
         assert!(!self.poses.is_empty());
 
         let mut best_error = f32::INFINITY;
@@ -169,6 +178,24 @@ impl Pose {
         let normalized = err / w / (45u32.pow(2) as f32);
         // anything above 45° is a flat 100% error
         return normalized.min(1.0);
+    }
+}
+
+impl Limb {
+    pub(crate) const LEFT_THIGH: usize = 0;
+    pub(crate) const LEFT_SHIN: usize = 1;
+    pub(crate) const RIGHT_THIGH: usize = 2;
+    pub(crate) const RIGHT_SHIN: usize = 3;
+
+    /// List of limbs that are always racked.
+    /// They can be relied upon for rendering.
+    fn base_limbs() -> Vec<Self> {
+        vec![
+            crate::pose_file::Limb::LeftThigh.into(),
+            crate::pose_file::Limb::LeftShin.into(),
+            crate::pose_file::Limb::RightThigh.into(),
+            crate::pose_file::Limb::RightShin.into(),
+        ]
     }
 }
 

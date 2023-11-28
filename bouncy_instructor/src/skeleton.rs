@@ -1,15 +1,38 @@
+use crate::pose::Limb;
 use crate::Keypoints;
+use wasm_bindgen::prelude::wasm_bindgen;
 
-/// A normalized representation of a specific body position snapshot.
+/// A self-sufficient description of a body position snapshot.
 ///
-/// Keypoints can be converted to a skeleton and then compared to poses.
-/// Rendering a skeleton should also be possible, which leads to a standardized
-/// character render. Of course, it won't match in an overlay to a video because
-/// limb lengths are off. But for rendering independent character of different
-/// physic this is perfect.
+/// This format is for exporting to other modules. JS code can easily read it
+/// and potentially render it.
 ///
-/// Note that the a skeleton needs a list of limb definitions to be meaningful.
-pub(crate) struct Skeleton {
+/// Note that the skeleton is stripped of position information, it only has
+/// angles of all body parts. This means it cannot be used to overlay a video.
+/// Use the original keypoints for such matters.
+#[wasm_bindgen]
+#[derive(Clone, Copy, Debug)]
+pub struct Skeleton {
+    pub left: Side,
+    pub right: Side,
+}
+
+#[wasm_bindgen(js_name = SkeletonSide)]
+#[derive(Clone, Copy, Debug)]
+pub struct Side {
+    pub thigh: f32,
+    pub shin: f32,
+    // TODO: add all other renderable limbs (requires adding keypoints, too)
+}
+
+/// A normalized representation of a body position snapshot, including all tracked information.
+///
+/// This format is optimal for comparisons against many different poses.
+///
+/// Keypoints can be converted to a SkeletonInfo object and then compared to poses.
+///
+/// Note that the a SkeletonInfo object needs a list of limb definitions to be meaningful.
+pub(crate) struct SkeletonInfo {
     /// A list of angles of the skeleton.
     ///
     /// Which angles are included depends on the poses we want to detect.
@@ -38,7 +61,7 @@ enum Direction {
     Unknown,
 }
 
-impl Skeleton {
+impl SkeletonInfo {
     pub(crate) fn from_keypoints(kp: &Keypoints) -> Self {
         let mut limb_angles =
             super::STATE.with(|state| state.borrow().db.angles_from_keypoints(kp));
@@ -70,5 +93,29 @@ impl Skeleton {
 
     pub(crate) fn angles(&self) -> &[f32] {
         &self.limb_angles
+    }
+
+    pub(crate) fn to_skeleton(&self) -> Skeleton {
+        let mut left = Side {
+            thigh: self.limb_angles[Limb::LEFT_THIGH],
+            shin: self.limb_angles[Limb::LEFT_SHIN],
+        };
+        let mut right = Side {
+            thigh: self.limb_angles[Limb::RIGHT_THIGH],
+            shin: self.limb_angles[Limb::RIGHT_SHIN],
+        };
+
+        if self.original_direction != self.direction {
+            left.flip_x();
+            right.flip_x();
+        }
+        Skeleton { left, right }
+    }
+}
+
+impl Side {
+    fn flip_x(&mut self) {
+        self.thigh *= -1.0;
+        self.shin *= -1.0;
     }
 }

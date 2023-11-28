@@ -19,6 +19,7 @@
   let videoElement;
   let camera;
   let landmarks = [];
+  let skeleton;
   let isModelOn = false;
   let cameraOn = false;
   let dataListener;
@@ -69,9 +70,9 @@
   onMount(async () => {
     dataListener = await poseCtx.newPoseDetection((result, timestamp) => {
       if (result.landmarks && result.landmarks.length >= 1) {
-        landmarks = result.landmarks[0];
+        // landmarks = result.landmarks[0];
         const kp = landmarksToKeypoints(result.landmarks[0]);
-        tracker.addKeypoints(kp, timestamp);
+        skeleton = tracker.addKeypoints(kp, timestamp);
       }
     });
 
@@ -91,7 +92,7 @@
   </Area>
   <Area width="{280}px" height="{280}px">
     <Canvas width={300} height={300}>
-      <Avatar {landmarks} />
+      <Avatar {landmarks} {skeleton} />
     </Canvas>
   </Area>
   <div>

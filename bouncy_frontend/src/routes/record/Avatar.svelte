@@ -5,20 +5,34 @@
 
   /** @type import('@mediapipe/tasks-vision').NormalizedLandmark[] */
   export let landmarks;
+  /** @type import('$lib/instructor/bouncy_instructor').Skeleton */
+  export let skeleton;
   export let width = 100;
   export let height = 100;
+
+  const mainColor = '#382eeb';
+  const secondColor = '#c2bfff';
 
   getContext('canvas').addItem(draw);
 
   /**
-   *
    * @param {CanvasRenderingContext2D} ctx
    */
   function draw(ctx) {
+    if (skeleton) {
+      drawSkeleton(ctx);
+    } else if (landmarks) {
+      drawLandmarks(ctx);
+    }
+  }
+
+  /**
+   * @param {CanvasRenderingContext2D} ctx
+   */
+  function drawLandmarks(ctx) {
     if (landmarks.length === 0) {
       return;
     }
-    const mainColor = '#382eeb';
     // Goal: Scale the avatar to fit the canvas height even if it doesn't fill
     // the camera field.
     // Note: Something is fishy. I thought landmarks are normalized to [0,1]? So
@@ -43,7 +57,7 @@
     });
 
     // torso
-    ctx.fillStyle = '#c2bfff';
+    ctx.fillStyle = secondColor;
     ctx.beginPath();
     ctx.moveTo(landmarks[TORSO[0]].x * w, landmarks[TORSO[0]].y * h);
     TORSO.slice(1).forEach((i) => {
@@ -67,5 +81,18 @@
       2 * Math.PI
     );
     ctx.fill();
+  }
+
+  /**
+   * @param {CanvasRenderingContext2D} ctx
+   */
+  function drawSkeleton(ctx) {
+    console.log(
+      'TODO: draw this skelly',
+      skeleton.left.shin,
+      skeleton.left.thigh,
+      skeleton.right.shin,
+      skeleton.right.thigh
+    );
   }
 </script>

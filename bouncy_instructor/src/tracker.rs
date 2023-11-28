@@ -1,5 +1,5 @@
 use crate::keypoints::Keypoints;
-use crate::skeleton::Skeleton;
+use crate::skeleton::{Skeleton, SkeletonInfo};
 use wasm_bindgen::prelude::wasm_bindgen;
 
 #[wasm_bindgen]
@@ -8,7 +8,7 @@ pub struct Tracker {
     /// invariant: ordered by timestamp
     history: Vec<(u32, Keypoints)>,
     /// tracked limbs
-    skeletons: Vec<Skeleton>,
+    skeletons: Vec<SkeletonInfo>,
 }
 
 /// The result of fitting keypoints to poses.
@@ -31,7 +31,7 @@ impl Tracker {
     }
 
     #[wasm_bindgen(js_name = addKeypoints)]
-    pub fn add_keypoints(&mut self, keypoints: Keypoints, timestamp: u32) {
+    pub fn add_keypoints(&mut self, keypoints: Keypoints, timestamp: u32) -> Skeleton {
         if let Some(last) = self.history.last() {
             if last.0 >= timestamp {
                 panic!("inserted data not strictly monotonically increasing");
@@ -39,7 +39,10 @@ impl Tracker {
         }
         // modification preserves timestamp order if it was true before
         self.history.push((timestamp, keypoints));
-        self.skeletons.push(Skeleton::from_keypoints(&keypoints));
+        let skeleton_info = SkeletonInfo::from_keypoints(&keypoints);
+        let skeleton = skeleton_info.to_skeleton();
+        self.skeletons.push(skeleton_info);
+        skeleton
     }
 
     #[wasm_bindgen(js_name = bestFitPosition)]

@@ -81,6 +81,36 @@ export class PoseApproximation {
   timestamp: number;
 }
 /**
+* A self-sufficient description of a body position snapshot.
+*
+* This format is for exporting to other modules. JS code can easily read it
+* and potentially render it.
+*
+* Note that the skeleton is stripped of position information, it only has
+* angles of all body parts. This means it cannot be used to overlay a video.
+* Use the original keypoints for such matters.
+*/
+export class Skeleton {
+  free(): void;
+/**
+*/
+  left: SkeletonSide;
+/**
+*/
+  right: SkeletonSide;
+}
+/**
+*/
+export class SkeletonSide {
+  free(): void;
+/**
+*/
+  shin: number;
+/**
+*/
+  thigh: number;
+}
+/**
 */
 export class Tracker {
   free(): void;
@@ -90,8 +120,9 @@ export class Tracker {
 /**
 * @param {Keypoints} keypoints
 * @param {number} timestamp
+* @returns {Skeleton}
 */
-  addKeypoints(keypoints: Keypoints, timestamp: number): void;
+  addKeypoints(keypoints: Keypoints, timestamp: number): Skeleton;
 /**
 * @param {number} start
 * @param {number} end
