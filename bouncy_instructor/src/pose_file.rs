@@ -32,8 +32,9 @@ pub(crate) struct Pose {
 #[derive(Deserialize)]
 pub(crate) struct LimbPosition {
     pub limb: Limb,
-    pub angle: (i16, i16),
     pub weight: f32,
+    pub angle: i16,
+    pub tolerance: u8,
 }
 
 #[derive(Deserialize)]

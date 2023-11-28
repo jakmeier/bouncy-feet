@@ -86,9 +86,11 @@ impl LimbPositionDatabase {
                         index = self.limbs.len();
                         self.limbs.push(limb);
                     }
+                    let alpha = def.angle as f32;
+                    let tolerance = def.tolerance as f32;
                     LimbPosition {
                         limb: index,
-                        angle: (def.angle.0 as f32, def.angle.1 as f32),
+                        angle: (alpha - tolerance, alpha + tolerance),
                         weight: def.weight,
                     }
                 })

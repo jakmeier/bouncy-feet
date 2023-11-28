@@ -4,52 +4,52 @@
     (
       name: "stand-still",
       limbs: [
-        ( limb: LeftShin, angle: (-5, 5), weight: 1.0),
-        ( limb: LeftThigh, angle: (-5, 5), weight: 1.0),
-        ( limb: RightShin, angle: (-5, 5), weight: 1.0),
-        ( limb: RightThigh, angle: (-5, 5), weight: 1.0),
+        ( limb: LeftShin, angle: 0, tolerance: 5, weight: 1.0),
+        ( limb: LeftThigh, angle: 0, tolerance: 5, weight: 1.0),
+        ( limb: RightShin, angle: 0, tolerance: 5, weight: 1.0),
+        ( limb: RightThigh, angle: 0, tolerance: 5, weight: 1.0),
       ]
     ),
     (
       name: "right-up",
       limbs: [
         // left leg has to stand straight, but it doesn't matter if the knee is angled
-        ( limb: LeftLeg, angle: (-5, 5), weight: 1.0),
+        ( limb: LeftLeg, angle: 0, tolerance: 5, weight: 1.0),
         // right leg is also somewhere around being straight down, but with a tight angle at the knee
-        ( limb: RightLeg, angle: (-20, 20), weight: 1.0),
-        ( limb: RightShin, angle: (-50, -10), weight: 0.2),
-        ( limb: RightThigh, angle: (50, 90), weight: 1.0),
+        ( limb: RightLeg, angle: 0, tolerance: 20, weight: 1.0),
+        ( limb: RightShin, angle: -30, tolerance: 20, weight: 0.2),
+        ( limb: RightThigh, angle: 70, tolerance: 20, weight: 1.0),
       ]
     ),
     (
       name: "left-up",
       limbs: [
-        ( limb: RightLeg, angle: (-5, 5), weight: 1.0),
-        ( limb: LeftLeg, angle: (-20, 20), weight: 1.0),
-        ( limb: LeftShin, angle: (-50, -10,), weight: 0.2),
-        ( limb: LeftThigh, angle: (50, 90), weight: 1.0),
+        ( limb: RightLeg, angle: 0, tolerance: 5, weight: 1.0),
+        ( limb: LeftLeg, angle: 0, tolerance: 20, weight: 1.0),
+        ( limb: LeftShin, angle: -30, tolerance: 20, weight: 0.2),
+        ( limb: LeftThigh, angle: 70, tolerance: 20, weight: 1.0),
       ]
     ),
     (
       name: "right-forward",
       limbs: [
-        ( limb: LeftThigh, angle: (-25, -15), weight: 1.0),
-        ( limb: LeftShin, angle: (-30, -20), weight: 1.0),
-        ( limb: LeftLeg, angle: (-35, -25), weight: 1.0),
-        ( limb: RightThigh, angle: (37, 42), weight: 1.0),
-        ( limb: RightShin, angle: (-2, 2), weight: 1.0),
-        ( limb: RightLeg, angle: (7, 12), weight: 1.0),
+        ( limb: LeftThigh, angle: -20, tolerance: 5, weight: 1.0),
+        ( limb: LeftShin, angle: -25, tolerance: 5, weight: 1.0),
+        ( limb: LeftLeg, angle: -30, tolerance: 5, weight: 1.0),
+        ( limb: RightThigh, angle: 40, tolerance: 2, weight: 1.0),
+        ( limb: RightShin, angle: 0, tolerance: 2, weight: 1.0),
+        ( limb: RightLeg, angle: 10, tolerance: 2, weight: 1.0),
       ]
     ),
     (
       name: "left-forward",
       limbs: [
-        ( limb: RightThigh, angle: (-25, -15), weight: 1.0),
-        ( limb: RightShin, angle: (-30, -20), weight: 1.0),
-        ( limb: RightLeg, angle: (-35, -25), weight: 1.0),
-        ( limb: LeftThigh, angle: (37, 42), weight: 1.0),
-        ( limb: LeftShin, angle: (-2, 2), weight: 1.0),
-        ( limb: LeftLeg, angle: (7, 12), weight: 1.0),
+        ( limb: RightThigh, angle: -20, tolerance: 5, weight: 1.0),
+        ( limb: RightShin, angle: -25, tolerance: 5, weight: 1.0),
+        ( limb: RightLeg, angle: -30, tolerance: 5, weight: 1.0),
+        ( limb: LeftThigh, angle: 40, tolerance: 2, weight: 1.0),
+        ( limb: LeftShin, angle: 0, tolerance: 2, weight: 1.0),
+        ( limb: LeftLeg, angle: 10, tolerance: 2, weight: 1.0),
       ]
     ),
   ]
