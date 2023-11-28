@@ -1,5 +1,5 @@
 <script>
-  import { distance2d } from '$lib/math';
+  import { add2dVector, distance2d } from '$lib/math';
   import { I, TORSO, bodyOutlinePairs } from '$lib/pose';
   import { getContext } from 'svelte';
 
@@ -9,6 +9,8 @@
   export let skeleton;
   export let width = 100;
   export let height = 100;
+  export let thigh = 0.2;
+  export let shin = 0.2;
 
   const mainColor = '#382eeb';
   const secondColor = '#c2bfff';
@@ -19,6 +21,11 @@
    * @param {CanvasRenderingContext2D} ctx
    */
   function draw(ctx) {
+    ctx.strokeStyle = mainColor;
+    ctx.lineWidth = 10;
+    ctx.lineCap = 'round';
+    ctx.fillStyle = secondColor;
+
     if (skeleton) {
       drawSkeleton(ctx);
     } else if (landmarks) {
@@ -45,19 +52,15 @@
     const h = height * scaling;
     const w = width * scaling;
 
-    ctx.strokeStyle = mainColor;
-    ctx.lineWidth = 10;
-    ctx.lineCap = 'round';
-
     bodyOutlinePairs.forEach(([a, b]) => {
-      ctx.beginPath();
-      ctx.moveTo(landmarks[a].x * w, landmarks[a].y * h);
-      ctx.lineTo(landmarks[b].x * w, landmarks[b].y * h);
-      ctx.stroke();
+      drawLine(
+        ctx,
+        { x: landmarks[a].x * w, y: landmarks[a].y * h },
+        { x: landmarks[b].x * w, y: landmarks[b].y * h }
+      );
     });
 
     // torso
-    ctx.fillStyle = secondColor;
     ctx.beginPath();
     ctx.moveTo(landmarks[TORSO[0]].x * w, landmarks[TORSO[0]].y * h);
     TORSO.slice(1).forEach((i) => {
@@ -87,12 +90,34 @@
    * @param {CanvasRenderingContext2D} ctx
    */
   function drawSkeleton(ctx) {
-    console.log(
-      'TODO: draw this skelly',
-      skeleton.left.shin,
-      skeleton.left.thigh,
-      skeleton.right.shin,
-      skeleton.right.thigh
-    );
+    const s = Math.min(height, width);
+    const center = { x: 0.5 * width, y: 0.5 * height };
+    drawSide(ctx, center, skeleton.left, s);
+    drawSide(ctx, center, skeleton.right, s);
+  }
+
+  /**
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {{ x: number; y: number; }} center
+   * @param {import("$lib/instructor/bouncy_instructor").SkeletonSide} side
+   * @param {number} s
+   */
+  function drawSide(ctx, center, side, s) {
+    const knee = add2dVector(center, side.thigh, thigh * s);
+    const ankle = add2dVector(knee, side.shin, shin * s);
+    drawLine(ctx, center, knee);
+    drawLine(ctx, knee, ankle);
+  }
+
+  /**
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {{ x: number; y: number; }} start
+   * @param {{ x: number; y: number; }} end
+   */
+  function drawLine(ctx, start, end) {
+    ctx.beginPath();
+    ctx.moveTo(start.x, start.y);
+    ctx.lineTo(end.x, end.y);
+    ctx.stroke();
   }
 </script>

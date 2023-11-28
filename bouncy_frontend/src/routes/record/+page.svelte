@@ -92,7 +92,7 @@
   </Area>
   <Area width="{280}px" height="{280}px">
     <Canvas width={300} height={300}>
-      <Avatar {landmarks} {skeleton} />
+      <Avatar width={300} height={300} {landmarks} {skeleton} />
     </Canvas>
   </Area>
   <div>
