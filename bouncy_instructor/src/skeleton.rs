@@ -22,6 +22,8 @@ pub struct Skeleton {
 pub struct Side {
     pub thigh: f32,
     pub shin: f32,
+    pub arm: f32,
+    pub forearm: f32,
     // TODO: add all other renderable limbs (requires adding keypoints, too)
 }
 
@@ -99,10 +101,14 @@ impl SkeletonInfo {
         let mut left = Side {
             thigh: self.limb_angles[Limb::LEFT_THIGH],
             shin: self.limb_angles[Limb::LEFT_SHIN],
+            arm: self.limb_angles[Limb::LEFT_ARM],
+            forearm: self.limb_angles[Limb::LEFT_FOREARM],
         };
         let mut right = Side {
             thigh: self.limb_angles[Limb::RIGHT_THIGH],
             shin: self.limb_angles[Limb::RIGHT_SHIN],
+            arm: self.limb_angles[Limb::RIGHT_ARM],
+            forearm: self.limb_angles[Limb::RIGHT_FOREARM],
         };
 
         if self.original_direction != self.direction {
@@ -117,5 +123,7 @@ impl Side {
     fn flip_x(&mut self) {
         self.thigh *= -1.0;
         self.shin *= -1.0;
+        self.arm *= -1.0;
+        self.forearm *= -1.0;
     }
 }

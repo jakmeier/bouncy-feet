@@ -50,11 +50,21 @@ export class KeypointsSide {
 * @param {Coordinate3d} hip
 * @param {Coordinate3d} knee
 * @param {Coordinate3d} ankle
+* @param {Coordinate3d} heel
+* @param {Coordinate3d} toes
+* @param {Coordinate3d} elbow
+* @param {Coordinate3d} wrist
 */
-  constructor(shoulder: Coordinate3d, hip: Coordinate3d, knee: Coordinate3d, ankle: Coordinate3d);
+  constructor(shoulder: Coordinate3d, hip: Coordinate3d, knee: Coordinate3d, ankle: Coordinate3d, heel: Coordinate3d, toes: Coordinate3d, elbow: Coordinate3d, wrist: Coordinate3d);
 /**
 */
   ankle: Coordinate3d;
+/**
+*/
+  elbow: Coordinate3d;
+/**
+*/
+  heel: Coordinate3d;
 /**
 */
   hip: Coordinate3d;
@@ -64,6 +74,12 @@ export class KeypointsSide {
 /**
 */
   shoulder: Coordinate3d;
+/**
+*/
+  toes: Coordinate3d;
+/**
+*/
+  wrist: Coordinate3d;
 }
 /**
 * The result of fitting keypoints to poses.
@@ -103,6 +119,12 @@ export class Skeleton {
 */
 export class SkeletonSide {
   free(): void;
+/**
+*/
+  arm: number;
+/**
+*/
+  forearm: number;
 /**
 */
   shin: number;

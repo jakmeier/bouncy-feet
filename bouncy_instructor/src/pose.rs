@@ -69,6 +69,8 @@ enum BodyPart {
     Hip,
     Knee,
     Ankle,
+    Elbow,
+    Wrist,
 }
 
 impl Default for LimbPositionDatabase {
@@ -156,6 +158,8 @@ impl BodyPoint {
             BodyPart::Hip => side.hip,
             BodyPart::Knee => side.knee,
             BodyPart::Ankle => side.ankle,
+            BodyPart::Elbow => side.elbow,
+            BodyPart::Wrist => side.wrist,
         }
     }
 }
@@ -184,8 +188,12 @@ impl Pose {
 impl Limb {
     pub(crate) const LEFT_THIGH: usize = 0;
     pub(crate) const LEFT_SHIN: usize = 1;
-    pub(crate) const RIGHT_THIGH: usize = 2;
-    pub(crate) const RIGHT_SHIN: usize = 3;
+    pub(crate) const LEFT_ARM: usize = 2;
+    pub(crate) const LEFT_FOREARM: usize = 3;
+    pub(crate) const RIGHT_THIGH: usize = 4;
+    pub(crate) const RIGHT_SHIN: usize = 5;
+    pub(crate) const RIGHT_ARM: usize = 6;
+    pub(crate) const RIGHT_FOREARM: usize = 7;
 
     /// List of limbs that are always racked.
     /// They can be relied upon for rendering.
@@ -193,8 +201,12 @@ impl Limb {
         vec![
             crate::pose_file::Limb::LeftThigh.into(),
             crate::pose_file::Limb::LeftShin.into(),
+            crate::pose_file::Limb::LeftArm.into(),
+            crate::pose_file::Limb::LeftForearm.into(),
             crate::pose_file::Limb::RightThigh.into(),
             crate::pose_file::Limb::RightShin.into(),
+            crate::pose_file::Limb::RightArm.into(),
+            crate::pose_file::Limb::RightForearm.into(),
         ]
     }
 }
@@ -232,6 +244,26 @@ impl From<crate::pose_file::Limb> for Limb {
                     side: BodySide::Left,
                 },
             },
+            crate::pose_file::Limb::LeftArm => Self {
+                start: BodyPoint {
+                    part: BodyPart::Shoulder,
+                    side: BodySide::Left,
+                },
+                end: BodyPoint {
+                    part: BodyPart::Elbow,
+                    side: BodySide::Left,
+                },
+            },
+            crate::pose_file::Limb::LeftForearm => Self {
+                start: BodyPoint {
+                    part: BodyPart::Elbow,
+                    side: BodySide::Left,
+                },
+                end: BodyPoint {
+                    part: BodyPart::Wrist,
+                    side: BodySide::Left,
+                },
+            },
             crate::pose_file::Limb::RightShin => Self {
                 start: BodyPoint {
                     part: BodyPart::Knee,
@@ -259,6 +291,26 @@ impl From<crate::pose_file::Limb> for Limb {
                 },
                 end: BodyPoint {
                     part: BodyPart::Ankle,
+                    side: BodySide::Right,
+                },
+            },
+            crate::pose_file::Limb::RightArm => Self {
+                start: BodyPoint {
+                    part: BodyPart::Shoulder,
+                    side: BodySide::Right,
+                },
+                end: BodyPoint {
+                    part: BodyPart::Elbow,
+                    side: BodySide::Right,
+                },
+            },
+            crate::pose_file::Limb::RightForearm => Self {
+                start: BodyPoint {
+                    part: BodyPart::Elbow,
+                    side: BodySide::Right,
+                },
+                end: BodyPoint {
+                    part: BodyPart::Wrist,
                     side: BodySide::Right,
                 },
             },

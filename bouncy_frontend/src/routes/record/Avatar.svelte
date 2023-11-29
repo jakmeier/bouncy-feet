@@ -9,8 +9,13 @@
   export let skeleton;
   export let width = 100;
   export let height = 100;
-  export let thigh = 0.2;
-  export let shin = 0.2;
+  export let lengths = {
+    thigh: 0.2,
+    shin: 0.2,
+    torso: 0.3,
+    arm: 0.1,
+    forearm: 0.15,
+  };
 
   const mainColor = '#382eeb';
   const secondColor = '#c2bfff';
@@ -73,17 +78,9 @@
       landmarks[I.RIGHT_SHOULDER]
     );
     const headRadius = 0.4 * shoulder * w;
-    // head
-    ctx.fillStyle = mainColor;
-    ctx.beginPath();
-    ctx.arc(
-      landmarks[I.NOSE].x * w,
-      landmarks[I.NOSE].y * h,
-      headRadius,
-      0,
-      2 * Math.PI
-    );
-    ctx.fill();
+    const x = landmarks[I.NOSE].x * w;
+    const y = landmarks[I.NOSE].y * h;
+    drawHead(ctx, x, y, headRadius);
   }
 
   /**
@@ -91,22 +88,31 @@
    */
   function drawSkeleton(ctx) {
     const s = Math.min(height, width);
-    const center = { x: 0.5 * width, y: 0.5 * height };
-    drawSide(ctx, center, skeleton.left, s);
-    drawSide(ctx, center, skeleton.right, s);
+    const hip = { x: 0.5 * width, y: 0.5 * height };
+    const shoulder = { x: hip.x, y: hip.y - lengths.torso * s };
+
+    drawSide(ctx, hip, shoulder, skeleton.left, s);
+    drawSide(ctx, hip, shoulder, skeleton.right, s);
+    drawHead(ctx, shoulder.x, shoulder.y - 0.1 * s, 0.075 * s);
   }
 
   /**
    * @param {CanvasRenderingContext2D} ctx
-   * @param {{ x: number; y: number; }} center
+   * @param {{ x: number; y: number; }} hip
    * @param {import("$lib/instructor/bouncy_instructor").SkeletonSide} side
    * @param {number} s
+   * @param {{ x: number; y: number; }} shoulder
    */
-  function drawSide(ctx, center, side, s) {
-    const knee = add2dVector(center, side.thigh, thigh * s);
-    const ankle = add2dVector(knee, side.shin, shin * s);
-    drawLine(ctx, center, knee);
+  function drawSide(ctx, hip, shoulder, side, s) {
+    const knee = add2dVector(hip, side.thigh, lengths.thigh * s);
+    const ankle = add2dVector(knee, side.shin, lengths.shin * s);
+    const elbow = add2dVector(shoulder, side.arm, lengths.arm * s);
+    const wrist = add2dVector(elbow, side.forearm, lengths.forearm * s);
+    drawLine(ctx, hip, knee);
     drawLine(ctx, knee, ankle);
+    drawLine(ctx, shoulder, hip);
+    drawLine(ctx, shoulder, elbow);
+    drawLine(ctx, elbow, wrist);
   }
 
   /**
@@ -119,5 +125,18 @@
     ctx.moveTo(start.x, start.y);
     ctx.lineTo(end.x, end.y);
     ctx.stroke();
+  }
+
+  /**
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {number} x
+   * @param {number} y
+   * @param {number} headRadius
+   */
+  function drawHead(ctx, x, y, headRadius) {
+    ctx.fillStyle = mainColor;
+    ctx.beginPath();
+    ctx.arc(x, y, headRadius, 0, 2 * Math.PI);
+    ctx.fill();
   }
 </script>

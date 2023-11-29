@@ -21,14 +21,22 @@ export function landmarksToKeypoints(landmarks) {
         coordinate(I.LEFT_SHOULDER, landmarks),
         coordinate(I.LEFT_HIP, landmarks),
         coordinate(I.LEFT_KNEE, landmarks),
-        coordinate(I.LEFT_ANKLE, landmarks)
+        coordinate(I.LEFT_ANKLE, landmarks),
+        coordinate(I.LEFT_HEEL, landmarks),
+        coordinate(I.LEFT_FOOT_INDEX, landmarks),
+        coordinate(I.LEFT_ELBOW, landmarks),
+        coordinate(I.LEFT_WRIST, landmarks),
     );
 
     const right = new KeypointsSide(
         coordinate(I.RIGHT_SHOULDER, landmarks),
         coordinate(I.RIGHT_HIP, landmarks),
         coordinate(I.RIGHT_KNEE, landmarks),
-        coordinate(I.RIGHT_ANKLE, landmarks)
+        coordinate(I.RIGHT_ANKLE, landmarks),
+        coordinate(I.RIGHT_HEEL, landmarks),
+        coordinate(I.RIGHT_FOOT_INDEX, landmarks),
+        coordinate(I.RIGHT_ELBOW, landmarks),
+        coordinate(I.RIGHT_WRIST, landmarks),
     );
     return new Keypoints(left, right);
 }

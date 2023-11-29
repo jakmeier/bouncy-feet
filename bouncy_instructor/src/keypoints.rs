@@ -14,6 +14,10 @@ pub struct Side {
     pub hip: Coordinate3d,
     pub knee: Coordinate3d,
     pub ankle: Coordinate3d,
+    pub heel: Coordinate3d,
+    pub toes: Coordinate3d,
+    pub elbow: Coordinate3d,
+    pub wrist: Coordinate3d,
 }
 
 #[wasm_bindgen]
@@ -47,12 +51,20 @@ impl Side {
         hip: Coordinate3d,
         knee: Coordinate3d,
         ankle: Coordinate3d,
+        heel: Coordinate3d,
+        toes: Coordinate3d,
+        elbow: Coordinate3d,
+        wrist: Coordinate3d,
     ) -> Self {
         Self {
             shoulder,
             hip,
             knee,
             ankle,
+            heel,
+            toes,
+            elbow,
+            wrist,
         }
     }
 }
@@ -68,7 +80,7 @@ impl Coordinate3d {
 impl Coordinate3d {
     /// The polar angle is measured against the y-axis, which goes from the
     /// ground to the sky.
-    /// 
+    ///
     /// The signed polar angle is between -180° and +180°, with 0° pointing to
     /// the ground. +90° goes towards east from the dancer perspective, which is
     /// (counter-intuitively) left in a non-mirrored video. But in a mirrored
@@ -87,7 +99,7 @@ impl Coordinate3d {
     /// Just like in cartography, east is +90° and west is -90° for the dancer.
     /// However, in mirrored videos, the angles are therefore counter-clock-wise
     /// as seen by the viewer.
-    /// 
+    ///
     /// Note that in the keypoint coordinate system, the positive z-axis faces
     /// south, not north. But since the camera coordinate system should not be
     /// of interest beyond the translation to angles, this fact rarely matters.

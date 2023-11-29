@@ -55,12 +55,20 @@ pub(crate) enum Limb {
     LeftThigh,
     /// hip to ankle
     LeftLeg,
+    /// shoulder to elbow
+    LeftArm,
+    /// elbow to wrist
+    LeftForearm,
     /// knee to ankle
     RightShin,
     /// hip to knee
     RightThigh,
     /// hip to ankle
     RightLeg,
+    /// shoulder to elbow
+    RightArm,
+    /// elbow to wrist
+    RightForearm,
     Custom {
         start: BodyPoint,
         end: BodyPoint,
