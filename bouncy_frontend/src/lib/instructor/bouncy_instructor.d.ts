@@ -97,7 +97,24 @@ export class PoseApproximation {
   timestamp: number;
 }
 /**
-* A self-sufficient description of a body position snapshot.
+* Projected segment, with a x-y angle and a length factor.
+*/
+export class Segment {
+  free(): void;
+/**
+* The 2D projected angle of the segment.
+*/
+  angle: number;
+/**
+* the factor to multiply lengths when drawing the projected segment in 2D
+*/
+  r: number;
+}
+/**
+* A self-sufficient description of a body position snapshot for 2d rendering.
+*
+* Each limb has a 2D angle in the x-y plane plus a length factor to simulate
+* the third dimension in a 2D projection.
 *
 * This format is for exporting to other modules. JS code can easily read it
 * and potentially render it.
@@ -121,16 +138,16 @@ export class SkeletonSide {
   free(): void;
 /**
 */
-  arm: number;
+  arm: Segment;
 /**
 */
-  forearm: number;
+  forearm: Segment;
 /**
 */
-  shin: number;
+  shin: Segment;
 /**
 */
-  thigh: number;
+  thigh: Segment;
 }
 /**
 */

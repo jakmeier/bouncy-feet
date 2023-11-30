@@ -14,7 +14,7 @@ export function distance2d(a, b) {
  */
 export function add2dVector(start, alpha, length) {
     return {
-        x: start.x + Math.sin(alpha / 180 * Math.PI) * length,
-        y: start.y + Math.cos(alpha / 180 * Math.PI) * length,
+        x: start.x + Math.sin(alpha) * length,
+        y: start.y + Math.cos(alpha) * length,
     };
 }

@@ -12,7 +12,7 @@
   export let lengths = {
     thigh: 0.2,
     shin: 0.2,
-    torso: 0.3,
+    torso: 0.25,
     arm: 0.1,
     forearm: 0.15,
   };
@@ -104,10 +104,26 @@
    * @param {{ x: number; y: number; }} shoulder
    */
   function drawSide(ctx, hip, shoulder, side, s) {
-    const knee = add2dVector(hip, side.thigh, lengths.thigh * s);
-    const ankle = add2dVector(knee, side.shin, lengths.shin * s);
-    const elbow = add2dVector(shoulder, side.arm, lengths.arm * s);
-    const wrist = add2dVector(elbow, side.forearm, lengths.forearm * s);
+    const knee = add2dVector(
+      hip,
+      side.thigh.angle,
+      side.thigh.r * lengths.thigh * s
+    );
+    const ankle = add2dVector(
+      knee,
+      side.shin.angle,
+      side.shin.r * lengths.shin * s
+    );
+    const elbow = add2dVector(
+      shoulder,
+      side.arm.angle,
+      side.arm.r * lengths.arm * s
+    );
+    const wrist = add2dVector(
+      elbow,
+      side.forearm.angle,
+      side.forearm.r * lengths.forearm * s
+    );
     drawLine(ctx, hip, knee);
     drawLine(ctx, knee, ankle);
     drawLine(ctx, shoulder, hip);

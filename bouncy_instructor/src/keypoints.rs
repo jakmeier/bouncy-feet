@@ -1,5 +1,7 @@
 use wasm_bindgen::prelude::wasm_bindgen;
 
+use crate::skeleton::SignedAngle;
+
 #[wasm_bindgen]
 #[derive(Clone, Copy, Debug)]
 pub struct Keypoints {
@@ -81,20 +83,32 @@ impl Coordinate3d {
     /// The polar angle is measured against the y-axis, which goes from the
     /// ground to the sky.
     ///
-    /// The signed polar angle is between -180° and +180°, with 0° pointing to
-    /// the ground. +90° goes towards east from the dancer perspective, which is
-    /// (counter-intuitively) left in a non-mirrored video. But in a mirrored
-    /// video, as usually used, it will be to the right.
-    pub(crate) fn signed_polar_angle(&self, other: Coordinate3d) -> f32 {
+    /// The polar angle is between 0° and +180°, with 0° pointing to
+    /// the ground, 180° to the sky.
+    ///
+    /// Returned values are in radian, hence [0, PI]
+    pub(crate) fn polar_angle(&self, other: Coordinate3d) -> SignedAngle {
         let dx = other.x - self.x;
         let dy = other.y - self.y;
-        dx.atan2(dy) * 180.0 / std::f32::consts::PI
+        let dz = other.z - self.z;
+
+        let r = (dx.powi(2) + dy.powi(2) + dz.powi(2)).sqrt();
+        if !r.is_normal() {
+            // Handle vectors of lengths very close to zero, NaN, or infinity.
+            // Returning 0° is as good as any other angle.
+            return SignedAngle(0.0);
+        }
+        // note: potentially this could be computed more efficiently
+        // note 2: what about Math.acos() instead of wasm ?
+        SignedAngle((dy / r).acos())
     }
 
     /// The azimuth is the clock-wise angle to the negative z-axis.
     ///
     /// The azimuth is between -180° and 180°. Someone facing the camera has an
     /// azimuth of 0°, which is also known as north.
+    ///
+    /// Returned values are in radian, hence [-PI to PI].
     ///
     /// Just like in cartography, east is +90° and west is -90° for the dancer.
     /// However, in mirrored videos, the angles are therefore counter-clock-wise
@@ -103,10 +117,18 @@ impl Coordinate3d {
     /// Note that in the keypoint coordinate system, the positive z-axis faces
     /// south, not north. But since the camera coordinate system should not be
     /// of interest beyond the translation to angles, this fact rarely matters.
-    pub(crate) fn azimuth(&self, other: Coordinate3d) -> f32 {
+    pub(crate) fn azimuth(&self, other: Coordinate3d) -> SignedAngle {
         let dz = other.z - self.z;
-        // this reversal makes the usually ccw atan2 produce cw angles
+        // this reversal makes the angles clock-wise
         let dx = self.x - other.x;
-        return (dx.atan2(dz) * 180.0) / std::f32::consts::PI;
+        let r = dx.hypot(dz);
+        if !r.is_normal() {
+            // Handle vectors of lengths very close to zero, NaN, or infinity.
+            // Returning 0° is as good as any other angle.
+            return SignedAngle(0.0);
+        }
+        // note: potentially this could be computed more efficiently, esp. the sign
+        // note 2: what about Math.acos() instead of wasm ?
+        SignedAngle(dx.signum() * (dz / r).acos())
     }
 }

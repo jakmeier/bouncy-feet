@@ -1,5 +1,5 @@
 use crate::keypoints::Keypoints;
-use crate::skeleton::{Skeleton, SkeletonInfo};
+use crate::skeleton::{Skeleton, Skeleton3d};
 use wasm_bindgen::prelude::wasm_bindgen;
 
 #[wasm_bindgen]
@@ -8,7 +8,7 @@ pub struct Tracker {
     /// invariant: ordered by timestamp
     history: Vec<(u32, Keypoints)>,
     /// tracked limbs
-    skeletons: Vec<SkeletonInfo>,
+    skeletons: Vec<Skeleton3d>,
 }
 
 /// The result of fitting keypoints to poses.
@@ -39,7 +39,7 @@ impl Tracker {
         }
         // modification preserves timestamp order if it was true before
         self.history.push((timestamp, keypoints));
-        let skeleton_info = SkeletonInfo::from_keypoints(&keypoints);
+        let skeleton_info = Skeleton3d::from_keypoints(&keypoints);
         let skeleton = skeleton_info.to_skeleton();
         self.skeletons.push(skeleton_info);
         skeleton
