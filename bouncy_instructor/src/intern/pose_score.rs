@@ -26,10 +26,10 @@ impl Pose {
         let mut err = 0.0;
         let mut w = 0.0;
         for limb in &self.limbs {
-            w += limb.weight;
+            w += 2.0 * limb.weight;
             let angle = angles[limb.limb];
-            err += range_error(angle.azimuth, limb.azimuth_range);
-            err += range_error(angle.polar, limb.polar_range);
+            err += limb.weight * range_error(angle.azimuth, limb.azimuth_range);
+            err += limb.weight * range_error(angle.polar, limb.polar_range);
         }
         // (sus) normalize such that 45° away is 1.0
         let normalized = err / w / std::f32::consts::FRAC_PI_4.powi(2);
@@ -48,5 +48,162 @@ fn range_error(value: SignedAngle, range: (SignedAngle, SignedAngle)) -> f32 {
         (*value - max).powi(2)
     } else {
         0.0
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    use crate::intern::pose::{Limb, LimbPosition};
+    use expect_test::expect;
+    use std::f32::consts::PI;
+
+    /// test several angle for perfect matches, they should always return zero error
+    #[test]
+    fn test_single_limb_perfect_score() {
+        check_single_limb_perfect_score(0.0, 0.0);
+        check_single_limb_perfect_score(90.0, 0.0);
+        check_single_limb_perfect_score(0.0, 90.0);
+        check_single_limb_perfect_score(45.0, 45.0);
+        check_single_limb_perfect_score(123.0, -12.0);
+    }
+
+    /// asserts that given angle for a limb and the same in the pose results in zero error
+    #[track_caller]
+    fn check_single_limb_perfect_score(azimuth: f32, polar: f32) {
+        let azimuth = SignedAngle::degree(azimuth);
+        let polar = SignedAngle::degree(polar);
+        let limb = LimbPosition::new(Limb::LEFT_THIGH, azimuth, polar, SignedAngle::ZERO, 1.0);
+        let pose = Pose::new(vec![limb]);
+        let mut angles = zero_skeleton();
+        angles[Limb::LEFT_THIGH] = Angle3d::new(azimuth, polar);
+        let error = pose.error(&angles);
+        assert_eq!(0.0, error);
+    }
+
+    // Below are several tests that define a specific skeleton and combine it
+    // with a fixed pose to see if the results are stable error scores.
+    // And then some more tests the other way around, defining several poses and
+    // testing against a fixed skeleton.
+    //
+    // When fine-tuning the error function, the exact numbers will change.
+    // Snapshot testing helps to quickly update the exact scores. Set the
+    // environment variable `UPDATE_EXPECT` to do it automatically while
+    // running tests. Then check that the changes actually make sense.
+
+    #[test]
+    fn test_standing_straight_pose_score() {
+        let tol = SignedAngle::degree(5.0);
+        #[rustfmt::skip]
+        let pose = Pose::new(vec![
+            LimbPosition::new(Limb::LEFT_THIGH, SignedAngle(0.0), SignedAngle(0.0), tol, 1.0),
+            LimbPosition::new(Limb::LEFT_SHIN, SignedAngle(0.0), SignedAngle(0.0), tol, 1.0),
+            LimbPosition::new(Limb::LEFT_ARM, SignedAngle(0.0), SignedAngle(0.0), tol, 1.0),
+            LimbPosition::new(Limb::LEFT_FOREARM, SignedAngle(0.0), SignedAngle(0.0), tol, 1.0),
+            LimbPosition::new(Limb::RIGHT_THIGH, SignedAngle(0.0), SignedAngle(0.0), tol, 1.0),
+            LimbPosition::new(Limb::RIGHT_SHIN, SignedAngle(0.0), SignedAngle(0.0), tol, 1.0),
+            LimbPosition::new(Limb::RIGHT_ARM, SignedAngle(0.0), SignedAngle(0.0), tol, 1.0),
+            LimbPosition::new(Limb::RIGHT_FOREARM, SignedAngle(0.0), SignedAngle(0.0), tol, 1.0),
+        ]);
+        check_score_fixed_skeleton(&pose, expect!["1"]);
+    }
+
+    #[test]
+    fn test_t_pose_score() {
+        let tol = SignedAngle::degree(5.0);
+        #[rustfmt::skip]
+        let pose = Pose::new(vec![
+            LimbPosition::new(Limb::LEFT_THIGH, SignedAngle(0.0), SignedAngle(0.0), tol, 1.0),
+            LimbPosition::new(Limb::LEFT_SHIN, SignedAngle(0.0), SignedAngle(0.0), tol, 1.0),
+            LimbPosition::new(Limb::LEFT_ARM, SignedAngle(3.0 * PI), SignedAngle(PI), tol, 1.0),
+            LimbPosition::new(Limb::LEFT_FOREARM, SignedAngle(3.0 * PI), SignedAngle(PI), tol, 1.0),
+            LimbPosition::new(Limb::RIGHT_THIGH, SignedAngle(0.0), SignedAngle(0.0), tol, 1.0),
+            LimbPosition::new(Limb::RIGHT_SHIN, SignedAngle(0.0), SignedAngle(0.0), tol, 1.0),
+            LimbPosition::new(Limb::RIGHT_ARM, SignedAngle(PI), SignedAngle(PI), tol, 1.0),
+            LimbPosition::new(Limb::RIGHT_FOREARM, SignedAngle(PI), SignedAngle(PI), tol, 1.0),
+        ]);
+        check_score_fixed_skeleton(&pose, expect!["1"]);
+    }
+
+    #[test]
+    fn test_close_to_correct_pose_score() {
+        let mut pose = fixed_pose(1.0);
+        pose.limbs[Limb::RIGHT_THIGH].polar_range.0 .0 -= PI / 5.0;
+        pose.limbs[Limb::RIGHT_THIGH].polar_range.1 .0 -= PI / 5.0;
+
+        pose.limbs[Limb::LEFT_ARM].polar_range.0 .0 += PI / 17.0;
+        pose.limbs[Limb::LEFT_ARM].polar_range.1 .0 += PI / 17.0;
+
+        pose.limbs[Limb::RIGHT_FOREARM].azimuth_range.0 .0 -= PI / 17.0;
+        pose.limbs[Limb::RIGHT_FOREARM].azimuth_range.1 .0 -= PI / 17.0;
+
+        check_score_fixed_skeleton(&pose, expect!["0.04348361"]);
+    }
+
+    #[test]
+    fn test_close_to_correct_skeleton_score() {
+        let mut skeleton = fixed_skeleton();
+        skeleton[0].polar.0 += PI / 37.0;
+        skeleton[1].polar.0 += PI / 17.0;
+        skeleton[2].azimuth.0 -= PI / 19.0;
+        check_score_fixed_pose(&skeleton, expect!["0.001581543"]);
+    }
+
+    #[test]
+    fn test_standing_straight_skeleton_score() {
+        let skeleton = zero_skeleton();
+        check_score_fixed_pose(&skeleton, expect!["1"]);
+    }
+
+    /// asserts that a pose evaluated against a fixed skeleton results in the expected error score
+    #[track_caller]
+    fn check_score_fixed_skeleton(pose: &Pose, expect: expect_test::Expect) {
+        let angles = fixed_skeleton();
+        let error = pose.error(&angles);
+        expect.assert_eq(&error.to_string());
+    }
+
+    /// asserts that a skeleton evaluated against a fixed pose results in the expected error score
+    #[track_caller]
+    fn check_score_fixed_pose(skeleton: &[Angle3d], expect: expect_test::Expect) {
+        let pose = fixed_pose(5.0);
+        let error = pose.error(&skeleton);
+        expect.assert_eq(&error.to_string());
+    }
+
+    fn zero_skeleton() -> Vec<Angle3d> {
+        vec![Angle3d::ZERO; Limb::base_limbs().len()]
+    }
+
+    /// using a somewhat random skeleton, doesn't really matter what it is
+    /// just don't make it too complicated, for interpretability's sake
+    fn fixed_skeleton() -> Vec<Angle3d> {
+        let mut angles = zero_skeleton();
+
+        angles[Limb::RIGHT_THIGH] = Angle3d::degree(0.0, 90.0);
+        angles[Limb::RIGHT_SHIN] = Angle3d::degree(0.0, 45.0);
+        angles[Limb::RIGHT_ARM] = Angle3d::degree(90.0, 90.0);
+        angles[Limb::RIGHT_FOREARM] = Angle3d::degree(90.0, 90.0);
+        angles[Limb::LEFT_ARM] = Angle3d::degree(270.0, 45.0);
+        angles[Limb::LEFT_FOREARM] = Angle3d::degree(270.0, 0.0);
+        angles
+    }
+
+    /// using the same angles as used in `fixed_skeleton`
+    #[rustfmt::skip]
+    fn fixed_pose(tolerance: f32) -> Pose {
+        let tol = SignedAngle::degree(tolerance);
+        Pose::new(vec![
+            LimbPosition::new(Limb::LEFT_THIGH, SignedAngle(0.0), SignedAngle(0.0), tol, 1.0),
+            LimbPosition::new(Limb::LEFT_SHIN, SignedAngle(0.0), SignedAngle(0.0), tol, 1.0),
+            LimbPosition::new(Limb::LEFT_ARM, SignedAngle(3.0 * PI/2.0), SignedAngle(PI/4.0), tol, 1.0),
+            LimbPosition::new(Limb::LEFT_FOREARM, SignedAngle(3.0 * PI/2.0), SignedAngle(0.0), tol, 1.0),
+            LimbPosition::new(Limb::RIGHT_THIGH, SignedAngle(0.0), SignedAngle(PI/2.0), tol, 1.0),
+            LimbPosition::new(Limb::RIGHT_SHIN, SignedAngle(0.0), SignedAngle(PI/4.0), tol, 1.0),
+            LimbPosition::new(Limb::RIGHT_ARM, SignedAngle(PI/2.0), SignedAngle(PI/2.0), tol, 1.0),
+            LimbPosition::new(Limb::RIGHT_FOREARM, SignedAngle(PI/2.0), SignedAngle(PI/2.0), tol, 1.0),
+        ])
     }
 }

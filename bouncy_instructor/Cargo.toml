@@ -24,3 +24,6 @@ thiserror = "1.0.50"
 [dependencies.web-sys]
 version = "0.3.65"
 features = ["Request", "Response", "Window", "console"]
+
+[dev-dependencies]
+expect-test = "1.4.1"
