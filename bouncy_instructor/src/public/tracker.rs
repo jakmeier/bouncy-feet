@@ -1,5 +1,6 @@
+use crate::intern::skeleton_3d::Skeleton3d;
 use crate::keypoints::Keypoints;
-use crate::skeleton::{Skeleton, Skeleton3d};
+use crate::skeleton::Skeleton;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 #[wasm_bindgen]

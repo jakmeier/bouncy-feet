@@ -1,6 +1,8 @@
-use wasm_bindgen::prelude::wasm_bindgen;
+//! This module contains types for `Keypoints`, which are the main input for the
+//! instructor.
 
-use crate::skeleton::SignedAngle;
+use crate::intern::geom::SignedAngle;
+use wasm_bindgen::prelude::wasm_bindgen;
 
 #[wasm_bindgen]
 #[derive(Clone, Copy, Debug)]
@@ -12,21 +14,25 @@ pub struct Keypoints {
 #[wasm_bindgen(js_name = KeypointsSide)]
 #[derive(Clone, Copy, Debug)]
 pub struct Side {
-    pub shoulder: Coordinate3d,
-    pub hip: Coordinate3d,
-    pub knee: Coordinate3d,
-    pub ankle: Coordinate3d,
-    pub heel: Coordinate3d,
-    pub toes: Coordinate3d,
-    pub elbow: Coordinate3d,
-    pub wrist: Coordinate3d,
+    pub shoulder: Cartesian3d,
+    pub hip: Cartesian3d,
+    pub knee: Cartesian3d,
+    pub ankle: Cartesian3d,
+    pub heel: Cartesian3d,
+    pub toes: Cartesian3d,
+    pub elbow: Cartesian3d,
+    pub wrist: Cartesian3d,
 }
 
+/// Coordinate for Keypoints
 #[wasm_bindgen]
 #[derive(Clone, Copy, Debug)]
-pub struct Coordinate3d {
+pub struct Cartesian3d {
+    /// left-right direction
     pub x: f32,
+    /// up-down direction
     pub y: f32,
+    /// distance to camera
     pub z: f32,
 }
 
@@ -49,14 +55,14 @@ impl Keypoints {
 impl Side {
     #[wasm_bindgen(constructor)]
     pub fn new(
-        shoulder: Coordinate3d,
-        hip: Coordinate3d,
-        knee: Coordinate3d,
-        ankle: Coordinate3d,
-        heel: Coordinate3d,
-        toes: Coordinate3d,
-        elbow: Coordinate3d,
-        wrist: Coordinate3d,
+        shoulder: Cartesian3d,
+        hip: Cartesian3d,
+        knee: Cartesian3d,
+        ankle: Cartesian3d,
+        heel: Cartesian3d,
+        toes: Cartesian3d,
+        elbow: Cartesian3d,
+        wrist: Cartesian3d,
     ) -> Self {
         Self {
             shoulder,
@@ -72,14 +78,14 @@ impl Side {
 }
 
 #[wasm_bindgen]
-impl Coordinate3d {
+impl Cartesian3d {
     #[wasm_bindgen(constructor)]
     pub fn new(x: f32, y: f32, z: f32) -> Self {
         Self { x, y, z }
     }
 }
 
-impl Coordinate3d {
+impl Cartesian3d {
     /// The polar angle is measured against the y-axis, which goes from the
     /// ground to the sky.
     ///
@@ -87,7 +93,7 @@ impl Coordinate3d {
     /// the ground, 180° to the sky.
     ///
     /// Returned values are in radian, hence [0, PI]
-    pub(crate) fn polar_angle(&self, other: Coordinate3d) -> SignedAngle {
+    pub(crate) fn polar_angle(&self, other: Cartesian3d) -> SignedAngle {
         let dx = other.x - self.x;
         let dy = other.y - self.y;
         let dz = other.z - self.z;
@@ -117,7 +123,7 @@ impl Coordinate3d {
     /// Note that in the keypoint coordinate system, the positive z-axis faces
     /// south, not north. But since the camera coordinate system should not be
     /// of interest beyond the translation to angles, this fact rarely matters.
-    pub(crate) fn azimuth(&self, other: Coordinate3d) -> SignedAngle {
+    pub(crate) fn azimuth(&self, other: Cartesian3d) -> SignedAngle {
         let dz = other.z - self.z;
         // this reversal makes the angles clock-wise
         let dx = self.x - other.x;
