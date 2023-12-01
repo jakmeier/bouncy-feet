@@ -8,11 +8,8 @@
 
 use std::f32::consts::PI;
 
-use crate::Keypoints;
-
-use super::geom::{Angle3d, SignedAngle};
+use super::geom::SignedAngle;
 use super::pose::{Limb, LimbPosition, Pose};
-use super::skeleton_3d::Skeleton3d;
 
 /// List of registered poses to recognize during tracking.
 ///
@@ -92,34 +89,11 @@ impl LimbPositionDatabase {
         &self.names[i]
     }
 
-    // TODO(refactor): does this method make sense on DB?
-    pub(crate) fn angles_from_keypoints(&self, kp: &Keypoints) -> Vec<Angle3d> {
-        self.limbs
-            .iter()
-            .map(|l| {
-                let start = l.start.keypoint(kp);
-                let end = l.end.keypoint(kp);
-                Angle3d {
-                    azimuth: start.azimuth(end),
-                    polar: start.polar_angle(end),
-                }
-            })
-            .collect()
+    pub(crate) fn limbs(&self) -> impl Iterator<Item = &Limb> {
+        self.limbs.iter()
     }
 
-    // TODO(refactor): does this method make sense on DB?
-    pub(crate) fn fit(&self, skeleton: &Skeleton3d) -> (f32, usize) {
-        assert!(!self.poses.is_empty());
-
-        let mut best_error = f32::INFINITY;
-        let mut best_i = 0;
-        for (i, pose) in self.poses.iter().enumerate() {
-            let err = pose.error(skeleton.angles());
-            if err < best_error {
-                best_error = err;
-                best_i = i;
-            }
-        }
-        return (best_error, best_i);
+    pub(crate) fn poses(&self) -> &[Pose] {
+        &self.poses
     }
 }

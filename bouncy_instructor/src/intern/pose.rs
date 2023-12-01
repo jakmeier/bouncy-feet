@@ -10,28 +10,28 @@ use crate::public::pose_file;
 use crate::Keypoints;
 
 pub(crate) struct Pose {
-    limbs: Vec<LimbPosition>,
+    pub(crate) limbs: Vec<LimbPosition>,
 }
 
 pub(crate) struct LimbPosition {
     /// index to stored limbs
-    limb: usize,
+    pub(crate) limb: usize,
     /// range of polar angles considered zero error
-    polar_range: (SignedAngle, SignedAngle),
+    pub(crate) polar_range: (SignedAngle, SignedAngle),
     /// range of azimuth angles considered zero error
-    azimuth_range: (SignedAngle, SignedAngle),
+    pub(crate) azimuth_range: (SignedAngle, SignedAngle),
     /// weight used for computing the position error
-    weight: f32,
+    pub(crate) weight: f32,
 }
 
 #[derive(PartialEq, Eq, Hash)]
 pub(crate) struct Limb {
-    pub start: BodyPoint,
-    pub end: BodyPoint,
+    start: BodyPoint,
+    end: BodyPoint,
 }
 
 #[derive(PartialEq, Eq, Hash)]
-pub(crate) struct BodyPoint {
+struct BodyPoint {
     side: BodySide,
     part: BodyPart,
 }
@@ -73,22 +73,6 @@ impl Pose {
     pub(crate) fn new(limbs: Vec<LimbPosition>) -> Self {
         Self { limbs }
     }
-
-    /// Error is between 0.0  and 1.0
-    pub(crate) fn error(&self, angles: &[Angle3d]) -> f32 {
-        let mut err = 0.0;
-        let mut w = 0.0;
-        for limb in &self.limbs {
-            w += limb.weight;
-            let angle = angles[limb.limb];
-            err += range_error(angle.azimuth, limb.azimuth_range);
-            err += range_error(angle.polar, limb.polar_range);
-        }
-        // (sus) normalize such that 45° away is 1.0
-        let normalized = err / w / std::f32::consts::FRAC_PI_4.powi(2);
-        // anything above 45° is a flat 100% error
-        return normalized.min(1.0);
-    }
 }
 
 impl Limb {
@@ -114,6 +98,15 @@ impl Limb {
             pose_file::Limb::RightArm.into(),
             pose_file::Limb::RightForearm.into(),
         ]
+    }
+
+    pub(crate) fn to_angle(&self, kp: &Keypoints) -> Angle3d {
+        let start = self.start.keypoint(kp);
+        let end = self.end.keypoint(kp);
+        Angle3d {
+            azimuth: start.azimuth(end),
+            polar: start.polar_angle(end),
+        }
     }
 }
 
@@ -272,18 +265,5 @@ impl From<pose_file::BodySide> for BodySide {
             pose_file::BodySide::Left => Self::Left,
             pose_file::BodySide::Right => Self::Right,
         }
-    }
-}
-
-fn range_error(value: SignedAngle, range: (SignedAngle, SignedAngle)) -> f32 {
-    // TODO: add tests and fix (e.g. error around positive to negative ranges, which is broken now)
-    let min = *range.0;
-    let max = *range.1;
-    if *value < min {
-        (min - *value).powi(2)
-    } else if *value > max {
-        (*value - max).powi(2)
-    } else {
-        0.0
     }
 }

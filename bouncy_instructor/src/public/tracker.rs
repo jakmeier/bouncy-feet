@@ -1,3 +1,4 @@
+use crate::intern::pose_score::best_fit_pose;
 use crate::intern::skeleton_3d::Skeleton3d;
 use crate::keypoints::Keypoints;
 use crate::skeleton::Skeleton;
@@ -62,7 +63,7 @@ impl Tracker {
             let mut history_index = 0;
 
             for i in first..last {
-                let (err, pose) = state.db.fit(&self.skeletons[i]);
+                let (err, pose) = best_fit_pose(&self.skeletons[i], state.db.poses());
                 if err < error {
                     error = err;
                     pose_index = pose;

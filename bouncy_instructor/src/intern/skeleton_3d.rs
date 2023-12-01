@@ -26,7 +26,14 @@ pub(crate) struct Skeleton3d {
 
 impl Skeleton3d {
     pub(crate) fn from_keypoints(kp: &Keypoints) -> Self {
-        let mut limb_angles = STATE.with(|state| state.borrow().db.angles_from_keypoints(kp));
+        let mut limb_angles = STATE.with(|state| {
+            state
+                .borrow()
+                .db
+                .limbs()
+                .map(|limb| limb.to_angle(kp))
+                .collect::<Vec<_>>()
+        });
         // Shoulder defines where he person is looking
         let shoulder_angle = kp.left.shoulder.azimuth(kp.right.shoulder);
 

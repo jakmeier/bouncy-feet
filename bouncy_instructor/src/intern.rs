@@ -4,4 +4,5 @@
 pub(crate) mod geom;
 pub(crate) mod pose;
 pub(crate) mod pose_db;
+pub(crate) mod pose_score;
 pub(crate) mod skeleton_3d;
