@@ -1,3 +1,5 @@
+//! Utilities for unit tests.
+
 use crate::intern::geom::{SignedAngle, Angle3d};
 
 #[track_caller]

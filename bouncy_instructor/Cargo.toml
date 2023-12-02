@@ -5,7 +5,9 @@ edition = "2021"
 # TODO: author, license, etc
 
 [lib]
-crate-type = ["cdylib"]
+# cdylib is for WASM
+# rlib is required for integration tests to work
+crate-type = ["cdylib", "rlib"]
 
 [profile.release]
 lto = true

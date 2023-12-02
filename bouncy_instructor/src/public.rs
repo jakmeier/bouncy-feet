@@ -24,6 +24,10 @@ pub async fn load_pose_file(url: &str) -> Result<(), JsValue> {
     let resp: web_sys::Response = resp_value.dyn_into().unwrap();
     let js_value = JsFuture::from(resp.text()?).await?;
     let text = js_value.as_string().ok_or("Not a string")?;
+    load_pose_str(&text)
+}
+
+pub fn load_pose_str(text: &str) -> Result<(), JsValue> {
     let parsed = PoseFile::from_str(&text)?;
     STATE.with(|state| state.borrow_mut().db.add(parsed.poses));
 

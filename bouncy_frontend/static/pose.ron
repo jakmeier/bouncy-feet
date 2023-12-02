@@ -2,7 +2,7 @@
   version: 0,
   poses: [
     (
-      name: "stand-still",
+      name: "standing-straight",
       limbs: [
         ( limb: LeftShin, angle: 0, tolerance: 5, weight: 1.0),
         ( limb: LeftThigh, angle: 0, tolerance: 5, weight: 1.0),
