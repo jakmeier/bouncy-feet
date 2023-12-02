@@ -6,8 +6,9 @@
 */
 export function loadPoseFile(url: string): Promise<void>;
 /**
+* Coordinate for Keypoints
 */
-export class Coordinate3d {
+export class Cartesian3d {
   free(): void;
 /**
 * @param {number} x
@@ -16,12 +17,15 @@ export class Coordinate3d {
 */
   constructor(x: number, y: number, z: number);
 /**
+* left-right direction
 */
   x: number;
 /**
+* up-down direction
 */
   y: number;
 /**
+* distance to camera
 */
   z: number;
 }
@@ -46,40 +50,40 @@ export class Keypoints {
 export class KeypointsSide {
   free(): void;
 /**
-* @param {Coordinate3d} shoulder
-* @param {Coordinate3d} hip
-* @param {Coordinate3d} knee
-* @param {Coordinate3d} ankle
-* @param {Coordinate3d} heel
-* @param {Coordinate3d} toes
-* @param {Coordinate3d} elbow
-* @param {Coordinate3d} wrist
+* @param {Cartesian3d} shoulder
+* @param {Cartesian3d} hip
+* @param {Cartesian3d} knee
+* @param {Cartesian3d} ankle
+* @param {Cartesian3d} heel
+* @param {Cartesian3d} toes
+* @param {Cartesian3d} elbow
+* @param {Cartesian3d} wrist
 */
-  constructor(shoulder: Coordinate3d, hip: Coordinate3d, knee: Coordinate3d, ankle: Coordinate3d, heel: Coordinate3d, toes: Coordinate3d, elbow: Coordinate3d, wrist: Coordinate3d);
+  constructor(shoulder: Cartesian3d, hip: Cartesian3d, knee: Cartesian3d, ankle: Cartesian3d, heel: Cartesian3d, toes: Cartesian3d, elbow: Cartesian3d, wrist: Cartesian3d);
 /**
 */
-  ankle: Coordinate3d;
+  ankle: Cartesian3d;
 /**
 */
-  elbow: Coordinate3d;
+  elbow: Cartesian3d;
 /**
 */
-  heel: Coordinate3d;
+  heel: Cartesian3d;
 /**
 */
-  hip: Coordinate3d;
+  hip: Cartesian3d;
 /**
 */
-  knee: Coordinate3d;
+  knee: Cartesian3d;
 /**
 */
-  shoulder: Coordinate3d;
+  shoulder: Cartesian3d;
 /**
 */
-  toes: Coordinate3d;
+  toes: Cartesian3d;
 /**
 */
-  wrist: Coordinate3d;
+  wrist: Cartesian3d;
 }
 /**
 * The result of fitting keypoints to poses.
@@ -97,7 +101,9 @@ export class PoseApproximation {
   timestamp: number;
 }
 /**
-* Projected segment, with a x-y angle and a length factor.
+* Projected lin segment, with a x-y angle and a length factor.
+*
+* This format is perfect for 2D drawing.
 */
 export class Segment {
   free(): void;
@@ -168,4 +174,9 @@ export class Tracker {
 * @returns {PoseApproximation | undefined}
 */
   bestFitPosition(start: number, end: number): PoseApproximation | undefined;
+/**
+* @param {number} timestamp
+* @returns {string}
+*/
+  exportFrame(timestamp: number): string;
 }

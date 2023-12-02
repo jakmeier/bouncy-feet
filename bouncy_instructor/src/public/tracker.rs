@@ -78,7 +78,17 @@ impl Tracker {
         })?;
         Some(result)
     }
+
+    #[wasm_bindgen(js_name = exportFrame)]
+    pub fn export_frame(&self, timestamp: u32) -> String {
+        let mut config = ron::ser::PrettyConfig::default();
+        config.indentor = "  ".to_string();
+        match self.history.binary_search_by(|f| f.0.cmp(&timestamp)) {
+            Ok(i) | Err(i) => ron::ser::to_string_pretty(&self.history[i..i + 1], config).unwrap(),
+        }
+    }
 }
+
 #[wasm_bindgen]
 impl PoseApproximation {
     #[wasm_bindgen(getter)]

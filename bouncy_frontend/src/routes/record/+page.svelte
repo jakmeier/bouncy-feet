@@ -7,12 +7,7 @@
   import Area from './Area.svelte';
   import { t } from '$lib/i18n';
 
-  import {
-    Tracker,
-    Keypoints,
-    KeypointsSide,
-    Coordinate3d,
-  } from '$lib/instructor/bouncy_instructor';
+  import { Tracker } from '$lib/instructor/bouncy_instructor';
 
   const poseCtx = getContext('pose');
 

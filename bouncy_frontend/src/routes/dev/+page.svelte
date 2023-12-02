@@ -24,7 +24,7 @@
 
   function loop() {
     if (dataListener) {
-      dataListener.trackFrame(video);
+      dataListener.trackFrame(video, video.currentTime * 1000);
     }
     requestAnimationFrame(loop);
   }
@@ -37,6 +37,20 @@
       }
     });
   });
+
+  function downloadFrame() {
+    const keypointsRon = tracker.exportFrame(video.currentTime * 1000);
+
+    // Create a temporary <a> to trigger the download
+    const a = document.createElement('a');
+    a.href =
+      'data:text/plain;charset=utf-8,' + encodeURIComponent(keypointsRon);
+    a.download = 'keypoints.ron';
+
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
 </script>
 
 <h1>Dev</h1>
@@ -50,3 +64,4 @@
     on:change={loadVideo}
   />
 </p>
+<button on:click={downloadFrame}> Download Keypoints of Frame </button>

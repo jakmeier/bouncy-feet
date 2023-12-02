@@ -2,17 +2,18 @@
 //! instructor.
 
 use crate::intern::geom::SignedAngle;
+use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::wasm_bindgen;
 
 #[wasm_bindgen]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct Keypoints {
     pub left: Side,
     pub right: Side,
 }
 
 #[wasm_bindgen(js_name = KeypointsSide)]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct Side {
     pub shoulder: Cartesian3d,
     pub hip: Cartesian3d,
@@ -26,7 +27,7 @@ pub struct Side {
 
 /// Coordinate for Keypoints
 #[wasm_bindgen]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct Cartesian3d {
     /// left-right direction
     pub x: f32,

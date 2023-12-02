@@ -13,7 +13,7 @@
  */
 
 import { PoseLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
-import { Coordinate3d, Keypoints, KeypointsSide, loadPoseFile } from './instructor/bouncy_instructor';
+import { Cartesian3d, Keypoints, KeypointsSide, loadPoseFile } from './instructor/bouncy_instructor';
 
 
 export function landmarksToKeypoints(landmarks) {
@@ -50,6 +50,7 @@ export class PoseDetection {
     constructor(consumer, mp) {
         this.consumer = consumer;
         this.tZero = new Date().getTime();
+        this.tPrev = -1;
         // media pipe `PoseLandmarker`
         this.mp = mp;
     }
@@ -66,12 +67,26 @@ export class PoseDetection {
         return new PoseDetection(consumer, mp);
     }
 
+
     /**
      * 
      * @param {import('@mediapipe/tasks-vision').ImageSource} videoElement
-     */
-    trackFrame(videoElement) {
-        const timestamp = this.currentTimestamp();
+     * @param {number} timestamp
+    */
+    trackFrame(videoElement, timestamp) {
+        if (timestamp === undefined || timestamp === null) {
+            timestamp = this.currentTimestamp();
+        }
+        if (timestamp <= this.tPrev) {
+            if (timestamp < this.tPrev) {
+                console.warn("Timestamp is in the past", timestamp, this.tPrev);
+            }
+            return;
+        }
+        if (timestamp === 0) {
+            timestamp = 1;
+        }
+        this.tPrev = timestamp;
         this.mp.detectForVideo(videoElement, timestamp, ((result) => this.resultCallback(result, timestamp)));
     }
 
@@ -129,7 +144,7 @@ async function initMediaPipeBackend() {
  * @param {import('@mediapipe/tasks-vision').Landmark[]} landmarks
  */
 function coordinate(i, landmarks) {
-    return new Coordinate3d(landmarks[i].x, landmarks[i].y, landmarks[i].z);
+    return new Cartesian3d(landmarks[i].x, landmarks[i].y, landmarks[i].z);
 }
 
 export const I = {
