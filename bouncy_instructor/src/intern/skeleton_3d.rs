@@ -1,5 +1,6 @@
 use super::geom::{Angle3d, SignedAngle};
 use super::pose::Limb;
+use super::pose_db::LimbIndex;
 use crate::skeleton::{Segment, Side, Skeleton};
 use crate::{Keypoints, STATE};
 
@@ -31,7 +32,7 @@ impl Skeleton3d {
                 .borrow()
                 .db
                 .limbs()
-                .map(|limb| limb.to_angle(kp))
+                .map(|(_index, limb)| limb.to_angle(kp))
                 .collect::<Vec<_>>()
         });
         // Shoulder defines where he person is looking
@@ -56,10 +57,10 @@ impl Skeleton3d {
     pub(crate) fn to_skeleton(&self) -> Skeleton {
         // TODO: add an option to NOT undo the normalization azimuth rotation
         let correction = self.azimuth_correction;
-        let segment = |i: usize| -> Segment {
+        let segment = |i: LimbIndex| -> Segment {
             Angle3d::new(
-                self.limb_angles[i].azimuth + correction,
-                self.limb_angles[i].polar,
+                self.limb_angles[i.as_usize()].azimuth + correction,
+                self.limb_angles[i.as_usize()].polar,
             )
             .into()
         };
@@ -96,25 +97,37 @@ mod tests {
         let kp = straight_standing_keypoints();
         let skeleton = Skeleton3d::from_keypoints(&kp);
         assert_float_angle_eq(0.0, skeleton.azimuth_correction);
-        assert_angle_3d_eq(Angle3d::ZERO, skeleton.limb_angles[pose::Limb::LEFT_THIGH]);
-        assert_angle_3d_eq(Angle3d::ZERO, skeleton.limb_angles[pose::Limb::LEFT_SHIN]);
         assert_angle_3d_eq(
-            Angle3d::degree(-90.0, 45.0),
-            skeleton.limb_angles[pose::Limb::LEFT_ARM],
+            Angle3d::ZERO,
+            skeleton.limb_angles[pose::Limb::LEFT_THIGH.as_usize()],
+        );
+        assert_angle_3d_eq(
+            Angle3d::ZERO,
+            skeleton.limb_angles[pose::Limb::LEFT_SHIN.as_usize()],
         );
         assert_angle_3d_eq(
             Angle3d::degree(-90.0, 45.0),
-            skeleton.limb_angles[pose::Limb::LEFT_FOREARM],
-        );
-        assert_angle_3d_eq(Angle3d::ZERO, skeleton.limb_angles[pose::Limb::RIGHT_THIGH]);
-        assert_angle_3d_eq(Angle3d::ZERO, skeleton.limb_angles[pose::Limb::RIGHT_SHIN]);
-        assert_angle_3d_eq(
-            Angle3d::degree(90.0, 45.0),
-            skeleton.limb_angles[pose::Limb::RIGHT_ARM],
+            skeleton.limb_angles[pose::Limb::LEFT_ARM.as_usize()],
         );
         assert_angle_3d_eq(
+            Angle3d::degree(-90.0, 45.0),
+            skeleton.limb_angles[pose::Limb::LEFT_FOREARM.as_usize()],
+        );
+        assert_angle_3d_eq(
+            Angle3d::ZERO,
+            skeleton.limb_angles[pose::Limb::RIGHT_THIGH.as_usize()],
+        );
+        assert_angle_3d_eq(
+            Angle3d::ZERO,
+            skeleton.limb_angles[pose::Limb::RIGHT_SHIN.as_usize()],
+        );
+        assert_angle_3d_eq(
             Angle3d::degree(90.0, 45.0),
-            skeleton.limb_angles[pose::Limb::RIGHT_FOREARM],
+            skeleton.limb_angles[pose::Limb::RIGHT_ARM.as_usize()],
+        );
+        assert_angle_3d_eq(
+            Angle3d::degree(90.0, 45.0),
+            skeleton.limb_angles[pose::Limb::RIGHT_FOREARM.as_usize()],
         );
     }
 

@@ -6,10 +6,10 @@
 //! to combine it with the list of poses. This module contains the context
 //!  structs required for this.
 
-use std::f32::consts::PI;
-
 use super::geom::SignedAngle;
 use super::pose::{Limb, LimbPosition, Pose};
+use crate::pose_file;
+use std::f32::consts::PI;
 
 /// List of registered poses to recognize during tracking.
 ///
@@ -34,7 +34,12 @@ pub(crate) struct LimbPositionDatabase {
     /// invariant: must contain only unique values
     /// contract: append only
     limbs: Vec<Limb>,
+    limb_names: Vec<String>,
 }
+
+/// For accessing LimbPositionDatabase::limbs
+#[derive(Clone, Copy)]
+pub(crate) struct LimbIndex(usize);
 
 impl Default for LimbPositionDatabase {
     fn default() -> Self {
@@ -42,6 +47,7 @@ impl Default for LimbPositionDatabase {
             poses: vec![],
             names: vec![],
             limbs: Limb::base_limbs(),
+            limb_names: Limb::base_limb_names(),
         }
     }
 }
@@ -56,9 +62,10 @@ impl LimbPositionDatabase {
                     let limb = Limb::from(def.limb);
                     let index;
                     if let Some(i) = self.limbs.iter().position(|l| *l == limb) {
-                        index = i;
+                        index = LimbIndex(i);
                     } else {
-                        index = self.limbs.len();
+                        index = LimbIndex(self.limbs.len());
+                        self.limb_names.push(format!("{limb:?}"));
                         self.limbs.push(limb);
                     }
                     // definition is in °, internal usage is in rad
@@ -89,11 +96,66 @@ impl LimbPositionDatabase {
         &self.names[i]
     }
 
-    pub(crate) fn limbs(&self) -> impl Iterator<Item = &Limb> {
-        self.limbs.iter()
+    pub(crate) fn limbs(&self) -> impl Iterator<Item = (LimbIndex, &Limb)> {
+        (0..self.limbs.len()).map(LimbIndex).zip(self.limbs.iter())
+    }
+
+    pub(crate) fn limb_name(&self, i: LimbIndex) -> &str {
+        &self.limb_names[i.0]
     }
 
     pub(crate) fn poses(&self) -> &[Pose] {
         &self.poses
+    }
+}
+
+impl Limb {
+    pub(crate) const LEFT_THIGH: LimbIndex = LimbIndex(0);
+    pub(crate) const LEFT_SHIN: LimbIndex = LimbIndex(1);
+    pub(crate) const LEFT_ARM: LimbIndex = LimbIndex(2);
+    pub(crate) const LEFT_FOREARM: LimbIndex = LimbIndex(3);
+    pub(crate) const RIGHT_THIGH: LimbIndex = LimbIndex(4);
+    pub(crate) const RIGHT_SHIN: LimbIndex = LimbIndex(5);
+    pub(crate) const RIGHT_ARM: LimbIndex = LimbIndex(6);
+    pub(crate) const RIGHT_FOREARM: LimbIndex = LimbIndex(7);
+
+    /// List of limbs that are always racked.
+    /// They can be relied upon for rendering.
+    pub(crate) fn base_limbs() -> Vec<Self> {
+        vec![
+            pose_file::Limb::LeftThigh.into(),
+            pose_file::Limb::LeftShin.into(),
+            pose_file::Limb::LeftArm.into(),
+            pose_file::Limb::LeftForearm.into(),
+            pose_file::Limb::RightThigh.into(),
+            pose_file::Limb::RightShin.into(),
+            pose_file::Limb::RightArm.into(),
+            pose_file::Limb::RightForearm.into(),
+        ]
+    }
+
+    pub(crate) fn base_limb_names() -> Vec<String> {
+        vec![
+            "LeftThigh".into(),
+            "LeftShin".into(),
+            "LeftArm".into(),
+            "LeftForearm".into(),
+            "RightThigh".into(),
+            "RightShin".into(),
+            "RightArm".into(),
+            "RightForearm".into(),
+        ]
+    }
+}
+
+impl LimbIndex {
+    pub(crate) fn as_usize(&self) -> usize {
+        self.0
+    }
+}
+
+impl From<LimbIndex> for usize {
+    fn from(value: LimbIndex) -> Self {
+        value.0
     }
 }

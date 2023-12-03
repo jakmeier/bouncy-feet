@@ -22,7 +22,9 @@
 
   let debugT = 0;
   let debugText = '';
+  let debugText2 = '';
   let debugError = 0;
+  let debugPos = { x: 0, y: 0, z: 0 };
 
   const tracker = new Tracker();
 
@@ -39,10 +41,12 @@
       if (debugT + 1000 < now) {
         debugT = now;
         const videoT = dataListener.currentTimestamp();
-        const approximation = tracker.bestFitPosition(videoT - 400, videoT);
+        const approximation = tracker.bestFitPose(videoT - 400, videoT);
         if (approximation) {
           debugError = approximation.error;
+          const worst = approximation.worstLimbs(1)[0];
           debugText = approximation.name;
+          debugText2 = `${worst.error} ${worst.name}`;
           console.log(
             `found ${approximation.name} with an error of ${approximation.error}`
           );
@@ -67,6 +71,7 @@
       if (result.landmarks && result.landmarks.length >= 1) {
         // landmarks = result.landmarks[0];
         const kp = landmarksToKeypoints(result.landmarks[0]);
+        debugPos = kp.right.wrist;
         skeleton = tracker.addKeypoints(kp, timestamp);
       }
     });
@@ -102,8 +107,12 @@
         <p>{$t('record.start-button')}</p>
       </button>
     {/if}
-    <p>{debugText}</p>
-    <p>{debugError}</p>
+    <div class="debug">
+      <p>{debugText}</p>
+      <p>{debugError}</p>
+      <p>{debugText2}</p>
+      <p>{debugPos.x.toPrecision(2)} | {debugPos.y.toPrecision(2)} | {debugPos.z.toPrecision(2)}</p>
+    </div>
   </div>
 
   <p>[recording settings]</p>
@@ -123,5 +132,9 @@
   }
   button span {
     font-size: 42px;
+  }
+
+  .debug {
+    font-size: 25px;
   }
 </style>

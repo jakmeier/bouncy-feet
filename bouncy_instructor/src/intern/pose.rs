@@ -4,6 +4,7 @@
 //! serialization. Code for conversion from that format into the format in this
 //! file is included here.
 
+use super::pose_db::LimbIndex;
 use crate::intern::geom::{Angle3d, SignedAngle};
 use crate::public::keypoints::Cartesian3d;
 use crate::public::pose_file;
@@ -15,7 +16,7 @@ pub(crate) struct Pose {
 
 pub(crate) struct LimbPosition {
     /// index to stored limbs
-    pub(crate) limb: usize,
+    pub(crate) limb: LimbIndex,
     /// range of polar angles considered zero error
     pub(crate) polar_range: (SignedAngle, SignedAngle),
     /// range of azimuth angles considered zero error
@@ -24,25 +25,25 @@ pub(crate) struct LimbPosition {
     pub(crate) weight: f32,
 }
 
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Hash, Debug)]
 pub(crate) struct Limb {
     start: BodyPoint,
     end: BodyPoint,
 }
 
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Hash, Debug)]
 struct BodyPoint {
     side: BodySide,
     part: BodyPart,
 }
 
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Hash, Debug)]
 enum BodySide {
     Left,
     Right,
 }
 
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Hash, Debug)]
 enum BodyPart {
     Shoulder,
     Hip,
@@ -76,30 +77,6 @@ impl Pose {
 }
 
 impl Limb {
-    pub(crate) const LEFT_THIGH: usize = 0;
-    pub(crate) const LEFT_SHIN: usize = 1;
-    pub(crate) const LEFT_ARM: usize = 2;
-    pub(crate) const LEFT_FOREARM: usize = 3;
-    pub(crate) const RIGHT_THIGH: usize = 4;
-    pub(crate) const RIGHT_SHIN: usize = 5;
-    pub(crate) const RIGHT_ARM: usize = 6;
-    pub(crate) const RIGHT_FOREARM: usize = 7;
-
-    /// List of limbs that are always racked.
-    /// They can be relied upon for rendering.
-    pub(crate) fn base_limbs() -> Vec<Self> {
-        vec![
-            pose_file::Limb::LeftThigh.into(),
-            pose_file::Limb::LeftShin.into(),
-            pose_file::Limb::LeftArm.into(),
-            pose_file::Limb::LeftForearm.into(),
-            pose_file::Limb::RightThigh.into(),
-            pose_file::Limb::RightShin.into(),
-            pose_file::Limb::RightArm.into(),
-            pose_file::Limb::RightForearm.into(),
-        ]
-    }
-
     pub(crate) fn to_angle(&self, kp: &Keypoints) -> Angle3d {
         let start = self.start.keypoint(kp);
         let end = self.end.keypoint(kp);
@@ -112,7 +89,7 @@ impl Limb {
 
 impl LimbPosition {
     pub(crate) fn new(
-        limb: usize,
+        limb: LimbIndex,
         azimuth: SignedAngle,
         polar: SignedAngle,
         tolerance: SignedAngle,

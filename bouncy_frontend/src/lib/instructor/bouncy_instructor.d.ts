@@ -86,9 +86,9 @@ export class KeypointsSide {
   wrist: Cartesian3d;
 }
 /**
-* The result of fitting keypoints to poses.
+* Self-describing error score for a specific limbb
 */
-export class PoseApproximation {
+export class LimbError {
   free(): void;
 /**
 */
@@ -97,6 +97,34 @@ export class PoseApproximation {
 */
   readonly name: string;
 /**
+*/
+  weight: number;
+}
+/**
+* The result of fitting keypoints to poses.
+*/
+export class PoseApproximation {
+  free(): void;
+/**
+* List all limbs, order by how well they fit, best fit first.
+* @returns {(LimbError)[]}
+*/
+  limbErrors(): (LimbError)[];
+/**
+* List the `n` limbs with the highest error contribution to the pose error.
+* @param {number} n
+* @returns {(LimbError)[]}
+*/
+  worstLimbs(n: number): (LimbError)[];
+/**
+* Total error between 0.0 and 1.0.
+*/
+  error: number;
+/**
+*/
+  readonly name: string;
+/**
+* Timestamp for which Keypoints were added
 */
   timestamp: number;
 }
@@ -169,11 +197,18 @@ export class Tracker {
 */
   addKeypoints(keypoints: Keypoints, timestamp: number): Skeleton;
 /**
+* Fit frames in a time interval against all poses and return the best fit.
 * @param {number} start
 * @param {number} end
 * @returns {PoseApproximation | undefined}
 */
-  bestFitPosition(start: number, end: number): PoseApproximation | undefined;
+  bestFitPose(start: number, end: number): PoseApproximation | undefined;
+/**
+* Fit a single frame against all poses and return all errors
+* @param {number} timestamp
+* @returns {(PoseApproximation)[]}
+*/
+  allPoseErrors(timestamp: number): (PoseApproximation)[];
 /**
 * @param {number} timestamp
 * @returns {string}

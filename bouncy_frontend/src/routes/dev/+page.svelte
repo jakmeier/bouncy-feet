@@ -3,6 +3,7 @@
   import { landmarksToKeypoints } from '$lib/pose';
   import { fileToUrl, waitForVideoMetaLoaded } from '$lib/promise_util';
   import { getContext, onMount } from 'svelte';
+  import PoseError from './PoseError.svelte';
 
   /** @type {HTMLInputElement}  */
   let upload;
@@ -10,13 +11,19 @@
   let video;
 
   let dataListener;
-  const tracker = new Tracker();
+  let tracker = new Tracker();
   const poseCtx = getContext('pose');
+
+  /**
+   * @type {import("$lib/instructor/bouncy_instructor").PoseApproximation[]}
+   */
+  let poseErrors = [];
 
   async function loadVideo(event) {
     if (event.target.files && event.target.files[0]) {
       video.src = await fileToUrl(event.target.files[0]);
       await waitForVideoMetaLoaded(video);
+      tracker = new Tracker();
       video.play();
       loop();
     }
@@ -51,6 +58,10 @@
     a.click();
     document.body.removeChild(a);
   }
+
+  function computePoseErrors() {
+    poseErrors = tracker.allPoseErrors(video.currentTime * 1000);
+  }
 </script>
 
 <h1>Dev</h1>
@@ -65,3 +76,8 @@
   />
 </p>
 <button on:click={downloadFrame}> Download Keypoints of Frame </button>
+<button on:click={computePoseErrors}> Show Pose Evaluations </button>
+<h2>Pose evaluations</h2>
+{#each poseErrors as pose}
+  <PoseError data={pose} />
+{/each}

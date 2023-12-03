@@ -2,39 +2,101 @@
 
 use super::geom::{Angle3d, SignedAngle};
 use super::pose::Pose;
+use super::pose_db::LimbIndex;
 use super::skeleton_3d::Skeleton3d;
 
 /// Find the pose with the lowest error score.
-pub(crate) fn best_fit_pose(skeleton: &Skeleton3d, poses: &[Pose]) -> (f32, usize) {
+pub(crate) fn best_fit_pose(skeleton: &Skeleton3d, poses: &[Pose]) -> (f32, ErrorDetails, usize) {
     assert!(!poses.is_empty());
 
     let mut best_error = f32::INFINITY;
+    let mut best_details = ErrorDetails::default();
     let mut best_i = 0;
     for (i, pose) in poses.iter().enumerate() {
-        let err = pose.error(skeleton.angles());
+        let details = pose.error(skeleton.angles());
+        let err = details.error_score();
         if err < best_error {
             best_error = err;
             best_i = i;
+            best_details = details;
         }
     }
-    return (best_error, best_i);
+    return (best_error, best_details, best_i);
+}
+
+/// Error details for all limbs
+#[derive(Default)]
+pub(crate) struct ErrorDetails {
+    /// Index of limbs which were part of the compared pose
+    pub limbs: Vec<LimbIndex>,
+    /// error per limb, already normalized to [0.0,1.0]
+    pub errors: Vec<f32>,
+    /// weights to compute full error score
+    pub weights: Vec<f32>,
 }
 
 impl Pose {
     /// Error is between 0.0  and 1.0
-    fn error(&self, angles: &[Angle3d]) -> f32 {
-        let mut err = 0.0;
-        let mut w = 0.0;
+    pub(crate) fn error(&self, angles: &[Angle3d]) -> ErrorDetails {
+        let mut errors = Vec::with_capacity(self.limbs.len());
+        let mut weights = Vec::with_capacity(self.limbs.len());
+        let mut limbs = Vec::with_capacity(self.limbs.len());
         for limb in &self.limbs {
-            w += 2.0 * limb.weight;
-            let angle = angles[limb.limb];
-            err += limb.weight * range_error(angle.azimuth, limb.azimuth_range);
-            err += limb.weight * range_error(angle.polar, limb.polar_range);
+            limbs.push(limb.limb);
+            let angle = angles[limb.limb.as_usize()];
+            let limb_error = range_error(angle.azimuth, limb.azimuth_range)
+                + range_error(angle.polar, limb.polar_range);
+            // normalize such that 45° away is 1.0
+            // anything above 45° is a flat 100% error
+            let normalized = 1.0f32.min(limb_error / 2.0 / std::f32::consts::FRAC_PI_4.powi(2));
+            errors.push(normalized);
+            weights.push(limb.weight);
         }
-        // (sus) normalize such that 45° away is 1.0
-        let normalized = err / w / std::f32::consts::FRAC_PI_4.powi(2);
-        // anything above 45° is a flat 100% error
-        return normalized.min(1.0);
+        return ErrorDetails {
+            limbs,
+            errors,
+            weights,
+        };
+    }
+}
+
+impl ErrorDetails {
+    pub(crate) fn error_score(&self) -> f32 {
+        let (total_err, total_weight) = self
+            .errors
+            .iter()
+            .zip(&self.weights)
+            .fold((0.0, 0.0), |(e_acc, w_acc), (e, w)| {
+                (e_acc + e * w, w_acc + w)
+            });
+        if total_weight > 0.0 {
+            total_err / total_weight
+        } else {
+            1.0
+        }
+    }
+
+    /// returns indices of limbs in increasing order of how much they contribute to the total error
+    pub(crate) fn sorted_by_error(&self, increasing: bool, weighted: bool) -> Vec<usize> {
+        let mut indices = (0..self.errors.len()).collect::<Vec<_>>();
+        indices.sort_by(|&left, &right| {
+            let lhs = if weighted {
+                self.errors[left] * self.weights[left]
+            } else {
+                self.errors[left]
+            };
+            let rhs = if weighted {
+                self.errors[right] * self.weights[right]
+            } else {
+                self.errors[right]
+            };
+            if increasing {
+                lhs.partial_cmp(&rhs).unwrap()
+            } else {
+                rhs.partial_cmp(&lhs).unwrap()
+            }
+        });
+        indices
     }
 }
 
@@ -78,9 +140,9 @@ mod tests {
         let limb = LimbPosition::new(Limb::LEFT_THIGH, azimuth, polar, SignedAngle::ZERO, 1.0);
         let pose = Pose::new(vec![limb]);
         let mut angles = zero_skeleton();
-        angles[Limb::LEFT_THIGH] = Angle3d::new(azimuth, polar);
+        angles[Limb::LEFT_THIGH.as_usize()] = Angle3d::new(azimuth, polar);
         let error = pose.error(&angles);
-        assert_eq!(0.0, error);
+        assert_eq!(0.0, error.error_score());
     }
 
     // Below are several tests that define a specific skeleton and combine it
@@ -130,14 +192,20 @@ mod tests {
     #[test]
     fn test_close_to_correct_pose_score() {
         let mut pose = fixed_pose(1.0);
-        pose.limbs[Limb::RIGHT_THIGH].polar_range.0 .0 -= PI / 5.0;
-        pose.limbs[Limb::RIGHT_THIGH].polar_range.1 .0 -= PI / 5.0;
+        pose.limbs[Limb::RIGHT_THIGH.as_usize()].polar_range.0 .0 -= PI / 5.0;
+        pose.limbs[Limb::RIGHT_THIGH.as_usize()].polar_range.1 .0 -= PI / 5.0;
 
-        pose.limbs[Limb::LEFT_ARM].polar_range.0 .0 += PI / 17.0;
-        pose.limbs[Limb::LEFT_ARM].polar_range.1 .0 += PI / 17.0;
+        pose.limbs[Limb::LEFT_ARM.as_usize()].polar_range.0 .0 += PI / 17.0;
+        pose.limbs[Limb::LEFT_ARM.as_usize()].polar_range.1 .0 += PI / 17.0;
 
-        pose.limbs[Limb::RIGHT_FOREARM].azimuth_range.0 .0 -= PI / 17.0;
-        pose.limbs[Limb::RIGHT_FOREARM].azimuth_range.1 .0 -= PI / 17.0;
+        pose.limbs[Limb::RIGHT_FOREARM.as_usize()]
+            .azimuth_range
+            .0
+             .0 -= PI / 17.0;
+        pose.limbs[Limb::RIGHT_FOREARM.as_usize()]
+            .azimuth_range
+            .1
+             .0 -= PI / 17.0;
 
         check_score_fixed_skeleton(&pose, expect!["0.04348361"]);
     }
@@ -161,7 +229,7 @@ mod tests {
     #[track_caller]
     fn check_score_fixed_skeleton(pose: &Pose, expect: expect_test::Expect) {
         let angles = fixed_skeleton();
-        let error = pose.error(&angles);
+        let error = pose.error(&angles).error_score();
         expect.assert_eq(&error.to_string());
     }
 
@@ -169,7 +237,7 @@ mod tests {
     #[track_caller]
     fn check_score_fixed_pose(skeleton: &[Angle3d], expect: expect_test::Expect) {
         let pose = fixed_pose(5.0);
-        let error = pose.error(&skeleton);
+        let error = pose.error(&skeleton).error_score();
         expect.assert_eq(&error.to_string());
     }
 
@@ -182,12 +250,12 @@ mod tests {
     fn fixed_skeleton() -> Vec<Angle3d> {
         let mut angles = zero_skeleton();
 
-        angles[Limb::RIGHT_THIGH] = Angle3d::degree(0.0, 90.0);
-        angles[Limb::RIGHT_SHIN] = Angle3d::degree(0.0, 45.0);
-        angles[Limb::RIGHT_ARM] = Angle3d::degree(90.0, 90.0);
-        angles[Limb::RIGHT_FOREARM] = Angle3d::degree(90.0, 90.0);
-        angles[Limb::LEFT_ARM] = Angle3d::degree(270.0, 45.0);
-        angles[Limb::LEFT_FOREARM] = Angle3d::degree(270.0, 0.0);
+        angles[Limb::RIGHT_THIGH.as_usize()] = Angle3d::degree(0.0, 90.0);
+        angles[Limb::RIGHT_SHIN.as_usize()] = Angle3d::degree(0.0, 45.0);
+        angles[Limb::RIGHT_ARM.as_usize()] = Angle3d::degree(90.0, 90.0);
+        angles[Limb::RIGHT_FOREARM.as_usize()] = Angle3d::degree(90.0, 90.0);
+        angles[Limb::LEFT_ARM.as_usize()] = Angle3d::degree(270.0, 45.0);
+        angles[Limb::LEFT_FOREARM.as_usize()] = Angle3d::degree(270.0, 0.0);
         angles
     }
 
