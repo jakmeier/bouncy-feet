@@ -14,7 +14,7 @@ fn check_pose_in_keypoints(keypoints: &str, expected_pose: &str) {
     let (timestamp, keypoints) = parsed[0];
     tracker.add_keypoints(keypoints, timestamp);
     let approximation = tracker
-        .best_fit_position(timestamp, timestamp)
+        .best_fit_pose(timestamp, timestamp)
         .expect("no match found");
 
     assert_eq!(expected_pose, approximation.name(), "wrong pose detected");
