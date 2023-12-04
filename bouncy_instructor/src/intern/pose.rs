@@ -4,8 +4,12 @@
 //! serialization. Code for conversion from that format into the format in this
 //! file is included here.
 
+use std::f32::consts::{FRAC_PI_2, PI};
+
+use super::geom::SignedAngle;
 use super::pose_db::LimbIndex;
-use crate::intern::geom::{Angle3d, SignedAngle};
+use super::pose_score::AngleTarget;
+use crate::intern::geom::Angle3d;
 use crate::public::keypoints::Cartesian3d;
 use crate::public::pose_file;
 use crate::Keypoints;
@@ -17,12 +21,8 @@ pub(crate) struct Pose {
 pub(crate) struct LimbPosition {
     /// index to stored limbs
     pub(crate) limb: LimbIndex,
-    /// range of polar angles considered zero error
-    pub(crate) polar_range: (SignedAngle, SignedAngle),
-    /// range of azimuth angles considered zero error
-    pub(crate) azimuth_range: (SignedAngle, SignedAngle),
-    /// weight used for computing the position error
-    pub(crate) weight: f32,
+    /// position and error computation for this limb position
+    pub(crate) target: AngleTarget,
 }
 
 #[derive(PartialEq, Eq, Hash, Debug)]
@@ -95,12 +95,49 @@ impl LimbPosition {
         tolerance: SignedAngle,
         weight: f32,
     ) -> Self {
-        Self {
-            limb,
-            azimuth_range: (azimuth - tolerance, azimuth + tolerance),
-            polar_range: (polar - tolerance, polar + tolerance),
-            weight,
+        let angle = Angle3d::new(azimuth, polar);
+        let target = AngleTarget::new(angle, tolerance, weight);
+
+        Self { limb, target }
+    }
+
+    pub(crate) fn from_orthogonal_angles(
+        limb: LimbIndex,
+        forward: Option<i16>,
+        right: Option<i16>,
+        tolerance: u8,
+        weight: f32,
+    ) -> Self {
+        // convert from pose definition coordinates to spherical coordinates
+        // definition is in °, internal usage is in rad
+        // definition uses two 2D angle which need to be combined into a 3D angle
+        let mut angle = Angle3d::ZERO;
+
+        if let Some(forward) = forward {
+            let azimuth = SignedAngle::radian(if forward.is_positive() { 0.0 } else { PI });
+            let polar = SignedAngle::degree(forward as f32).abs();
+            angle.azimuth = angle.azimuth + azimuth;
+            angle.polar = angle.polar + polar;
         }
+
+        if let Some(right) = right {
+            let azimuth = SignedAngle::radian(right.signum() as f32 * FRAC_PI_2);
+            let polar = SignedAngle::degree(right as f32).abs();
+            angle.azimuth = angle.azimuth + azimuth;
+            angle.polar = angle.polar + polar;
+        }
+
+        Self::new(
+            limb,
+            angle.azimuth,
+            angle.polar,
+            SignedAngle::degree(tolerance as f32),
+            weight,
+        )
+    }
+
+    pub(crate) fn weight(&self) -> f32 {
+        self.target.weight()
     }
 }
 

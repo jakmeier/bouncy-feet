@@ -8,6 +8,7 @@ pub(crate) mod tracker;
 pub use keypoints::{Keypoints, Side as KeypointsSide};
 pub use tracker::Tracker;
 
+use self::pose_file::ParseFileError;
 use super::STATE;
 use pose_file::PoseFile;
 use wasm_bindgen::prelude::wasm_bindgen;
@@ -24,10 +25,11 @@ pub async fn load_pose_file(url: &str) -> Result<(), JsValue> {
     let resp: web_sys::Response = resp_value.dyn_into().unwrap();
     let js_value = JsFuture::from(resp.text()?).await?;
     let text = js_value.as_string().ok_or("Not a string")?;
-    load_pose_str(&text)
+    load_pose_str(&text)?;
+    Ok(())
 }
 
-pub fn load_pose_str(text: &str) -> Result<(), JsValue> {
+pub fn load_pose_str(text: &str) -> Result<(), ParseFileError> {
     let parsed = PoseFile::from_str(&text)?;
     STATE.with(|state| state.borrow_mut().db.add(parsed.poses));
 

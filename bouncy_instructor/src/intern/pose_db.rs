@@ -6,10 +6,8 @@
 //! to combine it with the list of poses. This module contains the context
 //!  structs required for this.
 
-use super::geom::SignedAngle;
 use super::pose::{Limb, LimbPosition, Pose};
 use crate::pose_file;
-use std::f32::consts::PI;
 
 /// List of registered poses to recognize during tracking.
 ///
@@ -68,19 +66,14 @@ impl LimbPositionDatabase {
                         self.limb_names.push(format!("{limb:?}"));
                         self.limbs.push(limb);
                     }
-                    // definition is in °, internal usage is in rad
-                    let alpha = SignedAngle::degree(def.angle as f32);
-                    let tolerance = SignedAngle::degree(def.tolerance as f32);
 
-                    // convert from pose definition coordinates to spherical coordinates
-                    //
-                    // iterative implementation:
-                    // now: only forward/backward angles are allowed
-                    // future: explicitly define whether it is a side angle or a forward/backward angle
-                    let azimuth = SignedAngle(if alpha.is_sign_positive() { 0.0 } else { PI });
-                    let polar = SignedAngle(*alpha).abs();
-
-                    LimbPosition::new(index, azimuth, polar, tolerance, def.weight)
+                    LimbPosition::from_orthogonal_angles(
+                        index,
+                        def.forward,
+                        def.right,
+                        def.tolerance,
+                        def.weight,
+                    )
                 })
                 .collect();
             self.poses.push(Pose::new(limbs));

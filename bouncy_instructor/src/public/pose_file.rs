@@ -33,7 +33,12 @@ pub(crate) struct Pose {
 pub(crate) struct LimbPosition {
     pub limb: Limb,
     pub weight: f32,
-    pub angle: i16,
+    /// Angle in the forward direction (negative for backward)
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub forward: Option<i16>,
+    /// Angle in the right direction from the dancer's view (negative for left)
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub right: Option<i16>,
     pub tolerance: u8,
 }
 
@@ -90,7 +95,7 @@ pub(crate) enum BodyPart {
 }
 
 #[derive(Error, Debug)]
-pub(crate) enum ParseFileError {
+pub enum ParseFileError {
     #[error("invalid pose file version (expected {expected:?}, found {found:?})")]
     VersionMismatch { expected: u16, found: u16 },
     #[error("parsing pose file failed, {0}")]
