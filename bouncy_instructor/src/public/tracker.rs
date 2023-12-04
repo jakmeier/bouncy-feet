@@ -102,8 +102,10 @@ impl Tracker {
         if self.skeletons.is_empty() {
             return vec![];
         }
-        let i = 0; // TODO binary search
-        let skeleton = &self.skeletons[i];
+
+        let skeleton = match self.history.binary_search_by(|el| el.0.cmp(&timestamp)) {
+            Ok(i) | Err(i) => &self.skeletons[i],
+        };
         crate::STATE.with_borrow(|state| {
             let angles = skeleton.angles();
             state
