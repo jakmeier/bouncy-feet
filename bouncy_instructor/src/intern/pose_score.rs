@@ -44,11 +44,13 @@ impl Pose {
         for limb in &self.limbs {
             limbs.push(limb.limb);
             let angle = angles[limb.limb.as_usize()];
-            let limb_error = range_error(angle.azimuth, limb.azimuth_range)
-                + range_error(angle.polar, limb.polar_range);
-            // normalize such that 45° away is 1.0
-            // anything above 45° is a flat 100% error
-            let normalized = 1.0f32.min(limb_error / 2.0 / std::f32::consts::FRAC_PI_4.powi(2));
+            // for now, same weights for azimuth and polar
+            let limb_error = (range_error(angle.azimuth, limb.azimuth_range)
+                + range_error(angle.polar, limb.polar_range))
+                / 2.0;
+            // normalize such that 90° away is 1.0
+            // anything above 90° is a flat 100% error
+            let normalized = 1.0f32.min(limb_error / std::f32::consts::FRAC_PI_2.powi(2));
             errors.push(normalized);
             weights.push(limb.weight);
         }
@@ -169,7 +171,7 @@ mod tests {
             LimbPosition::new(Limb::RIGHT_ARM, SignedAngle(0.0), SignedAngle(0.0), tol, 1.0),
             LimbPosition::new(Limb::RIGHT_FOREARM, SignedAngle(0.0), SignedAngle(0.0), tol, 1.0),
         ]);
-        check_score_fixed_skeleton(&pose, expect!["1"]);
+        check_score_fixed_skeleton(&pose, expect!["0.41493058"]);
     }
 
     #[test]
@@ -186,7 +188,7 @@ mod tests {
             LimbPosition::new(Limb::RIGHT_ARM, SignedAngle(PI), SignedAngle(PI), tol, 1.0),
             LimbPosition::new(Limb::RIGHT_FOREARM, SignedAngle(PI), SignedAngle(PI), tol, 1.0),
         ]);
-        check_score_fixed_skeleton(&pose, expect!["1"]);
+        check_score_fixed_skeleton(&pose, expect!["0.541088"]);
     }
 
     #[test]
@@ -207,7 +209,7 @@ mod tests {
             .1
              .0 -= PI / 17.0;
 
-        check_score_fixed_skeleton(&pose, expect!["0.04348361"]);
+        check_score_fixed_skeleton(&pose, expect!["0.010870897"]);
     }
 
     #[test]
@@ -216,13 +218,13 @@ mod tests {
         skeleton[0].polar.0 += PI / 37.0;
         skeleton[1].polar.0 += PI / 17.0;
         skeleton[2].azimuth.0 -= PI / 19.0;
-        check_score_fixed_pose(&skeleton, expect!["0.001581543"]);
+        check_score_fixed_pose(&skeleton, expect!["0.00039538753"]);
     }
 
     #[test]
     fn test_standing_straight_skeleton_score() {
         let skeleton = zero_skeleton();
-        check_score_fixed_pose(&skeleton, expect!["1"]);
+        check_score_fixed_pose(&skeleton, expect!["0.41493058"]);
     }
 
     /// asserts that a pose evaluated against a fixed skeleton results in the expected error score

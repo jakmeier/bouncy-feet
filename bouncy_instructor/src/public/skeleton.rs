@@ -1,12 +1,11 @@
-use std::f32::consts::{FRAC_PI_2, TAU};
-use wasm_bindgen::prelude::wasm_bindgen;
-
 use crate::intern::geom::Angle3d;
+use std::f32::consts::TAU;
+use wasm_bindgen::prelude::wasm_bindgen;
 
 /// A self-sufficient description of a body position snapshot for 2d rendering.
 ///
 /// Each limb has a 2D angle in the x-y plane plus a length factor to simulate
-/// the third dimension in a 2D projection.
+/// the third dimension in a 2D projection. X grows to the right, y grows down.
 ///
 /// This format is for exporting to other modules. JS code can easily read it
 /// and potentially render it.
@@ -39,23 +38,25 @@ pub struct Side {
 #[wasm_bindgen]
 #[derive(Clone, Copy, PartialEq, Debug)]
 pub struct Segment {
-    /// The 2D projected angle of the segment.
+    /// The 2D projected angle of the segment, counter-clock wise to the x-axis,
+    /// in [0, 2*PI).
     pub angle: f32,
-    /// the factor to multiply lengths when drawing the projected segment in 2D
+    /// The factor to multiply lengths when drawing the projected segment in 2D.
     pub r: f32,
 }
 
 impl From<Angle3d> for Segment {
     fn from(value: Angle3d) -> Self {
-        let x = value.polar.sin() * value.azimuth.sin();
-        let y = -value.polar.cos();
+        // polar angle of 0 means 90° in the projected 2D system
+        let x = -value.polar.sin() * value.azimuth.sin();
+        let y = value.polar.cos();
         let xy_len = x.hypot(y);
-        let angle = if xy_len == 0.0 {
-            0.0
+        if xy_len.abs() <= 1e-6 {
+            Self { angle: 0.0, r: 0.0 }
         } else {
-            (y.atan2(x) + FRAC_PI_2) % TAU
-        };
-        Self { angle, r: xy_len }
+            let angle = (y.atan2(x) + TAU) % TAU;
+            Self { angle, r: xy_len }
+        }
     }
 }
 
@@ -89,15 +90,34 @@ mod tests {
     ///
     /// Note that 0° in the exported format is the x-axis, as is common in mathematics.
     /// But in the internal format, 0° is down, along the y-axis.
+    /// At least both systems use clock-wise angles (left-handed system) and in
+    /// both the y axis gros down.
     #[test]
     fn test_angle_to_segment() {
         // (azimuth, polar), (expected_angle, expected_len)
-        check_angle_to_segment((0.0, 0.0), (0.0, 1.0));
+        // straight down
+        check_angle_to_segment((0.0, 0.0), (90.0, 1.0));
+        check_angle_to_segment((45.0, 0.0), (90.0, 1.0));
+        check_angle_to_segment((-45.0, 0.0), (90.0, 1.0));
+        check_angle_to_segment((-90.0, 0.0), (90.0, 1.0));
+
+        // to the dancers right => left on screen
+        check_angle_to_segment((90.0, 90.0), (180.0, 1.0));
+        check_angle_to_segment((90.0, 45.0), (135.0, 1.0));
+        check_angle_to_segment((90.0, 100.0), (190.0, 1.0));
+
+        // to the dancers left => right on screen
+        check_angle_to_segment((270.0, 90.0), (0.0, 1.0));
+        check_angle_to_segment((270.0, 30.0), (60.0, 1.0));
+        check_angle_to_segment((270.0, 0.0), (90.0, 1.0));
+        check_angle_to_segment((270.0, -30.0), (120.0, 1.0));
+
+        // facing the camera: length is shortened
+        check_angle_to_segment((0.0, 30.0), (90.0, 3.0f32.sqrt() / 2.0));
+        check_angle_to_segment((0.0, 45.0), (90.0, FRAC_1_SQRT_2));
+        check_angle_to_segment((0.0, 60.0), (90.0, 0.5));
+        // here the azimuth could be anything, since the length is 0.0, but we
+        // want it to be 0.0 for uniqueness of coordinates
         check_angle_to_segment((0.0, 90.0), (0.0, 0.0));
-        check_angle_to_segment((90.0, 90.0), (90.0, 1.0));
-        check_angle_to_segment((270.0, 90.0), (-90.0, 1.0));
-        check_angle_to_segment((90.0, 45.0), (45.0, 1.0));
-        check_angle_to_segment((45.0, 0.0), (0.0, 1.0));
-        check_angle_to_segment((0.0, 45.0), (0.0, FRAC_1_SQRT_2));
     }
 }

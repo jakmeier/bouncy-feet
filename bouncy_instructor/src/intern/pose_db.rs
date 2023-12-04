@@ -78,7 +78,7 @@ impl LimbPositionDatabase {
                     // now: only forward/backward angles are allowed
                     // future: explicitly define whether it is a side angle or a forward/backward angle
                     let azimuth = SignedAngle(if alpha.is_sign_positive() { 0.0 } else { PI });
-                    let polar = SignedAngle(alpha.abs());
+                    let polar = SignedAngle(*alpha).abs();
 
                     LimbPosition::new(index, azimuth, polar, tolerance, def.weight)
                 })

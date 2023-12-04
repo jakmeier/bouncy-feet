@@ -7,14 +7,14 @@ export function distance2d(a, b) {
 }
 
 /**
- * Vector in signed polar angle format, x is horizontal and y vertical
+ * Vector in clockwise angle format, x is horizontal and y vertical
  * @param {{ x: number; y: number; }} start
  * @param {number} alpha
  * @param {number} length
  */
 export function add2dVector(start, alpha, length) {
     return {
-        x: start.x + Math.sin(alpha) * length,
-        y: start.y + Math.cos(alpha) * length,
+        x: start.x + Math.cos(alpha) * length,
+        y: start.y + Math.sin(alpha) * length,
     };
 }

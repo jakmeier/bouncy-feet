@@ -68,6 +68,7 @@ each element. (Until we replace it it with a more meaningful error function.)
 # 2D Skeleton Projections (exported)
 
 To draw a 2D projection of the skelton, x-y angles are computed and length
-contraction factors. This allows simple 2D drawing in JS code.
+contraction factors. This allows simple 2D drawing in JS code. Angles are in [0,
+2*PI), clockwise, starting at the positive x-axis.
 
 The 2D projection reverses the azimuth normalization.

@@ -11,7 +11,7 @@ pub(crate) struct Angle3d {
     pub polar: SignedAngle,
 }
 
-/// Represents angles from -PI to PI
+/// Represents angles from -PI (exclusive) to PI (inclusive)
 #[derive(Clone, Copy, PartialEq)]
 pub(crate) struct SignedAngle(pub(crate) f32);
 
@@ -36,8 +36,8 @@ impl Angle3d {
     #[allow(dead_code)]
     pub(crate) fn radian(azimuth: f32, polar: f32) -> Self {
         Self {
-            azimuth: SignedAngle(azimuth),
-            polar: SignedAngle(polar),
+            azimuth: SignedAngle::radian(azimuth),
+            polar: SignedAngle::radian(polar),
         }
     }
 }
@@ -54,14 +54,27 @@ impl SignedAngle {
         self.0 * 180.0 / PI
     }
 
-    /// Returns a copy of the angle where values are guaranteed to be in [-PI and PI)
+    /// Returns a copy of the angle where values are guaranteed to be in (-PI and PI]
     #[inline]
-    fn ensure_signed(self) -> Self {
-        // using add -> mod -> sub avoids branching
-        // unclear if it's worth it or not
+    fn ensure_signed(mut self) -> Self {
+        self.0 = self.0 % TAU;
+        // maybe branching here is bad for performance?
         // no performance testing was done so far
-        let alpha = (self.0 + PI) % TAU - PI;
-        Self(alpha)
+        if self.0 > PI {
+            self.0 -= TAU;
+        } else if self.0 <= -PI {
+            self.0 += TAU;
+        }
+        self
+    }
+
+    pub(crate) fn abs(mut self) -> Self {
+        self.0 = self.0.abs();
+        self
+    }
+
+    pub(crate) fn radian(alpha: f32) -> Self {
+        Self(alpha).ensure_signed()
     }
 }
 
@@ -106,14 +119,14 @@ mod tests {
     /// Tests `SignedAngle::degree`
     ///
     /// The inputs of are in ° in [f32::MIN, f32::MAX]
-    /// The internal representation must be in radians in [-PI, +PI).
+    /// The internal representation must be in radians in (-PI, +PI].
     #[test]
     fn test_angle_degree_to_radian() {
         assert_float_angle_eq(0.0, SignedAngle::degree(0.0));
         assert_float_angle_eq(FRAC_PI_4, SignedAngle::degree(45.0));
         assert_float_angle_eq(-FRAC_PI_4, SignedAngle::degree(-45.0));
         assert_float_angle_eq(-FRAC_PI_4, SignedAngle::degree(315.0));
-        assert_float_angle_eq(-PI, SignedAngle::degree(-180.0));
-        assert_float_angle_eq(-PI, SignedAngle::degree(180.0));
+        assert_float_angle_eq(PI, SignedAngle::degree(-180.0));
+        assert_float_angle_eq(PI, SignedAngle::degree(180.0));
     }
 }

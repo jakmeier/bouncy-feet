@@ -7,6 +7,12 @@
 export function loadPoseFile(url: string): Promise<void>;
 /**
 * Coordinate for Keypoints
+*
+* The coordinate system is growing down (y-axis), right (x-axis), and away
+* from the camera (z-axis).
+*
+* See the Keypoints section in bouncy_instructor/coordinates.md for visuals
+* and rationale.
 */
 export class Cartesian3d {
   free(): void;
@@ -136,11 +142,12 @@ export class PoseApproximation {
 export class Segment {
   free(): void;
 /**
-* The 2D projected angle of the segment.
+* The 2D projected angle of the segment, counter-clock wise to the x-axis,
+* in [0, 2*PI).
 */
   angle: number;
 /**
-* the factor to multiply lengths when drawing the projected segment in 2D
+* The factor to multiply lengths when drawing the projected segment in 2D.
 */
   r: number;
 }
@@ -148,7 +155,7 @@ export class Segment {
 * A self-sufficient description of a body position snapshot for 2d rendering.
 *
 * Each limb has a 2D angle in the x-y plane plus a length factor to simulate
-* the third dimension in a 2D projection.
+* the third dimension in a 2D projection. X grows to the right, y grows down.
 *
 * This format is for exporting to other modules. JS code can easily read it
 * and potentially render it.

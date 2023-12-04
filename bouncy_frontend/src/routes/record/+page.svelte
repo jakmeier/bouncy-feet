@@ -111,7 +111,7 @@
       <p>{debugText}</p>
       <p>{debugError}</p>
       <p>{debugText2}</p>
-      <p>{debugPos.x.toPrecision(2)} | {debugPos.y.toPrecision(2)} | {debugPos.z.toPrecision(2)}</p>
+      <p>({debugPos.x.toPrecision(2)} | {debugPos.y.toPrecision(2)} | {debugPos.z.toPrecision(2)})</p>
     </div>
   </div>
 
