@@ -17,7 +17,7 @@
         // left leg has to stand straight, but it doesn't matter if the knee is angled
         ( limb: LeftLeg, forward: 0, tolerance: 5, weight: 1.0),
         // right leg is also somewhere around being straight down, but with a tight angle at the knee
-        ( limb: RightLeg, forward: 0, tolerance: 5, weight: 0.5),
+        ( limb: RightLeg, forward: 0, tolerance: 5, weight: 0.3),
         ( limb: RightShin, forward: -30, tolerance: 20, weight: 0.2),
         ( limb: RightThigh, forward: 70, tolerance: 5, weight: 0.5),
       ]
@@ -26,7 +26,7 @@
       name: "left-up",
       limbs: [
         ( limb: RightLeg, forward: 0, tolerance: 5, weight: 1.0),
-        ( limb: LeftLeg, forward: 0, tolerance: 5, weight: 0.5),
+        ( limb: LeftLeg, forward: 0, tolerance: 5, weight: 0.3),
         ( limb: LeftShin, forward: -30, tolerance: 20, weight: 0.2),
         ( limb: LeftThigh, forward: 70, tolerance: 5, weight: 0.5),
       ]
@@ -34,23 +34,21 @@
     (
       name: "right-forward",
       limbs: [
-        ( limb: LeftThigh, forward: -20, tolerance: 5, weight: 1.0),
-        ( limb: LeftShin, forward: -25, tolerance: 5, weight: 1.0),
+        ( limb: LeftThigh, forward: -20, tolerance: 5, weight: 0.5),
+        ( limb: LeftShin, forward: -25, tolerance: 5, weight: 0.5),
         ( limb: LeftLeg, forward: -30, tolerance: 5, weight: 1.0),
-        ( limb: RightThigh, forward: 40, tolerance: 2, weight: 1.0),
-        ( limb: RightShin, forward: 0, tolerance: 2, weight: 1.0),
-        ( limb: RightLeg, forward: 10, tolerance: 2, weight: 1.0),
+        ( limb: RightThigh, forward: 40, tolerance: 5, weight: 1.0),
+        ( limb: RightShin, forward: 0, tolerance: 10, weight: 0.5),
       ]
     ),
     (
       name: "left-forward",
       limbs: [
-        ( limb: RightThigh, forward: -20, tolerance: 5, weight: 1.0),
-        ( limb: RightShin, forward: -25, tolerance: 5, weight: 1.0),
+        ( limb: RightThigh, forward: -20, tolerance: 5, weight: 0.5),
+        ( limb: RightShin, forward: -25, tolerance: 5, weight: 0.5),
         ( limb: RightLeg, forward: -30, tolerance: 5, weight: 1.0),
-        ( limb: LeftThigh, forward: 40, tolerance: 2, weight: 1.0),
-        ( limb: LeftShin, forward: 0, tolerance: 2, weight: 1.0),
-        ( limb: LeftLeg, forward: 10, tolerance: 2, weight: 1.0),
+        ( limb: LeftThigh, forward: 40, tolerance: 5, weight: 1.0),
+        ( limb: LeftShin, forward: 0, tolerance: 10, weight: 0.5),
       ]
     ),
   ]

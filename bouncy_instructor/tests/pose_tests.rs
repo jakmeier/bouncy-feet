@@ -32,7 +32,7 @@ fn check_pose_in_keypoints(keypoints: &str, expected_pose: &str) {
     assert_eq!(expected_pose, approximation.name(), "wrong pose detected");
     assert_eq!(timestamp, approximation.timestamp, "timestamp mangled");
     // TODO: this threshold should be much smaller, but for now I'm happy if tests just pass
-    let threshold = 0.35;
+    let threshold = 0.25;
     assert!(
         approximation.error < threshold,
         "correct pose but error is too big {}",
@@ -74,4 +74,16 @@ fn test_standing_2() {
 fn test_standing_3() {
     let keypoints = include_str!("./data/standing_west.keypoints.ron");
     check_pose_in_keypoints(keypoints, "standing-straight");
+}
+
+#[test]
+fn test_right_forward_1() {
+    let keypoints = include_str!("./data/right_forward_1.keypoints.ron");
+    check_pose_in_keypoints(keypoints, "right-forward");
+}
+
+#[test]
+fn test_right_up_1() {
+    let keypoints = include_str!("./data/right_up_1.keypoints.ron");
+    check_pose_in_keypoints(keypoints, "right-up");
 }
