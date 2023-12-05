@@ -46,12 +46,21 @@ impl Tracker {
     }
 
     #[wasm_bindgen(js_name = addKeypoints)]
-    pub fn add_keypoints(&mut self, keypoints: Keypoints, timestamp: u32) -> Skeleton {
+    pub fn add_keypoints(&mut self, mut keypoints: Keypoints, timestamp: u32) -> Skeleton {
         if let Some(last) = self.history.last() {
             if last.0 >= timestamp {
                 panic!("inserted data not strictly monotonically increasing");
             }
         }
+
+        // It seems that the z coordinate is just not to scale with x and y in
+        // the output of mediapipe. It should be adjusted when they are
+        // converted to keypoints, i.e. BEFORE we see it in WASM. But it's
+        // easier to fine tune the divisor inside Rust for now.
+        keypoints
+            .iter_mut()
+            .for_each(|coordiante| coordiante.z /= 2.0);
+
         // modification preserves timestamp order if it was true before
         self.history.push((timestamp, keypoints));
         let skeleton_info = Skeleton3d::from_keypoints(&keypoints);
