@@ -66,7 +66,7 @@ mod tests {
     use super::*;
     use crate::test_utils::*;
 
-    use std::f32::consts::{FRAC_1_SQRT_2, PI};
+    use std::f32::consts::FRAC_1_SQRT_2;
 
     #[track_caller]
     fn check_angle_to_segment(
