@@ -25,25 +25,25 @@ pub(crate) struct LimbPosition {
     pub(crate) target: AngleTarget,
 }
 
-#[derive(PartialEq, Eq, Hash, Debug)]
+#[derive(PartialEq, Eq, Hash, Debug, Clone, Copy)]
 pub(crate) struct Limb {
     start: BodyPoint,
     end: BodyPoint,
 }
 
-#[derive(PartialEq, Eq, Hash, Debug)]
+#[derive(PartialEq, Eq, Hash, Debug, Clone, Copy)]
 struct BodyPoint {
     side: BodySide,
     part: BodyPart,
 }
 
-#[derive(PartialEq, Eq, Hash, Debug)]
+#[derive(PartialEq, Eq, Hash, Debug, Clone, Copy)]
 enum BodySide {
     Left,
     Right,
 }
 
-#[derive(PartialEq, Eq, Hash, Debug)]
+#[derive(PartialEq, Eq, Hash, Debug, Clone, Copy)]
 enum BodyPart {
     Shoulder,
     Hip,

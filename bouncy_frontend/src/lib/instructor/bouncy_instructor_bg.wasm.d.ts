@@ -2,6 +2,8 @@
 export const memory: WebAssembly.Memory;
 export const __wbindgen_export_2: WebAssembly.Table;
 export function cartesian3d_new(a: number, b: number, c: number): number;
+export function exportedframe_keypoints(a: number, b: number): void;
+export function exportedframe_pose(a: number, b: number): void;
 export function keypoints_new(a: number, b: number): number;
 export function keypointsside_new(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number): number;
 export function limberror_name(a: number, b: number): void;
@@ -12,9 +14,10 @@ export function poseapproximation_worstLimbs(a: number, b: number, c: number): v
 export function tracker_addKeypoints(a: number, b: number, c: number): number;
 export function tracker_allPoseErrors(a: number, b: number, c: number): void;
 export function tracker_bestFitPose(a: number, b: number, c: number): number;
-export function tracker_exportFrame(a: number, b: number, c: number): void;
+export function tracker_exportFrame(a: number, b: number): number;
 export function tracker_new(): number;
 export function __wbg_cartesian3d_free(a: number): void;
+export function __wbg_exportedframe_free(a: number): void;
 export function __wbg_get_cartesian3d_x(a: number): number;
 export function __wbg_get_cartesian3d_y(a: number): number;
 export function __wbg_get_cartesian3d_z(a: number): number;

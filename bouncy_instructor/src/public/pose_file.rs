@@ -4,7 +4,7 @@
 //! logic. Instead, translate to internal types. This allows refactoring
 //! internal without changing the external formats.
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use thiserror::Error;
 use wasm_bindgen::JsValue;
 
@@ -22,27 +22,35 @@ pub(crate) struct PoseFile {
 /// This includes the exact desired position range and a name.
 /// This is the format for external files and loaded in at runtime.
 /// It is converted to a [`crate::pose::Pose`] for computations.
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub(crate) struct Pose {
     pub name: String,
     pub limbs: Vec<LimbPosition>,
 }
 
 /// Describes a desired angle of a limb defined by start and end point.
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub(crate) struct LimbPosition {
     pub limb: Limb,
     pub weight: f32,
     /// Angle in the forward direction (negative for backward)
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "::serde_with::rust::unwrap_or_skip"
+    )]
     pub forward: Option<i16>,
     /// Angle in the right direction from the dancer's view (negative for left)
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "::serde_with::rust::unwrap_or_skip"
+    )]
     pub right: Option<i16>,
     pub tolerance: u8,
 }
 
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub(crate) struct BodyPoint {
     pub side: BodySide,
     pub part: BodyPart,
@@ -52,7 +60,7 @@ pub(crate) struct BodyPoint {
 ///
 /// Custom points are maximally expressive but also verbose. Any limb that's
 /// used frequently should probably be included in the pre-defined list.
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub(crate) enum Limb {
     /// knee to ankle
     LeftShin,
@@ -80,18 +88,20 @@ pub(crate) enum Limb {
     },
 }
 
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub(crate) enum BodySide {
     Left,
     Right,
 }
 
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub(crate) enum BodyPart {
     Shoulder,
     Hip,
     Knee,
     Ankle,
+    Elbow,
+    Wrist,
 }
 
 #[derive(Error, Debug)]

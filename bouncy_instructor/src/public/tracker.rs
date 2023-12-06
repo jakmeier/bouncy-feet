@@ -34,6 +34,16 @@ pub struct LimbError {
     pub weight: f32,
 }
 
+/// Information of a recorded frame in RON format.
+///
+/// Can be useful for creating new poses, new keypoint inputs for tests, or just
+/// for general debugging.
+#[wasm_bindgen]
+pub struct ExportedFrame {
+    keypoints: String,
+    pose: String,
+}
+
 #[wasm_bindgen]
 impl Tracker {
     #[wasm_bindgen(constructor)]
@@ -136,11 +146,19 @@ impl Tracker {
     }
 
     #[wasm_bindgen(js_name = exportFrame)]
-    pub fn export_frame(&self, timestamp: u32) -> String {
+    pub fn export_frame(&self, timestamp: u32) -> ExportedFrame {
         let mut config = ron::ser::PrettyConfig::default();
         config.indentor = "  ".to_string();
         match self.history.binary_search_by(|f| f.0.cmp(&timestamp)) {
-            Ok(i) | Err(i) => ron::ser::to_string_pretty(&self.history[i..i + 1], config).unwrap(),
+            Ok(i) | Err(i) => ExportedFrame {
+                keypoints: ron::ser::to_string_pretty(&self.history[i..i + 1], config.clone())
+                    .unwrap(),
+                pose: ron::ser::to_string_pretty(
+                    &crate::pose_file::Pose::from(&self.skeletons[i]),
+                    config,
+                )
+                .unwrap(),
+            },
         }
     }
 }
@@ -185,6 +203,19 @@ impl PoseApproximation {
                 error: self.error_details.errors[i],
                 weight: self.error_details.weights[i],
             })
+    }
+}
+
+#[wasm_bindgen]
+impl ExportedFrame {
+    #[wasm_bindgen(getter)]
+    pub fn pose(&self) -> String {
+        self.pose.clone()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn keypoints(&self) -> String {
+        self.keypoints.clone()
     }
 }
 

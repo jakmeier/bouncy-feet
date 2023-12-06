@@ -36,6 +36,21 @@ export class Cartesian3d {
   z: number;
 }
 /**
+* Information of a recorded frame in RON format.
+*
+* Can be useful for creating new poses, new keypoint inputs for tests, or just
+* for general debugging.
+*/
+export class ExportedFrame {
+  free(): void;
+/**
+*/
+  readonly keypoints: string;
+/**
+*/
+  readonly pose: string;
+}
+/**
 */
 export class Keypoints {
   free(): void;
@@ -218,7 +233,7 @@ export class Tracker {
   allPoseErrors(timestamp: number): (PoseApproximation)[];
 /**
 * @param {number} timestamp
-* @returns {string}
+* @returns {ExportedFrame}
 */
-  exportFrame(timestamp: number): string;
+  exportFrame(timestamp: number): ExportedFrame;
 }

@@ -45,18 +45,25 @@
     });
   });
 
-  function downloadFrame() {
-    const keypointsRon = tracker.exportFrame(video.currentTime * 1000);
-
+  /**
+   * @param {string} filename
+   * @param {string} text
+   */
+  function downloadTextFile(filename, text) {
     // Create a temporary <a> to trigger the download
     const a = document.createElement('a');
-    a.href =
-      'data:text/plain;charset=utf-8,' + encodeURIComponent(keypointsRon);
-    a.download = 'keypoints.ron';
+    a.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(text);
+    a.download = filename;
 
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+  }
+
+  function downloadFrame() {
+    const exported = tracker.exportFrame(video.currentTime * 1000);
+    downloadTextFile('keypoints.ron', exported.keypoints);
+    downloadTextFile('pose.ron', exported.pose);
   }
 
   function computePoseErrors() {
