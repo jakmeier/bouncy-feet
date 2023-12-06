@@ -56,11 +56,11 @@ impl SignedAngle {
     pub(crate) const ZERO: Self = SignedAngle(0.0);
 
     pub(crate) fn degree(alpha: f32) -> Self {
-        Self(alpha * PI / 180.0).ensure_signed()
+        Self(alpha.to_radians()).ensure_signed()
     }
 
     pub(crate) fn as_degree(&self) -> f32 {
-        self.0 * 180.0 / PI
+        self.0.to_degrees()
     }
 
     /// Returns a copy of the angle where values are guaranteed to be in (-PI and PI]

@@ -76,7 +76,7 @@ mod tests {
         let angle = Angle3d::degree(azimuth, polar);
         let actual: Segment = angle.into();
         let expected = Segment {
-            angle: expected_angle / 180.0 * PI,
+            angle: expected_angle.to_radians(),
             r: expected_len,
         };
         assert!(
