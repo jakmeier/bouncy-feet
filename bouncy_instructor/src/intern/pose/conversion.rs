@@ -224,9 +224,28 @@ impl From<&Skeleton3d> for pose_file::Pose {
 
 impl From<Limb> for pose_file::Limb {
     fn from(other: Limb) -> Self {
-        Self::Custom {
-            start: other.start.into(),
-            end: other.end.into(),
+        use BodyPart::{Ankle, Elbow, Hip, Knee, Shoulder, Wrist};
+        use BodySide::{Left, Right};
+        match (
+            other.start.side,
+            other.start.part,
+            other.end.side,
+            other.end.part,
+        ) {
+            (Left, Knee, Left, Ankle) => pose_file::Limb::LeftShin,
+            (Left, Hip, Left, Knee) => pose_file::Limb::LeftThigh,
+            (Left, Hip, Left, Ankle) => pose_file::Limb::LeftLeg,
+            (Left, Shoulder, Left, Elbow) => pose_file::Limb::LeftArm,
+            (Left, Elbow, Left, Wrist) => pose_file::Limb::LeftForearm,
+            (Right, Knee, Right, Ankle) => pose_file::Limb::RightShin,
+            (Right, Hip, Right, Knee) => pose_file::Limb::RightThigh,
+            (Right, Hip, Right, Ankle) => pose_file::Limb::RightLeg,
+            (Right, Shoulder, Right, Elbow) => pose_file::Limb::RightArm,
+            (Right, Elbow, Right, Wrist) => pose_file::Limb::RightForearm,
+            _ => Self::Custom {
+                start: other.start.into(),
+                end: other.end.into(),
+            },
         }
     }
 }
