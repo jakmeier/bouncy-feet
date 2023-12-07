@@ -51,6 +51,8 @@ enum BodyPart {
     Ankle,
     Elbow,
     Wrist,
+    Heel,
+    Toes,
 }
 
 impl BodyPoint {
@@ -66,6 +68,8 @@ impl BodyPoint {
             BodyPart::Ankle => side.ankle,
             BodyPart::Elbow => side.elbow,
             BodyPart::Wrist => side.wrist,
+            BodyPart::Heel => side.heel,
+            BodyPart::Toes => side.toes,
         }
     }
 }

@@ -105,12 +105,14 @@ impl LimbPositionDatabase {
 impl Limb {
     pub(crate) const LEFT_THIGH: LimbIndex = LimbIndex(0);
     pub(crate) const LEFT_SHIN: LimbIndex = LimbIndex(1);
-    pub(crate) const LEFT_ARM: LimbIndex = LimbIndex(2);
-    pub(crate) const LEFT_FOREARM: LimbIndex = LimbIndex(3);
-    pub(crate) const RIGHT_THIGH: LimbIndex = LimbIndex(4);
-    pub(crate) const RIGHT_SHIN: LimbIndex = LimbIndex(5);
-    pub(crate) const RIGHT_ARM: LimbIndex = LimbIndex(6);
-    pub(crate) const RIGHT_FOREARM: LimbIndex = LimbIndex(7);
+    pub(crate) const LEFT_FOOT: LimbIndex = LimbIndex(2);
+    pub(crate) const LEFT_ARM: LimbIndex = LimbIndex(3);
+    pub(crate) const LEFT_FOREARM: LimbIndex = LimbIndex(4);
+    pub(crate) const RIGHT_THIGH: LimbIndex = LimbIndex(5);
+    pub(crate) const RIGHT_SHIN: LimbIndex = LimbIndex(6);
+    pub(crate) const RIGHT_FOOT: LimbIndex = LimbIndex(7);
+    pub(crate) const RIGHT_ARM: LimbIndex = LimbIndex(8);
+    pub(crate) const RIGHT_FOREARM: LimbIndex = LimbIndex(9);
 
     /// List of limbs that are always racked.
     /// They can be relied upon for rendering.
@@ -118,10 +120,12 @@ impl Limb {
         vec![
             pose_file::Limb::LeftThigh.into(),
             pose_file::Limb::LeftShin.into(),
+            pose_file::Limb::LeftFoot.into(),
             pose_file::Limb::LeftArm.into(),
             pose_file::Limb::LeftForearm.into(),
             pose_file::Limb::RightThigh.into(),
             pose_file::Limb::RightShin.into(),
+            pose_file::Limb::RightFoot.into(),
             pose_file::Limb::RightArm.into(),
             pose_file::Limb::RightForearm.into(),
         ]
@@ -131,10 +135,12 @@ impl Limb {
         vec![
             "LeftThigh".into(),
             "LeftShin".into(),
+            "LeftFoot".into(),
             "LeftArm".into(),
             "LeftForearm".into(),
             "RightThigh".into(),
             "RightShin".into(),
+            "RightFoot".into(),
             "RightArm".into(),
             "RightForearm".into(),
         ]

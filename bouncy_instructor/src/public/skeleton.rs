@@ -27,9 +27,9 @@ pub struct Side {
     pub shin: Segment,
     pub arm: Segment,
     pub forearm: Segment,
+    pub foot: Segment,
     // torso?
     // head?
-    // feet?
 }
 
 /// Projected lin segment, with a x-y angle and a length factor.

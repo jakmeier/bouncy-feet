@@ -70,12 +70,14 @@ impl Skeleton3d {
             shin: segment(Limb::LEFT_SHIN),
             arm: segment(Limb::LEFT_ARM),
             forearm: segment(Limb::LEFT_FOREARM),
+            foot: segment(Limb::LEFT_FOOT),
         };
         let right = Side {
             thigh: segment(Limb::RIGHT_THIGH),
             shin: segment(Limb::RIGHT_SHIN),
             arm: segment(Limb::RIGHT_ARM),
             forearm: segment(Limb::RIGHT_FOREARM),
+            foot: segment(Limb::RIGHT_FOOT),
         };
 
         Skeleton { left, right }

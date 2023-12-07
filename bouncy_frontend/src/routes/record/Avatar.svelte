@@ -15,6 +15,7 @@
     torso: 0.25,
     arm: 0.1,
     forearm: 0.15,
+    foot: 0.05,
   };
 
   const mainColor = '#382eeb';
@@ -114,6 +115,16 @@
       side.shin.angle,
       side.shin.r * lengths.shin * s
     );
+    // The foot is actually measured between heel and toe, but the skelton
+    // doesn't give information about wrist to heel. I could do some
+    // approximation, or actually track this. But seems not necessary. This
+    // looks good enough for the 2d render.
+    const heel = ankle;
+    const toe = add2dVector(
+      heel,
+      side.foot.angle,
+      side.foot.r * lengths.foot * s
+    );
     const elbow = add2dVector(
       shoulder,
       side.arm.angle,
@@ -129,6 +140,7 @@
     drawLine(ctx, shoulder, hip);
     drawLine(ctx, shoulder, elbow);
     drawLine(ctx, elbow, wrist);
+    drawLine(ctx, heel, toe);
   }
 
   /**

@@ -68,6 +68,8 @@ pub(crate) enum Limb {
     LeftThigh,
     /// hip to ankle
     LeftLeg,
+    /// heel to toe
+    LeftFoot,
     /// shoulder to elbow
     LeftArm,
     /// elbow to wrist
@@ -82,6 +84,8 @@ pub(crate) enum Limb {
     RightArm,
     /// elbow to wrist
     RightForearm,
+    /// heel to toe
+    RightFoot,
     Custom {
         start: BodyPoint,
         end: BodyPoint,
@@ -102,6 +106,8 @@ pub(crate) enum BodyPart {
     Ankle,
     Elbow,
     Wrist,
+    Heel,
+    Toes,
 }
 
 #[derive(Error, Debug)]

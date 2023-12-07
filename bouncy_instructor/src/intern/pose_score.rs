@@ -236,7 +236,7 @@ mod tests {
         let mut skeleton = fixed_skeleton();
         skeleton[0].polar.0 += PI / 37.0;
         skeleton[1].polar.0 += PI / 17.0;
-        skeleton[2].azimuth.0 -= PI / 19.0;
+        skeleton[3].azimuth.0 -= PI / 19.0;
         check_score_fixed_pose(&skeleton, expect!["0.007927824"]);
     }
 
@@ -287,10 +287,12 @@ mod tests {
         Pose::new(vec![
             LimbPosition::new(Limb::LEFT_THIGH, SignedAngle(0.0), SignedAngle(0.0), tol, 1.0),
             LimbPosition::new(Limb::LEFT_SHIN, SignedAngle(0.0), SignedAngle(0.0), tol, 1.0),
+            LimbPosition::new(Limb::LEFT_FOOT, SignedAngle(0.0), SignedAngle(0.0), tol, 0.0),
             LimbPosition::new(Limb::LEFT_ARM, SignedAngle(3.0 * PI/2.0), SignedAngle(PI/4.0), tol, 1.0),
             LimbPosition::new(Limb::LEFT_FOREARM, SignedAngle(3.0 * PI/2.0), SignedAngle(0.0), tol, 1.0),
             LimbPosition::new(Limb::RIGHT_THIGH, SignedAngle(0.0), SignedAngle(PI/2.0), tol, 1.0),
             LimbPosition::new(Limb::RIGHT_SHIN, SignedAngle(0.0), SignedAngle(PI/4.0), tol, 1.0),
+            LimbPosition::new(Limb::RIGHT_FOOT, SignedAngle(0.0), SignedAngle(0.0), tol, 0.0),
             LimbPosition::new(Limb::RIGHT_ARM, SignedAngle(PI/2.0), SignedAngle(PI/2.0), tol, 1.0),
             LimbPosition::new(Limb::RIGHT_FOREARM, SignedAngle(PI/2.0), SignedAngle(PI/2.0), tol, 1.0),
         ])

@@ -197,6 +197,9 @@ export class SkeletonSide {
   arm: Segment;
 /**
 */
+  foot: Segment;
+/**
+*/
   forearm: Segment;
 /**
 */

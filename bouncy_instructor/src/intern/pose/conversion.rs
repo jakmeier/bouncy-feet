@@ -49,6 +49,16 @@ impl From<pose_file::Limb> for Limb {
                     side: BodySide::Left,
                 },
             },
+            pose_file::Limb::LeftFoot => Self {
+                start: BodyPoint {
+                    part: BodyPart::Heel,
+                    side: BodySide::Left,
+                },
+                end: BodyPoint {
+                    part: BodyPart::Toes,
+                    side: BodySide::Left,
+                },
+            },
             pose_file::Limb::LeftArm => Self {
                 start: BodyPoint {
                     part: BodyPart::Shoulder,
@@ -96,6 +106,16 @@ impl From<pose_file::Limb> for Limb {
                 },
                 end: BodyPoint {
                     part: BodyPart::Ankle,
+                    side: BodySide::Right,
+                },
+            },
+            pose_file::Limb::RightFoot => Self {
+                start: BodyPoint {
+                    part: BodyPart::Heel,
+                    side: BodySide::Right,
+                },
+                end: BodyPoint {
+                    part: BodyPart::Toes,
                     side: BodySide::Right,
                 },
             },
@@ -155,6 +175,8 @@ impl From<pose_file::BodyPart> for BodyPart {
             pose_file::BodyPart::Ankle => Self::Ankle,
             pose_file::BodyPart::Elbow => Self::Elbow,
             pose_file::BodyPart::Wrist => Self::Wrist,
+            pose_file::BodyPart::Heel => Self::Heel,
+            pose_file::BodyPart::Toes => Self::Toes,
         }
     }
 }
@@ -168,6 +190,8 @@ impl From<BodyPart> for pose_file::BodyPart {
             BodyPart::Ankle => Self::Ankle,
             BodyPart::Elbow => Self::Elbow,
             BodyPart::Wrist => Self::Wrist,
+            BodyPart::Heel => Self::Heel,
+            BodyPart::Toes => Self::Toes,
         }
     }
 }
@@ -224,7 +248,7 @@ impl From<&Skeleton3d> for pose_file::Pose {
 
 impl From<Limb> for pose_file::Limb {
     fn from(other: Limb) -> Self {
-        use BodyPart::{Ankle, Elbow, Hip, Knee, Shoulder, Wrist};
+        use BodyPart::{Ankle, Elbow, Heel, Hip, Knee, Shoulder, Toes, Wrist};
         use BodySide::{Left, Right};
         match (
             other.start.side,
@@ -235,11 +259,13 @@ impl From<Limb> for pose_file::Limb {
             (Left, Knee, Left, Ankle) => pose_file::Limb::LeftShin,
             (Left, Hip, Left, Knee) => pose_file::Limb::LeftThigh,
             (Left, Hip, Left, Ankle) => pose_file::Limb::LeftLeg,
+            (Left, Heel, Left, Toes) => pose_file::Limb::LeftFoot,
             (Left, Shoulder, Left, Elbow) => pose_file::Limb::LeftArm,
             (Left, Elbow, Left, Wrist) => pose_file::Limb::LeftForearm,
             (Right, Knee, Right, Ankle) => pose_file::Limb::RightShin,
             (Right, Hip, Right, Knee) => pose_file::Limb::RightThigh,
             (Right, Hip, Right, Ankle) => pose_file::Limb::RightLeg,
+            (Right, Heel, Right, Toes) => pose_file::Limb::RightFoot,
             (Right, Shoulder, Right, Elbow) => pose_file::Limb::RightArm,
             (Right, Elbow, Right, Wrist) => pose_file::Limb::RightForearm,
             _ => Self::Custom {
