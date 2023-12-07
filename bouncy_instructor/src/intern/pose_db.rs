@@ -7,7 +7,7 @@
 //!  structs required for this.
 
 use super::pose::{Limb, LimbPosition, Pose};
-use crate::pose_file;
+use crate::pose_file::{self, ParseFileError};
 
 /// List of registered poses to recognize during tracking.
 ///
@@ -39,6 +39,10 @@ pub(crate) struct LimbPositionDatabase {
 #[derive(Clone, Copy)]
 pub(crate) struct LimbIndex(usize);
 
+pub(crate) enum AddPoseError {
+    MissingMirror(String),
+}
+
 impl Default for LimbPositionDatabase {
     fn default() -> Self {
         Self {
@@ -51,38 +55,75 @@ impl Default for LimbPositionDatabase {
 }
 
 impl LimbPositionDatabase {
-    pub(crate) fn add(&mut self, poses: Vec<crate::pose_file::Pose>) {
+    pub(crate) fn add(&mut self, poses: Vec<crate::pose_file::Pose>) -> Result<(), AddPoseError> {
         for pose in poses {
-            let limbs = pose
-                .limbs
-                .into_iter()
-                .map(|def| {
-                    let limb = Limb::from(def.limb);
-                    let index;
-                    if let Some(i) = self.limbs.iter().position(|l| *l == limb) {
-                        index = LimbIndex(i);
-                    } else {
-                        index = LimbIndex(self.limbs.len());
-                        self.limb_names.push(format!("{limb:?}"));
-                        self.limbs.push(limb);
-                    }
-
-                    LimbPosition::from_orthogonal_angles(
-                        index,
-                        def.forward,
-                        def.right,
-                        def.tolerance,
-                        def.weight,
-                    )
-                })
-                .collect();
-            self.poses.push(Pose::new(limbs));
+            let new_pose = if !pose.mirror_of.is_empty() {
+                if let Some(i) = self.pose_by_id(&pose.mirror_of) {
+                    self.pose_mirror(i)
+                } else {
+                    return Err(AddPoseError::MissingMirror(pose.mirror_of.clone()));
+                }
+            } else {
+                self.new_pose(pose.limbs)
+            };
+            self.poses.push(new_pose);
             self.names.push(pose.name);
         }
+        Ok(())
+    }
+
+    /// Take a list of limbs from a pose definition and produce a Pose.
+    fn new_pose(&mut self, limbs: Vec<pose_file::LimbPosition>) -> Pose {
+        let limbs = limbs
+            .into_iter()
+            .map(|def| {
+                let limb = Limb::from(def.limb);
+                let index = self.find_or_insert_limb(limb);
+                LimbPosition::from_orthogonal_angles(
+                    index,
+                    def.forward,
+                    def.right,
+                    def.tolerance,
+                    def.weight,
+                )
+            })
+            .collect();
+        Pose::new(limbs)
+    }
+
+    /// Take an existing pose and produce a mirror pose of it.
+    fn pose_mirror(&mut self, i: usize) -> Pose {
+        let limbs = self.poses[i]
+            .limbs
+            .clone() // clone necessary to avoid double mutable borrow of limbs
+            .iter()
+            .map(|reverse_position| {
+                let limb = self.limbs[reverse_position.limb.0].mirror();
+                let index = self.find_or_insert_limb(limb);
+                LimbPosition::from_limb_and_target(index, reverse_position.target.clone())
+            })
+            .collect();
+        Pose::new(limbs)
+    }
+
+    fn find_or_insert_limb(&mut self, limb: Limb) -> LimbIndex {
+        let index;
+        if let Some(i) = self.limbs.iter().position(|l| *l == limb) {
+            index = i;
+        } else {
+            index = self.limbs.len();
+            self.limb_names.push(format!("{limb:?}"));
+            self.limbs.push(limb);
+        }
+        LimbIndex(index)
     }
 
     pub(crate) fn is_empty(&self) -> bool {
         self.poses.is_empty()
+    }
+
+    pub(crate) fn pose_by_id(&self, id: &str) -> Option<usize> {
+        self.names.iter().position(|name| name == id)
     }
 
     pub(crate) fn pose_name(&self, i: usize) -> &str {
@@ -156,5 +197,13 @@ impl LimbIndex {
 impl From<LimbIndex> for usize {
     fn from(value: LimbIndex) -> Self {
         value.0
+    }
+}
+
+impl From<AddPoseError> for ParseFileError {
+    fn from(error: AddPoseError) -> Self {
+        match error {
+            AddPoseError::MissingMirror(id) => Self::UnknownPoseReference(id),
+        }
     }
 }

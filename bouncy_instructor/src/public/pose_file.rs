@@ -25,7 +25,10 @@ pub(crate) struct PoseFile {
 #[derive(Serialize, Deserialize)]
 pub(crate) struct Pose {
     pub name: String,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub limbs: Vec<LimbPosition>,
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub mirror_of: String,
 }
 
 /// Describes a desired angle of a limb defined by start and end point.
@@ -116,6 +119,9 @@ pub enum ParseFileError {
     VersionMismatch { expected: u16, found: u16 },
     #[error("parsing pose file failed, {0}")]
     RonError(#[from] ron::error::SpannedError),
+    // TODO: unit test
+    #[error("unknown pose reference `{0}`")]
+    UnknownPoseReference(String),
 }
 
 impl PoseFile {

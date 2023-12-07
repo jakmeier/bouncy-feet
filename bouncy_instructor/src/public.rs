@@ -31,7 +31,62 @@ pub async fn load_pose_file(url: &str) -> Result<(), JsValue> {
 
 pub fn load_pose_str(text: &str) -> Result<(), ParseFileError> {
     let parsed = PoseFile::from_str(&text)?;
-    STATE.with(|state| state.borrow_mut().db.add(parsed.poses));
-
+    STATE.with(|state| state.borrow_mut().db.add(parsed.poses))?;
     Ok(())
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_valid_pose_reference() {
+        let input = r#"
+        #![enable(implicit_some)]
+        (
+          version: 0,
+          poses: [
+            (
+              name: "test-pose-left",
+              limbs: [
+                (limb: LeftShin, forward: 0, tolerance: 5, weight: 1.0),
+              ]
+            ),
+            (
+              name: "test-pose-right",
+              mirror_of: "test-pose-left",
+            ),
+          ]
+        )
+        "#;
+        load_pose_str(input).unwrap();
+        let num_poses = STATE.with_borrow(|state| state.db.poses().len());
+        assert_eq!(num_poses, 2);
+    }
+
+    #[test]
+    fn test_invalid_pose_reference() {
+        let input = r#"
+        #![enable(implicit_some)]
+        (
+          version: 0,
+          poses: [
+            (
+              name: "test-pose-left",
+              limbs: [
+                (limb: LeftShin, forward: 0, tolerance: 5, weight: 1.0),
+              ]
+            ),
+            (
+              name: "test-pose-right",
+              mirror_of: "fake-id",
+            ),
+          ]
+        )
+        "#;
+        match load_pose_str(input) {
+            Err(ParseFileError::UnknownPoseReference(id)) if id == "fake-id" => (),
+            Err(other) => panic!("wrong error {other}"),
+            Ok(()) => panic!("expected an error when loading invalid reference"),
+        }
+    }
 }

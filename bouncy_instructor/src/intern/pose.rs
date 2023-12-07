@@ -18,6 +18,7 @@ pub(crate) struct Pose {
     pub(crate) limbs: Vec<LimbPosition>,
 }
 
+#[derive(Clone)]
 pub(crate) struct LimbPosition {
     /// index to stored limbs
     pub(crate) limb: LimbIndex,
@@ -72,6 +73,16 @@ impl BodyPoint {
             BodyPart::Toes => side.toes,
         }
     }
+
+    fn mirror(&self) -> Self {
+        Self {
+            side: match self.side {
+                BodySide::Left => BodySide::Right,
+                BodySide::Right => BodySide::Left,
+            },
+            part: self.part,
+        }
+    }
 }
 
 impl Pose {
@@ -89,9 +100,19 @@ impl Limb {
             polar: start.polar_angle(end),
         }
     }
+
+    pub(crate) fn mirror(&self) -> Self {
+        Self {
+            start: self.start.mirror(),
+            end: self.end.mirror(),
+        }
+    }
 }
 
 impl LimbPosition {
+    pub(crate) fn from_limb_and_target(limb: LimbIndex, target: AngleTarget) -> Self {
+        Self { limb, target }
+    }
     pub(crate) fn new(
         limb: LimbIndex,
         azimuth: SignedAngle,
@@ -102,7 +123,7 @@ impl LimbPosition {
         let angle = Angle3d::new(azimuth, polar);
         let target = AngleTarget::new(angle, tolerance, weight);
 
-        Self { limb, target }
+        Self::from_limb_and_target(limb, target)
     }
 
     pub(crate) fn from_orthogonal_angles(

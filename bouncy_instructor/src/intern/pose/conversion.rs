@@ -242,6 +242,7 @@ impl From<&Skeleton3d> for pose_file::Pose {
         Self {
             limbs,
             name: "Generated Pose".to_owned(),
+            mirror_of: String::new(),
         }
     }
 }

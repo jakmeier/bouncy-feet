@@ -9,6 +9,7 @@ use super::skeleton_3d::Skeleton3d;
 ///
 /// If the angle is not important, set the weight to 0. But the angle will still
 /// matter for rendering the perfect pose skeleton.
+#[derive(Clone)]
 pub(crate) struct AngleTarget {
     /// the perfect angle to achive
     angle: Angle3d,
