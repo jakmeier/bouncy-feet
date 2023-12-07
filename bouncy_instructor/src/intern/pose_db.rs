@@ -100,7 +100,7 @@ impl LimbPositionDatabase {
             .map(|reverse_position| {
                 let limb = self.limbs[reverse_position.limb.0].mirror();
                 let index = self.find_or_insert_limb(limb);
-                LimbPosition::from_limb_and_target(index, reverse_position.target.clone())
+                LimbPosition::from_limb_and_target(index, reverse_position.target.x_mirror())
             })
             .collect();
         Pose::new(limbs)

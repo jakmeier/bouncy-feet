@@ -49,10 +49,17 @@ impl Angle3d {
         let dist = (2.0 - 2.0 * (a + b)).sqrt();
         dist / 2.0
     }
+
+    /// Mirrors left/right, doesn't affect up/down or forward/backward
+    pub(crate) fn x_mirror(&self) -> Self {
+        Self {
+            azimuth: self.azimuth.mirror(),
+            polar: self.polar,
+        }
+    }
 }
 
 impl SignedAngle {
-    #[allow(dead_code)]
     pub(crate) const ZERO: Self = SignedAngle(0.0);
 
     pub(crate) fn degree(alpha: f32) -> Self {
@@ -84,6 +91,10 @@ impl SignedAngle {
 
     pub(crate) fn radian(alpha: f32) -> Self {
         Self(alpha).ensure_signed()
+    }
+
+    fn mirror(self) -> SignedAngle {
+        Self(-*self).ensure_signed()
     }
 }
 
@@ -123,7 +134,7 @@ mod tests {
     use super::*;
     use crate::test_utils::*;
 
-    use std::f32::consts::FRAC_PI_4;
+    use std::f32::consts::{FRAC_PI_2, FRAC_PI_3, FRAC_PI_4};
 
     /// Tests `SignedAngle::degree`
     ///
@@ -137,5 +148,27 @@ mod tests {
         assert_float_angle_eq(-FRAC_PI_4, SignedAngle::degree(315.0));
         assert_float_angle_eq(PI, SignedAngle::degree(-180.0));
         assert_float_angle_eq(PI, SignedAngle::degree(180.0));
+    }
+
+    #[test]
+    fn test_mirror_signed_angle() {
+        assert_eq!(SignedAngle::ZERO, SignedAngle::ZERO.mirror());
+        assert_eq!(SignedAngle(PI), SignedAngle(PI).mirror());
+        assert_angle_eq(
+            SignedAngle(FRAC_PI_2),
+            SignedAngle(3.0 * FRAC_PI_2).mirror(),
+        );
+        assert_angle_eq(
+            SignedAngle::degree(60.0),
+            SignedAngle::degree(300.0).mirror(),
+        );
+        assert_angle_eq(
+            SignedAngle(FRAC_PI_3),
+            SignedAngle(FRAC_PI_3).mirror().mirror(),
+        );
+        assert_angle_eq(
+            SignedAngle(FRAC_PI_4),
+            SignedAngle(FRAC_PI_4).mirror().mirror(),
+        );
     }
 }
