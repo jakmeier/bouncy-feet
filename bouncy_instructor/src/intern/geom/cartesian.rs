@@ -1,7 +1,13 @@
-use super::SignedAngle;
+use super::{Angle3d, SignedAngle};
 use crate::keypoints::Cartesian3d;
 
 impl Cartesian3d {
+    const ZERO: Self = Cartesian3d {
+        x: 0.0,
+        y: 0.0,
+        z: 0.0,
+    };
+
     /// The polar angle is measured against the y-axis, which goes from the
     /// ground to the sky.
     ///
@@ -57,12 +63,74 @@ impl Cartesian3d {
         // note 2: what about Math.acos() instead of wasm ?
         SignedAngle(dx.signum() * (dz / r).acos())
     }
+
+    #[allow(dead_code)]
+    pub(crate) fn length(&self) -> f32 {
+        (self.x.powi(2) + self.y.powi(2) + self.z.powi(2)).sqrt()
+    }
+}
+
+impl From<Cartesian3d> for Angle3d {
+    fn from(p: Cartesian3d) -> Self {
+        Self::new(
+            Cartesian3d::ZERO.azimuth(p),
+            Cartesian3d::ZERO.polar_angle(p),
+        )
+    }
+}
+
+impl From<Angle3d> for Cartesian3d {
+    fn from(angle: Angle3d) -> Self {
+        let x = -angle.polar.sin() * angle.azimuth.sin();
+        let y = angle.polar.cos();
+        let z = -angle.polar.sin() * angle.azimuth.cos();
+        Self { x, y, z }
+    }
+}
+
+impl std::ops::Add<Cartesian3d> for Cartesian3d {
+    type Output = Self;
+
+    fn add(self, rhs: Cartesian3d) -> Self::Output {
+        Self {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+            z: self.z + rhs.z,
+        }
+    }
+}
+
+impl std::ops::Sub<Cartesian3d> for Cartesian3d {
+    type Output = Self;
+
+    fn sub(self, rhs: Cartesian3d) -> Self::Output {
+        Self {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+            z: self.z - rhs.z,
+        }
+    }
+}
+
+impl std::ops::Mul<f32> for Cartesian3d {
+    type Output = Self;
+
+    fn mul(self, rhs: f32) -> Self::Output {
+        Self {
+            x: self.x * rhs,
+            y: self.y * rhs,
+            z: self.z * rhs,
+        }
+    }
 }
 
 #[cfg(test)]
 mod tests {
+    use std::f32::consts::FRAC_1_SQRT_2;
+
     use super::*;
-    use crate::test_utils::assert_angle_eq;
+    use crate::intern::geom::Angle3d;
+    use crate::test_utils::{assert_angle_eq, assert_cartesian_eq};
 
     #[test]
     fn test_cartesian_to_angle() {
@@ -99,5 +167,49 @@ mod tests {
             SignedAngle::degree(expected_polar),
             origin.polar_angle(cartesian),
         );
+    }
+
+    #[test]
+    fn test_angle_to_cartesian() {
+        // azimuth, polar, (x,y,z)
+        check_angle_to_cartesian(0.0, 0.0, (0.0, 1.0, 0.0));
+        check_angle_to_cartesian(-90.0, 90.0, (1.0, 0.0, 0.0));
+        check_angle_to_cartesian(90.0, 90.0, (-1.0, 0.0, 0.0));
+        check_angle_to_cartesian(0.0, 180.0, (0.0, -1.0, 0.0));
+        check_angle_to_cartesian(180.0, 90.0, (0.0, 0.0, 1.0));
+        check_angle_to_cartesian(0.0, 90.0, (0.0, 0.0, -1.0));
+        check_angle_to_cartesian(0.0, 45.0, (0.0, FRAC_1_SQRT_2, -FRAC_1_SQRT_2));
+    }
+
+    #[track_caller]
+    fn check_angle_to_cartesian(azimuth: f32, polar: f32, expected_cartesian: (f32, f32, f32)) {
+        let (x, y, z) = expected_cartesian;
+        let want = Cartesian3d::new(x, y, z);
+
+        let angle = Angle3d::degree(azimuth, polar);
+        let actual = Cartesian3d::from(angle);
+        assert_cartesian_eq(want, actual);
+    }
+
+    #[test]
+    fn test_cartesian_to_angle_and_back() {
+        check_cartesian_to_angle_and_back(1.0, 0.0, 0.0);
+        check_cartesian_to_angle_and_back(0.0, 1.0, 0.0);
+        check_cartesian_to_angle_and_back(0.0, 0.0, 1.0);
+        check_cartesian_to_angle_and_back(1.0, 1.0, 1.0);
+        check_cartesian_to_angle_and_back(1.0, -1.0, 1.0);
+        check_cartesian_to_angle_and_back(0.0, 1.0, -1.0);
+        check_cartesian_to_angle_and_back(-3.2, 7.1, -1.1);
+        check_cartesian_to_angle_and_back(0.0, 0.0, 0.0);
+    }
+
+    #[track_caller]
+    fn check_cartesian_to_angle_and_back(x: f32, y: f32, z: f32) {
+        let start = Cartesian3d::new(x, y, z);
+        let origin = Cartesian3d::new(0.0, 0.0, 0.0);
+        let angle = Angle3d::new(origin.azimuth(start), origin.polar_angle(start));
+
+        let end = Cartesian3d::from(angle) * start.length();
+        assert_cartesian_eq(start, end);
     }
 }

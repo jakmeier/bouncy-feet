@@ -22,7 +22,7 @@ pub(crate) struct PoseFile {
 /// This includes the exact desired position range and a name.
 /// This is the format for external files and loaded in at runtime.
 /// It is converted to a [`crate::pose::Pose`] for computations.
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub(crate) struct Pose {
     pub name: String,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -32,7 +32,7 @@ pub(crate) struct Pose {
 }
 
 /// Describes a desired angle of a limb defined by start and end point.
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub(crate) struct LimbPosition {
     pub limb: Limb,
     pub weight: f32,
@@ -53,7 +53,7 @@ pub(crate) struct LimbPosition {
     pub tolerance: u8,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
 pub(crate) struct BodyPoint {
     pub side: BodySide,
     pub part: BodyPart,
@@ -63,7 +63,7 @@ pub(crate) struct BodyPoint {
 ///
 /// Custom points are maximally expressive but also verbose. Any limb that's
 /// used frequently should probably be included in the pre-defined list.
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
 pub(crate) enum Limb {
     /// knee to ankle
     LeftShin,
@@ -95,13 +95,13 @@ pub(crate) enum Limb {
     },
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
 pub(crate) enum BodySide {
     Left,
     Right,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
 pub(crate) enum BodyPart {
     Shoulder,
     Hip,
@@ -119,7 +119,6 @@ pub enum ParseFileError {
     VersionMismatch { expected: u16, found: u16 },
     #[error("parsing pose file failed, {0}")]
     RonError(#[from] ron::error::SpannedError),
-    // TODO: unit test
     #[error("unknown pose reference `{0}`")]
     UnknownPoseReference(String),
 }

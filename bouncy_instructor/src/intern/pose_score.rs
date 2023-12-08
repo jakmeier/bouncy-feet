@@ -73,6 +73,10 @@ impl AngleTarget {
         self.weight
     }
 
+    pub(crate) fn angle(&self) -> Angle3d {
+        self.angle
+    }
+
     /// Mirrors left/right, doesn't affect up/down or forward/backward
     pub(crate) fn x_mirror(&self) -> AngleTarget {
         Self {

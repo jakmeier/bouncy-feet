@@ -39,6 +39,7 @@ pub(crate) struct LimbPositionDatabase {
 #[derive(Clone, Copy)]
 pub(crate) struct LimbIndex(usize);
 
+#[derive(Debug)]
 pub(crate) enum AddPoseError {
     MissingMirror(String),
 }

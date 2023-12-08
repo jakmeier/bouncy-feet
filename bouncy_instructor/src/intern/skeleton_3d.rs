@@ -26,6 +26,13 @@ pub(crate) struct Skeleton3d {
 }
 
 impl Skeleton3d {
+    pub(crate) fn new(limb_angles: Vec<Angle3d>, azimuth_correction: SignedAngle) -> Self {
+        Self {
+            limb_angles,
+            azimuth_correction,
+        }
+    }
+
     pub(crate) fn from_keypoints(kp: &Keypoints) -> Self {
         let mut limb_angles = STATE.with(|state| {
             state
@@ -35,7 +42,7 @@ impl Skeleton3d {
                 .map(|(_index, limb)| limb.to_angle(kp))
                 .collect::<Vec<_>>()
         });
-        // Shoulder defines where he person is looking
+        // Shoulder defines where the person is looking
         let shoulder_angle = kp.left.shoulder.azimuth(kp.right.shoulder);
 
         // Rotate skelton to face north.
@@ -44,10 +51,7 @@ impl Skeleton3d {
             angle.azimuth = angle.azimuth - azimuth_correction;
         }
 
-        Self {
-            limb_angles,
-            azimuth_correction,
-        }
+        Self::new(limb_angles, azimuth_correction)
     }
 
     pub(crate) fn angles(&self) -> &[Angle3d] {

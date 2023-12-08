@@ -29,6 +29,7 @@ impl SignedAngle {
         self
     }
 
+    #[allow(dead_code)]
     pub(crate) fn abs(mut self) -> Self {
         self.0 = self.0.abs();
         self
