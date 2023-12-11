@@ -66,7 +66,9 @@ impl AngleTarget {
         // especially the tolerance is super weird
         let tolerance_distance =
             Angle3d::ZERO.distance(&Angle3d::new(SignedAngle::ZERO, self.tolerance));
-        0.0f32.max(self.angle.distance(&value) - tolerance_distance)
+        0.0f32
+            .max(self.angle.distance(&value) - tolerance_distance)
+            .powi(2)
     }
 
     pub(crate) fn weight(&self) -> f32 {
@@ -206,7 +208,7 @@ mod tests {
             LimbPosition::new(Limb::RIGHT_ARM, SignedAngle(0.0), SignedAngle(0.0), tol, 1.0),
             LimbPosition::new(Limb::RIGHT_FOREARM, SignedAngle(0.0), SignedAngle(0.0), tol, 1.0),
         ]);
-        check_score_fixed_skeleton(&pose, expect!["0.33357385"]);
+        check_score_fixed_skeleton(&pose, expect!["0.193822"]);
     }
 
     #[test]
@@ -223,7 +225,7 @@ mod tests {
             LimbPosition::new(Limb::RIGHT_ARM, SignedAngle(PI), SignedAngle(PI), tol, 1.0),
             LimbPosition::new(Limb::RIGHT_FOREARM, SignedAngle(PI), SignedAngle(PI), tol, 1.0),
         ]);
-        check_score_fixed_skeleton(&pose, expect!["0.52077097"]);
+        check_score_fixed_skeleton(&pose, expect!["0.3906417"]);
     }
 
     #[test]
@@ -242,7 +244,7 @@ mod tests {
             .azimuth
             .0 += PI / 17.0;
 
-        check_score_fixed_skeleton(&pose, expect!["0.058421925"]);
+        check_score_fixed_skeleton(&pose, expect!["0.013016654"]);
     }
 
     #[test]
@@ -251,13 +253,13 @@ mod tests {
         skeleton[0].polar.0 += PI / 37.0;
         skeleton[1].polar.0 += PI / 17.0;
         skeleton[3].azimuth.0 -= PI / 19.0;
-        check_score_fixed_pose(&skeleton, expect!["0.007927824"]);
+        check_score_fixed_pose(&skeleton, expect!["0.0003231239"]);
     }
 
     #[test]
     fn test_standing_straight_skeleton_score() {
         let skeleton = zero_skeleton();
-        check_score_fixed_pose(&skeleton, expect!["0.33357385"]);
+        check_score_fixed_pose(&skeleton, expect!["0.193822"]);
     }
 
     /// asserts that a pose evaluated against a fixed skeleton results in the expected error score

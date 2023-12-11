@@ -31,8 +31,7 @@ fn check_pose_in_keypoints(keypoints: &str, expected_pose: &str) {
     }
     assert_eq!(expected_pose, approximation.name(), "wrong pose detected");
     assert_eq!(timestamp, approximation.timestamp, "timestamp mangled");
-    // TODO: this threshold should be much smaller, but for now I'm happy if tests just pass
-    let threshold = 0.25;
+    let threshold = 0.065;
     assert!(
         approximation.error < threshold,
         "correct pose but error is too big {}",
