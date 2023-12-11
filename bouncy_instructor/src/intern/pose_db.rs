@@ -36,7 +36,7 @@ pub(crate) struct LimbPositionDatabase {
 }
 
 /// For accessing LimbPositionDatabase::limbs
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub(crate) struct LimbIndex(usize);
 
 #[derive(Debug)]
@@ -141,6 +141,27 @@ impl LimbPositionDatabase {
 
     pub(crate) fn poses(&self) -> &[Pose] {
         &self.poses
+    }
+
+    /// A DB without default poses for testing where only one pose is needed.
+    #[cfg(test)]
+    pub(crate) fn test(target: super::geom::Angle3d) -> Self {
+        use crate::intern::geom::SignedAngle;
+
+        let poses = vec![Pose::new(vec![LimbPosition::new(
+            LimbIndex(0),
+            target.azimuth,
+            target.polar,
+            SignedAngle::ZERO,
+            1.0,
+        )])];
+
+        Self {
+            poses,
+            names: vec!["test_pose".into()],
+            limbs: vec![pose_file::Limb::LeftThigh.into()],
+            limb_names: vec!["test_limb".into()],
+        }
     }
 }
 

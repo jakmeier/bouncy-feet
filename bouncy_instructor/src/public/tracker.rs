@@ -153,11 +153,13 @@ impl Tracker {
             Ok(i) | Err(i) => ExportedFrame {
                 keypoints: ron::ser::to_string_pretty(&self.history[i..i + 1], config.clone())
                     .unwrap(),
-                pose: ron::ser::to_string_pretty(
-                    &crate::pose_file::Pose::from(&self.skeletons[i]),
-                    config,
-                )
-                .unwrap(),
+                pose: STATE.with_borrow(|state| {
+                    ron::ser::to_string_pretty(
+                        &crate::pose_file::Pose::from_with_db(&self.skeletons[i], &state.db),
+                        config,
+                    )
+                    .unwrap()
+                }),
             },
         }
     }

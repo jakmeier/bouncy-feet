@@ -18,7 +18,7 @@ pub(crate) struct Pose {
     pub(crate) limbs: Vec<LimbPosition>,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub(crate) struct LimbPosition {
     /// index to stored limbs
     pub(crate) limb: LimbIndex,
@@ -136,21 +136,25 @@ impl LimbPosition {
         // convert from pose definition coordinates to spherical coordinates
         // definition is in °, internal usage is in rad
         // definition uses two 2D angle which need to be combined into a 3D angle
-        let mut angle = Angle3d::ZERO;
-
-        if let Some(forward) = forward {
-            let azimuth = SignedAngle::radian(if forward.is_positive() { 0.0 } else { PI });
-            let polar = SignedAngle::degree(forward as f32).abs();
-            angle.azimuth = angle.azimuth + azimuth;
-            angle.polar = angle.polar + polar;
-        }
-
-        if let Some(right) = right {
-            let azimuth = SignedAngle::radian(right.signum() as f32 * FRAC_PI_2);
-            let polar = SignedAngle::degree(right as f32).abs();
-            angle.azimuth = angle.azimuth + azimuth;
-            angle.polar = angle.polar + polar;
-        }
+        let angle = match (forward, right) {
+            (None, None) => Angle3d::ZERO,
+            (None, Some(right)) => {
+                let azimuth = SignedAngle::radian(right.signum() as f32 * FRAC_PI_2);
+                let polar = SignedAngle::degree(right.abs() as f32);
+                Angle3d::new(azimuth, polar)
+            }
+            (Some(forward), None) => {
+                let azimuth = SignedAngle::radian(if forward.is_negative() { PI } else { 0.0 });
+                let polar = SignedAngle::degree(forward.abs() as f32);
+                Angle3d::new(azimuth, polar)
+            }
+            (Some(forward), Some(right)) => {
+                // Here we have 2 angles to be combined.
+                let right = SignedAngle::degree(right as f32);
+                let forward = SignedAngle::degree(forward as f32);
+                Angle3d::from_rotations(forward, right)
+            }
+        };
 
         Self::new(
             limb,

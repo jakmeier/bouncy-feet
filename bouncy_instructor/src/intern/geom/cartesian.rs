@@ -61,7 +61,7 @@ impl Cartesian3d {
         }
         // note: potentially this could be computed more efficiently, esp. the sign
         // note 2: what about Math.acos() instead of wasm ?
-        SignedAngle(dx.signum() * (dz / r).acos())
+        SignedAngle::radian(dx.signum() * (dz / r).acos())
     }
 
     #[allow(dead_code)]
@@ -179,6 +179,8 @@ mod tests {
         check_angle_to_cartesian(180.0, 90.0, (0.0, 0.0, 1.0));
         check_angle_to_cartesian(0.0, 90.0, (0.0, 0.0, -1.0));
         check_angle_to_cartesian(0.0, 45.0, (0.0, FRAC_1_SQRT_2, -FRAC_1_SQRT_2));
+        check_angle_to_cartesian(45.0, 45.0, (-0.5, FRAC_1_SQRT_2, -0.5));
+        check_angle_to_cartesian(135.0, 45.0, (-0.5, FRAC_1_SQRT_2, 0.5));
     }
 
     #[track_caller]

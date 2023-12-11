@@ -6,15 +6,18 @@
 //! ancestor module of pose.rs because it needs access to private fields and
 //! types.
 //!
-//! There are 2 conversions in here.
+//! These conversions are in here.
 //! 1) pose_file::Pose -> intern::pose::Pose
-//! 2) Skeleton3d -> pose_file::Pose
+//! 2) intern::pose::Pose -> Skeleton3d
+//! 3) Skeleton3d -> pose_file::Pose
 
-use std::f32::consts::TAU;
-
+use super::Pose;
+use crate::intern::geom::{Angle3d, SignedAngle};
 use crate::intern::pose::{BodyPart, BodyPoint, BodySide, Limb};
+use crate::intern::pose_db::LimbPositionDatabase;
 use crate::intern::skeleton_3d::Skeleton3d;
-use crate::{pose_file, STATE};
+use crate::keypoints::Cartesian3d;
+use crate::pose_file;
 
 impl From<pose_file::Limb> for Limb {
     fn from(other: pose_file::Limb) -> Self {
@@ -214,31 +217,32 @@ impl From<BodySide> for pose_file::BodySide {
     }
 }
 
-impl From<&Skeleton3d> for pose_file::Pose {
-    fn from(skeleton: &Skeleton3d) -> Self {
-        let limbs = STATE.with_borrow(|state| {
-            skeleton
-                .angles()
-                .iter()
-                .zip(state.db.limbs())
-                .map(|(angle, (_limb_index, &limb))| {
-                    let x = -angle.polar.sin() * angle.azimuth.sin();
-                    let z = angle.polar.cos() * -angle.azimuth.cos();
-                    let y = angle.polar.cos();
+impl pose_file::Pose {
+    pub(crate) fn from_with_db(skeleton: &Skeleton3d, db: &LimbPositionDatabase) -> Self {
+        let limbs = skeleton
+            .angles()
+            .iter()
+            .zip(db.limbs())
+            .map(|(angle, (_limb_index, &limb))| {
+                let p = Cartesian3d::from(*angle);
 
-                    let x_angle = (y.atan2(x) + TAU) % TAU;
-                    let z_angle = (z.atan2(x) + TAU) % TAU;
+                // revert two-fold rotation
+                let forward = -p.z.asin();
+                let right = if !angle.azimuth.is_sign_positive() {
+                    -(p.y / forward.cos()).acos()
+                } else {
+                    (p.y / forward.cos()).acos()
+                };
 
-                    crate::pose_file::LimbPosition {
-                        limb: limb.into(),
-                        weight: 1.0,
-                        forward: Some(x_angle.to_degrees() as i16),
-                        right: Some(z_angle.to_degrees() as i16),
-                        tolerance: 0,
-                    }
-                })
-                .collect::<Vec<_>>()
-        });
+                crate::pose_file::LimbPosition {
+                    limb: limb.into(),
+                    weight: 1.0,
+                    forward: Some(forward.to_degrees().round() as i16),
+                    right: Some(right.to_degrees().round() as i16),
+                    tolerance: 0,
+                }
+            })
+            .collect::<Vec<_>>();
         Self {
             limbs,
             name: "Generated Pose".to_owned(),
@@ -274,5 +278,184 @@ impl From<Limb> for pose_file::Limb {
                 end: other.end.into(),
             },
         }
+    }
+}
+
+impl Skeleton3d {
+    /// Creates a skeleton with all limbs set to perfectly match the pose.
+    /// Angles which are not defined in the pose are set to 0.
+    #[allow(dead_code)]
+    fn from_with_db(pose: &Pose, db: &LimbPositionDatabase) -> Self {
+        let num_limbs = db.limbs().count();
+        let mut limb_angles = vec![Angle3d::ZERO; num_limbs];
+        for limb in &pose.limbs {
+            limb_angles[limb.limb.as_usize()] = limb.target.angle();
+        }
+        let azimuth_correction = SignedAngle::ZERO;
+        Skeleton3d::new(limb_angles, azimuth_correction)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::intern::pose_db::LimbPositionDatabase;
+    use crate::test_utils::assert_angle_3d_eq;
+
+    use super::*;
+
+    #[test]
+    fn test_skeleton_to_pose() {
+        // azimuth, polar => forward, right
+        check_skeleton_to_pose(0.0, 0.0, Some(0), Some(0));
+        check_skeleton_to_pose(0.0, 90.0, Some(90), Some(0));
+        check_skeleton_to_pose(90.0, 90.0, Some(0), Some(90));
+        check_skeleton_to_pose(35.26, 60.0, Some(45), Some(45));
+
+        check_skeleton_to_pose(180.0, 90.0, Some(-90), Some(0));
+        check_skeleton_to_pose(-90.0, 90.0, Some(0), Some(-90));
+        check_skeleton_to_pose(-180.0 + 35.26, 60.0, Some(-45), Some(-45));
+        check_skeleton_to_pose(-35.26, 60.0, Some(45), Some(-45));
+        check_skeleton_to_pose(180.0 - 35.26, 60.0, Some(-45), Some(45));
+    }
+
+    #[track_caller]
+    fn check_skeleton_to_pose(azimuth: f32, polar: f32, forward: Option<i16>, right: Option<i16>) {
+        let azimuth = SignedAngle::degree(azimuth);
+        let polar = SignedAngle::degree(polar);
+
+        let azimuth_correction = SignedAngle::degree(0.0);
+        let skeleton = Skeleton3d::new(vec![Angle3d::new(azimuth, polar)], azimuth_correction);
+        let db = LimbPositionDatabase::test(Angle3d::new(azimuth, polar));
+
+        let pose = pose_file::Pose::from_with_db(&skeleton, &db);
+        assert_eq!(
+            1,
+            pose.limbs.len(),
+            "test DB should produce one limb skeleton"
+        );
+        assert_eq!(
+            forward, pose.limbs[0].forward,
+            "wrong forward angle, expected forward={forward:?} was {:?}",
+            pose.limbs[0]
+        );
+        assert_eq!(
+            right, pose.limbs[0].right,
+            "wrong right angle, expected right={right:?} was {:?}",
+            pose.limbs[0]
+        );
+    }
+
+    #[test]
+    fn test_pose_from_file() {
+        // input            |   expected
+        // forward, right   |   azimuth, polar
+        check_pose_from_file(0, 0, 0.0, 0.0);
+        check_pose_from_file(30, 0, 0.0, 30.0);
+        check_pose_from_file(-30, 0, 180.0, 30.0);
+        check_pose_from_file(0, 30, 90.0, 30.0);
+        check_pose_from_file(0, -30, -90.0, 30.0);
+        check_pose_from_file(45, 45, 35.26, 60.0); // (x=-0.5,y=0.5,z=-0.707)
+        check_pose_from_file(-45, 45, 180.0 - 35.26, 60.0); // (x=-0.5,y=0.5,z=0.707)
+        check_pose_from_file(45, -45, -35.26, 60.0); // (x=0.5,y=0.5,z=-0.707)
+        check_pose_from_file(-45, -45, 180.0 + 35.26, 60.0); // (x=0.5,y=0.5,z=j0.707)
+    }
+
+    #[track_caller]
+    fn check_pose_from_file(forward: i16, right: i16, azimuth: f32, polar: f32) {
+        let input = ron_string_pose(forward, right);
+
+        let mut db = LimbPositionDatabase::default();
+        let input_pose: pose_file::Pose = ron::from_str(&input).unwrap();
+        db.add(vec![input_pose]).unwrap();
+
+        assert_eq!(db.poses().len(), 1, "test expects only 1 pose");
+        let pose = db.poses().first().unwrap();
+        assert_eq!(pose.limbs.len(), 1, "test expects only 1 limb in pose");
+        let expected = Angle3d::degree(azimuth, polar);
+
+        assert_angle_3d_eq(expected, pose.limbs[0].target.angle());
+    }
+
+    #[test]
+    fn test_pose_conversion_circle_1() {
+        // forward, right
+        check_pose_conversion_circle(90, 0);
+        check_pose_conversion_circle(0, 90);
+        check_pose_conversion_circle(70, 0);
+        check_pose_conversion_circle(0, 20);
+    }
+
+    #[test]
+    fn test_pose_conversion_circle_2() {
+        // forward, right
+        check_pose_conversion_circle(-90, 0);
+        check_pose_conversion_circle(0, -90);
+        check_pose_conversion_circle(0, -30);
+        check_pose_conversion_circle(-60, 0);
+    }
+
+    #[test]
+    fn test_pose_conversion_circle_3() {
+        // forward, right
+        check_pose_conversion_circle(-20, 90);
+        check_pose_conversion_circle(20, -90);
+        check_pose_conversion_circle(-20, -90);
+        check_pose_conversion_circle(20, 90);
+    }
+
+    #[test]
+    fn test_pose_conversion_circle_4() {
+        // forward, right
+        check_pose_conversion_circle(30, 60);
+        check_pose_conversion_circle(20, -100);
+        check_pose_conversion_circle(10, 30);
+        check_pose_conversion_circle(-10, -30);
+        check_pose_conversion_circle(-60, 10);
+    }
+
+    /// Ensure a pose_file::Pose -> Pose -> Skeleton3d -> pose_file::Pose
+    /// returns an output equivalent to the input.
+    #[track_caller]
+    fn check_pose_conversion_circle(forward: i16, right: i16) {
+        let input = ron_string_pose(forward, right);
+
+        let mut db = LimbPositionDatabase::default();
+        let input_pose: pose_file::Pose = ron::from_str(&input).unwrap();
+        db.add(vec![input_pose]).unwrap();
+        let input_pose: pose_file::Pose = ron::from_str(&input).unwrap();
+
+        let mut poses = db
+            .poses()
+            .iter()
+            .map(|pose| Skeleton3d::from_with_db(pose, &db))
+            .map(|skeleton| pose_file::Pose::from_with_db(&skeleton, &db));
+
+        let output_pose = poses.next().unwrap();
+
+        // the output contains all limbs, even those not part of the pose
+        // remove all zero angle to reduce it to only the relevant angles
+        let output = output_pose
+            .limbs
+            .iter()
+            .filter(|limb| {
+                limb.forward.is_some_and(|angle| angle != 0)
+                    || limb.right.is_some_and(|angle| angle != 0)
+            })
+            .cloned()
+            .collect::<Vec<_>>();
+
+        assert_eq!(&input_pose.limbs, &output, "input does not match output");
+        assert!(poses.next().is_none(), "more poses than expected");
+    }
+
+    fn ron_string_pose(forward: i16, right: i16) -> String {
+        format!(
+            r#"(
+            name: "Generated Pose",
+            limbs: [
+              (limb: LeftThigh, forward: {forward}, right: {right}, tolerance: 0, weight: 1.0),
+            ]
+          )"#
+        )
     }
 }
