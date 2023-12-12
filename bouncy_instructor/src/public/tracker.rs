@@ -45,6 +45,12 @@ pub struct ExportedFrame {
 }
 
 #[wasm_bindgen]
+pub struct Skeletons {
+    pub front: Skeleton,
+    pub side: Skeleton,
+}
+
+#[wasm_bindgen]
 impl Tracker {
     #[wasm_bindgen(constructor)]
     pub fn new() -> Self {
@@ -56,7 +62,7 @@ impl Tracker {
     }
 
     #[wasm_bindgen(js_name = addKeypoints)]
-    pub fn add_keypoints(&mut self, mut keypoints: Keypoints, timestamp: u32) -> Skeleton {
+    pub fn add_keypoints(&mut self, mut keypoints: Keypoints, timestamp: u32) -> Skeletons {
         if let Some(last) = self.history.last() {
             if last.0 >= timestamp {
                 panic!("inserted data not strictly monotonically increasing");
@@ -74,9 +80,10 @@ impl Tracker {
         // modification preserves timestamp order if it was true before
         self.history.push((timestamp, keypoints));
         let skeleton_info = Skeleton3d::from_keypoints(&keypoints);
-        let skeleton = skeleton_info.to_skeleton();
+        let front = skeleton_info.to_skeleton(0.0);
+        let side = skeleton_info.to_skeleton(90.0);
         self.skeletons.push(skeleton_info);
-        skeleton
+        Skeletons { front, side }
     }
 
     /// Fit frames in a time interval against all poses and return the best fit.

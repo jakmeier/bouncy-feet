@@ -58,9 +58,9 @@ impl Skeleton3d {
         &self.limb_angles
     }
 
-    pub(crate) fn to_skeleton(&self) -> Skeleton {
+    pub(crate) fn to_skeleton(&self, rotation: f32) -> Skeleton {
         // TODO: add an option to NOT undo the normalization azimuth rotation
-        let correction = self.azimuth_correction;
+        let correction = self.azimuth_correction - SignedAngle::degree(rotation);
         let segment = |i: LimbIndex| -> Segment {
             Angle3d::new(
                 self.limb_angles[i.as_usize()].azimuth + correction,

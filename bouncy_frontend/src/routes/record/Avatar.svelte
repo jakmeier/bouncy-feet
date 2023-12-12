@@ -9,6 +9,7 @@
   export let skeleton;
   export let width = 100;
   export let height = 100;
+  export let sideway = false;
   export let lengths = {
     thigh: 0.2,
     shin: 0.2,
@@ -91,10 +92,21 @@
     const s = Math.min(height, width);
     const hip = { x: 0.5 * width, y: 0.5 * height };
     const shoulder = { x: hip.x, y: hip.y - lengths.torso * s };
+    const shoulderLen = sideway ? 0.0 : 0.05 * s;
+    const hipLen = sideway ? 0.0 : 0.03 * s;
 
-    drawSide(ctx, hip, shoulder, skeleton.left, s);
-    drawSide(ctx, hip, shoulder, skeleton.right, s);
+    const leftHip = { x: hip.x - hipLen, y: hip.y };
+    const leftShoulder = { x: shoulder.x - shoulderLen, y: shoulder.y };
+    drawSide(ctx, leftHip, leftShoulder, skeleton.left, s);
+    const rightHip = { x: hip.x + hipLen, y: hip.y };
+    const rightShoulder = { x: shoulder.x + shoulderLen, y: shoulder.y };
+    drawSide(ctx, rightHip, rightShoulder, skeleton.right, s);
     drawHead(ctx, shoulder.x, shoulder.y - 0.1 * s, 0.075 * s);
+
+    if (!sideway) {
+      drawLine(ctx, leftHip, rightHip);
+      drawLine(ctx, leftShoulder, rightShoulder);
+    }
   }
 
   /**

@@ -15,6 +15,7 @@
   let camera;
   let landmarks = [];
   let skeleton;
+  let sideSkeleton;
   let isModelOn = false;
   let cameraOn = false;
   let dataListener;
@@ -72,7 +73,9 @@
         // landmarks = result.landmarks[0];
         const kp = landmarksToKeypoints(result.landmarks[0]);
         debugPos = kp.right.wrist;
-        skeleton = tracker.addKeypoints(kp, timestamp);
+        const skeletons = tracker.addKeypoints(kp, timestamp);
+        skeleton = skeletons.front;
+        sideSkeleton = skeletons.side;
       }
     });
 
@@ -90,11 +93,24 @@
   <Area width="{280}px" height="{280}px">
     <Camera bind:videoElement bind:cameraOn bind:this={camera} />
   </Area>
-  <Area width="{280}px" height="{280}px">
-    <Canvas width={300} height={300}>
-      <Avatar width={300} height={300} {landmarks} {skeleton} />
-    </Canvas>
-  </Area>
+  <div class="skeletons">
+    <Area width="{280}px" height="{280}px">
+      <Canvas width={300} height={300}>
+        <Avatar width={300} height={300} {landmarks} {skeleton} />
+      </Canvas>
+    </Area>
+    <Area width="{280}px" height="{280}px">
+      <Canvas width={300} height={300}>
+        <Avatar
+          width={300}
+          height={300}
+          landmarks={undefined}
+          skeleton={sideSkeleton}
+          sideway
+        />
+      </Canvas>
+    </Area>
+  </div>
   <div>
     {#if cameraOn}
       <button on:click={stopCamera}>
@@ -111,7 +127,11 @@
       <p>{debugText}</p>
       <p>{debugError}</p>
       <p>{debugText2}</p>
-      <p>({debugPos.x.toPrecision(2)} | {debugPos.y.toPrecision(2)} | {debugPos.z.toPrecision(2)})</p>
+      <p>
+        ({debugPos.x.toPrecision(2)} | {debugPos.y.toPrecision(2)} | {debugPos.z.toPrecision(
+          2
+        )})
+      </p>
     </div>
   </div>
 
@@ -136,5 +156,11 @@
 
   .debug {
     font-size: 25px;
+  }
+
+  .skeletons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
   }
 </style>

@@ -210,6 +210,17 @@ export class SkeletonSide {
 }
 /**
 */
+export class Skeletons {
+  free(): void;
+/**
+*/
+  front: Skeleton;
+/**
+*/
+  side: Skeleton;
+}
+/**
+*/
 export class Tracker {
   free(): void;
 /**
@@ -218,9 +229,9 @@ export class Tracker {
 /**
 * @param {Keypoints} keypoints
 * @param {number} timestamp
-* @returns {Skeleton}
+* @returns {Skeletons}
 */
-  addKeypoints(keypoints: Keypoints, timestamp: number): Skeleton;
+  addKeypoints(keypoints: Keypoints, timestamp: number): Skeletons;
 /**
 * Fit frames in a time interval against all poses and return the best fit.
 * @param {number} start
