@@ -44,8 +44,55 @@
         (limb: LeftLeg, angle: -30, tolerance: 5, weight: 1.0),
         (limb: RightThigh, angle: 40, tolerance: 5, weight: 1.0),
         (limb: RightShin, angle: 0, tolerance: 10, weight: 0.5),
+        (limb: RightFoot, angle: 90, tolerance: 10, weight: 0.25),
       ]
     ),
     ( name: "left-forward", mirror_of: "right-forward", direction: Right ),
+    (
+      name: "right-forward-heel",
+      direction: Right,
+      limbs: [
+        (limb: LeftThigh, angle: -20, tolerance: 5, weight: 0.5),
+        (limb: LeftShin, angle: -25, tolerance: 5, weight: 0.5),
+        (limb: LeftLeg, angle: -30, tolerance: 5, weight: 1.0),
+        (limb: RightThigh, angle: 25, tolerance: 5, weight: 1.0),
+        (limb: RightShin, angle: 25, tolerance: 5, weight: 0.5),
+        (limb: RightFoot, angle: 120, tolerance: 10, weight: 1.0),
+      ]
+    ),
+    ( name: "left-forward-heel", mirror_of: "right-forward-heel", direction: Right ),
+    (
+      name: "v-open",
+      direction: Front,
+      limbs: [
+        (limb: LeftThigh, angle: -10, tolerance: 5, weight: 0.25),
+        (limb: LeftShin, angle: -10, tolerance: 5, weight: 0.25),
+        (limb: LeftFoot, angle: -90, tolerance: 15, weight: 1.0),
+        (limb: RightThigh, angle: 10, tolerance: 5, weight: 0.25),
+        (limb: RightShin, angle: 10, tolerance: 5, weight: 0.25),
+        (limb: RightFoot, angle: 90, tolerance: 15, weight: 1.0),
+      ]
+    ),
+    (
+      name: "v-closed",
+      direction: Front,
+      limbs: [
+        (limb: LeftThigh, angle: 0, tolerance: 5, weight: 0.25),
+        (limb: LeftShin, angle: -10, tolerance: 5, weight: 0.25),
+        (limb: LeftFoot, angle: 90, tolerance: 15, weight: 1.0),
+        (limb: RightThigh, angle: 0, tolerance: 5, weight: 0.25),
+        (limb: RightShin, angle: 10, tolerance: 5, weight: 0.25),
+        (limb: RightFoot, angle: -90, tolerance: 15, weight: 1.0),
+      ]
+    ),
+    (
+      name: "pendulum-right",
+      direction: Front,
+      limbs: [
+        (limb: RightShin, angle: 45, tolerance: 5, weight: 1.0),
+        (limb: RightThigh, angle: 45, tolerance: 5, weight: 1.0),
+      ]
+    ),
+    ( name: "pendulum-left", mirror_of: "pendulum-right", direction: Front ),
   ]
 )
