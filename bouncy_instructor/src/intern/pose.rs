@@ -12,7 +12,6 @@ use super::pose_score::AngleTarget;
 use crate::intern::geom::Angle3d;
 use crate::public::keypoints::Cartesian3d;
 use crate::Keypoints;
-use std::f32::consts::{FRAC_PI_2, PI};
 
 #[derive(Debug)]
 pub(crate) struct Pose {
@@ -131,51 +130,6 @@ impl LimbPosition {
     ) -> Self {
         let target = AngleTarget::new(polar, tolerance, weight);
         Self::from_limb_and_target(limb, target)
-    }
-
-    /// Applies two rotations, the forward rotation first and then the right rotation.
-    ///
-    /// Note: This is currently not used because the comparisons are made in 2D
-    /// projections. But I might reconsider 3D comparison in the future. And
-    /// then we also need 3D input.
-    #[allow(dead_code)]
-    pub(crate) fn from_orthogonal_angles(
-        limb: LimbIndex,
-        forward: Option<i16>,
-        right: Option<i16>,
-        tolerance: u8,
-        weight: f32,
-    ) -> Self {
-        // convert from pose definition coordinates to spherical coordinates
-        // definition is in °, internal usage is in rad
-        // definition uses two 2D angle which need to be combined into a 3D angle
-        let angle = match (forward, right) {
-            (None, None) => Angle3d::ZERO,
-            (None, Some(right)) => {
-                let azimuth = SignedAngle::radian(right.signum() as f32 * FRAC_PI_2);
-                let polar = SignedAngle::degree(right.abs() as f32);
-                Angle3d::new(azimuth, polar)
-            }
-            (Some(forward), None) => {
-                let azimuth = SignedAngle::radian(if forward.is_negative() { PI } else { 0.0 });
-                let polar = SignedAngle::degree(forward.abs() as f32);
-                Angle3d::new(azimuth, polar)
-            }
-            (Some(forward), Some(right)) => {
-                // Here we have 2 angles to be combined.
-                let right = SignedAngle::degree(right as f32);
-                let forward = SignedAngle::degree(forward as f32);
-                Angle3d::from_rotations(forward, right)
-            }
-        };
-
-        Self::new(
-            limb,
-            // angle.azimuth,
-            angle.polar,
-            SignedAngle::degree(tolerance as f32),
-            weight,
-        )
     }
 
     pub(crate) fn weight(&self) -> f32 {
