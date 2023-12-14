@@ -1,4 +1,5 @@
-//! Defines the external format for defining poses.
+//! Defines the external format for defining poses, which are still positions of
+//! a body.
 //!
 //! Best practice: Don't use any of the type of this file outside of parsing
 //! logic. Instead, translate to internal types. This allows refactoring

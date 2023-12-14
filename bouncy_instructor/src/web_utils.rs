@@ -1,5 +1,5 @@
 #[macro_export]
-#[cfg(target_arch="wasm32")]
+#[cfg(target_arch = "wasm32")]
 macro_rules! println {
     ( $( $t:tt )* ) => {
         web_sys::console::log_1(&format!( $( $t )* ).into());
@@ -7,7 +7,7 @@ macro_rules! println {
 }
 
 #[macro_export]
-#[cfg(not(target_arch="wasm32"))]
+#[cfg(not(target_arch = "wasm32"))]
 macro_rules! println {
     ( $( $t:tt )* ) => {
         println!( $( $t )* );

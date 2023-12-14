@@ -13,7 +13,7 @@
  */
 
 import { PoseLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
-import { Cartesian3d, Keypoints, KeypointsSide, loadPoseFile } from './instructor/bouncy_instructor';
+import { Cartesian3d, Keypoints, KeypointsSide, loadPoseFile, loadStepFile } from './instructor/bouncy_instructor';
 
 
 export function landmarksToKeypoints(landmarks) {
@@ -64,6 +64,7 @@ export class PoseDetection {
     static async new(consumer) {
         const mp = await initMediaPipeBackend();
         await loadPoseFile('/pose.ron').catch((e) => console.error(e));
+        await loadStepFile('/step.ron').catch((e) => console.error(e));
         return new PoseDetection(consumer, mp);
     }
 

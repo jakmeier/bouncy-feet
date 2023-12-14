@@ -6,6 +6,15 @@
 */
 export function loadPoseFile(url: string): Promise<void>;
 /**
+* @param {string} url
+* @returns {Promise<void>}
+*/
+export function loadStepFile(url: string): Promise<void>;
+/**
+* @returns {(StepInfo)[]}
+*/
+export function steps(): (StepInfo)[];
+/**
 * Coordinate for Keypoints
 *
 * The coordinate system is growing down (y-axis), right (x-axis), and away
@@ -218,6 +227,15 @@ export class Skeletons {
 /**
 */
   side: Skeleton;
+}
+/**
+* Information about a step for display in the frontend.
+*/
+export class StepInfo {
+  free(): void;
+/**
+*/
+  readonly name: string;
 }
 /**
 */

@@ -1,0 +1,15 @@
+#![enable(implicit_some)]
+(
+  version: 0,
+  steps: [
+    (
+      name: "Running Man",
+      keyframes: [
+        (pose: "right-forward", orientation: Right),
+        (pose: "left-up", orientation: Right),
+        (pose: "left-forward", orientation: Right),
+        (pose: "right-up", orientation: Right),
+      ]
+    ),
+  ]
+)

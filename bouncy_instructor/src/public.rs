@@ -3,12 +3,16 @@
 pub(crate) mod keypoints;
 pub(crate) mod pose_file;
 pub(crate) mod skeleton;
+pub(crate) mod step_file;
+pub(crate) mod step_info;
 pub(crate) mod tracker;
 
 pub use keypoints::{Keypoints, Side as KeypointsSide};
+pub use step_info::StepInfo;
 pub use tracker::Tracker;
 
 use self::pose_file::ParseFileError;
+use self::step_file::StepFile;
 use super::STATE;
 use pose_file::PoseFile;
 use wasm_bindgen::prelude::wasm_bindgen;
@@ -18,6 +22,36 @@ use web_sys::Request;
 
 #[wasm_bindgen(js_name = loadPoseFile)]
 pub async fn load_pose_file(url: &str) -> Result<(), JsValue> {
+    let text = load_text_file(url).await?;
+    load_pose_str(&text)?;
+    Ok(())
+}
+
+#[wasm_bindgen(js_name = loadStepFile)]
+pub async fn load_step_file(url: &str) -> Result<(), JsValue> {
+    let text = load_text_file(url).await?;
+    load_step_str(&text)?;
+    Ok(())
+}
+
+#[wasm_bindgen]
+pub fn steps() -> Vec<StepInfo> {
+    STATE.with_borrow(|state| state.steps.iter().map(StepInfo::from).collect::<Vec<_>>())
+}
+
+pub fn load_pose_str(text: &str) -> Result<(), ParseFileError> {
+    let parsed = PoseFile::from_str(&text)?;
+    STATE.with(|state| state.borrow_mut().add_poses(parsed.poses))?;
+    Ok(())
+}
+
+pub fn load_step_str(text: &str) -> Result<(), ParseFileError> {
+    let parsed = StepFile::from_str(&text)?;
+    STATE.with(|state| state.borrow_mut().add_steps(&parsed.steps))?;
+    Ok(())
+}
+
+async fn load_text_file(url: &str) -> Result<String, JsValue> {
     let request = Request::new_with_str(&url)?;
 
     let window = web_sys::window().unwrap();
@@ -25,22 +59,16 @@ pub async fn load_pose_file(url: &str) -> Result<(), JsValue> {
     let resp: web_sys::Response = resp_value.dyn_into().unwrap();
     let js_value = JsFuture::from(resp.text()?).await?;
     let text = js_value.as_string().ok_or("Not a string")?;
-    load_pose_str(&text)?;
-    Ok(())
+    Ok(text)
 }
 
-pub fn load_pose_str(text: &str) -> Result<(), ParseFileError> {
-    let parsed = PoseFile::from_str(&text)?;
-    STATE.with(|state| state.borrow_mut().db.add(parsed.poses))?;
-    Ok(())
-}
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn test_valid_pose_reference() {
-        let input = r#"
+        let pose_str = r#"
         #![enable(implicit_some)]
         (
           version: 0,
@@ -60,7 +88,23 @@ mod tests {
           ]
         )
         "#;
-        load_pose_str(input).unwrap();
+        let step_str = r#"
+        #![enable(implicit_some)]
+        (
+          version: 0,
+          steps: [
+            (
+              name: "Running Man",
+              keyframes: [
+                (pose: "test-pose-left", orientation: Right),
+                (pose: "test-pose-right", orientation: Right),
+              ]
+            ),
+          ]
+        )
+        "#;
+        load_pose_str(pose_str).unwrap();
+        load_step_str(step_str).unwrap();
         let num_poses = STATE.with_borrow(|state| state.db.poses().len());
         assert_eq!(num_poses, 2);
     }
