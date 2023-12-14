@@ -14,7 +14,9 @@ use crate::public::keypoints::Cartesian3d;
 use crate::Keypoints;
 use std::f32::consts::{FRAC_PI_2, PI};
 
+#[derive(Debug)]
 pub(crate) struct Pose {
+    pub(crate) direction: PoseDirection,
     pub(crate) limbs: Vec<LimbPosition>,
 }
 
@@ -56,6 +58,14 @@ enum BodyPart {
     Toes,
 }
 
+#[derive(PartialEq, Eq, Hash, Debug, Clone, Copy)]
+pub enum PoseDirection {
+    /// Dancer faces the camera.
+    Front,
+    /// Dancer faces to their right. (Left in non-mirrored video.)
+    Right,
+}
+
 impl BodyPoint {
     pub(crate) fn keypoint(&self, kp: &Keypoints) -> Cartesian3d {
         let side = match self.side {
@@ -86,8 +96,8 @@ impl BodyPoint {
 }
 
 impl Pose {
-    pub(crate) fn new(limbs: Vec<LimbPosition>) -> Self {
-        Self { limbs }
+    pub(crate) fn new(direction: PoseDirection, limbs: Vec<LimbPosition>) -> Self {
+        Self { direction, limbs }
     }
 }
 
@@ -115,17 +125,20 @@ impl LimbPosition {
     }
     pub(crate) fn new(
         limb: LimbIndex,
-        azimuth: SignedAngle,
         polar: SignedAngle,
         tolerance: SignedAngle,
         weight: f32,
     ) -> Self {
-        let angle = Angle3d::new(azimuth, polar);
-        let target = AngleTarget::new(angle, tolerance, weight);
-
+        let target = AngleTarget::new(polar, tolerance, weight);
         Self::from_limb_and_target(limb, target)
     }
 
+    /// Applies two rotations, the forward rotation first and then the right rotation.
+    ///
+    /// Note: This is currently not used because the comparisons are made in 2D
+    /// projections. But I might reconsider 3D comparison in the future. And
+    /// then we also need 3D input.
+    #[allow(dead_code)]
     pub(crate) fn from_orthogonal_angles(
         limb: LimbIndex,
         forward: Option<i16>,
@@ -158,7 +171,7 @@ impl LimbPosition {
 
         Self::new(
             limb,
-            angle.azimuth,
+            // angle.azimuth,
             angle.polar,
             SignedAngle::degree(tolerance as f32),
             weight,

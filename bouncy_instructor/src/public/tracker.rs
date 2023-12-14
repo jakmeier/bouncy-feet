@@ -7,9 +7,10 @@ use wasm_bindgen::prelude::wasm_bindgen;
 
 #[wasm_bindgen]
 pub struct Tracker {
-    /// full keypoints as originally recorded
     /// invariant: ordered by timestamp
-    history: Vec<(u32, Keypoints)>,
+    timestamps: Vec<u32>,
+    /// full keypoints as originally recorded
+    keypoints: Vec<Keypoints>,
     /// tracked limbs
     skeletons: Vec<Skeleton3d>,
 }
@@ -56,29 +57,23 @@ impl Tracker {
     pub fn new() -> Self {
         Tracker {
             // order by timestamp satisfied for empty list
-            history: vec![],
+            timestamps: vec![],
+            keypoints: vec![],
             skeletons: vec![],
         }
     }
 
     #[wasm_bindgen(js_name = addKeypoints)]
-    pub fn add_keypoints(&mut self, mut keypoints: Keypoints, timestamp: u32) -> Skeletons {
-        if let Some(last) = self.history.last() {
-            if last.0 >= timestamp {
+    pub fn add_keypoints(&mut self, keypoints: Keypoints, timestamp: u32) -> Skeletons {
+        if let Some(last) = self.timestamps.last() {
+            if *last >= timestamp {
                 panic!("inserted data not strictly monotonically increasing");
             }
         }
 
-        // It seems that the z coordinate is just not to scale with x and y in
-        // the output of mediapipe. It should be adjusted when they are
-        // converted to keypoints, i.e. BEFORE we see it in WASM. But it's
-        // easier to fine tune the divisor inside Rust for now.
-        keypoints
-            .iter_mut()
-            .for_each(|coordiante| coordiante.z /= 2.0);
-
         // modification preserves timestamp order if it was true before
-        self.history.push((timestamp, keypoints));
+        self.timestamps.push(timestamp);
+        self.keypoints.push(keypoints);
         let skeleton_info = Skeleton3d::from_keypoints(&keypoints);
         let front = skeleton_info.to_skeleton(0.0);
         let side = skeleton_info.to_skeleton(90.0);
@@ -89,8 +84,8 @@ impl Tracker {
     /// Fit frames in a time interval against all poses and return the best fit.
     #[wasm_bindgen(js_name = bestFitPose)]
     pub fn best_fit_pose(&self, start: u32, end: u32) -> Option<PoseApproximation> {
-        let first = self.history.partition_point(|(t, _kp)| *t < start);
-        let last = self.history.partition_point(|(t, _kp)| *t <= end);
+        let first = self.timestamps.partition_point(|t| *t < start);
+        let last = self.timestamps.partition_point(|t| *t <= end);
         if first == last {
             return None;
         }
@@ -115,7 +110,7 @@ impl Tracker {
             Some(PoseApproximation {
                 name: state.db.pose_name(pose_index).to_owned(),
                 error,
-                timestamp: self.history[history_index].0,
+                timestamp: self.timestamps[history_index],
                 error_details,
             })
         })?;
@@ -129,9 +124,19 @@ impl Tracker {
             return vec![];
         }
 
-        let skeleton = match self.history.binary_search_by(|el| el.0.cmp(&timestamp)) {
+        let skeleton = match self.timestamps.binary_search(&timestamp) {
             Ok(i) | Err(i) => &self.skeletons[i],
         };
+
+        // for debugging, quite useful for now
+        for (angle, name) in skeleton
+            .angles()
+            .iter()
+            .zip(crate::intern::pose::Limb::base_limb_names())
+        {
+            crate::println!("{name}: {angle:?}");
+        }
+
         crate::STATE.with_borrow(|state| {
             let angles = skeleton.angles();
             state
@@ -156,10 +161,13 @@ impl Tracker {
     pub fn export_frame(&self, timestamp: u32) -> ExportedFrame {
         let mut config = ron::ser::PrettyConfig::default();
         config.indentor = "  ".to_string();
-        match self.history.binary_search_by(|f| f.0.cmp(&timestamp)) {
+        match self.timestamps.binary_search(&timestamp) {
             Ok(i) | Err(i) => ExportedFrame {
-                keypoints: ron::ser::to_string_pretty(&self.history[i..i + 1], config.clone())
-                    .unwrap(),
+                keypoints: ron::ser::to_string_pretty(
+                    &[(self.timestamps[i], &self.keypoints[i])],
+                    config.clone(),
+                )
+                .unwrap(),
                 pose: STATE.with_borrow(|state| {
                     ron::ser::to_string_pretty(
                         &crate::pose_file::Pose::from_with_db(&self.skeletons[i], &state.db),

@@ -7,12 +7,33 @@ pub(crate) struct SignedAngle(pub(crate) f32);
 impl SignedAngle {
     pub(crate) const ZERO: Self = SignedAngle(0.0);
 
+    /// Constructor from angle in degrees.
     pub(crate) fn degree(alpha: f32) -> Self {
         Self(alpha.to_radians()).ensure_signed()
     }
 
+    /// Constructor from angle in radians.
+    pub(crate) fn radian(alpha: f32) -> Self {
+        Self(alpha).ensure_signed()
+    }
+
+    /// Return the angle in degrees
     pub(crate) fn as_degree(&self) -> f32 {
         self.0.to_degrees()
+    }
+
+    /// Return the angle in radians
+    pub(crate) fn as_radians(&self) -> f32 {
+        self.0
+    }
+
+    /// Return the angle in radians
+    ///
+    /// Important: Don't delete this function, or else `angle.to_radians()` will
+    /// still compile with an auto deref but do an extra conversion.
+    #[allow(dead_code)]
+    pub(crate) fn to_radians(&self) -> f32 {
+        self.as_radians()
     }
 
     /// Returns a copy of the angle where values are guaranteed to be in (-PI and PI]
@@ -33,10 +54,6 @@ impl SignedAngle {
     pub(crate) fn abs(mut self) -> Self {
         self.0 = self.0.abs();
         self
-    }
-
-    pub(crate) fn radian(alpha: f32) -> Self {
-        Self(alpha).ensure_signed()
     }
 
     pub(crate) fn mirror(self) -> SignedAngle {

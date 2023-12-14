@@ -132,6 +132,8 @@ mod tests {
     use crate::intern::geom::Angle3d;
     use crate::test_utils::{assert_angle_eq, assert_cartesian_eq};
 
+    const SQRT_3: f32 = 1.7320508075688772935;
+
     #[test]
     fn test_cartesian_to_angle() {
         // input, azimuth, polar
@@ -150,6 +152,11 @@ mod tests {
         check_cartesian_to_angle(Cartesian3d::new(0.0, 0.0, 1.0), 180.0, 90.0);
         // to the camera means north => azimuth = 0
         check_cartesian_to_angle(Cartesian3d::new(0.0, 0.0, -1.0), 0.0, 90.0);
+
+        check_cartesian_to_angle(Cartesian3d::new(1.0, 0.0, 0.0), -90.0, 90.0);
+        check_cartesian_to_angle(Cartesian3d::new(1.0, 1.0, 0.0), -90.0, 45.0);
+        check_cartesian_to_angle(Cartesian3d::new(1.0, SQRT_3, 0.0), -90.0, 30.0);
+        check_cartesian_to_angle(Cartesian3d::new(1.0, 1.0 / SQRT_3, 0.0), -90.0, 60.0);
     }
 
     #[track_caller]
@@ -167,6 +174,28 @@ mod tests {
             SignedAngle::degree(expected_polar),
             origin.polar_angle(cartesian),
         );
+    }
+
+    #[test]
+    fn test_cartesian_to_angle_to_2d_projected() {
+        // with z = 0, everything should be like 2D
+        check_cartesian_to_projected(Cartesian3d::new(-1.0, 0.0, 0.0), 90.0);
+        check_cartesian_to_projected(Cartesian3d::new(-1.0, 1.0, 0.0), 45.0);
+        check_cartesian_to_projected(Cartesian3d::new(-1.0, SQRT_3, 0.0), 30.0);
+        check_cartesian_to_projected(Cartesian3d::new(-1.0, 1.0 / SQRT_3, 0.0), 60.0);
+
+        // with z != 0, everything should actually just be the same with the 2D projection
+        check_cartesian_to_projected(Cartesian3d::new(-1.0, 0.0, 1.0), 90.0);
+        check_cartesian_to_projected(Cartesian3d::new(-1.0, 1.0, 1.0), 45.0);
+        check_cartesian_to_projected(Cartesian3d::new(-1.0, SQRT_3, 1.0), 30.0);
+        check_cartesian_to_projected(Cartesian3d::new(-1.0, 1.0 / SQRT_3, 1.0), 60.0);
+    }
+
+    #[track_caller]
+    fn check_cartesian_to_projected(cartesian: Cartesian3d, expected_angle: f32) {
+        let origin = Cartesian3d::new(0.0, 0.0, 0.0);
+        let angle = Angle3d::new(origin.azimuth(cartesian), origin.polar_angle(cartesian));
+        assert_angle_eq(SignedAngle::degree(expected_angle), angle.project_2d());
     }
 
     #[test]

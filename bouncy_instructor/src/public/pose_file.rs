@@ -25,8 +25,11 @@ pub(crate) struct PoseFile {
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub(crate) struct Pose {
     pub name: String,
+    pub direction: PoseDirection,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub limbs: Vec<LimbPosition>,
+    // TODO: define in which z-order two body parts should be
+    // pub body: Vec<BodyPartOrdering>
     #[serde(default, skip_serializing_if = "String::is_empty")]
     pub mirror_of: String,
 }
@@ -36,20 +39,12 @@ pub(crate) struct Pose {
 pub(crate) struct LimbPosition {
     pub limb: Limb,
     pub weight: f32,
-    /// Angle in the forward direction (negative for backward)
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::unwrap_or_skip"
-    )]
-    pub forward: Option<i16>,
-    /// Angle in the right direction from the dancer's view (negative for left)
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::unwrap_or_skip"
-    )]
-    pub right: Option<i16>,
+    /// Angle in the forward direction (negative for backward).
+    ///
+    /// Depending on whether the pose faces the camera or to the side, this
+    /// angle either means forward or sidewards. From a non-mirrored camera
+    /// point of view, it's always to the left in the video.
+    pub angle: i16,
     pub tolerance: u8,
 }
 
@@ -111,6 +106,14 @@ pub(crate) enum BodyPart {
     Wrist,
     Heel,
     Toes,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
+pub enum PoseDirection {
+    /// Dancer faces the camera.
+    Front,
+    /// Dancer faces to their right. (Left in non-mirrored video.)
+    Right,
 }
 
 #[derive(Error, Debug)]

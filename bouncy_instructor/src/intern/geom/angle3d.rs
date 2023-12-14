@@ -71,6 +71,19 @@ impl Angle3d {
             polar: self.polar,
         }
     }
+
+    /// From spherical 3D coordinates to a spherical 2D projection as seen by the camera.
+    pub(crate) fn project_2d(&self) -> SignedAngle {
+        // polar angle of 0 also means 0 in the projected 2D system
+        let x = self.polar.sin() * self.azimuth.sin();
+        let y = self.polar.cos();
+        let xy_len = x.hypot(y);
+        if xy_len.abs() <= 1e-6 {
+            SignedAngle::ZERO
+        } else {
+            SignedAngle::radian(x.atan2(y))
+        }
+    }
 }
 
 #[cfg(test)]

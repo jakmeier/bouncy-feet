@@ -47,12 +47,14 @@ mod tests {
           poses: [
             (
               name: "test-pose-left",
+              direction: Right,
               limbs: [
-                (limb: LeftShin, forward: 0, tolerance: 5, weight: 1.0),
+                (limb: LeftShin, angle: 0, tolerance: 5, weight: 1.0),
               ]
             ),
             (
               name: "test-pose-right",
+              direction: Right,
               mirror_of: "test-pose-left",
             ),
           ]
@@ -72,12 +74,14 @@ mod tests {
           poses: [
             (
               name: "test-pose-left",
+              direction: Right,
               limbs: [
-                (limb: LeftShin, forward: 0, tolerance: 5, weight: 1.0),
+                  (limb: LeftShin, angle: 0, tolerance: 5, weight: 1.0),
               ]
             ),
             (
               name: "test-pose-right",
+              direction: Right,
               mirror_of: "fake-id",
             ),
           ]

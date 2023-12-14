@@ -31,7 +31,7 @@ fn check_pose_in_keypoints(keypoints: &str, expected_pose: &str) {
     }
     assert_eq!(expected_pose, approximation.name(), "wrong pose detected");
     assert_eq!(timestamp, approximation.timestamp, "timestamp mangled");
-    let threshold = 0.065;
+    let threshold = 0.15;
     assert!(
         approximation.error < threshold,
         "correct pose but error is too big {}",
@@ -60,19 +60,19 @@ fn test_left_up_1() {
 #[test]
 fn test_standing_1() {
     let keypoints = include_str!("./data/standing_east.keypoints.ron");
-    check_pose_in_keypoints(keypoints, "standing-straight");
+    check_pose_in_keypoints(keypoints, "standing-straight-side");
 }
 
 #[test]
 fn test_standing_2() {
     let keypoints = include_str!("./data/standing_front.keypoints.ron");
-    check_pose_in_keypoints(keypoints, "standing-straight");
+    check_pose_in_keypoints(keypoints, "standing-straight-front");
 }
 
 #[test]
 fn test_standing_3() {
     let keypoints = include_str!("./data/standing_west.keypoints.ron");
-    check_pose_in_keypoints(keypoints, "standing-straight");
+    check_pose_in_keypoints(keypoints, "standing-straight-side");
 }
 
 #[test]

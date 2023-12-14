@@ -16,25 +16,56 @@ use crate::{Keypoints, STATE};
 /// meaningful.
 #[derive(Debug)]
 pub(crate) struct Skeleton3d {
+    /// Which direction the dance faces, before applying the azimuth correction.
+    direction: Direction,
+    /// A list of angles of the skeleton for comparison to poses.
+    ///
+    /// This is a 2D projection as seen from the camera.
+    /// Which limbs are included depends on the poses we want to detect.
+    limb_angles: Vec<SignedAngle>,
     /// A list of angles of the skeleton.
     ///
-    /// Which limbs are included depends on the poses we want to detect.
-    limb_angles: Vec<Angle3d>,
+    /// Same as `limb_angles` but includes 3D information.
+    /// However, 3D is generally speaking less accurate.
+    limb_angles_3d: Vec<Angle3d>,
     /// The angle between the standardized direction as stored (East) and what
     /// was recorded.
     azimuth_correction: SignedAngle,
 }
 
+#[derive(PartialEq, Clone, Copy, Debug)]
+pub(crate) enum Direction {
+    /// Looking at the camera (0° azimuth)
+    North,
+    /// Looking to the left as seen in a non-mirrored video, which is to the
+    /// right-hand-side of the dancer. (90° azimuth)
+    East,
+    /// Looking away from the camera (+/-180° azimuth)
+    South,
+    /// Looking to the right as seen in a non-mirrored video, which is to the
+    /// left-hand-side of the dancer. (-90° azimuth)
+    West,
+    /// For when we don't know the direction
+    Unknown,
+}
+
 impl Skeleton3d {
-    pub(crate) fn new(limb_angles: Vec<Angle3d>, azimuth_correction: SignedAngle) -> Self {
+    pub(crate) fn new(
+        direction: Direction,
+        limb_angles_3d: Vec<Angle3d>,
+        azimuth_correction: SignedAngle,
+    ) -> Self {
+        let limb_angles = limb_angles_3d.iter().map(Angle3d::project_2d).collect();
         Self {
+            direction,
             limb_angles,
+            limb_angles_3d,
             azimuth_correction,
         }
     }
 
     pub(crate) fn from_keypoints(kp: &Keypoints) -> Self {
-        let mut limb_angles = STATE.with(|state| {
+        let limb_angles_3d = STATE.with(|state| {
             state
                 .borrow()
                 .db
@@ -42,20 +73,38 @@ impl Skeleton3d {
                 .map(|(_index, limb)| limb.to_angle(kp))
                 .collect::<Vec<_>>()
         });
-        // Shoulder defines where the person is looking
         let shoulder_angle = kp.left.shoulder.azimuth(kp.right.shoulder);
-
-        // Rotate skelton to face north.
-        let azimuth_correction = shoulder_angle - SignedAngle::degree(90.0);
-        for angle in &mut limb_angles {
-            angle.azimuth = angle.azimuth - azimuth_correction;
-        }
-
-        Self::new(limb_angles, azimuth_correction)
+        Self::from_angles(limb_angles_3d, shoulder_angle)
     }
 
-    pub(crate) fn angles(&self) -> &[Angle3d] {
+    pub(crate) fn from_angles(
+        mut limb_angles_3d: Vec<Angle3d>,
+        shoulder_angle: SignedAngle,
+    ) -> Self {
+        // Shoulder defines where the person is looking
+        let direction = Direction::from_shoulder(shoulder_angle);
+
+        // Rotate skelton to face either north or east.
+        let mut azimuth_correction = SignedAngle::degree(0.0);
+        match direction {
+            Direction::West | Direction::South => {
+                azimuth_correction = SignedAngle::degree(180.0);
+                for angle in &mut limb_angles_3d {
+                    angle.azimuth = angle.azimuth - azimuth_correction;
+                }
+            }
+            _ => (),
+        }
+
+        Self::new(direction, limb_angles_3d, azimuth_correction)
+    }
+
+    pub(crate) fn angles(&self) -> &[SignedAngle] {
         &self.limb_angles
+    }
+
+    pub(crate) fn direction(&self) -> Direction {
+        self.direction
     }
 
     pub(crate) fn to_skeleton(&self, rotation: f32) -> Skeleton {
@@ -63,8 +112,8 @@ impl Skeleton3d {
         let correction = self.azimuth_correction - SignedAngle::degree(rotation);
         let segment = |i: LimbIndex| -> Segment {
             Angle3d::new(
-                self.limb_angles[i.as_usize()].azimuth + correction,
-                self.limb_angles[i.as_usize()].polar,
+                self.limb_angles_3d[i.as_usize()].azimuth + correction,
+                self.limb_angles_3d[i.as_usize()].polar,
             )
             .into()
         };
@@ -88,6 +137,18 @@ impl Skeleton3d {
     }
 }
 
+impl Direction {
+    pub(crate) fn from_shoulder(shoulder_angle: SignedAngle) -> Self {
+        match shoulder_angle.to_degrees() {
+            alpha if alpha <= 45.0 && alpha >= -45.0 => Direction::West,
+            alpha if alpha < 135.0 && alpha > 45.0 => Direction::North,
+            alpha if alpha <= -135.0 || alpha >= 135.0 => Direction::East,
+            alpha if alpha < -45.0 && alpha > -135.0 => Direction::South,
+            _ => Direction::Unknown,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
 
@@ -105,35 +166,35 @@ mod tests {
         assert_float_angle_eq(0.0, skeleton.azimuth_correction);
         assert_angle_3d_eq(
             Angle3d::ZERO,
-            skeleton.limb_angles[pose::Limb::LEFT_THIGH.as_usize()],
+            skeleton.limb_angles_3d[pose::Limb::LEFT_THIGH.as_usize()],
         );
         assert_angle_3d_eq(
             Angle3d::ZERO,
-            skeleton.limb_angles[pose::Limb::LEFT_SHIN.as_usize()],
+            skeleton.limb_angles_3d[pose::Limb::LEFT_SHIN.as_usize()],
         );
         assert_angle_3d_eq(
             Angle3d::degree(-90.0, 45.0),
-            skeleton.limb_angles[pose::Limb::LEFT_ARM.as_usize()],
+            skeleton.limb_angles_3d[pose::Limb::LEFT_ARM.as_usize()],
         );
         assert_angle_3d_eq(
             Angle3d::degree(-90.0, 45.0),
-            skeleton.limb_angles[pose::Limb::LEFT_FOREARM.as_usize()],
+            skeleton.limb_angles_3d[pose::Limb::LEFT_FOREARM.as_usize()],
         );
         assert_angle_3d_eq(
             Angle3d::ZERO,
-            skeleton.limb_angles[pose::Limb::RIGHT_THIGH.as_usize()],
+            skeleton.limb_angles_3d[pose::Limb::RIGHT_THIGH.as_usize()],
         );
         assert_angle_3d_eq(
             Angle3d::ZERO,
-            skeleton.limb_angles[pose::Limb::RIGHT_SHIN.as_usize()],
+            skeleton.limb_angles_3d[pose::Limb::RIGHT_SHIN.as_usize()],
         );
         assert_angle_3d_eq(
             Angle3d::degree(90.0, 45.0),
-            skeleton.limb_angles[pose::Limb::RIGHT_ARM.as_usize()],
+            skeleton.limb_angles_3d[pose::Limb::RIGHT_ARM.as_usize()],
         );
         assert_angle_3d_eq(
             Angle3d::degree(90.0, 45.0),
-            skeleton.limb_angles[pose::Limb::RIGHT_FOREARM.as_usize()],
+            skeleton.limb_angles_3d[pose::Limb::RIGHT_FOREARM.as_usize()],
         );
     }
 

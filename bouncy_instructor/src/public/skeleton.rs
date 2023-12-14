@@ -48,7 +48,7 @@ pub struct Segment {
 impl From<Angle3d> for Segment {
     fn from(value: Angle3d) -> Self {
         // polar angle of 0 means 90° in the projected 2D system
-        let x = -value.polar.sin() * value.azimuth.sin();
+        let x = value.polar.sin() * value.azimuth.sin();
         let y = value.polar.cos();
         let xy_len = x.hypot(y);
         if xy_len.abs() <= 1e-6 {

@@ -1,9 +1,10 @@
 //! Computing the error score between a pose and a skeleton.
 
-use super::geom::{Angle3d, SignedAngle};
+use super::geom::SignedAngle;
 use super::pose::Pose;
 use super::pose_db::LimbIndex;
 use super::skeleton_3d::Skeleton3d;
+use crate::intern::pose::PoseDirection;
 
 /// Describe the target angle and how to compute an error score from it.
 ///
@@ -11,8 +12,8 @@ use super::skeleton_3d::Skeleton3d;
 /// matter for rendering the perfect pose skeleton.
 #[derive(Clone, Debug)]
 pub(crate) struct AngleTarget {
-    /// the perfect angle to achive
-    angle: Angle3d,
+    /// the perfect angle to achieve
+    angle: SignedAngle,
     /// how many degrees in any direction is still considered no error
     tolerance: SignedAngle,
     /// weight factor for error computation
@@ -36,10 +37,17 @@ pub(crate) struct ErrorDetails {
 pub(crate) fn best_fit_pose(skeleton: &Skeleton3d, poses: &[Pose]) -> (f32, ErrorDetails, usize) {
     assert!(!poses.is_empty());
 
+    let direction = PoseDirection::from(skeleton.direction());
+    debug_assert!(0 < poses.iter().filter(|p| p.direction == direction).count());
+
     let mut best_error = f32::INFINITY;
     let mut best_details = ErrorDetails::default();
     let mut best_i = 0;
-    for (i, pose) in poses.iter().enumerate() {
+    for (i, pose) in poses
+        .iter()
+        .enumerate()
+        .filter(|(_i, p)| p.direction == direction)
+    {
         let details = pose.error(skeleton.angles());
         let err = details.error_score();
         if err < best_error {
@@ -52,7 +60,7 @@ pub(crate) fn best_fit_pose(skeleton: &Skeleton3d, poses: &[Pose]) -> (f32, Erro
 }
 
 impl AngleTarget {
-    pub(crate) fn new(angle: Angle3d, tolerance: SignedAngle, weight: f32) -> Self {
+    pub(crate) fn new(angle: SignedAngle, tolerance: SignedAngle, weight: f32) -> Self {
         Self {
             angle,
             tolerance,
@@ -61,28 +69,33 @@ impl AngleTarget {
     }
 
     /// Error between 0.0 and 1.0
-    fn target_error(&self, value: Angle3d) -> f32 {
-        // note: not sure if this error fromula is any good at all
-        // especially the tolerance is super weird
-        let tolerance_distance =
-            Angle3d::ZERO.distance(&Angle3d::new(SignedAngle::ZERO, self.tolerance));
-        0.0f32
-            .max(self.angle.distance(&value) - tolerance_distance)
-            .powi(2)
+    fn target_error(&self, value: SignedAngle) -> f32 {
+        let diff = (self.angle.as_radians() - value.as_radians()).abs();
+        let tolerance = self.tolerance.as_radians();
+        let diff_to_threshold = diff - tolerance;
+        if diff_to_threshold > 0.0 {
+            // Here is some design space to play around with.
+            // Right now, 1 radian ~ full error, which means around 57° away
+            // from the tolerance is thw worst, anything above is flat wrong.
+            // Which is rather arbitrary.
+            diff_to_threshold.powi(2).min(1.0)
+        } else {
+            0.0
+        }
     }
 
     pub(crate) fn weight(&self) -> f32 {
         self.weight
     }
 
-    pub(crate) fn angle(&self) -> Angle3d {
+    pub(crate) fn angle(&self) -> SignedAngle {
         self.angle
     }
 
-    /// Mirrors left/right, doesn't affect up/down or forward/backward
-    pub(crate) fn x_mirror(&self) -> AngleTarget {
+    /// Mirrors the angle keeping all else the same
+    pub(crate) fn mirror(&self) -> AngleTarget {
         Self {
-            angle: self.angle.x_mirror(),
+            angle: self.angle.mirror(),
             tolerance: self.tolerance,
             weight: self.weight,
         }
@@ -91,7 +104,7 @@ impl AngleTarget {
 
 impl Pose {
     /// Error is between 0.0  and 1.0
-    pub(crate) fn error(&self, angles: &[Angle3d]) -> ErrorDetails {
+    pub(crate) fn error(&self, angles: &[SignedAngle]) -> ErrorDetails {
         let mut errors = Vec::with_capacity(2 * self.limbs.len());
         let mut weights = Vec::with_capacity(2 * self.limbs.len());
         let mut limbs = Vec::with_capacity(2 * self.limbs.len());
@@ -156,7 +169,7 @@ mod tests {
     use super::*;
 
     use crate::intern::geom::SignedAngle;
-    use crate::intern::pose::{Limb, LimbPosition};
+    use crate::intern::pose::{Limb, LimbPosition, PoseDirection};
     use expect_test::expect;
     use std::f32::consts::PI;
 
@@ -174,12 +187,15 @@ mod tests {
     /// asserts that given angle for a limb and the same in the pose results in zero error
     #[track_caller]
     fn check_single_limb_perfect_score(azimuth: f32, polar: f32) {
-        let azimuth = SignedAngle::degree(azimuth);
-        let polar = SignedAngle::degree(polar);
-        let limb = LimbPosition::new(Limb::LEFT_THIGH, azimuth, polar, SignedAngle::ZERO, 1.0);
-        let pose = Pose::new(vec![limb]);
+        let polar = if azimuth < 0.0 || azimuth > 180.0 {
+            SignedAngle::degree(-polar)
+        } else {
+            SignedAngle::degree(polar)
+        };
+        let limb = LimbPosition::new(Limb::LEFT_THIGH, polar, SignedAngle::ZERO, 1.0);
+        let pose = Pose::new(PoseDirection::Front, vec![limb]);
         let mut angles = zero_skeleton();
-        angles[Limb::LEFT_THIGH.as_usize()] = Angle3d::new(azimuth, polar);
+        angles[Limb::LEFT_THIGH.as_usize()] = polar;
         let error = pose.error(&angles);
         assert_eq!(0.0, error.error_score());
     }
@@ -197,69 +213,64 @@ mod tests {
     #[test]
     fn test_standing_straight_pose_score() {
         let tol = SignedAngle::degree(5.0);
-        #[rustfmt::skip]
-        let pose = Pose::new(vec![
-            LimbPosition::new(Limb::LEFT_THIGH, SignedAngle(0.0), SignedAngle(0.0), tol, 1.0),
-            LimbPosition::new(Limb::LEFT_SHIN, SignedAngle(0.0), SignedAngle(0.0), tol, 1.0),
-            LimbPosition::new(Limb::LEFT_ARM, SignedAngle(0.0), SignedAngle(0.0), tol, 1.0),
-            LimbPosition::new(Limb::LEFT_FOREARM, SignedAngle(0.0), SignedAngle(0.0), tol, 1.0),
-            LimbPosition::new(Limb::RIGHT_THIGH, SignedAngle(0.0), SignedAngle(0.0), tol, 1.0),
-            LimbPosition::new(Limb::RIGHT_SHIN, SignedAngle(0.0), SignedAngle(0.0), tol, 1.0),
-            LimbPosition::new(Limb::RIGHT_ARM, SignedAngle(0.0), SignedAngle(0.0), tol, 1.0),
-            LimbPosition::new(Limb::RIGHT_FOREARM, SignedAngle(0.0), SignedAngle(0.0), tol, 1.0),
-        ]);
-        check_score_fixed_skeleton(&pose, expect!["0.193822"]);
+        let pose = Pose::new(
+            PoseDirection::Front,
+            vec![
+                LimbPosition::new(Limb::LEFT_THIGH, SignedAngle(0.0), tol, 1.0),
+                LimbPosition::new(Limb::LEFT_SHIN, SignedAngle(0.0), tol, 1.0),
+                LimbPosition::new(Limb::LEFT_ARM, SignedAngle(0.0), tol, 1.0),
+                LimbPosition::new(Limb::LEFT_FOREARM, SignedAngle(0.0), tol, 1.0),
+                LimbPosition::new(Limb::RIGHT_THIGH, SignedAngle(0.0), tol, 1.0),
+                LimbPosition::new(Limb::RIGHT_SHIN, SignedAngle(0.0), tol, 1.0),
+                LimbPosition::new(Limb::RIGHT_ARM, SignedAngle(0.0), tol, 1.0),
+                LimbPosition::new(Limb::RIGHT_FOREARM, SignedAngle(0.0), tol, 1.0),
+            ],
+        );
+        check_score_fixed_skeleton(&pose, expect!["0.49684697"]);
     }
 
     #[test]
     fn test_t_pose_score() {
         let tol = SignedAngle::degree(5.0);
-        #[rustfmt::skip]
-        let pose = Pose::new(vec![
-            LimbPosition::new(Limb::LEFT_THIGH, SignedAngle(0.0), SignedAngle(0.0), tol, 1.0),
-            LimbPosition::new(Limb::LEFT_SHIN, SignedAngle(0.0), SignedAngle(0.0), tol, 1.0),
-            LimbPosition::new(Limb::LEFT_ARM, SignedAngle(3.0 * PI), SignedAngle(PI), tol, 1.0),
-            LimbPosition::new(Limb::LEFT_FOREARM, SignedAngle(3.0 * PI), SignedAngle(PI), tol, 1.0),
-            LimbPosition::new(Limb::RIGHT_THIGH, SignedAngle(0.0), SignedAngle(0.0), tol, 1.0),
-            LimbPosition::new(Limb::RIGHT_SHIN, SignedAngle(0.0), SignedAngle(0.0), tol, 1.0),
-            LimbPosition::new(Limb::RIGHT_ARM, SignedAngle(PI), SignedAngle(PI), tol, 1.0),
-            LimbPosition::new(Limb::RIGHT_FOREARM, SignedAngle(PI), SignedAngle(PI), tol, 1.0),
-        ]);
-        check_score_fixed_skeleton(&pose, expect!["0.3906417"]);
+        let pose = Pose::new(
+            PoseDirection::Front,
+            vec![
+                LimbPosition::new(Limb::LEFT_THIGH, SignedAngle(0.0), tol, 1.0),
+                LimbPosition::new(Limb::LEFT_SHIN, SignedAngle(0.0), tol, 1.0),
+                LimbPosition::new(Limb::LEFT_ARM, SignedAngle(-PI), tol, 1.0),
+                LimbPosition::new(Limb::LEFT_FOREARM, SignedAngle(-PI), tol, 1.0),
+                LimbPosition::new(Limb::RIGHT_THIGH, SignedAngle(0.0), tol, 1.0),
+                LimbPosition::new(Limb::RIGHT_SHIN, SignedAngle(0.0), tol, 1.0),
+                LimbPosition::new(Limb::RIGHT_ARM, SignedAngle(PI), tol, 1.0),
+                LimbPosition::new(Limb::RIGHT_FOREARM, SignedAngle(PI), tol, 1.0),
+            ],
+        );
+        check_score_fixed_skeleton(&pose, expect!["0.68592346"]);
     }
 
     #[test]
     fn test_close_to_correct_pose_score() {
         let mut pose = fixed_pose(1.0);
-        pose.limbs[Limb::RIGHT_THIGH.as_usize()]
-            .target
-            .angle
-            .polar
-            .0 += PI / 5.0;
-        pose.limbs[Limb::LEFT_ARM.as_usize()].target.angle.polar.0 += PI / 17.0;
+        pose.limbs[Limb::RIGHT_THIGH.as_usize()].target.angle.0 += PI / 5.0;
+        pose.limbs[Limb::LEFT_ARM.as_usize()].target.angle.0 += PI / 17.0;
+        pose.limbs[Limb::RIGHT_FOREARM.as_usize()].target.angle.0 += PI / 17.0;
 
-        pose.limbs[Limb::RIGHT_FOREARM.as_usize()]
-            .target
-            .angle
-            .azimuth
-            .0 += PI / 17.0;
-
-        check_score_fixed_skeleton(&pose, expect!["0.013016654"]);
+        check_score_fixed_skeleton(&pose, expect!["0.053645715"]);
     }
 
     #[test]
     fn test_close_to_correct_skeleton_score() {
         let mut skeleton = fixed_skeleton();
-        skeleton[0].polar.0 += PI / 37.0;
-        skeleton[1].polar.0 += PI / 17.0;
-        skeleton[3].azimuth.0 -= PI / 19.0;
-        check_score_fixed_pose(&skeleton, expect!["0.0003231239"]);
+        skeleton[0].0 += PI / 37.0;
+        skeleton[1].0 += PI / 17.0;
+        skeleton[3].0 -= PI / 19.0;
+        check_score_fixed_pose(&skeleton, expect!["0.0019511592"]);
     }
 
     #[test]
     fn test_standing_straight_skeleton_score() {
         let skeleton = zero_skeleton();
-        check_score_fixed_pose(&skeleton, expect!["0.193822"]);
+        check_score_fixed_pose(&skeleton, expect!["0.49684697"]);
     }
 
     /// asserts that a pose evaluated against a fixed skeleton results in the expected error score
@@ -272,45 +283,47 @@ mod tests {
 
     /// asserts that a skeleton evaluated against a fixed pose results in the expected error score
     #[track_caller]
-    fn check_score_fixed_pose(skeleton: &[Angle3d], expect: expect_test::Expect) {
+    fn check_score_fixed_pose(skeleton: &[SignedAngle], expect: expect_test::Expect) {
         let pose = fixed_pose(5.0);
         let error = pose.error(&skeleton).error_score();
         expect.assert_eq(&error.to_string());
     }
 
-    fn zero_skeleton() -> Vec<Angle3d> {
-        vec![Angle3d::ZERO; Limb::base_limbs().len()]
+    fn zero_skeleton() -> Vec<SignedAngle> {
+        vec![SignedAngle::ZERO; Limb::base_limbs().len()]
     }
 
     /// using a somewhat random skeleton, doesn't really matter what it is
     /// just don't make it too complicated, for interpretability's sake
-    fn fixed_skeleton() -> Vec<Angle3d> {
+    fn fixed_skeleton() -> Vec<SignedAngle> {
         let mut angles = zero_skeleton();
 
-        angles[Limb::RIGHT_THIGH.as_usize()] = Angle3d::degree(0.0, 90.0);
-        angles[Limb::RIGHT_SHIN.as_usize()] = Angle3d::degree(0.0, 45.0);
-        angles[Limb::RIGHT_ARM.as_usize()] = Angle3d::degree(90.0, 90.0);
-        angles[Limb::RIGHT_FOREARM.as_usize()] = Angle3d::degree(90.0, 90.0);
-        angles[Limb::LEFT_ARM.as_usize()] = Angle3d::degree(270.0, 45.0);
-        angles[Limb::LEFT_FOREARM.as_usize()] = Angle3d::degree(270.0, 0.0);
+        angles[Limb::RIGHT_THIGH.as_usize()] = SignedAngle::degree(90.0);
+        angles[Limb::RIGHT_SHIN.as_usize()] = SignedAngle::degree(45.0);
+        angles[Limb::RIGHT_ARM.as_usize()] = SignedAngle::degree(90.0);
+        angles[Limb::RIGHT_FOREARM.as_usize()] = SignedAngle::degree(90.0);
+        angles[Limb::LEFT_ARM.as_usize()] = SignedAngle::degree(45.0);
+        angles[Limb::LEFT_FOREARM.as_usize()] = SignedAngle::degree(0.0);
         angles
     }
 
     /// using the same angles as used in `fixed_skeleton`
-    #[rustfmt::skip]
     fn fixed_pose(tolerance: f32) -> Pose {
         let tol = SignedAngle::degree(tolerance);
-        Pose::new(vec![
-            LimbPosition::new(Limb::LEFT_THIGH, SignedAngle(0.0), SignedAngle(0.0), tol, 1.0),
-            LimbPosition::new(Limb::LEFT_SHIN, SignedAngle(0.0), SignedAngle(0.0), tol, 1.0),
-            LimbPosition::new(Limb::LEFT_FOOT, SignedAngle(0.0), SignedAngle(0.0), tol, 0.0),
-            LimbPosition::new(Limb::LEFT_ARM, SignedAngle(3.0 * PI/2.0), SignedAngle(PI/4.0), tol, 1.0),
-            LimbPosition::new(Limb::LEFT_FOREARM, SignedAngle(3.0 * PI/2.0), SignedAngle(0.0), tol, 1.0),
-            LimbPosition::new(Limb::RIGHT_THIGH, SignedAngle(0.0), SignedAngle(PI/2.0), tol, 1.0),
-            LimbPosition::new(Limb::RIGHT_SHIN, SignedAngle(0.0), SignedAngle(PI/4.0), tol, 1.0),
-            LimbPosition::new(Limb::RIGHT_FOOT, SignedAngle(0.0), SignedAngle(0.0), tol, 0.0),
-            LimbPosition::new(Limb::RIGHT_ARM, SignedAngle(PI/2.0), SignedAngle(PI/2.0), tol, 1.0),
-            LimbPosition::new(Limb::RIGHT_FOREARM, SignedAngle(PI/2.0), SignedAngle(PI/2.0), tol, 1.0),
-        ])
+        Pose::new(
+            PoseDirection::Front,
+            vec![
+                LimbPosition::new(Limb::LEFT_THIGH, SignedAngle(0.0), tol, 1.0),
+                LimbPosition::new(Limb::LEFT_SHIN, SignedAngle(0.0), tol, 1.0),
+                LimbPosition::new(Limb::LEFT_FOOT, SignedAngle(0.0), tol, 0.0),
+                LimbPosition::new(Limb::LEFT_ARM, SignedAngle(PI / 4.0), tol, 1.0),
+                LimbPosition::new(Limb::LEFT_FOREARM, SignedAngle(0.0), tol, 1.0),
+                LimbPosition::new(Limb::RIGHT_THIGH, SignedAngle(PI / 2.0), tol, 1.0),
+                LimbPosition::new(Limb::RIGHT_SHIN, SignedAngle(PI / 4.0), tol, 1.0),
+                LimbPosition::new(Limb::RIGHT_FOOT, SignedAngle(0.0), tol, 0.0),
+                LimbPosition::new(Limb::RIGHT_ARM, SignedAngle(PI / 2.0), tol, 1.0),
+                LimbPosition::new(Limb::RIGHT_FOREARM, SignedAngle(PI / 2.0), tol, 1.0),
+            ],
+        )
     }
 }

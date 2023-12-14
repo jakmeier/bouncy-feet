@@ -6,7 +6,8 @@
 //! to combine it with the list of poses. This module contains the context
 //!  structs required for this.
 
-use super::pose::{Limb, LimbPosition, Pose};
+use super::geom::SignedAngle;
+use super::pose::{Limb, LimbPosition, Pose, PoseDirection};
 use crate::pose_file::{self, ParseFileError};
 
 /// List of registered poses to recognize during tracking.
@@ -65,7 +66,7 @@ impl LimbPositionDatabase {
                     return Err(AddPoseError::MissingMirror(pose.mirror_of.clone()));
                 }
             } else {
-                self.new_pose(pose.limbs)
+                self.new_pose(pose.direction, pose.limbs)
             };
             self.poses.push(new_pose);
             self.names.push(pose.name);
@@ -74,37 +75,48 @@ impl LimbPositionDatabase {
     }
 
     /// Take a list of limbs from a pose definition and produce a Pose.
-    fn new_pose(&mut self, limbs: Vec<pose_file::LimbPosition>) -> Pose {
+    fn new_pose(
+        &mut self,
+        direction: pose_file::PoseDirection,
+        limbs: Vec<pose_file::LimbPosition>,
+    ) -> Pose {
         let limbs = limbs
             .into_iter()
             .map(|def| {
                 let limb = Limb::from(def.limb);
                 let index = self.find_or_insert_limb(limb);
-                LimbPosition::from_orthogonal_angles(
+                LimbPosition::new(
                     index,
-                    def.forward,
-                    def.right,
-                    def.tolerance,
+                    SignedAngle::degree(def.angle as f32),
+                    SignedAngle::degree(def.tolerance as f32),
                     def.weight,
                 )
             })
             .collect();
-        Pose::new(limbs)
+        Pose::new(direction.into(), limbs)
     }
 
     /// Take an existing pose and produce a mirror pose of it.
     fn pose_mirror(&mut self, i: usize) -> Pose {
+        let direction = self.poses[i].direction;
         let limbs = self.poses[i]
             .limbs
             .clone() // clone necessary to avoid double mutable borrow of limbs
-            .iter()
-            .map(|reverse_position| {
-                let limb = self.limbs[reverse_position.limb.0].mirror();
+            .into_iter()
+            .map(|original_position| {
+                let limb = self.limbs[original_position.limb.0].mirror();
                 let index = self.find_or_insert_limb(limb);
-                LimbPosition::from_limb_and_target(index, reverse_position.target.x_mirror())
+                let target = match direction {
+                    PoseDirection::Right => original_position.target,
+                    PoseDirection::Front => {
+                        // when left and right leg is switched, outside switches sign
+                        original_position.target.mirror()
+                    }
+                };
+                LimbPosition::from_limb_and_target(index, target)
             })
             .collect();
-        Pose::new(limbs)
+        Pose::new(direction, limbs)
     }
 
     fn find_or_insert_limb(&mut self, limb: Limb) -> LimbIndex {
@@ -146,15 +158,15 @@ impl LimbPositionDatabase {
     /// A DB without default poses for testing where only one pose is needed.
     #[cfg(test)]
     pub(crate) fn test(target: super::geom::Angle3d) -> Self {
-        use crate::intern::geom::SignedAngle;
-
-        let poses = vec![Pose::new(vec![LimbPosition::new(
-            LimbIndex(0),
-            target.azimuth,
-            target.polar,
-            SignedAngle::ZERO,
-            1.0,
-        )])];
+        let poses = vec![Pose::new(
+            PoseDirection::Front,
+            vec![LimbPosition::new(
+                LimbIndex(0),
+                target.project_2d(),
+                SignedAngle::ZERO,
+                1.0,
+            )],
+        )];
 
         Self {
             poses,
