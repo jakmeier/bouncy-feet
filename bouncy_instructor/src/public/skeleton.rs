@@ -48,7 +48,7 @@ pub struct Segment {
 impl From<Angle3d> for Segment {
     fn from(value: Angle3d) -> Self {
         // polar angle of 0 means 90° in the projected 2D system
-        let x = value.polar.sin() * value.azimuth.sin();
+        let x = -value.polar.sin() * value.azimuth.sin();
         let y = value.polar.cos();
         let xy_len = x.hypot(y);
         if xy_len.abs() <= 1e-6 {
@@ -91,7 +91,7 @@ mod tests {
     /// Note that 0° in the exported format is the x-axis, as is common in mathematics.
     /// But in the internal format, 0° is down, along the y-axis.
     /// At least both systems use clock-wise angles (left-handed system) and in
-    /// both the y axis gros down.
+    /// both the y axis grows down.
     #[test]
     fn test_angle_to_segment() {
         // (azimuth, polar), (expected_angle, expected_len)
