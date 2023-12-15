@@ -41,48 +41,48 @@ fn check_pose_in_keypoints(keypoints: &str, expected_pose: &str) {
 
 #[test]
 fn test_left_forward_1() {
-    let keypoints = include_str!("./data/left_forward_1.keypoints.ron");
+    let keypoints = include_str!("./data/test_poses/left_forward_1.keypoints.ron");
     check_pose_in_keypoints(keypoints, "left-forward");
 }
 
 #[test]
 fn test_left_forward_2() {
-    let keypoints = include_str!("./data/left_forward_2.keypoints.ron");
+    let keypoints = include_str!("./data/test_poses/left_forward_2.keypoints.ron");
     check_pose_in_keypoints(keypoints, "left-forward");
 }
 
 #[test]
 fn test_left_up_1() {
-    let keypoints = include_str!("./data/left_up.keypoints.ron");
+    let keypoints = include_str!("./data/test_poses/left_up.keypoints.ron");
     check_pose_in_keypoints(keypoints, "left-up");
 }
 
 #[test]
 fn test_standing_1() {
-    let keypoints = include_str!("./data/standing_east.keypoints.ron");
+    let keypoints = include_str!("./data/test_poses/standing_east.keypoints.ron");
     check_pose_in_keypoints(keypoints, "standing-straight-side");
 }
 
 #[test]
 fn test_standing_2() {
-    let keypoints = include_str!("./data/standing_front.keypoints.ron");
+    let keypoints = include_str!("./data/test_poses/standing_front.keypoints.ron");
     check_pose_in_keypoints(keypoints, "standing-straight-front");
 }
 
 #[test]
 fn test_standing_3() {
-    let keypoints = include_str!("./data/standing_west.keypoints.ron");
+    let keypoints = include_str!("./data/test_poses/standing_west.keypoints.ron");
     check_pose_in_keypoints(keypoints, "standing-straight-side");
 }
 
 #[test]
 fn test_right_forward_1() {
-    let keypoints = include_str!("./data/right_forward_1.keypoints.ron");
+    let keypoints = include_str!("./data/test_poses/right_forward_1.keypoints.ron");
     check_pose_in_keypoints(keypoints, "right-forward");
 }
 
 #[test]
 fn test_right_up_1() {
-    let keypoints = include_str!("./data/right_up_1.keypoints.ron");
+    let keypoints = include_str!("./data/test_poses/right_up_1.keypoints.ron");
     check_pose_in_keypoints(keypoints, "right-up");
 }
