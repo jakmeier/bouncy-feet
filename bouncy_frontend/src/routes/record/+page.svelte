@@ -106,7 +106,6 @@
           height={300}
           landmarks={undefined}
           skeleton={sideSkeleton}
-          sideway
         />
       </Canvas>
     </Area>

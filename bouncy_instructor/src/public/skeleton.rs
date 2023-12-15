@@ -1,4 +1,7 @@
 use crate::intern::geom::Angle3d;
+use crate::intern::pose::Pose;
+use crate::intern::pose_db::LimbPositionDatabase;
+use crate::intern::skeleton_3d::{Direction, Skeleton3d};
 use std::f32::consts::TAU;
 use wasm_bindgen::prelude::wasm_bindgen;
 
@@ -18,6 +21,7 @@ use wasm_bindgen::prelude::wasm_bindgen;
 pub struct Skeleton {
     pub left: Side,
     pub right: Side,
+    pub sideway: bool,
 }
 
 #[wasm_bindgen(js_name = SkeletonSide)]
@@ -43,6 +47,17 @@ pub struct Segment {
     pub angle: f32,
     /// The factor to multiply lengths when drawing the projected segment in 2D.
     pub r: f32,
+}
+
+impl Skeleton {
+    pub(crate) fn from_pose(pose: &Pose, direction: Direction, db: &LimbPositionDatabase) -> Self {
+        let rotation = 0.0;
+        let sideway = match direction {
+            Direction::North | Direction::South | Direction::Unknown => false,
+            Direction::East | Direction::West => true,
+        };
+        Skeleton3d::from_with_db(pose, db).to_skeleton(rotation, sideway)
+    }
 }
 
 impl From<Angle3d> for Segment {

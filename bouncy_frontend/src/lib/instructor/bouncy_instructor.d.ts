@@ -196,6 +196,9 @@ export class Skeleton {
 /**
 */
   right: SkeletonSide;
+/**
+*/
+  sideway: boolean;
 }
 /**
 */
@@ -233,6 +236,11 @@ export class Skeletons {
 */
 export class StepInfo {
   free(): void;
+/**
+* @param {number} beat
+* @returns {Skeleton}
+*/
+  skeleton(beat: number): Skeleton;
 /**
 */
   readonly name: string;

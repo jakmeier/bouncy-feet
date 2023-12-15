@@ -4,7 +4,8 @@
     },
     "home": {
         "title": "Bouncy Feet!",
-        "nav": "Home"
+        "nav": "Home",
+        "steps": "Schritte"
     },
     "learn": {
         "title": "Lerne neue Schritte!",

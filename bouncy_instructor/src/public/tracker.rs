@@ -75,8 +75,8 @@ impl Tracker {
         self.timestamps.push(timestamp);
         self.keypoints.push(keypoints);
         let skeleton_info = Skeleton3d::from_keypoints(&keypoints);
-        let front = skeleton_info.to_skeleton(0.0);
-        let side = skeleton_info.to_skeleton(90.0);
+        let front = skeleton_info.to_skeleton(0.0, false);
+        let side = skeleton_info.to_skeleton(90.0, true);
         self.skeletons.push(skeleton_info);
         Skeletons { front, side }
     }

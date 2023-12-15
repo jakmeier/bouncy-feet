@@ -45,6 +45,7 @@
         (limb: RightThigh, angle: 40, tolerance: 5, weight: 1.0),
         (limb: RightShin, angle: 0, tolerance: 10, weight: 0.5),
         (limb: RightFoot, angle: 90, tolerance: 10, weight: 0.25),
+        (limb: LeftFoot, angle: 90, tolerance: 0, weight: 0.0),
       ]
     ),
     ( name: "left-forward", mirror_of: "right-forward", direction: Right ),
@@ -58,6 +59,7 @@
         (limb: RightThigh, angle: 25, tolerance: 5, weight: 1.0),
         (limb: RightShin, angle: 25, tolerance: 5, weight: 0.5),
         (limb: RightFoot, angle: 120, tolerance: 10, weight: 1.0),
+        (limb: LeftFoot, angle: 90, tolerance: 0, weight: 0.0),
       ]
     ),
     ( name: "left-forward-heel", mirror_of: "right-forward-heel", direction: Right ),

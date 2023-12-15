@@ -11,5 +11,30 @@
         (pose: "right-up", orientation: Right),
       ]
     ),
+    (
+      name: "Running Man on Heels",
+      keyframes: [
+        (pose: "right-forward-heel", orientation: Right),
+        (pose: "left-up", orientation: Right),
+        (pose: "left-forward-heel", orientation: Right),
+        (pose: "right-up", orientation: Right),
+      ]
+    ),
+    (
+      name: "V-Step",
+      keyframes: [
+        (pose: "v-open", orientation: ToCamera),
+        (pose: "v-closed", orientation: ToCamera),
+      ]
+    ),
+    (
+      name: "Pendulum",
+      keyframes: [
+        (pose: "pendulum-right", orientation: ToCamera),
+        (pose: "standing-straight-front", orientation: ToCamera),
+        (pose: "pendulum-left", orientation: ToCamera),
+        (pose: "standing-straight-front", orientation: ToCamera),
+      ]
+    ),
   ]
 )

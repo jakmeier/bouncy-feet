@@ -14,6 +14,6 @@ fn test_listing_static_steps() {
 
     step_names.sort();
 
-    let expect = expect!["Running Man"];
+    let expect = expect!["Pendulum,Running Man,Running Man on Heels,V-Step"];
     expect.assert_eq(&step_names.join(","));
 }

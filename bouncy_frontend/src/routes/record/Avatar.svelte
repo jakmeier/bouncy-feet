@@ -4,12 +4,12 @@
   import { getContext } from 'svelte';
 
   /** @type import('@mediapipe/tasks-vision').NormalizedLandmark[] */
-  export let landmarks;
+  export let landmarks = [];
   /** @type import('$lib/instructor/bouncy_instructor').Skeleton */
   export let skeleton;
   export let width = 100;
   export let height = 100;
-  export let sideway = false;
+  export let lineWidth = 10;
   export let lengths = {
     thigh: 0.2,
     shin: 0.2,
@@ -18,6 +18,8 @@
     forearm: 0.15,
     foot: 0.05,
   };
+
+  $: sideway = skeleton ? skeleton.sideway : false;
 
   const mainColor = '#382eeb';
   const secondColor = '#c2bfff';
@@ -29,7 +31,7 @@
    */
   function draw(ctx) {
     ctx.strokeStyle = mainColor;
-    ctx.lineWidth = 10;
+    ctx.lineWidth = lineWidth;
     ctx.lineCap = 'round';
     ctx.fillStyle = secondColor;
 
@@ -95,11 +97,12 @@
     const shoulderLen = sideway ? 0.0 : 0.05 * s;
     const hipLen = sideway ? 0.0 : 0.03 * s;
 
-    const leftHip = { x: hip.x - hipLen, y: hip.y };
-    const leftShoulder = { x: shoulder.x - shoulderLen, y: shoulder.y };
+    // right body part is left on screen
+    const leftHip = { x: hip.x + hipLen, y: hip.y };
+    const leftShoulder = { x: shoulder.x + shoulderLen, y: shoulder.y };
     drawSide(ctx, leftHip, leftShoulder, skeleton.left, s);
-    const rightHip = { x: hip.x + hipLen, y: hip.y };
-    const rightShoulder = { x: shoulder.x + shoulderLen, y: shoulder.y };
+    const rightHip = { x: hip.x - hipLen, y: hip.y };
+    const rightShoulder = { x: shoulder.x - shoulderLen, y: shoulder.y };
     drawSide(ctx, rightHip, rightShoulder, skeleton.right, s);
     drawHead(ctx, shoulder.x, shoulder.y - 0.1 * s, 0.075 * s);
 

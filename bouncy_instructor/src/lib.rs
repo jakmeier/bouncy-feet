@@ -8,6 +8,7 @@ mod test_utils;
 pub use public::*;
 
 use intern::pose_db::LimbPositionDatabase;
+use intern::skeleton_3d::Direction;
 use intern::step::Step;
 use std::cell::RefCell;
 
@@ -35,15 +36,32 @@ impl State {
 
     fn add_steps(&mut self, steps: &[step_file::Step]) -> Result<(), AddStepError> {
         for def in steps {
-            for frame in &def.keyframes {
-                let _pose = self
-                    .db
-                    .pose_by_id(&frame.pose)
-                    .ok_or_else(|| AddStepError::MissingPose(frame.pose.clone()))?;
-            }
+            let poses = def
+                .keyframes
+                .iter()
+                .map(|frame| {
+                    self.db
+                        .pose_by_id(&frame.pose)
+                        .ok_or_else(|| AddStepError::MissingPose(frame.pose.clone()))
+                })
+                .collect::<Result<_, _>>()?;
+
+            let directions = def
+                .keyframes
+                .iter()
+                .map(|frame| match frame.orientation {
+                    step_file::Orientation::ToCamera => Direction::North,
+                    step_file::Orientation::Right => Direction::East,
+                    step_file::Orientation::Away => Direction::South,
+                    step_file::Orientation::Left => Direction::West,
+                    step_file::Orientation::Any => Direction::Unknown,
+                })
+                .collect();
 
             let new_step = Step {
                 name: def.name.clone(),
+                poses,
+                directions,
             };
             self.steps.push(new_step);
         }

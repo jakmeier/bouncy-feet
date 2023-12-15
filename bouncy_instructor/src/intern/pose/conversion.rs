@@ -308,8 +308,7 @@ impl From<Limb> for pose_file::Limb {
 impl Skeleton3d {
     /// Creates a skeleton with all limbs set to perfectly match the pose.
     /// Angles which are not defined in the pose are set to 0.
-    #[allow(dead_code)]
-    fn from_with_db(pose: &Pose, db: &LimbPositionDatabase) -> Self {
+    pub(crate) fn from_with_db(pose: &Pose, db: &LimbPositionDatabase) -> Self {
         let num_limbs = db.limbs().count();
         let mut limb_angles = vec![Angle3d::ZERO; num_limbs];
         let azimuth = SignedAngle::degree(90.0);
