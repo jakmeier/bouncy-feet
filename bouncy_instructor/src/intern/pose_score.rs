@@ -23,7 +23,7 @@ pub(crate) struct AngleTarget {
 }
 
 /// Error details for all limbs
-#[derive(Default)]
+#[derive(Default, Debug, Clone)]
 pub(crate) struct ErrorDetails {
     /// Index of limbs which were part of the compared pose
     pub limbs: Vec<LimbIndex>,
