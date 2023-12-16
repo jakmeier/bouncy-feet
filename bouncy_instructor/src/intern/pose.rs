@@ -4,6 +4,7 @@
 //! serialization. Code for conversion from that format into the format in this
 //! file is included here.
 
+mod approximation;
 mod conversion;
 
 use super::geom::SignedAngle;

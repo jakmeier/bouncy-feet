@@ -45,6 +45,27 @@ export class Cartesian3d {
   z: number;
 }
 /**
+* A step detected on a video feed, ready for JS code to render.
+*/
+export class DetectedStep {
+  free(): void;
+/**
+*/
+  end: number;
+/**
+*/
+  error: number;
+/**
+*/
+  readonly name: string;
+/**
+*/
+  readonly poses: (PoseApproximation)[];
+/**
+*/
+  start: number;
+}
+/**
 * Information of a recorded frame in RON format.
 *
 * Can be useful for creating new poses, new keypoint inputs for tests, or just
@@ -116,7 +137,7 @@ export class KeypointsSide {
   wrist: Cartesian3d;
 }
 /**
-* Self-describing error score for a specific limbb
+* Self-describing error score for a specific limb
 */
 export class LimbError {
   free(): void;
@@ -253,13 +274,23 @@ export class Tracker {
 */
   constructor();
 /**
+* Insert keypoints of a new frame for tracking.
+*
+* This is the main method to insert data into the tracker.
 * @param {Keypoints} keypoints
 * @param {number} timestamp
 * @returns {Skeletons}
 */
   addKeypoints(keypoints: Keypoints, timestamp: number): Skeletons;
 /**
+* @returns {(DetectedStep)[]}
+*/
+  detectDance(): (DetectedStep)[];
+/**
 * Fit frames in a time interval against all poses and return the best fit.
+*
+* This API is exported mostly for debugging. To extract fitted dances, use
+* `detect_dance` instead.
 * @param {number} start
 * @param {number} end
 * @returns {PoseApproximation | undefined}
