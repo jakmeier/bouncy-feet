@@ -68,6 +68,11 @@ impl Tracker {
         Skeletons { front, side }
     }
 
+    #[wasm_bindgen(js_name = setBpm)]
+    pub fn set_bpm(&mut self, bpm: f32) {
+        self.bpm = bpm;
+    }
+
     #[wasm_bindgen(js_name = detectDance)]
     pub fn detect_dance(&self) -> Vec<DetectedStep> {
         let mut start = 0;

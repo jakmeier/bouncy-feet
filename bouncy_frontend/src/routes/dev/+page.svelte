@@ -69,6 +69,12 @@
   function computePoseErrors() {
     poseErrors = tracker.allPoseErrors(video.currentTime * 1000);
   }
+
+  function logDance() {
+    tracker.setBpm(220);
+    const detection = tracker.detectDance();
+    console.log(detection);
+  }
 </script>
 
 <h1>Dev</h1>
@@ -83,6 +89,7 @@
   />
 </p>
 <button on:click={downloadFrame}> Download Keypoints of Frame </button>
+<button on:click={logDance}> Log Dance </button>
 <button on:click={computePoseErrors}> Show Pose Evaluations </button>
 <h2>Pose evaluations</h2>
 {#each poseErrors as pose}

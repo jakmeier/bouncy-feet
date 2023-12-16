@@ -60,7 +60,13 @@ impl Tracker {
             let mut history_index = 0;
 
             for i in first..last {
-                let details = state.db.poses()[pose_index].error(&self.skeletons[i].angles());
+                let pose = &state.db.poses()[pose_index];
+                let skeleton = &self.skeletons[i];
+                if pose.direction != skeleton.direction().into() {
+                    continue;
+                }
+
+                let details = pose.error(&skeleton.angles());
                 let error = details.error_score();
                 if error < best_error {
                     best_error = error;

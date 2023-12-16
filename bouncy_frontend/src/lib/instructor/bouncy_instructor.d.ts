@@ -283,6 +283,10 @@ export class Tracker {
 */
   addKeypoints(keypoints: Keypoints, timestamp: number): Skeletons;
 /**
+* @param {number} bpm
+*/
+  setBpm(bpm: number): void;
+/**
 * @returns {(DetectedStep)[]}
 */
   detectDance(): (DetectedStep)[];

@@ -3,6 +3,7 @@ use super::Timestamp;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 /// A step detected on a video feed, ready for JS code to render.
+#[derive(Debug)]
 #[wasm_bindgen]
 pub struct DetectedStep {
     pub(crate) step_name: String,

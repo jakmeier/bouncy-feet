@@ -23,6 +23,7 @@ export function tracker_bestFitPose(a: number, b: number, c: number): number;
 export function tracker_detectDance(a: number, b: number): void;
 export function tracker_exportFrame(a: number, b: number): number;
 export function tracker_new(): number;
+export function tracker_setBpm(a: number, b: number): void;
 export function __wbg_cartesian3d_free(a: number): void;
 export function __wbg_detectedstep_free(a: number): void;
 export function __wbg_exportedframe_free(a: number): void;

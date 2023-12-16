@@ -126,7 +126,112 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_detect_dance() {
+    fn test_detect_dance_front() {
+        setup();
+
+        let mut tracker = Tracker::new();
+        let mut kp0 = facing_camera_keypoints();
+
+        kp0.left.knee = Cartesian3d::new(1.0, 0.0, 0.0);
+        kp0.left.ankle = Cartesian3d::new(1.0, 1.0, 0.0);
+        // 0°
+        tracker.add_keypoints(kp0, 0);
+        tracker.add_keypoints(kp0, 100);
+
+        // 45°
+        kp0.left.ankle = Cartesian3d::new(0.0, 1.0, 0.0);
+        tracker.add_keypoints(kp0, 500);
+
+        // 90°
+        kp0.left.ankle = Cartesian3d::new(0.5, 0.0, 0.0);
+        tracker.add_keypoints(kp0, 1000);
+
+        tracker.bpm = 60.0;
+
+        let dance = tracker.detect_dance();
+        assert_eq!(dance.len(), 1, "{:?}", dance);
+        assert_eq!(dance[0].name(), "Test-Step-2");
+    }
+
+    #[test]
+    fn test_detect_dance_side_no_match() {
+        setup();
+
+        let mut tracker = Tracker::new();
+        let mut kp0 = facing_right_keypoints();
+
+        kp0.left.knee = Cartesian3d::new(1.0, 0.0, 0.0);
+        kp0.left.ankle = Cartesian3d::new(1.0, 1.0, 0.0);
+        // 0°
+        tracker.add_keypoints(kp0, 0);
+        tracker.add_keypoints(kp0, 100);
+
+        // 45°
+        kp0.left.ankle = Cartesian3d::new(0.0, 1.0, 0.0);
+        tracker.add_keypoints(kp0, 500);
+
+        // 90°
+        kp0.left.ankle = Cartesian3d::new(0.5, 0.0, 0.0);
+        tracker.add_keypoints(kp0, 1000);
+
+        tracker.bpm = 60.0;
+
+        let dance = tracker.detect_dance();
+        assert_eq!(dance.len(), 0, "{:?}", dance);
+    }
+
+    #[test]
+    fn test_detect_dance_side() {
+        setup();
+
+        let mut tracker = Tracker::new();
+        let mut kp0 = facing_right_keypoints();
+
+        kp0.left.knee = Cartesian3d::new(1.0, 0.0, 0.0);
+        kp0.left.ankle = Cartesian3d::new(1.0, 1.0, 0.0);
+        // 0°
+        tracker.add_keypoints(kp0, 0);
+        tracker.add_keypoints(kp0, 100);
+
+        // 90°
+        kp0.left.ankle = Cartesian3d::new(0.5, 0.0, 0.0);
+        tracker.add_keypoints(kp0, 1000);
+
+        // 45°
+        kp0.left.ankle = Cartesian3d::new(0.0, 1.0, 0.0);
+        tracker.add_keypoints(kp0, 2000);
+        tracker.add_keypoints(kp0, 3000);
+
+        // 90°
+        kp0.left.ankle = Cartesian3d::new(0.5, 0.0, 0.0);
+        tracker.add_keypoints(kp0, 4000);
+
+        tracker.bpm = 60.0;
+
+        let dance = tracker.detect_dance();
+        assert_eq!(dance.len(), 1, "{:?}", dance);
+        assert_eq!(dance[0].name(), "Test-Step-4");
+    }
+
+    fn facing_camera_keypoints() -> Keypoints {
+        let mut kp0 = Keypoints::default();
+        kp0.left.shoulder = Cartesian3d::new(1.0, -2.0, 0.0);
+        kp0.right.shoulder = Cartesian3d::new(-1.0, -2.0, 0.0);
+        kp0.left.hip = Cartesian3d::new(1.0, -1.0, 0.0);
+        kp0.right.hip = Cartesian3d::new(-1.0, -1.0, 0.0);
+        kp0
+    }
+
+    fn facing_right_keypoints() -> Keypoints {
+        let mut kp0 = Keypoints::default();
+        kp0.left.shoulder = Cartesian3d::new(0.0, -2.0, -1.0);
+        kp0.right.shoulder = Cartesian3d::new(0.0, -2.0, 1.0);
+        kp0.left.hip = Cartesian3d::new(0.0, -1.0, -1.0);
+        kp0.right.hip = Cartesian3d::new(0.0, -1.0, 1.0);
+        kp0
+    }
+
+    fn setup() {
         load_pose_str(
             r#"
         #![enable(implicit_some)]
@@ -161,6 +266,13 @@ mod tests {
                 (limb: LeftShin, angle: 90, tolerance: 5, weight: 1.0),
               ]
             ),
+            (
+              name: "test-pose-4",
+              direction: Right,
+              limbs: [
+                (limb: LeftShin, angle: 45, tolerance: 5, weight: 1.0),
+              ]
+            ),
           ]
         )"#,
         )
@@ -192,39 +304,18 @@ mod tests {
                 (pose: "test-pose-1", orientation: ToCamera),
               ]
             ),
+            (
+              name: "Test-Step-4",
+              keyframes: [
+                (pose: "test-pose-3", orientation: ToCamera),
+                (pose: "test-pose-4", orientation: ToCamera),
+                (pose: "test-pose-4", orientation: ToCamera),
+                (pose: "test-pose-3", orientation: ToCamera),
+              ]
+            ),
           ]
         )"#,
         )
         .unwrap();
-
-        let mut tracker = Tracker::new();
-
-        let mut kp0 = Keypoints::default();
-
-        // make skeleton face the camera
-        kp0.left.shoulder = Cartesian3d::new(1.0, -2.0, 0.0);
-        kp0.right.shoulder = Cartesian3d::new(-1.0, -2.0, 0.0);
-        kp0.left.hip = Cartesian3d::new(1.0, -1.0, 0.0);
-        kp0.right.hip = Cartesian3d::new(-1.0, -1.0, 0.0);
-
-        kp0.left.knee = Cartesian3d::new(1.0, 0.0, 0.0);
-        kp0.left.ankle = Cartesian3d::new(1.0, 1.0, 0.0);
-        // 0°
-        tracker.add_keypoints(kp0, 0);
-        tracker.add_keypoints(kp0, 100);
-
-        // 45°
-        kp0.left.ankle = Cartesian3d::new(0.0, 1.0, 0.0);
-        tracker.add_keypoints(kp0, 500);
-
-        // 90°
-        kp0.left.ankle = Cartesian3d::new(0.5, 0.0, 0.0);
-        tracker.add_keypoints(kp0, 1000);
-
-        tracker.bpm = 60.0;
-
-        let dance = tracker.detect_dance();
-        assert_eq!(dance.len(), 1);
-        assert_eq!(dance[0].name(), "Test-Step-2");
     }
 }
