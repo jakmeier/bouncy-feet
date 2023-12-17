@@ -81,7 +81,7 @@ impl Tracker {
         let mut out = vec![];
         while let Some(step) = self.find_first_step(start, end) {
             let end_t = step.end;
-            start = self.timestamps[start..end].partition_point(|t| *t <= end_t);
+            start = start + self.timestamps[start..end].partition_point(|t| *t <= end_t);
             out.push(step);
         }
         out
