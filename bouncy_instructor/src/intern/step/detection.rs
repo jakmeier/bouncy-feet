@@ -118,6 +118,10 @@ impl Tracker {
     }
 }
 
+// Tests below check basic step detection has no major bugs. They are not
+// designed for checking correctness, we rely on integration tests for that.
+// Rather, they check that there are no infinite loop or panics when detecting
+// simple cases.
 #[cfg(test)]
 mod tests {
     use crate::keypoints::Cartesian3d;
@@ -131,7 +135,7 @@ mod tests {
         let times = [0, 100, 500, 1000];
         let expected_steps = ["Test-Step-2"];
 
-        check_detect_front_dance(&degrees, &times, &expected_steps);
+        check_detect_front_dance(&degrees, times, &expected_steps);
     }
 
     #[test]
@@ -140,7 +144,7 @@ mod tests {
         let times = [0, 100, 500, 1000];
         let expected_steps = [];
 
-        check_detect_side_dance(&degrees, &times, &expected_steps);
+        check_detect_side_dance(&degrees, times, &expected_steps);
     }
 
     #[test]
@@ -149,25 +153,72 @@ mod tests {
         let times = [0, 100, 1000, 2000, 3000, 4000];
         let expected_steps = ["Test-Step-4"];
 
-        check_detect_side_dance(&degrees, &times, &expected_steps);
+        check_detect_side_dance(&degrees, times, &expected_steps);
+    }
+
+    /// Test with two frames to skip at the start
+    #[test]
+    fn test_detect_dance_skip_start() {
+        let degrees = [-45, -45, 0, 90];
+        let times = [0, 100, 500, 1500];
+        let expected_steps = ["Test-Step-2"];
+
+        check_detect_front_dance(&degrees, times, &expected_steps);
+    }
+
+    #[test]
+    fn test_detect_dance_multi_step() {
+        let degrees = [0, -90, 0, -90, -90, 90, 0, -90, 0, -90, 0, 90];
+        let times = (0..degrees.len()).map(|n| (n * 1000) as u32);
+        let expected_steps = [
+            "Test-Step-1", // 0,-90
+            "Test-Step-1", // 0,-90
+            "Test-Step-3", // -90,90
+            "Test-Step-1", // 0,-90
+            "Test-Step-1", // 0,-90
+            "Test-Step-2", // 0,90
+        ];
+
+        check_detect_front_dance(&degrees, times, &expected_steps);
+    }
+
+    /// Test with a couple of frames to skip at the start and many frames between key matches.
+    #[test]
+    fn test_detect_dance_many_frames() {
+        let degrees = [
+            -90, -45, -45, -45, 0, 0, 0, 0, 0, 0, 0, // 0 - 900ms
+            0, 45, 45, 90, 90, 90, 90, 90, 90, 90, // 1000 - 1900ms
+        ];
+        let times = (0..degrees.len()).map(|n| (n * 100) as u32);
+        let expected_steps = ["Test-Step-2"];
+
+        check_detect_front_dance(&degrees, times, &expected_steps);
     }
 
     #[track_caller]
-    fn check_detect_side_dance(degrees: &[i16], times: &[u32], expected_steps: &[&str]) {
+    fn check_detect_side_dance(
+        degrees: &[i16],
+        times: impl IntoIterator<Item = u32>,
+        expected_steps: &[&str],
+    ) {
         let kp = facing_right_keypoints();
-        check_detect_dance(kp, degrees, times, expected_steps)
+        check_detect_dance(kp, degrees, times.into_iter(), expected_steps)
     }
     #[track_caller]
-    fn check_detect_front_dance(degrees: &[i16], times: &[u32], expected_steps: &[&str]) {
+    fn check_detect_front_dance(
+        degrees: &[i16],
+        times: impl IntoIterator<Item = u32>,
+        expected_steps: &[&str],
+    ) {
         let kp = facing_camera_keypoints();
-        check_detect_dance(kp, degrees, times, expected_steps)
+        check_detect_dance(kp, degrees, times.into_iter(), expected_steps)
     }
 
     #[track_caller]
     fn check_detect_dance(
         mut kp: Keypoints,
         degrees: &[i16],
-        times: &[u32],
+        times: impl Iterator<Item = u32>,
         expected_steps: &[&str],
     ) {
         setup();
@@ -175,7 +226,7 @@ mod tests {
         let mut tracker = Tracker::new();
         tracker.bpm = 60.0;
 
-        for (degree, time) in degrees.iter().zip(times.iter()) {
+        for (degree, time) in degrees.iter().zip(times) {
             match degree {
                 0 => {
                     kp.left.knee = Cartesian3d::new(1.0, 0.0, 0.0);
@@ -183,7 +234,7 @@ mod tests {
                 }
                 -45 => {
                     kp.left.knee = Cartesian3d::new(1.0, 0.0, 0.0);
-                    kp.left.ankle = Cartesian3d::new(0.0, -1.0, 0.0);
+                    kp.left.ankle = Cartesian3d::new(2.0, 0.0, 0.0);
                 }
                 45 => {
                     kp.left.knee = Cartesian3d::new(1.0, 0.0, 0.0);
@@ -193,12 +244,17 @@ mod tests {
                     kp.left.knee = Cartesian3d::new(1.0, 0.0, 0.0);
                     kp.left.ankle = Cartesian3d::new(0.5, 0.0, 0.0);
                 }
+                -90 => {
+                    kp.left.knee = Cartesian3d::new(1.0, 0.0, 0.0);
+                    kp.left.ankle = Cartesian3d::new(1.5, 0.0, 0.0);
+                }
                 other => panic!("{other}° not implemented in test setup"),
             }
-            tracker.add_keypoints(kp, *time);
+            tracker.add_keypoints(kp, time);
         }
 
         let dance = tracker.detect_dance();
+        println!("{dance:?}");
         let step_names = dance.into_iter().map(|d| d.step_name).collect::<Vec<_>>();
         let expected_steps = expected_steps
             .into_iter()
@@ -301,10 +357,10 @@ mod tests {
             (
               name: "Test-Step-4",
               keyframes: [
-                (pose: "test-pose-3", orientation: ToCamera),
-                (pose: "test-pose-4", orientation: ToCamera),
-                (pose: "test-pose-4", orientation: ToCamera),
-                (pose: "test-pose-3", orientation: ToCamera),
+                (pose: "test-pose-3", orientation: Right),
+                (pose: "test-pose-4", orientation: Right),
+                (pose: "test-pose-4", orientation: Right),
+                (pose: "test-pose-3", orientation: Right),
               ]
             ),
           ]
