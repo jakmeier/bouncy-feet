@@ -127,90 +127,84 @@ mod tests {
 
     #[test]
     fn test_detect_dance_front() {
-        setup();
+        let degrees = [0, 0, 45, 90];
+        let times = [0, 100, 500, 1000];
+        let expected_steps = ["Test-Step-2"];
 
-        let mut tracker = Tracker::new();
-        let mut kp0 = facing_camera_keypoints();
-
-        kp0.left.knee = Cartesian3d::new(1.0, 0.0, 0.0);
-        kp0.left.ankle = Cartesian3d::new(1.0, 1.0, 0.0);
-        // 0°
-        tracker.add_keypoints(kp0, 0);
-        tracker.add_keypoints(kp0, 100);
-
-        // 45°
-        kp0.left.ankle = Cartesian3d::new(0.0, 1.0, 0.0);
-        tracker.add_keypoints(kp0, 500);
-
-        // 90°
-        kp0.left.ankle = Cartesian3d::new(0.5, 0.0, 0.0);
-        tracker.add_keypoints(kp0, 1000);
-
-        tracker.bpm = 60.0;
-
-        let dance = tracker.detect_dance();
-        assert_eq!(dance.len(), 1, "{:?}", dance);
-        assert_eq!(dance[0].name(), "Test-Step-2");
+        check_detect_front_dance(&degrees, &times, &expected_steps);
     }
 
     #[test]
     fn test_detect_dance_side_no_match() {
-        setup();
+        let degrees = [0, 0, 45, 90];
+        let times = [0, 100, 500, 1000];
+        let expected_steps = [];
 
-        let mut tracker = Tracker::new();
-        let mut kp0 = facing_right_keypoints();
-
-        kp0.left.knee = Cartesian3d::new(1.0, 0.0, 0.0);
-        kp0.left.ankle = Cartesian3d::new(1.0, 1.0, 0.0);
-        // 0°
-        tracker.add_keypoints(kp0, 0);
-        tracker.add_keypoints(kp0, 100);
-
-        // 45°
-        kp0.left.ankle = Cartesian3d::new(0.0, 1.0, 0.0);
-        tracker.add_keypoints(kp0, 500);
-
-        // 90°
-        kp0.left.ankle = Cartesian3d::new(0.5, 0.0, 0.0);
-        tracker.add_keypoints(kp0, 1000);
-
-        tracker.bpm = 60.0;
-
-        let dance = tracker.detect_dance();
-        assert_eq!(dance.len(), 0, "{:?}", dance);
+        check_detect_side_dance(&degrees, &times, &expected_steps);
     }
 
     #[test]
     fn test_detect_dance_side() {
+        let degrees = [0, 0, 90, 45, 45, 90];
+        let times = [0, 100, 1000, 2000, 3000, 4000];
+        let expected_steps = ["Test-Step-4"];
+
+        check_detect_side_dance(&degrees, &times, &expected_steps);
+    }
+
+    #[track_caller]
+    fn check_detect_side_dance(degrees: &[i16], times: &[u32], expected_steps: &[&str]) {
+        let kp = facing_right_keypoints();
+        check_detect_dance(kp, degrees, times, expected_steps)
+    }
+    #[track_caller]
+    fn check_detect_front_dance(degrees: &[i16], times: &[u32], expected_steps: &[&str]) {
+        let kp = facing_camera_keypoints();
+        check_detect_dance(kp, degrees, times, expected_steps)
+    }
+
+    #[track_caller]
+    fn check_detect_dance(
+        mut kp: Keypoints,
+        degrees: &[i16],
+        times: &[u32],
+        expected_steps: &[&str],
+    ) {
         setup();
 
         let mut tracker = Tracker::new();
-        let mut kp0 = facing_right_keypoints();
-
-        kp0.left.knee = Cartesian3d::new(1.0, 0.0, 0.0);
-        kp0.left.ankle = Cartesian3d::new(1.0, 1.0, 0.0);
-        // 0°
-        tracker.add_keypoints(kp0, 0);
-        tracker.add_keypoints(kp0, 100);
-
-        // 90°
-        kp0.left.ankle = Cartesian3d::new(0.5, 0.0, 0.0);
-        tracker.add_keypoints(kp0, 1000);
-
-        // 45°
-        kp0.left.ankle = Cartesian3d::new(0.0, 1.0, 0.0);
-        tracker.add_keypoints(kp0, 2000);
-        tracker.add_keypoints(kp0, 3000);
-
-        // 90°
-        kp0.left.ankle = Cartesian3d::new(0.5, 0.0, 0.0);
-        tracker.add_keypoints(kp0, 4000);
-
         tracker.bpm = 60.0;
 
+        for (degree, time) in degrees.iter().zip(times.iter()) {
+            match degree {
+                0 => {
+                    kp.left.knee = Cartesian3d::new(1.0, 0.0, 0.0);
+                    kp.left.ankle = Cartesian3d::new(1.0, 1.0, 0.0);
+                }
+                -45 => {
+                    kp.left.knee = Cartesian3d::new(1.0, 0.0, 0.0);
+                    kp.left.ankle = Cartesian3d::new(0.0, -1.0, 0.0);
+                }
+                45 => {
+                    kp.left.knee = Cartesian3d::new(1.0, 0.0, 0.0);
+                    kp.left.ankle = Cartesian3d::new(0.0, 1.0, 0.0);
+                }
+                90 => {
+                    kp.left.knee = Cartesian3d::new(1.0, 0.0, 0.0);
+                    kp.left.ankle = Cartesian3d::new(0.5, 0.0, 0.0);
+                }
+                other => panic!("{other}° not implemented in test setup"),
+            }
+            tracker.add_keypoints(kp, *time);
+        }
+
         let dance = tracker.detect_dance();
-        assert_eq!(dance.len(), 1, "{:?}", dance);
-        assert_eq!(dance[0].name(), "Test-Step-4");
+        let step_names = dance.into_iter().map(|d| d.step_name).collect::<Vec<_>>();
+        let expected_steps = expected_steps
+            .into_iter()
+            .map(|s| s.to_owned())
+            .collect::<Vec<_>>();
+        assert_eq!(expected_steps, step_names);
     }
 
     fn facing_camera_keypoints() -> Keypoints {
