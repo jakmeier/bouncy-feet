@@ -51,7 +51,7 @@ impl Tracker {
             return None;
         }
 
-        let result = crate::STATE.with_borrow(|state| {
+        crate::STATE.with_borrow(|state| {
             if state.db.is_empty() {
                 return None;
             }
@@ -74,14 +74,18 @@ impl Tracker {
                     history_index = i;
                 }
             }
-            Some(PoseApproximation {
-                name: state.db.pose_name(pose_index).to_owned(),
-                error: best_error,
-                timestamp: self.timestamps[history_index],
-                error_details: best_details,
-            })
-        })?;
-        Some(result)
+            if best_error >= 1.0 {
+                // pose not even close to be found
+                None
+            } else {
+                Some(PoseApproximation {
+                    name: state.db.pose_name(pose_index).to_owned(),
+                    error: best_error,
+                    timestamp: self.timestamps[history_index],
+                    error_details: best_details,
+                })
+            }
+        })
     }
 
     /// Fit a single frame against all poses and return all errors
