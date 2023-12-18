@@ -107,8 +107,11 @@ impl Skeleton3d {
         self.direction
     }
 
-    pub(crate) fn to_skeleton(&self, rotation: f32, sideway: bool) -> Skeleton {
-        // TODO: add an option to NOT undo the normalization azimuth rotation
+    pub(crate) fn to_skeleton(&self, rotation: f32) -> Skeleton {
+        let sideway = match self.direction() {
+            Direction::North | Direction::South | Direction::Unknown => false,
+            Direction::East | Direction::West => true,
+        };
         let correction = self.azimuth_correction - SignedAngle::degree(rotation);
         let segment = |i: LimbIndex| -> Segment {
             Angle3d::new(

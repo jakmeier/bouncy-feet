@@ -29,10 +29,9 @@ impl From<&Step> for StepInfo {
         let skeletons = STATE.with_borrow(|state| {
             step.poses
                 .iter()
-                .enumerate()
-                .map(|(i, pose_index)| {
+                .map(|pose_index| {
                     let pose = &state.db.poses()[*pose_index];
-                    Skeleton::from_pose(pose, step.directions[i], &state.db)
+                    Skeleton::from_pose(pose, &state.db)
                 })
                 .collect()
         });

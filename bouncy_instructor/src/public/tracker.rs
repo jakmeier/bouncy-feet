@@ -68,8 +68,8 @@ impl Tracker {
         self.timestamps.push(timestamp);
         self.keypoints.push(keypoints);
         let skeleton_info = Skeleton3d::from_keypoints(&keypoints);
-        let front = skeleton_info.to_skeleton(0.0, false);
-        let side = skeleton_info.to_skeleton(90.0, true);
+        let front = skeleton_info.to_skeleton(0.0);
+        let side = skeleton_info.to_skeleton(90.0);
         self.skeletons.push(skeleton_info);
         Skeletons { front, side }
     }
@@ -121,12 +121,7 @@ impl Tracker {
     pub fn skeleton_at(&self, timestamp: Timestamp) -> Option<Skeleton> {
         let i = self.timestamps.partition_point(|t| *t < timestamp);
         if let Some(skeleton_info) = &self.skeletons.get(i) {
-            let direction = skeleton_info.direction();
-            use crate::intern::skeleton_3d::Direction;
-            Some(
-                skeleton_info
-                    .to_skeleton(0.0, matches!(direction, Direction::East | Direction::West)),
-            )
+            Some(skeleton_info.to_skeleton(0.0))
         } else {
             None
         }

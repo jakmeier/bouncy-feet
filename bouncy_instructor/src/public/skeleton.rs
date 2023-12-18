@@ -1,7 +1,7 @@
 use crate::intern::geom::Angle3d;
 use crate::intern::pose::Pose;
 use crate::intern::pose_db::LimbPositionDatabase;
-use crate::intern::skeleton_3d::{Direction, Skeleton3d};
+use crate::intern::skeleton_3d::Skeleton3d;
 use std::f32::consts::TAU;
 use wasm_bindgen::prelude::wasm_bindgen;
 
@@ -50,13 +50,9 @@ pub struct Segment {
 }
 
 impl Skeleton {
-    pub(crate) fn from_pose(pose: &Pose, direction: Direction, db: &LimbPositionDatabase) -> Self {
+    pub(crate) fn from_pose(pose: &Pose, db: &LimbPositionDatabase) -> Self {
         let rotation = 0.0;
-        let sideway = match direction {
-            Direction::North | Direction::South | Direction::Unknown => false,
-            Direction::East | Direction::West => true,
-        };
-        Skeleton3d::from_with_db(pose, db).to_skeleton(rotation, sideway)
+        Skeleton3d::from_with_db(pose, db).to_skeleton(rotation)
     }
 }
 
