@@ -47,6 +47,12 @@ impl Tracker {
         }
     }
 
+    pub fn clear(&mut self) {
+        self.keypoints.clear();
+        self.timestamps.clear();
+        self.skeletons.clear();
+    }
+
     /// Insert keypoints of a new frame for tracking.
     ///
     /// This is the main method to insert data into the tracker.
@@ -109,5 +115,20 @@ impl Tracker {
     #[wasm_bindgen(js_name = allPoseErrors)]
     pub fn all_pose_errors(&self, timestamp: Timestamp) -> Vec<pose_output::PoseApproximation> {
         self.all_pose_approximations(timestamp)
+    }
+
+    #[wasm_bindgen(js_name = skeletonAt)]
+    pub fn skeleton_at(&self, timestamp: Timestamp) -> Option<Skeleton> {
+        let i = self.timestamps.partition_point(|t| *t < timestamp);
+        if let Some(skeleton_info) = &self.skeletons.get(i) {
+            let direction = skeleton_info.direction();
+            use crate::intern::skeleton_3d::Direction;
+            Some(
+                skeleton_info
+                    .to_skeleton(0.0, matches!(direction, Direction::East | Direction::West)),
+            )
+        } else {
+            None
+        }
     }
 }

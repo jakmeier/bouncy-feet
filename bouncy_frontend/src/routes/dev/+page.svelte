@@ -2,8 +2,9 @@
   import { Tracker } from '$lib/instructor/bouncy_instructor';
   import { landmarksToKeypoints } from '$lib/pose';
   import { fileToUrl, waitForVideoMetaLoaded } from '$lib/promise_util';
-  import { getContext, onMount } from 'svelte';
+  import { getContext, onMount, setContext } from 'svelte';
   import PoseError from './PoseError.svelte';
+  import Banner from '../record/Banner.svelte';
 
   /** @type {HTMLInputElement}  */
   let upload;
@@ -12,18 +13,25 @@
 
   let dataListener;
   let tracker = new Tracker();
+  setContext('tracker', {
+    tracker,
+  });
   const poseCtx = getContext('pose');
 
   /**
    * @type {import("$lib/instructor/bouncy_instructor").PoseApproximation[]}
    */
   let poseErrors = [];
+  /**
+   * @type {import("$lib/instructor/bouncy_instructor").DetectedStep[]}
+   */
+  let detectedSteps = [];
 
   async function loadVideo(event) {
     if (event.target.files && event.target.files[0]) {
       video.src = await fileToUrl(event.target.files[0]);
       await waitForVideoMetaLoaded(video);
-      tracker = new Tracker();
+      tracker.clear();
       video.play();
       loop();
     }
@@ -72,8 +80,10 @@
 
   function logDance() {
     tracker.setBpm(220);
-    const detection = tracker.detectDance();
-    console.log(detection);
+    detectedSteps = tracker.detectDance();
+    detectedSteps.forEach((step) => {
+      console.log(step.name, step.start, step.end);
+    });
   }
 </script>
 
@@ -89,9 +99,11 @@
   />
 </p>
 <button on:click={downloadFrame}> Download Keypoints of Frame </button>
+<h2>Dance Evaluation</h2>
 <button on:click={logDance}> Log Dance </button>
-<button on:click={computePoseErrors}> Show Pose Evaluations </button>
+<Banner steps={detectedSteps} width={2000}></Banner>
 <h2>Pose evaluations</h2>
+<button on:click={computePoseErrors}> Show Pose Evaluations </button>
 {#each poseErrors as pose}
   <PoseError data={pose} />
 {/each}

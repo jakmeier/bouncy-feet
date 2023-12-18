@@ -3,11 +3,12 @@
   import { landmarksToKeypoints } from '$lib/pose';
   import Canvas from '$lib/Canvas.svelte';
   import Avatar from './Avatar.svelte';
-  import { getContext, onDestroy, onMount } from 'svelte';
+  import { getContext, onDestroy, onMount, setContext } from 'svelte';
   import Area from './Area.svelte';
   import { t } from '$lib/i18n';
 
   import { Tracker } from '$lib/instructor/bouncy_instructor';
+  import Banner from './Banner.svelte';
 
   const poseCtx = getContext('pose');
 
@@ -21,6 +22,11 @@
   let dataListener;
   let stop = false;
 
+  /**
+   * @type {import("$lib/instructor/bouncy_instructor").DetectedStep[]}
+   */
+  let detectedSteps = [];
+
   let debugT = 0;
   let debugText = '';
   let debugText2 = '';
@@ -28,6 +34,9 @@
   let debugPos = { x: 0, y: 0, z: 0 };
 
   const tracker = new Tracker();
+  setContext('tracker', {
+    tracker,
+  });
 
   function loop() {
     if (isModelOn && dataListener) {
@@ -65,6 +74,7 @@
   function stopCamera() {
     camera.stopCamera();
     isModelOn = false;
+    detectedSteps = tracker.detectDance();
   }
 
   onMount(async () => {
@@ -133,6 +143,8 @@
       </p>
     </div>
   </div>
+
+  <Banner steps={detectedSteps}></Banner>
 
   <p>[recording settings]</p>
 </div>

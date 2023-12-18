@@ -271,8 +271,16 @@ export class StepInfo {
 export class Tracker {
   free(): void;
 /**
+* @param {number} timestamp
+* @returns {ExportedFrame}
+*/
+  exportFrame(timestamp: number): ExportedFrame;
+/**
 */
   constructor();
+/**
+*/
+  clear(): void;
 /**
 * Insert keypoints of a new frame for tracking.
 *
@@ -308,7 +316,7 @@ export class Tracker {
   allPoseErrors(timestamp: number): (PoseApproximation)[];
 /**
 * @param {number} timestamp
-* @returns {ExportedFrame}
+* @returns {Skeleton | undefined}
 */
-  exportFrame(timestamp: number): ExportedFrame;
+  skeletonAt(timestamp: number): Skeleton | undefined;
 }
