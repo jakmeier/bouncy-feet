@@ -14,6 +14,8 @@
     "record": {
         "nav": "Aufnehmen",
         "start-button": "starten",
+        "record-button": "aufnehmen",
+        "done-button": "fertig",
         "stop-button": "stoppen"
     },
     "profile": {

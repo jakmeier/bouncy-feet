@@ -13,7 +13,7 @@
     align-items: center;
     justify-items: center;
     margin: 5px auto;
-    border: 5px var(--theme-main) solid;
+    border: 5px var(--theme-neutral-dark) solid;
     border-radius: 100px;
     overflow: hidden;
   }

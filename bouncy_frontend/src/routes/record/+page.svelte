@@ -12,13 +12,25 @@
 
   const poseCtx = getContext('pose');
 
+  /**
+   * @type {HTMLVideoElement}
+   */
   let videoElement;
+  /**
+   * @type {Camera}
+   */
   let camera;
-  let landmarks = [];
+  /**
+   * @type {undefined | import("$lib/instructor/bouncy_instructor").Skeleton}
+   */
+  /**
+   * @type {undefined | string}
+   */
+  let reviewVideoSrc;
   let skeleton;
-  let sideSkeleton;
   let isModelOn = false;
   let cameraOn = false;
+  let recordingStarted = false;
   let dataListener;
   let stop = false;
 
@@ -26,12 +38,6 @@
    * @type {import("$lib/instructor/bouncy_instructor").DetectedStep[]}
    */
   let detectedSteps = [];
-
-  let debugT = 0;
-  let debugText = '';
-  let debugText2 = '';
-  let debugError = 0;
-  let debugPos = { x: 0, y: 0, z: 0 };
 
   const tracker = new Tracker();
   setContext('tracker', {
@@ -44,48 +50,58 @@
       dataListener.trackFrame(videoElement);
       const t = performance.now() - start;
       if (t > 50) {
-        console.debug(`loop trackFrame took ${t}ms`);
+        console.debug(`trackFrame took ${t}ms`);
       }
-
-      const now = new Date().getTime();
-      if (debugT + 1000 < now) {
-        debugT = now;
-        const videoT = dataListener.currentTimestamp();
-        const approximation = tracker.bestFitPose(videoT - 400, videoT);
-        if (approximation) {
-          debugError = approximation.error;
-          const worst = approximation.worstLimbs(1)[0];
-          debugText = approximation.name;
-          debugText2 = `${worst.error} ${worst.name}`;
-          console.log(
-            `found ${approximation.name} with an error of ${approximation.error}`
-          );
-        }
+      detectedSteps = tracker.detectDance();
+      const t2 = performance.now() - start;
+      if (t2 - t > 30) {
+        console.debug(`detectDance took ${t2 - t}ms`);
       }
     }
     requestAnimationFrame(loop);
   }
 
   async function startCamera() {
-    await camera.startCamera();
-    isModelOn = true;
+    if (!cameraOn) {
+      await camera.startCamera();
+      isModelOn = true;
+    }
+  }
+
+  async function startRecording() {
+    await startCamera();
+    camera.startRecording();
+    tracker.clear();
+    recordingStarted = true;
   }
 
   function stopCamera() {
     camera.stopCamera();
     isModelOn = false;
+  }
+
+  async function stopCameraAndRecording() {
+    stopCamera();
     detectedSteps = tracker.detectDance();
+    const videoBlob = await camera.endRecording();
+
+    if (videoBlob) {
+      reviewVideoSrc = URL.createObjectURL(videoBlob);
+    }
+  }
+
+  function reset() {
+    recordingStarted = false;
+    reviewVideoSrc = undefined;
+    skeleton = undefined;
   }
 
   onMount(async () => {
     dataListener = await poseCtx.newPoseDetection((result, timestamp) => {
       if (result.landmarks && result.landmarks.length >= 1) {
-        // landmarks = result.landmarks[0];
         const kp = landmarksToKeypoints(result.landmarks[0]);
-        debugPos = kp.right.wrist;
         const skeletons = tracker.addKeypoints(kp, timestamp);
         skeleton = skeletons.front;
-        sideSkeleton = skeletons.side;
       }
     });
 
@@ -99,54 +115,60 @@
   });
 </script>
 
+<h1>
+  <!-- Space holder -->
+</h1>
+
 <div id="outer">
   <Area width="{280}px" height="{280}px">
-    <Camera bind:videoElement bind:cameraOn bind:this={camera} />
+    {#if reviewVideoSrc}
+      <!-- svelte-ignore a11y-media-has-caption -->
+      <video src={reviewVideoSrc} playsinline controls></video>
+    {:else}
+      <Camera bind:videoElement bind:cameraOn bind:this={camera} />
+    {/if}
   </Area>
-  <div class="skeletons">
-    <Area width="{280}px" height="{280}px">
-      <Canvas width={300} height={300}>
-        <Avatar width={300} height={300} {landmarks} {skeleton} />
-      </Canvas>
-    </Area>
-    <Area width="{280}px" height="{280}px">
-      <Canvas width={300} height={300}>
-        <Avatar
-          width={300}
-          height={300}
-          landmarks={undefined}
-          skeleton={sideSkeleton}
-        />
-      </Canvas>
-    </Area>
-  </div>
+
+  <Area width="{280}px" height="{280}px">
+    <Canvas width={300} height={300}>
+      <Avatar width={300} height={300} {skeleton} />
+    </Canvas>
+  </Area>
+
+  {#if recordingStarted}
+    <Banner steps={detectedSteps}></Banner>
+  {/if}
+
   <div>
-    {#if cameraOn}
+    {#if !cameraOn && !recordingStarted}
+      <button on:click={startCamera}>
+        <span class="material-symbols-outlined"> videocam </span>
+        <p>{$t('record.start-button')}</p>
+      </button>
+    {:else if !recordingStarted}
       <button on:click={stopCamera}>
-        <span class="material-symbols-outlined"> stop </span>
+        <span class="material-symbols-outlined"> videocam_off </span>
+        <p>{$t('record.stop-button')}</p>
+      </button>
+    {/if}
+
+    {#if !recordingStarted}
+      <button on:click={startRecording}>
+        <span class="material-symbols-outlined"> radio_button_unchecked </span>
+        <p>{$t('record.record-button')}</p>
+      </button>
+    {:else if isModelOn}
+      <button on:click={stopCameraAndRecording}>
+        <span class="material-symbols-outlined"> camera </span>
         <p>{$t('record.stop-button')}</p>
       </button>
     {:else}
-      <button on:click={startCamera}>
-        <span class="material-symbols-outlined"> radio_button_unchecked </span>
-        <p>{$t('record.start-button')}</p>
+      <button on:click={reset}>
+        <span class="material-symbols-outlined"> done </span>
+        <p>{$t('record.done-button')}</p>
       </button>
     {/if}
-    <div class="debug">
-      <p>{debugText}</p>
-      <p>{debugError}</p>
-      <p>{debugText2}</p>
-      <p>
-        ({debugPos.x.toPrecision(2)} | {debugPos.y.toPrecision(2)} | {debugPos.z.toPrecision(
-          2
-        )})
-      </p>
-    </div>
   </div>
-
-  <Banner steps={detectedSteps}></Banner>
-
-  <p>[recording settings]</p>
 </div>
 
 <style>
@@ -165,13 +187,10 @@
     font-size: 42px;
   }
 
-  .debug {
-    font-size: 25px;
-  }
-
-  .skeletons {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 5px;
+  @media (max-width: 360px) {
+    /* Two buttons must fit next to each other, including margin */
+    button {
+      width: 120px;
+    }
   }
 </style>
