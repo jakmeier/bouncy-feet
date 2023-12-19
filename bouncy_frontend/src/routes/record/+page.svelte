@@ -106,7 +106,6 @@
   async function onSeek() {
     if (recordingStarted && !isModelOn && reviewVideoElement) {
       const ms = reviewVideoElement.currentTime * 1000;
-      console.log(`seek to ${recordingStart + ms} because video is at ${ms}`);
       const reviewTimestamp = ms + recordingStart;
       skeleton = tracker.skeletonAt(reviewTimestamp);
       const cursor =

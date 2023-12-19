@@ -65,7 +65,6 @@
     const r = stepsDiv.scrollLeft / scrollableWidth;
     onScroll(r);
     cursor = r;
-    console.log(`scroll to ${r}`);
   }
 
   onMount(() => {
