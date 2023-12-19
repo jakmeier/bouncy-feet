@@ -3,6 +3,20 @@
   version: 0,
   steps: [
     (
+      name: "Idle",
+      keyframes: [
+        (pose: "standing-straight-front", orientation: ToCamera),
+        (pose: "standing-straight-front", orientation: ToCamera),
+      ]
+    ),
+    (
+      name: "Idle Side",
+      keyframes: [
+        (pose: "standing-straight-side", orientation: Right),
+        (pose: "standing-straight-side", orientation: Right),
+      ]
+    ),
+    (
       name: "Running Man",
       keyframes: [
         (pose: "right-forward", orientation: Right),
