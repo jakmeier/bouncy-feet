@@ -1,63 +1,86 @@
 <script>
-  import { onMount } from 'svelte';
   /* A left-right swiping banner view of a dance performance. */
 
+  import { onMount } from 'svelte';
   import BannerStep from './BannerStep.svelte';
+
+  const avatarSize = 60;
 
   /** @type{import("$lib/instructor/bouncy_instructor").DetectedStep[]} */
   export let steps = [];
-  export let timestamp = 0;
   export let reviewStart;
   export let reviewEnd;
-  const avatarSize = 60;
-  const scrollBuffer = 1000;
 
-  $: scrollableWidth = Math.max(500, steps.length * avatarSize * 4);
-  $: innerWidth = scrollableWidth + 2 * scrollBuffer;
+  /**
+   * @type {number}
+   * Between 0.0 and 1.0, depending on where in the scrollable range the center should be.
+   * Note that the scrollable range is typically larger than the range of detected steps.
+   */
+  let cursor = 0;
+  /**
+   * Manually called by parent. Due to cyclic reactivity, it seems easier than
+   * using reactive statements (but maybe I just don't know how to use them
+   * properly in such cases)
+   * @param {number} newCursorValue
+   */
+  export function setCursor(newCursorValue) {
+    cursor = newCursorValue;
+    adjustScroll(scrollableWidth, cursor);
+  }
+  /**
+   * @type {(cursor: number) => void}
+   * called when the parent should be notified about scrolling
+   * (the other direction of setCursor)
+   */
+  export let onScroll;
 
-  let scrollFired = false;
   /**
    * @type {HTMLDivElement}
    */
   let stepsDiv;
+  let visibleBannerWidth = 0;
+
+  // minimum 500px wide banner, bu it should scale with more drawn avatars
+  $: scrollableWidth = Math.max(500, steps.length * avatarSize * 4);
+  // scroll position zero should put the first possible pose in the center
+  // for this, we have to offset all positions by `scrollOffset`
+  $: scrollOffset = (visibleBannerWidth + avatarSize) / 2;
+  // likewise, cursor=1 should center the last possible pose hence, put a fake
+  // element in the banner to reserve extra space in it, here we compute the
+  // position of it
+  $: innerWidth = scrollableWidth + 2 * scrollOffset;
+
   /**
-   * @param {number} t
+   * @param {number} scrollableWidth
+   * @param {number} cursor
    */
-  function updateScrollPosition(t) {
-    if (stepsDiv && !scrollFired) {
-      stepsDiv.scrollTo(
-        scrollBuffer + (t / (reviewEnd - reviewStart)) * scrollableWidth,
-        0
-      );
-    } else {
-      scrollFired = false;
+  async function adjustScroll(scrollableWidth, cursor) {
+    // avoid cyclic update
+    if (stepsDiv) {
+      stepsDiv.scrollLeft = scrollableWidth * cursor;
     }
   }
 
-  function onScroll() {
-    scrollFired = true;
-    const r = Math.min(
-      Math.max(stepsDiv.scrollLeft - scrollBuffer, 0) / scrollableWidth,
-      1.0
-    );
-    timestamp = reviewStart + r * (reviewEnd - reviewStart);
-    console.log(`scroll to ${timestamp}`);
+  function scrolled() {
+    const r = stepsDiv.scrollLeft / scrollableWidth;
+    onScroll(r);
+    cursor = r;
+    console.log(`scroll to ${r}`);
   }
 
   onMount(() => {
-    stepsDiv.scrollTo(scrollBuffer, 0);
+    adjustScroll(scrollableWidth, cursor);
   });
-  $: updateScrollPosition(timestamp);
 </script>
 
-<div id="container">
+<div id="container" bind:clientWidth={visibleBannerWidth}>
   <img class="arrow" src="img/left_arrow.svg" alt="left arrow" />
-  <div id="steps" bind:this={stepsDiv} on:scroll={onScroll}>
+  <div id="steps" bind:this={stepsDiv} on:scroll={scrolled}>
     {#each steps as step}
       <BannerStep
         {step}
         {scrollableWidth}
-        scrollOffset={scrollBuffer}
+        {scrollOffset}
         {reviewStart}
         {reviewEnd}
         {avatarSize}

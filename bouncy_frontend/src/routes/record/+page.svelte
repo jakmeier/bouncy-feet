@@ -3,10 +3,9 @@
   import { landmarksToKeypoints } from '$lib/pose';
   import Canvas from '$lib/Canvas.svelte';
   import Avatar from './Avatar.svelte';
-  import { getContext, onDestroy, onMount, setContext } from 'svelte';
+  import { getContext, onDestroy, onMount, setContext, tick } from 'svelte';
   import Area from './Area.svelte';
   import { t } from '$lib/i18n';
-
   import { Tracker } from '$lib/instructor/bouncy_instructor';
   import Banner from './Banner.svelte';
 
@@ -33,8 +32,6 @@
   let dataListener;
   let stop = false;
   /** @type {number} */
-  let reviewTimestamp;
-  /** @type {number} */
   let lastSeek = 0;
 
   /** @type {import("$lib/instructor/bouncy_instructor").DetectedStep[]} */
@@ -60,7 +57,8 @@
       }
     }
     const now = new Date().getTime();
-    if (recordingStarted && !isModelOn && lastSeek + 100 < now) {
+    // for now, don't limit time between seeks
+    if (recordingStarted && !isModelOn && lastSeek + 0 < now) {
       onSeek();
       lastSeek = now;
     }
@@ -105,27 +103,35 @@
     recordingEnd = undefined;
   }
 
-  let onSeekFired = false;
-  function onSeek() {
+  async function onSeek() {
     if (recordingStarted && !isModelOn && reviewVideoElement) {
-      onSeekFired = true;
       const ms = reviewVideoElement.currentTime * 1000;
-      console.log(`seek to ${recordingStart} + ${ms}`);
-      reviewTimestamp = ms + recordingStart;
+      console.log(`seek to ${recordingStart + ms} because video is at ${ms}`);
+      const reviewTimestamp = ms + recordingStart;
       skeleton = tracker.skeletonAt(reviewTimestamp);
+      const cursor =
+        (reviewTimestamp - recordingStart) / (recordingEnd - recordingStart);
+      setCursor(cursor);
     }
   }
 
-  function onReviewTimestamp() {
-    if (onSeekFired) {
-      onSeekFired = false;
-      return;
-    }
-    if (reviewVideoElement) {
+  /**
+   * Manually called by child banner. Due to cyclic reactivity, it seems easier
+   * than using reactive statements (but maybe I just don't know how to use them
+   * properly in such cases)
+   * @param {number} cursor
+   */
+  function seekVideoToCursor(cursor) {
+    if (reviewVideoElement && reviewVideoElement.paused) {
       reviewVideoElement.currentTime =
-        (reviewTimestamp - recordingStart) / 1000;
+        (cursor * (recordingEnd - recordingStart)) / 1000;
     }
   }
+  // the other direction, to be manually called by parent
+  /**
+   * @type {(cursor: number) => void}
+   */
+  let setCursor;
 
   onMount(async () => {
     dataListener = await poseCtx.newPoseDetection((result, timestamp) => {
@@ -137,7 +143,6 @@
         const skeletons = tracker.addKeypoints(kp, timestamp);
         skeleton = skeletons.front;
         recordingEnd = timestamp;
-        reviewTimestamp = timestamp;
       }
     });
 
@@ -149,8 +154,6 @@
   onDestroy(() => {
     stop = true;
   });
-
-  $: reviewTimestamp, onReviewTimestamp();
 </script>
 
 <h1>
@@ -186,9 +189,10 @@
   {#if recordingStarted}
     <Banner
       steps={detectedSteps}
-      bind:timestamp={reviewTimestamp}
+      bind:setCursor
       reviewStart={recordingStart || 0}
       reviewEnd={recordingEnd || 1}
+      onScroll={seekVideoToCursor}
     ></Banner>
   {/if}
 
