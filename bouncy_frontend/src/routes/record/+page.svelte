@@ -143,6 +143,7 @@
         const skeletons = tracker.addKeypoints(kp, timestamp);
         skeleton = skeletons.front;
         recordingEnd = timestamp;
+        setCursor(1.0);
       }
     });
 
