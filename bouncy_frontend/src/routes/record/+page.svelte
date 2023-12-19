@@ -12,31 +12,32 @@
 
   const poseCtx = getContext('pose');
 
-  /**
-   * @type {HTMLVideoElement}
-   */
-  let videoElement;
-  /**
-   * @type {Camera}
-   */
+  /** @type {HTMLVideoElement} */
+  let cameraVideoElement;
+  /** @type {HTMLVideoElement} */
+  let reviewVideoElement;
+  /** @type {Camera} */
   let camera;
-  /**
-   * @type {undefined | import("$lib/instructor/bouncy_instructor").Skeleton}
-   */
-  /**
-   * @type {undefined | string}
-   */
+  /** @type {undefined | import("$lib/instructor/bouncy_instructor").Skeleton} */
+  /** @type {undefined | string} */
   let reviewVideoSrc;
+  /** @type {import("$lib/instructor/bouncy_instructor").Skeleton | undefined} */
   let skeleton;
   let isModelOn = false;
   let cameraOn = false;
   let recordingStarted = false;
+  /** @type {number | undefined} */
+  let recordingStart = undefined;
+  let recordingEnd = undefined;
+  /** @type {{ trackFrame: (arg0: HTMLVideoElement) => void; }} */
   let dataListener;
   let stop = false;
+  /** @type {number} */
+  let reviewTimestamp;
+  /** @type {number} */
+  let lastSeek = 0;
 
-  /**
-   * @type {import("$lib/instructor/bouncy_instructor").DetectedStep[]}
-   */
+  /** @type {import("$lib/instructor/bouncy_instructor").DetectedStep[]} */
   let detectedSteps = [];
 
   const tracker = new Tracker();
@@ -47,7 +48,7 @@
   function loop() {
     if (isModelOn && dataListener) {
       const start = performance.now();
-      dataListener.trackFrame(videoElement);
+      dataListener.trackFrame(cameraVideoElement);
       const t = performance.now() - start;
       if (t > 50) {
         console.debug(`trackFrame took ${t}ms`);
@@ -57,6 +58,11 @@
       if (t2 - t > 30) {
         console.debug(`detectDance took ${t2 - t}ms`);
       }
+    }
+    const now = new Date().getTime();
+    if (recordingStarted && !isModelOn && lastSeek + 100 < now) {
+      onSeek();
+      lastSeek = now;
     }
     requestAnimationFrame(loop);
   }
@@ -72,6 +78,7 @@
     await startCamera();
     camera.startRecording();
     tracker.clear();
+    recordingStart = undefined;
     recordingStarted = true;
   }
 
@@ -94,14 +101,43 @@
     recordingStarted = false;
     reviewVideoSrc = undefined;
     skeleton = undefined;
+    recordingStart = undefined;
+    recordingEnd = undefined;
+  }
+
+  let onSeekFired = false;
+  function onSeek() {
+    if (recordingStarted && !isModelOn && reviewVideoElement) {
+      onSeekFired = true;
+      const ms = reviewVideoElement.currentTime * 1000;
+      console.log(`seek to ${recordingStart} + ${ms}`);
+      reviewTimestamp = ms + recordingStart;
+      skeleton = tracker.skeletonAt(reviewTimestamp);
+    }
+  }
+
+  function onReviewTimestamp() {
+    if (onSeekFired) {
+      onSeekFired = false;
+      return;
+    }
+    if (reviewVideoElement) {
+      reviewVideoElement.currentTime =
+        (reviewTimestamp - recordingStart) / 1000;
+    }
   }
 
   onMount(async () => {
     dataListener = await poseCtx.newPoseDetection((result, timestamp) => {
+      if (recordingStart === undefined) {
+        recordingStart = timestamp;
+      }
       if (result.landmarks && result.landmarks.length >= 1) {
         const kp = landmarksToKeypoints(result.landmarks[0]);
         const skeletons = tracker.addKeypoints(kp, timestamp);
         skeleton = skeletons.front;
+        recordingEnd = timestamp;
+        reviewTimestamp = timestamp;
       }
     });
 
@@ -113,6 +149,8 @@
   onDestroy(() => {
     stop = true;
   });
+
+  $: reviewTimestamp, onReviewTimestamp();
 </script>
 
 <h1>
@@ -123,9 +161,19 @@
   <Area width="{280}px" height="{280}px">
     {#if reviewVideoSrc}
       <!-- svelte-ignore a11y-media-has-caption -->
-      <video src={reviewVideoSrc} playsinline controls></video>
+      <video
+        bind:this={reviewVideoElement}
+        on:seeked={onSeek}
+        src={reviewVideoSrc}
+        playsinline
+        controls
+      ></video>
     {:else}
-      <Camera bind:videoElement bind:cameraOn bind:this={camera} />
+      <Camera
+        bind:videoElement={cameraVideoElement}
+        bind:cameraOn
+        bind:this={camera}
+      />
     {/if}
   </Area>
 
@@ -136,7 +184,12 @@
   </Area>
 
   {#if recordingStarted}
-    <Banner steps={detectedSteps}></Banner>
+    <Banner
+      steps={detectedSteps}
+      bind:timestamp={reviewTimestamp}
+      reviewStart={recordingStart || 0}
+      reviewEnd={recordingEnd || 1}
+    ></Banner>
   {/if}
 
   <div>

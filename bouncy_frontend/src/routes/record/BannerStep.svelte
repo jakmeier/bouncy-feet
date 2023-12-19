@@ -7,7 +7,9 @@
   export let step;
 
   /** @type{number} */
-  export let totalWidth;
+  export let scrollableWidth;
+  /** @type{number} */
+  export let scrollOffset;
   /** @type{number} */
   export let reviewStart;
   /** @type{number} */
@@ -21,19 +23,21 @@
    * @param {number} t
    */
   function timeToPosition(t) {
-    return timeToPixel(t - reviewStart);
+    return scrollOffset + timeToPixel(t - reviewStart);
   }
 
   /**
    * @param {number} delta
    */
   function timeToPixel(delta) {
-    return (delta / (reviewEnd - reviewStart)) * totalWidth;
+    return (delta / (reviewEnd - reviewStart)) * scrollableWidth;
   }
 </script>
 
 <div
   class="step"
+  class:passive={step.name.includes('Idle')}
+  title={step.name}
   style="left: {timeToPosition(step.start)}px; width: {timeToPixel(
     step.end - step.start
   ) + avatarSize}px"
@@ -42,7 +46,6 @@
     <div
       class="pose"
       style="left: {timeToPixel(pose.timestamp - step.start)}px"
-      title={pose.name}
     >
       <Canvas width={avatarSize} height={avatarSize}>
         <Avatar
@@ -68,5 +71,10 @@
   .pose {
     position: absolute;
     height: 60px;
+  }
+
+  .passive {
+    border-color: var(--theme-neutral-light);
+    background-color: var(--theme-neutral-white);
   }
 </style>

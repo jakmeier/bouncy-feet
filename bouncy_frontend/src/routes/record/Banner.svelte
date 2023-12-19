@@ -1,30 +1,73 @@
 <script>
+  import { onMount } from 'svelte';
   /* A left-right swiping banner view of a dance performance. */
 
   import BannerStep from './BannerStep.svelte';
 
   /** @type{import("$lib/instructor/bouncy_instructor").DetectedStep[]} */
   export let steps = [];
+  export let timestamp = 0;
+  export let reviewStart;
+  export let reviewEnd;
   const avatarSize = 60;
+  const scrollBuffer = 1000;
 
-  $: reviewStart = steps.length > 0 ? steps[0].start : 0;
-  $: reviewEnd = steps.length > 0 ? steps[steps.length - 1].end : 1;
-  $: width = Math.max(500, steps.length * avatarSize * 4);
+  $: scrollableWidth = Math.max(500, steps.length * avatarSize * 4);
+  $: innerWidth = scrollableWidth + 2 * scrollBuffer;
+
+  let scrollFired = false;
+  /**
+   * @type {HTMLDivElement}
+   */
+  let stepsDiv;
+  /**
+   * @param {number} t
+   */
+  function updateScrollPosition(t) {
+    if (stepsDiv && !scrollFired) {
+      stepsDiv.scrollTo(
+        scrollBuffer + (t / (reviewEnd - reviewStart)) * scrollableWidth,
+        0
+      );
+    } else {
+      scrollFired = false;
+    }
+  }
+
+  function onScroll() {
+    scrollFired = true;
+    const r = Math.min(
+      Math.max(stepsDiv.scrollLeft - scrollBuffer, 0) / scrollableWidth,
+      1.0
+    );
+    timestamp = reviewStart + r * (reviewEnd - reviewStart);
+    console.log(`scroll to ${timestamp}`);
+  }
+
+  onMount(() => {
+    stepsDiv.scrollTo(scrollBuffer, 0);
+  });
+  $: updateScrollPosition(timestamp);
 </script>
 
 <div id="container">
   <img class="arrow" src="img/left_arrow.svg" alt="left arrow" />
-  <div id="steps">
+  <div id="steps" bind:this={stepsDiv} on:scroll={onScroll}>
     {#each steps as step}
       <BannerStep
         {step}
-        totalWidth={width}
+        {scrollableWidth}
+        scrollOffset={scrollBuffer}
         {reviewStart}
         {reviewEnd}
         {avatarSize}
       />
     {/each}
+    <div
+      style="position: absolute; left: {innerWidth}px; width:1px; height:1px;"
+    ></div>
   </div>
+  <div id="marker"></div>
   <img class="invert arrow" src="img/left_arrow.svg" alt="left arrow" />
 </div>
 
@@ -43,6 +86,17 @@
     overflow: scroll;
     height: 80px;
     width: 100%;
+  }
+
+  #marker {
+    position: absolute;
+    border: 5px solid var(--theme-neutral-dark);
+    height: 60px;
+    width: 60px;
+    left: 0;
+    right: 0;
+    margin: -4px auto;
+    pointer-events: none;
   }
 
   .arrow {
