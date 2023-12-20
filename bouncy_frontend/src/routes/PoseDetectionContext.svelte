@@ -3,7 +3,7 @@
   /**
    * PoseDetectionContext component
    *
-   * Provides access to a PoseDetection factory and manages he cleaning up of
+   * Provides access to a PoseDetection factory and manages the cleaning up of
    * resources related to it.
    */
   import { setContext, onDestroy, getContext } from 'svelte';

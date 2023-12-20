@@ -6,10 +6,18 @@
 */
 export function loadPoseFile(url: string): Promise<void>;
 /**
+* @param {string} data
+*/
+export function loadPoseString(data: string): void;
+/**
 * @param {string} url
 * @returns {Promise<void>}
 */
 export function loadStepFile(url: string): Promise<void>;
+/**
+* @param {string} data
+*/
+export function loadStepString(data: string): void;
 /**
 * @returns {(StepInfo)[]}
 */

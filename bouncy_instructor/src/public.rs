@@ -27,10 +27,22 @@ pub async fn load_pose_file(url: &str) -> Result<(), JsValue> {
     Ok(())
 }
 
+#[wasm_bindgen(js_name = loadPoseString)]
+pub fn load_pose_string(data: &str) -> Result<(), JsValue> {
+    load_pose_str(data)?;
+    Ok(())
+}
+
 #[wasm_bindgen(js_name = loadStepFile)]
 pub async fn load_step_file(url: &str) -> Result<(), JsValue> {
     let text = load_text_file(url).await?;
     load_step_str(&text)?;
+    Ok(())
+}
+
+#[wasm_bindgen(js_name = loadStepString)]
+pub fn load_step_string(data: &str) -> Result<(), JsValue> {
+    load_step_str(data)?;
     Ok(())
 }
 

@@ -1,9 +1,9 @@
 <script>
   import { t } from '$lib/i18n.js';
-  import { steps } from '$lib/instructor/bouncy_instructor';
   import Step from './Step.svelte';
 
-  let stepList = steps();
+  /** @type {import('./$types').PageData} */
+  export let data;
 </script>
 
 <h1>{$t('home.title')}</h1>
@@ -12,7 +12,7 @@
 
 <h2>{$t('home.steps')}</h2>
 <div class="step-table">
-  {#each stepList as step}
+  {#each data.allSteps as step}
     <Step {step} />
   {/each}
 </div>

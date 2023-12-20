@@ -1,4 +1,11 @@
 import { addTranslations, setLocale, setRoute } from '$lib/i18n.js';
+import {
+    loadPoseString,
+    loadStepString,
+    steps,
+} from '$lib/instructor/bouncy_instructor';
+
+let loadedOnce = false;
 
 /** @type {import('@sveltejs/kit').Load} */
 export const load = async ({ data }) => {
@@ -10,5 +17,19 @@ export const load = async ({ data }) => {
     await setRoute(route);
     await setLocale(locale);
 
-    return i18n;
+    if (!loadedOnce) {
+        loadedOnce = true;
+        loadOnce(data);
+    }
+
+    return {
+        i18n,
+        translations,
+        allSteps: steps(),
+    };
 };
+
+function loadOnce(data) {
+    loadPoseString(data.poseFileString);
+    loadStepString(data.stepFileString);
+}

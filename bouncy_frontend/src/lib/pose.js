@@ -63,8 +63,6 @@ export class PoseDetection {
      */
     static async new(consumer) {
         const mp = await initMediaPipeBackend();
-        await loadPoseFile('/pose.ron').catch((e) => console.error(e));
-        await loadStepFile('/step.ron').catch((e) => console.error(e));
         return new PoseDetection(consumer, mp);
     }
 

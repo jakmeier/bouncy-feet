@@ -1,7 +1,7 @@
 import { locales, loadTranslations, defaultLocale, translations } from '$lib/i18n.js';
 
 /** @type {import('@sveltejs/kit').ServerLoad} */
-export const load = async ({ url, cookies, request }) => {
+export const load = async ({ fetch, url, cookies, request }) => {
     const { pathname } = url;
 
     // Try to get the locale from cookie
@@ -23,8 +23,13 @@ export const load = async ({ url, cookies, request }) => {
 
     await loadTranslations(locale, pathname); // keep this just before the `return`
 
+    const poseFile = await fetch('/pose.ron').catch((e) => console.error(e));
+    const stepFile = await fetch('/step.ron').catch((e) => console.error(e));
+
     return {
         i18n: { locale, route: pathname },
         translations: translations.get(), // `translations` on server contain all translations loaded by different clients
+        poseFileString: await poseFile.text(),
+        stepFileString: await stepFile.text(),
     };
 };
