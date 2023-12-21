@@ -2,7 +2,7 @@
   import Camera from './Camera.svelte';
   import { landmarksToKeypoints } from '$lib/pose';
   import Canvas from '$lib/Canvas.svelte';
-  import Avatar from './Avatar.svelte';
+  import SvgAvatar from '$lib/avatar/SvgAvatar.svelte';
   import { getContext, onDestroy, onMount, setContext, tick } from 'svelte';
   import Area from './Area.svelte';
   import { t } from '$lib/i18n';
@@ -193,9 +193,9 @@
   </Area>
 
   <Area width="{280}px" height="{280}px">
-    <Canvas width={300} height={300}>
-      <Avatar width={300} height={300} {skeleton} />
-    </Canvas>
+    <svg viewBox="0 0 280 280">
+      <SvgAvatar width={280} height={280} {skeleton} />
+    </svg>
   </Area>
 
   {#if recordingStarted}

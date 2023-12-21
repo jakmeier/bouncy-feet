@@ -2,6 +2,7 @@
   import Canvas from '$lib/Canvas.svelte';
   import { getContext } from 'svelte';
   import Avatar from './Avatar.svelte';
+  import SvgAvatar from '$lib/avatar/SvgAvatar.svelte';
 
   /** @type{import("$lib/instructor/bouncy_instructor").DetectedStep} */
   export let step;
@@ -45,16 +46,18 @@
   {#each step.poses as pose}
     <div
       class="pose"
-      style="left: {timeToPixel(pose.timestamp - step.start)}px"
+      style="left: {timeToPixel(
+        pose.timestamp - step.start
+      )}px; width: {avatarSize}px; height: {avatarSize}px"
     >
-      <Canvas width={avatarSize} height={avatarSize}>
-        <Avatar
+      <svg viewBox="0 0 {avatarSize} {avatarSize}">
+        <SvgAvatar
           width={avatarSize}
           height={avatarSize}
           lineWidth={2}
           skeleton={trackerCtx.tracker.skeletonAt(pose.timestamp)}
         />
-      </Canvas>
+      </svg>
     </div>
   {/each}
 </div>
