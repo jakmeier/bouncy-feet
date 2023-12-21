@@ -4,24 +4,27 @@
   import { t } from '$lib/i18n.js';
   import PoseDetectionContext from './PoseDetectionContext.svelte';
   import UserContext from './UserContext.svelte';
+
+  const navBarHeight = 90;
 </script>
 
 <svelte:head>
   <title>{$t('meta.title')}</title>
 </svelte:head>
 
-<main>
+<main style="height: calc(100vh - {navBarHeight}px)">
   <UserContext>
     <PoseDetectionContext>
       <slot />
     </PoseDetectionContext>
   </UserContext>
 </main>
-<TabNavigation />
+<TabNavigation height={navBarHeight} />
 
 <style>
   main {
     margin: 5px;
+    overflow-y: scroll;
   }
 
   @media (min-width: 730px) {

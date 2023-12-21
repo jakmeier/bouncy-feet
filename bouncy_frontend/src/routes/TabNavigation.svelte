@@ -2,6 +2,8 @@
   import { page } from '$app/stores';
   import { t } from '$lib/i18n.js';
 
+  export let height = 100;
+
   const tabs = [
     { label: $t('home.nav'), icon: 'home', route: '/' },
     // { label: $t('learn.nav'), icon: 'book_5', route: '/learn' },
@@ -11,7 +13,7 @@
   ];
 </script>
 
-<nav class="navbar">
+<nav class="navbar" style="height:{height}px">
   {#each tabs as { label, route, icon }}
     <a
       class="tab"
@@ -33,7 +35,6 @@
     position: fixed;
     bottom: 0;
     width: 100%;
-    height: 100px;
   }
 
   a.tab {
