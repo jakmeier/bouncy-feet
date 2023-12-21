@@ -6,17 +6,14 @@
 
   /** @type {import('$lib/instructor/bouncy_instructor').StepInfo} */
   export let step;
+  export let poseIndex = 0;
+  $: skeleton = step.skeleton(poseIndex);
 </script>
 
 <div>
   <Area width="{100}px" height="{100}px">
     <svg viewBox="0 0 100 100">
-      <SvgAvatar
-        width={100}
-        height={100}
-        skeleton={step.skeleton(0)}
-        lineWidth={4}
-      />
+      <SvgAvatar width={100} height={100} {skeleton} lineWidth={4} />
     </svg>
   </Area>
   <!-- TODO: translations -->
