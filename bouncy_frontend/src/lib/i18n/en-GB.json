@@ -18,7 +18,13 @@
         "done-button": "done",
         "stop-button": "stop"
     },
+    "stats": {
+        "num-dances": "Dances",
+        "num-steps": "Steps",
+        "time-danced": "Danced for"
+    },
     "profile": {
+        "stats-title": "Statistics",
         "nav": "Profile"
     }
 }

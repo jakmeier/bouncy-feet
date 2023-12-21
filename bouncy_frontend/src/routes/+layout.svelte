@@ -3,6 +3,7 @@
   import '../app.css';
   import { t } from '$lib/i18n.js';
   import PoseDetectionContext from './PoseDetectionContext.svelte';
+  import UserContext from './UserContext.svelte';
 </script>
 
 <svelte:head>
@@ -10,9 +11,11 @@
 </svelte:head>
 
 <main>
-  <PoseDetectionContext>
-    <slot />
-  </PoseDetectionContext>
+  <UserContext>
+    <PoseDetectionContext>
+      <slot />
+    </PoseDetectionContext>
+  </UserContext>
 </main>
 <TabNavigation />
 

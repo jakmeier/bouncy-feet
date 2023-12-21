@@ -1,8 +1,29 @@
-<h1>My Profile</h1>
-<p>[stats]</p>
+<script>
+  import { getContext } from 'svelte';
+  import DanceStats from './DanceStats.svelte';
+  import { t } from '$lib/i18n';
 
-<h1>My Videos</h1>
-<p>[previously recorded videos]</p>
+  const user = getContext('user').store;
+</script>
 
-<h1>My Dancers</h1>
-<p>[unlocked skins and such]</p>
+<div class="profile-pic">
+  <span class="material-symbols-outlined" style="font-size:100px">
+    person
+  </span>
+  {$user.publicName}
+</div>
+<h2>{$t('profile.stats-title')}</h2>
+<DanceStats
+  seconds={$user.recordedSeconds}
+  numSteps={$user.recordedSteps}
+  numDances={$user.recordedDances}
+/>
+
+<style>
+  .profile-pic {
+    display: grid;
+    grid-template-columns: max-content;
+    justify-content: center;
+    font-weight: 900;
+  }
+</style>

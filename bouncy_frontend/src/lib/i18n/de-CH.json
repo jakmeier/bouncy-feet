@@ -18,7 +18,13 @@
         "done-button": "fertig",
         "stop-button": "stoppen"
     },
+    "stats": {
+        "num-dances": "Anzahl Tänze",
+        "num-steps": "Anzahl Schritte",
+        "time-danced": "Getanzt für"
+    },
     "profile": {
+        "stats-title": "Statistiken",
         "nav": "Profil"
     }
 }

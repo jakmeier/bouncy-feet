@@ -8,8 +8,10 @@
   import { t } from '$lib/i18n';
   import { Tracker } from '$lib/instructor/bouncy_instructor';
   import Banner from './Banner.svelte';
+  import DanceStats from '../profile/DanceStats.svelte';
 
   const poseCtx = getContext('pose');
+  const userCtx = getContext('user');
 
   /** @type {HTMLVideoElement} */
   let cameraVideoElement;
@@ -36,6 +38,9 @@
 
   /** @type {import("$lib/instructor/bouncy_instructor").DetectedStep[]} */
   let detectedSteps = [];
+
+  let reviewStatsNumSteps = 0;
+  let reviewStatsSeconds = 0;
 
   const tracker = new Tracker();
   setContext('tracker', {
@@ -88,6 +93,9 @@
   async function stopCameraAndRecording() {
     stopCamera();
     detectedSteps = tracker.detectDance();
+    const { numSteps, duration } = userCtx.addDanceToStats(detectedSteps);
+    reviewStatsNumSteps = numSteps;
+    reviewStatsSeconds = duration;
     const videoBlob = await camera.endRecording();
 
     if (videoBlob) {
@@ -142,7 +150,9 @@
         const skeletons = tracker.addKeypoints(kp, timestamp);
         skeleton = skeletons.front;
         recordingEnd = timestamp;
-        setCursor(1.0);
+        if (setCursor) {
+          setCursor(1.0);
+        }
       }
     });
 
@@ -220,6 +230,7 @@
         <p>{$t('record.stop-button')}</p>
       </button>
     {:else}
+      <DanceStats numSteps={reviewStatsNumSteps} seconds={reviewStatsSeconds} />
       <button on:click={reset}>
         <span class="material-symbols-outlined"> done </span>
         <p>{$t('record.done-button')}</p>
