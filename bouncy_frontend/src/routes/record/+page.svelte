@@ -239,6 +239,7 @@
       </button>
     {/if}
   </div>
+  <p style="width: 100px; height: 50px;"></p>
 </div>
 
 <style>

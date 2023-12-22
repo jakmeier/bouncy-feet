@@ -1,16 +1,28 @@
 <script>
   import { page } from '$app/stores';
   import { t } from '$lib/i18n.js';
+  import { base } from '$app/paths';
+  import { dev } from '$app/environment';
 
   export let height = 100;
 
   const tabs = [
-    { label: $t('home.nav'), icon: 'home', route: '/' },
-    // { label: $t('learn.nav'), icon: 'book_5', route: '/learn' },
-    { label: $t('record.nav'), icon: 'directions_walk', route: '/record' },
-    { label: $t('profile.nav'), icon: 'account_circle', route: '/profile' },
-    { label: 'Dev', icon: 'code', route: '/dev' },
+    { label: $t('home.nav'), icon: 'home', route: `${base}/` },
+    { label: $t('learn.nav'), icon: 'book_5', route: `${base}/learn` },
+    {
+      label: $t('record.nav'),
+      icon: 'directions_walk',
+      route: `${base}/record`,
+    },
+    {
+      label: $t('profile.nav'),
+      icon: 'account_circle',
+      route: `${base}/profile`,
+    },
   ];
+  if (dev) {
+    tabs.push({ label: 'Dev', icon: 'code', route: `${base}/dev` });
+  }
 </script>
 
 <nav class="navbar" style="height:{height}px">
@@ -28,8 +40,9 @@
 
 <style>
   .navbar {
-    display: grid;
-    grid-template-columns: auto auto auto auto;
+    display: flex;
+    flex-flow: row;
+    justify-content: space-around;
     overflow: hidden;
     background-color: var(--theme-neutral-dark);
     position: fixed;

@@ -5,6 +5,9 @@ import {
     steps,
 } from '$lib/instructor/bouncy_instructor';
 
+export const prerender = true;
+export const trailingSlash = 'always';
+
 let loadedOnce = false;
 
 /** @type {import('@sveltejs/kit').Load} */

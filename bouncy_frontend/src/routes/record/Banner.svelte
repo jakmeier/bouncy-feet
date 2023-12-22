@@ -3,6 +3,7 @@
 
   import { onMount } from 'svelte';
   import BannerStep from './BannerStep.svelte';
+  import { base } from '$app/paths';
 
   const avatarSize = 60;
 
@@ -73,7 +74,7 @@
 </script>
 
 <div id="container" bind:clientWidth={visibleBannerWidth}>
-  <img class="arrow" src="img/left_arrow.svg" alt="left arrow" />
+  <img class="arrow" src="{base}/img/left_arrow.svg" alt="left arrow" />
   <div id="steps" bind:this={stepsDiv} on:scroll={scrolled}>
     {#each steps as step}
       <BannerStep
@@ -90,7 +91,7 @@
     ></div>
   </div>
   <div id="marker"></div>
-  <img class="invert arrow" src="img/left_arrow.svg" alt="left arrow" />
+  <img class="invert arrow" src="{base}/img/left_arrow.svg" alt="left arrow" />
 </div>
 
 <style>

@@ -1,5 +1,7 @@
 import { locales, loadTranslations, defaultLocale, translations } from '$lib/i18n.js';
 
+export const prerender = true;
+
 /** @type {import('@sveltejs/kit').ServerLoad} */
 export const load = async ({ fetch, url, cookies, request }) => {
     const { pathname } = url;
@@ -10,7 +12,10 @@ export const load = async ({ fetch, url, cookies, request }) => {
     // Get user preferred locale
     if (!locale) {
         // TODO: better locale detection: find closest match instead of exact match only
-        locale = request.headers.get('accept-language').split(/,/)[0];
+        const header = request.headers.get('accept-language');
+        if (header) {
+            locale = header.split(/,/)[0];
+        }
     }
 
     // Get defined locales

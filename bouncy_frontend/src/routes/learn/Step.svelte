@@ -1,7 +1,7 @@
 <script>
   import Canvas from '$lib/Canvas.svelte';
-  import Area from './record/Area.svelte';
-  import Avatar from './record/Avatar.svelte';
+  import Area from '../record/Area.svelte';
+  import Avatar from '../record/Avatar.svelte';
   import SvgAvatar from '$lib/avatar/SvgAvatar.svelte';
 
   /** @type {import('$lib/instructor/bouncy_instructor').StepInfo} */

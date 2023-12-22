@@ -14,7 +14,7 @@
 
 import { PoseLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
 import { Cartesian3d, Keypoints, KeypointsSide, loadPoseFile, loadStepFile } from './instructor/bouncy_instructor';
-
+import { base } from '$app/paths';
 
 export function landmarksToKeypoints(landmarks) {
     const left = new KeypointsSide(
@@ -126,7 +126,7 @@ async function initMediaPipeBackend() {
         {
             baseOptions: {
                 // loading from a path (could also load from buffer)
-                modelAssetPath: 'models/pose_landmarker_full.task',
+                modelAssetPath: `${base}/models/pose_landmarker_full.task`,
             },
             runningMode: "VIDEO",
             numPoses: 1,

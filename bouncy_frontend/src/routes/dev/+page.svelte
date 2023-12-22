@@ -89,6 +89,7 @@
 
 <h1>Dev</h1>
 
+<!-- svelte-ignore a11y-media-has-caption -->
 <video bind:this={video} playsinline controls></video>
 <p>
   <input
