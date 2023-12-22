@@ -20,6 +20,7 @@
         "done-button": "done",
         "stop-camera": "stop camera",
         "stop-record": "stop video",
+        "download": "download",
         "settings": {
             "bpm": "BPM (approximately)",
             "double-speed": "Also dance to the offbeat (double speed)"

@@ -250,6 +250,12 @@
           <span class="material-symbols-outlined"> done </span>
           <p>{$t('record.done-button')}</p>
         </button>
+        <a href={reviewVideoSrc} download>
+          <button>
+            <span class="material-symbols-outlined"> download </span>
+            <p>{$t('record.download')}</p>
+          </button>
+        </a>
       {/if}
     {/if}
   </div>
