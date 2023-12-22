@@ -1,7 +1,6 @@
 <script>
   import Camera from './Camera.svelte';
   import { landmarksToKeypoints } from '$lib/pose';
-  import Canvas from '$lib/Canvas.svelte';
   import SvgAvatar from '$lib/avatar/SvgAvatar.svelte';
   import { getContext, onDestroy, onMount, setContext, tick } from 'svelte';
   import Area from './Area.svelte';
@@ -9,6 +8,7 @@
   import { Tracker } from '$lib/instructor/bouncy_instructor';
   import Banner from './Banner.svelte';
   import DanceStats from '../profile/DanceStats.svelte';
+  import Settings from './Settings.svelte';
 
   const poseCtx = getContext('pose');
   const userCtx = getContext('user');
@@ -26,6 +26,7 @@
   let skeleton;
   let isModelOn = false;
   let cameraOn = false;
+  let showCamera = false;
   let recordingStarted = false;
   /** @type {number | undefined} */
   let recordingStart = undefined;
@@ -71,6 +72,8 @@
   }
 
   async function startCamera() {
+    showCamera = true;
+    await tick();
     if (!cameraOn) {
       await camera.startCamera();
       isModelOn = true;
@@ -168,35 +171,39 @@
   });
 </script>
 
-<h1>
-  <!-- Space holder -->
-</h1>
-
 <div id="outer">
-  <Area width="{280}px" height="{280}px">
-    {#if reviewVideoSrc}
-      <!-- svelte-ignore a11y-media-has-caption -->
-      <video
-        bind:this={reviewVideoElement}
-        on:seeked={onSeek}
-        src={reviewVideoSrc}
-        playsinline
-        controls
-      ></video>
-    {:else}
-      <Camera
-        bind:videoElement={cameraVideoElement}
-        bind:cameraOn
-        bind:this={camera}
-      />
-    {/if}
-  </Area>
+  <h1>{$t('record.title')}</h1>
+  {#if !showCamera}
+    <p>{$t('record.description')}</p>
+    <div style="margin: 30px">
+      <Settings {tracker}></Settings>
+    </div>
+  {:else}
+    <Area width="{280}px" height="{280}px">
+      {#if reviewVideoSrc}
+        <!-- svelte-ignore a11y-media-has-caption -->
+        <video
+          bind:this={reviewVideoElement}
+          on:seeked={onSeek}
+          src={reviewVideoSrc}
+          playsinline
+          controls
+        ></video>
+      {:else}
+        <Camera
+          bind:videoElement={cameraVideoElement}
+          bind:cameraOn
+          bind:this={camera}
+        />
+      {/if}
+    </Area>
 
-  <Area width="{280}px" height="{280}px">
-    <svg viewBox="0 0 280 280">
-      <SvgAvatar width={280} height={280} {skeleton} />
-    </svg>
-  </Area>
+    <Area width="{280}px" height="{280}px">
+      <svg viewBox="0 0 280 280">
+        <SvgAvatar width={280} height={280} {skeleton} />
+      </svg>
+    </Area>
+  {/if}
 
   {#if recordingStarted}
     <Banner
@@ -217,26 +224,33 @@
     {:else if !recordingStarted}
       <button on:click={stopCamera}>
         <span class="material-symbols-outlined"> videocam_off </span>
-        <p>{$t('record.stop-button')}</p>
+        <p>{$t('record.stop-camera')}</p>
       </button>
     {/if}
 
-    {#if !recordingStarted}
-      <button on:click={startRecording}>
-        <span class="material-symbols-outlined"> radio_button_unchecked </span>
-        <p>{$t('record.record-button')}</p>
-      </button>
-    {:else if isModelOn}
-      <button on:click={stopCameraAndRecording}>
-        <span class="material-symbols-outlined"> camera </span>
-        <p>{$t('record.stop-button')}</p>
-      </button>
-    {:else}
-      <DanceStats numSteps={reviewStatsNumSteps} seconds={reviewStatsSeconds} />
-      <button on:click={reset}>
-        <span class="material-symbols-outlined"> done </span>
-        <p>{$t('record.done-button')}</p>
-      </button>
+    {#if showCamera}
+      {#if !recordingStarted}
+        <button on:click={startRecording}>
+          <span class="material-symbols-outlined">
+            radio_button_unchecked
+          </span>
+          <p>{$t('record.record-button')}</p>
+        </button>
+      {:else if isModelOn}
+        <button on:click={stopCameraAndRecording}>
+          <span class="material-symbols-outlined"> camera </span>
+          <p>{$t('record.stop-record')}</p>
+        </button>
+      {:else}
+        <DanceStats
+          numSteps={reviewStatsNumSteps}
+          seconds={reviewStatsSeconds}
+        />
+        <button on:click={reset}>
+          <span class="material-symbols-outlined"> done </span>
+          <p>{$t('record.done-button')}</p>
+        </button>
+      {/if}
     {/if}
   </div>
   <p style="width: 100px; height: 50px;"></p>

@@ -12,11 +12,18 @@
         "nav": "Lernen"
     },
     "record": {
+        "title": "Tanzen",
+        "description": "Bring deine eigene Musik und filme dich beim Tanzen.",
         "nav": "Aufnehmen",
-        "start-button": "starten",
-        "record-button": "aufnehmen",
+        "start-button": "Kamera starten",
+        "record-button": "Video aufnehmen",
         "done-button": "fertig",
-        "stop-button": "stoppen"
+        "stop-camera": "Kamera stoppen",
+        "stop-record": "Video stoppen",
+        "settings": {
+            "bpm": "BPM (ungefähr)",
+            "double-speed": "Auch auf den Off-Beat tanzen (doppelte Geschwindigkeit)"
+        }
     },
     "stats": {
         "num-dances": "Anzahl Tänze",

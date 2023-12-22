@@ -79,7 +79,6 @@
   }
 
   function logDance() {
-    tracker.setBpm(220);
     detectedSteps = tracker.detectDance();
     detectedSteps.forEach((step) => {
       console.log(step.name, step.start, step.end);

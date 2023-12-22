@@ -12,11 +12,18 @@
         "nav": "Learn"
     },
     "record": {
+        "title": "Dance",
+        "description": "Bring your own music and then record yourself while dancing.",
         "nav": "Record",
-        "start-button": "start",
-        "record-button": "record",
+        "start-button": "start camera",
+        "record-button": "record video",
         "done-button": "done",
-        "stop-button": "stop"
+        "stop-camera": "stop camera",
+        "stop-record": "stop video",
+        "settings": {
+            "bpm": "BPM (approximately)",
+            "double-speed": "Also dance to the offbeat (double speed)"
+        }
     },
     "stats": {
         "num-dances": "Dances",
