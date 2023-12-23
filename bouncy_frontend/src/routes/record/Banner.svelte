@@ -130,17 +130,4 @@
   .invert {
     transform: scaleX(-1);
   }
-
-  @media (max-width: 731px) {
-    #container {
-      grid-template-columns: 5px 1fr 5px;
-      margin: 2px 0;
-      gap: 10px;
-    }
-    .arrow {
-      width: 5px;
-      padding: 0 2.5px;
-      background-color: var(--theme-neutral-light);
-    }
-  }
 </style>

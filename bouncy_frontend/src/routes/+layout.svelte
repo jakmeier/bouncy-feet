@@ -24,7 +24,8 @@
 <style>
   main {
     margin: 5px;
-    overflow-y: scroll;
+    max-width: calc(min(730px, 100vw) - 10px);
+    overflow-y: auto;
   }
 
   @media (min-width: 730px) {

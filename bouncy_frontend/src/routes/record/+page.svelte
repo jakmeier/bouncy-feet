@@ -172,31 +172,34 @@
 </script>
 
 <div id="outer">
-  <h1>{$t('record.title')}</h1>
   {#if !showCamera}
+    <h1>{$t('record.title')}</h1>
     <p>{$t('record.description')}</p>
     <div style="margin: 30px">
       <Settings {tracker}></Settings>
     </div>
   {:else}
-    <Area width="{280}px" height="{280}px">
-      {#if reviewVideoSrc}
-        <!-- svelte-ignore a11y-media-has-caption -->
-        <video
-          bind:this={reviewVideoElement}
-          on:seeked={onSeek}
-          src={reviewVideoSrc}
-          playsinline
-          controls
-        ></video>
-      {:else}
+    {#if reviewVideoSrc}
+      <!-- svelte-ignore a11y-media-has-caption -->
+      <video
+        bind:this={reviewVideoElement}
+        on:seeked={onSeek}
+        src={reviewVideoSrc}
+        playsinline
+        controls
+        style="margin-top: 10px;"
+      ></video>
+    {:else}
+      <Area width="{282}px" height="{376}px">
         <Camera
+          width={282}
+          height={376}
           bind:videoElement={cameraVideoElement}
           bind:cameraOn
           bind:this={camera}
         />
-      {/if}
-    </Area>
+      </Area>
+    {/if}
 
     <Area width="{280}px" height="{280}px">
       <svg viewBox="0 0 280 280">
@@ -216,15 +219,10 @@
   {/if}
 
   <div>
-    {#if !cameraOn && !recordingStarted}
-      <button on:click={startCamera}>
+    {#if !showCamera}
+      <button on:click={startRecording}>
         <span class="material-symbols-outlined"> videocam </span>
         <p>{$t('record.start-button')}</p>
-      </button>
-    {:else if !recordingStarted}
-      <button on:click={stopCamera}>
-        <span class="material-symbols-outlined"> videocam_off </span>
-        <p>{$t('record.stop-camera')}</p>
       </button>
     {/if}
 

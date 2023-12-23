@@ -7,6 +7,9 @@
   export let videoElement = null;
   export let cameraOn = false;
 
+  export let width = 480;
+  export let height = 360;
+
   let stream;
   /**
    * @type {MediaRecorder | null}
@@ -32,17 +35,32 @@
       video: {
         facingMode: 'user',
         width: 360,
-        height: 360,
+        height: 480,
         frameRate: {
           ideal: 60,
         },
       },
     };
-    
+
     stream = await navigator.mediaDevices.getUserMedia(videoConfig);
     videoElement.srcObject = stream;
     await waitForVideoMetaLoaded(videoElement);
     videoElement.play();
+    const w = videoElement.videoWidth;
+    const h = videoElement.videoHeight;
+    if (w / h > width / height) {
+      // video too wide, zoom to center to match height
+      videoElement.style.height = height + 'px';
+      const hiddenWidth = (height * w) / h;
+      videoElement.style.width = hiddenWidth + 'px';
+      videoElement.style['margin-left'] = `-${(hiddenWidth - width) / 2}px`;
+    } else {
+      // video too high, zoom to center to match width
+      videoElement.style.width = width + 'px';
+      const hiddenHeight = (width * h) / w;
+      videoElement.style.height = hiddenHeight + 'px';
+      videoElement.style['margin-top'] = `-${(hiddenHeight - height) / 2}px`;
+    }
 
     cameraOn = true;
   }

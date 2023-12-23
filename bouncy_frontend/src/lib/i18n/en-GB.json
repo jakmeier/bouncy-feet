@@ -15,13 +15,15 @@
         "title": "Dance",
         "description": "Bring your own music and then record yourself while dancing.",
         "nav": "Record",
-        "start-button": "start camera",
+        "start-button": "start",
         "record-button": "record video",
         "done-button": "done",
         "stop-camera": "stop camera",
         "stop-record": "stop video",
-        "download": "download",
+        "download": "save",
         "settings": {
+            "title": "Settings",
+            "description": "How fast will you dance?",
             "bpm": "BPM (approximately)",
             "double-speed": "Also dance to the offbeat (double speed)"
         }

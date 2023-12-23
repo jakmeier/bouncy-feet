@@ -15,13 +15,15 @@
         "title": "Tanzen",
         "description": "Bring deine eigene Musik und filme dich beim Tanzen.",
         "nav": "Aufnehmen",
-        "start-button": "Kamera starten",
+        "start-button": "Starten",
         "record-button": "Video aufnehmen",
         "done-button": "fertig",
         "stop-camera": "Kamera stoppen",
         "stop-record": "Video stoppen",
-        "download": "Herunterladen",
+        "download": "Speichern",
         "settings": {
+            "title": "Einstellungen",
+            "description": "Wie schnell wirst du tanzen?",
             "bpm": "BPM (ungefähr)",
             "double-speed": "Auch auf den Off-Beat tanzen (doppelte Geschwindigkeit)"
         }

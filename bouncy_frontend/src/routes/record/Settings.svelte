@@ -10,9 +10,12 @@
   $: tracker.setBpm(bpm * (double ? 2 : 1));
 </script>
 
+<h2>{$t('record.settings.title')}</h2>
+<p>{$t('record.settings.description')}</p>
+
 <label>
   <input type="number" bind:value={bpm} min="60" max="180" class="number" />
-  <input type="range" bind:value={bpm} min="60" max="180" />
+  <input type="range" bind:value={bpm} min="60" max="180" class="range"/>
   {$t('record.settings.bpm')}
 </label>
 
@@ -32,7 +35,10 @@
     padding: 0.5em;
   }
   .number {
-    width: 75px;
+    width: min(60px,20vw);
+  }
+  .range {
+    width: min(200px,30vw);
   }
   input[type='checkbox'] {
     width: 2em;
