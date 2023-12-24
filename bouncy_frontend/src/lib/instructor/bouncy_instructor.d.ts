@@ -279,11 +279,6 @@ export class StepInfo {
 export class Tracker {
   free(): void;
 /**
-* @param {number} timestamp
-* @returns {ExportedFrame}
-*/
-  exportFrame(timestamp: number): ExportedFrame;
-/**
 */
   constructor();
 /**
@@ -327,4 +322,9 @@ export class Tracker {
 * @returns {Skeleton | undefined}
 */
   skeletonAt(timestamp: number): Skeleton | undefined;
+/**
+* @param {number} timestamp
+* @returns {ExportedFrame}
+*/
+  exportFrame(timestamp: number): ExportedFrame;
 }

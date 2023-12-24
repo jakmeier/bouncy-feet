@@ -9,7 +9,9 @@
         (limb: LeftShin, angle: 0, tolerance: 5, weight: 1.0),
         (limb: LeftThigh, angle: 0, tolerance: 5, weight: 1.0),
         (limb: RightShin, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: LeftFoot, angle: 0, tolerance: 5, weight: 1.0),
         (limb: RightThigh, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: RightFoot, angle: 0, tolerance: 5, weight: 1.0),
       ]
     ),
     (

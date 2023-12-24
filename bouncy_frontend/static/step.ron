@@ -7,11 +7,15 @@
       keyframes: [
         (pose: "standing-straight-front", orientation: ToCamera),
         (pose: "standing-straight-front", orientation: ToCamera),
+        (pose: "standing-straight-front", orientation: ToCamera),
+        (pose: "standing-straight-front", orientation: ToCamera),
       ]
     ),
     (
       name: "Idle Side",
       keyframes: [
+        (pose: "standing-straight-side", orientation: Right),
+        (pose: "standing-straight-side", orientation: Right),
         (pose: "standing-straight-side", orientation: Right),
         (pose: "standing-straight-side", orientation: Right),
       ]

@@ -25,9 +25,12 @@ impl Tracker {
         let min_dt = (dt * 0.5).round() as u32;
         let max_dt = (dt * 1.5).round() as u32;
 
-        let threshold = 0.3;
+        let threshold = 0.2;
         let pose_window_ms = max_dt;
         // let step_window_ms = dt;
+
+        // hack: only return idle if nothing else was found
+        let mut idle_result = None;
 
         // pre-conditions:
         //   timestamps are sorted in increasing order
@@ -51,7 +54,11 @@ impl Tracker {
                 let step_start_index =
                     start + self.timestamps[start..end].partition_point(|t| *t < step_start_t);
                 if let Some(step) = self.detect_step(step_start_index, min_dt, max_dt) {
-                    return Some(step);
+                    if !step.step_name.contains("Idle") {
+                        return Some(step);
+                    } else if idle_result.is_none() {
+                        idle_result = Some(step)
+                    }
                 }
                 // no step follows that pose, move search window to be after the pose just checked
                 // TODO: should the pose be recorded and the search window moved by min_dt?
@@ -71,7 +78,7 @@ impl Tracker {
             }
         }
 
-        None
+        idle_result
     }
 
     /// Try to find a step after `start` with the given minimum and maximum beat
@@ -108,8 +115,16 @@ impl Tracker {
                 if !pose_matches.is_empty() {
                     let detection = DetectedStep::new(step.name.clone(), pose_matches);
                     if detection.error < best_error {
-                        best_error = detection.error;
-                        result = Some(detection);
+                        // hack: only overwrite with non-idle step with idle step if we are sure
+                        if !step.name.contains("Idle")
+                            || result
+                                .as_ref()
+                                .is_some_and(|r: &DetectedStep| r.step_name.contains("Idle"))
+                            || (best_error > 0.2 && detection.error < 0.075)
+                        {
+                            best_error = detection.error;
+                            result = Some(detection);
+                        }
                     }
                 }
             }

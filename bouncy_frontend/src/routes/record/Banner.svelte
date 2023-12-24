@@ -45,7 +45,7 @@
   $: scrollableWidth = Math.max(500, steps.length * avatarSize * 4);
   // scroll position zero should put the first possible pose in the center
   // for this, we have to offset all positions by `scrollOffset`
-  $: scrollOffset = (visibleBannerWidth + avatarSize) / 2;
+  $: scrollOffset = (visibleBannerWidth - avatarSize) / 2;
   // likewise, cursor=1 should center the last possible pose hence, put a fake
   // element in the banner to reserve extra space in it, here we compute the
   // position of it
