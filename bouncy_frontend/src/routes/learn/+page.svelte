@@ -19,8 +19,10 @@
 
 <h2>{$t('home.steps')}</h2>
 <div class="step-table">
-  {#each data.allSteps as step}
-    <Step {step} poseIndex={$i} />
+  {#each data.uniqueNameSteps as step}
+    {#if !step.name.includes('Idle')}
+      <Step {step} poseIndex={$i} />
+    {/if}
   {/each}
 </div>
 

@@ -98,5 +98,62 @@
       ]
     ),
     ( name: "pendulum-left", mirror_of: "pendulum-right", direction: Front ),
+    (
+      name: "t-open-right",
+      direction: Front,
+      limbs: [
+        (limb: LeftThigh, weight: 0.1, angle: -5, tolerance: 5),
+        (limb: LeftShin, weight: 0.1, angle: 10, tolerance: 5),
+        (limb: LeftLeg, weight: 0.2, angle: 0, tolerance: 5),
+        (limb: LeftFoot, weight: 0.5, angle: -60, tolerance: 15),
+        (limb: LeftArm, weight: 0.0, angle: -10, tolerance: 0),
+        (limb: LeftForearm, weight: 0.0, angle: -15, tolerance: 0),
+        (limb: RightThigh, weight: 1.0, angle: 27, tolerance: 5,),
+        (limb: RightShin, weight: 1.0, angle: 14, tolerance: 5),
+        (limb: RightLeg, weight: 1.0, angle: 21, tolerance: 5),
+        (limb: RightFoot, weight: 0.0, angle: 73, tolerance: 0),
+        (limb: RightArm, weight: 0.0, angle: 28, tolerance: 0),
+        (limb: RightForearm, weight: 0.0, angle: -13, tolerance: 0),
+      ],
+    ),
+    ( name: "t-open-left", mirror_of: "t-open-right", direction: Front ),
+    (
+      name: "t-closed-right",
+      direction: Front,
+      // indistinguishable from standing straight, need a way to specify a high foot position
+      // also: in t-step, sometimes it's not classified as Front
+      limbs: [
+        (limb: LeftShin, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: LeftThigh, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: RightShin, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: LeftFoot, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: RightThigh, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: RightFoot, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: LeftArm, weight: 0.0,  angle: -7,  tolerance: 0,),
+        (limb: LeftForearm,  weight: 0.0,  angle: -16,  tolerance: 0,),
+        (limb: RightArm, weight: 0.0, angle: 32, tolerance: 0),
+        (limb: RightForearm, weight: 0.0, angle: -18, tolerance: 0),
+      ],
+    ),
+    ( name: "t-closed-left", mirror_of: "t-closed-right", direction: Front ),
+    (
+      name: "polly-right",
+      direction: Front,
+      limbs: [
+        ( limb: LeftThigh, weight: 1.0, angle: 10, tolerance: 5),
+        ( limb: LeftShin, weight: 1.0, angle: 23, tolerance: 5),
+        ( limb: LeftLeg, weight: 1.0, angle: 20, tolerance: 5),
+        ( limb: LeftFoot, weight: 0.0, angle: -60, tolerance: 0),
+        ( limb: LeftArm, weight: 0.0, angle: 38, tolerance: 0),
+        ( limb: LeftForearm, weight: 0.0, angle: 164, tolerance: 0),
+        ( limb: RightThigh, weight: 1.0, angle: -20, tolerance: 5),
+        ( limb: RightShin, weight: 1.0, angle: -20, tolerance: 5),
+        ( limb: RightFoot, weight: 0.5, angle: -110, tolerance: 10),
+        ( limb: RightArm, weight: 0.0, angle: 21, tolerance: 0),
+        ( limb: RightForearm, weight: 0.0, angle: 19, tolerance: 0),
+        ( limb: RightLeg, weight: 1.0, angle: -20, tolerance: 5),
+      ]
+    ),
+    ( name: "polly-left", mirror_of: "polly-right", direction: Front ),
   ]
 )

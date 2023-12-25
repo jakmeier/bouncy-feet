@@ -25,10 +25,22 @@ export const load = async ({ data }) => {
         loadOnce(data);
     }
 
+    const allSteps = steps();
+    const uniqueNameSteps = [];
+
+    const seenNames = new Set();
+    for (const step of allSteps) {
+        if (!seenNames.has(step.name)) {
+            seenNames.add(step.name);
+            uniqueNameSteps.push(step);
+        }
+    }
+
     return {
         i18n,
         translations,
-        allSteps: steps(),
+        uniqueNameSteps,
+        allSteps,
     };
 };
 
