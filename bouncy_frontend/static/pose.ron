@@ -12,6 +12,10 @@
         (limb: LeftFoot, angle: 0, tolerance: 5, weight: 1.0),
         (limb: RightThigh, angle: 0, tolerance: 5, weight: 1.0),
         (limb: RightFoot, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: RightArm, angle: 10, tolerance: 0, weight: 0.0),
+        (limb: RightForearm, angle: -5, tolerance: 0, weight: 0.0),
+        (limb: LeftArm, angle: -10, tolerance: 0, weight: 0.0),
+        (limb: LeftForearm, angle: 5, tolerance: 0, weight: 0.0),
       ]
     ),
     (
@@ -22,6 +26,10 @@
         (limb: LeftThigh, angle: 0, tolerance: 5, weight: 1.0),
         (limb: RightShin, angle: 0, tolerance: 5, weight: 1.0),
         (limb: RightThigh, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: RightArm, angle: 6, tolerance: 0, weight: 0.0),
+        (limb: RightForearm, angle: 18, tolerance: 0, weight: 0.0),
+        (limb: LeftArm, angle: -12, tolerance: 0, weight: 0.0),
+        (limb: LeftForearm, angle: 6, tolerance: 0, weight: 0.0),
       ]
     ),
     (
@@ -34,6 +42,11 @@
         (limb: RightLeg, angle: 0, tolerance: 5, weight: 0.5),
         (limb: RightShin, angle: -30, tolerance: 5, weight: 1.0),
         (limb: RightThigh, angle: 70, tolerance: 5, weight: 1.0),
+        // jsut for the db view
+        (limb: RightArm, angle: 6, tolerance: 0, weight: 0.0),
+        (limb: RightForearm, angle: 18, tolerance: 0, weight: 0.0),
+        (limb: LeftArm, angle: -12, tolerance: 0, weight: 0.0),
+        (limb: LeftForearm, angle: 6, tolerance: 0, weight: 0.0),
       ]
     ),
     ( name: "left-up", mirror_of: "right-up", direction: Right ),
@@ -48,6 +61,10 @@
         (limb: RightShin, angle: 0, tolerance: 10, weight: 0.5),
         (limb: RightFoot, angle: 90, tolerance: 10, weight: 0.25),
         (limb: LeftFoot, angle: 90, tolerance: 0, weight: 0.0),
+        (limb: RightArm, angle: 0, tolerance: 0, weight: 0.0),
+        (limb: RightForearm, angle: 96, tolerance: 0, weight: 0.0),
+        (limb: LeftArm, angle: -25, tolerance: 0, weight: 0.0),
+        (limb: LeftForearm, angle: -20, tolerance: 0, weight: 0.0),
       ]
     ),
     ( name: "left-forward", mirror_of: "right-forward", direction: Right ),
@@ -62,6 +79,10 @@
         (limb: RightShin, angle: 25, tolerance: 5, weight: 0.5),
         (limb: RightFoot, angle: 120, tolerance: 10, weight: 1.0),
         (limb: LeftFoot, angle: 90, tolerance: 0, weight: 0.0),
+        (limb: RightArm, angle: 0, tolerance: 0, weight: 0.0),
+        (limb: RightForearm, angle: 96, tolerance: 0, weight: 0.0),
+        (limb: LeftArm, angle: -25, tolerance: 0, weight: 0.0),
+        (limb: LeftForearm, angle: -20, tolerance: 0, weight: 0.0),
       ]
     ),
     ( name: "left-forward-heel", mirror_of: "right-forward-heel", direction: Right ),
@@ -75,6 +96,10 @@
         (limb: RightThigh, angle: 10, tolerance: 5, weight: 0.25),
         (limb: RightShin, angle: 10, tolerance: 5, weight: 0.25),
         (limb: RightFoot, angle: 90, tolerance: 15, weight: 1.0),
+        (limb: RightArm, angle: 90, tolerance: 0, weight: 0.0),
+        (limb: RightForearm, angle: 90, tolerance: 0, weight: 0.0),
+        (limb: LeftArm, angle: -90, tolerance: 0, weight: 0.0),
+        (limb: LeftForearm, angle: -90, tolerance: 0, weight: 0.0),
       ]
     ),
     (
@@ -87,6 +112,10 @@
         (limb: RightThigh, angle: 0, tolerance: 5, weight: 0.25),
         (limb: RightShin, angle: 10, tolerance: 5, weight: 0.25),
         (limb: RightFoot, angle: -90, tolerance: 15, weight: 1.0),
+        (limb: RightArm, angle: 80, tolerance: 0, weight: 0.0),
+        (limb: RightForearm, angle: 100, tolerance: 0, weight: 0.0),
+        (limb: LeftArm, angle: -80, tolerance: 0, weight: 0.0),
+        (limb: LeftForearm, angle: -100, tolerance: 0, weight: 0.0),
       ]
     ),
     (
