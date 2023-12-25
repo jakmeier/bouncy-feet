@@ -38,6 +38,7 @@
 <div
   class="step"
   class:passive={step.name.includes('Idle')}
+  class:good={step.error < 0.1}
   title={step.name}
   style="left: {timeToPosition(step.start)}px; width: {timeToPixel(
     step.end - step.start
@@ -60,15 +61,33 @@
       </svg>
     </div>
   {/each}
+  {#if !step.name.includes('Idle')}
+    <div class="step-name">
+      <!-- TODO: translation -->
+      {step.name} ({(10 * (0.2-step.error)/0.2).toFixed(0)})
+    </div>
+  {/if}
 </div>
 
 <style>
   .step {
     position: absolute;
     height: 60px;
-    background-color: var(--theme-neutral-light);
     border-radius: 10px;
     border: 1px solid var(--theme-main);
+  }
+  .good {
+    border-color: var(--theme-main);
+    background-color: var(--theme-neutral-light);
+  }
+  .passive {
+    border-color: var(--theme-neutral-light);
+    background-color: var(--theme-neutral-white);
+  }
+
+  .step-name {
+    position: absolute;
+    top: 60px;
   }
 
   .pose {
@@ -76,8 +95,5 @@
     height: 60px;
   }
 
-  .passive {
-    border-color: var(--theme-neutral-light);
-    background-color: var(--theme-neutral-white);
-  }
+
 </style>
