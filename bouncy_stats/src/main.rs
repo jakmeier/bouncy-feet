@@ -7,7 +7,7 @@ use sqlx::sqlite::SqliteRow;
 use sqlx::{Executor, Sqlite, SqlitePool};
 use tokio::net::TcpListener;
 
-const DB_PATH: &str = "sqlite:db.sqlite";
+const DB_PATH: &str = "sqlite:data/db.sqlite";
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
