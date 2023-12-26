@@ -175,7 +175,7 @@
   {#if !showCamera}
     <h1>{$t('record.title')}</h1>
     <p>{$t('record.description')}</p>
-    <div style="margin: 30px">
+    <div style="margin: 30px 0px">
       <Settings {tracker}></Settings>
     </div>
   {:else}
