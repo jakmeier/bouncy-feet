@@ -14,7 +14,10 @@
   }
 
   async function refreshLeaderboard() {
-    scoreboardData = await fetchLeaderboard();
+    let result = await fetchLeaderboard();
+    if(result) {
+      scoreboardData = result;
+    }
   }
   refreshLeaderboard();
 </script>

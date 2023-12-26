@@ -1,5 +1,11 @@
-// TODO: for production, point to hosted site
-const STATS_API_BASE = "http://localhost:3000";
+import { dev } from "$app/environment";
+
+// TODO: This is a temporary place to host the stats service
+let STATS_API_BASE = "https://demo.paddlers.ch:3000";
+
+if (dev) {
+    STATS_API_BASE = "http://localhost:3000";
+}
 
 /**
  * @param {{ id: string; publicName: string; recordedSteps: number; recordedSeconds: number; recordedDances: number; }} user
