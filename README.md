@@ -64,6 +64,7 @@ core business logic (dance detection).
 
 ## Progress Status
 
+- 26 Dec 2023: Started hosting a live demo on https://demos.jakobmeier.ch/bouncy-feet.
 - 23 Dec 2023: Update README to better describe the project ambitions. The
   techstack with SvelteKit + Rust to create a PWA is mostly locked in now.
 - 20 Nov 2023: Started using [SvelteKit](https://kit.svelte.dev/).
