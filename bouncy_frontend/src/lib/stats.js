@@ -32,3 +32,19 @@ export async function submitStats(user) {
         console.error(`Error during post request to ${apiUrl}:`, error);
     }
 }
+
+export async function fetchLeaderboard() {
+    const apiUrl = STATS_API_BASE + '/scoreboard';
+
+    try {
+        const response = await fetch(apiUrl);
+
+        if (response.ok) {
+            return await response.json();
+        } else {
+            console.error('Failed to read scoreboard');
+        }
+    } catch (error) {
+        console.error('Error while reading scoreboard:', error);
+    }
+}

@@ -2,13 +2,21 @@
   import { getContext } from 'svelte';
   import DanceStats from './DanceStats.svelte';
   import { t } from '$lib/i18n';
-  import { submitStats } from '$lib/stats';
+  import { submitStats, fetchLeaderboard } from '$lib/stats';
+  import Leaderboard from './Leaderboard.svelte';
 
   const user = getContext('user').store;
+  let scoreboardData = [];
 
-  function submit() {
-    submitStats($user);
+  async function submit() {
+    await submitStats($user);
+    refreshLeaderboard();
   }
+
+  async function refreshLeaderboard() {
+    scoreboardData = await fetchLeaderboard();
+  }
+  refreshLeaderboard();
 </script>
 
 <div class="profile-pic">
@@ -28,6 +36,9 @@
   <input type="text" bind:value={$user.publicName} />
 </label>
 <button on:click={submit}>{$t('profile.submit-stats')}</button>
+
+<h2>{$t('profile.leaderboard-title')}</h2>
+<Leaderboard users={scoreboardData} />
 
 <style>
   .profile-pic {

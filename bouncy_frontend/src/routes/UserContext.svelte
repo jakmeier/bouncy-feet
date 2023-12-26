@@ -3,6 +3,7 @@
    * Provides access to a user local storage
    */
   import { browser } from '$app/environment';
+  import { submitStats } from '$lib/stats';
   import { generateRandomUsername } from '$lib/username';
   import { setContext } from 'svelte';
   import { writable } from 'svelte/store';
@@ -54,6 +55,8 @@
     $user.recordedDances += 1;
     $user.recordedSteps += steps;
     $user.recordedSeconds += duration;
+
+    submitStats($user);
 
     return {
       numSteps: steps,

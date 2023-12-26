@@ -7,6 +7,10 @@
         "nav": "Home",
         "steps": "Schritte"
     },
+    "leaderboard": {
+        "user-header": "Tänzer",
+        "steps-header": "Schritte"
+    },
     "learn": {
         "title": "Lerne neue Schritte!",
         "nav": "Lernen"
@@ -34,7 +38,8 @@
         "time-danced": "Getanzt für"
     },
     "profile": {
-        "stats-title": "Statistiken",
+        "stats-title": "Mein Fortschritt",
+        "leaderboard-title": "Rangliste",
         "submit-stats": "Rangliste aktualisieren",
         "nav": "Profil"
     }

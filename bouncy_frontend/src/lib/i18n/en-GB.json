@@ -7,6 +7,10 @@
         "nav": "Home",
         "steps": "Steps"
     },
+    "leaderboard": {
+        "user-header": "Dancer",
+        "steps-header": "Steps"
+    },
     "learn": {
         "title": "Learn new moves",
         "nav": "Learn"
@@ -34,7 +38,8 @@
         "time-danced": "Danced for"
     },
     "profile": {
-        "stats-title": "Statistics",
+        "stats-title": "My Progress",
+        "leaderboard-title": "Leaderboard",
         "submit-stats": "Refresh leaderboard",
         "nav": "Profile"
     }
