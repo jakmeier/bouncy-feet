@@ -16,6 +16,7 @@ async fn main() -> anyhow::Result<()> {
         .route("/", get(root))
         .route("/scoreboard", get(get_scores))
         .route("/user/stats", post(post_stats))
+        .layer(tower_http::cors::CorsLayer::permissive())
         .with_state(create_db_pool);
 
     let listener = TcpListener::bind("0.0.0.0:3000").await.unwrap();
@@ -25,7 +26,7 @@ async fn main() -> anyhow::Result<()> {
 
 #[derive(Deserialize)]
 struct NewUserStats {
-    id: u64,
+    id: String,
     name: String,
     steps: u64,
     seconds: u64,
@@ -34,7 +35,7 @@ struct NewUserStats {
 
 #[derive(Debug, sqlx::FromRow)]
 struct User {
-    id: i64,
+    id: String,
     name: String,
     steps: i64,
     seconds: i64,
@@ -77,7 +78,7 @@ async fn post_stats(
     let mut tx = db_pool.begin().await.map_err(internal_error)?;
 
     let db_formatted_user = User {
-        id: user.id as i64,
+        id: user.id,
         name: user.name,
         steps: user.steps as i64,
         seconds: user.seconds as i64,
@@ -103,7 +104,7 @@ async fn create_db_pool() -> anyhow::Result<SqlitePool> {
     let mut db = db_pool.acquire().await?;
     db.execute(
         "CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY,
+                id TEXT PRIMARY KEY,
                 name TEXT NOT NULL,
                 steps INTEGER,
                 seconds INTEGER,
@@ -120,7 +121,7 @@ async fn insert_or_update_user(
     user: &User,
 ) -> Result<(), sqlx::Error> {
     let existing_user: Option<SqliteRow> = tx
-        .fetch_optional(sqlx::query("SELECT * FROM users WHERE id = ?").bind(user.id as i64))
+        .fetch_optional(sqlx::query("SELECT * FROM users WHERE id = ?").bind(&user.id))
         .await?;
 
     if existing_user.is_some() {
@@ -133,7 +134,7 @@ async fn insert_or_update_user(
             .bind(user.steps)
             .bind(user.seconds)
             .bind(user.dances)
-            .bind(user.id),
+            .bind(&user.id),
         )
         .await?;
     } else {
@@ -142,7 +143,7 @@ async fn insert_or_update_user(
             sqlx::query(
                 "INSERT INTO users (id, name, steps, seconds, dances) VALUES (?, ?, ?, ?, ?)",
             )
-            .bind(user.id)
+            .bind(&user.id)
             .bind(&user.name)
             .bind(user.steps)
             .bind(user.seconds)

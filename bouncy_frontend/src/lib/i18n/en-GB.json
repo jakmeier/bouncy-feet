@@ -35,6 +35,7 @@
     },
     "profile": {
         "stats-title": "Statistics",
+        "submit-stats": "Refresh leaderboard",
         "nav": "Profile"
     }
 }

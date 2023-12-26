@@ -3,7 +3,8 @@
    * Provides access to a user local storage
    */
   import { browser } from '$app/environment';
-  import { setContext, onDestroy } from 'svelte';
+  import { generateRandomUsername } from '$lib/username';
+  import { setContext } from 'svelte';
   import { writable } from 'svelte/store';
 
   function fromLocalStorage() {
@@ -15,9 +16,13 @@
   }
 
   const stored = browser ? fromLocalStorage() : null;
+  if (stored && !stored.id) {
+    stored.id = crypto.randomUUID();
+  }
   const user = writable(
     stored || {
-      publicName: 'fake user name',
+      id: crypto.randomUUID(),
+      publicName: generateRandomUsername(),
       score: 0,
       recordedDances: 0,
       recordedSeconds: 0,
