@@ -1,5 +1,4 @@
 <script>
-  import { fly } from 'svelte/transition';
   import { tweened } from 'svelte/motion';
   import { quadIn } from 'svelte/easing';
 
@@ -39,6 +38,5 @@
   y1={$startY}
   x2={$endX}
   y2={$endY}
-  transition:fly={{ duration: animationTime }}
 >
 </line>
