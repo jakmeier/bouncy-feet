@@ -8,7 +8,6 @@
 
   const tabs = [
     { label: $t('home.nav'), icon: 'home', route: `${base}/` },
-    { label: $t('learn.nav'), icon: 'book_5', route: `${base}/learn` },
     {
       label: $t('record.nav'),
       icon: 'directions_walk',
@@ -19,6 +18,7 @@
       icon: 'account_circle',
       route: `${base}/profile`,
     },
+    { label: $t('learn.nav'), icon: 'book_5', route: `${base}/learn` },
   ];
   if (dev) {
     tabs.push({ label: 'Dev', icon: 'code', route: `${base}/dev` });
