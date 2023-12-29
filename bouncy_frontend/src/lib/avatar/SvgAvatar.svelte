@@ -8,6 +8,8 @@
   export let width = 100;
   export let height = 100;
   export let lineWidth = 10;
+  /** @type{number} animationTime in ms */
+  export let animationTime = 500;
   export let lengths = {
     thigh: 0.2,
     shin: 0.2,
@@ -38,16 +40,18 @@
   $: headRadius = 0.075 * size;
 </script>
 
-{#if skeleton && !sideway}
-  <g
-    stroke-width="{lineWidth * 0.8}px"
-    stroke={headColor}
-    fill={bodyColor}
-    stroke-linecap="round"
-  >
+<g
+  stroke-width="{lineWidth * 0.9}px"
+  stroke={headColor}
+  fill={bodyColor}
+  stroke-linecap="round"
+>
+  {#if skeleton && !sideway}
     <SvgPolygon points={[leftHip, rightHip, rightShoulder, leftShoulder]} />
-  </g>
-{/if}
+  {:else}
+    <SvgLine {animationTime} start={leftShoulder} end={leftHip} />
+  {/if}
+</g>
 
 {#if skeleton}
   <g stroke-width="{lineWidth}px" stroke={leftColor} stroke-linecap="round">
@@ -57,6 +61,7 @@
       side={skeleton.left}
       shoulder={leftShoulder}
       hip={leftHip}
+      {animationTime}
     ></SvgAvatarSide>
   </g>
   <g stroke-width="{lineWidth}px" stroke={rightColor} stroke-linecap="round">
@@ -66,6 +71,7 @@
       side={skeleton.right}
       shoulder={rightShoulder}
       hip={rightHip}
+      {animationTime}
     ></SvgAvatarSide>
   </g>
   <circle

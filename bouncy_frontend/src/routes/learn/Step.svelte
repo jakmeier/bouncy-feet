@@ -5,6 +5,8 @@
   /** @type {import('$lib/instructor/bouncy_instructor').StepInfo} */
   export let step;
   export let poseIndex = 0;
+  /** @type{number} animationTime in ms */
+  export let animationTime = 500;
   $: skeleton = step.skeleton(poseIndex);
 </script>
 
@@ -19,6 +21,7 @@
         leftColor="var(--theme-accent)"
         rightColor="var(--theme-main)"
         headColor="var(--theme-neutral-dark)"
+        {animationTime}
       />
     </svg>
   </Area>

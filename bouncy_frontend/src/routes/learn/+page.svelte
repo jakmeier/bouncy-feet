@@ -6,10 +6,15 @@
   /** @type {import('./$types').PageData} */
   export let data;
 
+  const stepTime = 300;
+  // animationTime < stepTime will freeze zhe position for a moment, which makes
+  // it clearer. If the difference is too much, it looks robotic.
+  const animationTime = stepTime * 0.85;
+
   const i = readable(0, (set) => {
     const handle = setInterval(() => {
       set($i + 1);
-    }, 300);
+    }, stepTime);
 
     return () => clearInterval(handle);
   });
@@ -21,7 +26,7 @@
 <div class="step-table">
   {#each data.uniqueNameSteps as step}
     {#if !step.name.includes('Idle')}
-      <Step {step} poseIndex={$i} />
+      <Step {step} poseIndex={$i} {animationTime} />
     {/if}
   {/each}
 </div>

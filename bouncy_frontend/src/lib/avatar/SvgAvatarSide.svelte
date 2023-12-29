@@ -14,6 +14,8 @@
    * @type {{ thigh: number; shin: number; foot: number; arm: number; forearm: number; }}
    */
   export let lengths;
+  /** @type{number} animationTime in ms */
+  export let animationTime;
 
   $: knee = add2dVector(
     hip,
@@ -47,9 +49,8 @@
   );
 </script>
 
-<SvgLine start={hip} end={knee}></SvgLine>
-<SvgLine start={knee} end={ankle}></SvgLine>
-<SvgLine start={shoulder} end={hip}></SvgLine>
-<SvgLine start={shoulder} end={elbow}></SvgLine>
-<SvgLine start={elbow} end={wrist}></SvgLine>
-<SvgLine start={heel} end={toe}></SvgLine>
+<SvgLine {animationTime} start={hip} end={knee} />
+<SvgLine {animationTime} start={knee} end={ankle} />
+<SvgLine {animationTime} start={shoulder} end={elbow} />
+<SvgLine {animationTime} start={elbow} end={wrist} />
+<SvgLine {animationTime} start={heel} end={toe} />
