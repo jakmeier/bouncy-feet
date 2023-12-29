@@ -17,8 +17,10 @@
     foot: 0.05,
   };
 
-  const mainColor = '#382eeb';
-  const secondColor = '#c2bfff';
+  export let leftColor = 'var(--theme-main)';
+  export let rightColor = 'var(--theme-main)';
+  export let headColor = 'var(--theme-main)';
+  export let bodyColor = 'var(--theme-neutral-light)';
 
   $: sideway = skeleton ? skeleton.sideway : false;
   $: size = Math.min(height, width);
@@ -36,8 +38,19 @@
   $: headRadius = 0.075 * size;
 </script>
 
+{#if skeleton && !sideway}
+  <g
+    stroke-width="{lineWidth * 0.8}px"
+    stroke={headColor}
+    fill={bodyColor}
+    stroke-linecap="round"
+  >
+    <SvgPolygon points={[leftHip, rightHip, rightShoulder, leftShoulder]} />
+  </g>
+{/if}
+
 {#if skeleton}
-  <g stroke-width="{lineWidth}px" stroke={mainColor} stroke-linecap="round">
+  <g stroke-width="{lineWidth}px" stroke={leftColor} stroke-linecap="round">
     <SvgAvatarSide
       {lengths}
       {size}
@@ -45,6 +58,8 @@
       shoulder={leftShoulder}
       hip={leftHip}
     ></SvgAvatarSide>
+  </g>
+  <g stroke-width="{lineWidth}px" stroke={rightColor} stroke-linecap="round">
     <SvgAvatarSide
       {lengths}
       {size}
@@ -52,21 +67,11 @@
       shoulder={rightShoulder}
       hip={rightHip}
     ></SvgAvatarSide>
-    <circle
-      cx={shoulder.x}
-      cy={shoulder.y - 0.1 * size}
-      r={headRadius}
-      fill={mainColor}
-    />
   </g>
-{/if}
-{#if skeleton && !sideway}
-  <g
-    stroke-width="{lineWidth}px"
-    stroke={mainColor}
-    fill={secondColor}
-    stroke-linecap="round"
-  >
-    <SvgPolygon points={[leftHip, rightHip, rightShoulder, leftShoulder]} />
-  </g>
+  <circle
+    cx={shoulder.x}
+    cy={shoulder.y - 0.1 * size}
+    r={headRadius}
+    fill={headColor}
+  />
 {/if}
