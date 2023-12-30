@@ -271,8 +271,18 @@ export class StepInfo {
 */
   skeleton(beat: number): Skeleton;
 /**
+* The identifier for the step. The same ID is used for variations of the same step.
 */
   readonly name: string;
+/**
+* Description identifier for the translated text which describes how the
+* variation is different from the original.
+*
+* For example: "left-first" can be used for all steps which are the same
+* as the original but instead of starting with the right foot, it starts
+* with the left foot first. The app shows a translated text like "Left Leg First".
+*/
+  readonly variation: string | undefined;
 }
 /**
 */

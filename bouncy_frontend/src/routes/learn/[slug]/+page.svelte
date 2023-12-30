@@ -4,12 +4,16 @@
   import { t } from '$lib/i18n.js';
   import Step from '../Step.svelte';
   import BackButton from '$lib/BackButton.svelte';
+  import Select from 'svelte-select';
 
   /** @type {import('./$types').PageData} */
   export let data;
 
   const name = $page.params.slug;
   const variations = data.allSteps.filter((step) => step.name === name);
+  const selectItems = variations.map((step) => {
+    return { value: step, label: $t(`step.variation.${step.variation}`) };
+  });
 
   let bpm = 240;
   $: stepTime = 60_000 / bpm;
@@ -28,39 +32,56 @@
     fuse = foo();
     return () => clearTimeout(fuse);
   });
+
+  let selected = selectItems[0];
 </script>
 
 <BackButton />
 
 <h1>{name}</h1>
 
-{#if variations.length > 0}
-  <Step step={variations[0]} poseIndex={$a.i} {animationTime} size={200} />
-{/if}
+<Step step={selected.value} poseIndex={$a.i} {animationTime} size={200} />
 
 <label>
   {$t('learn.step.speed')}
-  <input type="number" bind:value={bpm} min="10" max="300" class="number" />
-  <input type="range" bind:value={bpm} min="10" max="300" class="range" />
+  <input type="number" bind:value={bpm} min="30" max="300" class="number" />
+  <input type="range" bind:value={bpm} min="30" max="300" class="range" />
 </label>
 
-<!-- 
-    TODO: render multiple variations, something like this but with information included what 
-    is different about this variation, like left first. Translated, of course.
-    {#each variations as step, i}
-    <h3>{Variation 'I'.repeat(i + 1)}</h3>
-    <Step {step} poseIndex={0} animationTime={300} />
-{/each} 
--->
+{#if selectItems.length > 1}
+  <div class="label">
+    {$t('learn.step.variation')}
+    <Select
+      bind:value={selected}
+      items={selectItems}
+      showChevron={true}
+      clearable={false}
+      --background="var(--theme-neutral-light)"
+      --selected-item-color="var(--theme-neutral-dark)"
+      --item-hover-bg="var(--theme-main)"
+      --item-hover-color="var(--theme-neutral-light)"
+      --item-active-background="var(--theme-accent)"
+      --item-is-active-bg="var(--theme-neutral-white)"
+      --item-is-active-color="var(--theme-neutral-dark)"
+      --border="1px solid var(--theme-neutral-dark)"
+      --border-hover="1.5px solid var(--theme-main)"
+      --border-focused="1.5px solid var(--theme-main)"
+      --margin="10px auto"
+      --padding="10px"
+      --font-size="20px"
+    />
+  </div>
+{/if}
 
 <style>
   h1 {
     text-align: center;
   }
-  label {
+  label,
+  .label {
     display: grid;
     justify-items: center;
-    margin: auto;
+    margin: 10px auto;
     max-width: 300px;
     background-color: var(--theme-neutral-light);
     border-radius: 10px;

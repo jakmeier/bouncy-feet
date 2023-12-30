@@ -8,11 +8,13 @@ use wasm_bindgen::prelude::wasm_bindgen;
 #[wasm_bindgen]
 pub struct StepInfo {
     name: String,
+    step_variation: Option<String>,
     skeletons: Vec<Skeleton>,
 }
 
 #[wasm_bindgen]
 impl StepInfo {
+    /// The identifier for the step. The same ID is used for variations of the same step.
     #[wasm_bindgen(getter)]
     pub fn name(&self) -> String {
         self.name.clone()
@@ -21,6 +23,17 @@ impl StepInfo {
     pub fn skeleton(&self, beat: usize) -> Skeleton {
         debug_assert!(self.skeletons.len() > 0);
         self.skeletons[beat % self.skeletons.len()]
+    }
+
+    /// Description identifier for the translated text which describes how the
+    /// variation is different from the original.
+    ///
+    /// For example: "left-first" can be used for all steps which are the same
+    /// as the original but instead of starting with the right foot, it starts
+    /// with the left foot first. The app shows a translated text like "Left Leg First".
+    #[wasm_bindgen(getter)]
+    pub fn variation(&self) -> Option<String> {
+        self.step_variation.clone()
     }
 }
 
@@ -37,6 +50,7 @@ impl From<&Step> for StepInfo {
         });
         Self {
             name: step.name.clone(),
+            step_variation: step.variation.clone(),
             skeletons,
         }
     }

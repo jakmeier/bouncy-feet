@@ -19,7 +19,8 @@
         "title": "Library",
         "nav": "Learn",
         "step": {
-            "speed": "Speed [bpm]"
+            "speed": "Speed [bpm]",
+            "variation": "Variation"
         }
     },
     "record": {
@@ -49,5 +50,15 @@
         "leaderboard-title": "Leaderboard",
         "submit-stats": "Refresh leaderboard",
         "nav": "Profile"
+    },
+    "step": {
+        "variation": {
+            "right-first": "Right leg first",
+            "right-forward": "Right leg forward",
+            "right-out": "Right leg outwards",
+            "left-first": "Left leg first",
+            "left-forward": "Left leg forward",
+            "left-out": "Left leg outwards"
+        }
     }
 }

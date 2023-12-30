@@ -24,7 +24,16 @@ pub(crate) struct StepFile {
 /// It is converted to a [`crate::step::Step`] for step detection.
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub(crate) struct Step {
+    /// The identifier for the step. The same ID is used for variations of the same step.
     pub name: String,
+    /// Description identifier for the translated text which describes how the
+    /// variation is different from the original.
+    ///
+    /// For example: "left-first" can be used for all steps which are the same
+    /// as the original but instead of starting with the right foot, it starts
+    /// with the left foot first. The app shows a translated text like "Left Leg First".
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub variation: Option<String>,
     pub keyframes: Vec<StepPosition>,
 }
 

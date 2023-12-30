@@ -19,7 +19,8 @@
         "title": "Bibliothek",
         "nav": "Lernen",
         "step": {
-            "speed": "Tempo [BPM]"
+            "speed": "Tempo [BPM]",
+            "variation": "Variation"
         }
     },
     "record": {
@@ -49,5 +50,15 @@
         "leaderboard-title": "Rangliste",
         "submit-stats": "Rangliste aktualisieren",
         "nav": "Profil"
+    },
+    "step": {
+        "variation": {
+            "right-first": "Rechtes Bein zuerst",
+            "right-forward": "Rechts nach vorne",
+            "right-out": "Rechts nach aussen",
+            "left-first": "Linkes Bein zuerst",
+            "left-forward": "Links nach vorne",
+            "left-out": "Links nach aussen"
+        }
     }
 }

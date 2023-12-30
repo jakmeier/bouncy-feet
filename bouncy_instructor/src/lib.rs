@@ -60,6 +60,7 @@ impl State {
 
             let new_step = Step {
                 name: def.name.clone(),
+                variation: def.variation.clone(),
                 poses,
                 directions,
             };

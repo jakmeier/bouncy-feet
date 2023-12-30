@@ -18,6 +18,7 @@ export function poseapproximation_name(a: number, b: number): void;
 export function poseapproximation_worstLimbs(a: number, b: number, c: number): void;
 export function stepinfo_name(a: number, b: number): void;
 export function stepinfo_skeleton(a: number, b: number): number;
+export function stepinfo_variation(a: number, b: number): void;
 export function steps(a: number): void;
 export function tracker_addKeypoints(a: number, b: number, c: number): number;
 export function tracker_allPoseErrors(a: number, b: number, c: number): void;

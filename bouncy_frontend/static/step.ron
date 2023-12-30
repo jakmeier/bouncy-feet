@@ -18,6 +18,7 @@
     ),
     (
       name: "Running Man",
+      variation: "right-first",
       keyframes: [
         (pose: "right-forward", orientation: Right),
         (pose: "left-up", orientation: Right),
@@ -27,6 +28,7 @@
     ),
     (
       name: "Running Man",
+      variation: "left-first",
       keyframes: [
         (pose: "left-forward", orientation: Right),
         (pose: "right-up", orientation: Right),
@@ -36,6 +38,7 @@
     ),
     (
       name: "Double Running Man",
+      variation: "right-forward",
       keyframes: [
         (pose: "right-forward", orientation: Right),
         (pose: "left-up", orientation: Right),
@@ -45,6 +48,7 @@
     ),
     (
       name: "Double Running Man",
+      variation: "left-forward",
       keyframes: [
         (pose: "left-forward", orientation: Right),
         (pose: "right-up", orientation: Right),
@@ -54,6 +58,7 @@
     ),
     (
       name: "Running Man on Heels",
+      variation: "right-first",
       keyframes: [
         (pose: "right-forward-heel", orientation: Right),
         (pose: "left-up", orientation: Right),
@@ -63,6 +68,7 @@
     ),
     (
       name: "Running Man on Heels",
+      variation: "left-first",
       keyframes: [
         (pose: "left-forward-heel", orientation: Right),
         (pose: "right-up", orientation: Right),
@@ -79,6 +85,7 @@
     ),
     (
       name: "T-Step",
+      variation: "right-out",
       keyframes: [
         (pose: "t-open-right", orientation: ToCamera),
         (pose: "t-closed-right", orientation: ToCamera),
@@ -86,6 +93,7 @@
     ),
     (
       name: "T-Step",
+      variation: "left-out",
       keyframes: [
         (pose: "t-open-left", orientation: ToCamera),
         (pose: "t-closed-left", orientation: ToCamera),
@@ -93,6 +101,7 @@
     ),
     (
       name: "Pendulum",
+      variation: "right-first",
       keyframes: [
         (pose: "pendulum-right", orientation: ToCamera),
         (pose: "standing-straight-front", orientation: ToCamera),
@@ -101,7 +110,18 @@
       ]
     ),
     (
+      name: "Pendulum",
+      variation: "left-first",
+      keyframes: [
+        (pose: "pendulum-left", orientation: ToCamera),
+        (pose: "standing-straight-front", orientation: ToCamera),
+        (pose: "pendulum-right", orientation: ToCamera),
+        (pose: "standing-straight-front", orientation: ToCamera),
+      ]
+    ),
+    (
       name: "Polly Pocket",
+      variation: "right-first",
       keyframes: [
         (pose: "polly-right", orientation: ToCamera),
         (pose: "t-closed-left", orientation: ToCamera),
@@ -111,6 +131,7 @@
     ),
     (
       name: "Polly Pocket",
+      variation: "left-first",
       keyframes: [
         (pose: "polly-left", orientation: ToCamera),
         (pose: "t-closed-right", orientation: ToCamera),

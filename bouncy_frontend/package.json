@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "vite dev",
+    "dev-host": "vite dev --host 0.0.0.0",
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
@@ -35,6 +36,7 @@
   },
   "type": "module",
   "dependencies": {
+    "svelte-select": "^5.8.1",
     "sveltekit-i18n": "^2.4.2"
   }
 }
