@@ -16,6 +16,7 @@ export function loadStepString(a: number, b: number, c: number): void;
 export function poseapproximation_limbErrors(a: number, b: number): void;
 export function poseapproximation_name(a: number, b: number): void;
 export function poseapproximation_worstLimbs(a: number, b: number, c: number): void;
+export function skeleton_resting(a: number): number;
 export function stepinfo_name(a: number, b: number): void;
 export function stepinfo_skeleton(a: number, b: number): number;
 export function stepinfo_variation(a: number, b: number): void;

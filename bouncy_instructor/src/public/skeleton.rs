@@ -25,7 +25,7 @@ pub struct Skeleton {
 }
 
 #[wasm_bindgen(js_name = SkeletonSide)]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Default)]
 pub struct Side {
     pub thigh: Segment,
     pub shin: Segment,
@@ -49,6 +49,26 @@ pub struct Segment {
     pub r: f32,
 }
 
+#[wasm_bindgen]
+impl Skeleton {
+    pub fn resting(sideway: bool) -> Self {
+        let mut left = Side::default();
+        let mut right = Side::default();
+        if sideway {
+            left.foot.angle = 180.0_f32.to_radians();
+            right.foot.angle = 180.0_f32.to_radians();
+        } else {
+            left.foot.angle = 60.0_f32.to_radians();
+            right.foot.angle = 120.0_f32.to_radians();
+        }
+        Skeleton {
+            left,
+            right,
+            sideway,
+        }
+    }
+}
+
 impl Skeleton {
     pub(crate) fn from_pose(pose: &Pose, db: &LimbPositionDatabase) -> Self {
         let rotation = 0.0;
@@ -67,6 +87,15 @@ impl From<Angle3d> for Segment {
         } else {
             let angle = (y.atan2(x) + TAU) % TAU;
             Self { angle, r: xy_len }
+        }
+    }
+}
+
+impl Default for Segment {
+    fn default() -> Self {
+        Self {
+            angle: 90.0_f32.to_radians(),
+            r: 1.0,
         }
     }
 }

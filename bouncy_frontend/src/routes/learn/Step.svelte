@@ -1,6 +1,7 @@
 <script>
   import Area from '../record/Area.svelte';
   import SvgAvatar from '$lib/avatar/SvgAvatar.svelte';
+  import { Skeleton } from '$lib/instructor/bouncy_instructor';
 
   /** @type {import('$lib/instructor/bouncy_instructor').StepInfo} */
   export let step;
@@ -8,7 +9,11 @@
   export let poseIndex = 0;
   /** @type{number} animationTime in ms */
   export let animationTime = 500;
-  $: skeleton = step.skeleton(poseIndex);
+
+  // When the pose index is negative, it should show a resting position
+  // according to the orientation of the first pose.
+  const restingStep = Skeleton.resting(step.skeleton(0).sideway);
+  $: skeleton = poseIndex >= 0 ? step.skeleton(poseIndex) : restingStep;
 </script>
 
 <Area width="{size}px" height="{size}px">

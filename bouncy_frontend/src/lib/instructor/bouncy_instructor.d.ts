@@ -220,6 +220,11 @@ export class Segment {
 export class Skeleton {
   free(): void;
 /**
+* @param {boolean} sideway
+* @returns {Skeleton}
+*/
+  static resting(sideway: boolean): Skeleton;
+/**
 */
   left: SkeletonSide;
 /**

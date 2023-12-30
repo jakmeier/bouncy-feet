@@ -11,7 +11,7 @@
   // it clearer. If the difference is too much, it looks robotic.
   const animationTime = stepTime * 0.85;
 
-  const i = readable(0, (set) => {
+  const i = readable(-1, (set) => {
     const handle = setInterval(() => {
       set($i + 1);
     }, stepTime);
