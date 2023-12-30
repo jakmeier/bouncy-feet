@@ -115,6 +115,7 @@ impl Skeleton3d {
             Direction::East | Direction::West => true,
         };
         let correction = self.azimuth_correction - SignedAngle::degree(rotation);
+        let backwards = correction.as_radians().abs() > FRAC_PI_2;
         let segment = |i: LimbIndex| -> Segment {
             Angle3d::new(
                 self.limb_angles_3d[i.as_usize()].azimuth + correction,
@@ -142,6 +143,7 @@ impl Skeleton3d {
             left,
             right,
             sideway,
+            backwards,
         }
     }
 }

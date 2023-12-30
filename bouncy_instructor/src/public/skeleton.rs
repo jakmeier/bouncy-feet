@@ -21,7 +21,10 @@ use wasm_bindgen::prelude::wasm_bindgen;
 pub struct Skeleton {
     pub left: Side,
     pub right: Side,
+    /// Does the dancer look more to the side han they face the camera?
     pub sideway: bool,
+    /// Does the dancer face away more than they face the camera?
+    pub backwards: bool,
 }
 
 #[wasm_bindgen(js_name = SkeletonSide)]
@@ -65,6 +68,7 @@ impl Skeleton {
             left,
             right,
             sideway,
+            backwards: false,
         }
     }
 }

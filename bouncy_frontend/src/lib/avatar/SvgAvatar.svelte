@@ -31,11 +31,19 @@
   $: shoulderLen = sideway ? 0.0 : 0.05 * size;
   $: hipLen = sideway ? 0.0 : 0.03 * size;
 
+  let leftHip, rightHip, rightShoulder, leftShoulder;
   // right body part is left on screen
-  $: leftHip = { x: hip.x + hipLen, y: hip.y };
-  $: leftShoulder = { x: shoulder.x + shoulderLen, y: shoulder.y };
-  $: rightHip = { x: hip.x - hipLen, y: hip.y };
-  $: rightShoulder = { x: shoulder.x - shoulderLen, y: shoulder.y };
+  $: {
+    leftHip = { x: hip.x + hipLen, y: hip.y };
+    leftShoulder = { x: shoulder.x + shoulderLen, y: shoulder.y };
+    rightHip = { x: hip.x - hipLen, y: hip.y };
+    rightShoulder = { x: shoulder.x - shoulderLen, y: shoulder.y };
+    // when the dance looks away from the camera, we need to switch sides
+    if (skeleton.backwards) {
+      [leftHip, rightHip] = [rightHip, leftHip];
+      [leftShoulder, rightShoulder] = [rightShoulder, leftShoulder];
+    }
+  }
 
   $: headRadius = 0.075 * size;
 </script>

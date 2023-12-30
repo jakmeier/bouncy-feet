@@ -225,12 +225,17 @@ export class Skeleton {
 */
   static resting(sideway: boolean): Skeleton;
 /**
+* Does the dancer face away more than they face the camera?
+*/
+  backwards: boolean;
+/**
 */
   left: SkeletonSide;
 /**
 */
   right: SkeletonSide;
 /**
+* Does the dancer look more to the side han they face the camera?
 */
   sideway: boolean;
 }
