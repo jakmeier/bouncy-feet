@@ -39,7 +39,7 @@
     rightHip = { x: hip.x - hipLen, y: hip.y };
     rightShoulder = { x: shoulder.x - shoulderLen, y: shoulder.y };
     // when the dance looks away from the camera, we need to switch sides
-    if (skeleton.backwards) {
+    if (skeleton && skeleton.backwards) {
       [leftHip, rightHip] = [rightHip, leftHip];
       [leftShoulder, rightShoulder] = [rightShoulder, leftShoulder];
     }
