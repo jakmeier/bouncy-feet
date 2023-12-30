@@ -17,7 +17,10 @@
     },
     "learn": {
         "title": "Bibliothek",
-        "nav": "Lernen"
+        "nav": "Lernen",
+        "step": {
+            "speed": "Tempo [BPM]"
+        }
     },
     "record": {
         "title": "Tanzen",

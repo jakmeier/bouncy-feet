@@ -1,6 +1,6 @@
 <script>
   import { tweened } from 'svelte/motion';
-  import { quadIn } from 'svelte/easing';
+  import { quadIn, quadOut, quadInOut } from 'svelte/easing';
 
   /** @type{{ x: number; y: number; }} */
   export let start;
@@ -14,7 +14,7 @@
   // keeping it simple for now. I like quadIn for the avatar step animation,
   // which is the only place this is currently in use.
   const animation = {
-    duration: animationTime,
+    duration: () => animationTime,
     easing: quadIn,
   };
   // use svelte/motion.tweened for smoothly changing x,y values
@@ -33,10 +33,4 @@
   $: start, end, updatePosition();
 </script>
 
-<line
-  x1={$startX}
-  y1={$startY}
-  x2={$endX}
-  y2={$endY}
->
-</line>
+<line x1={$startX} y1={$startY} x2={$endX} y2={$endY}> </line>

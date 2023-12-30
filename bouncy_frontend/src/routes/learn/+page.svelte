@@ -26,7 +26,11 @@
 <div class="step-table">
   {#each data.uniqueNameSteps as step}
     {#if !step.name.includes('Idle')}
-      <Step {step} poseIndex={$i} {animationTime} />
+      <a href={`./${step.name}`}>
+        <Step {step} poseIndex={$i} {animationTime} />
+        <!-- TODO: translations -->
+        <h3>{step.name}</h3>
+      </a>
     {/if}
   {/each}
 </div>
@@ -37,5 +41,9 @@
     grid-template-columns: 1fr 1fr 1fr;
     text-align: center;
     gap: 20px 0px;
+  }
+
+  a {
+    color: var(--theme-neutral-dark);
   }
 </style>
