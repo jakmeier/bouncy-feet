@@ -56,6 +56,7 @@
       items={selectItems}
       showChevron={true}
       clearable={false}
+      searchable={false}
       --background="var(--theme-neutral-light)"
       --selected-item-color="var(--theme-neutral-dark)"
       --item-hover-bg="var(--theme-main)"
