@@ -1,4 +1,5 @@
 use expect_test::expect;
+use std::collections::HashSet;
 
 mod common;
 
@@ -16,4 +17,22 @@ fn test_listing_static_steps() {
 
     let expect = expect!["Double Running Man,Double Running Man,Idle,Idle Side,Pendulum,Pendulum,Polly Pocket,Polly Pocket,Running Man,Running Man,Running Man on Heels,Running Man on Heels,T-Step,T-Step,V-Step"];
     expect.assert_eq(&step_names.join(","));
+}
+
+#[test]
+fn test_unique_step_id() {
+    common::load_static_files();
+    let steps = bouncy_instructor::steps();
+    let mut unique_ids = HashSet::<String>::new();
+    let mut duplicates = vec![];
+    for step in &steps {
+        if !unique_ids.insert(step.id()) {
+            duplicates.push(step.id());
+        }
+    }
+
+    assert!(
+        steps.len() == unique_ids.len(),
+        "Duplicate step ID detected. {duplicates:?}"
+    )
 }

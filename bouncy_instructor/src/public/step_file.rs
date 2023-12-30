@@ -24,7 +24,11 @@ pub(crate) struct StepFile {
 /// It is converted to a [`crate::step::Step`] for step detection.
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub(crate) struct Step {
-    /// The identifier for the step. The same ID is used for variations of the same step.
+    /// The unique identifier for the step.
+    pub id: String,
+    /// The descriptive name for the step. The same name is used for variations
+    /// of the same step. This name can also be shown to users if no translation
+    /// is available.
     pub name: String,
     /// Description identifier for the translated text which describes how the
     /// variation is different from the original.

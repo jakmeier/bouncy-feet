@@ -59,6 +59,7 @@ impl State {
                 .collect();
 
             let new_step = Step {
+                id: def.id.clone(),
                 name: def.name.clone(),
                 variation: def.variation.clone(),
                 poses,

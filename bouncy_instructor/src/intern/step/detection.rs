@@ -350,6 +350,7 @@ mod tests {
           steps: [
             (
                 name: "Test-Step-1",
+                id: "0",
                 keyframes: [
                 (pose: "test-pose-0", orientation: ToCamera),
                 (pose: "test-pose-2", orientation: ToCamera),
@@ -357,6 +358,7 @@ mod tests {
             ),
             (
               name: "Test-Step-2",
+              id: "1",
               keyframes: [
                 (pose: "test-pose-0", orientation: ToCamera),
                 (pose: "test-pose-1", orientation: ToCamera),
@@ -364,6 +366,7 @@ mod tests {
             ),
             (
               name: "Test-Step-3",
+              id: "2",
               keyframes: [
                 (pose: "test-pose-2", orientation: ToCamera),
                 (pose: "test-pose-1", orientation: ToCamera),
@@ -371,6 +374,7 @@ mod tests {
             ),
             (
               name: "Test-Step-4",
+              id: "3",
               keyframes: [
                 (pose: "test-pose-3", orientation: Right),
                 (pose: "test-pose-4", orientation: Right),

@@ -3,6 +3,7 @@ use super::skeleton_3d::Direction;
 mod detection;
 
 pub(crate) struct Step {
+    pub id: String,
     pub name: String,
     pub variation: Option<String>,
     pub poses: Vec<usize>,

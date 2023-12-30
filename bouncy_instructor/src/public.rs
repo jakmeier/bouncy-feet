@@ -107,6 +107,7 @@ mod tests {
           steps: [
             (
               name: "Running Man",
+              id: "rm-0",
               keyframes: [
                 (pose: "test-pose-left", orientation: Right),
                 (pose: "test-pose-right", orientation: Right),

@@ -7,6 +7,7 @@ use wasm_bindgen::prelude::wasm_bindgen;
 #[derive(Debug)]
 #[wasm_bindgen]
 pub struct StepInfo {
+    id: String,
     name: String,
     step_variation: Option<String>,
     skeletons: Vec<Skeleton>,
@@ -14,7 +15,14 @@ pub struct StepInfo {
 
 #[wasm_bindgen]
 impl StepInfo {
-    /// The identifier for the step. The same ID is used for variations of the same step.
+    /// The unique identifier for the step.
+    #[wasm_bindgen(getter)]
+    pub fn id(&self) -> String {
+        self.id.clone()
+    }
+
+    /// The descriptive name for the step. The same name is used for variations
+    /// of the same step.
     #[wasm_bindgen(getter)]
     pub fn name(&self) -> String {
         self.name.clone()
@@ -49,6 +57,7 @@ impl From<&Step> for StepInfo {
                 .collect()
         });
         Self {
+            id: step.id.clone(),
             name: step.name.clone(),
             step_variation: step.variation.clone(),
             skeletons,
