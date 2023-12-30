@@ -47,6 +47,7 @@
         (limb: RightForearm, angle: 18, tolerance: 0, weight: 0.0),
         (limb: LeftArm, angle: -12, tolerance: 0, weight: 0.0),
         (limb: LeftForearm, angle: 6, tolerance: 0, weight: 0.0),
+        (limb: LeftFoot, angle: 90, tolerance: 0, weight: 0.0),
       ]
     ),
     ( name: "left-up", mirror_of: "right-up", direction: Right ),
