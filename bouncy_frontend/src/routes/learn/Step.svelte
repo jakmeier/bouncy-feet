@@ -5,6 +5,7 @@
 
   /** @type {import('$lib/instructor/bouncy_instructor').StepInfo} */
   export let step;
+  export let rotation = 0.0;
   export let size = 100;
   export let poseIndex = 0;
   /** @type{number} animationTime in ms */
@@ -13,7 +14,7 @@
   // When the pose index is negative, it should show a resting position
   // according to the orientation of the first pose.
   const restingStep = Skeleton.resting(step.skeleton(0).sideway);
-  $: skeleton = poseIndex >= 0 ? step.skeleton(poseIndex) : restingStep;
+  $: skeleton = poseIndex >= 0 ? step.rotatedSkeleton(poseIndex, rotation) : restingStep;
 </script>
 
 <Area width="{size}px" height="{size}px">

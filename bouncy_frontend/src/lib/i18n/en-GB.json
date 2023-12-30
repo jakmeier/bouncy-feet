@@ -19,6 +19,7 @@
         "title": "Library",
         "nav": "Learn",
         "step": {
+            "rotation": "Rotate (experimental)",
             "speed": "Speed [bpm]",
             "variation": "Variation"
         }

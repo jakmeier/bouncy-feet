@@ -69,6 +69,10 @@ impl State {
         }
         Ok(())
     }
+
+    fn step(&self, id: &str) -> Option<&Step> {
+        self.steps.iter().find(|step| step.id == id)
+    }
 }
 
 #[derive(Debug)]

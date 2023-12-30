@@ -15,6 +15,7 @@
     return { value: step, label: $t(`step.variation.${step.variation}`) };
   });
 
+  let degree = 0;
   let bpm = 240;
   $: stepTime = 60_000 / bpm;
   $: animationTime = stepTime * 0.85;
@@ -40,12 +41,30 @@
 
 <h1>{name}</h1>
 
-<Step step={selected.value} poseIndex={$a.i} {animationTime} size={200} />
+<Step
+  step={selected.value}
+  poseIndex={$a.i}
+  {animationTime}
+  size={200}
+  rotation={degree}
+/>
 
 <label>
   {$t('learn.step.speed')}
   <input type="number" bind:value={bpm} min="30" max="300" class="number" />
   <input type="range" bind:value={bpm} min="30" max="300" class="range" />
+</label>
+
+<label>
+  {$t('learn.step.rotation')}
+  <input
+    type="number"
+    bind:value={degree}
+    min="-180"
+    max="180"
+    class="number"
+  />
+  <input type="range" bind:value={degree} min="-180" max="180" class="range" />
 </label>
 
 {#if selectItems.length > 1}

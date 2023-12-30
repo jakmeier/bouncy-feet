@@ -276,7 +276,19 @@ export class StepInfo {
 */
   skeleton(beat: number): Skeleton;
 /**
-* The identifier for the step. The same ID is used for variations of the same step.
+* Applies a rotation (in degree) and returns the resulting skelton.
+* @param {number} beat
+* @param {number} rotation
+* @returns {Skeleton}
+*/
+  rotatedSkeleton(beat: number, rotation: number): Skeleton;
+/**
+* The unique identifier for the step.
+*/
+  readonly id: string;
+/**
+* The descriptive name for the step. The same name is used for variations
+* of the same step.
 */
   readonly name: string;
 /**

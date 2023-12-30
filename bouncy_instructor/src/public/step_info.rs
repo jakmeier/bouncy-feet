@@ -1,3 +1,4 @@
+use crate::intern::skeleton_3d::Skeleton3d;
 use crate::intern::step::Step;
 use crate::skeleton::Skeleton;
 use crate::STATE;
@@ -31,6 +32,18 @@ impl StepInfo {
     pub fn skeleton(&self, beat: usize) -> Skeleton {
         debug_assert!(self.skeletons.len() > 0);
         self.skeletons[beat % self.skeletons.len()]
+    }
+
+    /// Applies a rotation (in degree) and returns the resulting skelton.
+    #[wasm_bindgen(js_name = "rotatedSkeleton")]
+    pub fn rotated_skeleton(&self, beat: usize, rotation: f32) -> Skeleton {
+        debug_assert!(self.skeletons.len() > 0);
+        STATE.with_borrow(|state| {
+            let step = state.step(&self.id).expect("missing step");
+            let pose_index = step.poses[beat % step.poses.len()];
+            let pose = &state.db.poses()[pose_index];
+            Skeleton3d::from_with_db(pose, &state.db).to_skeleton(rotation)
+        })
     }
 
     /// Description identifier for the translated text which describes how the

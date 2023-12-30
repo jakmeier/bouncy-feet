@@ -19,6 +19,7 @@
         "title": "Bibliothek",
         "nav": "Lernen",
         "step": {
+            "rotation": "Drehen (experimentell)",
             "speed": "Tempo [BPM]",
             "variation": "Variation"
         }

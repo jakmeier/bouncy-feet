@@ -3,6 +3,7 @@ use super::pose::Limb;
 use super::pose_db::LimbIndex;
 use crate::skeleton::{Segment, Side, Skeleton};
 use crate::{Keypoints, STATE};
+use std::f32::consts::FRAC_PI_2;
 
 /// A normalized representation of a body position snapshot, including all
 /// tracked information.
@@ -108,7 +109,8 @@ impl Skeleton3d {
     }
 
     pub(crate) fn to_skeleton(&self, rotation: f32) -> Skeleton {
-        let sideway = match self.direction() {
+        let direction = self.direction().rotate(SignedAngle::degree(rotation));
+        let sideway = match direction {
             Direction::North | Direction::South | Direction::Unknown => false,
             Direction::East | Direction::West => true,
         };
@@ -152,6 +154,25 @@ impl Direction {
             alpha if alpha <= -135.0 || alpha >= 135.0 => Direction::East,
             alpha if alpha < -45.0 && alpha > -135.0 => Direction::South,
             _ => Direction::Unknown,
+        }
+    }
+
+    fn rotate(&self, rotation: SignedAngle) -> Direction {
+        let quarters = rotation.as_positive_radians() / FRAC_PI_2;
+        let mut out = *self;
+        for _ in 0..quarters.round() as usize {
+            out = out.rotate_one();
+        }
+        out
+    }
+
+    fn rotate_one(&self) -> Direction {
+        match self {
+            Direction::North => Direction::East,
+            Direction::East => Direction::South,
+            Direction::South => Direction::West,
+            Direction::West => Direction::North,
+            Direction::Unknown => Direction::Unknown,
         }
     }
 }

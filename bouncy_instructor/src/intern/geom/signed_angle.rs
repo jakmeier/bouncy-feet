@@ -27,6 +27,11 @@ impl SignedAngle {
         self.0
     }
 
+    /// Return the angle in radians in range [0,2PI]
+    pub(crate) fn as_positive_radians(&self) -> f32 {
+        (self.0 + TAU) % TAU
+    }
+
     /// Return the angle in radians
     ///
     /// Important: Don't delete this function, or else `angle.to_radians()` will
