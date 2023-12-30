@@ -3,6 +3,7 @@
   import { readable } from 'svelte/store';
   import { t } from '$lib/i18n.js';
   import Step from '../Step.svelte';
+  import BackButton from '$lib/BackButton.svelte';
 
   /** @type {import('./$types').PageData} */
   export let data;
@@ -29,6 +30,8 @@
   });
 </script>
 
+<BackButton />
+
 <h1>{name}</h1>
 
 {#if variations.length > 0}
@@ -51,6 +54,9 @@
 -->
 
 <style>
+  h1 {
+    text-align: center;
+  }
   label {
     display: grid;
     justify-items: center;
