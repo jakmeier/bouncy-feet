@@ -11,6 +11,7 @@ use intern::dance::Dance;
 use intern::pose_db::LimbPositionDatabase;
 use intern::skeleton_3d::Direction;
 use intern::step::Step;
+use public::parsing::ParseFileError;
 use std::cell::RefCell;
 
 /// Singleton internal state, shared between `Tracker` instances that run in the
@@ -107,7 +108,7 @@ enum AddStepError {
     MissingPose(String),
 }
 
-impl From<AddStepError> for pose_file::ParseFileError {
+impl From<AddStepError> for ParseFileError {
     fn from(error: AddStepError) -> Self {
         match error {
             AddStepError::MissingPose(id) => Self::UnknownPoseReference(id),
@@ -120,7 +121,7 @@ enum AddDanceError {
     MissingStep(String),
 }
 
-impl From<AddDanceError> for pose_file::ParseFileError {
+impl From<AddDanceError> for ParseFileError {
     fn from(error: AddDanceError) -> Self {
         match error {
             AddDanceError::MissingStep(name) => Self::UnknownStepName(name),

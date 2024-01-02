@@ -1,13 +1,9 @@
 //! Defines the external format for defining poses, which are still positions of
 //! a body.
-//!
-//! Best practice: Don't use any of the type of this file outside of parsing
-//! logic. Instead, translate to internal types. This allows refactoring
-//! internal without changing the external formats.
 
 use serde::{Deserialize, Serialize};
-use thiserror::Error;
-use wasm_bindgen::JsValue;
+
+use super::ParseFileError;
 
 const CURRENT_VERSION: u16 = 0;
 
@@ -117,18 +113,6 @@ pub enum PoseDirection {
     Right,
 }
 
-#[derive(Error, Debug)]
-pub enum ParseFileError {
-    #[error("invalid pose file version (expected {expected:?}, found {found:?})")]
-    VersionMismatch { expected: u16, found: u16 },
-    #[error("parsing pose file failed, {0}")]
-    RonError(#[from] ron::error::SpannedError),
-    #[error("unknown pose reference `{0}`")]
-    UnknownPoseReference(String),
-    #[error("unknown step reference `{0}`")]
-    UnknownStepName(String),
-}
-
 impl PoseFile {
     pub(crate) fn from_str(text: &str) -> Result<Self, ParseFileError> {
         let parsed: PoseFile = ron::from_str(text)?;
@@ -139,11 +123,5 @@ impl PoseFile {
             });
         }
         Ok(parsed)
-    }
-}
-
-impl From<ParseFileError> for JsValue {
-    fn from(value: ParseFileError) -> Self {
-        format!("{value}").into()
     }
 }

@@ -1,11 +1,7 @@
 //! Defines the external format for defining steps, which are a combination of
 //! poses.
-//!
-//! Best practice: Don't use any of the type of this file outside of parsing
-//! logic. Instead, translate to internal types. This allows refactoring
-//! internal without changing the external formats.
 
-use crate::pose_file::ParseFileError;
+use crate::parsing::ParseFileError;
 use serde::{Deserialize, Serialize};
 
 const CURRENT_VERSION: u16 = 0;

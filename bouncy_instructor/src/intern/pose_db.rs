@@ -8,7 +8,8 @@
 
 use super::geom::SignedAngle;
 use super::pose::{Limb, LimbPosition, Pose, PoseDirection};
-use crate::pose_file::{self, ParseFileError};
+use crate::parsing::ParseFileError;
+use crate::pose_file;
 
 /// List of registered poses to recognize during tracking.
 ///
