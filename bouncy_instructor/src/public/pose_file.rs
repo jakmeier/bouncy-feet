@@ -125,6 +125,8 @@ pub enum ParseFileError {
     RonError(#[from] ron::error::SpannedError),
     #[error("unknown pose reference `{0}`")]
     UnknownPoseReference(String),
+    #[error("unknown step reference `{0}`")]
+    UnknownStepName(String),
 }
 
 impl PoseFile {

@@ -1,0 +1,15 @@
+(
+  version: 0,
+  dances: [
+    (
+      id: "Bouncy Feet Dance",
+      steps: [
+        "Polly Pocket",
+        "Running Man on Heels",
+        "Running Man on Heels",
+        "Running Man",
+        "Running Man",
+      ],
+    ),
+  ]
+)
