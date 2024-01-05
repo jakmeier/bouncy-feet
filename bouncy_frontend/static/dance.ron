@@ -2,13 +2,15 @@
   version: 0,
   dances: [
     (
+      // This is for featuring a dynamic looking dabce on the front page.
+      // It's not necessarily very danceable.
       id: "Bouncy Feet Dance",
       steps: [
         "Polly Pocket",
-        "Running Man on Heels",
-        "Running Man on Heels",
+        "T-Step",
         "Running Man",
-        "Running Man",
+        "T-Step",
+        "Running Man on Heels",
       ],
     ),
   ]

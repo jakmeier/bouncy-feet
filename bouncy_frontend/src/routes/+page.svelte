@@ -40,15 +40,16 @@
 <style>
   button {
     width: min(50vw, 250px);
-    height: min(50vw, 200px);
+    height: min(30vw, 150px);
   }
   button span {
-    font-size: min(20vw, 100px);
+    font-size: min(10vw, 100px);
   }
   button p {
     font-size: 20px;
   }
   .dancers {
     display: grid;
+    margin: 20px;
   }
 </style>

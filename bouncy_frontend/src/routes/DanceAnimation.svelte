@@ -5,7 +5,7 @@
 
   /** @type{import("$lib/instructor/bouncy_instructor").DanceInfo} */
   export let dance;
-  export let beat = counter(-1, 1, 200);
+  export let beat = counter(-6, 1, 200);
   export let animationTime = 160;
   export let size = 100;
 
