@@ -1,7 +1,9 @@
 import { addTranslations, setLocale, setRoute } from '$lib/i18n.js';
 import {
+    loadDanceString,
     loadPoseString,
     loadStepString,
+    dances,
     steps,
 } from '$lib/instructor/bouncy_instructor';
 
@@ -26,6 +28,7 @@ export const load = async ({ data }) => {
     }
 
     const allSteps = steps();
+    const allDances = dances();
     const uniqueNameSteps = [];
 
     const seenNames = new Set();
@@ -41,10 +44,12 @@ export const load = async ({ data }) => {
         translations,
         uniqueNameSteps,
         allSteps,
+        allDances,
     };
 };
 
 function loadOnce(data) {
     loadPoseString(data.poseFileString);
     loadStepString(data.stepFileString);
+    loadDanceString(data.danceFileString);
 }

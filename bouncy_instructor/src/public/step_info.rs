@@ -56,6 +56,12 @@ impl StepInfo {
     pub fn variation(&self) -> Option<String> {
         self.step_variation.clone()
     }
+
+    /// The number of beats the step takes for one repetition.
+    #[wasm_bindgen(getter)]
+    pub fn beats(&self) -> usize {
+        self.skeletons.len()
+    }
 }
 
 impl From<&Step> for StepInfo {

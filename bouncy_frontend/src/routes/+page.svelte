@@ -1,6 +1,12 @@
 <script>
   import { t } from '$lib/i18n.js';
   import { base } from '$app/paths';
+  import DanceAnimation from './DanceAnimation.svelte';
+
+  /** @type {import('./$types').PageData} */
+  export let data;
+  let featuredDance = data.allDances.length > 0 ? data.allDances[0] : null;
+  const numDancers = 3;
 </script>
 
 <h1>{$t('home.title')}</h1>
@@ -23,6 +29,14 @@
   </a>
 </div>
 
+<div class="dancers" style="grid-template-columns: repeat({numDancers}, 1fr);">
+  {#if featuredDance}
+    {#each { length: numDancers } as _}
+      <DanceAnimation dance={featuredDance} />
+    {/each}
+  {/if}
+</div>
+
 <style>
   button {
     width: min(50vw, 250px);
@@ -33,5 +47,8 @@
   }
   button p {
     font-size: 20px;
+  }
+  .dancers {
+    display: grid;
   }
 </style>

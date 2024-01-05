@@ -10,10 +10,19 @@ export function loadPoseFile(url: string): Promise<void>;
 */
 export function loadPoseString(data: string): void;
 /**
+* @param {string} data
+*/
+export function loadDanceString(data: string): void;
+/**
 * @param {string} url
 * @returns {Promise<void>}
 */
 export function loadStepFile(url: string): Promise<void>;
+/**
+* @param {string} url
+* @returns {Promise<void>}
+*/
+export function loadDanceFile(url: string): Promise<void>;
 /**
 * @param {string} data
 */
@@ -22,6 +31,10 @@ export function loadStepString(data: string): void;
 * @returns {(StepInfo)[]}
 */
 export function steps(): (StepInfo)[];
+/**
+* @returns {(DanceInfo)[]}
+*/
+export function dances(): (DanceInfo)[];
 /**
 * Coordinate for Keypoints
 *
@@ -51,6 +64,25 @@ export class Cartesian3d {
 * distance to camera
 */
   z: number;
+}
+/**
+* Information about a dance for display in the frontend.
+*/
+export class DanceInfo {
+  free(): void;
+/**
+* @param {number} beat
+* @returns {Skeleton}
+*/
+  skeleton(beat: number): Skeleton;
+/**
+* The number of beats the dance takes for one repetition.
+*/
+  readonly beats: number;
+/**
+* The unique identifier for the dance.
+*/
+  readonly id: string;
 }
 /**
 * A step detected on a video feed, ready for JS code to render.
@@ -287,6 +319,10 @@ export class StepInfo {
 * @returns {Skeleton}
 */
   rotatedSkeleton(beat: number, rotation: number): Skeleton;
+/**
+* The number of beats the step takes for one repetition.
+*/
+  readonly beats: number;
 /**
 * The unique identifier for the step.
 */

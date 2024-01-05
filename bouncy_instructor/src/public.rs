@@ -37,6 +37,12 @@ pub fn load_pose_string(data: &str) -> Result<(), JsValue> {
     Ok(())
 }
 
+#[wasm_bindgen(js_name = loadDanceString)]
+pub fn load_dance_string(data: &str) -> Result<(), JsValue> {
+    load_dance_str(data)?;
+    Ok(())
+}
+
 #[wasm_bindgen(js_name = loadStepFile)]
 pub async fn load_step_file(url: &str) -> Result<(), JsValue> {
     let text = load_text_file(url).await?;
@@ -45,7 +51,7 @@ pub async fn load_step_file(url: &str) -> Result<(), JsValue> {
 }
 
 #[wasm_bindgen(js_name = loadDanceFile)]
-pub async fn load_danc_file(url: &str) -> Result<(), JsValue> {
+pub async fn load_dance_file(url: &str) -> Result<(), JsValue> {
     let text = load_text_file(url).await?;
     load_dance_str(&text)?;
     Ok(())

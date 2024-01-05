@@ -30,11 +30,13 @@ export const load = async ({ fetch, url, cookies, request }) => {
 
     const poseFile = await fetch('/pose.ron').catch((e) => console.error(e));
     const stepFile = await fetch('/step.ron').catch((e) => console.error(e));
+    const danceFile = await fetch('/dance.ron').catch((e) => console.error(e));
 
     return {
         i18n: { locale, route: pathname },
         translations: translations.get(), // `translations` on server contain all translations loaded by different clients
         poseFileString: await poseFile.text(),
         stepFileString: await stepFile.text(),
+        danceFileString: await danceFile.text(),
     };
 };
