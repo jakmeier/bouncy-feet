@@ -8,8 +8,7 @@
         "description1": "Place your phone so that the camera can see your whole body while you dance. Then record your dance session, and the app will try to detect the steps.",
         "description2": "This is an early, pre-alpha version of Bouncy Feet. The content is very limited and unpolished. If you run into issues with the app, please open an issue on GitHub.",
         "go-button": "Let's Go",
-        "nav": "Home",
-        "steps": "Steps"
+        "nav": "Home"
     },
     "leaderboard": {
         "user-header": "Dancer",
@@ -18,6 +17,9 @@
     "learn": {
         "title": "Library",
         "nav": "Learn",
+        "dances-subtitle": "Dances",
+        "steps-subtitle": "Steps",
+        "new-dance-button": "Create New",
         "step": {
             "rotation": "Rotate (experimental)",
             "speed": "Speed [bpm]",

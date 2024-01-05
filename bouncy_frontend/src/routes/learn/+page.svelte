@@ -1,6 +1,8 @@
 <script>
   import { t } from '$lib/i18n.js';
   import { counter } from '$lib/timer';
+  import DanceAnimation from '../DanceAnimation.svelte';
+  import Area from '../record/Area.svelte';
   import Step from './Step.svelte';
 
   /** @type {import('./$types').PageData} */
@@ -12,11 +14,32 @@
   const animationTime = stepTime * 0.85;
 
   const i = counter(-1, 1, stepTime);
+  const danceSize = '150px';
+  const borderRadius = '25px';
 </script>
 
 <h1>{$t('learn.title')}</h1>
 
-<h2>{$t('home.steps')}</h2>
+<h2>{$t('learn.dances-subtitle')}</h2>
+<div class="dance-table">
+  {#each data.allDances as dance}
+    <div>
+      <Area width={danceSize} height={danceSize} {borderRadius}>
+        <DanceAnimation {dance} />
+      </Area>
+      <!-- TODO: id to translated name -->
+      <h3>{dance.id}</h3>
+    </div>
+  {/each}
+  <div>
+    <Area width={danceSize} height={danceSize} {borderRadius}>
+      <span class="material-symbols-outlined add-button"> add_circle </span>
+      {$t('learn.new-dance-button')}
+    </Area>
+  </div>
+</div>
+
+<h2>{$t('learn.steps-subtitle')}</h2>
 <div class="step-table">
   {#each data.uniqueNameSteps as step}
     {#if !step.name.includes('Idle')}
@@ -30,14 +53,24 @@
 </div>
 
 <style>
-  .step-table {
+  .step-table,
+  .dance-table {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
     text-align: center;
     gap: 20px 0px;
+  }
+  .step-table {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+  .dance-table {
+    grid-template-columns: 1fr 1fr;
   }
 
   a {
     color: var(--theme-neutral-dark);
+  }
+
+  .add-button {
+    font-size: 100px;
   }
 </style>

@@ -1,9 +1,13 @@
 <script>
   export let width = '250px';
   export let height = '250px';
+  export let borderRadius = '100px';
 </script>
 
-<div class="area" style="height: {height}; width: {width};">
+<div
+  class="area"
+  style="height: {height}; width: {width}; border-radius: {borderRadius};"
+>
   <slot />
 </div>
 
@@ -14,7 +18,6 @@
     justify-items: center;
     margin: 5px auto;
     border: 5px var(--theme-neutral-dark) solid;
-    border-radius: 100px;
     overflow: hidden;
   }
 </style>

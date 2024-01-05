@@ -8,8 +8,7 @@
         "description1": "Platziere dein Telefon so, dass die Kamera deinen ganzen Körper beim Tanzen sieht. Dann tanzt du Freestyle und die App versucht die Schritte zu erkennen.",
         "description2": "Diese Version von Bouncy Feet ist ein Prototyp. Die Inhalte sind sehr begrenzt und noch nicht wirklich ausgereift. Falls du Probleme mit der App hast, öffne bitte ein Issue auf GitHub.",
         "go-button": "Los gehts",
-        "nav": "Home",
-        "steps": "Schritte"
+        "nav": "Home"
     },
     "leaderboard": {
         "user-header": "Tänzer/in",
@@ -18,6 +17,9 @@
     "learn": {
         "title": "Bibliothek",
         "nav": "Lernen",
+        "dances-subtitle": "Tänze",
+        "steps-subtitle": "Schritte",
+        "new-dance-button": "Neuer Tanz",
         "step": {
             "rotation": "Drehen (experimentell)",
             "speed": "Tempo [BPM]",
