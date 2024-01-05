@@ -1,7 +1,7 @@
 <script>
   import { t } from '$lib/i18n.js';
+  import { counter } from '$lib/timer';
   import Step from './Step.svelte';
-  import { readable } from 'svelte/store';
 
   /** @type {import('./$types').PageData} */
   export let data;
@@ -11,13 +11,7 @@
   // it clearer. If the difference is too much, it looks robotic.
   const animationTime = stepTime * 0.85;
 
-  const i = readable(-1, (set) => {
-    const handle = setInterval(() => {
-      set($i + 1);
-    }, stepTime);
-
-    return () => clearInterval(handle);
-  });
+  const i = counter(-1, 1, stepTime);
 </script>
 
 <h1>{$t('learn.title')}</h1>

@@ -1,10 +1,10 @@
 <script>
   import { page } from '$app/stores';
-  import { readable } from 'svelte/store';
   import { t } from '$lib/i18n.js';
   import Step from '../Step.svelte';
   import BackButton from '$lib/BackButton.svelte';
   import Select from 'svelte-select';
+  import { dynamicCounter } from '$lib/timer';
 
   /** @type {import('./$types').PageData} */
   export let data;
@@ -20,19 +20,8 @@
   $: stepTime = 60_000 / bpm;
   $: animationTime = stepTime * 0.85;
 
-  // A chain of `setTimeout` calls which uses live values of `stepTime` for the
-  // delay. The `fuse` variable holds the handle of the currently outstanding
-  // `setTimeout` call, which is canceled when the store is destroyed.
-  let fuse;
-  const a = readable({ i: 0, bpm }, (set) => {
-    const foo = () =>
-      setTimeout(() => {
-        set({ i: $a.i + 1, bpm });
-        foo();
-      }, stepTime);
-    fuse = foo();
-    return () => clearTimeout(fuse);
-  });
+  const beatCounter = dynamicCounter(-1, 1, stepTime);
+  $: beatCounter.setDelay(stepTime);
 
   let selected = selectItems[0];
 </script>
@@ -43,7 +32,7 @@
 
 <Step
   step={selected.value}
-  poseIndex={$a.i}
+  poseIndex={$beatCounter}
   {animationTime}
   size={200}
   rotation={degree}
