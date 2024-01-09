@@ -29,7 +29,7 @@ input {
 }
 
 a {
-    color: var(--theme-accent);
+    color: var(--theme-neutral-dark);
     font-weight: 900;
 }
 

@@ -5,6 +5,7 @@ export function cartesian3d_new(a: number, b: number, c: number): number;
 export function danceinfo_beats(a: number): number;
 export function danceinfo_id(a: number, b: number): void;
 export function danceinfo_skeleton(a: number, b: number): number;
+export function danceinfo_steps(a: number, b: number): void;
 export function dances(a: number): void;
 export function detectedstep_name(a: number, b: number): void;
 export function detectedstep_poses(a: number, b: number): void;

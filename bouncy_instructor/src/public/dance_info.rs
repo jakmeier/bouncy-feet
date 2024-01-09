@@ -21,6 +21,10 @@ impl DanceInfo {
         self.id.clone()
     }
 
+    pub fn steps(&self) -> Vec<StepInfo> {
+        self.steps.clone()
+    }
+
     pub fn skeleton(&self, beat: usize) -> Skeleton {
         debug_assert!(self.steps.len() > 0 && self.total_beats > 0);
         let mut offset = beat % self.total_beats;

@@ -71,6 +71,10 @@ export class Cartesian3d {
 export class DanceInfo {
   free(): void;
 /**
+* @returns {(StepInfo)[]}
+*/
+  steps(): (StepInfo)[];
+/**
 * @param {number} beat
 * @returns {Skeleton}
 */

@@ -68,10 +68,6 @@
     grid-template-columns: 1fr 1fr;
   }
 
-  a {
-    color: var(--theme-neutral-dark);
-  }
-
   .add-button {
     font-size: 100px;
   }

@@ -5,7 +5,7 @@ use crate::STATE;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 /// Information about a step for display in the frontend.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 #[wasm_bindgen]
 pub struct StepInfo {
     id: String,
