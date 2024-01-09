@@ -45,7 +45,7 @@
 <div class="step-table">
   {#each data.uniqueNameSteps as step}
     {#if !step.name.includes('Idle')}
-      <a href={`./pose/${step.name}`}>
+      <a href={`./step/${step.name}`}>
         <Step {step} poseIndex={$i} {animationTime} />
         <!-- TODO: translations -->
         <h3>{step.name}</h3>
