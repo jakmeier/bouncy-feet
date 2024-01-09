@@ -2,7 +2,7 @@
   import { page } from '$app/stores';
   import { t } from '$lib/i18n.js';
   import Step from '../../Step.svelte';
-  import BackButton from '$lib/BackButton.svelte';
+  import Header from '$lib/Header.svelte';
   import Select from 'svelte-select';
   import { dynamicCounter } from '$lib/timer';
 
@@ -26,9 +26,7 @@
   let selected = selectItems[0];
 </script>
 
-<BackButton />
-
-<h1>{name}</h1>
+<Header title={name} />
 
 <Step
   step={selected.value}

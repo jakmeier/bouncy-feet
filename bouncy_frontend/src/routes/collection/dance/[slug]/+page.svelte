@@ -1,7 +1,7 @@
 <script>
   import { page } from '$app/stores';
   import { t } from '$lib/i18n.js';
-  import BackButton from '$lib/BackButton.svelte';
+  import Header from '$lib/Header.svelte';
   import DanceAnimation from '../../../DanceAnimation.svelte';
   import Step from '../../Step.svelte';
   import { dynamicCounter, counter } from '$lib/timer';
@@ -21,10 +21,8 @@
   const beatCounter = counter(-1, 1, stepTime);
 </script>
 
-<BackButton />
-
 <!-- TODO: translate -->
-<h1>{id}</h1>
+<Header title={id} />
 
 <div class="page">
   <div
@@ -52,9 +50,6 @@
 </div>
 
 <style>
-  h1 {
-    text-align: center;
-  }
   .page {
     overflow: hidden;
   }
