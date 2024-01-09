@@ -1,7 +1,7 @@
 <script>
   import { page } from '$app/stores';
   import { t } from '$lib/i18n.js';
-  import Step from '../Step.svelte';
+  import Step from '../../Step.svelte';
   import BackButton from '$lib/BackButton.svelte';
   import Select from 'svelte-select';
   import { dynamicCounter } from '$lib/timer';
@@ -39,13 +39,13 @@
 />
 
 <label>
-  {$t('learn.step.speed')}
+  {$t('collection.step.speed')}
   <input type="number" bind:value={bpm} min="30" max="300" class="number" />
   <input type="range" bind:value={bpm} min="30" max="300" class="range" />
 </label>
 
 <label>
-  {$t('learn.step.rotation')}
+  {$t('collection.step.rotation')}
   <input
     type="number"
     bind:value={degree}
@@ -58,7 +58,7 @@
 
 {#if selectItems.length > 1}
   <div class="label">
-    {$t('learn.step.variation')}
+    {$t('collection.step.variation')}
     <Select
       bind:value={selected}
       items={selectItems}

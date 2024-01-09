@@ -14,9 +14,9 @@
         "user-header": "Tänzer/in",
         "steps-header": "Schritte"
     },
-    "learn": {
-        "title": "Bibliothek",
-        "nav": "Lernen",
+    "collection": {
+        "title": "Sammlung",
+        "nav": "Sammlung",
         "dances-subtitle": "Tänze",
         "steps-subtitle": "Schritte",
         "new-dance-button": "Neuer Tanz",

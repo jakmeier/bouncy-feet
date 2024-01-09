@@ -14,9 +14,9 @@
         "user-header": "Dancer",
         "steps-header": "Steps"
     },
-    "learn": {
-        "title": "Library",
-        "nav": "Learn",
+    "collection": {
+        "title": "Collection",
+        "nav": "Collection",
         "dances-subtitle": "Dances",
         "steps-subtitle": "Steps",
         "new-dance-button": "Create New",

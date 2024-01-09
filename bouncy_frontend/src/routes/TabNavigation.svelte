@@ -18,7 +18,7 @@
       icon: 'account_circle',
       route: `${base}/profile`,
     },
-    { label: $t('learn.nav'), icon: 'book_5', route: `${base}/learn` },
+    { label: $t('collection.nav'), icon: 'book_5', route: `${base}/collection` },
   ];
   if (dev) {
     tabs.push({ label: 'Dev', icon: 'code', route: `${base}/dev` });
