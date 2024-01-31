@@ -29,6 +29,7 @@
     "record": {
         "title": "Dance",
         "description": "Bring your own music and then record yourself while dancing.",
+        "description1": "The video is evaluated locally on your device. It never leaves your device.",
         "nav": "Record",
         "start-button": "start",
         "record-button": "record video",
@@ -39,7 +40,8 @@
         "settings": {
             "title": "Settings",
             "description": "How fast will you dance?",
-            "bpm": "BPM (approximately)",
+            "bpm-unit": "BPM",
+            "bpm-setting": "BPM (approximately)",
             "double-speed": "Also dance to the offbeat (double speed)"
         }
     },

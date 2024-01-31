@@ -3,26 +3,53 @@
 
   /** @type {import("$lib/instructor/bouncy_instructor").Tracker} */
   export let tracker;
+  export let expand = false;
 
   let bpm = 120;
   let double = false;
 
   $: tracker.setBpm(bpm * (double ? 2 : 1));
+
+  function expandSettings(event) {
+    if (
+      event.type === 'click' ||
+      (event.type === 'keydown' && (event.key === 'Enter' || event.key === ' '))
+    ) {
+      expand = !expand;
+    }
+  }
 </script>
 
-<h2>{$t('record.settings.title')}</h2>
-<p>{$t('record.settings.description')}</p>
+<h2>
+  {$t('record.settings.title')}:
+  {bpm}
+  {$t('record.settings.bpm-unit')}
+  <span
+    class="material-symbols-outlined"
+    role="button"
+    tabindex="0"
+    on:click={expandSettings}
+    on:keydown={expandSettings}
+    aria-expanded={expand}
+  >
+    edit
+  </span>
+</h2>
 
-<label>
-  <input type="number" bind:value={bpm} min="60" max="180" class="number" />
-  <input type="range" bind:value={bpm} min="60" max="180" class="range"/>
-  {$t('record.settings.bpm')}
-</label>
+{#if expand}
+  <p>{$t('record.settings.description')}</p>
 
-<label>
-  <input type="checkbox" bind:checked={double} />
-  {$t('record.settings.double-speed')}
-</label>
+  <label>
+    <input type="number" bind:value={bpm} min="60" max="180" class="number" />
+    <input type="range" bind:value={bpm} min="60" max="180" class="range" />
+    {$t('record.settings.bpm-setting')}
+  </label>
+
+  <label>
+    <input type="checkbox" bind:checked={double} />
+    {$t('record.settings.double-speed')}
+  </label>
+{/if}
 
 <style>
   label {
@@ -35,10 +62,10 @@
     padding: 0.5em;
   }
   .number {
-    width: min(60px,20vw);
+    width: min(60px, 20vw);
   }
   .range {
-    width: min(200px,30vw);
+    width: min(200px, 30vw);
   }
   input[type='checkbox'] {
     width: 2em;

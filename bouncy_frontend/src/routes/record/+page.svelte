@@ -175,6 +175,7 @@
   {#if !showCamera}
     <h1>{$t('record.title')}</h1>
     <p>{$t('record.description')}</p>
+    <p>{$t('record.description1')}</p>
     <div style="margin: 30px 0px">
       <Settings {tracker}></Settings>
     </div>

@@ -29,6 +29,7 @@
     "record": {
         "title": "Tanzen",
         "description": "Bring deine eigene Musik und filme dich beim Tanzen.",
+        "description1": "Das Video wird lokal auf deinem Gerät ausgewertet. Das Video verlässt dein Gerät nicht.",
         "nav": "Aufnehmen",
         "start-button": "Starten",
         "record-button": "Video aufnehmen",
@@ -39,7 +40,8 @@
         "settings": {
             "title": "Einstellungen",
             "description": "Wie schnell wirst du tanzen?",
-            "bpm": "BPM (ungefähr)",
+            "bpm-unit": "BPM",
+            "bpm-setting": "BPM (ungefähr)",
             "double-speed": "Auch auf den Off-Beat tanzen (doppelte Geschwindigkeit)"
         }
     },
