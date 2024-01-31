@@ -52,6 +52,9 @@
 {/if}
 
 <style>
+  h2 {
+    text-align: center;
+  }
   label {
     display: flex;
     gap: 0.5rem;
