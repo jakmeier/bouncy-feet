@@ -36,6 +36,7 @@ impl Angle3d {
     }
 
     /// Distance in a sphere with r = 0.5, result is in [0.0,1.0]
+    #[allow(dead_code)]
     pub(crate) fn distance(&self, other: &Self) -> f32 {
         let a = self.polar.sin() * other.polar.sin() * (self.azimuth - other.azimuth).cos();
         let b = self.polar.cos() * other.polar.cos();

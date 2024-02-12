@@ -37,14 +37,14 @@ impl SignedAngle {
     /// Important: Don't delete this function, or else `angle.to_radians()` will
     /// still compile with an auto deref but do an extra conversion.
     #[allow(dead_code)]
-    pub(crate) fn to_radians(&self) -> f32 {
+    pub(crate) fn to_radians(self) -> f32 {
         self.as_radians()
     }
 
     /// Returns a copy of the angle where values are guaranteed to be in (-PI and PI]
     #[inline]
     fn ensure_signed(mut self) -> Self {
-        self.0 = self.0 % TAU;
+        self.0 %= TAU;
         // maybe branching here is bad for performance?
         // no performance testing was done so far
         if self.0 > PI {

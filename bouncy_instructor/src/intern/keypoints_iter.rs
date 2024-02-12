@@ -4,9 +4,10 @@ use crate::Keypoints;
 impl Keypoints {
     #[allow(dead_code)]
     pub(crate) fn iter(&self) -> KeypointsIter {
-        KeypointsIter { i: 0, kp: &self }
+        KeypointsIter { i: 0, kp: self }
     }
-
+    
+    #[allow(dead_code)]
     pub(crate) fn iter_mut(&mut self) -> KeypointsIterMut {
         // note: It would be nice to avoid extra allocations but it's not that
         // easy to avoid shared &mut. Best I can think of is

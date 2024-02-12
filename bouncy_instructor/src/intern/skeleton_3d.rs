@@ -148,6 +148,7 @@ impl Skeleton3d {
     }
 }
 
+#[allow(clippy::manual_range_contains)]
 impl Direction {
     pub(crate) fn from_shoulder(shoulder_angle: SignedAngle) -> Self {
         match shoulder_angle.to_degrees() {

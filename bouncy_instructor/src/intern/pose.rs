@@ -102,7 +102,7 @@ impl Pose {
 }
 
 impl Limb {
-    pub(crate) fn to_angle(&self, kp: &Keypoints) -> Angle3d {
+    pub(crate) fn to_angle(self, kp: &Keypoints) -> Angle3d {
         let start = self.start.keypoint(kp);
         let end = self.end.keypoint(kp);
         Angle3d {

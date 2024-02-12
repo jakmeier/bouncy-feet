@@ -68,7 +68,7 @@ impl Tracker {
                 start_t = *self.timestamps.get(start).unwrap_or(&u32::MAX);
             } else {
                 // couldn't even match a pose, shift search window by one window length
-                start_t = start_t + pose_window_ms;
+                start_t += pose_window_ms;
                 // recover i0 and i1, plus:
                 // start_t just increased
                 // => timestamps[start] < start_t

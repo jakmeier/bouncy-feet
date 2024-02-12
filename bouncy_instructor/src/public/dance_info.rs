@@ -48,7 +48,7 @@ impl DanceInfo {
     }
 
     pub fn skeleton(&self, beat: usize) -> Skeleton {
-        debug_assert!(self.steps.len() > 0 && self.total_beats > 0);
+        debug_assert!(!self.steps.is_empty() && self.total_beats > 0);
         let mut offset = beat % self.total_beats;
 
         for step in &self.steps {

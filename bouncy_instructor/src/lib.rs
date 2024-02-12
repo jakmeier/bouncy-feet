@@ -80,7 +80,7 @@ impl State {
             if let Some(missing) = def
                 .steps
                 .iter()
-                .find(|step_name| self.steps_by_name(&step_name).next().is_none())
+                .find(|step_name| self.steps_by_name(step_name).next().is_none())
             {
                 return Err(AddDanceError::MissingStep(missing.clone()));
             }

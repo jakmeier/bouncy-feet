@@ -2,7 +2,6 @@ mod frame_output;
 mod pose_output;
 mod step_output;
 
-pub use frame_output::ExportedFrame;
 pub use pose_output::PoseApproximation;
 pub use step_output::DetectedStep;
 
@@ -120,10 +119,8 @@ impl Tracker {
     #[wasm_bindgen(js_name = skeletonAt)]
     pub fn skeleton_at(&self, timestamp: Timestamp) -> Option<Skeleton> {
         let i = self.timestamps.partition_point(|t| *t < timestamp);
-        if let Some(skeleton_info) = &self.skeletons.get(i) {
-            Some(skeleton_info.to_skeleton(0.0))
-        } else {
-            None
-        }
+        self.skeletons
+            .get(i)
+            .map(|skeleton_info| skeleton_info.to_skeleton(0.0))
     }
 }

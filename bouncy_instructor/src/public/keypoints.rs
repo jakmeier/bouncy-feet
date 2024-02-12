@@ -59,6 +59,7 @@ impl Keypoints {
 
 #[wasm_bindgen(js_class = KeypointsSide)]
 impl Side {
+    #[allow(clippy::too_many_arguments)]
     #[wasm_bindgen(constructor)]
     pub fn new(
         shoulder: Cartesian3d,

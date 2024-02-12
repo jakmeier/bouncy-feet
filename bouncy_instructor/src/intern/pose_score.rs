@@ -56,7 +56,7 @@ pub(crate) fn best_fit_pose(skeleton: &Skeleton3d, poses: &[Pose]) -> (f32, Erro
             best_details = details;
         }
     }
-    return (best_error, best_details, best_i);
+    (best_error, best_details, best_i)
 }
 
 impl AngleTarget {
@@ -115,11 +115,11 @@ impl Pose {
             errors.push(limb.target.target_error(angle));
             weights.push(limb.weight());
         }
-        return ErrorDetails {
+        ErrorDetails {
             limbs,
             errors,
             weights,
-        };
+        }
     }
 }
 

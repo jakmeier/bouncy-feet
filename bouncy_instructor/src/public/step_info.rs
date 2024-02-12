@@ -30,14 +30,14 @@ impl StepInfo {
     }
 
     pub fn skeleton(&self, beat: usize) -> Skeleton {
-        debug_assert!(self.skeletons.len() > 0);
+        debug_assert!(!self.skeletons.is_empty());
         self.skeletons[beat % self.skeletons.len()]
     }
 
     /// Applies a rotation (in degree) and returns the resulting skelton.
     #[wasm_bindgen(js_name = "rotatedSkeleton")]
     pub fn rotated_skeleton(&self, beat: usize, rotation: f32) -> Skeleton {
-        debug_assert!(self.skeletons.len() > 0);
+        debug_assert!(!self.skeletons.is_empty());
         STATE.with_borrow(|state| {
             let step = state.step(&self.id).expect("missing step");
             let pose_index = step.poses[beat % step.poses.len()];

@@ -66,7 +66,7 @@ impl Tracker {
                     continue;
                 }
 
-                let details = pose.error(&skeleton.angles());
+                let details = pose.error(skeleton.angles());
                 let error = details.error_score();
                 if error < best_error {
                     best_error = error;
@@ -115,7 +115,7 @@ impl Tracker {
                 .iter()
                 .enumerate()
                 .map(|(pose_index, pose)| {
-                    let details = pose.error(&angles);
+                    let details = pose.error(angles);
                     PoseApproximation {
                         name: state.db.pose_name(pose_index).to_owned(),
                         error: details.error_score(),

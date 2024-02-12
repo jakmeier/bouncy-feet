@@ -74,25 +74,25 @@ pub fn dances() -> Vec<DanceInfo> {
 }
 
 pub fn load_pose_str(text: &str) -> Result<(), ParseFileError> {
-    let parsed = PoseFile::from_str(&text)?;
+    let parsed = PoseFile::from_str(text)?;
     STATE.with(|state| state.borrow_mut().add_poses(parsed.poses))?;
     Ok(())
 }
 
 pub fn load_step_str(text: &str) -> Result<(), ParseFileError> {
-    let parsed = StepFile::from_str(&text)?;
+    let parsed = StepFile::from_str(text)?;
     STATE.with(|state| state.borrow_mut().add_steps(&parsed.steps))?;
     Ok(())
 }
 
 pub fn load_dance_str(text: &str) -> Result<(), ParseFileError> {
-    let parsed = DanceFile::from_str(&text)?;
+    let parsed = DanceFile::from_str(text)?;
     STATE.with(|state| state.borrow_mut().add_dances(parsed.dances))?;
     Ok(())
 }
 
 async fn load_text_file(url: &str) -> Result<String, JsValue> {
-    let request = Request::new_with_str(&url)?;
+    let request = Request::new_with_str(url)?;
 
     let window = web_sys::window().unwrap();
     let resp_value = JsFuture::from(window.fetch_with_request(&request)).await?;
