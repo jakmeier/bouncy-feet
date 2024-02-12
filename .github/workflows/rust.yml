@@ -16,6 +16,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Run Clippy
+      working-directory: ./bouncy_instructor
+      run: cargo clippy --all-targets --all-features
     - name: Build
       working-directory: ./bouncy_instructor
       run: cargo build --verbose
