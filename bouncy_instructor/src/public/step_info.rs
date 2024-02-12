@@ -62,6 +62,13 @@ impl StepInfo {
     pub fn beats(&self) -> usize {
         self.skeletons.len()
     }
+
+    // Cursed: Sometimes I need to initiate a Rust clone from within JS to avoid
+    // use-after-free.
+    #[wasm_bindgen(js_name = "rustClone")]
+    pub fn rust_clone(&self) -> Self {
+        self.clone()
+    }
 }
 
 impl From<&Step> for StepInfo {

@@ -71,6 +71,12 @@ export class Cartesian3d {
 export class DanceInfo {
   free(): void;
 /**
+* Create a new dance info object, without registering it.
+* @param {string} id
+* @param {(StepInfo)[]} steps
+*/
+  constructor(id: string, steps: (StepInfo)[]);
+/**
 * @returns {(StepInfo)[]}
 */
   steps(): (StepInfo)[];
@@ -324,6 +330,10 @@ export class StepInfo {
 */
   rotatedSkeleton(beat: number, rotation: number): Skeleton;
 /**
+* @returns {StepInfo}
+*/
+  rustClone(): StepInfo;
+/**
 * The number of beats the step takes for one repetition.
 */
   readonly beats: number;
@@ -350,6 +360,11 @@ export class StepInfo {
 */
 export class Tracker {
   free(): void;
+/**
+* @param {number} timestamp
+* @returns {ExportedFrame}
+*/
+  exportFrame(timestamp: number): ExportedFrame;
 /**
 */
   constructor();
@@ -394,9 +409,4 @@ export class Tracker {
 * @returns {Skeleton | undefined}
 */
   skeletonAt(timestamp: number): Skeleton | undefined;
-/**
-* @param {number} timestamp
-* @returns {ExportedFrame}
-*/
-  exportFrame(timestamp: number): ExportedFrame;
 }

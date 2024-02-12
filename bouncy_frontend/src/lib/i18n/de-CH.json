@@ -24,7 +24,13 @@
             "rotation": "Drehen (experimentell)",
             "speed": "Tempo [BPM]",
             "variation": "Variation"
+        },
+        "new-dance": {
+            "default-dance-name": "Mein Tanz"
         }
+    },
+    "editor": {
+        "pick-step-instruction": "Wähle einen Schritt"
     },
     "record": {
         "title": "Tanzen",

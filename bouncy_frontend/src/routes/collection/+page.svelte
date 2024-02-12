@@ -34,10 +34,12 @@
     </div>
   {/each}
   <div>
-    <Area width={danceSize} height={danceSize} {borderRadius}>
-      <span class="material-symbols-outlined add-button"> add_circle </span>
-      {$t('collection.new-dance-button')}
-    </Area>
+    <a href={`./dance/new`} class="no-line-link">
+      <Area width={danceSize} height={danceSize} {borderRadius}>
+        <span class="material-symbols-outlined add-button"> add_circle </span>
+        {$t('collection.new-dance-button')}
+      </Area>
+    </a>
   </div>
 </div>
 
@@ -70,5 +72,8 @@
 
   .add-button {
     font-size: 100px;
+  }
+  .no-line-link {
+    text-decoration: none;
   }
 </style>
