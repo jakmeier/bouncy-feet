@@ -272,7 +272,7 @@ mod tests {
         println!("{dance:?}");
         let step_names = dance.into_iter().map(|d| d.step_name).collect::<Vec<_>>();
         let expected_steps = expected_steps
-            .into_iter()
+            .iter()
             .map(|s| s.to_owned())
             .collect::<Vec<_>>();
         assert_eq!(expected_steps, step_names);

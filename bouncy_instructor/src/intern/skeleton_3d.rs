@@ -235,7 +235,7 @@ mod tests {
     ///    | |
     ///   _| |_
     fn straight_standing_keypoints() -> Keypoints {
-        let kp = Keypoints {
+        Keypoints {
             left: crate::keypoints::Side {
                 shoulder: Cartesian3d::new(6.0, 1.0, 1.0),
                 hip: Cartesian3d::new(5.0, 3.0, 1.0),
@@ -256,7 +256,6 @@ mod tests {
                 elbow: Cartesian3d::new(1.0, 2.0, 1.0),
                 wrist: Cartesian3d::new(0.0, 3.0, 1.0),
             },
-        };
-        kp
+        }
     }
 }

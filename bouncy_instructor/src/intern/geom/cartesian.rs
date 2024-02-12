@@ -132,7 +132,7 @@ mod tests {
     use crate::intern::geom::Angle3d;
     use crate::test_utils::{assert_angle_eq, assert_cartesian_eq};
 
-    const SQRT_3: f32 = 1.7320508075688772935;
+    const SQRT_3: f32 = 1.732_050_8;
 
     #[test]
     fn test_cartesian_to_angle() {

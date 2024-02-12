@@ -285,7 +285,7 @@ mod tests {
     #[track_caller]
     fn check_score_fixed_pose(skeleton: &[SignedAngle], expect: expect_test::Expect) {
         let pose = fixed_pose(5.0);
-        let error = pose.error(&skeleton).error_score();
+        let error = pose.error(skeleton).error_score();
         expect.assert_eq(&error.to_string());
     }
 

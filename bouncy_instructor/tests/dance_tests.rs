@@ -15,7 +15,7 @@ fn test_unique_dance_id() {
     }
 
     assert!(
-        unique_ids.len() > 0,
+        !unique_ids.is_empty(),
         "No static dances found after loading."
     );
     assert!(
