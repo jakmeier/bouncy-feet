@@ -72,6 +72,17 @@ export class DanceInfo {
   free(): void;
 /**
 * Create a new dance info object, without registering it.
+*
+* Cursed: Calling this constructor leaves the values inside the input list wasm-nulled out.
+* 
+* Let's say we pass in `[new StepInfo(), new SteInfo()]`. After calling
+* this, it will look like
+* `[Object { __wbg_ptr: 0 }, Object { __wbg_ptr: 0 }]`.
+* The Rust values have been moved out of the JS array into a Rust Vec.
+* 
+* At this point, checking the values inside the array for null in JS will
+* correctly show that these are not null. But any further calls to Rust
+* methods will result in "Error: null pointer passed to rust".
 * @param {string} id
 * @param {(StepInfo)[]} steps
 */
