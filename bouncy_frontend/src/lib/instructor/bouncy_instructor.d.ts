@@ -66,6 +66,37 @@ export class Cartesian3d {
   z: number;
 }
 /**
+*/
+export class DanceBuilder {
+  free(): void;
+/**
+* @param {string} id
+* @returns {DanceBuilder}
+*/
+  static new(id: string): DanceBuilder;
+/**
+* @param {string} step_id
+*/
+  addStep(step_id: string): void;
+}
+/**
+*/
+export class DanceFileBuilder {
+  free(): void;
+/**
+* @returns {DanceFileBuilder}
+*/
+  static new(): DanceFileBuilder;
+/**
+* @param {DanceBuilder} dance_builder
+*/
+  addDance(dance_builder: DanceBuilder): void;
+/**
+* @returns {string}
+*/
+  build(): string;
+}
+/**
 * Information about a dance for display in the frontend.
 */
 export class DanceInfo {
@@ -74,12 +105,12 @@ export class DanceInfo {
 * Create a new dance info object, without registering it.
 *
 * Cursed: Calling this constructor leaves the values inside the input list wasm-nulled out.
-* 
+*
 * Let's say we pass in `[new StepInfo(), new SteInfo()]`. After calling
 * this, it will look like
 * `[Object { __wbg_ptr: 0 }, Object { __wbg_ptr: 0 }]`.
 * The Rust values have been moved out of the JS array into a Rust Vec.
-* 
+*
 * At this point, checking the values inside the array for null in JS will
 * correctly show that these are not null. But any further calls to Rust
 * methods will result in "Error: null pointer passed to rust".

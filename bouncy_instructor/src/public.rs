@@ -1,6 +1,7 @@
 //! Wrapper module for all types and methods that are exported by the WASM
 //! module.
 pub(crate) mod dance_info;
+pub(crate) mod editor;
 pub(crate) mod keypoints;
 pub(crate) mod parsing;
 pub(crate) mod skeleton;

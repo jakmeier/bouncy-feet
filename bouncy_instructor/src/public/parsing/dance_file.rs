@@ -4,10 +4,10 @@
 use crate::parsing::ParseFileError;
 use serde::{Deserialize, Serialize};
 
-const CURRENT_VERSION: u16 = 0;
+pub(crate) const CURRENT_VERSION: u16 = 0;
 
 /// Format for dance definition files.
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub(crate) struct DanceFile {
     pub version: u16,
     pub dances: Vec<Dance>,
