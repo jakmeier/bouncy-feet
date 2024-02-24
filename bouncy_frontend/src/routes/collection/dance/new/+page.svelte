@@ -4,9 +4,10 @@
   import DanceAnimation from '../../../DanceAnimation.svelte';
   import Step from '../../Step.svelte';
   import { counter } from '$lib/timer';
-  import { DanceInfo } from '$lib/instructor/bouncy_instructor';
+  import { DanceBuilder, DanceInfo } from '$lib/instructor/bouncy_instructor';
   import Area from '../../../record/Area.svelte';
   import SelectStep from './SelectStep.svelte';
+  // import { getContext } from 'svelte';
 
   /** @type {import('./$types').PageData} */
   export let data;
@@ -19,10 +20,13 @@
   const borderRadius = '25px';
 
   const beatCounter = counter(-1, 1, stepTime);
+  // const localCollection = getContext('localCollection');
+  // const localDances = localCollection.dances;
 
   let id = $t('collection.new-dance.default-dance-name');
-  /** @type {DanceInfo | null} */
-  let dance = null;
+  /** @type {DanceBuilder} */
+  let danceBuilder = new DanceBuilder('tempPreviewDance');
+  $: dancePreview = danceBuilder.danceInfo();
   /**
    * @type {import('$lib/instructor/bouncy_instructor').StepInfo[]}
    */
@@ -37,29 +41,28 @@
     }
 
     steps.push(stepInfo);
-    preview();
+    danceBuilder.addStep(stepInfo.id);
+    // trigger reload in ui (can I do better?)
+    danceBuilder = danceBuilder;
+
     return true;
   }
 
-  function preview() {
-    if (steps.length > 0) {
-      // cursed: need to rust-clone `StepInfo`s before they are moved in a
-      // vector, which leaves the original values nulled out.
-      const stepsClone = steps.map((s) => s.rustClone());
-      dance = new DanceInfo('tempDance', stepsClone);
-    }
+  function save() {
+    // TODO
+    // $localDances = [...$localDances, danceBuilder];
   }
 </script>
 
-<Header title={id} />
+<Header title={id} button="save" on:click={save} />
 
 <div class="page">
   <div
     class="dance"
     style="max-width: {danceSize}px; max-height: {danceSize}px"
   >
-    {#if dance !== null}
-      <DanceAnimation {dance} />
+    {#if dancePreview.length() > 0}
+      <DanceAnimation dance={dancePreview} />
     {/if}
   </div>
 

@@ -71,13 +71,27 @@ export class DanceBuilder {
   free(): void;
 /**
 * @param {string} id
-* @returns {DanceBuilder}
 */
-  static new(id: string): DanceBuilder;
+  constructor(id: string);
+/**
+* @returns {number}
+*/
+  length(): number;
 /**
 * @param {string} step_id
 */
   addStep(step_id: string): void;
+/**
+* @param {string} id
+*/
+  set_id(id: string): void;
+/**
+*/
+  clear(): void;
+/**
+* @returns {DanceInfo}
+*/
+  danceInfo(): DanceInfo;
 }
 /**
 */
@@ -102,31 +116,18 @@ export class DanceFileBuilder {
 export class DanceInfo {
   free(): void;
 /**
-* Create a new dance info object, without registering it.
-*
-* Cursed: Calling this constructor leaves the values inside the input list wasm-nulled out.
-*
-* Let's say we pass in `[new StepInfo(), new SteInfo()]`. After calling
-* this, it will look like
-* `[Object { __wbg_ptr: 0 }, Object { __wbg_ptr: 0 }]`.
-* The Rust values have been moved out of the JS array into a Rust Vec.
-*
-* At this point, checking the values inside the array for null in JS will
-* correctly show that these are not null. But any further calls to Rust
-* methods will result in "Error: null pointer passed to rust".
-* @param {string} id
-* @param {(StepInfo)[]} steps
+* @returns {number}
 */
-  constructor(id: string, steps: (StepInfo)[]);
+  length(): number;
 /**
 * @returns {(StepInfo)[]}
 */
   steps(): (StepInfo)[];
 /**
 * @param {number} beat
-* @returns {Skeleton}
+* @returns {Skeleton | undefined}
 */
-  skeleton(beat: number): Skeleton;
+  skeleton(beat: number): Skeleton | undefined;
 /**
 * The number of beats the dance takes for one repetition.
 */
@@ -403,11 +404,6 @@ export class StepInfo {
 export class Tracker {
   free(): void;
 /**
-* @param {number} timestamp
-* @returns {ExportedFrame}
-*/
-  exportFrame(timestamp: number): ExportedFrame;
-/**
 */
   constructor();
 /**
@@ -451,4 +447,9 @@ export class Tracker {
 * @returns {Skeleton | undefined}
 */
   skeletonAt(timestamp: number): Skeleton | undefined;
+/**
+* @param {number} timestamp
+* @returns {ExportedFrame}
+*/
+  exportFrame(timestamp: number): ExportedFrame;
 }
