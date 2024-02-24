@@ -40,6 +40,6 @@ impl DanceFileBuilder {
         };
         let config = ron::ser::PrettyConfig::default();
         let string = ron::ser::to_string_pretty(&file_data, config)?;
-        return Ok(string);
+        Ok(string)
     }
 }
