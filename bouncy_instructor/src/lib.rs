@@ -80,14 +80,14 @@ impl State {
             if let Some(missing) = def
                 .steps
                 .iter()
-                .find(|step_name| self.steps_by_name(step_name).next().is_none())
+                .find(|step_id| self.step(step_id).is_none())
             {
                 return Err(AddDanceError::MissingStep(missing.clone()));
             }
 
             let dance = Dance {
                 id: def.id,
-                steps: def.steps,
+                step_ids: def.steps,
             };
             self.dances.push(dance);
         }
@@ -96,14 +96,6 @@ impl State {
 
     fn step(&self, id: &str) -> Option<&Step> {
         self.steps.iter().find(|step| step.id == id)
-    }
-
-    fn steps_by_name<'a>(&'a self, name: &'a str) -> impl Iterator<Item = &Step> {
-        self.steps.iter().filter(move |step| step.name == name)
-    }
-
-    fn first_step_by_name<'a>(&'a self, name: &'a str) -> Option<&Step> {
-        self.steps_by_name(name).next()
     }
 }
 

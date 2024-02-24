@@ -18,12 +18,12 @@ impl DanceInfo {
     /// Create a new dance info object, without registering it.
     ///
     /// Cursed: Calling this constructor leaves the values inside the input list wasm-nulled out.
-    /// 
+    ///
     /// Let's say we pass in `[new StepInfo(), new SteInfo()]`. After calling
     /// this, it will look like
     /// `[Object { __wbg_ptr: 0 }, Object { __wbg_ptr: 0 }]`.
     /// The Rust values have been moved out of the JS array into a Rust Vec.
-    /// 
+    ///
     /// At this point, checking the values inside the array for null in JS will
     /// correctly show that these are not null. But any further calls to Rust
     /// methods will result in "Error: null pointer passed to rust".
@@ -72,14 +72,9 @@ impl From<&Dance> for DanceInfo {
     fn from(dance: &Dance) -> Self {
         let steps: Vec<StepInfo> = STATE.with_borrow(|state| {
             dance
-                .steps
+                .step_ids
                 .iter()
-                .map(|step_name| {
-                    state
-                        .first_step_by_name(step_name)
-                        .expect("step must exist")
-                        .into()
-                })
+                .map(|step_name| state.step(step_name).expect("step must exist").into())
                 .collect()
         });
         let total_beats = steps.iter().map(|step| step.beats()).sum();

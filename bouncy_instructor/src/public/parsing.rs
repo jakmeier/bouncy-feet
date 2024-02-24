@@ -90,11 +90,11 @@ mod tests {
         dances: [
           (
             id: "test-dance-0",
-            steps: ["Running Man"],
+            steps: ["rm-0"],
           ),
           (
             id: "test-dance-1",
-            steps: ["Running Man", "Running Man", "Running Man"],
+            steps: ["rm-0", "rm-0", "rm-0"],
           ),
         ]
       )
@@ -182,11 +182,11 @@ mod tests {
           dances: [
             (
               id: "test-dance-0",
-              steps: ["Running Man"],
+              steps: ["rm-0"],
             ),
             (
               id: "test-dance-1",
-              steps: ["Running Man", "Running Man", "fake-name", "Running Man"],
+              steps: ["rm-0", "rm-0", "fake-id", "rm-0"],
             ),
           ]
         )
@@ -194,7 +194,7 @@ mod tests {
         load_pose_str(POSE_STR).unwrap();
         load_step_str(STEP_STR).unwrap();
         match load_dance_str(input) {
-            Err(ParseFileError::UnknownStepName(id)) if id == "fake-name" => (),
+            Err(ParseFileError::UnknownStepName(id)) if id == "fake-id" => (),
             Err(other) => panic!("wrong error {other}"),
             Ok(()) => panic!("expected an error when loading invalid reference"),
         }
