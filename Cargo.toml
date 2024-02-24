@@ -1,0 +1,3 @@
+[workspace]
+members = ["bouncy_instructor", "bouncy_stats"]
+resolver = "2"
