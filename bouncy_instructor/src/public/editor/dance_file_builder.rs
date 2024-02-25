@@ -26,7 +26,7 @@ impl DanceFileBuilder {
     #[wasm_bindgen(js_name = "fromRon")]
     pub fn from_ron(text: &str) -> Result<DanceFileBuilder, JsValue> {
         let file = DanceFile::from_str(text)?;
-        return Ok(file.into());
+        Ok(file.into())
     }
 
     #[wasm_bindgen(js_name = "withDance")]
@@ -53,10 +53,7 @@ impl DanceFileBuilder {
     }
 
     pub fn dances(&self) -> Vec<DanceInfo> {
-        self.dances
-            .iter()
-            .map(|dance| DanceInfo::from(dance))
-            .collect()
+        self.dances.iter().map(DanceInfo::from).collect()
     }
 }
 
