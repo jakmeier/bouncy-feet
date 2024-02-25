@@ -1,7 +1,8 @@
 use crate::dance_file::DanceFile;
 use crate::editor::ExportError;
-use crate::{dance_file, intern};
+use crate::{dance_file, intern, DanceInfo};
 use wasm_bindgen::prelude::wasm_bindgen;
+use wasm_bindgen::JsValue;
 
 use super::dance_builder::DanceBuilder;
 
@@ -14,6 +15,7 @@ pub struct DanceFileBuilder {
 
 #[wasm_bindgen]
 impl DanceFileBuilder {
+    #[wasm_bindgen(constructor)]
     pub fn new() -> Self {
         Self {
             version: dance_file::CURRENT_VERSION,
@@ -21,12 +23,20 @@ impl DanceFileBuilder {
         }
     }
 
-    #[wasm_bindgen(js_name = "addDance")]
-    pub fn add_dance(&mut self, dance_builder: &DanceBuilder) {
-        self.dances.push(dance_builder.build());
+    #[wasm_bindgen(js_name = "fromRon")]
+    pub fn from_ron(text: &str) -> Result<DanceFileBuilder, JsValue> {
+        let file = DanceFile::from_str(text)?;
+        return Ok(file.into());
     }
 
-    pub fn build(&self) -> Result<String, ExportError> {
+    #[wasm_bindgen(js_name = "withDance")]
+    pub fn with_dance(mut self, dance_builder: &DanceBuilder) -> Self {
+        self.dances.push(dance_builder.build());
+        self
+    }
+
+    #[wasm_bindgen(js_name = "buildRon")]
+    pub fn build_ron(&self) -> Result<String, ExportError> {
         let file_data = DanceFile {
             version: self.version,
             dances: self
@@ -38,8 +48,30 @@ impl DanceFileBuilder {
                 })
                 .collect(),
         };
-        let config = ron::ser::PrettyConfig::default();
-        let string = ron::ser::to_string_pretty(&file_data, config)?;
+        let string = ron::ser::to_string(&file_data)?;
         Ok(string)
+    }
+
+    pub fn dances(&self) -> Vec<DanceInfo> {
+        self.dances
+            .iter()
+            .map(|dance| DanceInfo::from(dance))
+            .collect()
+    }
+}
+
+impl From<DanceFile> for DanceFileBuilder {
+    fn from(other: DanceFile) -> Self {
+        Self {
+            version: other.version,
+            dances: other
+                .dances
+                .into_iter()
+                .map(|d| intern::dance::Dance {
+                    id: d.id,
+                    step_ids: d.steps,
+                })
+                .collect(),
+        }
     }
 }

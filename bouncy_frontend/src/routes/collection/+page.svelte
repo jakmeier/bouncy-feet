@@ -1,12 +1,16 @@
 <script>
   import { t } from '$lib/i18n.js';
   import { counter } from '$lib/timer';
+  import { getContext } from 'svelte';
   import DanceAnimation from '../DanceAnimation.svelte';
   import Area from '../record/Area.svelte';
   import Step from './Step.svelte';
 
   /** @type {import('./$types').PageData} */
   export let data;
+
+  const localCollection = getContext('localCollection');
+  const localDances = localCollection.dances;
 
   const stepTime = 300;
   // animationTime < stepTime will freeze zhe position for a moment, which makes
@@ -22,7 +26,7 @@
 
 <h2>{$t('collection.dances-subtitle')}</h2>
 <div class="dance-table">
-  {#each data.allDances as dance}
+  {#each [...data.officialDances, ...$localDances] as dance}
     <div>
       <a href={`./dance/${dance.id}`}>
         <Area width={danceSize} height={danceSize} {borderRadius}>

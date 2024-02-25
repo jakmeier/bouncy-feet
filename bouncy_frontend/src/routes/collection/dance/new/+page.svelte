@@ -7,7 +7,7 @@
   import { DanceBuilder, DanceInfo } from '$lib/instructor/bouncy_instructor';
   import Area from '../../../record/Area.svelte';
   import SelectStep from './SelectStep.svelte';
-  // import { getContext } from 'svelte';
+  import { getContext } from 'svelte';
 
   /** @type {import('./$types').PageData} */
   export let data;
@@ -20,8 +20,8 @@
   const borderRadius = '25px';
 
   const beatCounter = counter(-1, 1, stepTime);
-  // const localCollection = getContext('localCollection');
-  // const localDances = localCollection.dances;
+  const localCollection = getContext('localCollection');
+  const dances = localCollection.dances;
 
   let id = $t('collection.new-dance.default-dance-name');
   /** @type {DanceBuilder} */
@@ -49,8 +49,8 @@
   }
 
   function save() {
-    // TODO
-    // $localDances = [...$localDances, danceBuilder];
+    // TODO: pick name
+    localCollection.addDanceBuilder(danceBuilder);
   }
 </script>
 

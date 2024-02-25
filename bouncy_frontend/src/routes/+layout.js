@@ -28,7 +28,7 @@ export const load = async ({ data }) => {
     }
 
     const allSteps = steps();
-    const allDances = dances();
+    const officialDances = dances();
     const uniqueNameSteps = [];
 
     const seenNames = new Set();
@@ -44,7 +44,7 @@ export const load = async ({ data }) => {
         translations,
         uniqueNameSteps,
         allSteps,
-        allDances,
+        officialDances,
     };
 };
 

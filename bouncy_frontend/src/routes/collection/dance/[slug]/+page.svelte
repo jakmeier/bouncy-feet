@@ -5,6 +5,7 @@
   import DanceAnimation from '../../../DanceAnimation.svelte';
   import Step from '../../Step.svelte';
   import { dynamicCounter, counter } from '$lib/timer';
+  import { getContext } from 'svelte';
 
   /** @type {import('./$types').PageData} */
   export let data;
@@ -15,8 +16,15 @@
   const danceSize = 250;
   const stepSize = 100;
 
+  const localCollection = getContext('localCollection');
+  const localDances = localCollection.dances;
+
   const id = $page.params.slug;
-  const dance = data.allDances.find((dance) => dance.id === id);
+  const isSelected = (
+    /** @type {import('$lib/instructor/bouncy_instructor').DanceInfo} */ dance
+  ) => dance.id === id;
+  const dance =
+    data.officialDances.find(isSelected) || $localDances.find(isSelected);
   const steps = dance?.steps() || [];
   const beatCounter = counter(-1, 1, stepTime);
 </script>
@@ -29,7 +37,9 @@
     class="dance"
     style="max-width: {danceSize}px; max-height: {danceSize}px"
   >
+  {#if dance}
     <DanceAnimation {dance} />
+  {/if}
   </div>
 
   <div class="steps-container">

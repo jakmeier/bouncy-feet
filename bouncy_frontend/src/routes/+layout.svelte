@@ -4,6 +4,7 @@
   import { t } from '$lib/i18n.js';
   import PoseDetectionContext from './PoseDetectionContext.svelte';
   import UserContext from './UserContext.svelte';
+  import LocalCollectionContext from './LocalCollectionContext.svelte';
 
   const navBarHeight = 90;
 </script>
@@ -14,9 +15,11 @@
 
 <main style="height: calc(100vh - {navBarHeight}px)">
   <UserContext>
-    <PoseDetectionContext>
-      <slot />
-    </PoseDetectionContext>
+    <LocalCollectionContext>
+      <PoseDetectionContext>
+        <slot />
+      </PoseDetectionContext>
+    </LocalCollectionContext>
   </UserContext>
 </main>
 <TabNavigation height={navBarHeight} />

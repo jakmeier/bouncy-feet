@@ -5,7 +5,7 @@
 
   /** @type {import('./$types').PageData} */
   export let data;
-  let featuredDance = data.allDances.length > 0 ? data.allDances[0] : null;
+  let featuredDance = data.officialDances.length > 0 ? data.officialDances[0] : null;
   const numDancers = 3;
 </script>
 

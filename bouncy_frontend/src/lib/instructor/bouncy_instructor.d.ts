@@ -98,17 +98,26 @@ export class DanceBuilder {
 export class DanceFileBuilder {
   free(): void;
 /**
+*/
+  constructor();
+/**
+* @param {string} text
 * @returns {DanceFileBuilder}
 */
-  static new(): DanceFileBuilder;
+  static fromRon(text: string): DanceFileBuilder;
 /**
 * @param {DanceBuilder} dance_builder
+* @returns {DanceFileBuilder}
 */
-  addDance(dance_builder: DanceBuilder): void;
+  withDance(dance_builder: DanceBuilder): DanceFileBuilder;
 /**
 * @returns {string}
 */
-  build(): string;
+  buildRon(): string;
+/**
+* @returns {(DanceInfo)[]}
+*/
+  dances(): (DanceInfo)[];
 }
 /**
 * Information about a dance for display in the frontend.
