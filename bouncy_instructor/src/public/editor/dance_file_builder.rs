@@ -29,10 +29,13 @@ impl DanceFileBuilder {
         Ok(file.into())
     }
 
-    #[wasm_bindgen(js_name = "withDance")]
-    pub fn with_dance(mut self, dance_builder: &DanceBuilder) -> Self {
+    #[wasm_bindgen(js_name = "addDance")]
+    pub fn add_dance(&mut self, dance_builder: &DanceBuilder) -> Result<(), String> {
+        if self.dances.iter().any(|dance| dance.id == dance_builder.id) {
+            return Err("Dance ID already exists".to_owned());
+        }
         self.dances.push(dance_builder.build());
-        self
+        Ok(())
     }
 
     #[wasm_bindgen(js_name = "buildRon")]

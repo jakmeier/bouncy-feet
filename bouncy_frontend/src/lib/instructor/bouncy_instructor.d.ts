@@ -107,9 +107,8 @@ export class DanceFileBuilder {
   static fromRon(text: string): DanceFileBuilder;
 /**
 * @param {DanceBuilder} dance_builder
-* @returns {DanceFileBuilder}
 */
-  withDance(dance_builder: DanceBuilder): DanceFileBuilder;
+  addDance(dance_builder: DanceBuilder): void;
 /**
 * @returns {string}
 */

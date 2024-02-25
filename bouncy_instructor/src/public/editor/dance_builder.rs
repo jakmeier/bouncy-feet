@@ -4,7 +4,7 @@ use wasm_bindgen::prelude::wasm_bindgen;
 #[wasm_bindgen]
 
 pub struct DanceBuilder {
-    id: String,
+    pub(crate) id: String,
     step_ids: Vec<String>,
 }
 

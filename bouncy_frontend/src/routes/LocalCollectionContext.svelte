@@ -8,10 +8,11 @@
     DanceBuilder,
   } from '$lib/instructor/bouncy_instructor';
   import { setContext } from 'svelte';
-  import { derived, readable, writable } from 'svelte/store';
+  import { derived, writable } from 'svelte/store';
 
-  const fileBuilder = browser
-    ? DanceFileBuilder.fromRon(localStorage.dances)
+  const ron = browser ? localStorage.dances : null;
+  const fileBuilder = ron
+    ? DanceFileBuilder.fromRon(ron)
     : new DanceFileBuilder();
 
   const builderStore = writable(fileBuilder);
@@ -34,7 +35,9 @@
    * @param {DanceBuilder} danceBuilder
    */
   function addDanceBuilder(danceBuilder) {
-    $builderStore = $builderStore.withDance(danceBuilder);
+    $builderStore.addDance(danceBuilder);
+    // trigger update (can I do better?)
+    $builderStore = $builderStore;
   }
 </script>
 
