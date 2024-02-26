@@ -124,7 +124,7 @@ impl Pose {
         let z_errors = self
             .z
             .iter()
-            .filter(|ordering| ordering.satisfied(positions))
+            .filter(|ordering| !ordering.satisfied(positions))
             .cloned()
             .collect();
         ErrorDetails {

@@ -43,7 +43,7 @@ pub(crate) struct BodyPoint {
     part: BodyPart,
 }
 
-#[derive(PartialEq, Eq, Hash, Debug, Clone, Copy)]
+#[derive(PartialEq, Eq, Hash, Clone, Copy)]
 pub(crate) struct BodyPartOrdering {
     forward: BodyPoint,
     backward: BodyPoint,
@@ -178,5 +178,15 @@ impl BodyPartOrdering {
     pub(crate) fn satisfied(&self, positions: &HashMap<BodyPoint, f32>) -> bool {
         // Note: This check should probably be more sophisticated, eventually.
         positions[&self.forward] < positions[&self.backward]
+    }
+}
+
+impl std::fmt::Debug for BodyPartOrdering {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{0:?} {1:?} behind {2:?} {3:?}",
+            self.backward.side, self.backward.part, self.forward.side, self.forward.part,
+        )
     }
 }

@@ -10,10 +10,13 @@
   <ol>
     {#each limbs as limbError}
       <li>
-        {limbError.name} | {limbError.error.toPrecision(
-          precision
-        )} (x{limbError.weight.toPrecision(2)})
+        {limbError.name} | {limbError.error.toPrecision(precision)} (x{limbError.weight.toPrecision(
+          2
+        )})
       </li>
+    {/each}
+    {#each data.zErrors() as zError}
+      <li>Z-Error, expected: {zError.expected}</li>
     {/each}
   </ol>
 </div>
