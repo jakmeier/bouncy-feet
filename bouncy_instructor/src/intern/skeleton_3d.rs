@@ -1,8 +1,9 @@
 use super::geom::{Angle3d, SignedAngle};
-use super::pose::Limb;
+use super::pose::{BodyPoint, Limb};
 use super::pose_db::LimbIndex;
 use crate::skeleton::{Segment, Side, Skeleton};
 use crate::{Keypoints, STATE};
+use std::collections::HashMap;
 use std::f32::consts::FRAC_PI_2;
 
 /// A normalized representation of a body position snapshot, including all
@@ -27,11 +28,13 @@ pub(crate) struct Skeleton3d {
     /// A list of angles of the skeleton.
     ///
     /// Same as `limb_angles` but includes 3D information.
-    /// However, 3D is generally speaking less accurate.
+    /// However, 3D is less accurate, generally speaking.
     limb_angles_3d: Vec<Angle3d>,
     /// The angle between the standardized direction as stored (East) and what
     /// was recorded.
     azimuth_correction: SignedAngle,
+    /// Z position estimates of body parts
+    z: HashMap<BodyPoint, f32>,
 }
 
 #[derive(PartialEq, Clone, Copy, Debug)]
@@ -55,6 +58,7 @@ impl Skeleton3d {
         direction: Direction,
         limb_angles_3d: Vec<Angle3d>,
         azimuth_correction: SignedAngle,
+        z: HashMap<BodyPoint, f32>,
     ) -> Self {
         let limb_angles = limb_angles_3d.iter().map(Angle3d::project_2d).collect();
         Self {
@@ -62,6 +66,7 @@ impl Skeleton3d {
             limb_angles,
             limb_angles_3d,
             azimuth_correction,
+            z,
         }
     }
 
@@ -75,12 +80,17 @@ impl Skeleton3d {
                 .collect::<Vec<_>>()
         });
         let shoulder_angle = kp.left.shoulder.azimuth(kp.right.shoulder);
-        Self::from_angles(limb_angles_3d, shoulder_angle)
+        let z: HashMap<_, _> = kp
+            .body_points()
+            .map(|(body_point, coordinate)| (body_point, coordinate.z))
+            .collect();
+        Self::from_angles(limb_angles_3d, shoulder_angle, z)
     }
 
     pub(crate) fn from_angles(
         mut limb_angles_3d: Vec<Angle3d>,
         shoulder_angle: SignedAngle,
+        z: HashMap<BodyPoint, f32>,
     ) -> Self {
         // Shoulder defines where the person is looking
         let direction = Direction::from_shoulder(shoulder_angle);
@@ -97,11 +107,15 @@ impl Skeleton3d {
             _ => (),
         }
 
-        Self::new(direction, limb_angles_3d, azimuth_correction)
+        Self::new(direction, limb_angles_3d, azimuth_correction, z)
     }
 
     pub(crate) fn angles(&self) -> &[SignedAngle] {
         &self.limb_angles
+    }
+
+    pub(crate) fn positions(&self) -> &HashMap<BodyPoint, f32> {
+        &self.z
     }
 
     pub(crate) fn direction(&self) -> Direction {

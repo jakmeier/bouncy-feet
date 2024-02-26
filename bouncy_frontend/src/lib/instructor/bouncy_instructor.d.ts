@@ -263,6 +263,10 @@ export class PoseApproximation {
 */
   limbErrors(): (LimbError)[];
 /**
+* @returns {(ZError)[]}
+*/
+  zErrors(): (ZError)[];
+/**
 * List the `n` limbs with the highest error contribution to the pose error.
 * @param {number} n
 * @returns {(LimbError)[]}
@@ -412,6 +416,11 @@ export class StepInfo {
 export class Tracker {
   free(): void;
 /**
+* @param {number} timestamp
+* @returns {ExportedFrame}
+*/
+  exportFrame(timestamp: number): ExportedFrame;
+/**
 */
   constructor();
 /**
@@ -455,9 +464,12 @@ export class Tracker {
 * @returns {Skeleton | undefined}
 */
   skeletonAt(timestamp: number): Skeleton | undefined;
+}
 /**
-* @param {number} timestamp
-* @returns {ExportedFrame}
 */
-  exportFrame(timestamp: number): ExportedFrame;
+export class ZError {
+  free(): void;
+/**
+*/
+  readonly expected: string;
 }

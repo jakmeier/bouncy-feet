@@ -25,6 +25,11 @@ pub struct LimbError {
 }
 
 #[wasm_bindgen]
+pub struct ZError {
+    expected: String,
+}
+
+#[wasm_bindgen]
 impl PoseApproximation {
     #[wasm_bindgen(getter)]
     pub fn name(&self) -> String {
@@ -37,6 +42,17 @@ impl PoseApproximation {
         let increasing = true;
         let weighted = false;
         self.sorted_limb_errors_impl(increasing, weighted).collect()
+    }
+
+    #[wasm_bindgen(js_name = zErrors)]
+    pub fn z_errors(&self) -> Vec<ZError> {
+        self.error_details
+            .z_errors
+            .iter()
+            .map(|expected| ZError {
+                expected: format!("{expected:?}"),
+            })
+            .collect()
     }
 
     /// List the `n` limbs with the highest error contribution to the pose error.
@@ -72,5 +88,13 @@ impl LimbError {
     #[wasm_bindgen(getter)]
     pub fn name(&self) -> String {
         self.name.clone()
+    }
+}
+
+#[wasm_bindgen]
+impl ZError {
+    #[wasm_bindgen(getter)]
+    pub fn expected(&self) -> String {
+        self.expected.clone()
     }
 }

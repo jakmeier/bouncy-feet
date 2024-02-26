@@ -1,10 +1,11 @@
 //! Computing the error score between a pose and a skeleton.
 
 use super::geom::SignedAngle;
-use super::pose::Pose;
+use super::pose::{BodyPartOrdering, BodyPoint, Pose};
 use super::pose_db::LimbIndex;
 use super::skeleton_3d::Skeleton3d;
 use crate::intern::pose::PoseDirection;
+use std::collections::HashMap;
 
 /// Describe the target angle and how to compute an error score from it.
 ///
@@ -31,6 +32,7 @@ pub(crate) struct ErrorDetails {
     pub errors: Vec<f32>,
     /// weights to compute full error score
     pub weights: Vec<f32>,
+    pub z_errors: Vec<BodyPartOrdering>,
 }
 
 /// Find the pose with the lowest error score.
@@ -48,7 +50,7 @@ pub(crate) fn best_fit_pose(skeleton: &Skeleton3d, poses: &[Pose]) -> (f32, Erro
         .enumerate()
         .filter(|(_i, p)| p.direction == direction)
     {
-        let details = pose.error(skeleton.angles());
+        let details = pose.error(skeleton.angles(), skeleton.positions());
         let err = details.error_score();
         if err < best_error {
             best_error = err;
@@ -104,7 +106,11 @@ impl AngleTarget {
 
 impl Pose {
     /// Error is between 0.0  and 1.0
-    pub(crate) fn error(&self, angles: &[SignedAngle]) -> ErrorDetails {
+    pub(crate) fn error(
+        &self,
+        angles: &[SignedAngle],
+        positions: &HashMap<BodyPoint, f32>,
+    ) -> ErrorDetails {
         let mut errors = Vec::with_capacity(2 * self.limbs.len());
         let mut weights = Vec::with_capacity(2 * self.limbs.len());
         let mut limbs = Vec::with_capacity(2 * self.limbs.len());
@@ -115,10 +121,17 @@ impl Pose {
             errors.push(limb.target.target_error(angle));
             weights.push(limb.weight());
         }
+        let z_errors = self
+            .z
+            .iter()
+            .filter(|ordering| ordering.satisfied(positions))
+            .cloned()
+            .collect();
         ErrorDetails {
             limbs,
             errors,
             weights,
+            z_errors,
         }
     }
 }
@@ -196,7 +209,7 @@ mod tests {
         let pose = Pose::new(PoseDirection::Front, vec![limb], vec![]);
         let mut angles = zero_skeleton();
         angles[Limb::LEFT_THIGH.as_usize()] = polar;
-        let error = pose.error(&angles);
+        let error = pose.error(&angles, &Default::default());
         assert_eq!(0.0, error.error_score());
     }
 
@@ -279,7 +292,7 @@ mod tests {
     #[track_caller]
     fn check_score_fixed_skeleton(pose: &Pose, expect: expect_test::Expect) {
         let angles = fixed_skeleton();
-        let error = pose.error(&angles).error_score();
+        let error = pose.error(&angles, &Default::default()).error_score();
         expect.assert_eq(&error.to_string());
     }
 
@@ -287,7 +300,7 @@ mod tests {
     #[track_caller]
     fn check_score_fixed_pose(skeleton: &[SignedAngle], expect: expect_test::Expect) {
         let pose = fixed_pose(5.0);
-        let error = pose.error(skeleton).error_score();
+        let error = pose.error(skeleton, &Default::default()).error_score();
         expect.assert_eq(&error.to_string());
     }
 

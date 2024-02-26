@@ -66,7 +66,7 @@ impl Tracker {
                     continue;
                 }
 
-                let details = pose.error(skeleton.angles());
+                let details = pose.error(skeleton.angles(), skeleton.positions());
                 let error = details.error_score();
                 if error < best_error {
                     best_error = error;
@@ -109,13 +109,14 @@ impl Tracker {
 
         crate::STATE.with_borrow(|state| {
             let angles = skeleton.angles();
+            let positions = skeleton.positions();
             state
                 .db
                 .poses()
                 .iter()
                 .enumerate()
                 .map(|(pose_index, pose)| {
-                    let details = pose.error(angles);
+                    let details = pose.error(angles, positions);
                     PoseApproximation {
                         name: state.db.pose_name(pose_index).to_owned(),
                         error: details.error_score(),

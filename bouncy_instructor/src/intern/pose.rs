@@ -13,6 +13,8 @@ use super::pose_score::AngleTarget;
 use crate::intern::geom::Angle3d;
 use crate::public::keypoints::Cartesian3d;
 use crate::Keypoints;
+use std::collections::HashMap;
+use strum::IntoEnumIterator;
 
 #[derive(Debug)]
 pub(crate) struct Pose {
@@ -36,7 +38,7 @@ pub(crate) struct Limb {
 }
 
 #[derive(PartialEq, Eq, Hash, Debug, Clone, Copy)]
-struct BodyPoint {
+pub(crate) struct BodyPoint {
     side: BodySide,
     part: BodyPart,
 }
@@ -53,7 +55,7 @@ enum BodySide {
     Right,
 }
 
-#[derive(PartialEq, Eq, Hash, Debug, Clone, Copy)]
+#[derive(PartialEq, Eq, Hash, Debug, Clone, Copy, strum::EnumIter)]
 enum BodyPart {
     Shoulder,
     Hip,
@@ -99,6 +101,18 @@ impl BodyPoint {
             },
             part: self.part,
         }
+    }
+
+    pub(crate) fn iter() -> impl Iterator<Item = Self> {
+        let left = BodyPart::iter().map(|part| Self {
+            side: BodySide::Left,
+            part,
+        });
+        let right = BodyPart::iter().map(|part| Self {
+            side: BodySide::Right,
+            part,
+        });
+        left.chain(right)
     }
 }
 
@@ -159,5 +173,10 @@ impl BodyPartOrdering {
             backward: self.backward.mirror(),
             forward: self.forward.mirror(),
         }
+    }
+
+    pub(crate) fn satisfied(&self, positions: &HashMap<BodyPoint, f32>) -> bool {
+        // Note: This check should probably be more sophisticated, eventually.
+        positions[&self.forward] < positions[&self.backward]
     }
 }

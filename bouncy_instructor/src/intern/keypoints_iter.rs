@@ -1,3 +1,4 @@
+use super::pose::BodyPoint;
 use crate::keypoints::Cartesian3d;
 use crate::Keypoints;
 
@@ -6,7 +7,7 @@ impl Keypoints {
     pub(crate) fn iter(&self) -> KeypointsIter {
         KeypointsIter { i: 0, kp: self }
     }
-    
+
     #[allow(dead_code)]
     pub(crate) fn iter_mut(&mut self) -> KeypointsIterMut {
         // note: It would be nice to avoid extra allocations but it's not that
@@ -31,6 +32,13 @@ impl Keypoints {
                 &mut self.right.toes,
                 &mut self.right.wrist,
             ],
+        }
+    }
+
+    pub(crate) fn body_points(&self) -> BodyPointsIter {
+        BodyPointsIter {
+            kp: self,
+            bp: Box::new(BodyPoint::iter()),
         }
     }
 }
@@ -77,5 +85,20 @@ impl<'a> Iterator for KeypointsIterMut<'a> {
 
     fn next(&mut self) -> Option<Self::Item> {
         self.kp.pop()
+    }
+}
+
+pub(crate) struct BodyPointsIter<'a> {
+    kp: &'a Keypoints,
+    bp: Box<dyn Iterator<Item = BodyPoint>>,
+}
+
+impl<'a> Iterator for BodyPointsIter<'a> {
+    type Item = (BodyPoint, Cartesian3d);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.bp
+            .next()
+            .map(|body_point| (body_point, body_point.keypoint(self.kp)))
     }
 }

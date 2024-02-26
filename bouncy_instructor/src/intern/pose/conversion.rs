@@ -339,7 +339,12 @@ impl Skeleton3d {
             limb_angles[limb.limb.as_usize()] = Angle3d::new(azimuth, limb.target.angle());
         }
         let azimuth_correction = SignedAngle::ZERO;
-        Skeleton3d::new(direction, limb_angles, azimuth_correction)
+        Skeleton3d::new(
+            direction,
+            limb_angles,
+            azimuth_correction,
+            Default::default(),
+        )
     }
 }
 
@@ -370,6 +375,7 @@ mod tests {
         let skeleton = Skeleton3d::from_angles(
             vec![Angle3d::degree(azimuth, polar)],
             SignedAngle::degree(90.0),
+            Default::default(),
         );
         let db = LimbPositionDatabase::test(Angle3d::degree(azimuth, polar));
 

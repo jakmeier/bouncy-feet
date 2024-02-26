@@ -15,6 +15,7 @@ wasm-bindgen = "0.2.88"
 wasm-bindgen-futures = "0.4.38"
 serde = { version = "1.0", features = ["derive"] }
 serde_with = "3.4"
+strum = { version = "0.26", features = ["derive"] }
 # RON: Use a not-so-common serialization format that support comments, is not
 # white-space dependent, and isn't annoyingly verbose or rigid with commas.
 # It also simply fits in nicely with a Rust code base.
