@@ -12,9 +12,9 @@
 //! 3) Skeleton3d -> pose_file::Pose
 
 use super::{BodyPartOrdering, Pose, PoseDirection};
+use crate::intern::dance_collection::DanceCollection;
 use crate::intern::geom::{Angle3d, SignedAngle};
 use crate::intern::pose::{BodyPart, BodyPoint, BodySide, Limb};
-use crate::intern::pose_db::LimbPositionDatabase;
 use crate::intern::skeleton_3d::{Direction, Skeleton3d};
 use crate::pose_file;
 
@@ -270,7 +270,7 @@ impl From<Direction> for pose_file::PoseDirection {
 
 impl pose_file::Pose {
     /// Take a skeleton and compute a matching pose definition for it.
-    pub(crate) fn from_with_db(skeleton: &Skeleton3d, db: &LimbPositionDatabase) -> Self {
+    pub(crate) fn from_with_db(skeleton: &Skeleton3d, db: &DanceCollection) -> Self {
         let limbs = skeleton
             .angles()
             .iter()
@@ -327,7 +327,7 @@ impl From<Limb> for pose_file::Limb {
 impl Skeleton3d {
     /// Creates a skeleton with all limbs set to perfectly match the pose.
     /// Angles which are not defined in the pose are set to 0.
-    pub(crate) fn from_with_db(pose: &Pose, db: &LimbPositionDatabase) -> Self {
+    pub(crate) fn from_with_db(pose: &Pose, db: &DanceCollection) -> Self {
         let num_limbs = db.limbs().count();
         let mut limb_angles = vec![Angle3d::ZERO; num_limbs];
         let azimuth = SignedAngle::degree(90.0);
@@ -350,7 +350,7 @@ impl Skeleton3d {
 
 #[cfg(test)]
 mod tests {
-    use crate::intern::pose_db::LimbPositionDatabase;
+    use crate::intern::dance_collection::DanceCollection;
     use crate::test_utils::assert_angle_eq;
 
     use super::*;
@@ -377,7 +377,7 @@ mod tests {
             SignedAngle::degree(90.0),
             Default::default(),
         );
-        let db = LimbPositionDatabase::test(Angle3d::degree(azimuth, polar));
+        let db = DanceCollection::test(Angle3d::degree(azimuth, polar));
 
         let pose = pose_file::Pose::from_with_db(&skeleton, &db);
         assert_eq!(
@@ -411,7 +411,7 @@ mod tests {
         // again.
         let want = angle as f32;
 
-        let mut db = LimbPositionDatabase::default();
+        let mut db = DanceCollection::default();
         let input_pose: pose_file::Pose = ron::from_str(&input).unwrap();
         db.add(vec![input_pose]).unwrap();
 
@@ -452,7 +452,7 @@ mod tests {
     fn check_pose_conversion_circle(angle: i16, is_front: bool, add_z: bool) {
         let input = ron_string_pose(angle, is_front, add_z);
 
-        let mut db = LimbPositionDatabase::default();
+        let mut db = DanceCollection::default();
         let input_pose: pose_file::Pose = ron::from_str(&input).unwrap();
         db.add(vec![input_pose]).unwrap();
         let input_pose: pose_file::Pose = ron::from_str(&input).unwrap();

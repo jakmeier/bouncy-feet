@@ -6,12 +6,16 @@
 //! to combine it with the list of poses. This module contains the context
 //!  structs required for this.
 
+use super::dance::Dance;
 use super::geom::SignedAngle;
 use super::pose::{BodyPartOrdering, Limb, LimbPosition, Pose, PoseDirection};
+use super::skeleton_3d::Direction;
+use super::step::Step;
 use crate::parsing::ParseFileError;
-use crate::pose_file;
+use crate::step_file::{self, Orientation};
+use crate::{dance_file, pose_file, AddDanceError, AddStepError};
 
-/// List of registered poses to recognize during tracking.
+/// List of registered poses/steps/dances to recognize during tracking.
 ///
 /// Each pose is a description of a body position. This includes the exact
 /// desired position, a name, and most importantly, the formulas for computing
@@ -19,11 +23,8 @@ use crate::pose_file;
 ///
 /// Actual poses are defined in external files and loaded in at runtime. Here
 /// data they are stored in the most convenient way, which will see many
-/// refactoring over time.
-///
-/// Errors are always between 0 and 1, where 0 is a perfect match.
-/// For now, the error formula is implicitly the same for all limbs.
-pub(crate) struct LimbPositionDatabase {
+/// refactorings over time.
+pub(crate) struct DanceCollection {
     /// Pose definitions
     poses: Vec<Pose>,
     /// Pose names, shares the index with `.poses`
@@ -35,6 +36,9 @@ pub(crate) struct LimbPositionDatabase {
     /// contract: append only
     limbs: Vec<Limb>,
     limb_names: Vec<String>,
+
+    steps: Vec<Step>,
+    dances: Vec<Dance>,
 }
 
 /// For accessing LimbPositionDatabase::limbs
@@ -46,18 +50,20 @@ pub(crate) enum AddPoseError {
     MissingMirror(String),
 }
 
-impl Default for LimbPositionDatabase {
+impl Default for DanceCollection {
     fn default() -> Self {
         Self {
             poses: vec![],
             names: vec![],
             limbs: Limb::base_limbs(),
             limb_names: Limb::base_limb_names(),
+            steps: Default::default(),
+            dances: Default::default(),
         }
     }
 }
 
-impl LimbPositionDatabase {
+impl DanceCollection {
     pub(crate) fn add(&mut self, poses: Vec<crate::pose_file::Pose>) -> Result<(), AddPoseError> {
         for pose in poses {
             let new_pose = if !pose.mirror_of.is_empty() {
@@ -164,6 +170,75 @@ impl LimbPositionDatabase {
         &self.poses
     }
 
+    pub(crate) fn steps(&self) -> &[Step] {
+        &self.steps
+    }
+
+    pub(crate) fn dances(&self) -> &[Dance] {
+        &self.dances
+    }
+
+    pub(crate) fn add_steps(&mut self, steps: &[step_file::Step]) -> Result<(), AddStepError> {
+        for def in steps {
+            let poses = def
+                .keyframes
+                .iter()
+                .map(|frame| {
+                    self.pose_by_id(&frame.pose)
+                        .ok_or_else(|| AddStepError::MissingPose(frame.pose.clone()))
+                })
+                .collect::<Result<_, _>>()?;
+
+            let directions = def
+                .keyframes
+                .iter()
+                .map(|frame| match frame.orientation {
+                    Orientation::ToCamera => Direction::North,
+                    Orientation::Right => Direction::East,
+                    Orientation::Away => Direction::South,
+                    Orientation::Left => Direction::West,
+                    Orientation::Any => Direction::Unknown,
+                })
+                .collect();
+
+            let new_step = Step {
+                id: def.id.clone(),
+                name: def.name.clone(),
+                variation: def.variation.clone(),
+                poses,
+                directions,
+            };
+            self.steps.push(new_step);
+        }
+        Ok(())
+    }
+
+    pub(crate) fn add_dances(
+        &mut self,
+        dances: Vec<dance_file::Dance>,
+    ) -> Result<(), AddDanceError> {
+        for def in dances {
+            if let Some(missing) = def
+                .steps
+                .iter()
+                .find(|step_id| self.step(step_id).is_none())
+            {
+                return Err(AddDanceError::MissingStep(missing.clone()));
+            }
+
+            let dance = Dance {
+                id: def.id,
+                step_ids: def.steps,
+            };
+            self.dances.push(dance);
+        }
+        Ok(())
+    }
+
+    pub(crate) fn step(&self, id: &str) -> Option<&Step> {
+        self.steps.iter().find(|step| step.id == id)
+    }
+
     /// A DB without default poses for testing where only one pose is needed.
     #[cfg(test)]
     pub(crate) fn test(target: super::geom::Angle3d) -> Self {
@@ -183,6 +258,7 @@ impl LimbPositionDatabase {
             names: vec!["test_pose".into()],
             limbs: vec![pose_file::Limb::LeftThigh.into()],
             limb_names: vec!["test_limb".into()],
+            ..Default::default()
         }
     }
 }

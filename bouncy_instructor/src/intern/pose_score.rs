@@ -1,8 +1,8 @@
 //! Computing the error score between a pose and a skeleton.
 
+use super::dance_collection::LimbIndex;
 use super::geom::SignedAngle;
 use super::pose::{BodyPartOrdering, BodyPoint, Pose};
-use super::pose_db::LimbIndex;
 use super::skeleton_3d::Skeleton3d;
 use crate::intern::pose::PoseDirection;
 use std::collections::HashMap;

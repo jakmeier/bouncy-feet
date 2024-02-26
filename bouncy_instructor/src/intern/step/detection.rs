@@ -98,7 +98,7 @@ impl Tracker {
         let mut result = None;
 
         STATE.with_borrow(|state| {
-            for step in &state.steps {
+            for step in state.db.steps() {
                 let mut pose_matches = vec![];
                 let mut start_t = self.timestamps[start];
                 let mut end_t = start_t + max_dt;

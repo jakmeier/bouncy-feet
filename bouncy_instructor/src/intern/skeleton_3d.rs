@@ -1,6 +1,6 @@
+use super::dance_collection::LimbIndex;
 use super::geom::{Angle3d, SignedAngle};
 use super::pose::{BodyPoint, Limb};
-use super::pose_db::LimbIndex;
 use crate::skeleton::{Segment, Side, Skeleton};
 use crate::{Keypoints, STATE};
 use std::collections::HashMap;

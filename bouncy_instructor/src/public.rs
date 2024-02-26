@@ -66,12 +66,26 @@ pub fn load_step_string(data: &str) -> Result<(), JsValue> {
 
 #[wasm_bindgen]
 pub fn steps() -> Vec<StepInfo> {
-    STATE.with_borrow(|state| state.steps.iter().map(StepInfo::from).collect::<Vec<_>>())
+    STATE.with_borrow(|state| {
+        state
+            .db
+            .steps()
+            .iter()
+            .map(StepInfo::from)
+            .collect::<Vec<_>>()
+    })
 }
 
 #[wasm_bindgen]
 pub fn dances() -> Vec<DanceInfo> {
-    STATE.with_borrow(|state| state.dances.iter().map(DanceInfo::from).collect::<Vec<_>>())
+    STATE.with_borrow(|state| {
+        state
+            .db
+            .dances()
+            .iter()
+            .map(DanceInfo::from)
+            .collect::<Vec<_>>()
+    })
 }
 
 pub fn load_pose_str(text: &str) -> Result<(), ParseFileError> {

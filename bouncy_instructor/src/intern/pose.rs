@@ -7,8 +7,8 @@
 mod approximation;
 mod conversion;
 
+use super::dance_collection::LimbIndex;
 use super::geom::SignedAngle;
-use super::pose_db::LimbIndex;
 use super::pose_score::AngleTarget;
 use crate::intern::geom::Angle3d;
 use crate::public::keypoints::Cartesian3d;
