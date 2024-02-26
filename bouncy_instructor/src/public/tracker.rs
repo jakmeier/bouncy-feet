@@ -5,15 +5,19 @@ mod step_output;
 pub use pose_output::PoseApproximation;
 pub use step_output::DetectedStep;
 
+use crate::intern::dance_collection::DanceCollection;
 use crate::intern::skeleton_3d::Skeleton3d;
 use crate::keypoints::Keypoints;
 use crate::skeleton::Skeleton;
+use std::rc::Rc;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 type Timestamp = u32;
 
 #[wasm_bindgen]
 pub struct Tracker {
+    pub(crate) db: Rc<DanceCollection>,
+
     /// invariant: ordered by timestamp
     pub(crate) timestamps: Vec<Timestamp>,
     /// full keypoints as originally recorded
@@ -38,6 +42,7 @@ impl Tracker {
     #[wasm_bindgen(constructor)]
     pub fn new() -> Self {
         Tracker {
+            db: crate::STATE.with_borrow(|state| Rc::clone(&state.db)),
             // order by timestamp satisfied for empty list
             timestamps: vec![],
             keypoints: vec![],
@@ -66,7 +71,7 @@ impl Tracker {
         // modification preserves timestamp order if it was true before
         self.timestamps.push(timestamp);
         self.keypoints.push(keypoints);
-        let skeleton_info = Skeleton3d::from_keypoints(&keypoints);
+        let skeleton_info = Skeleton3d::from_keypoints(&keypoints, &self.db);
         let front = skeleton_info.to_skeleton(0.0);
         let side = skeleton_info.to_skeleton(90.0);
         self.skeletons.push(skeleton_info);

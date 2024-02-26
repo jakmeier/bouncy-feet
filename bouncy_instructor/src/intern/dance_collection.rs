@@ -24,6 +24,7 @@ use crate::{dance_file, pose_file, AddDanceError, AddStepError};
 /// Actual poses are defined in external files and loaded in at runtime. Here
 /// data they are stored in the most convenient way, which will see many
 /// refactorings over time.
+#[derive(Clone)]
 pub(crate) struct DanceCollection {
     /// Pose definitions
     poses: Vec<Pose>,

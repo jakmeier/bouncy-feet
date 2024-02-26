@@ -1,8 +1,8 @@
-use super::dance_collection::LimbIndex;
+use super::dance_collection::{DanceCollection, LimbIndex};
 use super::geom::{Angle3d, SignedAngle};
 use super::pose::{BodyPoint, Limb};
 use crate::skeleton::{Segment, Side, Skeleton};
-use crate::{Keypoints, STATE};
+use crate::Keypoints;
 use std::collections::HashMap;
 use std::f32::consts::FRAC_PI_2;
 
@@ -70,15 +70,11 @@ impl Skeleton3d {
         }
     }
 
-    pub(crate) fn from_keypoints(kp: &Keypoints) -> Self {
-        let limb_angles_3d = STATE.with(|state| {
-            state
-                .borrow()
-                .db
-                .limbs()
-                .map(|(_index, limb)| limb.to_angle(kp))
-                .collect::<Vec<_>>()
-        });
+    pub(crate) fn from_keypoints(kp: &Keypoints, db: &DanceCollection) -> Self {
+        let limb_angles_3d = db
+            .limbs()
+            .map(|(_index, limb)| limb.to_angle(kp))
+            .collect::<Vec<_>>();
         let shoulder_angle = kp.left.shoulder.azimuth(kp.right.shoulder);
         let z: HashMap<_, _> = kp
             .body_points()
@@ -207,7 +203,7 @@ mod tests {
     #[test]
     fn test_keypoints_to_3d_skeleton() {
         let kp = straight_standing_keypoints();
-        let skeleton = Skeleton3d::from_keypoints(&kp);
+        let skeleton = Skeleton3d::from_keypoints(&kp, &Default::default());
         assert_float_angle_eq(0.0, skeleton.azimuth_correction);
         assert_angle_3d_eq(
             Angle3d::ZERO,

@@ -1,5 +1,4 @@
 use super::{Timestamp, Tracker};
-use crate::STATE;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 /// Information of a recorded frame in RON format.
@@ -25,13 +24,11 @@ impl Tracker {
                     config.clone(),
                 )
                 .unwrap(),
-                pose: STATE.with_borrow(|state| {
-                    ron::ser::to_string_pretty(
-                        &crate::pose_file::Pose::from_with_db(&self.skeletons[i], &state.db),
-                        config,
-                    )
-                    .unwrap()
-                }),
+                pose: ron::ser::to_string_pretty(
+                    &crate::pose_file::Pose::from_with_db(&self.skeletons[i], &self.db),
+                    config,
+                )
+                .unwrap(),
             },
         }
     }

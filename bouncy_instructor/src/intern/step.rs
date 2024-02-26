@@ -2,6 +2,7 @@ use super::skeleton_3d::Direction;
 
 mod detection;
 
+#[derive(Clone)]
 pub(crate) struct Step {
     pub id: String,
     pub name: String,

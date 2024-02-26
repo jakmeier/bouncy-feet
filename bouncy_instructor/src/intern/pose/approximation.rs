@@ -1,3 +1,4 @@
+use crate::intern::dance_collection::DanceCollection;
 use crate::intern::pose_score::{best_fit_pose, ErrorDetails};
 use crate::public::Tracker;
 use crate::tracker::PoseApproximation;
@@ -10,32 +11,29 @@ impl Tracker {
         first: usize,
         last: usize,
     ) -> Option<PoseApproximation> {
-        let result = crate::STATE.with_borrow(|state| {
-            if state.db.is_empty() {
-                return None;
-            }
-            let mut error = f32::INFINITY;
-            let mut error_details = ErrorDetails::default();
-            let mut pose_index = 0;
-            let mut history_index = 0;
+        if self.db.is_empty() {
+            return None;
+        }
+        let mut error = f32::INFINITY;
+        let mut error_details = ErrorDetails::default();
+        let mut pose_index = 0;
+        let mut history_index = 0;
 
-            for i in first..last {
-                let (err, details, pose) = best_fit_pose(&self.skeletons[i], state.db.poses());
-                if err < error {
-                    error = err;
-                    error_details = details;
-                    pose_index = pose;
-                    history_index = i;
-                }
+        for i in first..last {
+            let (err, details, pose) = best_fit_pose(&self.skeletons[i], self.db.poses());
+            if err < error {
+                error = err;
+                error_details = details;
+                pose_index = pose;
+                history_index = i;
             }
-            Some(PoseApproximation {
-                name: state.db.pose_name(pose_index).to_owned(),
-                error,
-                timestamp: self.timestamps[history_index],
-                error_details,
-            })
-        })?;
-        Some(result)
+        }
+        Some(PoseApproximation {
+            name: self.db.pose_name(pose_index).to_owned(),
+            error,
+            timestamp: self.timestamps[history_index],
+            error_details,
+        })
     }
 
     /// Find the best matching approximation of the given pose in the given range.
@@ -44,6 +42,7 @@ impl Tracker {
         pose_index: usize,
         start: Timestamp,
         end: Timestamp,
+        db: &DanceCollection,
     ) -> Option<PoseApproximation> {
         let first = self.timestamps.partition_point(|t| *t < start);
         let last = self.timestamps.partition_point(|t| *t <= end);
@@ -51,41 +50,39 @@ impl Tracker {
             return None;
         }
 
-        crate::STATE.with_borrow(|state| {
-            if state.db.is_empty() {
-                return None;
-            }
-            let mut best_error = f32::INFINITY;
-            let mut best_details = ErrorDetails::default();
-            let mut history_index = 0;
+        if db.is_empty() {
+            return None;
+        }
+        let mut best_error = f32::INFINITY;
+        let mut best_details = ErrorDetails::default();
+        let mut history_index = 0;
 
-            for i in first..last {
-                let pose = &state.db.poses()[pose_index];
-                let skeleton = &self.skeletons[i];
-                if pose.direction != skeleton.direction().into() {
-                    continue;
-                }
+        for i in first..last {
+            let pose = &db.poses()[pose_index];
+            let skeleton = &self.skeletons[i];
+            if pose.direction != skeleton.direction().into() {
+                continue;
+            }
 
-                let details = pose.error(skeleton.angles(), skeleton.positions());
-                let error = details.error_score();
-                if error < best_error {
-                    best_error = error;
-                    best_details = details;
-                    history_index = i;
-                }
+            let details = pose.error(skeleton.angles(), skeleton.positions());
+            let error = details.error_score();
+            if error < best_error {
+                best_error = error;
+                best_details = details;
+                history_index = i;
             }
-            if best_error >= 1.0 {
-                // pose not even close to be found
-                None
-            } else {
-                Some(PoseApproximation {
-                    name: state.db.pose_name(pose_index).to_owned(),
-                    error: best_error,
-                    timestamp: self.timestamps[history_index],
-                    error_details: best_details,
-                })
-            }
-        })
+        }
+        if best_error >= 1.0 {
+            // pose not even close to be found
+            None
+        } else {
+            Some(PoseApproximation {
+                name: db.pose_name(pose_index).to_owned(),
+                error: best_error,
+                timestamp: self.timestamps[history_index],
+                error_details: best_details,
+            })
+        }
     }
 
     /// Fit a single frame against all poses and return all errors
@@ -107,24 +104,21 @@ impl Tracker {
             crate::println!("{name}: {angle:?}");
         }
 
-        crate::STATE.with_borrow(|state| {
-            let angles = skeleton.angles();
-            let positions = skeleton.positions();
-            state
-                .db
-                .poses()
-                .iter()
-                .enumerate()
-                .map(|(pose_index, pose)| {
-                    let details = pose.error(angles, positions);
-                    PoseApproximation {
-                        name: state.db.pose_name(pose_index).to_owned(),
-                        error: details.error_score(),
-                        timestamp,
-                        error_details: details,
-                    }
-                })
-                .collect()
-        })
+        let angles = skeleton.angles();
+        let positions = skeleton.positions();
+        self.db
+            .poses()
+            .iter()
+            .enumerate()
+            .map(|(pose_index, pose)| {
+                let details = pose.error(angles, positions);
+                PoseApproximation {
+                    name: self.db.pose_name(pose_index).to_owned(),
+                    error: details.error_score(),
+                    timestamp,
+                    error_details: details,
+                }
+            })
+            .collect()
     }
 }

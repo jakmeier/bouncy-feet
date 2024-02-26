@@ -16,7 +16,7 @@ use crate::Keypoints;
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub(crate) struct Pose {
     pub(crate) direction: PoseDirection,
     pub(crate) limbs: Vec<LimbPosition>,

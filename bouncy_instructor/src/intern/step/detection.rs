@@ -1,6 +1,7 @@
+use crate::intern::dance_collection::DanceCollection;
 use crate::public::tracker::PoseApproximation;
 use crate::tracker::DetectedStep;
-use crate::{Tracker, STATE};
+use crate::Tracker;
 
 impl DetectedStep {
     pub(crate) fn new(step_name: String, poses: Vec<PoseApproximation>) -> Self {
@@ -53,7 +54,7 @@ impl Tracker {
                 let step_start_t = first_pose_candidate.unwrap().timestamp;
                 let step_start_index =
                     start + self.timestamps[start..end].partition_point(|t| *t < step_start_t);
-                if let Some(step) = self.detect_step(step_start_index, min_dt, max_dt) {
+                if let Some(step) = self.detect_step(step_start_index, min_dt, max_dt, &self.db) {
                     if !step.step_name.contains("Idle") {
                         return Some(step);
                     } else if idle_result.is_none() {
@@ -93,42 +94,46 @@ impl Tracker {
     /// The second way is substantially better because it makes it more likely
     /// to find a step. Otherwise, perhaps there is a slightly better match for
     /// a pose with a flat foot, while the intended step needed the pose on heels.
-    fn detect_step(&self, start: usize, min_dt: u32, max_dt: u32) -> Option<DetectedStep> {
+    fn detect_step(
+        &self,
+        start: usize,
+        min_dt: u32,
+        max_dt: u32,
+        db: &DanceCollection,
+    ) -> Option<DetectedStep> {
         let mut best_error = f32::INFINITY;
         let mut result = None;
 
-        STATE.with_borrow(|state| {
-            for step in state.db.steps() {
-                let mut pose_matches = vec![];
-                let mut start_t = self.timestamps[start];
-                let mut end_t = start_t + max_dt;
-                for pose in &step.poses {
-                    if let Some(pose_match) = self.find_pose(*pose, start_t, end_t) {
-                        start_t = pose_match.timestamp + min_dt;
-                        end_t = pose_match.timestamp + max_dt;
-                        pose_matches.push(pose_match);
-                    } else {
-                        pose_matches.clear();
-                        break;
-                    }
+        for step in db.steps() {
+            let mut pose_matches = vec![];
+            let mut start_t = self.timestamps[start];
+            let mut end_t = start_t + max_dt;
+            for pose in &step.poses {
+                if let Some(pose_match) = self.find_pose(*pose, start_t, end_t, db) {
+                    start_t = pose_match.timestamp + min_dt;
+                    end_t = pose_match.timestamp + max_dt;
+                    pose_matches.push(pose_match);
+                } else {
+                    pose_matches.clear();
+                    break;
                 }
-                if !pose_matches.is_empty() {
-                    let detection = DetectedStep::new(step.name.clone(), pose_matches);
-                    if detection.error < best_error {
-                        // hack: only overwrite with non-idle step with idle step if we are sure
-                        if !step.name.contains("Idle")
-                            || result
-                                .as_ref()
-                                .is_some_and(|r: &DetectedStep| r.step_name.contains("Idle"))
-                            || (best_error > 0.2 && detection.error < 0.075)
-                        {
-                            best_error = detection.error;
-                            result = Some(detection);
-                        }
+            }
+            if !pose_matches.is_empty() {
+                let detection = DetectedStep::new(step.name.clone(), pose_matches);
+                if detection.error < best_error {
+                    // hack: only overwrite with non-idle step with idle step if we are sure
+                    if !step.name.contains("Idle")
+                        || result
+                            .as_ref()
+                            .is_some_and(|r: &DetectedStep| r.step_name.contains("Idle"))
+                        || (best_error > 0.2 && detection.error < 0.075)
+                    {
+                        best_error = detection.error;
+                        result = Some(detection);
                     }
                 }
             }
-        });
+        }
         result
     }
 }
