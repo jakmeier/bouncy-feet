@@ -5,7 +5,7 @@ mod step_output;
 pub use pose_output::PoseApproximation;
 pub use step_output::DetectedStep;
 
-use crate::intern::dance_collection::DanceCollection;
+use crate::intern::dance_collection::{DanceCollection, ForeignCollectionError};
 use crate::intern::skeleton_3d::Skeleton3d;
 use crate::keypoints::Keypoints;
 use crate::skeleton::Skeleton;
@@ -39,6 +39,7 @@ pub struct Skeletons {
 
 #[wasm_bindgen]
 impl Tracker {
+    /// Create a tracker for all known steps.
     #[wasm_bindgen(constructor)]
     pub fn new() -> Self {
         Tracker {
@@ -49,6 +50,26 @@ impl Tracker {
             skeletons: vec![],
             bpm: 120.0,
         }
+    }
+
+    /// Track one specific step, by name, including its variations (with the same name).
+    #[wasm_bindgen(js_name = "StepTracker")]
+    pub fn new_step_tracker(step_name: String) -> Result<Tracker, ForeignCollectionError> {
+        let mut db = DanceCollection::default();
+        crate::STATE.with_borrow(|state| {
+            for step in state.db.steps_by_name(&step_name) {
+                db.add_foreign_step(&state.db, &step.id)?;
+            }
+            Ok(())
+        })?;
+        Ok(Tracker {
+            db: Rc::new(db),
+            // order by timestamp satisfied for empty list
+            timestamps: vec![],
+            keypoints: vec![],
+            skeletons: vec![],
+            bpm: 120.0,
+        })
     }
 
     pub fn clear(&mut self) {

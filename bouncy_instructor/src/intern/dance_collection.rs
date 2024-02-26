@@ -65,7 +65,10 @@ impl Default for DanceCollection {
 }
 
 impl DanceCollection {
-    pub(crate) fn add(&mut self, poses: Vec<crate::pose_file::Pose>) -> Result<(), AddPoseError> {
+    pub(crate) fn add_poses(
+        &mut self,
+        poses: Vec<crate::pose_file::Pose>,
+    ) -> Result<(), AddPoseError> {
         for pose in poses {
             let new_pose = if !pose.mirror_of.is_empty() {
                 if let Some(i) = self.pose_by_id(&pose.mirror_of) {
@@ -80,6 +83,30 @@ impl DanceCollection {
             self.names.push(pose.name);
         }
         Ok(())
+    }
+
+    /// Copies a pose from a different dance collection
+    fn add_foreign_pose(&mut self, other: &Self, pose_index: usize) -> usize {
+        let pose = &other.poses()[pose_index];
+
+        let limbs = pose
+            .limbs
+            .iter()
+            .map(|limb| {
+                let index = self.find_or_insert_limb(other.limbs[limb.limb.0]);
+                LimbPosition {
+                    limb: index,
+                    target: limb.target.clone(),
+                }
+            })
+            .collect();
+
+        let new_pose = Pose::new(pose.direction, limbs, pose.z.clone());
+
+        let new_index = self.poses.len();
+        self.poses.push(new_pose);
+        self.names.push(other.pose_name(pose_index).to_owned());
+        new_index
     }
 
     /// Take data from a pose definition and produce a Pose.
@@ -214,6 +241,35 @@ impl DanceCollection {
         Ok(())
     }
 
+    /// Copies a step from a different dance collection, including poses.
+    pub(crate) fn add_foreign_step(
+        &mut self,
+        other: &Self,
+        id: &str,
+    ) -> Result<(), ForeignCollectionError> {
+        let step = other
+            .step(id)
+            .ok_or_else(|| ForeignCollectionError::MissingStep(id.to_owned()))?;
+        let poses = step
+            .poses
+            .iter()
+            .map(|&foreign_pose_index| {
+                let pose_id = other.pose_name(foreign_pose_index);
+                self.pose_by_id(pose_id)
+                    .unwrap_or_else(|| self.add_foreign_pose(other, foreign_pose_index))
+            })
+            .collect();
+        let new_step = Step {
+            id: step.id.clone(),
+            name: step.name.clone(),
+            variation: step.variation.clone(),
+            poses,
+            directions: step.directions.clone(),
+        };
+        self.steps.push(new_step);
+        Ok(())
+    }
+
     pub(crate) fn add_dances(
         &mut self,
         dances: Vec<dance_file::Dance>,
@@ -238,6 +294,10 @@ impl DanceCollection {
 
     pub(crate) fn step(&self, id: &str) -> Option<&Step> {
         self.steps.iter().find(|step| step.id == id)
+    }
+
+    pub(crate) fn steps_by_name<'a>(&'a self, name: &'a str) -> impl Iterator<Item = &Step> {
+        self.steps.iter().filter(move |step| step.name == name)
     }
 
     /// A DB without default poses for testing where only one pose is needed.
@@ -326,5 +386,17 @@ impl From<AddPoseError> for ParseFileError {
         match error {
             AddPoseError::MissingMirror(id) => Self::UnknownPoseReference(id),
         }
+    }
+}
+
+#[derive(thiserror::Error, Debug)]
+pub enum ForeignCollectionError {
+    #[error("internal error, could not find {0}")]
+    MissingStep(String),
+}
+
+impl From<ForeignCollectionError> for wasm_bindgen::JsValue {
+    fn from(value: ForeignCollectionError) -> Self {
+        format!("{value}").into()
     }
 }

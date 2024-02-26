@@ -413,7 +413,7 @@ mod tests {
 
         let mut db = DanceCollection::default();
         let input_pose: pose_file::Pose = ron::from_str(&input).unwrap();
-        db.add(vec![input_pose]).unwrap();
+        db.add_poses(vec![input_pose]).unwrap();
 
         assert_eq!(db.poses().len(), 1, "test expects only 1 pose");
         let pose = db.poses().first().unwrap();
@@ -454,7 +454,7 @@ mod tests {
 
         let mut db = DanceCollection::default();
         let input_pose: pose_file::Pose = ron::from_str(&input).unwrap();
-        db.add(vec![input_pose]).unwrap();
+        db.add_poses(vec![input_pose]).unwrap();
         let input_pose: pose_file::Pose = ron::from_str(&input).unwrap();
 
         let mut poses = db

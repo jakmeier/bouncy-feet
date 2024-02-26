@@ -33,7 +33,7 @@ impl State {
         &mut self,
         poses: Vec<pose_file::Pose>,
     ) -> Result<(), intern::dance_collection::AddPoseError> {
-        Rc::make_mut(&mut self.db).add(poses)
+        Rc::make_mut(&mut self.db).add_poses(poses)
     }
 
     fn add_steps(&mut self, steps: &[step_file::Step]) -> Result<(), AddStepError> {

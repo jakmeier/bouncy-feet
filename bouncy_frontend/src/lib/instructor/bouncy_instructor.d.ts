@@ -416,8 +416,15 @@ export class StepInfo {
 export class Tracker {
   free(): void;
 /**
+* Create a tracker for all known steps.
 */
   constructor();
+/**
+* Track one specific step, by name, including its variations (with the same name).
+* @param {string} step_name
+* @returns {Tracker}
+*/
+  static StepTracker(step_name: string): Tracker;
 /**
 */
   clear(): void;
