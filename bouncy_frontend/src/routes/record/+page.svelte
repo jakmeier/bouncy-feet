@@ -9,6 +9,8 @@
   import Banner from './Banner.svelte';
   import DanceStats from '../profile/DanceStats.svelte';
   import Settings from './Settings.svelte';
+  import AllPoseErrors from './AllPoseErrors.svelte';
+  import { dev } from '$app/environment';
 
   const poseCtx = getContext('pose');
   const userCtx = getContext('user');
@@ -260,6 +262,10 @@
   </div>
   <p style="width: 100px; height: 50px;"></p>
 </div>
+
+{#if dev && showCamera && recordingStarted && !isModelOn}
+  <AllPoseErrors {reviewVideoElement} {recordingStart}></AllPoseErrors>
+{/if}
 
 <style>
   #outer {
