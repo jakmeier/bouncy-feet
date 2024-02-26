@@ -11,7 +11,7 @@
 //! 2) intern::pose::Pose -> Skeleton3d
 //! 3) Skeleton3d -> pose_file::Pose
 
-use super::{Pose, PoseDirection};
+use super::{BodyPartOrdering, Pose, PoseDirection};
 use crate::intern::geom::{Angle3d, SignedAngle};
 use crate::intern::pose::{BodyPart, BodyPoint, BodySide, Limb};
 use crate::intern::pose_db::LimbPositionDatabase;
@@ -198,6 +198,24 @@ impl From<BodyPart> for pose_file::BodyPart {
     }
 }
 
+impl From<pose_file::BodyPartOrdering> for BodyPartOrdering {
+    fn from(other: pose_file::BodyPartOrdering) -> Self {
+        Self {
+            forward: other.forward.into(),
+            backward: other.backward.into(),
+        }
+    }
+}
+
+impl From<BodyPartOrdering> for pose_file::BodyPartOrdering {
+    fn from(other: BodyPartOrdering) -> Self {
+        Self {
+            forward: other.forward.into(),
+            backward: other.backward.into(),
+        }
+    }
+}
+
 impl From<pose_file::BodySide> for BodySide {
     fn from(other: pose_file::BodySide) -> Self {
         match other {
@@ -271,6 +289,7 @@ impl pose_file::Pose {
             limbs,
             name: "Generated Pose".to_owned(),
             mirror_of: String::new(),
+            z: Vec::new(),
         }
     }
 }

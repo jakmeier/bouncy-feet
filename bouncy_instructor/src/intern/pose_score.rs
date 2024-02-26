@@ -193,7 +193,7 @@ mod tests {
             SignedAngle::degree(polar)
         };
         let limb = LimbPosition::new(Limb::LEFT_THIGH, polar, SignedAngle::ZERO, 1.0);
-        let pose = Pose::new(PoseDirection::Front, vec![limb]);
+        let pose = Pose::new(PoseDirection::Front, vec![limb], vec![]);
         let mut angles = zero_skeleton();
         angles[Limb::LEFT_THIGH.as_usize()] = polar;
         let error = pose.error(&angles);
@@ -225,6 +225,7 @@ mod tests {
                 LimbPosition::new(Limb::RIGHT_ARM, SignedAngle(0.0), tol, 1.0),
                 LimbPosition::new(Limb::RIGHT_FOREARM, SignedAngle(0.0), tol, 1.0),
             ],
+            vec![],
         );
         check_score_fixed_skeleton(&pose, expect!["0.49684697"]);
     }
@@ -244,6 +245,7 @@ mod tests {
                 LimbPosition::new(Limb::RIGHT_ARM, SignedAngle(PI), tol, 1.0),
                 LimbPosition::new(Limb::RIGHT_FOREARM, SignedAngle(PI), tol, 1.0),
             ],
+            vec![],
         );
         check_score_fixed_skeleton(&pose, expect!["0.68592346"]);
     }
@@ -324,6 +326,7 @@ mod tests {
                 LimbPosition::new(Limb::RIGHT_ARM, SignedAngle(PI / 2.0), tol, 1.0),
                 LimbPosition::new(Limb::RIGHT_FOREARM, SignedAngle(PI / 2.0), tol, 1.0),
             ],
+            vec![],
         )
     }
 }

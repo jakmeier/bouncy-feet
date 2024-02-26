@@ -7,7 +7,7 @@
 //!  structs required for this.
 
 use super::geom::SignedAngle;
-use super::pose::{Limb, LimbPosition, Pose, PoseDirection};
+use super::pose::{BodyPartOrdering, Limb, LimbPosition, Pose, PoseDirection};
 use crate::parsing::ParseFileError;
 use crate::pose_file;
 
@@ -67,7 +67,7 @@ impl LimbPositionDatabase {
                     return Err(AddPoseError::MissingMirror(pose.mirror_of.clone()));
                 }
             } else {
-                self.new_pose(pose.direction, pose.limbs)
+                self.new_pose(pose.direction, pose.limbs, pose.z)
             };
             self.poses.push(new_pose);
             self.names.push(pose.name);
@@ -75,11 +75,12 @@ impl LimbPositionDatabase {
         Ok(())
     }
 
-    /// Take a list of limbs from a pose definition and produce a Pose.
+    /// Take data from a pose definition and produce a Pose.
     fn new_pose(
         &mut self,
         direction: pose_file::PoseDirection,
         limbs: Vec<pose_file::LimbPosition>,
+        z: Vec<pose_file::BodyPartOrdering>,
     ) -> Pose {
         let limbs = limbs
             .into_iter()
@@ -94,7 +95,8 @@ impl LimbPositionDatabase {
                 )
             })
             .collect();
-        Pose::new(direction.into(), limbs)
+        let z = z.into_iter().map(From::from).collect();
+        Pose::new(direction.into(), limbs, z)
     }
 
     /// Take an existing pose and produce a mirror pose of it.
@@ -117,7 +119,13 @@ impl LimbPositionDatabase {
                 LimbPosition::from_limb_and_target(index, target)
             })
             .collect();
-        Pose::new(direction, limbs)
+        let z = self.poses[i]
+            .z
+            .iter()
+            .map(From::from)
+            .map(BodyPartOrdering::mirror)
+            .collect();
+        Pose::new(direction, limbs, z)
     }
 
     fn find_or_insert_limb(&mut self, limb: Limb) -> LimbIndex {
@@ -167,6 +175,7 @@ impl LimbPositionDatabase {
                 SignedAngle::ZERO,
                 1.0,
             )],
+            vec![],
         )];
 
         Self {

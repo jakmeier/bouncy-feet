@@ -18,6 +18,7 @@ use crate::Keypoints;
 pub(crate) struct Pose {
     pub(crate) direction: PoseDirection,
     pub(crate) limbs: Vec<LimbPosition>,
+    pub(crate) z: Vec<BodyPartOrdering>,
 }
 
 #[derive(Clone, Debug)]
@@ -38,6 +39,12 @@ pub(crate) struct Limb {
 struct BodyPoint {
     side: BodySide,
     part: BodyPart,
+}
+
+#[derive(PartialEq, Eq, Hash, Debug, Clone, Copy)]
+pub(crate) struct BodyPartOrdering {
+    forward: BodyPoint,
+    backward: BodyPoint,
 }
 
 #[derive(PartialEq, Eq, Hash, Debug, Clone, Copy)]
@@ -96,8 +103,16 @@ impl BodyPoint {
 }
 
 impl Pose {
-    pub(crate) fn new(direction: PoseDirection, limbs: Vec<LimbPosition>) -> Self {
-        Self { direction, limbs }
+    pub(crate) fn new(
+        direction: PoseDirection,
+        limbs: Vec<LimbPosition>,
+        z: Vec<BodyPartOrdering>,
+    ) -> Self {
+        Self {
+            direction,
+            limbs,
+            z,
+        }
     }
 }
 
@@ -135,5 +150,14 @@ impl LimbPosition {
 
     pub(crate) fn weight(&self) -> f32 {
         self.target.weight()
+    }
+}
+
+impl BodyPartOrdering {
+    pub(crate) fn mirror(&self) -> Self {
+        Self {
+            backward: self.backward.mirror(),
+            forward: self.forward.mirror(),
+        }
     }
 }

@@ -25,8 +25,11 @@ pub(crate) struct Pose {
     pub direction: PoseDirection,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub limbs: Vec<LimbPosition>,
-    // TODO: define in which z-order two body parts should be
-    // pub body: Vec<BodyPartOrdering>
+    /// The Z-Axis is the distance to the camera. It can only be measured quite
+    /// inaccurately from the camera image, hence poses define only relative
+    /// position comparisons instead of numeric coordinates.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub z: Vec<BodyPartOrdering>,
     #[serde(default, skip_serializing_if = "String::is_empty")]
     pub mirror_of: String,
 }
@@ -49,6 +52,13 @@ pub(crate) struct LimbPosition {
 pub(crate) struct BodyPoint {
     pub side: BodySide,
     pub part: BodyPart,
+}
+
+/// Defines a simple is-in-front-of relation between two body parts.
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
+pub(crate) struct BodyPartOrdering {
+    pub forward: BodyPoint,
+    pub backward: BodyPoint,
 }
 
 /// Either a pre-defined limb or a custom pair of body points.
