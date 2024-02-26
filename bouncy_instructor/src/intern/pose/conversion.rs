@@ -399,7 +399,7 @@ mod tests {
 
     #[track_caller]
     fn check_pose_from_file(angle: i16, is_front: bool) {
-        let input = ron_string_pose(angle, is_front);
+        let input = ron_string_pose(angle, is_front, false);
         // Note: With the current definition format, there is no conversion
         // happening, just the original should be in. But this might change
         // again.
@@ -418,33 +418,33 @@ mod tests {
 
     #[test]
     fn test_pose_conversion_circle_1() {
-        check_pose_conversion_circle(90, true);
-        check_pose_conversion_circle(90, false);
-        check_pose_conversion_circle(70, true);
-        check_pose_conversion_circle(20, false);
+        check_pose_conversion_circle(90, true, false);
+        check_pose_conversion_circle(90, false, false);
+        check_pose_conversion_circle(70, true, false);
+        check_pose_conversion_circle(20, false, false);
     }
 
     #[test]
     fn test_pose_conversion_circle_2() {
-        check_pose_conversion_circle(-90, true);
-        check_pose_conversion_circle(-90, false);
-        check_pose_conversion_circle(-30, true);
-        check_pose_conversion_circle(-60, false);
+        check_pose_conversion_circle(-90, true, true);
+        check_pose_conversion_circle(-90, false, true);
+        check_pose_conversion_circle(-30, true, true);
+        check_pose_conversion_circle(-60, false, true);
     }
 
     #[test]
     fn test_pose_conversion_circle_3() {
-        check_pose_conversion_circle(120, true);
-        check_pose_conversion_circle(120, false);
-        check_pose_conversion_circle(135, true);
-        check_pose_conversion_circle(-135, false);
+        check_pose_conversion_circle(120, true, false);
+        check_pose_conversion_circle(120, false, false);
+        check_pose_conversion_circle(135, true, false);
+        check_pose_conversion_circle(-135, false, false);
     }
 
     /// Ensure a pose_file::Pose -> Pose -> Skeleton3d -> pose_file::Pose
     /// returns an output equivalent to the input.
     #[track_caller]
-    fn check_pose_conversion_circle(angle: i16, is_front: bool) {
-        let input = ron_string_pose(angle, is_front);
+    fn check_pose_conversion_circle(angle: i16, is_front: bool, add_z: bool) {
+        let input = ron_string_pose(angle, is_front, add_z);
 
         let mut db = LimbPositionDatabase::default();
         let input_pose: pose_file::Pose = ron::from_str(&input).unwrap();
@@ -459,6 +459,13 @@ mod tests {
 
         let output_pose = poses.next().unwrap();
 
+        // This is expected to not work, as there is currently no way for the
+        // generated pose to know which body parts to look for.
+        // assert_eq!(
+        //     &input_pose.z, &output_pose.z,
+        //     "input Z does not match output Z"
+        // );
+
         // the output contains all limbs, even those not part of the pose
         // remove all zero angle to reduce it to only the relevant angles
         let output = output_pose
@@ -472,15 +479,21 @@ mod tests {
         assert!(poses.next().is_none(), "more poses than expected");
     }
 
-    fn ron_string_pose(angle: i16, front: bool) -> String {
+    fn ron_string_pose(angle: i16, front: bool, add_z: bool) -> String {
         let direction = if front { "Front" } else { "Right" };
+        let z = if add_z {
+            "z: [(forward: (side: Right, part: Ankle), backward: (side: Left, part: Ankle))]"
+        } else {
+            ""
+        };
         format!(
             r#"(
             name: "Generated Pose",
             direction: {direction},
             limbs: [
               (limb: LeftThigh, angle: {angle}, tolerance: 0, weight: 1.0),
-            ]
+            ],
+            {z}
           )"#
         )
     }
