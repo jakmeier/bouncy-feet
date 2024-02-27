@@ -80,10 +80,16 @@
   </div>
 {/if}
 
+<div class="label">
+  <a href="./record">
+    <button class="light">
+      <span class="material-symbols-outlined"> videocam </span>
+      <p>{$t('record.start-button')}</p>
+    </button>
+  </a>
+</div>
+
 <style>
-  h1 {
-    text-align: center;
-  }
   label,
   .label {
     display: grid;
@@ -93,5 +99,8 @@
     background-color: var(--theme-neutral-light);
     border-radius: 10px;
     padding: 10px;
+  }
+  button {
+    width: 200px;
   }
 </style>

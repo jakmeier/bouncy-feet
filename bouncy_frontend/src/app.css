@@ -8,6 +8,7 @@
     --theme-neutral-light: #c2bfff;
     --theme-neutral-white: #ffffff;
     --theme-accent: #e97516;
+    --theme-accent-light: #ffad69;;
 }
 
 /*
@@ -37,6 +38,15 @@ button {
     background-color: var(--theme-accent);
     color: var(--theme-neutral-dark);
     border: none;
+    border-radius: 2px;
+    font-size: 20px;
+    padding: 10px;
+}
+
+button.light {
+    background-color: var(--theme-accent-light);
+    color: var(--theme-neutral-dark);
+    border: var(--theme-neutral-dark) solid 3px;
     border-radius: 2px;
     font-size: 20px;
     padding: 10px;
