@@ -9,7 +9,9 @@
 
   /** @type{import("$lib/instructor/bouncy_instructor").DetectedStep[]} */
   export let steps = [];
+  /** @type {number} */
   export let reviewStart;
+  /** @type {number} */
   export let reviewEnd;
 
   /**
@@ -29,11 +31,11 @@
     adjustScroll(scrollableWidth, cursor);
   }
   /**
-   * @type {(cursor: number) => void}
+   * @type {undefined | ((cursor: number) => void)}
    * called when the parent should be notified about scrolling
    * (the other direction of setCursor)
    */
-  export let onScroll;
+  export let onScroll = undefined;
 
   /**
    * @type {HTMLDivElement}
@@ -45,7 +47,7 @@
   $: scrollableWidth = Math.max(500, steps.length * avatarSize * 4);
   // scroll position zero should put the first possible pose in the center
   // for this, we have to offset all positions by `scrollOffset`
-  $: scrollOffset = (visibleBannerWidth) / 2 - avatarSize;
+  $: scrollOffset = visibleBannerWidth / 2 - avatarSize;
   // likewise, cursor=1 should center the last possible pose hence, put a fake
   // element in the banner to reserve extra space in it, here we compute the
   // position of it
@@ -64,7 +66,9 @@
 
   function scrolled() {
     const r = stepsDiv.scrollLeft / scrollableWidth;
-    onScroll(r);
+    if (onScroll) {
+      onScroll(r);
+    }
     cursor = r;
   }
 

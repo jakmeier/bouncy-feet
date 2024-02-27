@@ -45,6 +45,7 @@
     let steps = 0;
     let prevPoseName = '';
     for (const step of dance) {
+      // TODO: this count doens't work for repeated steps
       if (step.name !== prevPoseName) {
         steps += 1;
         prevPoseName = step.name;
@@ -56,7 +57,11 @@
     $user.recordedSteps += steps;
     $user.recordedSeconds += duration;
 
-    submitStats($user);
+    try {
+      submitStats($user);
+    } catch (err) {
+      console.warn('Submitting stats failed', err);
+    }
 
     return {
       numSteps: steps,

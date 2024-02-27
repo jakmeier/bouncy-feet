@@ -16,6 +16,9 @@ import { PoseLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
 import { Cartesian3d, Keypoints, KeypointsSide, loadPoseFile, loadStepFile } from './instructor/bouncy_instructor';
 import { base } from '$app/paths';
 
+/**
+ * @param {import("@mediapipe/tasks-vision").Landmark[]} landmarks
+ */
 export function landmarksToKeypoints(landmarks) {
     const left = new KeypointsSide(
         coordinate(I.LEFT_SHOULDER, landmarks),

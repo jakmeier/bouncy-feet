@@ -52,6 +52,11 @@
   }
 </script>
 
-<canvas bind:this={canvas} {width} {height} style="width: {width}px; height: {height}px;">
+<canvas
+  bind:this={canvas}
+  {width}
+  {height}
+  style="width: {width}px; height: {height}px;"
+>
   <slot />
 </canvas>

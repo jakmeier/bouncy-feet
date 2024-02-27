@@ -42,6 +42,7 @@
         "done-button": "done",
         "stop-camera": "stop camera",
         "stop-record": "stop video",
+        "train-dance-prefix": "Train",
         "download": "save",
         "settings": {
             "title": "Settings",
