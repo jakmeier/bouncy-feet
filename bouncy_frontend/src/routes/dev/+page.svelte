@@ -3,8 +3,8 @@
   import { landmarksToKeypoints } from '$lib/pose';
   import { fileToUrl, waitForVideoMetaLoaded } from '$lib/promise_util';
   import { getContext, onMount, setContext } from 'svelte';
-  import PoseError from './PoseError.svelte';
-  import Banner from '../record/Banner.svelte';
+  import PoseError from '$lib/components/dev/PoseError.svelte';
+  import Banner from '$lib/components/review/Banner.svelte';
 
   /** @type {HTMLInputElement}  */
   let upload;

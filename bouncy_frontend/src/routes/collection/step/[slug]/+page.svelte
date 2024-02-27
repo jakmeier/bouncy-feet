@@ -2,7 +2,7 @@
   import { page } from '$app/stores';
   import { t } from '$lib/i18n.js';
   import Step from '../../Step.svelte';
-  import Header from '$lib/Header.svelte';
+  import Header from '$lib/components/Header.svelte';
   import Select from 'svelte-select';
   import { dynamicCounter } from '$lib/timer';
 

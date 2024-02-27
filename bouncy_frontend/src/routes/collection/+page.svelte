@@ -3,7 +3,7 @@
   import { counter } from '$lib/timer';
   import { getContext } from 'svelte';
   import DanceAnimation from '../DanceAnimation.svelte';
-  import Area from '../record/Area.svelte';
+  import Area from '$lib/components/Area.svelte';
   import Step from './Step.svelte';
 
   /** @type {import('./$types').PageData} */

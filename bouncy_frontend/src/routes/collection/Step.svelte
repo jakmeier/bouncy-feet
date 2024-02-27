@@ -1,6 +1,6 @@
 <script>
-  import Area from '../record/Area.svelte';
-  import SvgAvatar from '$lib/avatar/SvgAvatar.svelte';
+  import Area from '$lib/components/Area.svelte';
+  import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
   import { Skeleton } from '$lib/instructor/bouncy_instructor';
 
   /** @type {import('$lib/instructor/bouncy_instructor').StepInfo} */

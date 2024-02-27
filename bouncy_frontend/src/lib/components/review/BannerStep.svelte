@@ -1,8 +1,6 @@
 <script>
-  import Canvas from '$lib/Canvas.svelte';
   import { getContext } from 'svelte';
-  import Avatar from './Avatar.svelte';
-  import SvgAvatar from '$lib/avatar/SvgAvatar.svelte';
+  import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
 
   /** @type{import("$lib/instructor/bouncy_instructor").DetectedStep} */
   export let step;
@@ -64,7 +62,7 @@
   {#if !step.name.includes('Idle')}
     <div class="step-name">
       <!-- TODO: translation -->
-      {step.name} ({(10 * (0.2-step.error)/0.2).toFixed(0)})
+      {step.name} ({((10 * (0.2 - step.error)) / 0.2).toFixed(0)})
     </div>
   {/if}
 </div>
@@ -94,6 +92,4 @@
     position: absolute;
     height: 60px;
   }
-
-
 </style>

@@ -1,5 +1,5 @@
 <script>
-  import SvgAvatar from '$lib/avatar/SvgAvatar.svelte';
+  import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
   import { Skeleton } from '$lib/instructor/bouncy_instructor';
   import { counter } from '$lib/timer';
 

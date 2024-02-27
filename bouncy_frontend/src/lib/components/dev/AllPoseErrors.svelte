@@ -1,6 +1,6 @@
 <script>
   import { getContext } from 'svelte';
-  import PoseError from '../dev/PoseError.svelte';
+  import PoseError from './PoseError.svelte';
 
   /** @type {HTMLVideoElement} */
   export let reviewVideoElement;

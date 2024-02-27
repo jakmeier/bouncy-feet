@@ -1,15 +1,15 @@
 <script>
   // TODO: clean up module hierarchy and move duplicated code into new components
-  import Camera from '../../../../record/Camera.svelte';
+  import Camera from '$lib/components/record/Camera.svelte';
   import { landmarksToKeypoints } from '$lib/pose';
-  import SvgAvatar from '$lib/avatar/SvgAvatar.svelte';
+  import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
   import { getContext, onDestroy, onMount, setContext, tick } from 'svelte';
-  import Area from '../../../../record/Area.svelte';
+  import Area from '$lib/components/Area.svelte';
   import { t } from '$lib/i18n';
   import { Tracker } from '$lib/instructor/bouncy_instructor';
-  import Banner from '../../../../record/Banner.svelte';
+  import Banner from '$lib/components/review/Banner.svelte';
   import DanceStats from '../../../../profile/DanceStats.svelte';
-  import AllPoseErrors from '../../../../record/AllPoseErrors.svelte';
+  import AllPoseErrors from '$lib/components/dev/AllPoseErrors.svelte';
   import { dev } from '$app/environment';
   import { page } from '$app/stores';
 

@@ -1,10 +1,9 @@
 <script>
   import { page } from '$app/stores';
-  import { t } from '$lib/i18n.js';
-  import Header from '$lib/Header.svelte';
+  import Header from '$lib/components/Header.svelte';
   import DanceAnimation from '../../../DanceAnimation.svelte';
   import Step from '../../Step.svelte';
-  import { dynamicCounter, counter } from '$lib/timer';
+  import { counter } from '$lib/timer';
   import { getContext } from 'svelte';
 
   /** @type {import('./$types').PageData} */
@@ -37,9 +36,9 @@
     class="dance"
     style="max-width: {danceSize}px; max-height: {danceSize}px"
   >
-  {#if dance}
-    <DanceAnimation {dance} />
-  {/if}
+    {#if dance}
+      <DanceAnimation {dance} />
+    {/if}
   </div>
 
   <div class="steps-container">
