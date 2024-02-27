@@ -42,13 +42,15 @@
       return;
     }
 
+    // we are actually counting pose changes, not steps in the usual sense
     let steps = 0;
     let prevPoseName = '';
     for (const step of dance) {
-      // TODO: this count doens't work for repeated steps
-      if (step.name !== prevPoseName) {
-        steps += 1;
-        prevPoseName = step.name;
+      for (const pose of step.poses) {
+        if (pose.name !== prevPoseName) {
+          steps += 1;
+          prevPoseName = pose.name;
+        }
       }
     }
 
