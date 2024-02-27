@@ -300,6 +300,10 @@ impl DanceCollection {
         self.steps.iter().filter(move |step| step.name == name)
     }
 
+    pub(crate) fn idle_steps(&self) -> impl Iterator<Item = &Step> {
+        self.steps.iter().filter(|step| step.id.contains("idle"))
+    }
+
     /// A DB without default poses for testing where only one pose is needed.
     #[cfg(test)]
     pub(crate) fn test(target: super::geom::Angle3d) -> Self {

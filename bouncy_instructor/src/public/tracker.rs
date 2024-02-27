@@ -60,6 +60,10 @@ impl Tracker {
             for step in state.db.steps_by_name(&step_name) {
                 db.add_foreign_step(&state.db, &step.id)?;
             }
+            // also add idle steps, those should always be included in a tracker
+            for step in state.db.idle_steps() {
+                db.add_foreign_step(&state.db, &step.id)?;
+            }
             Ok(())
         })?;
         Ok(Tracker {
