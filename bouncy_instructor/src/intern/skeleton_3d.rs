@@ -35,6 +35,8 @@ pub(crate) struct Skeleton3d {
     azimuth_correction: SignedAngle,
     /// Z position estimates of body parts
     z: HashMap<BodyPoint, f32>,
+    /// Z position estimates of limbs
+    limbs_z: Vec<f32>,
 }
 
 #[derive(PartialEq, Clone, Copy, Debug)]
@@ -57,6 +59,7 @@ impl Skeleton3d {
     pub(crate) fn new(
         direction: Direction,
         limb_angles_3d: Vec<Angle3d>,
+        limbs_z: Vec<f32>,
         azimuth_correction: SignedAngle,
         z: HashMap<BodyPoint, f32>,
     ) -> Self {
@@ -65,6 +68,7 @@ impl Skeleton3d {
             direction,
             limb_angles,
             limb_angles_3d,
+            limbs_z,
             azimuth_correction,
             z,
         }
@@ -80,13 +84,18 @@ impl Skeleton3d {
             .body_points()
             .map(|(body_point, coordinate)| (body_point, coordinate.z))
             .collect();
-        Self::from_angles(limb_angles_3d, shoulder_angle, z)
+        let limbs_z = db
+            .limbs()
+            .map(|(_index, limb)| limb.z(kp))
+            .collect::<Vec<_>>();
+        Self::from_angles(limb_angles_3d, shoulder_angle, z, limbs_z)
     }
 
     pub(crate) fn from_angles(
         mut limb_angles_3d: Vec<Angle3d>,
         shoulder_angle: SignedAngle,
         z: HashMap<BodyPoint, f32>,
+        limbs_z: Vec<f32>,
     ) -> Self {
         // Shoulder defines where the person is looking
         let direction = Direction::from_shoulder(shoulder_angle);
@@ -103,7 +112,7 @@ impl Skeleton3d {
             _ => (),
         }
 
-        Self::new(direction, limb_angles_3d, azimuth_correction, z)
+        Self::new(direction, limb_angles_3d, limbs_z, azimuth_correction, z)
     }
 
     pub(crate) fn angles(&self) -> &[SignedAngle] {
@@ -127,11 +136,15 @@ impl Skeleton3d {
         let correction = self.azimuth_correction - SignedAngle::degree(rotation);
         let backwards = correction.as_radians().abs() > FRAC_PI_2;
         let segment = |i: LimbIndex| -> Segment {
-            Angle3d::new(
+            let mut s: Segment = Angle3d::new(
                 self.limb_angles_3d[i.as_usize()].azimuth + correction,
                 self.limb_angles_3d[i.as_usize()].polar,
             )
-            .into()
+            .into();
+
+            let stretched_z = self.limbs_z[i.as_usize()] * 100.0;
+            s.z = stretched_z.min(i16::MAX as f32).max(i16::MIN as f32) as i16;
+            s
         };
 
         let left = Side {

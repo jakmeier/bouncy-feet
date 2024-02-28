@@ -300,12 +300,17 @@ export class Segment {
 * The factor to multiply lengths when drawing the projected segment in 2D.
 */
   r: number;
+/**
+* Z-Index for draw ordering
+*/
+  z: number;
 }
 /**
 * A self-sufficient description of a body position snapshot for 2d rendering.
 *
 * Each limb has a 2D angle in the x-y plane plus a length factor to simulate
 * the third dimension in a 2D projection. X grows to the right, y grows down.
+* Plus, there is a z-index for the order in which segments should be drawn.
 *
 * This format is for exporting to other modules. JS code can easily read it
 * and potentially render it.

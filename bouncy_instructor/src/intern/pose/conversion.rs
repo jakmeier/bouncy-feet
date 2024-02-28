@@ -330,6 +330,7 @@ impl Skeleton3d {
     pub(crate) fn from_with_db(pose: &Pose, db: &DanceCollection) -> Self {
         let num_limbs = db.limbs().count();
         let mut limb_angles = vec![Angle3d::ZERO; num_limbs];
+        let mut limbs_z = vec![0.0; num_limbs];
         let azimuth = SignedAngle::degree(90.0);
         let direction = match pose.direction {
             PoseDirection::Front => Direction::North,
@@ -338,12 +339,21 @@ impl Skeleton3d {
         for limb in &pose.limbs {
             limb_angles[limb.limb.as_usize()] = Angle3d::new(azimuth, limb.target.angle());
         }
+        for z_ordering in &pose.z {
+            for (limb_index, _limb) in z_ordering.forward.attached_limbs(db) {
+                limbs_z[limb_index.as_usize()] += 1.0;
+            }
+            for (limb_index, _limb) in z_ordering.backward.attached_limbs(db) {
+                limbs_z[limb_index.as_usize()] -= 1.0;
+            }
+        }
         let azimuth_correction = SignedAngle::ZERO;
         Skeleton3d::new(
             direction,
             limb_angles,
+            limbs_z,
             azimuth_correction,
-            Default::default(),
+            Default::default(), // TODO: add z info
         )
     }
 }

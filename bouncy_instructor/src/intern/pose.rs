@@ -7,7 +7,7 @@
 mod approximation;
 mod conversion;
 
-use super::dance_collection::LimbIndex;
+use super::dance_collection::{DanceCollection, LimbIndex};
 use super::geom::SignedAngle;
 use super::pose_score::AngleTarget;
 use crate::intern::geom::Angle3d;
@@ -114,6 +114,14 @@ impl BodyPoint {
         });
         left.chain(right)
     }
+
+    pub(crate) fn attached_limbs<'a>(
+        &'a self,
+        db: &'a DanceCollection,
+    ) -> impl Iterator<Item = (LimbIndex, &'a Limb)> {
+        db.limbs()
+            .filter(|(_index, limb)| limb.start == *self || limb.end == *self)
+    }
 }
 
 impl Pose {
@@ -138,6 +146,12 @@ impl Limb {
             azimuth: start.azimuth(end),
             polar: start.polar_angle(end),
         }
+    }
+
+    pub(crate) fn z(self, kp: &Keypoints) -> f32 {
+        let start = self.start.keypoint(kp);
+        let end = self.end.keypoint(kp);
+        (start.z + end.z) / 2.0
     }
 
     pub(crate) fn mirror(&self) -> Self {

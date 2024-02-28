@@ -31,7 +31,15 @@
   $: shoulderLen = sideway ? 0.0 : 0.05 * size;
   $: hipLen = sideway ? 0.0 : 0.03 * size;
 
-  let leftHip, rightHip, rightShoulder, leftShoulder;
+  /** @type {{ x: number; y: number; }} */
+  let leftHip;
+  /** @type {{ x: number; y: number; }} */
+  let rightHip;
+  /** @type {{ x: number; y: number; }} */
+  let rightShoulder;
+  /** @type {{ x: number; y: number; }} */
+  let leftShoulder;
+
   // right body part is left on screen
   $: {
     leftHip = { x: hip.x + hipLen, y: hip.y };

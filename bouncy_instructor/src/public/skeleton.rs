@@ -9,6 +9,7 @@ use wasm_bindgen::prelude::wasm_bindgen;
 ///
 /// Each limb has a 2D angle in the x-y plane plus a length factor to simulate
 /// the third dimension in a 2D projection. X grows to the right, y grows down.
+/// Plus, there is a z-index for the order in which segments should be drawn.
 ///
 /// This format is for exporting to other modules. JS code can easily read it
 /// and potentially render it.
@@ -50,6 +51,8 @@ pub struct Segment {
     pub angle: f32,
     /// The factor to multiply lengths when drawing the projected segment in 2D.
     pub r: f32,
+    /// Z-Index for draw ordering
+    pub z: i16,
 }
 
 #[wasm_bindgen]
@@ -87,10 +90,18 @@ impl From<Angle3d> for Segment {
         let y = value.polar.cos();
         let xy_len = x.hypot(y);
         if xy_len.abs() <= 1e-6 {
-            Self { angle: 0.0, r: 0.0 }
+            Self {
+                angle: 0.0,
+                r: 0.0,
+                z: 0,
+            }
         } else {
             let angle = (y.atan2(x) + TAU) % TAU;
-            Self { angle, r: xy_len }
+            Self {
+                angle,
+                r: xy_len,
+                z: 0,
+            }
         }
     }
 }
@@ -100,6 +111,7 @@ impl Default for Segment {
         Self {
             angle: 90.0_f32.to_radians(),
             r: 1.0,
+            z: 0,
         }
     }
 }

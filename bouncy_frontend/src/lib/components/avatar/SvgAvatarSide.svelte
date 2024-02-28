@@ -49,8 +49,8 @@
   );
 </script>
 
-<SvgLine bind:animationTime start={hip} end={knee} />
-<SvgLine bind:animationTime start={knee} end={ankle} />
-<SvgLine bind:animationTime start={shoulder} end={elbow} />
-<SvgLine bind:animationTime start={elbow} end={wrist} />
-<SvgLine bind:animationTime start={heel} end={toe} />
+<SvgLine bind:animationTime start={hip} end={knee} z={side.thigh.z} />
+<SvgLine bind:animationTime start={knee} end={ankle} z={side.shin.z} />
+<SvgLine bind:animationTime start={shoulder} end={elbow} z={side.arm.z} />
+<SvgLine bind:animationTime start={elbow} end={wrist} z={side.forearm.z} />
+<SvgLine bind:animationTime start={heel} end={toe} z={side.foot.z} />
