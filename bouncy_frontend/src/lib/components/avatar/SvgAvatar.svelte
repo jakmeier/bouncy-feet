@@ -8,8 +8,8 @@
   export let width = 100;
   export let height = 100;
   export let lineWidth = 10;
-  /** @type{number} animationTime in ms */
-  export let animationTime = 500;
+  /** @type{number} animationTime in ms, default is 0 (instance movement) */
+  export let animationTime = 0;
   export let lengths = {
     thigh: 0.2,
     shin: 0.2,
