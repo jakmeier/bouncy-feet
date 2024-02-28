@@ -5,6 +5,7 @@
   import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
   import { getContext, onDestroy, onMount } from 'svelte';
   import { landmarksToKeypoints } from '$lib/pose';
+  import BackgroundTask from '../BackgroundTask.svelte';
 
   export let cameraOn = false;
   /** @type {undefined | number} */
@@ -40,7 +41,7 @@
   let dataListener;
   let stop = false;
 
-  function loop() {
+  function onFrame() {
     if (cameraOn && dataListener) {
       const start = performance.now();
       dataListener.trackFrame(cameraVideoElement);
@@ -54,7 +55,6 @@
         console.debug(`detectDance took ${t2 - t}ms`);
       }
     }
-    requestAnimationFrame(loop);
   }
 
   // Communicate a cursor seek from the video to the banner.
@@ -81,16 +81,10 @@
 
   onMount(async () => {
     dataListener = await poseCtx.newPoseDetection(onPoseDetection);
-
-    if (!stop) {
-      loop();
-    }
-  });
-
-  onDestroy(() => {
-    stop = true;
   });
 </script>
+
+<BackgroundTask {onFrame}></BackgroundTask>
 
 <Area width="{282}px" height="{376}px">
   <Camera

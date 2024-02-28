@@ -5,6 +5,7 @@
   import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
   import Banner from './Banner.svelte';
   import { getContext } from 'svelte';
+  import BackgroundTask from '$lib/components/BackgroundTask.svelte';
 
   /** @type {string} URL (usually local) to the video for review  */
   export let reviewVideoSrc;
@@ -53,10 +54,15 @@
   let setCursor;
 </script>
 
+<!-- update banner position on every frame, to keep it in sync with the video
+even when it is playing. In theory, `on:timeupdate={onSeek}` in the video would
+be better, however, this fires at different rates per browser and often only
+once per 250ms. -->
+<BackgroundTask onFrame={onSeek}></BackgroundTask>
+
 <!-- svelte-ignore a11y-media-has-caption -->
 <video
   bind:this={reviewVideoElement}
-  on:seeked={onSeek}
   src={reviewVideoSrc}
   playsinline
   controls
