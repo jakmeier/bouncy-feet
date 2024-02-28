@@ -133,7 +133,7 @@
       ]
     ),
     (
-      name: "Polly Pocket",
+      name: "Diagonal Running Man",
       id: "pp-0",
       variation: "right-first",
       keyframes: [
@@ -144,7 +144,7 @@
       ]
     ),
     (
-      name: "Polly Pocket",
+      name: "Diagonal Running Man",
       id: "pp-1",
       variation: "left-first",
       keyframes: [
