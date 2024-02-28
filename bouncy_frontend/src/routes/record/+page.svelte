@@ -1,26 +1,18 @@
 <script>
-  import Camera from '$lib/components/record/Camera.svelte';
-  import { landmarksToKeypoints } from '$lib/pose';
-  import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
-  import { getContext, onDestroy, onMount, setContext, tick } from 'svelte';
-  import Area from '$lib/components/Area.svelte';
+  import LiveRecording from '$lib/components/record/LiveRecording.svelte';
+  import VideoReview from '$lib/components/review/VideoReview.svelte';
+  import { getContext, setContext, tick } from 'svelte';
   import { t } from '$lib/i18n';
   import { Tracker } from '$lib/instructor/bouncy_instructor';
-  import Banner from '$lib/components/review/Banner.svelte';
   import DanceStats from '../profile/DanceStats.svelte';
   import Settings from '$lib/components/record/Settings.svelte';
   import AllPoseErrors from '$lib/components/dev/AllPoseErrors.svelte';
   import { dev } from '$app/environment';
 
-  const poseCtx = getContext('pose');
   const userCtx = getContext('user');
 
   /** @type {HTMLVideoElement} */
-  let cameraVideoElement;
-  /** @type {HTMLVideoElement} */
   let reviewVideoElement;
-  /** @type {Camera} */
-  let camera;
   /** @type {undefined | import("$lib/instructor/bouncy_instructor").Skeleton} */
   /** @type {undefined | string} */
   let reviewVideoSrc;
@@ -32,12 +24,8 @@
   let recordingStarted = false;
   /** @type {number | undefined} */
   let recordingStart = undefined;
+  /** @type {number | undefined} */
   let recordingEnd = undefined;
-  /** @type {{ trackFrame: (arg0: HTMLVideoElement) => void; }} */
-  let dataListener;
-  let stop = false;
-  /** @type {number} */
-  let lastSeek = 0;
 
   /** @type {import("$lib/instructor/bouncy_instructor").DetectedStep[]} */
   let detectedSteps = [];
@@ -50,28 +38,14 @@
     tracker,
   });
 
-  function loop() {
-    if (isModelOn && dataListener) {
-      const start = performance.now();
-      dataListener.trackFrame(cameraVideoElement);
-      const t = performance.now() - start;
-      if (t > 50) {
-        console.debug(`trackFrame took ${t}ms`);
-      }
-      detectedSteps = tracker.detectDance();
-      const t2 = performance.now() - start;
-      if (t2 - t > 30) {
-        console.debug(`detectDance took ${t2 - t}ms`);
-      }
-    }
-    const now = new Date().getTime();
-    // for now, don't limit time between seeks
-    if (recordingStarted && !isModelOn && lastSeek + 0 < now) {
-      onSeek();
-      lastSeek = now;
-    }
-    requestAnimationFrame(loop);
-  }
+  const camera = {
+    startCamera: async () => {},
+    stopCamera: async () => {},
+    startRecording: async () => {},
+    endRecording: async () => {
+      return undefined;
+    },
+  };
 
   async function startCamera() {
     showCamera = true;
@@ -118,59 +92,6 @@
     recordingEnd = undefined;
   }
 
-  async function onSeek() {
-    if (recordingStarted && !isModelOn && reviewVideoElement) {
-      const ms = reviewVideoElement.currentTime * 1000;
-      const reviewTimestamp = ms + recordingStart;
-      skeleton = tracker.skeletonAt(reviewTimestamp);
-      const cursor =
-        (reviewTimestamp - recordingStart) / (recordingEnd - recordingStart);
-      setCursor(cursor);
-    }
-  }
-
-  /**
-   * Manually called by child banner. Due to cyclic reactivity, it seems easier
-   * than using reactive statements (but maybe I just don't know how to use them
-   * properly in such cases)
-   * @param {number} cursor
-   */
-  function seekVideoToCursor(cursor) {
-    if (reviewVideoElement && reviewVideoElement.paused) {
-      reviewVideoElement.currentTime =
-        (cursor * (recordingEnd - recordingStart)) / 1000;
-    }
-  }
-  // the other direction, to be manually called by parent
-  /**
-   * @type {(cursor: number) => void}
-   */
-  let setCursor;
-
-  onMount(async () => {
-    dataListener = await poseCtx.newPoseDetection((result, timestamp) => {
-      if (recordingStart === undefined) {
-        recordingStart = timestamp;
-      }
-      if (result.landmarks && result.landmarks.length >= 1) {
-        const kp = landmarksToKeypoints(result.landmarks[0]);
-        const skeletons = tracker.addKeypoints(kp, timestamp);
-        skeleton = skeletons.front;
-        recordingEnd = timestamp;
-        if (setCursor) {
-          setCursor(1.0);
-        }
-      }
-    });
-
-    if (!stop) {
-      loop();
-    }
-  });
-
-  onDestroy(() => {
-    stop = true;
-  });
 </script>
 
 <div id="outer">
@@ -181,44 +102,22 @@
     <div style="margin: 30px 0px">
       <Settings {tracker}></Settings>
     </div>
+  {:else if reviewVideoSrc !== undefined && recordingStart !== undefined && recordingEnd !== undefined}
+    <VideoReview
+      {reviewVideoSrc}
+      {detectedSteps}
+      {recordingStart}
+      {recordingEnd}
+    ></VideoReview>
   {:else}
-    {#if reviewVideoSrc}
-      <!-- svelte-ignore a11y-media-has-caption -->
-      <video
-        bind:this={reviewVideoElement}
-        on:seeked={onSeek}
-        src={reviewVideoSrc}
-        playsinline
-        controls
-        style="margin-top: 10px;"
-      ></video>
-    {:else}
-      <Area width="{282}px" height="{376}px">
-        <Camera
-          width={282}
-          height={376}
-          bind:videoElement={cameraVideoElement}
-          bind:cameraOn
-          bind:this={camera}
-        />
-      </Area>
-    {/if}
-
-    <Area width="{280}px" height="{280}px">
-      <svg viewBox="0 0 280 280">
-        <SvgAvatar width={280} height={280} {skeleton} />
-      </svg>
-    </Area>
-  {/if}
-
-  {#if recordingStarted}
-    <Banner
-      steps={detectedSteps}
-      bind:setCursor
-      reviewStart={recordingStart || 0}
-      reviewEnd={recordingEnd || 1}
-      onScroll={seekVideoToCursor}
-    ></Banner>
+    <LiveRecording
+      bind:startCamera={camera.startCamera}
+      bind:stopCamera={camera.stopCamera}
+      bind:startRecording={camera.startRecording}
+      bind:endRecording={camera.endRecording}
+      bind:recordingStart
+      bind:recordingEnd
+    ></LiveRecording>
   {/if}
 
   <div>
