@@ -19,13 +19,6 @@
   const trackerCtx = getContext('tracker');
 
   /**
-   * @param {number} t
-   */
-  function timeToPosition(t) {
-    return scrollOffset + timeToPixel(t - reviewStart);
-  }
-
-  /**
    * @param {number} delta
    */
   function timeToPixel(delta) {
@@ -38,7 +31,7 @@
   class:passive={step.name.includes('Idle')}
   class:good={step.error < 0.1}
   title={step.name}
-  style="left: {timeToPosition(step.start)}px; width: {timeToPixel(
+  style="left: {scrollOffset + timeToPixel(step.start - reviewStart)}px; width: {timeToPixel(
     step.end - step.start
   ) + avatarSize}px"
 >

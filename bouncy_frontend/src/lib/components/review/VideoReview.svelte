@@ -27,8 +27,7 @@
     const ms = reviewVideoElement.currentTime * 1000;
     const reviewTimestamp = ms + recordingStart;
     skeleton = tracker.skeletonAt(reviewTimestamp);
-    const cursor =
-      (reviewTimestamp - recordingStart) / (recordingEnd - recordingStart);
+    const cursor = ms / (recordingEnd - recordingStart);
     setCursor(cursor);
   }
 
@@ -78,8 +77,8 @@ once per 250ms. -->
 <Banner
   steps={detectedSteps}
   bind:setCursor
-  reviewStart={recordingStart || 0}
-  reviewEnd={recordingEnd || 1}
+  reviewStart={recordingStart}
+  reviewEnd={recordingEnd}
   onScroll={seekVideoToCursor}
 ></Banner>
 

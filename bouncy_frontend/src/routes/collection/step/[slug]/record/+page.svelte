@@ -39,9 +39,9 @@
 
   async function turnOnRecording() {
     await startCamera();
-    isModelOn = true;
     await startRecording();
     tracker.clear();
+    isModelOn = true;
     recordingStart = undefined;
   }
 
