@@ -17,8 +17,6 @@
   /** @type {undefined | string} */
   let reviewVideoSrc;
   let isModelOn = false;
-  let cameraOn = false;
-  let recordingStarted = false;
   /** @type {number | undefined} */
   let recordingStart = undefined;
   /** @type {number | undefined} */
@@ -40,14 +38,11 @@
   let endRecording;
 
   async function turnOnRecording() {
-    if (!cameraOn) {
-      await startCamera();
-      isModelOn = true;
-      await startRecording();
-      tracker.clear();
-      recordingStart = undefined;
-      recordingStarted = true;
-    }
+    await startCamera();
+    isModelOn = true;
+    await startRecording();
+    tracker.clear();
+    recordingStart = undefined;
   }
 
   function stop() {
@@ -72,11 +67,13 @@
     }
   }
 
-  function reset() {
-    recordingStarted = false;
+  async function reset() {
     reviewVideoSrc = undefined;
     recordingStart = undefined;
     recordingEnd = undefined;
+    // wait for LiveRecording component to be mounted again
+    await tick();
+    await turnOnRecording();
   }
 
   onMount(() => {
@@ -97,7 +94,6 @@
     ></VideoReview>
   {:else}
     <LiveRecording
-      bind:cameraOn
       bind:startCamera
       bind:stopCamera
       bind:startRecording
