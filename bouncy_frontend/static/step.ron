@@ -154,5 +154,27 @@
         (pose: "t-closed-left", orientation: ToCamera),
       ]
     ),
+    (
+      name: "Criss-Cross",
+      id: "cc-0",
+      variation: "right-first",
+      keyframes: [
+        (pose: "staggered-stance-right", orientation: ToCamera),
+        (pose: "light-outward-stance", orientation: ToCamera),
+        (pose: "staggered-stance-left", orientation: ToCamera),
+        (pose: "light-outward-stance", orientation: ToCamera),
+      ]
+    ),
+    (
+      name: "Criss-Cross",
+      id: "cc-1",
+      variation: "left-first",
+      keyframes: [
+        (pose: "staggered-stance-left", orientation: ToCamera),
+        (pose: "light-outward-stance", orientation: ToCamera),
+        (pose: "staggered-stance-right", orientation: ToCamera),
+        (pose: "light-outward-stance", orientation: ToCamera),
+      ]
+    ),
   ]
 )
