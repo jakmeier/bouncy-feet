@@ -134,6 +134,7 @@ mod tests {
         let expected = Segment {
             angle: expected_angle.to_radians(),
             r: expected_len,
+            z: 0,
         };
         assert!(
             float_eq(expected.angle, actual.angle),

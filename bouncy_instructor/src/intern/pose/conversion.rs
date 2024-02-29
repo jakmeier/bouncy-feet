@@ -17,6 +17,7 @@ use crate::intern::geom::{Angle3d, SignedAngle};
 use crate::intern::pose::{BodyPart, BodyPoint, BodySide, Limb};
 use crate::intern::skeleton_3d::{Direction, Skeleton3d};
 use crate::pose_file;
+use std::collections::HashMap;
 
 impl From<pose_file::Limb> for Limb {
     fn from(other: pose_file::Limb) -> Self {
@@ -331,6 +332,7 @@ impl Skeleton3d {
         let num_limbs = db.limbs().count();
         let mut limb_angles = vec![Angle3d::ZERO; num_limbs];
         let mut limbs_z = vec![0.0; num_limbs];
+        let mut body_part_z = HashMap::new();
         let azimuth = SignedAngle::degree(90.0);
         let direction = match pose.direction {
             PoseDirection::Front => Direction::North,
@@ -346,6 +348,8 @@ impl Skeleton3d {
             for (limb_index, _limb) in z_ordering.backward.attached_limbs(db) {
                 limbs_z[limb_index.as_usize()] -= 1.0;
             }
+            body_part_z.insert(z_ordering.forward, 1.0);
+            body_part_z.insert(z_ordering.backward, -1.0);
         }
         let azimuth_correction = SignedAngle::ZERO;
         Skeleton3d::new(
@@ -353,7 +357,7 @@ impl Skeleton3d {
             limb_angles,
             limbs_z,
             azimuth_correction,
-            Default::default(), // TODO: add z info
+            body_part_z,
         )
     }
 }
@@ -386,6 +390,7 @@ mod tests {
             vec![Angle3d::degree(azimuth, polar)],
             SignedAngle::degree(90.0),
             Default::default(),
+            vec![0.0],
         );
         let db = DanceCollection::test(Angle3d::degree(azimuth, polar));
 
