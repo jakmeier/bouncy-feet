@@ -1,4 +1,6 @@
 <script>
+  import Animation from '$lib/components/avatar/Animation.svelte';
+  import Svg from '$lib/components/avatar/Svg.svelte';
   import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
   import { Skeleton } from '$lib/instructor/bouncy_instructor';
   import { counter } from '$lib/timer';
@@ -16,14 +18,10 @@
   $: skeleton = $beat >= 0 ? dance.skeleton($beat) : restingStep;
 </script>
 
-<svg viewBox="0 0 {size} {size}">
-  {#if skeleton}
-    <SvgAvatar
-      width={size}
-      height={size}
-      {skeleton}
-      lineWidth={4}
-      {animationTime}
-    />
-  {/if}
-</svg>
+<Animation {animationTime}>
+  <Svg height={size} width={size}>
+    {#if skeleton}
+      <SvgAvatar width={size} height={size} {skeleton} lineWidth={4} />
+    {/if}
+  </Svg>
+</Animation>

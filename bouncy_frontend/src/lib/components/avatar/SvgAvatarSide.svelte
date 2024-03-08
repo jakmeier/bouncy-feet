@@ -1,6 +1,7 @@
 <script>
   import SvgLine from './SvgLine.svelte';
   import { add2dVector } from '$lib/math';
+  import { getContext } from 'svelte';
 
   /** @type {{ x: number; y: number; }} */
   export let hip;
@@ -14,8 +15,11 @@
    * @type {{ thigh: number; shin: number; foot: number; arm: number; forearm: number; }}
    */
   export let lengths;
-  /** @type{number} animationTime in ms */
-  export let animationTime;
+  /** @type{string} */
+  export let sideId;
+
+  const svg = getContext('svg');
+  const svgStyle = getContext('svg-style');
 
   $: knee = add2dVector(
     hip,
@@ -47,10 +51,46 @@
     side.forearm.angle,
     side.forearm.r * lengths.forearm * size
   );
+
+  $: lines = [
+    {
+      id: `thigh`,
+      start: hip,
+      end: knee,
+      z: side.thigh.z,
+      style: svgStyle,
+    },
+    {
+      id: `shin`,
+      start: knee,
+      end: ankle,
+      z: side.shin.z,
+      style: svgStyle,
+    },
+    {
+      id: `arm`,
+      start: shoulder,
+      end: elbow,
+      z: side.arm.z,
+      style: svgStyle,
+    },
+    {
+      id: `forearm`,
+      start: elbow,
+      end: wrist,
+      z: side.forearm.z,
+      style: svgStyle,
+    },
+    {
+      id: `foot`,
+      start: heel,
+      end: toe,
+      z: side.foot.z,
+      style: svgStyle,
+    },
+  ];
 </script>
 
-<SvgLine bind:animationTime start={hip} end={knee} z={side.thigh.z} />
-<SvgLine bind:animationTime start={knee} end={ankle} z={side.shin.z} />
-<SvgLine bind:animationTime start={shoulder} end={elbow} z={side.arm.z} />
-<SvgLine bind:animationTime start={elbow} end={wrist} z={side.forearm.z} />
-<SvgLine bind:animationTime start={heel} end={toe} z={side.foot.z} />
+{#each lines as line}
+  <SvgLine {line} id={`${sideId}-${line.id}`} />
+{/each}

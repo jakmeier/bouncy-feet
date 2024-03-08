@@ -1,15 +1,14 @@
 <script>
   import SvgAvatarSide from './SvgAvatarSide.svelte';
-  import SvgLine from './SvgLine.svelte';
+  import PhysicalSvgLine from './PhysicalSvgLine.svelte';
   import SvgPolygon from './SvgPolygon.svelte';
+  import SvgStyle from './SvgStyle.svelte';
 
   /** @type import('$lib/instructor/bouncy_instructor').Skeleton */
   export let skeleton;
   export let width = 100;
   export let height = 100;
   export let lineWidth = 10;
-  /** @type{number} animationTime in ms, default is 0 (instance movement) */
-  export let animationTime = 0;
   export let lengths = {
     thigh: 0.2,
     shin: 0.2,
@@ -56,40 +55,49 @@
   $: headRadius = 0.075 * size;
 </script>
 
-<g
-  stroke-width="{lineWidth * 0.9}px"
-  stroke={headColor}
-  fill={bodyColor}
-  stroke-linecap="round"
->
-  {#if skeleton && !sideway}
-    <SvgPolygon points={[leftHip, rightHip, rightShoulder, leftShoulder]} />
-  {:else}
-    <SvgLine {animationTime} start={leftShoulder} end={leftHip} />
-  {/if}
-</g>
+{#if skeleton && !sideway}
+  <SvgPolygon
+    points={[leftHip, rightHip, rightShoulder, leftShoulder]}
+    style={{
+      color: headColor,
+      fill: bodyColor,
+      linecap: 'round',
+      lineWidth: lineWidth * 0.9,
+    }}
+  />
+{:else}
+  <PhysicalSvgLine
+    start={leftShoulder}
+    end={leftHip}
+    style={{
+      color: headColor,
+      linecap: 'round',
+      lineWidth: lineWidth * 0.9,
+    }}
+  />
+{/if}
 
 {#if skeleton}
-  <g stroke-width="{lineWidth}px" stroke={leftColor} stroke-linecap="round">
+  <SvgStyle color={leftColor} linecap="round" {lineWidth}>
     <SvgAvatarSide
       {lengths}
       {size}
       side={skeleton.left}
       shoulder={leftShoulder}
       hip={leftHip}
-      {animationTime}
+      sideId={'left'}
     ></SvgAvatarSide>
-  </g>
-  <g stroke-width="{lineWidth}px" stroke={rightColor} stroke-linecap="round">
+  </SvgStyle>
+  <SvgStyle color={rightColor} linecap="round" {lineWidth}>
     <SvgAvatarSide
       {lengths}
       {size}
       side={skeleton.right}
       shoulder={rightShoulder}
       hip={rightHip}
-      {animationTime}
+      sideId={'right'}
     ></SvgAvatarSide>
-  </g>
+  </SvgStyle>
   <circle
     cx={shoulder.x}
     cy={shoulder.y - 0.1 * size}

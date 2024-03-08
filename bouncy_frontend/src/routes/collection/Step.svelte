@@ -1,5 +1,7 @@
 <script>
   import Area from '$lib/components/Area.svelte';
+  import Animation from '$lib/components/avatar/Animation.svelte';
+  import Svg from '$lib/components/avatar/Svg.svelte';
   import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
   import { Skeleton } from '$lib/instructor/bouncy_instructor';
 
@@ -14,20 +16,22 @@
   // When the pose index is negative, it should show a resting position
   // according to the orientation of the first pose.
   const restingStep = Skeleton.resting(step.skeleton(0).sideway);
-  $: skeleton = poseIndex >= 0 ? step.rotatedSkeleton(poseIndex, rotation) : restingStep;
+  $: skeleton =
+    poseIndex >= 0 ? step.rotatedSkeleton(poseIndex, rotation) : restingStep;
 </script>
 
 <Area width="{size}px" height="{size}px">
-  <svg viewBox="0 0 {size} {size}">
-    <SvgAvatar
-      width={size}
-      height={size}
-      {skeleton}
-      lineWidth={4}
-      leftColor="var(--theme-accent)"
-      rightColor="var(--theme-main)"
-      headColor="var(--theme-neutral-dark)"
-      {animationTime}
-    />
-  </svg>
+  <Animation {animationTime}>
+    <Svg width={size} height={size}>
+      <SvgAvatar
+        width={size}
+        height={size}
+        {skeleton}
+        lineWidth={4}
+        leftColor="var(--theme-accent)"
+        rightColor="var(--theme-main)"
+        headColor="var(--theme-neutral-dark)"
+      />
+    </Svg>
+  </Animation>
 </Area>

@@ -184,7 +184,8 @@
         ( limb: RightLeg, weight: 1.0, angle: -20, tolerance: 5),
       ],
       z: [
-        ( forward: (side: Right, part: Ankle), backward: (side: Left, part: Ankle) )
+        ( forward: (side: Right, part: Ankle), backward: (side: Left, part: Ankle) ),
+        ( forward: (side: Right, part: Knee), backward: (side: Left, part: Knee) ),
       ]
     ),
     ( name: "polly-left", mirror_of: "polly-right", direction: Front ),
@@ -206,7 +207,8 @@
         ( limb: RightForearm, weight: 0.0, angle: 10, tolerance: 0),
       ],
       z: [
-        ( forward: (side: Right, part: Ankle), backward: (side: Left, part: Ankle) )
+        ( forward: (side: Right, part: Ankle), backward: (side: Left, part: Ankle) ),
+        ( forward: (side: Right, part: Knee), backward: (side: Left, part: Knee) ),
       ]
     ),
     ( name: "staggered-stance-left", mirror_of: "staggered-stance-right", direction: Front ),
