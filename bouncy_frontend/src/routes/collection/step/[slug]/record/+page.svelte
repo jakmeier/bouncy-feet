@@ -6,7 +6,7 @@
   import LiveRecording from '$lib/components/record/LiveRecording.svelte';
   import DanceStats from '../../../../profile/DanceStats.svelte';
   import VideoReview from '$lib/components/review/VideoReview.svelte';
-  import Header from '$lib/components/Header.svelte';
+  import Header from '$lib/components/ui/Header.svelte';
 
   const danceName = $page.params.slug;
   const tracker = Tracker.StepTracker(danceName);

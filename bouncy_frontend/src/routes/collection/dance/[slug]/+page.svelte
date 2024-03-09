@@ -1,6 +1,6 @@
 <script>
   import { page } from '$app/stores';
-  import Header from '$lib/components/Header.svelte';
+  import Header from '$lib/components/ui/Header.svelte';
   import DanceAnimation from '../../../DanceAnimation.svelte';
   import Step from '../../Step.svelte';
   import { counter } from '$lib/timer';

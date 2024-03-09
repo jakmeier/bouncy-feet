@@ -1,5 +1,5 @@
 <script>
-  import Area from '$lib/components/Area.svelte';
+  import Area from '$lib/components/ui/Area.svelte';
   import Animation from '$lib/components/avatar/Animation.svelte';
   import Svg from '$lib/components/avatar/Svg.svelte';
   import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';

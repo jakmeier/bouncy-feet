@@ -1,11 +1,11 @@
 <script>
   import { t } from '$lib/i18n.js';
-  import Header from '$lib/components/Header.svelte';
+  import Header from '$lib/components/ui/Header.svelte';
   import DanceAnimation from '../../../DanceAnimation.svelte';
   import Step from '../../Step.svelte';
   import { counter } from '$lib/timer';
   import { DanceBuilder, DanceInfo } from '$lib/instructor/bouncy_instructor';
-  import Area from '$lib/components/Area.svelte';
+  import Area from '$lib/components/ui/Area.svelte';
   import SelectStep from './SelectStep.svelte';
   import { getContext } from 'svelte';
   import Popup from '$lib/components/ui/Popup.svelte';

@@ -1,7 +1,7 @@
 <script>
   import { dev } from '$app/environment';
   import AllPoseErrors from '$lib/components/dev/AllPoseErrors.svelte';
-  import Area from '$lib/components/Area.svelte';
+  import Area from '$lib/components/ui/Area.svelte';
   import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
   import Banner from './Banner.svelte';
   import { getContext } from 'svelte';
