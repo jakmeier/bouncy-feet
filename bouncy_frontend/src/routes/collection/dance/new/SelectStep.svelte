@@ -1,6 +1,7 @@
 <script>
-  import { t } from '$lib/i18n.js';
   import Step from '../../Step.svelte';
+  import UiBox from '$lib/components/ui/UiBox.svelte';
+
   /** @type {import('$lib/instructor/bouncy_instructor').StepInfo[]} */
   export let steps;
   export let show = false;
@@ -27,9 +28,8 @@
 </script>
 
 {#if show}
-  <div id="container" style="show">
-    <p>{$t('editor.pick-step-instruction')}</p>
-    <div class="step-table">
+  <UiBox title="editor.pick-step-instruction">
+    <div>
       {#each steps as step, i}
         <div
           on:click={() => select(step)}
@@ -47,17 +47,5 @@
         </div>
       {/each}
     </div>
-  </div>
+  </UiBox>
 {/if}
-
-<style>
-  p {
-    background-color: var(--theme-neutral-dark);
-    color: var(--theme-neutral-white);
-  }
-  #container {
-    text-align: center;
-    background-color: var(--theme-neutral-light);
-    width: 100%;
-  }
-</style>
