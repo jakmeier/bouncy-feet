@@ -1,10 +1,12 @@
 <script>
   import { page } from '$app/stores';
+  import { t } from '$lib/i18n.js';
   import Header from '$lib/components/ui/Header.svelte';
   import DanceAnimation from '../../../DanceAnimation.svelte';
   import Step from '../../Step.svelte';
   import { counter } from '$lib/timer';
   import { getContext } from 'svelte';
+  import Popup from '$lib/components/ui/Popup.svelte';
 
   /** @type {import('./$types').PageData} */
   export let data;
@@ -26,10 +28,35 @@
     data.officialDances.find(isSelected) || $localDances.find(isSelected);
   const steps = dance?.steps() || [];
   const beatCounter = counter(-1, 1, stepTime);
+
+  /** @type {import('svelte/store').Writable<boolean>} */
+  let optionsPopupActive;
+
+  function edit() {
+    alert('NIY');
+    $optionsPopupActive = false;
+  }
+
+  function copyAndEdit() {
+    alert('NIY');
+    $optionsPopupActive = false;
+  }
+
+  function maybeDelete() {
+    if (confirm($t('editor.delete-dance-confirmation'))) {
+      localCollection.removeDance(id);
+      $optionsPopupActive = false;
+      window.history.back();
+    }
+  }
 </script>
 
 <!-- TODO: translate -->
-<Header title={id} />
+<Header
+  title={id}
+  button="edit"
+  on:click={() => optionsPopupActive.set(true)}
+/>
 
 <div class="page">
   <div
@@ -57,6 +84,16 @@
     {/each}
   </div>
 </div>
+
+<Popup bind:isOpen={optionsPopupActive} title="editor.edit-dance-context-menu">
+  <button class="light" on:click={edit}>{$t('editor.edit-button')}</button>
+  <button class="light" on:click={copyAndEdit}
+    >{$t('editor.edit-copy-button')}</button
+  >
+  <button class="danger" on:click={maybeDelete}
+    >{$t('editor.delete-dance-button')}</button
+  >
+</Popup>
 
 <style>
   .page {

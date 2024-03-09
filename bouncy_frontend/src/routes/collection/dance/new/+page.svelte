@@ -114,15 +114,13 @@
 </div>
 
 <Popup bind:isOpen={savePopupActive} title="editor.new-dance.pick-name-prompt">
-  <div class="form">
-    <label for="name">
-      {$t('editor.new-dance.name-label')}
-    </label>
-    <input id="name" name="name" bind:value={danceName} />
-    <button class="light" on:click={save}
-      >{$t('editor.new-dance.save-button-label')}</button
-    >
-  </div>
+  <label for="name">
+    {$t('editor.new-dance.name-label')}
+  </label>
+  <input id="name" name="name" bind:value={danceName} />
+  <button class="light" on:click={save}
+    >{$t('editor.new-dance.save-button-label')}</button
+  >
 </Popup>
 
 <style>
@@ -148,14 +146,6 @@
   }
   .step a {
     font-weight: 400;
-  }
-  .form {
-    display: flex;
-    flex-direction: column;
-    min-height: 100px;
-    padding: 10px;
-    align-items: center;
-    gap: 10px;
   }
   button {
     width: 50%;

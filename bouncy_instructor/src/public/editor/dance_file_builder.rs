@@ -38,6 +38,16 @@ impl DanceFileBuilder {
         Ok(())
     }
 
+    #[wasm_bindgen(js_name = "removeDance")]
+    pub fn remove_dance(&mut self, id: String) -> Result<(), String> {
+        if let Some(index) = self.dances.iter().position(|dance| dance.id == id) {
+            self.dances.remove(index);
+            Ok(())
+        } else {
+            Err("Dance ID does not exists".to_owned())
+        }
+    }
+
     #[wasm_bindgen(js_name = "buildRon")]
     pub fn build_ron(&self) -> Result<String, ExportError> {
         let file_data = DanceFile {

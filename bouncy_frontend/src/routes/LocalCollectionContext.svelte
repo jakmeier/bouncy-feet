@@ -20,6 +20,7 @@
     builder: builderStore,
     dances: derived(builderStore, ($b) => $b.dances()),
     addDanceBuilder,
+    removeDance,
   };
 
   if (browser) {
@@ -36,6 +37,15 @@
    */
   function addDanceBuilder(danceBuilder) {
     $builderStore.addDance(danceBuilder);
+    // trigger update (can I do better?)
+    $builderStore = $builderStore;
+  }
+
+  /**
+   * @param {String} id
+   */
+  function removeDance(id) {
+    $builderStore.removeDance(id);
     // trigger update (can I do better?)
     $builderStore = $builderStore;
   }

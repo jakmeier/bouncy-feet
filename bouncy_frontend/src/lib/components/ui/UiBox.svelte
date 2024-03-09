@@ -26,4 +26,12 @@
     background-color: var(--theme-neutral-light);
     width: 100%;
   }
+  .inner {
+    display: flex;
+    flex-direction: column;
+    min-height: 100px;
+    padding: 10px;
+    align-items: center;
+    gap: 10px;
+  }
 </style>

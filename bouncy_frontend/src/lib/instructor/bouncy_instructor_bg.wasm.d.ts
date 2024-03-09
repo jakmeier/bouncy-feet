@@ -13,6 +13,7 @@ export function dancefilebuilder_buildRon(a: number, b: number): void;
 export function dancefilebuilder_dances(a: number, b: number): void;
 export function dancefilebuilder_fromRon(a: number, b: number, c: number): void;
 export function dancefilebuilder_new(): number;
+export function dancefilebuilder_removeDance(a: number, b: number, c: number, d: number): void;
 export function danceinfo_beats(a: number): number;
 export function danceinfo_id(a: number, b: number): void;
 export function danceinfo_length(a: number): number;

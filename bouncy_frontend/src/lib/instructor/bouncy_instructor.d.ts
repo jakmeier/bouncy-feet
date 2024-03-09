@@ -110,6 +110,10 @@ export class DanceFileBuilder {
 */
   addDance(dance_builder: DanceBuilder): void;
 /**
+* @param {string} id
+*/
+  removeDance(id: string): void;
+/**
 * @returns {string}
 */
   buildRon(): string;
