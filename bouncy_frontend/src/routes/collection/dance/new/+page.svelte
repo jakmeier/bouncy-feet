@@ -8,6 +8,7 @@
   import Area from '$lib/components/Area.svelte';
   import SelectStep from './SelectStep.svelte';
   import { getContext } from 'svelte';
+  import Popup from '$lib/components/ui/Popup.svelte';
 
   /** @type {import('./$types').PageData} */
   export let data;
@@ -23,7 +24,7 @@
   const localCollection = getContext('localCollection');
   const dances = localCollection.dances;
 
-  let id = $t('collection.new-dance.default-dance-name');
+  let danceName = $t('editor.new-dance.default-dance-name');
   /** @type {DanceBuilder} */
   let danceBuilder = new DanceBuilder('tempPreviewDance');
   $: dancePreview = danceBuilder.danceInfo();
@@ -33,6 +34,8 @@
   let steps = [];
 
   let stepSelectionActive = false;
+  /** @type {import('svelte/store').Writable<boolean>} */
+  let savePopupActive;
 
   /** @param {import('$lib/instructor/bouncy_instructor').StepInfo} stepInfo */
   function selectedCallback(stepInfo) {
@@ -48,13 +51,24 @@
     return true;
   }
 
+  function openSavePopup() {
+    $savePopupActive = true;
+  }
+
   function save() {
-    // TODO: pick name
-    localCollection.addDanceBuilder(danceBuilder);
+    try {
+      danceBuilder.setId(danceName);
+      localCollection.addDanceBuilder(danceBuilder);
+      $savePopupActive = false;
+    } catch (e) {
+      // TODO: display error to user
+      // possible cause: name already exists
+      console.error(e);
+    }
   }
 </script>
 
-<Header title={id} button="save" on:click={save} />
+<Header title={danceName} button="save" on:click={openSavePopup} />
 
 <div class="page">
   <div
@@ -99,6 +113,18 @@
   ></SelectStep>
 </div>
 
+<Popup bind:isOpen={savePopupActive} title="editor.new-dance.pick-name-prompt">
+  <div class="form">
+    <label for="name">
+      {$t('editor.new-dance.name-label')}
+    </label>
+    <input id="name" name="name" bind:value={danceName} />
+    <button class="light" on:click={save}
+      >{$t('editor.new-dance.save-button-label')}</button
+    >
+  </div>
+</Popup>
+
 <style>
   .page {
     overflow: hidden;
@@ -122,5 +148,16 @@
   }
   .step a {
     font-weight: 400;
+  }
+  .form {
+    display: flex;
+    flex-direction: column;
+    min-height: 100px;
+    padding: 10px;
+    align-items: center;
+    gap: 10px;
+  }
+  button {
+    width: 50%;
   }
 </style>

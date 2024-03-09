@@ -28,7 +28,7 @@
 </script>
 
 {#if show}
-  <UiBox title="editor.pick-step-instruction">
+  <UiBox title="editor.pick-step-prompt">
     <div>
       {#each steps as step, i}
         <div

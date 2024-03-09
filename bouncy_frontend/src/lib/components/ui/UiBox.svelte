@@ -2,7 +2,7 @@
   import { t } from '$lib/i18n.js';
 
   /** @type{String|undefined} */
-  export let title;
+  export let title = undefined;
 </script>
 
 <div id="container">
@@ -18,8 +18,10 @@
   p {
     background-color: var(--theme-neutral-dark);
     color: var(--theme-neutral-white);
+    margin: 0;
   }
   #container {
+    min-width: 200px;
     text-align: center;
     background-color: var(--theme-neutral-light);
     width: 100%;

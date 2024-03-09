@@ -7,7 +7,7 @@ export function dancebuilder_clear(a: number): void;
 export function dancebuilder_danceInfo(a: number): number;
 export function dancebuilder_length(a: number): number;
 export function dancebuilder_new(a: number, b: number): number;
-export function dancebuilder_set_id(a: number, b: number, c: number): void;
+export function dancebuilder_setId(a: number, b: number, c: number): void;
 export function dancefilebuilder_addDance(a: number, b: number, c: number): void;
 export function dancefilebuilder_buildRon(a: number, b: number): void;
 export function dancefilebuilder_dances(a: number, b: number): void;

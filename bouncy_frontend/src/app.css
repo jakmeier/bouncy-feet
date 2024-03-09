@@ -8,7 +8,7 @@
     --theme-neutral-light: #c2bfff;
     --theme-neutral-white: #ffffff;
     --theme-accent: #e97516;
-    --theme-accent-light: #ffad69;;
+    --theme-accent-light: #ffad69;
 }
 
 /*
@@ -29,6 +29,11 @@ input {
     font-size: 20px;
 }
 
+input {
+    font-size: 40px;
+    max-width: 100%;
+}
+
 a {
     color: var(--theme-neutral-dark);
     font-weight: 900;
@@ -46,7 +51,7 @@ button {
 button.light {
     background-color: var(--theme-accent-light);
     color: var(--theme-neutral-dark);
-    border: var(--theme-neutral-dark) solid 3px;
+    border: var(--theme-neutral-dark) solid 1px;
     border-radius: 2px;
     font-size: 20px;
     padding: 10px;

@@ -84,7 +84,7 @@ export class DanceBuilder {
 /**
 * @param {string} id
 */
-  set_id(id: string): void;
+  setId(id: string): void;
 /**
 */
   clear(): void;

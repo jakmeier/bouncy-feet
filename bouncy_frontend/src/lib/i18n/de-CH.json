@@ -24,13 +24,16 @@
             "rotation": "Drehen (experimentell)",
             "speed": "Tempo [BPM]",
             "variation": "Variation"
-        },
-        "new-dance": {
-            "default-dance-name": "Mein Tanz"
         }
     },
     "editor": {
-        "pick-step-instruction": "Wähle einen Schritt"
+        "pick-step-prompt": "Wähle einen Schritt",
+        "new-dance": {
+            "default-dance-name": "Mein Tanz",
+            "pick-name-prompt": "Wähle einen Namen",
+            "name-label": "Name",
+            "save-button-label": "Speichern"
+        }
     },
     "record": {
         "title": "Tanzen",

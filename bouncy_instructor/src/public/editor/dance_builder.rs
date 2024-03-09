@@ -27,6 +27,7 @@ impl DanceBuilder {
         self.step_ids.push(step_id);
     }
 
+    #[wasm_bindgen(js_name = "setId")]
     pub fn set_id(&mut self, id: String) {
         self.id = id;
     }
