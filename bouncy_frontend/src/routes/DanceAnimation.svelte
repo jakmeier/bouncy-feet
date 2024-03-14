@@ -19,7 +19,7 @@
 </script>
 
 <Animation {animationTime}>
-  <Svg height={size} width={size}>
+  <Svg height={size} width={size} orderByZ>
     {#if skeleton}
       <SvgAvatar width={size} height={size} {skeleton} lineWidth={4} />
     {/if}

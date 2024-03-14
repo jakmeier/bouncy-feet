@@ -7,6 +7,8 @@
   export let width;
   /** @type {number} */
   export let height;
+  /** @type {boolean} */
+  export let orderByZ = false;
 
   let animationCtx = getContext('animation');
   let animationTime = null;
@@ -34,6 +36,10 @@
   }
 
   async function update() {
+    if (!orderByZ) {
+      displayedLines = lines;
+      return;
+    }
     // Step 1: Set the z value according to the matching ID, then sort by z
     displayedLines = displayedLines
       .map((line) => {

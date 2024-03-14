@@ -22,7 +22,7 @@
 
 <Area width="{size}px" height="{size}px">
   <Animation {animationTime}>
-    <Svg width={size} height={size}>
+    <Svg width={size} height={size} orderByZ>
       <SvgAvatar
         width={size}
         height={size}

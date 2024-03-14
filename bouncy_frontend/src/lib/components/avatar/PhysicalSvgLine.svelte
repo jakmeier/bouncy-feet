@@ -13,7 +13,7 @@
   export let style;
 
   const animationCtx = getContext('animation');
-  const animation = animationCtx ? animationCtx.animation : writable(0);
+  const animation = animationCtx ? animationCtx.animation : writable({duration: 0});
 
   // use svelte/motion.tweened for smoothly changing x,y values
   const startX = tweened(start.x, $animation);
