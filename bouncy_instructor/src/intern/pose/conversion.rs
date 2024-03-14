@@ -328,15 +328,16 @@ impl From<Limb> for pose_file::Limb {
 impl Skeleton3d {
     /// Creates a skeleton with all limbs set to perfectly match the pose.
     /// Angles which are not defined in the pose are set to 0.
-    pub(crate) fn from_with_db(pose: &Pose, db: &DanceCollection) -> Self {
+    pub(crate) fn from_with_db(pose: &Pose, db: &DanceCollection, direction: Direction) -> Self {
         let num_limbs = db.limbs().count();
         let mut limb_angles = vec![Angle3d::ZERO; num_limbs];
         let mut limbs_z = vec![0.0; num_limbs];
         let mut body_part_z = HashMap::new();
-        let azimuth = SignedAngle::degree(90.0);
-        let direction = match pose.direction {
-            PoseDirection::Front => Direction::North,
-            PoseDirection::Right => Direction::East,
+        let azimuth = match direction {
+            Direction::North | Direction::East => SignedAngle::degree(90.0),
+            Direction::South => SignedAngle::degree(270.0),
+            Direction::West => SignedAngle::degree(270.0),
+            Direction::Unknown => SignedAngle::degree(90.0),
         };
         for limb in &pose.limbs {
             limb_angles[limb.limb.as_usize()] = Angle3d::new(azimuth, limb.target.angle());

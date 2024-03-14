@@ -8,6 +8,7 @@ use wasm_bindgen::prelude::wasm_bindgen;
 #[derive(Debug, Clone)]
 #[wasm_bindgen]
 pub struct StepInfo {
+    // TODO: stronger typing
     id: String,
     name: String,
     step_variation: Option<String>,
@@ -41,8 +42,9 @@ impl StepInfo {
         STATE.with_borrow(|state| {
             let step = state.step(&self.id).expect("missing step");
             let pose_index = step.poses[beat % step.poses.len()];
+            let direction = step.directions[beat % step.poses.len()];
             let pose = &state.db.poses()[pose_index];
-            Skeleton3d::from_with_db(pose, &state.db).to_skeleton(rotation)
+            Skeleton3d::from_with_db(pose, &state.db, direction).to_skeleton(rotation)
         })
     }
 
@@ -76,9 +78,10 @@ impl From<&Step> for StepInfo {
         let skeletons = STATE.with_borrow(|state| {
             step.poses
                 .iter()
-                .map(|pose_index| {
+                .zip(&step.directions)
+                .map(|(pose_index, direction)| {
                     let pose = &state.db.poses()[*pose_index];
-                    Skeleton::from_pose(pose, &state.db)
+                    Skeleton::from_pose(pose, &state.db, *direction)
                 })
                 .collect()
         });
