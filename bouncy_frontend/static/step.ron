@@ -176,5 +176,16 @@
         (pose: "light-outward-stance", orientation: ToCamera),
       ]
     ),
+    (
+      name: "Knee Up",
+      id: "knee-0",
+      variation: "right-first",
+      keyframes: [
+        (pose: "standing-straight-front", orientation: ToCamera),
+        (pose: "right-up", orientation: Right),
+        (pose: "standing-straight-front", orientation: ToCamera),
+        (pose: "left-up", orientation: Left),
+      ]
+    ),
   ]
 )
