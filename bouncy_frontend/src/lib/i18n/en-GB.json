@@ -27,6 +27,11 @@
         }
     },
     "editor": {
+        "edit-dance-context-menu": "Edit",
+        "delete-dance-button": "Delete dance",
+        "delete-dance-confirmation": "Delete the dance?",
+        "edit-button": "Edit dance",
+        "edit-copy-button": "Copy and edit",
         "pick-step-prompt": "Pick a step",
         "new-dance": {
             "default-dance-name": "My Dance",

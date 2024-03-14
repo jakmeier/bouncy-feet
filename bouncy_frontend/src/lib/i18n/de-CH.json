@@ -27,6 +27,11 @@
         }
     },
     "editor": {
+        "edit-dance-context-menu": "Bearbeiten",
+        "delete-dance-button": "Tanz löschen",
+        "delete-dance-confirmation": "Tanz wirklich löschen?",
+        "edit-button": "Tanz bearbeiten",
+        "edit-copy-button": "Kopieren und bearbeiten",
         "pick-step-prompt": "Wähle einen Schritt",
         "new-dance": {
             "default-dance-name": "Mein Tanz",
