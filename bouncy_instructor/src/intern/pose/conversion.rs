@@ -476,7 +476,7 @@ mod tests {
         let mut poses = db
             .poses()
             .iter()
-            .map(|pose| Skeleton3d::from_with_db(pose, &db))
+            .map(|pose| Skeleton3d::from_with_db(pose, &db, Direction::Unknown))
             .map(|skeleton| pose_file::Pose::from_with_db(&skeleton, &db));
 
         let output_pose = poses.next().unwrap();
