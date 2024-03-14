@@ -230,7 +230,8 @@
         ( limb: RightForearm, weight: 0.0, angle: -10, tolerance: 0),
       ],
       z: [
-        ( forward: (side: Right, part: Ankle), backward: (side: Left, part: Ankle) )
+        ( forward: (side: Right, part: Ankle), backward: (side: Left, part: Ankle) ),
+        ( forward: (side: Right, part: Knee), backward: (side: Left, part: Knee) ),
       ]
     ),
   ]
