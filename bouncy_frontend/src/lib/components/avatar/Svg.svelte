@@ -45,11 +45,13 @@
       })
       .sort((a, b) => a.z - b.z);
 
-    const swap = $animationTime;
-    $animationTime = 0;
-    await tick();
-    if (swap !== 0) {
-      $animationTime = swap;
+    if (animationTime !== null) {
+      const swap = $animationTime;
+      $animationTime = 0;
+      await tick();
+      if (swap !== 0) {
+        $animationTime = swap;
+      }
     }
 
     // Step 2: Update also the other values, keeping the z-sorted order

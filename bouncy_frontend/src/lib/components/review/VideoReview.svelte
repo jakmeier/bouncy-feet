@@ -2,6 +2,7 @@
   import { dev } from '$app/environment';
   import AllPoseErrors from '$lib/components/dev/AllPoseErrors.svelte';
   import Area from '$lib/components/ui/Area.svelte';
+  import Svg from '$lib/components/avatar/Svg.svelte';
   import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
   import Banner from './Banner.svelte';
   import { getContext } from 'svelte';
@@ -69,9 +70,9 @@ once per 250ms. -->
 ></video>
 
 <Area width="{280}px" height="{280}px">
-  <svg viewBox="0 0 280 280">
+  <Svg height={280} width={280}>
     <SvgAvatar width={280} height={280} {skeleton} />
-  </svg>
+  </Svg>
 </Area>
 
 <Banner

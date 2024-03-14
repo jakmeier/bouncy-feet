@@ -1,6 +1,7 @@
 <script>
   import { tweened } from 'svelte/motion';
   import { getContext } from 'svelte';
+  import { writable } from 'svelte/store';
 
   /** @type{Point} */
   export let start;
@@ -11,7 +12,8 @@
   /** @type{Style} */
   export let style;
 
-  const animation = getContext('animation').animation;
+  const animationCtx = getContext('animation');
+  const animation = animationCtx ? animationCtx.animation : writable(0);
 
   // use svelte/motion.tweened for smoothly changing x,y values
   const startX = tweened(start.x, $animation);

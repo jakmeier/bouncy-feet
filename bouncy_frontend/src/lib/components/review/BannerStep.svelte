@@ -1,6 +1,7 @@
 <script>
   import { getContext } from 'svelte';
   import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
+  import Svg from '$lib/components/avatar/Svg.svelte';
 
   /** @type{import("$lib/instructor/bouncy_instructor").DetectedStep} */
   export let step;
@@ -31,7 +32,8 @@
   class:passive={step.name.includes('Idle')}
   class:good={step.error < 0.1}
   title={step.name}
-  style="left: {scrollOffset + timeToPixel(step.start - reviewStart)}px; width: {timeToPixel(
+  style="left: {scrollOffset +
+    timeToPixel(step.start - reviewStart)}px; width: {timeToPixel(
     step.end - step.start
   ) + avatarSize}px"
 >
@@ -42,14 +44,14 @@
         pose.timestamp - step.start
       )}px; width: {avatarSize}px; height: {avatarSize}px"
     >
-      <svg viewBox="0 0 {avatarSize} {avatarSize}">
+      <Svg height={avatarSize} width={avatarSize}>
         <SvgAvatar
           width={avatarSize}
           height={avatarSize}
           lineWidth={2}
           skeleton={trackerCtx.tracker.skeletonAt(pose.timestamp)}
         />
-      </svg>
+      </Svg>
     </div>
   {/each}
   {#if !step.name.includes('Idle')}

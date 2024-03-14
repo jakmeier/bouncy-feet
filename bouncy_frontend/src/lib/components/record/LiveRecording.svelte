@@ -3,6 +3,7 @@
   import Banner from '$lib/components/review/Banner.svelte';
   import Camera from '$lib/components/record/Camera.svelte';
   import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
+  import Svg from '$lib/components/avatar/Svg.svelte';
   import { getContext, onDestroy, onMount } from 'svelte';
   import { landmarksToKeypoints } from '$lib/pose';
   import BackgroundTask from '../BackgroundTask.svelte';
@@ -39,7 +40,6 @@
   let skeleton;
   /** @type {{ trackFrame: (arg0: HTMLVideoElement) => void; }} */
   let dataListener;
-  let stop = false;
 
   function onFrame() {
     if (cameraOn && dataListener) {
@@ -97,11 +97,11 @@
 </Area>
 
 <Area width="{280}px" height="{280}px">
-  <svg viewBox="0 0 280 280">
+  <Svg height={280} width={280}>
     {#if skeleton}
       <SvgAvatar width={280} height={280} {skeleton} />
     {/if}
-  </svg>
+  </Svg>
 </Area>
 
 <Banner
