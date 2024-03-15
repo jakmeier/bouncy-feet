@@ -2,7 +2,7 @@
   import TabNavigation from './TabNavigation.svelte';
   import '../app.css';
   import { t } from '$lib/i18n.js';
-  import { hideNavigation } from '$lib/stores/UiState.js';
+  import { backgroundColor, hideNavigation } from '$lib/stores/UiState.js';
   import PoseDetectionContext from './PoseDetectionContext.svelte';
   import UserContext from './UserContext.svelte';
   import LocalCollectionContext from './LocalCollectionContext.svelte';
@@ -14,15 +14,17 @@
   <title>{$t('meta.title')}</title>
 </svelte:head>
 
-<main style="height: calc(100vh - {navBarHeight}px)">
-  <UserContext>
-    <LocalCollectionContext>
-      <PoseDetectionContext>
-        <slot />
-      </PoseDetectionContext>
-    </LocalCollectionContext>
-  </UserContext>
-</main>
+<div style="background-color: {$backgroundColor}; padding: 5px;">
+  <main style="height: calc(100vh - {navBarHeight}px)">
+    <UserContext>
+      <LocalCollectionContext>
+        <PoseDetectionContext>
+          <slot />
+        </PoseDetectionContext>
+      </LocalCollectionContext>
+    </UserContext>
+  </main>
+</div>
 
 {#if !$hideNavigation}
   <TabNavigation height={navBarHeight} />

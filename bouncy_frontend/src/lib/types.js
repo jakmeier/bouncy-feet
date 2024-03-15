@@ -1,5 +1,9 @@
 
 /**
+ * @typedef {Object} Features
+ * @property {boolean} enableFreestyleRecording
+ * @property {boolean} enableDevView
+ * 
  * @typedef {Object} Point
  * @property {number} x 
  * @property {number} y

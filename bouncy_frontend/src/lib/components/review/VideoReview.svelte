@@ -1,5 +1,5 @@
 <script>
-  import { dev } from '$app/environment';
+  import { dev } from '$lib/stores/FeatureSelection.js';
   import AllPoseErrors from '$lib/components/dev/AllPoseErrors.svelte';
   import Area from '$lib/components/ui/Area.svelte';
   import Svg from '$lib/components/avatar/Svg.svelte';
@@ -83,6 +83,6 @@ once per 250ms. -->
   onScroll={seekVideoToCursor}
 ></Banner>
 
-{#if dev}
+{#if $dev}
   <AllPoseErrors {reviewVideoElement} {recordingStart}></AllPoseErrors>
 {/if}

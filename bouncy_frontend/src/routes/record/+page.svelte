@@ -7,7 +7,7 @@
   import DanceStats from '../profile/DanceStats.svelte';
   import Settings from '$lib/components/record/Settings.svelte';
   import AllPoseErrors from '$lib/components/dev/AllPoseErrors.svelte';
-  import { dev } from '$app/environment';
+  import { dev } from '$lib/stores/FeatureSelection.js';
 
   const userCtx = getContext('user');
 
@@ -91,7 +91,6 @@
     recordingStart = undefined;
     recordingEnd = undefined;
   }
-
 </script>
 
 <div id="outer">
@@ -162,7 +161,7 @@
   <p style="width: 100px; height: 50px;"></p>
 </div>
 
-{#if dev && showCamera && recordingStarted && !isModelOn}
+{#if $dev && showCamera && recordingStarted && !isModelOn}
   <AllPoseErrors {reviewVideoElement} {recordingStart}></AllPoseErrors>
 {/if}
 

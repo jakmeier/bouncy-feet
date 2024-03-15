@@ -2,26 +2,37 @@
   import { page } from '$app/stores';
   import { t } from '$lib/i18n.js';
   import { base } from '$app/paths';
-  import { dev } from '$app/environment';
+  import { features } from '$lib/stores/FeatureSelection';
 
   export let height = 100;
 
-  const tabs = [
-    { label: $t('home.nav'), icon: 'home', route: `${base}/` },
-    {
-      label: $t('record.nav'),
-      icon: 'directions_walk',
-      route: `${base}/record`,
-    },
-    {
+  $: tabs = buildTabs($features);
+
+  /** @param {Features} features */
+  function buildTabs(features) {
+    const tabs = [];
+    tabs.push({ label: $t('home.nav'), icon: 'home', route: `${base}/` });
+    if (features.enableFreestyleRecording) {
+      tabs.push({
+        label: $t('record.nav'),
+        icon: 'directions_walk',
+        route: `${base}/record`,
+      });
+    }
+    tabs.push({
+      label: $t('collection.nav'),
+      icon: 'book_5',
+      route: `${base}/collection`,
+    });
+    tabs.push({
       label: $t('profile.nav'),
       icon: 'account_circle',
       route: `${base}/profile`,
-    },
-    { label: $t('collection.nav'), icon: 'book_5', route: `${base}/collection` },
-  ];
-  if (dev) {
-    tabs.push({ label: 'Dev', icon: 'code', route: `${base}/dev` });
+    });
+    if (features.enableDevView) {
+      tabs.push({ label: 'Dev', icon: 'code', route: `${base}/dev` });
+    }
+    return tabs;
   }
 </script>
 
