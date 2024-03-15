@@ -74,6 +74,7 @@
     },
     "step": {
         "variation": {
+            "undefined": "undefined",
             "right-first": "Right leg first",
             "right-forward": "Right leg forward",
             "right-out": "Right leg outwards",

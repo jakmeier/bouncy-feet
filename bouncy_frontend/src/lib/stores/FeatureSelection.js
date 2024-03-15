@@ -17,6 +17,8 @@ export const features = derived([version, dev], ([$v, $dev]) => {
     return {
         /* Features that are not ready to be released */
         enableFreestyleRecording: $v >= 0.999,
+        enableDanceCollection: $v >= 0.003,
+        enableDanceCreator: $v >= 0.003,
 
         /* Features that stay in dev */
         enableDevView: $dev,

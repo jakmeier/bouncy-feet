@@ -74,6 +74,7 @@
     },
     "step": {
         "variation": {
+            "undefined": "undefiniert",
             "right-first": "Rechtes Bein zuerst",
             "right-forward": "Rechts nach vorne",
             "right-out": "Rechts nach aussen",

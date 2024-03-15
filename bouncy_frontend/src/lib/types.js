@@ -2,6 +2,8 @@
 /**
  * @typedef {Object} Features
  * @property {boolean} enableFreestyleRecording
+ * @property {boolean} enableDanceCollection
+ * @property {boolean} enableDanceCreator
  * @property {boolean} enableDevView
  * 
  * @typedef {Object} Point

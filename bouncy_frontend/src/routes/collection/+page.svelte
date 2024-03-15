@@ -5,6 +5,8 @@
   import DanceAnimation from '../DanceAnimation.svelte';
   import Area from '$lib/components/ui/Area.svelte';
   import Step from './Step.svelte';
+  import { features } from '$lib/stores/FeatureSelection';
+  import { browser } from '$app/environment';
 
   /** @type {import('./$types').PageData} */
   export let data;
@@ -24,28 +26,34 @@
 
 <h1>{$t('collection.title')}</h1>
 
-<h2>{$t('collection.dances-subtitle')}</h2>
-<div class="dance-table">
-  {#each [...data.officialDances, ...$localDances] as dance}
-    <div>
-      <a href={`./dance/${dance.id}`}>
-        <Area width={danceSize} height={danceSize} {borderRadius}>
-          <DanceAnimation {dance} />
-        </Area>
-        <!-- TODO: id to translated name -->
-        <h3>{dance.id}</h3>
-      </a>
-    </div>
-  {/each}
-  <div>
-    <a href={`./dance/new`} class="no-line-link">
-      <Area width={danceSize} height={danceSize} {borderRadius}>
-        <span class="material-symbols-outlined add-button"> add_circle </span>
-        {$t('collection.new-dance-button')}
-      </Area>
-    </a>
+{#if !browser || $features.enableDanceCollection}
+  <h2>{$t('collection.dances-subtitle')}</h2>
+  <div class="dance-table">
+    {#each [...data.officialDances, ...$localDances] as dance}
+      <div>
+        <a href={`./dance/${dance.id}`}>
+          <Area width={danceSize} height={danceSize} {borderRadius}>
+            <DanceAnimation {dance} />
+          </Area>
+          <!-- TODO: id to translated name -->
+          <h3>{dance.id}</h3>
+        </a>
+      </div>
+    {/each}
+    {#if $features.enableDanceCreator}
+      <div>
+        <a href={`./dance/new`} class="no-line-link">
+          <Area width={danceSize} height={danceSize} {borderRadius}>
+            <span class="material-symbols-outlined add-button">
+              add_circle
+            </span>
+            {$t('collection.new-dance-button')}
+          </Area>
+        </a>
+      </div>
+    {/if}
   </div>
-</div>
+{/if}
 
 <h2>{$t('collection.steps-subtitle')}</h2>
 <div class="step-table">
