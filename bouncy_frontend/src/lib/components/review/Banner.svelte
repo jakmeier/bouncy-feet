@@ -110,9 +110,11 @@
 
   #steps {
     position: relative;
-    overflow: scroll;
-    height: 80px;
+    overflow: scroll visible;
+    min-height: 80px;
+    height: 100px;
     width: 100%;
+    padding-bottom: 10px;
   }
 
   #marker {

@@ -23,6 +23,7 @@
         </PoseDetectionContext>
       </LocalCollectionContext>
     </UserContext>
+    <div class=scroll-buffer></div>
   </main>
 </div>
 
@@ -35,6 +36,10 @@
     margin: 5px;
     max-width: calc(min(730px, 100vw) - 10px);
     overflow-y: auto;
+  }
+
+  .scroll-buffer {
+    height: 100px;
   }
 
   @media (min-width: 730px) {

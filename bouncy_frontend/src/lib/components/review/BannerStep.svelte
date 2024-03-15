@@ -29,31 +29,35 @@
 
 <div
   class="step"
-  class:passive={step.name.includes('Idle')}
-  class:good={step.error < 0.1}
   title={step.name}
   style="left: {scrollOffset +
     timeToPixel(step.start - reviewStart)}px; width: {timeToPixel(
     step.end - step.start
   ) + avatarSize}px"
 >
-  {#each step.poses as pose}
-    <div
-      class="pose"
-      style="left: {timeToPixel(
-        pose.timestamp - step.start
-      )}px; width: {avatarSize}px; height: {avatarSize}px"
-    >
-      <Svg height={avatarSize} width={avatarSize}>
-        <SvgAvatar
-          width={avatarSize}
-          height={avatarSize}
-          lineWidth={2}
-          skeleton={trackerCtx.tracker.skeletonAt(pose.timestamp)}
-        />
-      </Svg>
-    </div>
-  {/each}
+  <div
+    class="pose-group"
+    class:passive={step.name.includes('Idle')}
+    class:good={step.error < 0.1}
+  >
+    {#each step.poses as pose}
+      <div
+        class="pose"
+        style="left: {timeToPixel(
+          pose.timestamp - step.start
+        )}px; width: {avatarSize}px; height: {avatarSize}px"
+      >
+        <Svg height={avatarSize} width={avatarSize}>
+          <SvgAvatar
+            width={avatarSize}
+            height={avatarSize}
+            lineWidth={2}
+            skeleton={trackerCtx.tracker.skeletonAt(pose.timestamp)}
+          />
+        </Svg>
+      </div>
+    {/each}
+  </div>
   {#if !step.name.includes('Idle')}
     <div class="step-name">
       <!-- TODO: translation -->
@@ -65,6 +69,14 @@
 <style>
   .step {
     position: absolute;
+    display: grid;
+    grid-template-areas:
+      'poses'
+      'name';
+  }
+  .pose-group {
+    grid-area: poses;
+    width: 100%;
     height: 60px;
     border-radius: 10px;
     border: 1px solid var(--theme-main);
@@ -77,12 +89,9 @@
     border-color: var(--theme-neutral-light);
     background-color: var(--theme-neutral-white);
   }
-
   .step-name {
-    position: absolute;
-    top: 60px;
+    grid-area: name;
   }
-
   .pose {
     position: absolute;
     height: 60px;

@@ -116,9 +116,9 @@
       </button>
     {:else}
       <DanceStats numSteps={reviewStatsNumSteps} seconds={reviewStatsSeconds} />
-      <button on:click={reset}>
-        <span class="material-symbols-outlined"> done </span>
-        <p>{$t('record.done-button')}</p>
+      <button class="light" on:click={reset}>
+        <span class="material-symbols-outlined"> videocam </span>
+        <p>{$t('record.start-button')}</p>
       </button>
       <!-- <a href={reviewVideoSrc} download>
         <button>

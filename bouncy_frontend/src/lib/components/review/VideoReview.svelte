@@ -18,6 +18,8 @@
   export let detectedSteps = [];
 
   let tracker = getContext('tracker').tracker;
+  const avatarSize = 140;
+  const avatarLineWidth = 5;
 
   /** @type {HTMLVideoElement} */
   let reviewVideoElement;
@@ -52,6 +54,14 @@
    * @type {(cursor: number) => void}
    */
   let setCursor;
+
+  function togglePlay() {
+    if (reviewVideoElement.paused) {
+      reviewVideoElement.play();
+    } else {
+      reviewVideoElement.pause();
+    }
+  }
 </script>
 
 <!-- update banner position on every frame, to keep it in sync with the video
@@ -60,20 +70,29 @@ be better, however, this fires at different rates per browser and often only
 once per 250ms. -->
 <BackgroundTask onFrame={onSeek}></BackgroundTask>
 
-<!-- svelte-ignore a11y-media-has-caption -->
-<video
-  bind:this={reviewVideoElement}
-  src={reviewVideoSrc}
-  playsinline
-  controls
-  style="margin-top: 10px;"
-></video>
+<div class="upper">
+  <div>
+    <!-- svelte-ignore a11y-media-has-caption -->
+    <video
+      bind:this={reviewVideoElement}
+      on:click={togglePlay}
+      src={reviewVideoSrc}
+      playsinline
+      style="margin-top: 10px; max-width: 100%"
+    ></video>
+  </div>
 
-<Area width="{280}px" height="{280}px">
-  <Svg height={280} width={280}>
-    <SvgAvatar width={280} height={280} {skeleton} />
-  </Svg>
-</Area>
+  <div>
+    <Svg height={avatarSize} width={avatarSize}>
+      <SvgAvatar
+        width={avatarSize}
+        height={avatarSize}
+        lineWidth={avatarLineWidth}
+        {skeleton}
+      />
+    </Svg>
+  </div>
+</div>
 
 <Banner
   steps={detectedSteps}
@@ -86,3 +105,11 @@ once per 250ms. -->
 {#if $dev}
   <AllPoseErrors {reviewVideoElement} {recordingStart}></AllPoseErrors>
 {/if}
+
+<style>
+  .upper {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    align-items: center;
+  }
+</style>

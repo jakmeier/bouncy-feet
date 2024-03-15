@@ -7,8 +7,8 @@
   export let videoElement = null;
   export let cameraOn = false;
 
-  export let width = 480;
-  export let height = 360;
+  export let width = 360;
+  export let height = 480;
 
   let stream;
   /**
@@ -36,6 +36,8 @@
         facingMode: 'user',
         width: 360,
         height: 480,
+        // The only way I managed to get a portrait camera on phones...
+        aspectRatio: { exact: 1.5 },
         frameRate: {
           ideal: 60,
         },
