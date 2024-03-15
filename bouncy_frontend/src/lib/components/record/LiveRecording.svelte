@@ -4,7 +4,8 @@
   import Camera from '$lib/components/record/Camera.svelte';
   import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
   import Svg from '$lib/components/avatar/Svg.svelte';
-  import { getContext, onDestroy, onMount } from 'svelte';
+  import { hideNavigation } from '$lib/stores/UiState';
+  import { getContext, onMount } from 'svelte';
   import { landmarksToKeypoints } from '$lib/pose';
   import BackgroundTask from '../BackgroundTask.svelte';
 
@@ -31,6 +32,9 @@
 
   const poseCtx = getContext('pose');
   let tracker = getContext('tracker').tracker;
+  const avatarSize = 140;
+  const avatarLineWidth = 5;
+  $: $hideNavigation = cameraOn;
 
   /** @type {Camera} */
   let camera;
@@ -96,10 +100,15 @@
   />
 </Area>
 
-<Area width="{280}px" height="{280}px">
-  <Svg height={280} width={280}>
+<Area width="{avatarSize}px" height="{avatarSize}px">
+  <Svg height={avatarSize} width={avatarSize}>
     {#if skeleton}
-      <SvgAvatar width={280} height={280} {skeleton} />
+      <SvgAvatar
+        width={avatarSize}
+        height={avatarSize}
+        lineWidth={avatarLineWidth}
+        {skeleton}
+      />
     {/if}
   </Svg>
 </Area>

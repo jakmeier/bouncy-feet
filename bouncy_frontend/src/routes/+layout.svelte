@@ -2,11 +2,12 @@
   import TabNavigation from './TabNavigation.svelte';
   import '../app.css';
   import { t } from '$lib/i18n.js';
+  import { hideNavigation } from '$lib/stores/UiState.js';
   import PoseDetectionContext from './PoseDetectionContext.svelte';
   import UserContext from './UserContext.svelte';
   import LocalCollectionContext from './LocalCollectionContext.svelte';
 
-  const navBarHeight = 90;
+  $: navBarHeight = $hideNavigation ? 0 : 90;
 </script>
 
 <svelte:head>
@@ -22,7 +23,10 @@
     </LocalCollectionContext>
   </UserContext>
 </main>
-<TabNavigation height={navBarHeight} />
+
+{#if !$hideNavigation}
+  <TabNavigation height={navBarHeight} />
+{/if}
 
 <style>
   main {

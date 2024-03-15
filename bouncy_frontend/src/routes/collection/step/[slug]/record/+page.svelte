@@ -7,6 +7,7 @@
   import DanceStats from '../../../../profile/DanceStats.svelte';
   import VideoReview from '$lib/components/review/VideoReview.svelte';
   import Header from '$lib/components/ui/Header.svelte';
+  import { hideNavigation } from '$lib/stores/UiState';
 
   const danceName = $page.params.slug;
   const tracker = Tracker.StepTracker(danceName);
@@ -82,7 +83,11 @@
 </script>
 
 <!-- TODO: translate danceName -->
-<Header title="{$t('record.train-dance-prefix')} {danceName}" />
+{#if $hideNavigation}
+  <div class="title">{danceName}</div>
+{:else}
+  <Header title="{$t('record.train-dance-prefix')} {danceName}" />
+{/if}
 
 <div id="outer">
   {#if reviewVideoSrc !== undefined && recordingStart !== undefined && recordingEnd !== undefined}
@@ -140,6 +145,18 @@
   }
   button span {
     font-size: 42px;
+  }
+
+  div.title {
+    margin: auto;
+    height: 25px;
+    width: 100%;
+    padding: 3px;
+    background-color: var(--theme-neutral-light);
+    border-radius: 2px;
+    text-align: center;
+    font-size: 23px;
+    overflow: hidden auto;
   }
 
   @media (max-width: 360px) {

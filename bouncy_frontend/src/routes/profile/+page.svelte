@@ -15,7 +15,7 @@
 
   async function refreshLeaderboard() {
     let result = await fetchLeaderboard();
-    if(result) {
+    if (result) {
       scoreboardData = result;
     }
   }
@@ -35,13 +35,16 @@
   numDances={$user.recordedDances}
 />
 
-<label>
-  <input type="text" bind:value={$user.publicName} />
-</label>
-<button on:click={submit}>{$t('profile.submit-stats')}</button>
+<form class="inputs">
+  <label for="publicName">{$t('profile.public-name')}</label>
+  <input id="publicName" type="text" bind:value={$user.publicName} />
+</form>
 
 <h2>{$t('profile.leaderboard-title')}</h2>
 <Leaderboard users={scoreboardData} />
+<form class="inputs">
+  <button on:click={submit} class="light">{$t('profile.submit-stats')}</button>
+</form>
 
 <style>
   .profile-pic {
@@ -50,5 +53,11 @@
     justify-content: center;
     font-weight: 900;
     text-align: center;
+  }
+
+  .inputs {
+    /* display grid allows to fit input field to width */
+    display: grid;
+    gap: 5px;
   }
 </style>

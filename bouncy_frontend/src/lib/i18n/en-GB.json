@@ -68,6 +68,7 @@
     "profile": {
         "stats-title": "My Progress",
         "leaderboard-title": "Leaderboard",
+        "public-name": "Public name",
         "submit-stats": "Refresh leaderboard",
         "nav": "Profile"
     },

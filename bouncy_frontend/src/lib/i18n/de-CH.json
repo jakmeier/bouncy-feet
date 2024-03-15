@@ -68,6 +68,7 @@
     "profile": {
         "stats-title": "Mein Fortschritt",
         "leaderboard-title": "Rangliste",
+        "public-name": "Anzeigename",
         "submit-stats": "Rangliste aktualisieren",
         "nav": "Profil"
     },
