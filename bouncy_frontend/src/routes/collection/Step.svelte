@@ -20,7 +20,7 @@
     poseIndex >= 0 ? step.rotatedSkeleton(poseIndex, rotation) : restingStep;
 </script>
 
-<Area width="{size}px" height="{size}px">
+<Area width="{size}px" height="{size}px" borderRadius=20px borderWidth=2px>
   <Animation {animationTime}>
     <Svg width={size} height={size} orderByZ>
       <SvgAvatar

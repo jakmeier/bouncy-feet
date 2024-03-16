@@ -28,22 +28,21 @@
   </span>
   {$user.publicName}
 </div>
-<h2>{$t('profile.stats-title')}</h2>
+<h2 class=box>{$t('profile.stats-title')}</h2>
 <DanceStats
   seconds={$user.recordedSeconds}
   numSteps={$user.recordedSteps}
   numDances={$user.recordedDances}
 />
 
-<form class="inputs">
-  <label for="publicName">{$t('profile.public-name')}</label>
-  <input id="publicName" type="text" bind:value={$user.publicName} />
-</form>
-
-<h2>{$t('profile.leaderboard-title')}</h2>
+<h2 class=box>{$t('profile.leaderboard-title')}</h2>
 <Leaderboard users={scoreboardData} />
 <form class="inputs">
   <button on:click={submit} class="light">{$t('profile.submit-stats')}</button>
+</form>
+<form class="inputs">
+  <label for="publicName">{$t('profile.public-name')}</label>
+  <input id="publicName" type="text" bind:value={$user.publicName} />
 </form>
 
 <style>
@@ -59,5 +58,6 @@
     /* display grid allows to fit input field to width */
     display: grid;
     gap: 5px;
+    margin: 25px 5px;
   }
 </style>

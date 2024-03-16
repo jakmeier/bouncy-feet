@@ -24,10 +24,10 @@
   const borderRadius = '25px';
 </script>
 
-<h1>{$t('collection.title')}</h1>
+<h1 class=colored>{$t('collection.title')}</h1>
 
 {#if !browser || $features.enableDanceCollection}
-  <h2>{$t('collection.dances-subtitle')}</h2>
+  <h2 class=box>{$t('collection.dances-subtitle')}</h2>
   <div class="dance-table">
     {#each [...data.officialDances, ...$localDances] as dance}
       <div>
@@ -55,7 +55,7 @@
   </div>
 {/if}
 
-<h2>{$t('collection.steps-subtitle')}</h2>
+<h2 class=box>{$t('collection.steps-subtitle')}</h2>
 <div class="step-table">
   {#each data.uniqueNameSteps as step}
     {#if !step.name.includes('Idle')}
@@ -69,6 +69,9 @@
 </div>
 
 <style>
+  h1 {
+    margin: 5px 0;
+  }
   .step-table,
   .dance-table {
     display: grid;

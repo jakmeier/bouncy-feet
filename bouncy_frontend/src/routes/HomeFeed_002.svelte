@@ -12,7 +12,7 @@
   let swapBackgroundColor = 'var(--theme-neutral-white)';
   onMount(() => {
     swapBackgroundColor = $backgroundColor;
-    $backgroundColor = 'var(--theme-main)';
+    $backgroundColor = 'var(--theme-neutral-white)';
   });
   onDestroy(() => {
     $backgroundColor = swapBackgroundColor;
@@ -28,10 +28,10 @@
     {#each { length: numDancers } as _}
       <DanceAnimation
         dance={featuredDance}
-        leftColor={'var(--theme-accent-light)'}
-        rightColor={'var(--theme-accent-light)'}
-        headColor={'var(--theme-accent-light)'}
-        bodyColor={'var(--theme-accent-light)'}
+        leftColor={'var(--theme-main)'}
+        rightColor={'var(--theme-main)'}
+        headColor={'var(--theme-main)'}
+        bodyColor={'var(--theme-main)'}
       />
     {/each}
   {/if}
@@ -50,13 +50,10 @@
 
 <style>
   h1 {
-    margin: -5px -5px 15px -5px;
-    background-color: var(--theme-main);
-    color: var(--theme-accent);
-    width: 100vw;
     padding: 25px 0;
-    font-weight: 900;
     text-align: center;
+    text-shadow: var(--theme-main) 0px 0px 11px;
+    font-size: 45px;
   }
   .dancers {
     display: grid;

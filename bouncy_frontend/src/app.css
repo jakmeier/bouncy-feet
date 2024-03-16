@@ -29,6 +29,21 @@ input {
     font-size: 20px;
 }
 
+h1.colored {
+    /* color: var(--theme-main); */
+    /* font-weight: 900; */
+    text-shadow: var(--theme-main) 0px 0px 20px;
+}
+
+h2.box {
+    margin: 5px 0;
+    background-color: var(--theme-neutral-light);
+    border-radius: 5px;
+    padding: 5px;
+    text-align: center;
+    font-size: 20px;
+}
+
 input {
     font-size: 40px;
     width: auto;
