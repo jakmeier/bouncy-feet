@@ -35,7 +35,6 @@
   main {
     margin: 5px;
     max-width: calc(min(730px, 100vw) - 10px);
-    overflow-y: auto;
   }
 
   .scroll-buffer {
