@@ -5,6 +5,7 @@
   import Header from '$lib/components/ui/Header.svelte';
   import Select from 'svelte-select';
   import { dynamicCounter } from '$lib/timer';
+  import { features } from '$lib/stores/FeatureSelection';
 
   /** @type {import('./$types').PageData} */
   export let data;
@@ -42,17 +43,25 @@
   <input type="range" bind:value={bpm} min="30" max="300" class="range" />
 </label>
 
-<label>
-  {$t('collection.step.rotation')}
-  <input
-    type="number"
-    bind:value={degree}
-    min="-180"
-    max="180"
-    class="number"
-  />
-  <input type="range" bind:value={degree} min="-180" max="180" class="range" />
-</label>
+{#if $features.enableAvatarRotation}
+  <label>
+    {$t('collection.step.rotation')}
+    <input
+      type="number"
+      bind:value={degree}
+      min="-180"
+      max="180"
+      class="number"
+    />
+    <input
+      type="range"
+      bind:value={degree}
+      min="-180"
+      max="180"
+      class="range"
+    />
+  </label>
+{/if}
 
 {#if selectItems.length > 1}
   <div class="label">

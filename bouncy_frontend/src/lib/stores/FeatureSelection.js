@@ -16,6 +16,7 @@ export const version = derived(dev, ($dev) => $dev ? 0.999 : 0.002);
 export const features = derived([version, dev], ([$v, $dev]) => {
     return {
         /* Features that are not ready to be released */
+        enableAvatarRotation: $v >= 0.999,
         enableFreestyleRecording: $v >= 0.999,
         enableDanceCollection: $v >= 0.003,
         enableDanceCreator: $v >= 0.003,

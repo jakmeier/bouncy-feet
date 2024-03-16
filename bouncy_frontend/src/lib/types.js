@@ -1,6 +1,7 @@
 
 /**
  * @typedef {Object} Features
+ * @property {boolean} enableAvatarRotation
  * @property {boolean} enableFreestyleRecording
  * @property {boolean} enableDanceCollection
  * @property {boolean} enableDanceCreator
