@@ -6,6 +6,7 @@
   import Select from 'svelte-select';
   import { dynamicCounter } from '$lib/timer';
   import { features } from '$lib/stores/FeatureSelection';
+  import { browser } from '$app/environment';
 
   /** @type {import('./$types').PageData} */
   export let data;
@@ -89,14 +90,16 @@
   </div>
 {/if}
 
-<div class="label">
-  <a href="./record">
-    <button class="light">
-      <span class="material-symbols-outlined"> videocam </span>
-      <p>{$t('record.start-button')}</p>
-    </button>
-  </a>
-</div>
+{#if $features.enableStepRecording || !browser}
+  <div class="label">
+    <a href="./record">
+      <button class="light">
+        <span class="material-symbols-outlined"> videocam </span>
+        <p>{$t('record.start-button')}</p>
+      </button>
+    </a>
+  </div>
+{/if}
 
 <style>
   label,

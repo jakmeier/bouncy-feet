@@ -20,6 +20,7 @@ export const features = derived([version, dev], ([$v, $dev]) => {
         enableFreestyleRecording: $v >= 0.999,
         enableDanceCollection: $v >= 0.003,
         enableDanceCreator: $v >= 0.003,
+        enableStepRecording: $v >= 0.004,
 
         /* Features that stay in dev */
         enableDevView: $dev,
