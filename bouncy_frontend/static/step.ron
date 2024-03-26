@@ -187,5 +187,71 @@
         (pose: "left-up", orientation: Left),
       ]
     ),
+    (
+      name: "Simple Heels",
+      id: "simple-heels-0",
+      variation: "right-first",
+      keyframes: [
+        (pose: "standing-straight-front", orientation: ToCamera),
+        (pose: "right-heel-front", orientation: ToCamera),
+        (pose: "standing-straight-front", orientation: ToCamera),
+        (pose: "left-heel-front", orientation: ToCamera),
+      ]
+    ),
+    (
+      name: "Simple Heels",
+      id: "simple-heels-1",
+      variation: "left-first",
+      keyframes: [
+        (pose: "standing-straight-front", orientation: ToCamera),
+        (pose: "left-heel-front", orientation: ToCamera),
+        (pose: "standing-straight-front", orientation: ToCamera),
+        (pose: "right-heel-front", orientation: ToCamera),
+      ]
+    ),
+    (
+      name: "Open Running Man on Heels",
+      id: "open-rm-heels-0",
+      variation: "right-first",
+      keyframes: [
+        (pose: "t-closed-right", orientation: ToCamera),
+        (pose: "open-heel-rm-right", orientation: ToCamera),
+        (pose: "t-closed-left", orientation: ToCamera),
+        (pose: "open-heel-rm-left", orientation: ToCamera),
+      ]
+    ),
+    (
+      name: "Open Running Man on Heels",
+      id: "open-rm-heels-1",
+      variation: "left-first",
+      keyframes: [
+        (pose: "t-closed-left", orientation: ToCamera),
+        (pose: "open-heel-rm-left", orientation: ToCamera),
+        (pose: "t-closed-right", orientation: ToCamera),
+        (pose: "open-heel-rm-right", orientation: ToCamera),
+      ]
+    ),
+    (
+      name: "Open Running Man",
+      id: "open-rm-0",
+      variation: "right-first",
+      keyframes: [
+        (pose: "t-closed-right", orientation: ToCamera),
+        (pose: "open-rm-right", orientation: ToCamera),
+        (pose: "t-closed-left", orientation: ToCamera),
+        (pose: "open-rm-left", orientation: ToCamera),
+      ]
+    ),
+    (
+      name: "Open Running Man",
+      id: "open-rm-1",
+      variation: "left-first",
+      keyframes: [
+        (pose: "t-closed-left", orientation: ToCamera),
+        (pose: "open-rm-left", orientation: ToCamera),
+        (pose: "t-closed-right", orientation: ToCamera),
+        (pose: "open-rm-right", orientation: ToCamera),
+      ]
+    ),
   ]
 )
