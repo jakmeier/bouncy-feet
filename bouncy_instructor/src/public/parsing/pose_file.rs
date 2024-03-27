@@ -1,6 +1,8 @@
 //! Defines the external format for defining poses, which are still positions of
 //! a body.
 
+use std::collections::HashMap;
+
 use serde::{Deserialize, Serialize};
 
 use super::ParseFileError;
@@ -28,8 +30,8 @@ pub(crate) struct Pose {
     /// The Z-Axis is the distance to the camera. It can only be measured quite
     /// inaccurately from the camera image, hence poses define only relative
     /// position comparisons instead of numeric coordinates.
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub z: Vec<BodyPartOrdering>,
+    #[serde(default, skip_serializing_if = "PoseZ::is_empty")]
+    pub z: PoseZ,
     #[serde(default, skip_serializing_if = "String::is_empty")]
     pub mirror_of: String,
 }
@@ -48,14 +50,30 @@ pub(crate) struct LimbPosition {
     pub tolerance: u8,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Hash, Clone)]
 pub(crate) struct BodyPoint {
     pub side: BodySide,
     pub part: BodyPart,
 }
 
+#[derive(Serialize, Deserialize, Debug, PartialEq, Default, Clone)]
+pub(crate) struct PoseZ {
+    /// +1 is maximally stretched towards the camera, -1 away from the camera,
+    /// 0.0 is neutral and default for all unspecified points.
+    #[serde(default, skip_serializing_if = "HashMap::is_empty")]
+    pub absolute: HashMap<BodyPoint, f32>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub order: Vec<BodyPartOrdering>,
+}
+
 /// Defines a simple is-in-front-of relation between two body parts.
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
+///
+/// This is more or less the only thing that can be consistently checked in a
+/// video. But is it good enough to draw skeletons properly in a 2D projection?
+/// Without position per body part info, not really. To know the length of a
+/// limb, for example the thigh with a raised knee towards the camera, one must
+/// know how much forward the knee is compared to the hip and the foot.
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Hash, Clone)]
 pub(crate) struct BodyPartOrdering {
     pub forward: BodyPoint,
     pub backward: BodyPoint,
@@ -97,13 +115,13 @@ pub(crate) enum Limb {
     },
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Hash, Clone)]
 pub(crate) enum BodySide {
     Left,
     Right,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Hash, Clone)]
 pub(crate) enum BodyPart {
     Shoulder,
     Hip,
@@ -133,5 +151,11 @@ impl PoseFile {
             });
         }
         Ok(parsed)
+    }
+}
+
+impl PoseZ {
+    pub fn is_empty(&self) -> bool {
+        self.absolute.is_empty() && self.order.is_empty()
     }
 }

@@ -1,6 +1,7 @@
 use super::dance_collection::{DanceCollection, LimbIndex};
 use super::geom::{Angle3d, SignedAngle};
 use super::pose::{BodyPoint, Limb};
+use crate::keypoints::Cartesian3d;
 use crate::skeleton::{Segment, Side, Skeleton};
 use crate::Keypoints;
 use std::collections::HashMap;
@@ -34,7 +35,7 @@ pub(crate) struct Skeleton3d {
     /// was recorded.
     azimuth_correction: SignedAngle,
     /// Z position estimates of body parts
-    z: HashMap<BodyPoint, f32>,
+    coordinates: HashMap<BodyPoint, Cartesian3d>,
     /// Z position estimates of limbs
     limbs_z: Vec<f32>,
 }
@@ -61,7 +62,7 @@ impl Skeleton3d {
         limb_angles_3d: Vec<Angle3d>,
         limbs_z: Vec<f32>,
         azimuth_correction: SignedAngle,
-        z: HashMap<BodyPoint, f32>,
+        coordinates: HashMap<BodyPoint, Cartesian3d>,
     ) -> Self {
         let limb_angles = limb_angles_3d.iter().map(Angle3d::project_2d).collect();
         Self {
@@ -70,7 +71,7 @@ impl Skeleton3d {
             limb_angles_3d,
             limbs_z,
             azimuth_correction,
-            z,
+            coordinates,
         }
     }
 
@@ -80,21 +81,18 @@ impl Skeleton3d {
             .map(|(_index, limb)| limb.to_angle(kp))
             .collect::<Vec<_>>();
         let shoulder_angle = kp.left.shoulder.azimuth(kp.right.shoulder);
-        let z: HashMap<_, _> = kp
-            .body_points()
-            .map(|(body_point, coordinate)| (body_point, coordinate.z))
-            .collect();
+        let pos: HashMap<_, _> = kp.body_points().collect();
         let limbs_z = db
             .limbs()
             .map(|(_index, limb)| limb.z(kp))
             .collect::<Vec<_>>();
-        Self::from_angles(limb_angles_3d, shoulder_angle, z, limbs_z)
+        Self::from_angles(limb_angles_3d, shoulder_angle, pos, limbs_z)
     }
 
     pub(crate) fn from_angles(
         mut limb_angles_3d: Vec<Angle3d>,
         shoulder_angle: SignedAngle,
-        z: HashMap<BodyPoint, f32>,
+        pos: HashMap<BodyPoint, Cartesian3d>,
         limbs_z: Vec<f32>,
     ) -> Self {
         // Shoulder defines where the person is looking
@@ -112,15 +110,15 @@ impl Skeleton3d {
             _ => (),
         }
 
-        Self::new(direction, limb_angles_3d, limbs_z, azimuth_correction, z)
+        Self::new(direction, limb_angles_3d, limbs_z, azimuth_correction, pos)
     }
 
     pub(crate) fn angles(&self) -> &[SignedAngle] {
         &self.limb_angles
     }
 
-    pub(crate) fn positions(&self) -> &HashMap<BodyPoint, f32> {
-        &self.z
+    pub(crate) fn positions(&self) -> &HashMap<BodyPoint, Cartesian3d> {
+        &self.coordinates
     }
 
     pub(crate) fn direction(&self) -> Direction {

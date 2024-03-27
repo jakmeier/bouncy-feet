@@ -5,6 +5,7 @@
   import { getContext, onMount, setContext } from 'svelte';
   import PoseError from '$lib/components/dev/PoseError.svelte';
   import Banner from '$lib/components/review/Banner.svelte';
+  import VideoReview from '$lib/components/review/VideoReview.svelte';
 
   /** @type {HTMLInputElement}  */
   let upload;
@@ -17,6 +18,11 @@
     tracker,
   });
   const poseCtx = getContext('pose');
+
+  /** @type {undefined | number} */
+  let recordingStart;
+  /** @type {undefined | number} */
+  let recordingEnd;
 
   /**
    * @type {import("$lib/instructor/bouncy_instructor").PoseApproximation[]}
@@ -46,9 +52,13 @@
 
   onMount(async () => {
     dataListener = await poseCtx.newPoseDetection((result, timestamp) => {
+      if (recordingStart === undefined) {
+        recordingStart = timestamp;
+      }
       if (result.landmarks && result.landmarks.length >= 1) {
         const kp = landmarksToKeypoints(result.landmarks[0]);
         tracker.addKeypoints(kp, timestamp);
+        recordingEnd = timestamp;
       }
     });
   });
@@ -101,9 +111,22 @@
 <button on:click={downloadFrame}> Download Keypoints of Frame </button>
 <h2>Dance Evaluation</h2>
 <button on:click={logDance}> Log Dance </button>
-<Banner steps={detectedSteps} width={2000}></Banner>
+{#if detectedSteps.length > 0 && video}
+  <VideoReview
+    reviewVideoSrc={video.src}
+    {detectedSteps}
+    {recordingStart}
+    {recordingEnd}
+  ></VideoReview>
+{/if}
 <h2>Pose evaluations</h2>
 <button on:click={computePoseErrors}> Show Pose Evaluations </button>
 {#each poseErrors as pose}
   <PoseError data={pose} />
 {/each}
+
+<style>
+  video {
+    max-width: 100%;
+  }
+</style>

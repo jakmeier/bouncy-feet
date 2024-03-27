@@ -20,7 +20,8 @@ use strum::IntoEnumIterator;
 pub(crate) struct Pose {
     pub(crate) direction: PoseDirection,
     pub(crate) limbs: Vec<LimbPosition>,
-    pub(crate) z: Vec<BodyPartOrdering>,
+    pub(crate) z_absolute: HashMap<BodyPoint, f32>,
+    pub(crate) z_order: Vec<BodyPartOrdering>,
 }
 
 #[derive(Clone, Debug)]
@@ -45,8 +46,8 @@ pub(crate) struct BodyPoint {
 
 #[derive(PartialEq, Eq, Hash, Clone, Copy)]
 pub(crate) struct BodyPartOrdering {
-    forward: BodyPoint,
-    backward: BodyPoint,
+    pub(crate) forward: BodyPoint,
+    pub(crate) backward: BodyPoint,
 }
 
 #[derive(PartialEq, Eq, Hash, Debug, Clone, Copy)]
@@ -93,7 +94,7 @@ impl BodyPoint {
         }
     }
 
-    fn mirror(&self) -> Self {
+    pub(crate) fn mirror(&self) -> Self {
         Self {
             side: match self.side {
                 BodySide::Left => BodySide::Right,
@@ -128,12 +129,14 @@ impl Pose {
     pub(crate) fn new(
         direction: PoseDirection,
         limbs: Vec<LimbPosition>,
-        z: Vec<BodyPartOrdering>,
+        z_absolute: HashMap<BodyPoint, f32>,
+        z_order: Vec<BodyPartOrdering>,
     ) -> Self {
         Self {
             direction,
             limbs,
-            z,
+            z_absolute,
+            z_order,
         }
     }
 }
@@ -189,9 +192,9 @@ impl BodyPartOrdering {
         }
     }
 
-    pub(crate) fn satisfied(&self, positions: &HashMap<BodyPoint, f32>) -> bool {
+    pub(crate) fn satisfied(&self, positions: &HashMap<BodyPoint, Cartesian3d>) -> bool {
         // Note: This check should probably be more sophisticated, eventually.
-        positions[&self.forward] < positions[&self.backward]
+        positions[&self.forward].z < positions[&self.backward].z
     }
 }
 

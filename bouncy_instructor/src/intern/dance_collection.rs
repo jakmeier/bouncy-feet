@@ -12,6 +12,7 @@ use super::pose::{BodyPartOrdering, Limb, LimbPosition, Pose, PoseDirection};
 use super::skeleton_3d::Direction;
 use super::step::Step;
 use crate::parsing::ParseFileError;
+use crate::pose_file::PoseZ;
 use crate::step_file::{self, Orientation};
 use crate::{dance_file, pose_file, AddDanceError, AddStepError};
 
@@ -101,7 +102,12 @@ impl DanceCollection {
             })
             .collect();
 
-        let new_pose = Pose::new(pose.direction, limbs, pose.z.clone());
+        let new_pose = Pose::new(
+            pose.direction,
+            limbs,
+            pose.z_absolute.clone(),
+            pose.z_order.clone(),
+        );
 
         let new_index = self.poses.len();
         self.poses.push(new_pose);
@@ -114,7 +120,7 @@ impl DanceCollection {
         &mut self,
         direction: pose_file::PoseDirection,
         limbs: Vec<pose_file::LimbPosition>,
-        z: Vec<pose_file::BodyPartOrdering>,
+        z: PoseZ,
     ) -> Pose {
         let limbs = limbs
             .into_iter()
@@ -129,8 +135,9 @@ impl DanceCollection {
                 )
             })
             .collect();
-        let z = z.into_iter().map(From::from).collect();
-        Pose::new(direction.into(), limbs, z)
+        let z_order = z.order.into_iter().map(From::from).collect();
+        let z_absolute = z.absolute.into_iter().map(|(k, v)| (k.into(), v)).collect();
+        Pose::new(direction.into(), limbs, z_absolute, z_order)
     }
 
     /// Take an existing pose and produce a mirror pose of it.
@@ -153,13 +160,18 @@ impl DanceCollection {
                 LimbPosition::from_limb_and_target(index, target)
             })
             .collect();
-        let z = self.poses[i]
-            .z
+        let z_absolute = self.poses[i]
+            .z_absolute
+            .iter()
+            .map(|(body_point, &value)| (body_point.mirror(), value))
+            .collect();
+        let z_order = self.poses[i]
+            .z_order
             .iter()
             .map(From::from)
             .map(BodyPartOrdering::mirror)
             .collect();
-        Pose::new(direction, limbs, z)
+        Pose::new(direction, limbs, z_absolute, z_order)
     }
 
     fn find_or_insert_limb(&mut self, limb: Limb) -> LimbIndex {
@@ -315,7 +327,8 @@ impl DanceCollection {
                 SignedAngle::ZERO,
                 1.0,
             )],
-            vec![],
+            Default::default(),
+            Default::default(),
         )];
 
         Self {

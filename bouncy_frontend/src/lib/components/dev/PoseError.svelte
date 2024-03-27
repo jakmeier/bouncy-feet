@@ -18,7 +18,14 @@
       {/if}
     {/each}
     {#each data.zErrors() as zError}
-      <li>Z-Error, expected: {zError.expected}</li>
+      <li>
+        Z-Error: {zError.error}{zError.quadrant_error ? 'wrong quadrant' : ''}
+      </li>
+    {/each}
+    {#each data.zOrderErrors() as orderError}
+      <li>
+        Z-Order-Error: {orderError.expected}
+      </li>
     {/each}
   </ol>
 </div>

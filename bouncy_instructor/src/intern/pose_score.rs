@@ -5,6 +5,7 @@ use super::geom::SignedAngle;
 use super::pose::{BodyPartOrdering, BodyPoint, Pose};
 use super::skeleton_3d::Skeleton3d;
 use crate::intern::pose::PoseDirection;
+use crate::keypoints::Cartesian3d;
 use std::collections::HashMap;
 
 /// Describe the target angle and how to compute an error score from it.
@@ -32,7 +33,15 @@ pub(crate) struct ErrorDetails {
     pub errors: Vec<f32>,
     /// weights to compute full error score
     pub weights: Vec<f32>,
-    pub z_errors: Vec<BodyPartOrdering>,
+    /// Ordering of body parts is off
+    pub z_order_errors: Vec<BodyPartOrdering>,
+    /// All z-tracked body points
+    pub body_points: Vec<BodyPoint>,
+    /// Z-error in absolute terms, experimental and generally not very useful
+    /// because z-tracking is not that accurate.
+    pub z_absolute_errors: Vec<f32>,
+    /// Is the body part in the expected quadrant?
+    pub quadrant_errors: Vec<bool>,
 }
 
 /// Find the pose with the lowest error score.
@@ -109,7 +118,7 @@ impl Pose {
     pub(crate) fn error(
         &self,
         angles: &[SignedAngle],
-        positions: &HashMap<BodyPoint, f32>,
+        positions: &HashMap<BodyPoint, Cartesian3d>,
     ) -> ErrorDetails {
         let mut errors = Vec::with_capacity(2 * self.limbs.len());
         let mut weights = Vec::with_capacity(2 * self.limbs.len());
@@ -121,17 +130,32 @@ impl Pose {
             errors.push(limb.target.target_error(angle));
             weights.push(limb.weight());
         }
-        let z_errors = self
-            .z
+        let z_order_errors = self
+            .z_order
             .iter()
             .filter(|ordering| !ordering.satisfied(positions))
             .cloned()
             .collect();
+        let body_points = self.z_absolute.keys().cloned().collect();
+        let (z_absolute_errors, quadrant_errors) = self
+            .z_absolute
+            .iter()
+            .map(|(k, &expected_z)| {
+                let z = positions[k].z;
+                // TODO: also look at angles to check quadrant
+                let quadrant_error = !same_sign(z, expected_z, 0.1);
+                let z_error = (z - expected_z).powi(2);
+                (z_error, quadrant_error)
+            })
+            .unzip();
         ErrorDetails {
             limbs,
             errors,
             weights,
-            z_errors,
+            body_points,
+            z_order_errors,
+            z_absolute_errors,
+            quadrant_errors,
         }
     }
 }
@@ -176,6 +200,10 @@ impl ErrorDetails {
     }
 }
 
+fn same_sign(a: f32, b: f32, eps: f32) -> bool {
+    a.signum() == b.signum() || (a.abs() <= eps && b.abs() <= eps)
+}
+
 #[cfg(test)]
 mod tests {
 
@@ -206,7 +234,7 @@ mod tests {
             SignedAngle::degree(polar)
         };
         let limb = LimbPosition::new(Limb::LEFT_THIGH, polar, SignedAngle::ZERO, 1.0);
-        let pose = Pose::new(PoseDirection::Front, vec![limb], vec![]);
+        let pose = Pose::new(PoseDirection::Front, vec![limb], Default::default(), vec![]);
         let mut angles = zero_skeleton();
         angles[Limb::LEFT_THIGH.as_usize()] = polar;
         let error = pose.error(&angles, &Default::default());
@@ -238,6 +266,7 @@ mod tests {
                 LimbPosition::new(Limb::RIGHT_ARM, SignedAngle(0.0), tol, 1.0),
                 LimbPosition::new(Limb::RIGHT_FOREARM, SignedAngle(0.0), tol, 1.0),
             ],
+            Default::default(),
             vec![],
         );
         check_score_fixed_skeleton(&pose, expect!["0.49684697"]);
@@ -258,6 +287,7 @@ mod tests {
                 LimbPosition::new(Limb::RIGHT_ARM, SignedAngle(PI), tol, 1.0),
                 LimbPosition::new(Limb::RIGHT_FOREARM, SignedAngle(PI), tol, 1.0),
             ],
+            Default::default(),
             vec![],
         );
         check_score_fixed_skeleton(&pose, expect!["0.68592346"]);
@@ -339,6 +369,7 @@ mod tests {
                 LimbPosition::new(Limb::RIGHT_ARM, SignedAngle(PI / 2.0), tol, 1.0),
                 LimbPosition::new(Limb::RIGHT_FOREARM, SignedAngle(PI / 2.0), tol, 1.0),
             ],
+            Default::default(),
             vec![],
         )
     }

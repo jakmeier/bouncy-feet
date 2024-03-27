@@ -16,8 +16,8 @@ use crate::intern::dance_collection::DanceCollection;
 use crate::intern::geom::{Angle3d, SignedAngle};
 use crate::intern::pose::{BodyPart, BodyPoint, BodySide, Limb};
 use crate::intern::skeleton_3d::{Direction, Skeleton3d};
+use crate::keypoints::Cartesian3d;
 use crate::pose_file;
-use std::collections::HashMap;
 
 impl From<pose_file::Limb> for Limb {
     fn from(other: pose_file::Limb) -> Self {
@@ -290,7 +290,7 @@ impl pose_file::Pose {
             limbs,
             name: "Generated Pose".to_owned(),
             mirror_of: String::new(),
-            z: Vec::new(),
+            z: Default::default(),
         }
     }
 }
@@ -332,7 +332,7 @@ impl Skeleton3d {
         let num_limbs = db.limbs().count();
         let mut limb_angles = vec![Angle3d::ZERO; num_limbs];
         let mut limbs_z = vec![0.0; num_limbs];
-        let mut body_part_z = HashMap::new();
+        let mut body_part_z = pose.z_absolute.clone();
         let azimuth = match direction {
             Direction::North | Direction::East => SignedAngle::degree(90.0),
             Direction::South => SignedAngle::degree(270.0),
@@ -342,23 +342,32 @@ impl Skeleton3d {
         for limb in &pose.limbs {
             limb_angles[limb.limb.as_usize()] = Angle3d::new(azimuth, limb.target.angle());
         }
-        for z_ordering in &pose.z {
+        for z_ordering in &pose.z_order {
             for (limb_index, _limb) in z_ordering.forward.attached_limbs(db) {
                 limbs_z[limb_index.as_usize()] += 1.0;
             }
             for (limb_index, _limb) in z_ordering.backward.attached_limbs(db) {
                 limbs_z[limb_index.as_usize()] -= 1.0;
             }
-            body_part_z.insert(z_ordering.forward, 1.0);
-            body_part_z.insert(z_ordering.backward, -1.0);
+
+            let forward = *body_part_z.entry(z_ordering.forward).or_insert(1.0);
+            let backwards = body_part_z.entry(z_ordering.backward).or_insert(-1.0);
+            if forward <= *backwards {
+                *backwards -= 0.1;
+            }
         }
+        // TODO: it might make sense to compute x and y guesses from angles
+        let coordinates = body_part_z
+            .into_iter()
+            .map(|(k, z)| (k, Cartesian3d::new(0.0, 0.0, z)))
+            .collect();
         let azimuth_correction = SignedAngle::ZERO;
         Skeleton3d::new(
             direction,
             limb_angles,
             limbs_z,
             azimuth_correction,
-            body_part_z,
+            coordinates,
         )
     }
 }
@@ -504,7 +513,7 @@ mod tests {
     fn ron_string_pose(angle: i16, front: bool, add_z: bool) -> String {
         let direction = if front { "Front" } else { "Right" };
         let z = if add_z {
-            "z: [(forward: (side: Right, part: Ankle), backward: (side: Left, part: Ankle))]"
+            "z: ( order: [(forward: (side: Right, part: Ankle), backward: (side: Left, part: Ankle))] )"
         } else {
             ""
         };

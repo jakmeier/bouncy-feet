@@ -1,4 +1,5 @@
 use super::Timestamp;
+use crate::intern::pose::BodyPoint;
 use crate::intern::pose_score::ErrorDetails;
 use crate::STATE;
 use wasm_bindgen::prelude::wasm_bindgen;
@@ -26,7 +27,15 @@ pub struct LimbError {
 
 #[wasm_bindgen]
 pub struct ZError {
-    expected: String,
+    body_point: BodyPoint,
+    pub error: f32,
+    pub quadrant_error: bool,
+}
+
+#[wasm_bindgen]
+pub struct ZWrongOrderError {
+    expected_forward: BodyPoint,
+    expected_backward: BodyPoint,
 }
 
 #[wasm_bindgen]
@@ -47,10 +56,26 @@ impl PoseApproximation {
     #[wasm_bindgen(js_name = zErrors)]
     pub fn z_errors(&self) -> Vec<ZError> {
         self.error_details
-            .z_errors
+            .z_absolute_errors
             .iter()
-            .map(|expected| ZError {
-                expected: format!("{expected:?}"),
+            .zip(&self.error_details.quadrant_errors)
+            .zip(&self.error_details.body_points)
+            .map(|((&error, &quadrant_error), &body_point)| ZError {
+                body_point,
+                error,
+                quadrant_error,
+            })
+            .collect()
+    }
+
+    #[wasm_bindgen(js_name = zOrderErrors)]
+    pub fn z_order_errors(&self) -> Vec<ZWrongOrderError> {
+        self.error_details
+            .z_order_errors
+            .iter()
+            .map(|expected| ZWrongOrderError {
+                expected_backward: expected.backward,
+                expected_forward: expected.forward,
             })
             .collect()
     }
@@ -94,7 +119,18 @@ impl LimbError {
 #[wasm_bindgen]
 impl ZError {
     #[wasm_bindgen(getter)]
+    pub fn name(&self) -> String {
+        format!("{:?}", self.body_point)
+    }
+}
+
+#[wasm_bindgen]
+impl ZWrongOrderError {
+    #[wasm_bindgen(getter)]
     pub fn expected(&self) -> String {
-        self.expected.clone()
+        format!(
+            "{:?} behind {:?}",
+            self.expected_backward, self.expected_forward
+        )
     }
 }
