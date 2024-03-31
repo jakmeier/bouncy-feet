@@ -202,6 +202,10 @@ impl DanceCollection {
         (0..self.limbs.len()).map(LimbIndex).zip(self.limbs.iter())
     }
 
+    pub(crate) fn limb(&self, index: LimbIndex) -> &Limb {
+        &self.limbs[index.as_usize()]
+    }
+
     pub(crate) fn limb_name(&self, i: LimbIndex) -> &str {
         &self.limb_names[i.0]
     }

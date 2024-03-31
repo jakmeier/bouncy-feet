@@ -34,8 +34,21 @@ it backwards makes it negative. Sidewards movements are represented as "side
 angles", which is defined exactly the same way just with an extra flag marking
 it as side-angle. For these, positive angles are to the dancers right.
 
-Typically, either a forward/backward or a side angle is defined, rarely would
-you need to combined them. But it is possible.
+Each pose is either frontal (facing the camera) or to the side. In frontal
+poses, the defined angles are sideways of the body. If the position is sideway,
+the angles are forward/backward as seen by the person. This means, the **angels
+are always as seen by the camera**.
+
+There is also an optional Z section for poses. It can currently define two
+different things, relative ordering between body parts and absolute z-values per
+body part. (But note that angles are still as defined as seen in the video.)
+The first property could be good enough for drawing limbs in the right
+z-order as well as some simple checks on a video. But drawing looks all wrong
+because limbs are no shortened as they need to be. The second property, at least
+for, seems more complete.
+
+This entire z-situation is likely to be unified somehow in the future. It is
+experimental at this stage.
 
 **Turning the entire body is NOT part of pose definitions. This has to be defined
 as part of a step.**

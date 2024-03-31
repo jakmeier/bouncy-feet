@@ -339,8 +339,20 @@ impl Skeleton3d {
             Direction::West => SignedAngle::degree(270.0),
             Direction::Unknown => SignedAngle::degree(90.0),
         };
-        for limb in &pose.limbs {
-            limb_angles[limb.limb.as_usize()] = Angle3d::new(azimuth, limb.target.angle());
+        for limb_pos in &pose.limbs {
+            // combine 2D angle as seen by the camera + z coordinates to a 3D angle
+            let limb = db.limb(limb_pos.limb);
+            let start_z = *body_part_z.get(&limb.start).unwrap_or(&0.0);
+            let end_z = *body_part_z.get(&limb.end).unwrap_or(&0.0);
+            let dz = end_z - start_z;
+            let computed_angle = if dz.abs() < 1e-6 {
+                Angle3d::new(azimuth, limb_pos.target.angle())
+            } else {
+                let projected: Cartesian3d = Angle3d::new(azimuth, limb_pos.target.angle()).into();
+                let unprojected = projected + Cartesian3d::new(0.0, 0.0, dz);
+                Angle3d::from(unprojected)
+            };
+            limb_angles[limb_pos.limb.as_usize()] = computed_angle;
         }
         for z_ordering in &pose.z_order {
             for (limb_index, _limb) in z_ordering.forward.attached_limbs(db) {
