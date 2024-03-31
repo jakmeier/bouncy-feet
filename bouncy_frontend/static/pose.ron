@@ -123,7 +123,7 @@
       name: "pendulum-right",
       direction: Front,
       limbs: [
-        (limb: RightShin, angle: 45, tolerance: 5, weight: 1.0),
+        (limb: RightShin, angle: 55, tolerance: 5, weight: 1.0),
         (limb: RightThigh, angle: 45, tolerance: 5, weight: 1.0),
       ]
     ),
@@ -150,21 +150,29 @@
     (
       name: "t-closed-right",
       direction: Front,
-      // indistinguishable from standing straight, need a way to specify a high foot position
       // also: in t-step, sometimes it's not classified as Front
       limbs: [
-        (limb: LeftShin, angle: 0, tolerance: 5, weight: 1.0),
-        (limb: LeftThigh, angle: 0, tolerance: 5, weight: 1.0),
-        (limb: RightShin, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: LeftShin, angle: -10, tolerance: 5, weight: 1.0),
+        (limb: LeftThigh, angle: 5, tolerance: 5, weight: 1.0),
         (limb: LeftFoot, angle: 0, tolerance: 5, weight: 1.0),
-        (limb: RightThigh, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: RightLeg, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: RightShin, angle: -50, tolerance: 5, weight: 0.0),
+        (limb: RightThigh, angle: 15, tolerance: 5, weight: 0.0),
         (limb: RightFoot, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: LeftFoot, angle: 60, tolerance: 20, weight: 0.5),
         (limb: LeftArm, weight: 0.0,  angle: -7,  tolerance: 0,),
         (limb: LeftForearm,  weight: 0.0,  angle: -16,  tolerance: 0,),
         (limb: RightArm, weight: 0.0, angle: 32, tolerance: 0),
         (limb: RightForearm, weight: 0.0, angle: -18, tolerance: 0),
       ],
-      // TODO: z must define that right knee is forward and/or right thigh and shin are shortened
+      z: (
+        absolute: {
+          (side: Right, part: Ankle): -0.75,
+          (side: Right, part: Knee): 0.5,
+          (side: Right, part: Toes): -0.5,
+          (side: Right, part: Heel): -0.8,
+        },
+      )
     ),
     ( name: "t-closed-left", mirror_of: "t-closed-right", direction: Front ),
     (
@@ -176,7 +184,7 @@
         ( limb: LeftLeg, weight: 1.0, angle: 20, tolerance: 5),
         ( limb: LeftFoot, weight: 0.0, angle: -60, tolerance: 0),
         ( limb: LeftArm, weight: 0.0, angle: 38, tolerance: 0),
-        ( limb: LeftForearm, weight: 0.0, angle: 164, tolerance: 0),
+        ( limb: LeftForearm, weight: 0.0, angle: 134, tolerance: 0),
         ( limb: RightThigh, weight: 1.0, angle: -20, tolerance: 5),
         ( limb: RightShin, weight: 1.0, angle: -20, tolerance: 5),
         ( limb: RightFoot, weight: 0.5, angle: -110, tolerance: 10),
@@ -185,9 +193,16 @@
         ( limb: RightLeg, weight: 1.0, angle: -20, tolerance: 5),
       ],
       z: (
+        absolute: {
+          (side: Right, part: Ankle): 1.0,
+          (side: Right, part: Knee): 0.5,
+          (side: Left, part: Ankle): -1.0,
+          (side: Left, part: Knee): -0.5,
+        },
         order: [
           ( forward: (side: Right, part: Ankle), backward: (side: Left, part: Ankle) ),
           ( forward: (side: Right, part: Knee), backward: (side: Left, part: Knee) ),
+          ( forward: (side: Left, part: Elbow), backward: (side: Right, part: Elbow) ),
         ]
       )
     ),
