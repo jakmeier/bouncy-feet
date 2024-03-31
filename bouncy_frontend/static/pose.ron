@@ -153,10 +153,10 @@
       // also: in t-step, sometimes it's not classified as Front
       limbs: [
         (limb: LeftShin, angle: -10, tolerance: 5, weight: 1.0),
-        (limb: LeftThigh, angle: 5, tolerance: 5, weight: 1.0),
+        (limb: LeftThigh, angle: -5, tolerance: 5, weight: 1.0),
         (limb: LeftFoot, angle: 0, tolerance: 5, weight: 1.0),
         (limb: RightLeg, angle: 0, tolerance: 5, weight: 1.0),
-        (limb: RightShin, angle: -50, tolerance: 5, weight: 0.0),
+        (limb: RightShin, angle: -80, tolerance: 5, weight: 0.0),
         (limb: RightThigh, angle: 15, tolerance: 5, weight: 0.0),
         (limb: RightFoot, angle: 0, tolerance: 5, weight: 1.0),
         (limb: LeftFoot, angle: 60, tolerance: 20, weight: 0.5),
@@ -167,11 +167,15 @@
       ],
       z: (
         absolute: {
-          (side: Right, part: Ankle): -0.75,
+          (side: Right, part: Ankle): -1.0,
           (side: Right, part: Knee): 0.5,
-          (side: Right, part: Toes): -0.5,
-          (side: Right, part: Heel): -0.8,
+          (side: Right, part: Toes): -0.9,
+          (side: Right, part: Heel): -1.0,
         },
+          order: [
+          ( forward: (side: Left, part: Ankle), backward: (side: Right, part: Knee) ),
+          ( forward: (side: Left, part: Toes), backward: (side: Right, part: Knee) ),
+        ]
       )
     ),
     ( name: "t-closed-left", mirror_of: "t-closed-right", direction: Front ),
@@ -260,18 +264,27 @@
       name: "left-heel-front",
       direction: Front,
       limbs: [
-        ( limb: LeftThigh, weight: 1.0, angle: -10, tolerance: 2),
+        ( limb: LeftThigh, weight: 1.0, angle: -15, tolerance: 2),
         ( limb: LeftShin, weight: 1.0, angle: -10, tolerance: 2),
-        ( limb: LeftFoot, weight: 1.0, angle: -90, tolerance: 5),
-        ( limb: RightThigh, weight: 1.0, angle: -5, tolerance: 3),
-        ( limb: RightShin, weight: 1.0, angle: 0, tolerance: 3),
+        ( limb: LeftFoot, weight: 1.0, angle: -100, tolerance: 5),
+        ( limb: RightThigh, weight: 1.0, angle: 15, tolerance: 3),
+        ( limb: RightShin, weight: 1.0, angle: -10, tolerance: 3),
         ( limb: RightLeg, weight: 1.0, angle: -2, tolerance: 2),
-        ( limb: RightFoot, weight: 0.2, angle: 30, tolerance: 10),
+        ( limb: RightFoot, weight: 0.2, angle: 10, tolerance: 10),
         ( limb: LeftArm, weight: 0.0, angle: -20, tolerance: 0),
         ( limb: LeftForearm, weight: 0.0, angle: -40, tolerance: 0),
         ( limb: RightArm, weight: 0.0, angle: 50, tolerance: 0),
         ( limb: RightForearm, weight: 0.0, angle: 5, tolerance: 0),
-      ]
+      ],
+      z: (
+        absolute: {
+          (side: Left, part: Ankle): 1.0,
+          (side: Left, part: Toes): 1.0,
+          (side: Left, part: Heel): 1.0,
+          (side: Left, part: Knee): 0.5,
+          (side: Right, part: Knee): 0.5,
+        },
+      ),
     ),
     ( name: "right-heel-front", mirror_of: "left-heel-front", direction: Front ),
     (
@@ -295,7 +308,7 @@
       name: "open-heel-rm-left",
       direction: Front,
       limbs: [
-        ( limb: LeftThigh, weight: 1.0, angle: -10, tolerance: 2),
+        ( limb: LeftThigh, weight: 1.0, angle: -20, tolerance: 2),
         ( limb: LeftShin, weight: 1.0, angle: -20, tolerance: 2),
         ( limb: LeftFoot, weight: 1.0, angle: -120, tolerance: 5),
         ( limb: RightThigh, weight: 1.0, angle: 15, tolerance: 3),
