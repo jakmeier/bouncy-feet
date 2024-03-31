@@ -159,3 +159,16 @@ impl PoseZ {
         self.absolute.is_empty() && self.order.is_empty()
     }
 }
+
+impl BodyPoint {
+    pub fn default_pivot() -> Self {
+        BodyPoint {
+            side: BodySide::Left,
+            part: BodyPart::Hip,
+        }
+    }
+
+    pub fn is_default_pivot(&self) -> bool {
+        *self == Self::default_pivot()
+    }
+}

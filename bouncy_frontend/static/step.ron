@@ -97,8 +97,8 @@
       id: "t-0",
       variation: "right-out",
       keyframes: [
-        (pose: "t-open-right", orientation: ToCamera),
-        (pose: "t-closed-right", orientation: ToCamera),
+        (pose: "t-open-right", orientation: ToCamera, pivot: (side: Left, part: Toes)),
+        (pose: "t-closed-right", orientation: ToCamera, pivot: (side: Left, part: Heel)),
       ]
     ),
     (
@@ -106,8 +106,8 @@
       id: "t-1",
       variation: "left-out",
       keyframes: [
-        (pose: "t-open-left", orientation: ToCamera),
-        (pose: "t-closed-left", orientation: ToCamera),
+        (pose: "t-open-left", orientation: ToCamera, pivot: (side: Right, part: Toes)),
+        (pose: "t-closed-left", orientation: ToCamera, pivot: (side: Right, part: Heel)),
       ]
     ),
     (

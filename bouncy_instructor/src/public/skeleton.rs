@@ -56,6 +56,13 @@ pub struct Segment {
 }
 
 #[wasm_bindgen]
+#[derive(Clone, Copy, PartialEq, Debug, Default)]
+pub struct Cartesian2d {
+    pub x: f32,
+    pub y: f32,
+}
+
+#[wasm_bindgen]
 impl Skeleton {
     pub fn resting(sideway: bool) -> Self {
         let mut left = Side::default();
@@ -102,6 +109,15 @@ impl From<Angle3d> for Segment {
                 r: xy_len,
                 z: 0,
             }
+        }
+    }
+}
+
+impl From<Segment> for Cartesian2d {
+    fn from(segment: Segment) -> Self {
+        Self {
+            x: segment.angle.cos() * segment.r,
+            y: segment.angle.sin() * segment.r,
         }
     }
 }

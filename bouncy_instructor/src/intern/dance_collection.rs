@@ -8,7 +8,7 @@
 
 use super::dance::Dance;
 use super::geom::SignedAngle;
-use super::pose::{BodyPartOrdering, Limb, LimbPosition, Pose, PoseDirection};
+use super::pose::{BodyPartOrdering, BodyPoint, Limb, LimbPosition, Pose, PoseDirection};
 use super::skeleton_3d::Direction;
 use super::step::Step;
 use crate::parsing::ParseFileError;
@@ -245,12 +245,19 @@ impl DanceCollection {
                 })
                 .collect();
 
+            let pivots = def
+                .keyframes
+                .iter()
+                .map(|frame| BodyPoint::from(frame.pivot.clone()))
+                .collect();
+
             let new_step = Step {
                 id: def.id.clone(),
                 name: def.name.clone(),
                 variation: def.variation.clone(),
                 poses,
                 directions,
+                pivots,
             };
             self.steps.push(new_step);
         }
@@ -281,6 +288,7 @@ impl DanceCollection {
             variation: step.variation.clone(),
             poses,
             directions: step.directions.clone(),
+            pivots: step.pivots.clone(),
         };
         self.steps.push(new_step);
         Ok(())

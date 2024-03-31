@@ -40,8 +40,8 @@ pub(crate) struct Limb {
 
 #[derive(PartialEq, Eq, Hash, Debug, Clone, Copy)]
 pub(crate) struct BodyPoint {
-    side: BodySide,
-    part: BodyPart,
+    pub(crate) side: BodySide,
+    pub(crate) part: BodyPart,
 }
 
 #[derive(PartialEq, Eq, Hash, Clone, Copy)]
@@ -51,13 +51,13 @@ pub(crate) struct BodyPartOrdering {
 }
 
 #[derive(PartialEq, Eq, Hash, Debug, Clone, Copy)]
-enum BodySide {
+pub(crate) enum BodySide {
     Left,
     Right,
 }
 
 #[derive(PartialEq, Eq, Hash, Debug, Clone, Copy, strum::EnumIter)]
-enum BodyPart {
+pub(crate) enum BodyPart {
     Shoulder,
     Hip,
     Knee,

@@ -36,6 +36,17 @@ export function steps(): (StepInfo)[];
 */
 export function dances(): (DanceInfo)[];
 /**
+*/
+export class Cartesian2d {
+  free(): void;
+/**
+*/
+  x: number;
+/**
+*/
+  y: number;
+}
+/**
 * Coordinate for Keypoints
 *
 * The coordinate system is growing down (y-axis), right (x-axis), and away
@@ -391,6 +402,11 @@ export class StepInfo {
 */
   skeleton(beat: number): Skeleton;
 /**
+* @param {number} beat
+* @returns {Cartesian2d}
+*/
+  bodyShift(beat: number): Cartesian2d;
+/**
 * Applies a rotation (in degree) and returns the resulting skelton.
 * @param {number} beat
 * @param {number} rotation
@@ -428,6 +444,11 @@ export class StepInfo {
 */
 export class Tracker {
   free(): void;
+/**
+* @param {number} timestamp
+* @returns {ExportedFrame}
+*/
+  exportFrame(timestamp: number): ExportedFrame;
 /**
 * Create a tracker for all known steps.
 */
@@ -479,11 +500,6 @@ export class Tracker {
 * @returns {Skeleton | undefined}
 */
   skeletonAt(timestamp: number): Skeleton | undefined;
-/**
-* @param {number} timestamp
-* @returns {ExportedFrame}
-*/
-  exportFrame(timestamp: number): ExportedFrame;
 }
 /**
 */

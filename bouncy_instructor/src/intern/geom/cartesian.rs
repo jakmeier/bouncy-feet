@@ -1,5 +1,6 @@
 use super::{Angle3d, SignedAngle};
 use crate::keypoints::Cartesian3d;
+use crate::skeleton::Cartesian2d;
 
 impl Cartesian3d {
     const ZERO: Self = Cartesian3d {
@@ -120,6 +121,50 @@ impl std::ops::Mul<f32> for Cartesian3d {
             x: self.x * rhs,
             y: self.y * rhs,
             z: self.z * rhs,
+        }
+    }
+}
+
+impl std::ops::Add<Cartesian2d> for Cartesian2d {
+    type Output = Self;
+
+    fn add(self, rhs: Cartesian2d) -> Self::Output {
+        Self {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+        }
+    }
+}
+
+impl std::ops::Sub<Cartesian2d> for Cartesian2d {
+    type Output = Self;
+
+    fn sub(self, rhs: Cartesian2d) -> Self::Output {
+        Self {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+        }
+    }
+}
+
+impl std::ops::Mul<f32> for Cartesian2d {
+    type Output = Self;
+
+    fn mul(self, rhs: f32) -> Self::Output {
+        Self {
+            x: self.x * rhs,
+            y: self.y * rhs,
+        }
+    }
+}
+
+impl std::ops::Mul<usize> for Cartesian2d {
+    type Output = Self;
+
+    fn mul(self, rhs: usize) -> Self::Output {
+        Self {
+            x: self.x * rhs as f32,
+            y: self.y * rhs as f32,
         }
     }
 }

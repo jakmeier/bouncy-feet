@@ -2,6 +2,7 @@
 //! poses.
 
 use crate::parsing::ParseFileError;
+use crate::pose_file::BodyPoint;
 use serde::{Deserialize, Serialize};
 
 const CURRENT_VERSION: u16 = 0;
@@ -34,6 +35,7 @@ pub(crate) struct Step {
     /// with the left foot first. The app shows a translated text like "Left Leg First".
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub variation: Option<String>,
+    /// Poses per beat.
     pub keyframes: Vec<StepPosition>,
 }
 
@@ -44,6 +46,15 @@ pub(crate) struct StepPosition {
     /// specify how the pose should be oriented
     #[serde(default, skip_serializing_if = "Orientation::any")]
     pub orientation: Orientation,
+    /// Which body part shall remain fixed, while the rest of the body moves.
+    ///
+    /// The pivot defines defines how to transition into this pose. On the first
+    /// pose of a step, this is relevant for looping.
+    #[serde(
+        default = "BodyPoint::default_pivot",
+        skip_serializing_if = "BodyPoint::is_default_pivot"
+    )]
+    pub pivot: BodyPoint,
 }
 
 /// Define in which direction a pose should be oriented.
