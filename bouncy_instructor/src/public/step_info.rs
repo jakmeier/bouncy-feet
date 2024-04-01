@@ -105,11 +105,18 @@ impl From<&Step> for StepInfo {
         // this, we have to calculate 2D coordinates of skeletons. This usd to
         // be JS only... Now it's also in Rust! (Maybe we can make it Rust only?)
         let mut accumulated_body_shift = vec![Cartesian2d::default()];
-        for (pivot, skeleton) in step.pivots.iter().zip(skeletons.windows(2)) {
+        for (pivot, skeleton) in step.pivots[1..].iter().zip(skeletons.windows(2)) {
             let before = skeleton[0].position(*pivot);
             let after = skeleton[1].position(*pivot);
             let diff = after - before;
-            accumulated_body_shift.push(*accumulated_body_shift.last().unwrap() + diff);
+            accumulated_body_shift.push(*accumulated_body_shift.last().unwrap() - diff);
+        }
+        if !skeletons.is_empty() && !step.pivots.is_empty() {
+            let pivot = step.pivots[0];
+            let before = skeletons.last().unwrap().position(pivot);
+            let after = skeletons[0].position(pivot);
+            let diff = after - before;
+            accumulated_body_shift.push(*accumulated_body_shift.last().unwrap() - diff);
         }
 
         Self {
