@@ -25,10 +25,18 @@
   export let headColor = 'var(--theme-main)';
   export let bodyColor = 'var(--theme-neutral-light)';
 
+  function wrap(s, min, max) {
+    let wrapped = (s - min) % (max - min);
+    if (wrapped < 0) {
+      wrapped += max - min;
+    }
+    return wrapped + min;
+  }
+
   $: sideway = skeleton ? skeleton.sideway : false;
   $: size = Math.min(height, width);
   $: hip = {
-    x: (0.5 + bodyShift.x) * width,
+    x: (0.5 + wrap(bodyShift.x, -0.75, 0.75)) * width,
     y: (0.5 + bodyShift.y) * height,
   };
   $: shoulder = { x: hip.x, y: hip.y - lengths.torso * size };
