@@ -1,0 +1,80 @@
+<script>
+  import { tweened } from 'svelte/motion';
+  import { getContext } from 'svelte';
+  import { derived, writable } from 'svelte/store';
+
+  /** @type{Point[]} */
+  export let points;
+  /**
+   * @type {{ lineWidth: any; color: any; fill: any; linecap: any; }}
+   */
+  export let style;
+
+  let displayedPoints = [...points];
+
+  const animationCtx = getContext('animation');
+  const animation = animationCtx
+    ? animationCtx.animation
+    : writable({ duration: 0 });
+
+  const coordinates = createTweens(points);
+
+  $: points, updateValues(points);
+  /**
+   * @param {Point[]} ps
+   */
+  function updateValues(ps) {
+    for (let i = 0; i < coordinates.length; i++) {
+      // set tweens and let svelte motion handle the animation
+      // subscribers are updating the displayedPoints
+      coordinates[i].x.set(ps[i].x, $animation);
+      coordinates[i].y.set(ps[i].y, $animation);
+    }
+  }
+
+  const allStores = coordinates.flatMap((p) => [p.x, p.y]);
+  const pointsList = derived(allStores, (_) =>
+    displayedPoints.map((p) => `${p.x},${p.y}`).join()
+  );
+
+  /** @param {Point[]} p */
+  function createTweens(p) {
+    if (!Array.isArray(p)) {
+      console.error('Points should be an array.');
+      return [];
+    }
+    return p.map((point, i) => {
+      const x = tweened(point.x, $animation);
+      x.subscribe((x) => setX(i, x));
+      const y = tweened(point.y, $animation);
+      y.subscribe((y) => setY(i, y));
+      return {
+        x,
+        y,
+      };
+    });
+  }
+
+  /**
+   * @param {number} i
+   * @param {number} x
+   */
+  function setX(i, x) {
+    displayedPoints[i].x = x;
+  }
+  /**
+   * @param {number} i
+   * @param {number} y
+   */
+  function setY(i, y) {
+    displayedPoints[i].y = y;
+  }
+</script>
+
+<polygon
+  points={$pointsList}
+  stroke-width="{style.lineWidth}px"
+  stroke={style.color}
+  fill={style.fill}
+  stroke-linecap={style.linecap}
+/>

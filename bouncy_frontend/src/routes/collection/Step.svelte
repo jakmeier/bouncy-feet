@@ -18,15 +18,27 @@
   const restingStep = Skeleton.resting(step.skeleton(0).sideway);
   $: skeleton =
     poseIndex >= 0 ? step.rotatedSkeleton(poseIndex, rotation) : restingStep;
+  $: bodyShift =
+    poseIndex >= 0 ? stepBodyShift(step, poseIndex) : { x: 0, y: 0 };
+
+  /**
+   * @param {import("$lib/instructor/bouncy_instructor").StepInfo} step
+   * @param {number} poseIndex
+   */
+  function stepBodyShift(step, poseIndex) {
+    const cartesian = step.bodyShift(poseIndex);
+    return { x: cartesian.x, y: cartesian.y };
+  }
 </script>
 
-<Area width="{size}px" height="{size}px" borderRadius=20px borderWidth=2px>
+<Area width="{size}px" height="{size}px" borderRadius="20px" borderWidth="2px">
   <Animation {animationTime}>
     <Svg width={size} height={size} orderByZ>
       <SvgAvatar
         width={size}
         height={size}
         {skeleton}
+        {bodyShift}
         lineWidth={4}
         leftColor="var(--theme-accent)"
         rightColor="var(--theme-main)"

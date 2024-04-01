@@ -18,6 +18,17 @@
  * @property {Point} end
  * @property {number} z
  * @property {any} style
+ * 
+ * @typedef {Object} Polygon
+ * @property {String} id
+ * @property {Point[]} points
+ * @property {any} style
+ *
+ * @typedef {Object} Circle
+ * @property {number} cx 
+ * @property {number} cy 
+ * @property {number} r 
+ * @property {string} fill 
  *
  * @typedef {Object} Style
  * @property {String} color

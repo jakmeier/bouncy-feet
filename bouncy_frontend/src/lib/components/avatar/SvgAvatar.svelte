@@ -3,12 +3,14 @@
   import PhysicalSvgLine from './PhysicalSvgLine.svelte';
   import SvgPolygon from './SvgPolygon.svelte';
   import SvgStyle from './SvgStyle.svelte';
+  import SvgCircle from './SvgCircle.svelte';
 
   /** @type import('$lib/instructor/bouncy_instructor').Skeleton */
   export let skeleton;
   export let width = 100;
   export let height = 100;
   export let lineWidth = 10;
+  export let bodyShift = { x: 0, y: 0 };
   export let lengths = {
     thigh: 0.2,
     shin: 0.2,
@@ -25,7 +27,10 @@
 
   $: sideway = skeleton ? skeleton.sideway : false;
   $: size = Math.min(height, width);
-  $: hip = { x: 0.5 * width, y: 0.5 * height };
+  $: hip = {
+    x: (0.5 + bodyShift.x) * width,
+    y: (0.5 + bodyShift.y) * height,
+  };
   $: shoulder = { x: hip.x, y: hip.y - lengths.torso * size };
   $: shoulderLen = sideway ? 0.0 : 0.05 * size;
   $: hipLen = sideway ? 0.0 : 0.03 * size;
@@ -57,6 +62,7 @@
 
 {#if skeleton && !sideway}
   <SvgPolygon
+    id="torso"
     points={[leftHip, rightHip, rightShoulder, leftShoulder]}
     style={{
       color: headColor,
@@ -78,6 +84,13 @@
 {/if}
 
 {#if skeleton}
+  <SvgCircle
+    id="head"
+    cx={shoulder.x}
+    cy={shoulder.y - 0.1 * size}
+    r={headRadius}
+    fill={headColor}
+  />
   <SvgStyle color={leftColor} linecap="round" {lineWidth}>
     <SvgAvatarSide
       {lengths}
@@ -98,10 +111,4 @@
       sideId={'right'}
     ></SvgAvatarSide>
   </SvgStyle>
-  <circle
-    cx={shoulder.x}
-    cy={shoulder.y - 0.1 * size}
-    r={headRadius}
-    fill={headColor}
-  />
 {/if}
