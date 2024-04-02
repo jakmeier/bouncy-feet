@@ -14,6 +14,8 @@ pub struct StepInfo {
     name: String,
     step_variation: Option<String>,
     skeletons: Vec<Skeleton>,
+    /// How far the whole body moves as defined in the pose.
+    pose_body_shift: Vec<Cartesian2d>,
     /// How far the whole body moves after applying the pose transitions.
     accumulated_body_shift: Vec<Cartesian2d>,
 }
@@ -47,7 +49,10 @@ impl StepInfo {
             .last()
             .copied()
             .unwrap_or_default();
-        shift_full_turn * n_full_turns + self.accumulated_body_shift[beat % self.skeletons.len()]
+        let pose_shift = self.pose_body_shift[beat % self.skeletons.len()];
+        pose_shift
+            + shift_full_turn * n_full_turns
+            + self.accumulated_body_shift[beat % self.skeletons.len()]
     }
 
     /// Applies a rotation (in degree) and returns the resulting skelton.
@@ -90,15 +95,15 @@ impl StepInfo {
 
 impl From<&Step> for StepInfo {
     fn from(step: &Step) -> Self {
-        let skeletons: Vec<_> = STATE.with_borrow(|state| {
-            step.poses
-                .iter()
-                .zip(&step.directions)
-                .map(|(pose_index, direction)| {
-                    let pose = &state.db.poses()[*pose_index];
-                    Skeleton::from_pose(pose, &state.db, *direction)
-                })
-                .collect()
+        let mut skeletons = vec![];
+        let mut pose_body_shift = vec![];
+
+        STATE.with_borrow(|state| {
+            for (pose_index, direction) in step.poses.iter().zip(&step.directions) {
+                let pose = &state.db.poses()[*pose_index];
+                skeletons.push(Skeleton::from_pose(pose, &state.db, *direction));
+                pose_body_shift.push(pose.shift);
+            }
         });
 
         // Compute how far the body shifts after 0,1,2,3... transitions. For
@@ -119,11 +124,14 @@ impl From<&Step> for StepInfo {
             accumulated_body_shift.push(*accumulated_body_shift.last().unwrap() - diff);
         }
 
+        debug_assert_eq!(skeletons.len(), pose_body_shift.len());
+        debug_assert_eq!(skeletons.len() + 1, accumulated_body_shift.len());
         Self {
             id: step.id.clone(),
             name: step.name.clone(),
             step_variation: step.variation.clone(),
             skeletons,
+            pose_body_shift,
             accumulated_body_shift,
         }
     }

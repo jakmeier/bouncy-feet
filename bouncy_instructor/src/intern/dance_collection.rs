@@ -13,6 +13,7 @@ use super::skeleton_3d::Direction;
 use super::step::Step;
 use crate::parsing::ParseFileError;
 use crate::pose_file::PoseZ;
+use crate::skeleton::Cartesian2d;
 use crate::step_file::{self, Orientation};
 use crate::{dance_file, pose_file, AddDanceError, AddStepError};
 
@@ -78,7 +79,12 @@ impl DanceCollection {
                     return Err(AddPoseError::MissingMirror(pose.mirror_of.clone()));
                 }
             } else {
-                self.new_pose(pose.direction, pose.limbs, pose.z)
+                self.new_pose(
+                    pose.direction,
+                    pose.limbs,
+                    Cartesian2d::new(-pose.x_shift, -pose.y_shift),
+                    pose.z,
+                )
             };
             self.poses.push(new_pose);
             self.names.push(pose.name);
@@ -105,6 +111,7 @@ impl DanceCollection {
         let new_pose = Pose::new(
             pose.direction,
             limbs,
+            pose.shift,
             pose.z_absolute.clone(),
             pose.z_order.clone(),
         );
@@ -120,6 +127,7 @@ impl DanceCollection {
         &mut self,
         direction: pose_file::PoseDirection,
         limbs: Vec<pose_file::LimbPosition>,
+        shift: Cartesian2d,
         z: PoseZ,
     ) -> Pose {
         let limbs = limbs
@@ -137,7 +145,7 @@ impl DanceCollection {
             .collect();
         let z_order = z.order.into_iter().map(From::from).collect();
         let z_absolute = z.absolute.into_iter().map(|(k, v)| (k.into(), v)).collect();
-        Pose::new(direction.into(), limbs, z_absolute, z_order)
+        Pose::new(direction.into(), limbs, shift, z_absolute, z_order)
     }
 
     /// Take an existing pose and produce a mirror pose of it.
@@ -171,7 +179,8 @@ impl DanceCollection {
             .map(From::from)
             .map(BodyPartOrdering::mirror)
             .collect();
-        Pose::new(direction, limbs, z_absolute, z_order)
+        let shift = self.poses[i].shift;
+        Pose::new(direction, limbs, shift, z_absolute, z_order)
     }
 
     fn find_or_insert_limb(&mut self, limb: Limb) -> LimbIndex {
@@ -339,6 +348,7 @@ impl DanceCollection {
                 SignedAngle::ZERO,
                 1.0,
             )],
+            Cartesian2d::default(),
             Default::default(),
             Default::default(),
         )];

@@ -27,6 +27,12 @@ pub(crate) struct Pose {
     pub direction: PoseDirection,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub limbs: Vec<LimbPosition>,
+    /// Move the entire body in the horizontal direction
+    #[serde(default, skip_serializing_if = "is_zero")]
+    pub x_shift: f32,
+    /// Move the entire body in the vertical direction
+    #[serde(default, skip_serializing_if = "is_zero")]
+    pub y_shift: f32,
     /// The Z-Axis is the distance to the camera. It can only be measured quite
     /// inaccurately from the camera image, hence poses define only relative
     /// position comparisons instead of numeric coordinates.
@@ -34,6 +40,10 @@ pub(crate) struct Pose {
     pub z: PoseZ,
     #[serde(default, skip_serializing_if = "String::is_empty")]
     pub mirror_of: String,
+}
+
+fn is_zero(f: &f32) -> bool {
+    f.abs() < 1e-6
 }
 
 /// Describes a desired angle of a limb defined by start and end point.

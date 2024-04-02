@@ -12,6 +12,7 @@ use super::geom::SignedAngle;
 use super::pose_score::AngleTarget;
 use crate::intern::geom::Angle3d;
 use crate::public::keypoints::Cartesian3d;
+use crate::skeleton::Cartesian2d;
 use crate::Keypoints;
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
@@ -20,6 +21,7 @@ use strum::IntoEnumIterator;
 pub(crate) struct Pose {
     pub(crate) direction: PoseDirection,
     pub(crate) limbs: Vec<LimbPosition>,
+    pub(crate) shift: Cartesian2d,
     pub(crate) z_absolute: HashMap<BodyPoint, f32>,
     pub(crate) z_order: Vec<BodyPartOrdering>,
 }
@@ -129,12 +131,14 @@ impl Pose {
     pub(crate) fn new(
         direction: PoseDirection,
         limbs: Vec<LimbPosition>,
+        shift: Cartesian2d,
         z_absolute: HashMap<BodyPoint, f32>,
         z_order: Vec<BodyPartOrdering>,
     ) -> Self {
         Self {
             direction,
             limbs,
+            shift,
             z_absolute,
             z_order,
         }

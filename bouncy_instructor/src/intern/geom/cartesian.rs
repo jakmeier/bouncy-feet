@@ -2,6 +2,12 @@ use super::{Angle3d, SignedAngle};
 use crate::keypoints::Cartesian3d;
 use crate::skeleton::Cartesian2d;
 
+impl Cartesian2d {
+    pub fn new(x: f32, y: f32) -> Self {
+        Self { x, y }
+    }
+}
+
 impl Cartesian3d {
     const ZERO: Self = Cartesian3d {
         x: 0.0,

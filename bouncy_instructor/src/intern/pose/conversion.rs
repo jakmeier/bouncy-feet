@@ -291,6 +291,8 @@ impl pose_file::Pose {
             name: "Generated Pose".to_owned(),
             mirror_of: String::new(),
             z: Default::default(),
+            x_shift: 0.0,
+            y_shift: 0.0,
         }
     }
 }
