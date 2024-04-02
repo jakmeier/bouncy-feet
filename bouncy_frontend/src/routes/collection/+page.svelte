@@ -15,9 +15,9 @@
   const localDances = localCollection.dances;
 
   const stepTime = 300;
-  // animationTime < stepTime will freeze zhe position for a moment, which makes
+  // animationTime < stepTime will freeze the position for a moment, which makes
   // it clearer. If the difference is too much, it looks robotic.
-  const animationTime = stepTime * 0.85;
+  const animationTime = stepTime * 0.7;
 
   const i = counter(-1, 1, stepTime);
   const danceSize = '150px';

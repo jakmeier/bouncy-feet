@@ -25,6 +25,11 @@
   export let headColor = 'var(--theme-main)';
   export let bodyColor = 'var(--theme-neutral-light)';
 
+  /**
+   * @param {number} s
+   * @param {number} min
+   * @param {number} max
+   */
   function wrap(s, min, max) {
     let wrapped = (s - min) % (max - min);
     if (wrapped < 0) {
