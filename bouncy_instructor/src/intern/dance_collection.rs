@@ -83,6 +83,8 @@ impl DanceCollection {
                     pose.direction,
                     pose.limbs,
                     Cartesian2d::new(-pose.x_shift, -pose.y_shift),
+                    SignedAngle::degree(pose.turn_shoulder as f32),
+                    SignedAngle::degree(pose.turn_hip as f32),
                     pose.z,
                 )
             };
@@ -112,6 +114,8 @@ impl DanceCollection {
             pose.direction,
             limbs,
             pose.shift,
+            pose.turn_shoulder,
+            pose.turn_hip,
             pose.z_absolute.clone(),
             pose.z_order.clone(),
         );
@@ -128,6 +132,8 @@ impl DanceCollection {
         direction: pose_file::PoseDirection,
         limbs: Vec<pose_file::LimbPosition>,
         shift: Cartesian2d,
+        turn_shoulder: SignedAngle,
+        turn_hip: SignedAngle,
         z: PoseZ,
     ) -> Pose {
         let limbs = limbs
@@ -145,7 +151,15 @@ impl DanceCollection {
             .collect();
         let z_order = z.order.into_iter().map(From::from).collect();
         let z_absolute = z.absolute.into_iter().map(|(k, v)| (k.into(), v)).collect();
-        Pose::new(direction.into(), limbs, shift, z_absolute, z_order)
+        Pose::new(
+            direction.into(),
+            limbs,
+            shift,
+            turn_shoulder,
+            turn_hip,
+            z_absolute,
+            z_order,
+        )
     }
 
     /// Take an existing pose and produce a mirror pose of it.
@@ -179,8 +193,16 @@ impl DanceCollection {
             .map(From::from)
             .map(BodyPartOrdering::mirror)
             .collect();
-        let shift = self.poses[i].shift;
-        Pose::new(direction, limbs, shift, z_absolute, z_order)
+        let other = &self.poses[i];
+        Pose::new(
+            direction,
+            limbs,
+            other.shift.mirror(),
+            other.turn_shoulder,
+            other.turn_hip,
+            z_absolute,
+            z_order,
+        )
     }
 
     fn find_or_insert_limb(&mut self, limb: Limb) -> LimbIndex {
@@ -349,6 +371,8 @@ impl DanceCollection {
                 1.0,
             )],
             Cartesian2d::default(),
+            SignedAngle::ZERO,
+            SignedAngle::ZERO,
             Default::default(),
             Default::default(),
         )];

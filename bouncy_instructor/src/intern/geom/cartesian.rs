@@ -6,6 +6,13 @@ impl Cartesian2d {
     pub fn new(x: f32, y: f32) -> Self {
         Self { x, y }
     }
+
+    pub fn mirror(&self) -> Self {
+        Self {
+            x: -self.x,
+            y: self.y,
+        }
+    }
 }
 
 impl Cartesian3d {

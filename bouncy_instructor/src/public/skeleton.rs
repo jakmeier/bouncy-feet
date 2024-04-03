@@ -22,6 +22,8 @@ use wasm_bindgen::prelude::wasm_bindgen;
 pub struct Skeleton {
     pub left: Side,
     pub right: Side,
+    pub hip: Segment,
+    pub shoulder: Segment,
     /// Does the dancer look more to the side han they face the camera?
     pub sideway: bool,
     /// Does the dancer face away more than they face the camera?
@@ -77,6 +79,8 @@ impl Skeleton {
         Skeleton {
             left,
             right,
+            shoulder: Segment::default(),
+            hip: Segment::default(),
             sideway,
             backwards: false,
         }

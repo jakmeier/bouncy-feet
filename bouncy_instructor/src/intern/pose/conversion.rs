@@ -293,6 +293,8 @@ impl pose_file::Pose {
             z: Default::default(),
             x_shift: 0.0,
             y_shift: 0.0,
+            turn_shoulder: skeleton.turn_shoulder.to_degrees().round() as i16,
+            turn_hip: skeleton.turn_hip.to_degrees().round() as i16,
         }
     }
 }
@@ -380,6 +382,8 @@ impl Skeleton3d {
             direction,
             limb_angles,
             limbs_z,
+            pose.turn_shoulder,
+            pose.turn_hip,
             azimuth_correction,
             coordinates,
         )
@@ -412,6 +416,7 @@ mod tests {
     fn check_skeleton_to_pose(azimuth: f32, polar: f32, angle: i16) {
         let skeleton = Skeleton3d::from_angles(
             vec![Angle3d::degree(azimuth, polar)],
+            SignedAngle::degree(90.0),
             SignedAngle::degree(90.0),
             Default::default(),
             vec![0.0],

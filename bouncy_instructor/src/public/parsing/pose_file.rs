@@ -33,6 +33,13 @@ pub(crate) struct Pose {
     /// Move the entire body in the vertical direction
     #[serde(default, skip_serializing_if = "is_zero")]
     pub y_shift: f32,
+    /// Degrees of turned shoulder from base direction. More than 45° won't
+    /// work, use different direction instead.
+    #[serde(default, skip_serializing_if = "zero")]
+    pub turn_shoulder: i16,
+    /// Degrees of turned hip from base direction.
+    #[serde(default, skip_serializing_if = "zero")]
+    pub turn_hip: i16,
     /// The Z-Axis is the distance to the camera. It can only be measured quite
     /// inaccurately from the camera image, hence poses define only relative
     /// position comparisons instead of numeric coordinates.
@@ -40,10 +47,6 @@ pub(crate) struct Pose {
     pub z: PoseZ,
     #[serde(default, skip_serializing_if = "String::is_empty")]
     pub mirror_of: String,
-}
-
-fn is_zero(f: &f32) -> bool {
-    f.abs() < 1e-6
 }
 
 /// Describes a desired angle of a limb defined by start and end point.
@@ -181,4 +184,12 @@ impl BodyPoint {
     pub fn is_default_pivot(&self) -> bool {
         *self == Self::default_pivot()
     }
+}
+
+fn is_zero(f: &f32) -> bool {
+    f.abs() < 1e-6
+}
+
+fn zero(i: &i16) -> bool {
+    *i == 0
 }

@@ -1,9 +1,9 @@
 <script>
   import SvgAvatarSide from './SvgAvatarSide.svelte';
-  import PhysicalSvgLine from './PhysicalSvgLine.svelte';
   import SvgPolygon from './SvgPolygon.svelte';
   import SvgStyle from './SvgStyle.svelte';
   import SvgCircle from './SvgCircle.svelte';
+  import { add2dVector } from '$lib/math';
 
   /** @type import('$lib/instructor/bouncy_instructor').Skeleton */
   export let skeleton;
@@ -18,6 +18,8 @@
     arm: 0.1,
     forearm: 0.15,
     foot: 0.05,
+    shoulder: 0.1,
+    hip: 0.06,
   };
 
   export let leftColor = 'var(--theme-main)';
@@ -45,8 +47,8 @@
     y: (0.5 + bodyShift.y) * height,
   };
   $: shoulder = { x: hip.x, y: hip.y - lengths.torso * size };
-  $: shoulderLen = sideway ? 0.0 : 0.05 * size;
-  $: hipLen = sideway ? 0.0 : 0.03 * size;
+  // $: shoulderLen = sideway ? 0.0 : 0.05 * size;
+  // $: hipLen = sideway ? 0.0 : 0.03 * size;
 
   /** @type {{ x: number; y: number; }} */
   let leftHip;
@@ -59,10 +61,26 @@
 
   // right body part is left on screen
   $: {
-    leftHip = { x: hip.x + hipLen, y: hip.y };
-    leftShoulder = { x: shoulder.x + shoulderLen, y: shoulder.y };
-    rightHip = { x: hip.x - hipLen, y: hip.y };
-    rightShoulder = { x: shoulder.x - shoulderLen, y: shoulder.y };
+    leftHip = add2dVector(
+      hip,
+      skeleton.hip.angle,
+      -size * skeleton.hip.r * (lengths.hip / 2)
+    );
+    leftShoulder = add2dVector(
+      shoulder,
+      skeleton.shoulder.angle,
+      -size * skeleton.shoulder.r * (lengths.shoulder / 2)
+    );
+    rightHip = add2dVector(
+      hip,
+      skeleton.hip.angle,
+      size * skeleton.hip.r * (lengths.hip / 2)
+    );
+    rightShoulder = add2dVector(
+      shoulder,
+      skeleton.shoulder.angle,
+      size * skeleton.shoulder.r * (lengths.shoulder / 2)
+    );
     // when the dance looks away from the camera, we need to switch sides
     if (skeleton && skeleton.backwards) {
       [leftHip, rightHip] = [rightHip, leftHip];
@@ -73,28 +91,16 @@
   $: headRadius = 0.075 * size;
 </script>
 
-{#if skeleton && !sideway}
-  <SvgPolygon
-    id="torso"
-    points={[leftHip, rightHip, rightShoulder, leftShoulder]}
-    style={{
-      color: headColor,
-      fill: bodyColor,
-      linecap: 'round',
-      lineWidth: lineWidth * 0.9,
-    }}
-  />
-{:else}
-  <PhysicalSvgLine
-    start={leftShoulder}
-    end={leftHip}
-    style={{
-      color: headColor,
-      linecap: 'round',
-      lineWidth: lineWidth * 0.9,
-    }}
-  />
-{/if}
+<SvgPolygon
+  id="torso"
+  points={[leftHip, rightHip, rightShoulder, leftShoulder]}
+  style={{
+    color: headColor,
+    fill: bodyColor,
+    linecap: 'round',
+    lineWidth: lineWidth * 0.9,
+  }}
+/>
 
 {#if skeleton}
   <SvgCircle

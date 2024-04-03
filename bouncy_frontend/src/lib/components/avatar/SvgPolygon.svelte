@@ -1,5 +1,5 @@
 <script>
-  import { getContext } from 'svelte';
+  import { getContext, onDestroy, onMount } from 'svelte';
 
   /** @type{{ x: number; y: number; }[]} */
   export let points;
@@ -12,4 +12,7 @@
 
   const svg = getContext('svg');
   $: svg.setPolygon(id, { points, style });
+
+  onMount(() => svg.setPolygon(id, { points, style }));
+  onDestroy(() => svg.removePolygon(id));
 </script>

@@ -22,6 +22,8 @@ pub(crate) struct Pose {
     pub(crate) direction: PoseDirection,
     pub(crate) limbs: Vec<LimbPosition>,
     pub(crate) shift: Cartesian2d,
+    pub(crate) turn_shoulder: SignedAngle,
+    pub(crate) turn_hip: SignedAngle,
     pub(crate) z_absolute: HashMap<BodyPoint, f32>,
     pub(crate) z_order: Vec<BodyPartOrdering>,
 }
@@ -132,6 +134,8 @@ impl Pose {
         direction: PoseDirection,
         limbs: Vec<LimbPosition>,
         shift: Cartesian2d,
+        turn_shoulder: SignedAngle,
+        turn_hip: SignedAngle,
         z_absolute: HashMap<BodyPoint, f32>,
         z_order: Vec<BodyPartOrdering>,
     ) -> Self {
@@ -139,6 +143,8 @@ impl Pose {
             direction,
             limbs,
             shift,
+            turn_shoulder,
+            turn_hip,
             z_absolute,
             z_order,
         }

@@ -57,6 +57,15 @@
 
   /**
    * @param {string} id
+   */
+  function removePolygon(id) {
+    let index = polygons.findIndex((x) => x.id === id);
+    polygons.splice(index, 1);
+    polygons = polygons;
+  }
+
+  /**
+   * @param {string} id
    * @param {Circle} circle
    */
   function setCircle(id, circle) {
@@ -106,7 +115,7 @@
     displayedLines = displayedLines.sort((a, b) => a.z - b.z);
   }
 
-  setContext('svg', { setLine, setPolygon, setCircle, update });
+  setContext('svg', { setLine, setPolygon, removePolygon, setCircle, update });
 </script>
 
 <svg viewBox="0 0 {width} {height}">

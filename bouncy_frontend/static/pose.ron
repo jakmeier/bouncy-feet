@@ -35,6 +35,8 @@
     (
       name: "right-up",
       direction: Right,
+      turn_shoulder: 30,
+      turn_hip: 20,
       limbs: [
         // left leg has to stand straight, but it doesn't matter if the knee is angled
         (limb: LeftLeg, angle: 0, tolerance: 3, weight: 1.0),
@@ -185,6 +187,7 @@
       name: "polly-right",
       direction: Front,
       y_shift: -0.03125,
+      turn_hip: 60,
       limbs: [
         ( limb: LeftThigh, weight: 1.0, angle: 10, tolerance: 5),
         ( limb: LeftShin, weight: 1.0, angle: 23, tolerance: 5),
@@ -300,6 +303,8 @@
       name: "open-rm-left",
       direction: Front,
       y_shift: -0.025,
+      turn_shoulder: 35,
+      turn_hip: 45,
       limbs: [
         ( limb: LeftThigh, weight: 1.0, angle: -25, tolerance: 2),
         ( limb: LeftShin, weight: 1.0, angle: -5, tolerance: 2),
@@ -330,6 +335,8 @@
       name: "open-heel-rm-left",
       direction: Front,
       y_shift: -0.04,
+      turn_shoulder: 35,
+      turn_hip: 45,
       limbs: [
         ( limb: LeftThigh, weight: 1.0, angle: -20, tolerance: 2),
         ( limb: LeftShin, weight: 1.0, angle: -20, tolerance: 2),

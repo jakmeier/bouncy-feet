@@ -351,10 +351,16 @@ export class Skeleton {
   backwards: boolean;
 /**
 */
+  hip: Segment;
+/**
+*/
   left: SkeletonSide;
 /**
 */
   right: SkeletonSide;
+/**
+*/
+  shoulder: Segment;
 /**
 * Does the dancer look more to the side han they face the camera?
 */

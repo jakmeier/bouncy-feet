@@ -238,6 +238,8 @@ mod tests {
             PoseDirection::Front,
             vec![limb],
             Default::default(),
+            SignedAngle::ZERO,
+            SignedAngle::ZERO,
             Default::default(),
             vec![],
         );
@@ -273,6 +275,8 @@ mod tests {
                 LimbPosition::new(Limb::RIGHT_FOREARM, SignedAngle(0.0), tol, 1.0),
             ],
             Default::default(),
+            SignedAngle::ZERO,
+            SignedAngle::ZERO,
             Default::default(),
             vec![],
         );
@@ -295,6 +299,8 @@ mod tests {
                 LimbPosition::new(Limb::RIGHT_FOREARM, SignedAngle(PI), tol, 1.0),
             ],
             Default::default(),
+            SignedAngle::ZERO,
+            SignedAngle::ZERO,
             Default::default(),
             vec![],
         );
@@ -378,6 +384,8 @@ mod tests {
                 LimbPosition::new(Limb::RIGHT_FOREARM, SignedAngle(PI / 2.0), tol, 1.0),
             ],
             Default::default(),
+            SignedAngle::ZERO,
+            SignedAngle::ZERO,
             Default::default(),
             vec![],
         )

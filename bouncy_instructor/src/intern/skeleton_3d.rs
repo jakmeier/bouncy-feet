@@ -31,6 +31,11 @@ pub(crate) struct Skeleton3d {
     /// Same as `limb_angles` but includes 3D information.
     /// However, 3D is less accurate, generally speaking.
     limb_angles_3d: Vec<Angle3d>,
+    /// Degrees of turned shoulder from base direction. More than 45° won't
+    /// work, use different direction instead.
+    pub(crate) turn_shoulder: SignedAngle,
+    /// Degrees of turned hip from base direction.
+    pub(crate) turn_hip: SignedAngle,
     /// The angle between the standardized direction as stored (East) and what
     /// was recorded.
     azimuth_correction: SignedAngle,
@@ -61,6 +66,8 @@ impl Skeleton3d {
         direction: Direction,
         limb_angles_3d: Vec<Angle3d>,
         limbs_z: Vec<f32>,
+        turn_shoulder: SignedAngle,
+        turn_hip: SignedAngle,
         azimuth_correction: SignedAngle,
         coordinates: HashMap<BodyPoint, Cartesian3d>,
     ) -> Self {
@@ -70,6 +77,8 @@ impl Skeleton3d {
             limb_angles,
             limb_angles_3d,
             limbs_z,
+            turn_shoulder,
+            turn_hip,
             azimuth_correction,
             coordinates,
         }
@@ -81,22 +90,27 @@ impl Skeleton3d {
             .map(|(_index, limb)| limb.to_angle(kp))
             .collect::<Vec<_>>();
         let shoulder_angle = kp.left.shoulder.azimuth(kp.right.shoulder);
+        let hip_angle = kp.left.hip.azimuth(kp.right.hip);
         let pos: HashMap<_, _> = kp.body_points().collect();
         let limbs_z = db
             .limbs()
             .map(|(_index, limb)| limb.z(kp))
             .collect::<Vec<_>>();
-        Self::from_angles(limb_angles_3d, shoulder_angle, pos, limbs_z)
+        Self::from_angles(limb_angles_3d, shoulder_angle, hip_angle, pos, limbs_z)
     }
 
     pub(crate) fn from_angles(
         mut limb_angles_3d: Vec<Angle3d>,
         shoulder_angle: SignedAngle,
+        hip_angle: SignedAngle,
         pos: HashMap<BodyPoint, Cartesian3d>,
         limbs_z: Vec<f32>,
     ) -> Self {
         // Shoulder defines where the person is looking
         let direction = Direction::from_shoulder(shoulder_angle);
+        // This means, by definition, turn shoulder" is zero
+        let turn_shoulder = SignedAngle::ZERO;
+        let turn_hip = hip_angle - shoulder_angle;
 
         // Rotate skelton to face either north or east.
         let mut azimuth_correction = SignedAngle::degree(0.0);
@@ -110,7 +124,15 @@ impl Skeleton3d {
             _ => (),
         }
 
-        Self::new(direction, limb_angles_3d, limbs_z, azimuth_correction, pos)
+        Self::new(
+            direction,
+            limb_angles_3d,
+            limbs_z,
+            turn_shoulder,
+            turn_hip,
+            azimuth_correction,
+            pos,
+        )
     }
 
     pub(crate) fn angles(&self) -> &[SignedAngle] {
@@ -160,9 +182,28 @@ impl Skeleton3d {
             foot: segment(Limb::RIGHT_FOOT),
         };
 
+        let base_dir = if sideway {
+            SignedAngle::ZERO
+        } else {
+            SignedAngle::degree(90.0)
+        };
+        let shoulder: Segment = Angle3d::new(
+            base_dir + self.turn_shoulder + correction,
+            SignedAngle::degree(90.0),
+        )
+        .into();
+
+        let hip: Segment = Angle3d::new(
+            base_dir + self.turn_hip + correction,
+            SignedAngle::degree(90.0),
+        )
+        .into();
+
         Skeleton {
             left,
             right,
+            shoulder,
+            hip,
             sideway,
             backwards,
         }
