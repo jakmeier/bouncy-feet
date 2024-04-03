@@ -85,54 +85,6 @@
       ]
     ),
     (
-      name: "V-Step",
-      id: "v-0",
-      keyframes: [
-        (pose: "v-open", orientation: ToCamera),
-        (pose: "v-closed", orientation: ToCamera),
-      ]
-    ),
-    (
-      name: "T-Step",
-      id: "t-0",
-      variation: "right-out",
-      keyframes: [
-        (pose: "t-open-right", orientation: ToCamera, pivot: (side: Left, part: Toes)),
-        (pose: "t-closed-right", orientation: ToCamera, pivot: (side: Left, part: Heel)),
-      ]
-    ),
-    (
-      name: "T-Step",
-      id: "t-1",
-      variation: "left-out",
-      keyframes: [
-        (pose: "t-open-left", orientation: ToCamera, pivot: (side: Right, part: Toes)),
-        (pose: "t-closed-left", orientation: ToCamera, pivot: (side: Right, part: Heel)),
-      ]
-    ),
-    (
-      name: "Pendulum",
-      id: "p-0",
-      variation: "right-first",
-      keyframes: [
-        (pose: "pendulum-right", orientation: ToCamera),
-        (pose: "standing-straight-front", orientation: ToCamera),
-        (pose: "pendulum-left", orientation: ToCamera),
-        (pose: "standing-straight-front", orientation: ToCamera),
-      ]
-    ),
-    (
-      name: "Pendulum",
-      id: "p-1",
-      variation: "left-first",
-      keyframes: [
-        (pose: "pendulum-left", orientation: ToCamera),
-        (pose: "standing-straight-front", orientation: ToCamera),
-        (pose: "pendulum-right", orientation: ToCamera),
-        (pose: "standing-straight-front", orientation: ToCamera),
-      ]
-    ),
-    (
       name: "Diagonal Running Man",
       id: "pp-0",
       variation: "right-first",
@@ -155,6 +107,24 @@
       ]
     ),
     (
+      name: "T-Step",
+      id: "t-0",
+      variation: "right-out",
+      keyframes: [
+        (pose: "t-open-right", orientation: ToCamera, pivot: (side: Left, part: Toes)),
+        (pose: "t-closed-right", orientation: ToCamera, pivot: (side: Left, part: Heel)),
+      ]
+    ),
+    (
+      name: "T-Step",
+      id: "t-1",
+      variation: "left-out",
+      keyframes: [
+        (pose: "t-open-left", orientation: ToCamera, pivot: (side: Right, part: Toes)),
+        (pose: "t-closed-left", orientation: ToCamera, pivot: (side: Right, part: Heel)),
+      ]
+    ),
+    (
       name: "Criss-Cross",
       id: "cc-0",
       variation: "right-first",
@@ -163,6 +133,35 @@
         (pose: "light-outward-stance", orientation: ToCamera),
         (pose: "staggered-stance-left", orientation: ToCamera),
         (pose: "light-outward-stance", orientation: ToCamera),
+      ]
+    ),
+    (
+      name: "Happy Feet",
+      id: "happy-feet-0",
+      variation: "right-first",
+      keyframes: [
+        (pose: "closed-x", orientation: ToCamera),
+        (pose: "happy-right", orientation: ToCamera),
+        (pose: "closed-x", orientation: ToCamera),
+        (pose: "happy-left", orientation: ToCamera),
+      ]
+    ),
+    (
+      name: "V-Step",
+      id: "v-0",
+      variation: "right-out",
+      keyframes: [
+        (pose: "v-open-right", orientation: ToCamera, pivot: (side: Right, part: Toes)),
+        (pose: "v-closed", orientation: ToCamera, pivot: (side: Right, part: Heel)),
+      ]
+    ),
+    (
+      name: "V-Step",
+      id: "v-1",
+      variation: "left-out",
+      keyframes: [
+        (pose: "v-open-left", orientation: ToCamera, pivot: (side: Left, part: Toes)),
+        (pose: "v-closed", orientation: ToCamera, pivot: (side: Left, part: Heel)),
       ]
     ),
     (
@@ -185,6 +184,28 @@
         (pose: "right-up", orientation: Right),
         (pose: "standing-straight-front", orientation: ToCamera),
         (pose: "left-up", orientation: Left),
+      ]
+    ),
+    (
+      name: "Open Running Man",
+      id: "open-rm-0",
+      variation: "right-first",
+      keyframes: [
+        (pose: "t-closed-right", orientation: ToCamera),
+        (pose: "open-rm-right", orientation: ToCamera),
+        (pose: "t-closed-left", orientation: ToCamera),
+        (pose: "open-rm-left", orientation: ToCamera),
+      ]
+    ),
+    (
+      name: "Open Running Man",
+      id: "open-rm-1",
+      variation: "left-first",
+      keyframes: [
+        (pose: "t-closed-left", orientation: ToCamera),
+        (pose: "open-rm-left", orientation: ToCamera),
+        (pose: "t-closed-right", orientation: ToCamera),
+        (pose: "open-rm-right", orientation: ToCamera),
       ]
     ),
     (
@@ -232,36 +253,25 @@
       ]
     ),
     (
-      name: "Open Running Man",
-      id: "open-rm-0",
+      name: "Pendulum",
+      id: "p-0",
       variation: "right-first",
       keyframes: [
-        (pose: "t-closed-right", orientation: ToCamera),
-        (pose: "open-rm-right", orientation: ToCamera),
-        (pose: "t-closed-left", orientation: ToCamera),
-        (pose: "open-rm-left", orientation: ToCamera),
+        (pose: "pendulum-right", orientation: ToCamera),
+        (pose: "standing-straight-front", orientation: ToCamera),
+        (pose: "pendulum-left", orientation: ToCamera),
+        (pose: "standing-straight-front", orientation: ToCamera),
       ]
     ),
     (
-      name: "Open Running Man",
-      id: "open-rm-1",
+      name: "Pendulum",
+      id: "p-1",
       variation: "left-first",
       keyframes: [
-        (pose: "t-closed-left", orientation: ToCamera),
-        (pose: "open-rm-left", orientation: ToCamera),
-        (pose: "t-closed-right", orientation: ToCamera),
-        (pose: "open-rm-right", orientation: ToCamera),
-      ]
-    ),
-    (
-      name: "Happy Feet",
-      id: "happy-feet-0",
-      variation: "right-first",
-      keyframes: [
-        (pose: "closed-x", orientation: ToCamera),
-        (pose: "happy-right", orientation: ToCamera),
-        (pose: "closed-x", orientation: ToCamera),
-        (pose: "happy-left", orientation: ToCamera),
+        (pose: "pendulum-left", orientation: ToCamera),
+        (pose: "standing-straight-front", orientation: ToCamera),
+        (pose: "pendulum-right", orientation: ToCamera),
+        (pose: "standing-straight-front", orientation: ToCamera),
       ]
     ),
   ]
