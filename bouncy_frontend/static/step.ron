@@ -253,5 +253,16 @@
         (pose: "open-rm-right", orientation: ToCamera),
       ]
     ),
+    (
+      name: "Happy Feet",
+      id: "happy-feet-0",
+      variation: "right-first",
+      keyframes: [
+        (pose: "closed-x", orientation: ToCamera),
+        (pose: "happy-right", orientation: ToCamera),
+        (pose: "closed-x", orientation: ToCamera),
+        (pose: "happy-left", orientation: ToCamera),
+      ]
+    ),
   ]
 )

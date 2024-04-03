@@ -15,7 +15,7 @@ fn test_listing_static_steps() {
 
     step_names.sort();
 
-    let expect = expect!["Criss-Cross,Criss-Cross,Diagonal Running Man,Diagonal Running Man,Double Running Man,Double Running Man,Idle,Idle Side,Knee Up,Open Running Man,Open Running Man,Open Running Man on Heels,Open Running Man on Heels,Pendulum,Pendulum,Running Man,Running Man,Running Man on Heels,Running Man on Heels,Simple Heels,Simple Heels,T-Step,T-Step,V-Step"];
+    let expect = expect!["Criss-Cross,Criss-Cross,Diagonal Running Man,Diagonal Running Man,Double Running Man,Double Running Man,Happy Feet,Idle,Idle Side,Knee Up,Open Running Man,Open Running Man,Open Running Man on Heels,Open Running Man on Heels,Pendulum,Pendulum,Running Man,Running Man,Running Man on Heels,Running Man on Heels,Simple Heels,Simple Heels,T-Step,T-Step,V-Step"];
     expect.assert_eq(&step_names.join(","));
 }
 
