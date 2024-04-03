@@ -60,7 +60,7 @@
   let leftShoulder;
 
   // right body part is left on screen
-  $: {
+  $: if (skeleton) {
     leftHip = add2dVector(
       hip,
       skeleton.hip.angle,
@@ -82,7 +82,7 @@
       size * skeleton.shoulder.r * (lengths.shoulder / 2)
     );
     // when the dance looks away from the camera, we need to switch sides
-    if (skeleton && skeleton.backwards) {
+    if (skeleton.backwards) {
       [leftHip, rightHip] = [rightHip, leftHip];
       [leftShoulder, rightShoulder] = [rightShoulder, leftShoulder];
     }

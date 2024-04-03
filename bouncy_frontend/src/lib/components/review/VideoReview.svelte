@@ -1,7 +1,6 @@
 <script>
   import { dev } from '$lib/stores/FeatureSelection.js';
   import AllPoseErrors from '$lib/components/dev/AllPoseErrors.svelte';
-  import Area from '$lib/components/ui/Area.svelte';
   import Svg from '$lib/components/avatar/Svg.svelte';
   import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
   import Banner from './Banner.svelte';
@@ -84,12 +83,14 @@ once per 250ms. -->
 
   <div>
     <Svg height={avatarSize} width={avatarSize}>
-      <SvgAvatar
-        width={avatarSize}
-        height={avatarSize}
-        lineWidth={avatarLineWidth}
-        {skeleton}
-      />
+      {#if skeleton}
+        <SvgAvatar
+          width={avatarSize}
+          height={avatarSize}
+          lineWidth={avatarLineWidth}
+          {skeleton}
+        />
+      {/if}
     </Svg>
   </div>
 </div>
