@@ -64,7 +64,11 @@ core business logic (dance detection).
 
 ## Progress Status
 
-- 19 Mar 2023: Created live demo with more stable features to https://app.bouncy-feet.ch.
+-  3 Apr 2024: Released v0.2.1 to the live demo.
+    - More steps to the collection, now there are 13 steps.
+    - Many improvements to drawing, such as z-perspective for limbs, the torso
+      no longer being fixed to the center, and smooth shoulder/hip angles.
+- 19 Mar 2024: Created live demo with more stable features to https://app.bouncy-feet.ch.
 - 26 Dec 2023: Started hosting a live demo on https://demos.jakobmeier.ch/bouncy-feet.
 - 23 Dec 2023: Update README to better describe the project ambitions. The
   techstack with SvelteKit + Rust to create a PWA is mostly locked in now.
