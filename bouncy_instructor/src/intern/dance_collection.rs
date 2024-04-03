@@ -198,8 +198,8 @@ impl DanceCollection {
             direction,
             limbs,
             other.shift.mirror(),
-            other.turn_shoulder,
-            other.turn_hip,
+            other.turn_shoulder.mirror(),
+            other.turn_hip.mirror(),
             z_absolute,
             z_order,
         )

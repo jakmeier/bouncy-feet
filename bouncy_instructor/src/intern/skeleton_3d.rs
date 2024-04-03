@@ -182,11 +182,7 @@ impl Skeleton3d {
             foot: segment(Limb::RIGHT_FOOT),
         };
 
-        let base_dir = if sideway {
-            SignedAngle::ZERO
-        } else {
-            SignedAngle::degree(90.0)
-        };
+        let base_dir = direction.angle();
         let shoulder: Segment = Angle3d::new(
             base_dir + self.turn_shoulder + correction,
             SignedAngle::degree(90.0),
@@ -238,6 +234,16 @@ impl Direction {
             Direction::South => Direction::West,
             Direction::West => Direction::North,
             Direction::Unknown => Direction::Unknown,
+        }
+    }
+
+    fn angle(&self) -> SignedAngle {
+        match self {
+            Direction::North => SignedAngle::degree(90.0),
+            Direction::East => SignedAngle::ZERO,
+            Direction::South => SignedAngle::degree(-90.0),
+            Direction::West => SignedAngle::degree(-180.0),
+            Direction::Unknown => SignedAngle::ZERO,
         }
     }
 }
