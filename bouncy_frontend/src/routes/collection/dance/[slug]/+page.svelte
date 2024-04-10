@@ -8,6 +8,7 @@
   import { getContext } from 'svelte';
   import Popup from '$lib/components/ui/Popup.svelte';
   import { goto } from '$app/navigation';
+  import { derived } from 'svelte/store';
 
   /** @type {import('./$types').PageData} */
   export let data;
@@ -21,13 +22,13 @@
   const localCollection = getContext('localCollection');
   const localDances = localCollection.dances;
 
-  const id = $page.params.slug;
+  const id = derived(page, ($page) => $page.params.slug);
   const isSelected = (
     /** @type {import('$lib/instructor/bouncy_instructor').DanceInfo} */ dance
-  ) => dance.id === id;
-  const dance =
+  ) => dance.id === $id;
+  $: dance =
     data.officialDances.find(isSelected) || $localDances.find(isSelected);
-  const steps = dance?.steps() || [];
+  $: steps = dance?.steps() || [];
   const beatCounter = counter(-1, 1, stepTime);
 
   /** @type {import('svelte/store').Writable<boolean>} */
@@ -45,7 +46,7 @@
 
   function maybeDelete() {
     if (confirm($t('editor.delete-dance-confirmation'))) {
-      localCollection.removeDance(id);
+      localCollection.removeDance($id);
       $optionsPopupActive = false;
       window.history.back();
     }
@@ -54,7 +55,7 @@
 
 <!-- TODO: translate -->
 <Header
-  title={id}
+  title={$id}
   button="edit"
   on:click={() => optionsPopupActive.set(true)}
 />
