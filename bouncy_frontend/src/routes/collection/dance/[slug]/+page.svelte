@@ -7,6 +7,7 @@
   import { counter } from '$lib/timer';
   import { getContext } from 'svelte';
   import Popup from '$lib/components/ui/Popup.svelte';
+  import { goto } from '$app/navigation';
 
   /** @type {import('./$types').PageData} */
   export let data;
@@ -33,14 +34,14 @@
   let optionsPopupActive;
 
   function edit() {
-    alert('NIY');
     $optionsPopupActive = false;
+    goto('./edit');
   }
 
-  function copyAndEdit() {
-    alert('NIY');
-    $optionsPopupActive = false;
-  }
+  // function copyAndEdit() {
+  //   $optionsPopupActive = false;
+  //   goto('./edit');
+  // }
 
   function maybeDelete() {
     if (confirm($t('editor.delete-dance-confirmation'))) {
@@ -87,9 +88,9 @@
 
 <Popup bind:isOpen={optionsPopupActive} title="editor.edit-dance-context-menu">
   <button class="light" on:click={edit}>{$t('editor.edit-button')}</button>
-  <button class="light" on:click={copyAndEdit}
+  <!-- <button class="light" on:click={copyAndEdit}
     >{$t('editor.edit-copy-button')}</button
-  >
+  > -->
   <button class="danger" on:click={maybeDelete}
     >{$t('editor.delete-dance-button')}</button
   >

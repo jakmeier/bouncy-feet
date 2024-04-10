@@ -33,6 +33,9 @@
         "edit-button": "Tanz bearbeiten",
         "edit-copy-button": "Kopieren und bearbeiten",
         "pick-step-prompt": "Wähle einen Schritt",
+        "saving-prompt": "Wie soll der Tanz gespeichert werden?",
+        "save-copy-button": "Kopie speichern",
+        "overwrite-existing-button": "Überschreiben",
         "new-dance": {
             "default-dance-name": "Mein Tanz",
             "pick-name-prompt": "Wähle einen Namen",

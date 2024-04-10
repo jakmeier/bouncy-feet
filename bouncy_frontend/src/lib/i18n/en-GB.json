@@ -33,6 +33,9 @@
         "edit-button": "Edit dance",
         "edit-copy-button": "Copy and edit",
         "pick-step-prompt": "Pick a step",
+        "saving-prompt": "How to save the dance?",
+        "save-copy-button": "Save a copy",
+        "overwrite-existing-button": "Overwrite",
         "new-dance": {
             "default-dance-name": "My Dance",
             "pick-name-prompt": "Pick a name",

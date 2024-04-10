@@ -38,6 +38,19 @@ impl DanceFileBuilder {
         Ok(())
     }
 
+    #[wasm_bindgen(js_name = "overwriteDance")]
+    pub fn overwrite_dance(&mut self, dance_builder: &DanceBuilder) -> Result<(), String> {
+        let Some(index) = self
+            .dances
+            .iter()
+            .position(|dance| dance.id == dance_builder.id)
+        else {
+            return Err("Dance ID does not exist".to_owned());
+        };
+        self.dances[index] = dance_builder.build();
+        Ok(())
+    }
+
     #[wasm_bindgen(js_name = "removeDance")]
     pub fn remove_dance(&mut self, id: String) -> Result<(), String> {
         if let Some(index) = self.dances.iter().position(|dance| dance.id == id) {

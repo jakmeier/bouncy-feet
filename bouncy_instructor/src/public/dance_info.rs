@@ -1,3 +1,4 @@
+use crate::editor::dance_builder::DanceBuilder;
 use crate::intern::dance::Dance;
 use crate::public::skeleton::Skeleton;
 use crate::{StepInfo, STATE};
@@ -7,10 +8,10 @@ use wasm_bindgen::prelude::wasm_bindgen;
 #[derive(Debug)]
 #[wasm_bindgen]
 pub struct DanceInfo {
-    id: String,
-    steps: Vec<StepInfo>,
+    pub(crate) id: String,
+    pub(crate) steps: Vec<StepInfo>,
     /// invariant: total_beats is the sum of all steps beat lengths
-    total_beats: usize,
+    pub(crate) total_beats: usize,
 }
 
 #[wasm_bindgen]
@@ -50,6 +51,11 @@ impl DanceInfo {
     #[wasm_bindgen(getter)]
     pub fn beats(&self) -> usize {
         self.total_beats
+    }
+
+    #[wasm_bindgen(js_name = "asBuilder")]
+    pub fn as_builder(&self) -> DanceBuilder {
+        DanceBuilder::from(self)
     }
 }
 

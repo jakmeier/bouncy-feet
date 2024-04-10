@@ -20,6 +20,7 @@
     builder: builderStore,
     dances: derived(builderStore, ($b) => $b.dances()),
     addDanceBuilder,
+    overwriteDanceBuilder,
     removeDance,
   };
 
@@ -37,6 +38,15 @@
    */
   function addDanceBuilder(danceBuilder) {
     $builderStore.addDance(danceBuilder);
+    // trigger update (can I do better?)
+    $builderStore = $builderStore;
+  }
+
+  /**
+   * @param {DanceBuilder} danceBuilder
+   */
+  function overwriteDanceBuilder(danceBuilder) {
+    $builderStore.overwriteDance(danceBuilder);
     // trigger update (can I do better?)
     $builderStore = $builderStore;
   }

@@ -1,5 +1,5 @@
 <script>
-  import Step from '../../Step.svelte';
+  import Step from '../Step.svelte';
   import UiBox from '$lib/components/ui/UiBox.svelte';
 
   /** @type {import('$lib/instructor/bouncy_instructor').StepInfo[]} */

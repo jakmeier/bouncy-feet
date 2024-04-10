@@ -121,6 +121,10 @@ export class DanceFileBuilder {
 */
   addDance(dance_builder: DanceBuilder): void;
 /**
+* @param {DanceBuilder} dance_builder
+*/
+  overwriteDance(dance_builder: DanceBuilder): void;
+/**
 * @param {string} id
 */
   removeDance(id: string): void;
@@ -151,6 +155,10 @@ export class DanceInfo {
 * @returns {Skeleton | undefined}
 */
   skeleton(beat: number): Skeleton | undefined;
+/**
+* @returns {DanceBuilder}
+*/
+  asBuilder(): DanceBuilder;
 /**
 * The number of beats the dance takes for one repetition.
 */
@@ -451,6 +459,11 @@ export class StepInfo {
 export class Tracker {
   free(): void;
 /**
+* @param {number} timestamp
+* @returns {ExportedFrame}
+*/
+  exportFrame(timestamp: number): ExportedFrame;
+/**
 * Create a tracker for all known steps.
 */
   constructor();
@@ -501,11 +514,6 @@ export class Tracker {
 * @returns {Skeleton | undefined}
 */
   skeletonAt(timestamp: number): Skeleton | undefined;
-/**
-* @param {number} timestamp
-* @returns {ExportedFrame}
-*/
-  exportFrame(timestamp: number): ExportedFrame;
 }
 /**
 */

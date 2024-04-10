@@ -49,3 +49,12 @@ impl DanceBuilder {
         }
     }
 }
+
+impl From<&DanceInfo> for DanceBuilder {
+    fn from(dance: &DanceInfo) -> Self {
+        Self {
+            id: dance.id(),
+            step_ids: dance.steps.iter().map(|step| step.id()).collect(),
+        }
+    }
+}
