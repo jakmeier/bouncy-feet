@@ -36,21 +36,69 @@
 
     return true;
   }
+
+  // Drag-and-drop stuff below
+  /** @type {string | null} */
+  let draggedStep = null;
+
+  /**
+   * @param {DragEvent} event
+   * @param {import("$lib/instructor/bouncy_instructor").StepInfo} step
+   */
+  function handleDragStart(event, step) {
+    draggedStep = step.id;
+
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.dropEffect = 'move';
+    }
+    danceBuilder = danceBuilder;
+    steps = danceBuilder.danceInfo().steps();
+  }
+
+  /**
+   * @param {{preventDefault: () => void;}} event
+   * @param {number} index
+   */
+  function handleDragOver(event, index) {
+    event.preventDefault();
+
+    const draggedIndex = steps.findIndex((step) => step.id === draggedStep);
+    if (draggedStep && draggedIndex !== -1 && draggedIndex !== index) {
+      console.log('moving', draggedIndex, 'to', index);
+      danceBuilder.removeStep(draggedIndex);
+      danceBuilder.insertStep(index, draggedStep);
+      danceBuilder = danceBuilder;
+      steps = danceBuilder.danceInfo().steps();
+    }
+  }
+
+  /**
+   * @param {DragEvent & { currentTarget: EventTarget & HTMLDivElement; }} event
+   */
+  function handleDrop(event) {
+    event.preventDefault();
+    draggedStep = null;
+  }
 </script>
 
 <div class="outer">
   <div class="steps-container">
-    {#each steps as step}
-      <div class="step">
-        <a href={`../../step/${step.name}`}>
-          <Step
-            {step}
-            poseIndex={$beatCounter}
-            {animationTime}
-            size={stepSize}
-          />
-          <p style="width: {stepSize}px">{step.name}</p>
-        </a>
+    {#each steps as step, i}
+      <div
+        class="step"
+        draggable="true"
+        on:dragstart={(event) => handleDragStart(event, step)}
+        on:dragover={(event) => handleDragOver(event, i)}
+        on:drop={handleDrop}
+        on:dragend={handleDrop}
+        style="opacity: {step.id === draggedStep ? 0.3 : 1.0}"
+      >
+        <Step {step} poseIndex={$beatCounter} {animationTime} size={stepSize} />
+        <p class="handle" style="width: {stepSize}px">
+          <span class="material-symbols-outlined">open_with</span>
+        </p>
+        <p style="width: {stepSize}px">{step.name}</p>
       </div>
     {/each}
   </div>
@@ -83,6 +131,7 @@
   }
   .step {
     margin: 2px;
+    transition: all 0.2s ease-in-out;
   }
   .step p {
     background-color: var(--theme-neutral-light);
@@ -91,7 +140,7 @@
     margin: 0;
     padding: 2px;
   }
-  .step a {
-    font-weight: 400;
+  p.handle {
+    margin-bottom: 5px;
   }
 </style>

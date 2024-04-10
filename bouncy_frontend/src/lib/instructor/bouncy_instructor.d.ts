@@ -89,13 +89,23 @@ export class DanceBuilder {
 */
   length(): number;
 /**
+* @param {string} id
+*/
+  setId(id: string): void;
+/**
 * @param {string} step_id
 */
   addStep(step_id: string): void;
 /**
-* @param {string} id
+* @param {number} pos
+* @returns {string}
 */
-  setId(id: string): void;
+  removeStep(pos: number): string;
+/**
+* @param {number} pos
+* @param {string} step_id
+*/
+  insertStep(pos: number, step_id: string): void;
 /**
 */
   clear(): void;
