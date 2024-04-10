@@ -28,6 +28,7 @@
     },
     "editor": {
         "edit-dance-context-menu": "Bearbeiten",
+        "dance-copy-postfix": "Kopie",
         "delete-dance-button": "Tanz löschen",
         "delete-dance-confirmation": "Tanz wirklich löschen?",
         "edit-button": "Tanz bearbeiten",
