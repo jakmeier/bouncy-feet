@@ -37,6 +37,17 @@
     return true;
   }
 
+  /**
+   * @param {{preventDefault: () => void;}} event
+   * @param {number} index
+   */
+  function handleRemove(event, index) {
+    event.preventDefault();
+    danceBuilder.removeStep(index);
+    danceBuilder = danceBuilder;
+    steps = danceBuilder.danceInfo().steps();
+  }
+
   // Drag-and-drop stuff below
   /** @type {string | null} */
   let draggedStep = null;
@@ -95,6 +106,9 @@
         style="opacity: {step.id === draggedStep ? 0.3 : 1.0}"
       >
         <Step {step} poseIndex={$beatCounter} {animationTime} size={stepSize} />
+        <div class="delete-button" on:click={(event) => handleRemove(event, i)}>
+          <span class="material-symbols-outlined">close</span>
+        </div>
         <p class="handle" style="width: {stepSize}px">
           <span class="material-symbols-outlined">open_with</span>
         </p>
@@ -130,17 +144,33 @@
     overflow: auto hidden;
   }
   .step {
+    position: relative;
     margin: 2px;
     transition: all 0.2s ease-in-out;
   }
-  .step p {
-    background-color: var(--theme-neutral-light);
+  .step p,
+  div.delete-button {
     border-radius: 5px;
     text-align: center;
     margin: 0;
     padding: 2px;
   }
+  .step p {
+    background-color: var(--theme-neutral-light);
+  }
   p.handle {
+    background-color: var(--theme-accent-light);
     margin-bottom: 5px;
+  }
+  div.delete-button {
+    background-color: var(--theme-accent-light);
+    position: absolute;
+    width: 35px;
+    height: 25px;
+    top: 0px;
+    right: 0px;
+  }
+  div.delete-button:hover {
+    background-color: var(--theme-accent);
   }
 </style>
