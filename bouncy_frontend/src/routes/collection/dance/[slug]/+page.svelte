@@ -29,6 +29,7 @@
   $: dance =
     data.officialDances.find(isSelected) || $localDances.find(isSelected);
   $: steps = dance?.steps() || [];
+  $: isStatic = data.officialDances.find(isSelected) !== undefined;
   const beatCounter = counter(-1, 1, stepTime);
 
   /** @type {import('svelte/store').Writable<boolean>} */
@@ -92,9 +93,11 @@
   <!-- <button class="light" on:click={copyAndEdit}
     >{$t('editor.edit-copy-button')}</button
   > -->
-  <button class="danger" on:click={maybeDelete}
-    >{$t('editor.delete-dance-button')}</button
-  >
+  {#if !isStatic}
+    <button class="danger" on:click={maybeDelete}
+      >{$t('editor.delete-dance-button')}</button
+    >
+  {/if}
 </Popup>
 
 <style>
