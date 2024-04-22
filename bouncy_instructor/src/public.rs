@@ -108,7 +108,7 @@ pub fn dance_builder_from_dance(dance_id: String) -> Result<DanceBuilder, String
             .iter()
             .find(|dance| dance.id == dance_id)
             .cloned()
-            .map(|dance| DanceBuilder::from(dance))
+            .map(DanceBuilder::from)
             .ok_or_else(|| format!("missing dance {dance_id}"))
     })
 }

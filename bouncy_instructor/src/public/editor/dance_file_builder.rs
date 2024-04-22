@@ -107,7 +107,7 @@ impl From<DanceFile> for DanceFileBuilder {
             dances: other
                 .dances
                 .into_iter()
-                .map(|d| intern::dance::Dance::from(d))
+                .map(intern::dance::Dance::from)
                 .collect(),
         }
     }
