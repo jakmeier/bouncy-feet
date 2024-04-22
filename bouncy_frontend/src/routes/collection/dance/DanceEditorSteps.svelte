@@ -117,6 +117,23 @@
     event.preventDefault();
     draggedStep = null;
   }
+
+  function clickAddButton() {
+    stepSelectionActive = !stepSelectionActive;
+    selectedStepIndex = -1;
+  }
+
+  /**
+   * @param {number} i
+   */
+  function selectStep(i) {
+    if (selectedStepIndex === i) {
+      selectedStepIndex = -1;
+    } else {
+      selectedStepIndex = i;
+      stepSelectionActive = false;
+    }
+  }
 </script>
 
 <div class="outer">
@@ -131,16 +148,20 @@
         on:dragover={(event) => handleDragOver(event, i)}
         on:drop={handleDrop}
         on:dragend={handleDrop}
-        on:click={() => (selectedStepIndex = i)}
+        on:click={() => selectStep(i)}
         style="opacity: {step.id === draggedStep ? 0.3 : 1.0}"
       >
-        <Step
-          {step}
-          poseIndex={$beatCounter}
-          {animationTime}
-          size={stepSize}
-          borderWidth={selectedStepIndex === i ? 5 : 2}
-        />
+        <div class="fixed-size">
+          <div class="center">
+            <Step
+              {step}
+              poseIndex={$beatCounter}
+              {animationTime}
+              size={stepSize}
+              borderWidth={selectedStepIndex === i ? 5 : 2}
+            />
+          </div>
+        </div>
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div class="delete-button" on:click={(event) => handleRemove(event, i)}>
           <span class="material-symbols-outlined">close</span>
@@ -151,6 +172,19 @@
         <p style="width: {stepSize}px">{step.name}</p>
       </div>
     {/each}
+
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <div on:click={clickAddButton}>
+      <Area width="{stepSize}px" height="{stepSize}px" {borderRadius}>
+        <span
+          class="material-symbols-outlined add-button"
+          style="font-size: {stepSize / 2}px"
+        >
+          add_circle
+        </span>
+      </Area>
+    </div>
   </div>
 
   {#if selectedStepIndex !== -1}
@@ -164,19 +198,6 @@
       flipped={danceBuilder.isFlipped(selectedStepIndex)}
     ></DanceStepDetails>
   {/if}
-
-  <!-- svelte-ignore a11y-click-events-have-key-events -->
-  <!-- svelte-ignore a11y-no-static-element-interactions -->
-  <div on:click={() => (stepSelectionActive = !stepSelectionActive)}>
-    <Area width="{stepSize}px" height="{stepSize}px" {borderRadius}>
-      <span
-        class="material-symbols-outlined add-button"
-        style="font-size: {stepSize / 2}px"
-      >
-        add_circle
-      </span>
-    </Area>
-  </div>
 
   <SelectStep
     bind:show={stepSelectionActive}
@@ -222,5 +243,13 @@
   }
   div.delete-button:hover {
     background-color: var(--theme-accent);
+  }
+
+  .fixed-size {
+    height: 115px;
+    width: 110px;
+  }
+  .center {
+    margin: auto;
   }
 </style>
