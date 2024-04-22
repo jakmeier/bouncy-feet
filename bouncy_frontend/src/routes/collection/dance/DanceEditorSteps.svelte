@@ -77,21 +77,22 @@
   // Drag-and-drop stuff below
   /** @type {string | null} */
   let draggedStep = null;
+  /** @type {number} */
+  let draggedStepIndex = -1;
 
   /**
    * @param {DragEvent} event
-   * @param {import("$lib/instructor/bouncy_instructor").StepInfo} step
+   * @param {number} index
    */
-  function handleDragStart(event, step) {
-    draggedStep = step.id;
+  function handleDragStart(event, index) {
+    draggedStep = steps[index].id;
+    draggedStepIndex = index;
     selectedStepIndex = -1;
 
     if (event.dataTransfer) {
       event.dataTransfer.effectAllowed = 'move';
       event.dataTransfer.dropEffect = 'move';
     }
-    danceBuilder = danceBuilder;
-    steps = danceBuilder.danceInfo().steps();
   }
 
   /**
@@ -101,9 +102,9 @@
   function handleDragOver(event, index) {
     event.preventDefault();
 
-    const draggedIndex = steps.findIndex((step) => step.id === draggedStep);
-    if (draggedStep && draggedIndex !== -1 && draggedIndex !== index) {
-      danceBuilder.removeStep(draggedIndex);
+    if (draggedStep && draggedStepIndex !== -1 && draggedStepIndex !== index) {
+      danceBuilder.removeStep(draggedStepIndex);
+      draggedStepIndex = index;
       danceBuilder.insertStep(index, draggedStep);
       danceBuilder = danceBuilder;
       steps = danceBuilder.danceInfo().steps();
@@ -116,6 +117,7 @@
   function handleDrop(event) {
     event.preventDefault();
     draggedStep = null;
+    draggedStepIndex = -1;
   }
 
   function clickAddButton() {
@@ -144,12 +146,12 @@
       <div
         class="step"
         draggable="true"
-        on:dragstart={(event) => handleDragStart(event, step)}
+        on:dragstart={(event) => handleDragStart(event, i)}
         on:dragover={(event) => handleDragOver(event, i)}
         on:drop={handleDrop}
         on:dragend={handleDrop}
         on:click={() => selectStep(i)}
-        style="opacity: {step.id === draggedStep ? 0.3 : 1.0}"
+        style="opacity: {i === draggedStepIndex ? 0.3 : 1.0}"
       >
         <div class="fixed-size">
           <div class="center">
