@@ -27,7 +27,6 @@
 
   const baseStep = stepById(selectedStep.id, false) || selectedStep;
   const flippedStep = stepById(selectedStep.id, true) || selectedStep;
-  //    allSteps.find((step) => step.id == selectedStep.id);
 </script>
 
 <UiBox title="editor.direction">

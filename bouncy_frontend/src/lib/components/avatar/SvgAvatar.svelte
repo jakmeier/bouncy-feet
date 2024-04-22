@@ -40,15 +40,12 @@
     return wrapped + min;
   }
 
-  $: sideway = skeleton ? skeleton.sideway : false;
   $: size = Math.min(height, width);
   $: hip = {
     x: (0.5 + wrap(bodyShift.x, -0.75, 0.75)) * width,
     y: (0.5 + bodyShift.y) * height,
   };
   $: shoulder = { x: hip.x, y: hip.y - lengths.torso * size };
-  // $: shoulderLen = sideway ? 0.0 : 0.05 * size;
-  // $: hipLen = sideway ? 0.0 : 0.03 * size;
 
   /** @type {{ x: number; y: number; }} */
   let leftHip;
