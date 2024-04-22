@@ -3,9 +3,14 @@
   import { counter } from '$lib/timer';
   import Area from '$lib/components/ui/Area.svelte';
   import SelectStep from './SelectStep.svelte';
+  import DanceStepDetails from './DanceStepDetails.svelte';
 
   /** @type {import("$lib/instructor/bouncy_instructor").StepInfo[]} */
   export let availableSteps;
+  /** @type {import("$lib/instructor/bouncy_instructor").StepInfo[]} */
+  $: uniqueSteps = availableSteps.filter(
+    (step, index, self) => index === self.findIndex((t) => t.name === step.name)
+  );
   /** @type {import('$lib/instructor/bouncy_instructor').DanceBuilder} */
   export let danceBuilder;
 
@@ -21,6 +26,7 @@
    * @type {import('$lib/instructor/bouncy_instructor').StepInfo[]}
    */
   let steps = danceBuilder.danceInfo().steps();
+  let selectedStepIndex = -1;
 
   let stepSelectionActive = false;
   /** @param {import('$lib/instructor/bouncy_instructor').StepInfo} stepInfo */
@@ -29,6 +35,7 @@
       return false;
     }
 
+    selectedStepIndex = steps.length;
     steps.push(stepInfo);
     danceBuilder.addStep(stepInfo.id);
     // trigger reload in ui (can I do better?)
@@ -37,12 +44,22 @@
     return true;
   }
 
+  /** @param {import('$lib/instructor/bouncy_instructor').StepInfo} stepInfo */
+  function selectedVariationCallback(stepInfo) {
+    if (selectedStepIndex !== -1) {
+      steps[selectedStepIndex] = stepInfo;
+      danceBuilder.removeStep(selectedStepIndex);
+      danceBuilder.insertStep(selectedStepIndex, stepInfo.id);
+    }
+  }
+
   /**
    * @param {{preventDefault: () => void;}} event
    * @param {number} index
    */
   function handleRemove(event, index) {
     event.preventDefault();
+    selectedStepIndex = -1;
     danceBuilder.removeStep(index);
     danceBuilder = danceBuilder;
     steps = danceBuilder.danceInfo().steps();
@@ -58,6 +75,7 @@
    */
   function handleDragStart(event, step) {
     draggedStep = step.id;
+    selectedStepIndex = -1;
 
     if (event.dataTransfer) {
       event.dataTransfer.effectAllowed = 'move';
@@ -96,6 +114,8 @@
 <div class="outer">
   <div class="steps-container">
     {#each steps as step, i}
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
       <div
         class="step"
         draggable="true"
@@ -103,9 +123,17 @@
         on:dragover={(event) => handleDragOver(event, i)}
         on:drop={handleDrop}
         on:dragend={handleDrop}
+        on:click={() => (selectedStepIndex = i)}
         style="opacity: {step.id === draggedStep ? 0.3 : 1.0}"
       >
-        <Step {step} poseIndex={$beatCounter} {animationTime} size={stepSize} />
+        <Step
+          {step}
+          poseIndex={$beatCounter}
+          {animationTime}
+          size={stepSize}
+          borderWidth={selectedStepIndex === i ? 5 : 2}
+        />
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div class="delete-button" on:click={(event) => handleRemove(event, i)}>
           <span class="material-symbols-outlined">close</span>
         </div>
@@ -117,6 +145,18 @@
     {/each}
   </div>
 
+  {#if selectedStepIndex !== -1}
+    <DanceStepDetails
+      allSteps={availableSteps}
+      selectedStep={steps[selectedStepIndex]}
+      poseIndex={$beatCounter}
+      {animationTime}
+      {selectedVariationCallback}
+    ></DanceStepDetails>
+  {/if}
+
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div on:click={() => (stepSelectionActive = !stepSelectionActive)}>
     <Area width="{stepSize}px" height="{stepSize}px" {borderRadius}>
       <span
@@ -131,7 +171,7 @@
   <SelectStep
     bind:show={stepSelectionActive}
     {selectedCallback}
-    steps={availableSteps}
+    steps={uniqueSteps}
   ></SelectStep>
 </div>
 

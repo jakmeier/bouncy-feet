@@ -10,6 +10,7 @@
   export let rotation = 0.0;
   export let size = 100;
   export let poseIndex = 0;
+  export let borderWidth = 2;
   /** @type{number} animationTime in ms */
   export let animationTime = 500;
 
@@ -31,7 +32,12 @@
   }
 </script>
 
-<Area width="{size}px" height="{size}px" borderRadius="20px" borderWidth="2px">
+<Area
+  width="{size}px"
+  height="{size}px"
+  borderRadius="20px"
+  borderWidth="{borderWidth}px"
+>
   <Animation {animationTime}>
     <Svg width={size} height={size} orderByZ>
       <SvgAvatar

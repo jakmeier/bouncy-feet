@@ -38,4 +38,4 @@
   }
 </script>
 
-<DanceEditor availableSteps={data.uniqueNameSteps} {danceBuilder} />
+<DanceEditor availableSteps={data.allSteps} {danceBuilder} />
