@@ -32,9 +32,20 @@ export function loadStepString(data: string): void;
 */
 export function steps(): (StepInfo)[];
 /**
+* @param {string} id
+* @param {boolean} flipped
+* @returns {StepInfo | undefined}
+*/
+export function stepById(id: string, flipped: boolean): StepInfo | undefined;
+/**
 * @returns {(DanceInfo)[]}
 */
 export function dances(): (DanceInfo)[];
+/**
+* @param {string} dance_id
+* @returns {DanceBuilder}
+*/
+export function danceBuilderFromDance(dance_id: string): DanceBuilder;
 /**
 */
 export class Cartesian2d {
@@ -107,6 +118,16 @@ export class DanceBuilder {
 */
   insertStep(pos: number, step_id: string): void;
 /**
+* @param {number} pos
+* @param {boolean} flipped
+*/
+  setOrientation(pos: number, flipped: boolean): void;
+/**
+* @param {number} pos
+* @returns {boolean}
+*/
+  isFlipped(pos: number): boolean;
+/**
 */
   clear(): void;
 /**
@@ -146,6 +167,11 @@ export class DanceFileBuilder {
 * @returns {(DanceInfo)[]}
 */
   dances(): (DanceInfo)[];
+/**
+* @param {string} dance_id
+* @returns {DanceBuilder}
+*/
+  danceBuilder(dance_id: string): DanceBuilder;
 }
 /**
 * Information about a dance for display in the frontend.
@@ -165,10 +191,6 @@ export class DanceInfo {
 * @returns {Skeleton | undefined}
 */
   skeleton(beat: number): Skeleton | undefined;
-/**
-* @returns {DanceBuilder}
-*/
-  asBuilder(): DanceBuilder;
 /**
 * The number of beats the dance takes for one repetition.
 */

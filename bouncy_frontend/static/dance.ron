@@ -1,14 +1,14 @@
 (
-  version: 0,
+  version: 1,
   dances: [
     (
       // This is for featuring a dynamic looking dance on the front page.
       // It's not necessarily very danceable.
       id: "Bouncy Feet Dance",
       steps: [
-        "pp-0",
-        "rm-0",
-        "hrm-0",
+        (id: "pp-0"),
+        (id: "rm-0"),
+        (id: "hrm-0"),
       ],
     ),
   ]

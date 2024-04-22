@@ -16,6 +16,7 @@ pub use tracker::Tracker;
 pub(crate) use parsing::{dance_file, pose_file, step_file};
 
 use super::STATE;
+use editor::dance_builder::DanceBuilder;
 use parsing::dance_file::DanceFile;
 use parsing::pose_file::PoseFile;
 use parsing::step_file::StepFile;
@@ -71,9 +72,19 @@ pub fn steps() -> Vec<StepInfo> {
             .db
             .steps()
             .iter()
+            .cloned()
             .map(StepInfo::from)
             .collect::<Vec<_>>()
     })
+}
+
+#[wasm_bindgen(js_name = "stepById")]
+pub fn step_by_id(id: String, flipped: bool) -> Option<StepInfo> {
+    let mut step = STATE.with_borrow(|state| state.db.step(&id).cloned())?;
+    if flipped {
+        step = step.flipped();
+    }
+    Some(StepInfo::from(step))
 }
 
 #[wasm_bindgen]
@@ -85,6 +96,20 @@ pub fn dances() -> Vec<DanceInfo> {
             .iter()
             .map(DanceInfo::from)
             .collect::<Vec<_>>()
+    })
+}
+
+#[wasm_bindgen(js_name = "danceBuilderFromDance")]
+pub fn dance_builder_from_dance(dance_id: String) -> Result<DanceBuilder, String> {
+    STATE.with_borrow(|state| {
+        state
+            .db
+            .dances()
+            .iter()
+            .find(|dance| dance.id == dance_id)
+            .cloned()
+            .map(|dance| DanceBuilder::from(dance))
+            .ok_or_else(|| format!("missing dance {dance_id}"))
     })
 }
 

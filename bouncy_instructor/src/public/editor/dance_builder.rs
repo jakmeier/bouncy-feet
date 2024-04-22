@@ -6,6 +6,7 @@ use wasm_bindgen::prelude::wasm_bindgen;
 pub struct DanceBuilder {
     pub(crate) id: String,
     step_ids: Vec<String>,
+    flip_orientation: Vec<bool>,
 }
 
 #[wasm_bindgen]
@@ -15,6 +16,7 @@ impl DanceBuilder {
         Self {
             id,
             step_ids: vec![],
+            flip_orientation: vec![],
         }
     }
 
@@ -30,6 +32,7 @@ impl DanceBuilder {
     #[wasm_bindgen(js_name = "addStep")]
     pub fn add_step(&mut self, step_id: String) {
         self.step_ids.push(step_id);
+        self.flip_orientation.push(false);
     }
 
     #[wasm_bindgen(js_name = "removeStep")]
@@ -50,6 +53,23 @@ impl DanceBuilder {
         Ok(())
     }
 
+    #[wasm_bindgen(js_name = "setOrientation")]
+    pub fn set_orientation(&mut self, pos: usize, flipped: bool) -> Result<(), String> {
+        if pos > self.flip_orientation.len() {
+            return Err(format!("step index {pos} out of bound"));
+        }
+        self.flip_orientation[pos] = flipped;
+        Ok(())
+    }
+
+    #[wasm_bindgen(js_name = "isFlipped")]
+    pub fn is_flipped(&mut self, pos: usize) -> Result<bool, String> {
+        if pos > self.flip_orientation.len() {
+            return Err(format!("step index {pos} out of bound"));
+        }
+        Ok(self.flip_orientation[pos])
+    }
+
     pub fn clear(&mut self) {
         self.step_ids.clear();
     }
@@ -64,15 +84,17 @@ impl DanceBuilder {
         intern::dance::Dance {
             id: self.id.clone(),
             step_ids: self.step_ids.clone(),
+            flip_orientation: self.flip_orientation.clone(),
         }
     }
 }
 
-impl From<&DanceInfo> for DanceBuilder {
-    fn from(dance: &DanceInfo) -> Self {
+impl From<intern::dance::Dance> for DanceBuilder {
+    fn from(dance: intern::dance::Dance) -> Self {
         Self {
-            id: dance.id(),
-            step_ids: dance.steps.iter().map(|step| step.id()).collect(),
+            id: dance.id,
+            step_ids: dance.step_ids,
+            flip_orientation: dance.flip_orientation,
         }
     }
 }

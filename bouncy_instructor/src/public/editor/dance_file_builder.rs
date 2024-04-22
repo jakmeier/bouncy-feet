@@ -1,4 +1,4 @@
-use crate::dance_file::DanceFile;
+use crate::dance_file::{DanceFile, DanceStep};
 use crate::editor::ExportError;
 use crate::{dance_file, intern, DanceInfo};
 use wasm_bindgen::prelude::wasm_bindgen;
@@ -70,7 +70,15 @@ impl DanceFileBuilder {
                 .iter()
                 .map(|dance| dance_file::Dance {
                     id: dance.id.clone(),
-                    steps: dance.step_ids.clone(),
+                    steps: dance
+                        .step_ids
+                        .iter()
+                        .zip(dance.flip_orientation.iter())
+                        .map(|(id, &flip_orientation)| DanceStep {
+                            id: id.clone(),
+                            flip_orientation,
+                        })
+                        .collect(),
                 })
                 .collect(),
         };
@@ -81,6 +89,15 @@ impl DanceFileBuilder {
     pub fn dances(&self) -> Vec<DanceInfo> {
         self.dances.iter().map(DanceInfo::from).collect()
     }
+
+    #[wasm_bindgen(js_name = "danceBuilder")]
+    pub fn dance_builder(&self, dance_id: String) -> Result<DanceBuilder, String> {
+        self.dances
+            .iter()
+            .find(|dance| dance.id == dance_id)
+            .map(|dance| DanceBuilder::from(dance.clone()))
+            .ok_or_else(|| format!("missing dance {dance_id} in dance file builder"))
+    }
 }
 
 impl From<DanceFile> for DanceFileBuilder {
@@ -90,10 +107,7 @@ impl From<DanceFile> for DanceFileBuilder {
             dances: other
                 .dances
                 .into_iter()
-                .map(|d| intern::dance::Dance {
-                    id: d.id,
-                    step_ids: d.steps,
-                })
+                .map(|d| intern::dance::Dance::from(d))
                 .collect(),
         }
     }

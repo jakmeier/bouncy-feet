@@ -93,8 +93,8 @@ impl StepInfo {
     }
 }
 
-impl From<&Step> for StepInfo {
-    fn from(step: &Step) -> Self {
+impl From<Step> for StepInfo {
+    fn from(step: Step) -> Self {
         let mut skeletons = vec![];
         let mut pose_body_shift = vec![];
 
@@ -127,9 +127,9 @@ impl From<&Step> for StepInfo {
         debug_assert_eq!(skeletons.len(), pose_body_shift.len());
         debug_assert_eq!(skeletons.len() + 1, accumulated_body_shift.len());
         Self {
-            id: step.id.clone(),
-            name: step.name.clone(),
-            step_variation: step.variation.clone(),
+            id: step.id,
+            name: step.name,
+            step_variation: step.variation,
             skeletons,
             pose_body_shift,
             accumulated_body_shift,

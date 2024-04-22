@@ -1,4 +1,3 @@
-use crate::editor::dance_builder::DanceBuilder;
 use crate::intern::dance::Dance;
 use crate::public::skeleton::Skeleton;
 use crate::{StepInfo, STATE};
@@ -52,11 +51,6 @@ impl DanceInfo {
     pub fn beats(&self) -> usize {
         self.total_beats
     }
-
-    #[wasm_bindgen(js_name = "asBuilder")]
-    pub fn as_builder(&self) -> DanceBuilder {
-        DanceBuilder::from(self)
-    }
 }
 
 impl From<&Dance> for DanceInfo {
@@ -65,7 +59,14 @@ impl From<&Dance> for DanceInfo {
             dance
                 .step_ids
                 .iter()
-                .map(|step_name| state.step(step_name).expect("step must exist").into())
+                .zip(&dance.flip_orientation)
+                .map(|(step_name, &flipped)| {
+                    let mut step = state.step(step_name).expect("step must exist").clone();
+                    if flipped {
+                        step = step.flipped();
+                    }
+                    step.into()
+                })
                 .collect()
         });
         let total_beats = steps.iter().map(|step| step.beats()).sum();

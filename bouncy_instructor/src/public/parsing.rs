@@ -14,9 +14,9 @@ use wasm_bindgen::JsValue;
 
 #[derive(Error, Debug)]
 pub enum ParseFileError {
-    #[error("invalid pose file version (expected {expected:?}, found {found:?})")]
+    #[error("invalid file version (expected {expected:?}, found {found:?})")]
     VersionMismatch { expected: u16, found: u16 },
-    #[error("parsing pose file failed, {0}")]
+    #[error("parsing file failed, {0}")]
     RonError(#[from] ron::error::SpannedError),
     #[error("unknown pose reference `{0}`")]
     UnknownPoseReference(String),

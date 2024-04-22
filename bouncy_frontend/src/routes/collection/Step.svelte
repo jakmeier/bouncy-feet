@@ -17,8 +17,15 @@
   // When the pose index is negative, it should show a resting position
   // according to the orientation of the first pose.
   const restingStep = Skeleton.resting(step.skeleton(0).sideway);
+  // TODO: rotation and flipped orientation does not work
+  // $: skeleton =
+  //   poseIndex >= 0 ? step.rotatedSkeleton(poseIndex, rotation) : restingStep;
   $: skeleton =
-    poseIndex >= 0 ? step.rotatedSkeleton(poseIndex, rotation) : restingStep;
+    poseIndex >= 0
+      ? rotation === 0
+        ? step.skeleton(poseIndex)
+        : step.rotatedSkeleton(poseIndex, rotation)
+      : restingStep;
   $: bodyShift =
     poseIndex >= 0 ? stepBodyShift(step, poseIndex) : { x: 0, y: 0 };
 

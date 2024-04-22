@@ -37,6 +37,7 @@
         "saving-prompt": "How to save the dance?",
         "save-copy-button": "Save a copy",
         "overwrite-existing-button": "Overwrite",
+        "direction": "Direction",
         "new-dance": {
             "default-dance-name": "My Dance",
             "pick-name-prompt": "Pick a name",

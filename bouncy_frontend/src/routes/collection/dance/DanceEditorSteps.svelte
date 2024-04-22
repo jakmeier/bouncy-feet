@@ -53,6 +53,15 @@
     }
   }
 
+  /** @param {boolean} flipped */
+  function setFlippedCallback(flipped) {
+    if (selectedStepIndex !== -1) {
+      danceBuilder.setOrientation(selectedStepIndex, flipped);
+      steps = danceBuilder.danceInfo().steps();
+      danceBuilder = danceBuilder;
+    }
+  }
+
   /**
    * @param {{preventDefault: () => void;}} event
    * @param {number} index
@@ -94,7 +103,6 @@
 
     const draggedIndex = steps.findIndex((step) => step.id === draggedStep);
     if (draggedStep && draggedIndex !== -1 && draggedIndex !== index) {
-      console.log('moving', draggedIndex, 'to', index);
       danceBuilder.removeStep(draggedIndex);
       danceBuilder.insertStep(index, draggedStep);
       danceBuilder = danceBuilder;
@@ -152,6 +160,8 @@
       poseIndex={$beatCounter}
       {animationTime}
       {selectedVariationCallback}
+      {setFlippedCallback}
+      flipped={danceBuilder.isFlipped(selectedStepIndex)}
     ></DanceStepDetails>
   {/if}
 

@@ -1,5 +1,6 @@
 <script>
   import UiBox from '$lib/components/ui/UiBox.svelte';
+  import { stepById } from '$lib/instructor/bouncy_instructor';
   import Step from '../Step.svelte';
 
   /** @type {import("$lib/instructor/bouncy_instructor").StepInfo[]} */
@@ -17,7 +18,50 @@
    * @type {(step: import('$lib/instructor/bouncy_instructor').StepInfo) => void }
    */
   export let selectedVariationCallback;
+  /**
+   * @type {(flipped: boolean) => void }
+   */
+  export let setFlippedCallback;
+  /** @type {boolean} */
+  export let flipped;
+
+  const baseStep = stepById(selectedStep.id, false) || selectedStep;
+  const flippedStep = stepById(selectedStep.id, true) || selectedStep;
+  //    allSteps.find((step) => step.id == selectedStep.id);
 </script>
+
+<UiBox title="editor.direction">
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <div class="outer-box">
+    <p></p>
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <div class="step" on:click={() => setFlippedCallback(false)}>
+      <Step
+        step={baseStep}
+        {poseIndex}
+        {animationTime}
+        size={stepSize}
+        borderWidth={flipped ? 2 : 5}
+      />
+      <p class="direction">
+        <span class="material-symbols-outlined"> arrow_back </span>
+      </p>
+    </div>
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <div class="step" on:click={() => setFlippedCallback(true)}>
+      <Step
+        step={flippedStep}
+        {poseIndex}
+        {animationTime}
+        size={stepSize}
+        borderWidth={flipped ? 5 : 2}
+      />
+      <p class="direction">
+        <span class="material-symbols-outlined"> arrow_forward </span>
+      </p>
+    </div>
+  </div>
+</UiBox>
 
 <UiBox title="collection.step.variation">
   <div class="outer-box">
@@ -52,5 +96,9 @@
     margin: 0;
     padding: 2px;
     background-color: var(--theme-neutral-white);
+  }
+
+  .direction {
+    margin: 0;
   }
 </style>

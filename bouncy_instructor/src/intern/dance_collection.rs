@@ -330,19 +330,10 @@ impl DanceCollection {
         dances: Vec<dance_file::Dance>,
     ) -> Result<(), AddDanceError> {
         for def in dances {
-            if let Some(missing) = def
-                .steps
-                .iter()
-                .find(|step_id| self.step(step_id).is_none())
-            {
-                return Err(AddDanceError::MissingStep(missing.clone()));
+            if let Some(missing) = def.steps.iter().find(|step| self.step(&step.id).is_none()) {
+                return Err(AddDanceError::MissingStep(missing.id.clone()));
             }
-
-            let dance = Dance {
-                id: def.id,
-                step_ids: def.steps,
-            };
-            self.dances.push(dance);
+            self.dances.push(def.into());
         }
         Ok(())
     }

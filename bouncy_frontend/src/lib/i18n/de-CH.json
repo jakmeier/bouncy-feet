@@ -37,6 +37,7 @@
         "saving-prompt": "Wie soll der Tanz gespeichert werden?",
         "save-copy-button": "Kopie speichern",
         "overwrite-existing-button": "Überschreiben",
+        "direction": "Richtung",
         "new-dance": {
             "default-dance-name": "Mein Tanz",
             "pick-name-prompt": "Wähle einen Namen",
