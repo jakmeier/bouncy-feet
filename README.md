@@ -64,6 +64,11 @@ core business logic (dance detection).
 
 ## Progress Status
 
+-  7 May 2024: Released v0.3.0 to the live demo.
+    - Collection now shows *dances*, which are choreographies that consist of
+      multiple steps in a row.
+    - 4 demo dances for a start.
+    - Create new dances and edit existing ones.
 -  3 Apr 2024: Released v0.2.1 to the live demo.
     - More steps to the collection, now there are 13 steps.
     - Many improvements to drawing, such as z-perspective for limbs, the torso

@@ -10,7 +10,7 @@ export const dev = readable(privDev, (set) => {
         window.toggleDev = () => { privDev = !privDev; set(privDev); };
     }
 });
-export const version = derived(dev, ($dev) => $dev ? 0.999 : 0.002);
+export const version = derived(dev, ($dev) => $dev ? 0.999 : 0.003);
 
 /** @type {import("svelte/motion").Readable<Features>} */
 export const features = derived([version, dev], ([$v, $dev]) => {
