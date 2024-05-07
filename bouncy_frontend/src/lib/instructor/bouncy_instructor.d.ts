@@ -192,6 +192,12 @@ export class DanceInfo {
 */
   skeleton(beat: number): Skeleton | undefined;
 /**
+* How much the body position deviates from the origin.
+* @param {number} beat
+* @returns {Cartesian2d}
+*/
+  bodyShift(beat: number): Cartesian2d;
+/**
 * The number of beats the dance takes for one repetition.
 */
   readonly beats: number;
@@ -448,6 +454,7 @@ export class StepInfo {
 */
   skeleton(beat: number): Skeleton;
 /**
+* How much the body position deviates from the origin.
 * @param {number} beat
 * @returns {Cartesian2d}
 */

@@ -1,6 +1,7 @@
 //! Wrapper module for all internal code of the instructor, which can be
 //! modified without affecting the WASM module interface.
 
+pub(crate) mod body_shift;
 pub(crate) mod dance;
 pub(crate) mod dance_collection;
 pub(crate) mod geom;

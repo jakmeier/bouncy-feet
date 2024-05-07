@@ -22,6 +22,7 @@ export function dancefilebuilder_new(): number;
 export function dancefilebuilder_overwriteDance(a: number, b: number, c: number): void;
 export function dancefilebuilder_removeDance(a: number, b: number, c: number, d: number): void;
 export function danceinfo_beats(a: number): number;
+export function danceinfo_bodyShift(a: number, b: number): number;
 export function danceinfo_id(a: number, b: number): void;
 export function danceinfo_length(a: number): number;
 export function danceinfo_skeleton(a: number, b: number): number;

@@ -25,6 +25,16 @@
   const firstPost = dance.skeleton(0);
   const restingStep = Skeleton.resting(firstPost ? firstPost.sideway : false);
   $: skeleton = $beat >= 0 ? dance.skeleton($beat) : restingStep;
+  $: bodyShift = $beat >= 0 ? danceBodyShift(dance, $beat) : { x: 0, y: 0 };
+
+  /**
+   * @param {import("$lib/instructor/bouncy_instructor").DanceInfo} dance
+   * @param {number} poseIndex
+   */
+  function danceBodyShift(dance, poseIndex) {
+    const cartesian = dance.bodyShift(poseIndex);
+    return { x: cartesian.x, y: cartesian.y };
+  }
 </script>
 
 <Animation {animationTime}>
@@ -34,6 +44,7 @@
         width={size}
         height={size}
         {skeleton}
+        {bodyShift}
         lineWidth={4}
         {leftColor}
         {rightColor}

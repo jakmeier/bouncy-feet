@@ -1,3 +1,4 @@
+use crate::intern::body_shift::BodyShift;
 use crate::intern::pose::{BodyPart, BodyPoint};
 use crate::intern::skeleton_3d::Skeleton3d;
 use crate::intern::step::Step;
@@ -13,11 +14,8 @@ pub struct StepInfo {
     id: String,
     name: String,
     step_variation: Option<String>,
-    skeletons: Vec<Skeleton>,
-    /// How far the whole body moves as defined in the pose.
-    pose_body_shift: Vec<Cartesian2d>,
-    /// How far the whole body moves after applying the pose transitions.
-    accumulated_body_shift: Vec<Cartesian2d>,
+    pub(crate) skeletons: Vec<Skeleton>,
+    body_shift: BodyShift,
 }
 
 #[wasm_bindgen]
@@ -40,19 +38,10 @@ impl StepInfo {
         self.skeletons[beat % self.skeletons.len()]
     }
 
+    /// How much the body position deviates from the origin.
     #[wasm_bindgen(js_name = "bodyShift")]
     pub fn body_shift(&self, beat: usize) -> Cartesian2d {
-        debug_assert!(!self.accumulated_body_shift.is_empty());
-        let n_full_turns = beat / self.skeletons.len();
-        let shift_full_turn = self
-            .accumulated_body_shift
-            .last()
-            .copied()
-            .unwrap_or_default();
-        let pose_shift = self.pose_body_shift[beat % self.skeletons.len()];
-        pose_shift
-            + shift_full_turn * n_full_turns
-            + self.accumulated_body_shift[beat % self.skeletons.len()]
+        self.body_shift.at_beat(beat)
     }
 
     /// Applies a rotation (in degree) and returns the resulting skelton.
@@ -96,43 +85,22 @@ impl StepInfo {
 impl From<Step> for StepInfo {
     fn from(step: Step) -> Self {
         let mut skeletons = vec![];
-        let mut pose_body_shift = vec![];
+        let mut body_shift = BodyShift::new();
 
         STATE.with_borrow(|state| {
             for (pose_index, direction) in step.poses.iter().zip(&step.directions) {
                 let pose = &state.db.poses()[*pose_index];
                 skeletons.push(Skeleton::from_pose(pose, &state.db, *direction));
-                pose_body_shift.push(pose.shift);
             }
+            body_shift.add_step(&step, &skeletons, &state.db);
         });
 
-        // Compute how far the body shifts after 0,1,2,3... transitions. For
-        // this, we have to calculate 2D coordinates of skeletons. This usd to
-        // be JS only... Now it's also in Rust! (Maybe we can make it Rust only?)
-        let mut accumulated_body_shift = vec![Cartesian2d::default()];
-        for (pivot, skeleton) in step.pivots[1..].iter().zip(skeletons.windows(2)) {
-            let before = skeleton[0].position(*pivot);
-            let after = skeleton[1].position(*pivot);
-            let diff = after - before;
-            accumulated_body_shift.push(*accumulated_body_shift.last().unwrap() - diff);
-        }
-        if !skeletons.is_empty() && !step.pivots.is_empty() {
-            let pivot = step.pivots[0];
-            let before = skeletons.last().unwrap().position(pivot);
-            let after = skeletons[0].position(pivot);
-            let diff = after - before;
-            accumulated_body_shift.push(*accumulated_body_shift.last().unwrap() - diff);
-        }
-
-        debug_assert_eq!(skeletons.len(), pose_body_shift.len());
-        debug_assert_eq!(skeletons.len() + 1, accumulated_body_shift.len());
         Self {
             id: step.id,
             name: step.name,
             step_variation: step.variation,
             skeletons,
-            pose_body_shift,
-            accumulated_body_shift,
+            body_shift,
         }
     }
 }
@@ -146,7 +114,7 @@ impl Skeleton {
     // const FOREARM_LEN: f32 = 0.15;
     const FOOT_LEN: f32 = 0.05;
 
-    fn position(&self, body_point: BodyPoint) -> Cartesian2d {
+    pub(crate) fn position(&self, body_point: BodyPoint) -> Cartesian2d {
         let side = match body_point.side {
             crate::intern::pose::BodySide::Left => &self.left,
             crate::intern::pose::BodySide::Right => &self.right,
