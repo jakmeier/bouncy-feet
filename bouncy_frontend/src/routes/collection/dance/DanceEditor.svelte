@@ -51,7 +51,7 @@
       danceBuilder.setId(danceName);
       $pickNamePopupActive = false;
       localCollection.addDanceBuilder(danceBuilder);
-      goto(`../${danceName}`, { replaceState: true });
+      goto(`/collection/dance/${danceName}`, { replaceState: true });
     } catch (e) {
       // TODO: display error to user
       // possible cause: name already exists
