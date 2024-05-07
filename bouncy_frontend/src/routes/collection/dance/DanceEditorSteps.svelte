@@ -205,6 +205,8 @@
     bind:show={stepSelectionActive}
     {selectedCallback}
     steps={uniqueSteps}
+    poseIndex={$beatCounter}
+    {animationTime}
   ></SelectStep>
 </div>
 
