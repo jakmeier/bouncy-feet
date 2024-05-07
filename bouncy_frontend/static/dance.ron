@@ -4,12 +4,44 @@
     (
       // This is for featuring a dynamic looking dance on the front page.
       // It's not necessarily very danceable.
-      id: "Bouncy Feet Dance",
+      id: "Demo Dance",
       steps: [
         (id: "pp-0"),
         (id: "rm-0"),
         (id: "hrm-0"),
       ],
     ),
+    (
+      id:"Turning Running Man",
+      steps:[
+        (id:"rm-0"),
+        (id:"rm-0"),
+        (id:"drm-0"),
+        (id:"rm-0", flip_orientation:true),
+        (id:"rm-0", flip_orientation:true),
+        (id:"drm-0", flip_orientation:true),
+      ]
+    ),
+    (
+      id:"Knee Warm-Up",
+      steps:[
+        (id:"idle-0"),
+        (id:"simple-heels-0"),
+        (id:"knee-0"),
+        (id:"open-rm-heels-0"),
+      ]
+    ),
+    (
+      id:"Side Movements",
+      steps:[
+        (id:"t-1"),
+        (id:"t-1"),
+        (id:"v-0"),
+        (id:"v-0"),
+        (id:"t-0"),
+        (id:"t-0"),
+        (id:"v-1"),
+        (id:"v-1"),
+      ]),
   ]
 )
