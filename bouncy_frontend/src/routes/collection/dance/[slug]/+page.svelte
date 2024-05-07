@@ -40,11 +40,6 @@
     goto('./edit');
   }
 
-  // function copyAndEdit() {
-  //   $optionsPopupActive = false;
-  //   goto('./edit');
-  // }
-
   function maybeDelete() {
     if (confirm($t('editor.delete-dance-confirmation'))) {
       localCollection.removeDance($id);

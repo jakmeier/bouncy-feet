@@ -36,6 +36,7 @@
   },
   "type": "module",
   "dependencies": {
+    "svelte-adapter-bun": "^0.5.2",
     "svelte-select": "^5.8.1",
     "sveltekit-i18n": "^2.4.2"
   }
