@@ -14,6 +14,10 @@
   /** @type {string} */
   let danceName = danceBuilder.danceInfo().id;
 
+  const bpm = 200;
+  const stepTime = 60_000 / bpm;
+  const animationTime = stepTime * 0.85;
+
   const danceSize = 250;
 
   const localCollection = getContext('localCollection');
@@ -81,11 +85,16 @@
     style="max-width: {danceSize}px; max-height: {danceSize}px"
   >
     {#if dancePreview.length() > 0}
-      <DanceAnimation dance={dancePreview} />
+      <DanceAnimation dance={dancePreview} {animationTime} {stepTime} />
     {/if}
   </div>
 
-  <DanceEditorSteps {availableSteps} bind:danceBuilder />
+  <DanceEditorSteps
+    {availableSteps}
+    {animationTime}
+    {stepTime}
+    bind:danceBuilder
+  />
 </div>
 
 <Popup bind:isOpen={savingMethodPopupActive} title="editor.saving-prompt">

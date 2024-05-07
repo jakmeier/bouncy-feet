@@ -14,9 +14,9 @@
   /** @type {import('$lib/instructor/bouncy_instructor').DanceBuilder} */
   export let danceBuilder;
 
-  const bpm = 240;
-  const stepTime = 60_000 / bpm;
-  const animationTime = stepTime * 0.85;
+  export let animationTime;
+  export let stepTime;
+
   const stepSize = 100;
   const borderRadius = '25px';
 

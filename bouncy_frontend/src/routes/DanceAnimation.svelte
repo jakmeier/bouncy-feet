@@ -7,8 +7,10 @@
 
   /** @type{import("$lib/instructor/bouncy_instructor").DanceInfo} */
   export let dance;
-  export let beat = counter(-6, 1, 200);
-  export let animationTime = 160;
+  const bpm = 260;
+  export let stepTime = 60_000 / bpm;
+  export let beat = counter(-5, 1, stepTime);
+  export let animationTime = stepTime * 0.85;
   export let size = 100;
 
   /** @type{undefined|string} */
