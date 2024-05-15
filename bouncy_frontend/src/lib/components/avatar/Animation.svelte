@@ -7,7 +7,9 @@
   export let easing = quadIn;
 
   const animationTimeStore = writable(animationTime);
+  $: animationTimeStore.set(animationTime);
   const easingStore = writable(easing);
+  $: easingStore.set(easing);
   const animation = derived(
     [animationTimeStore, easingStore],
     ([$animationTime, $easing]) => {

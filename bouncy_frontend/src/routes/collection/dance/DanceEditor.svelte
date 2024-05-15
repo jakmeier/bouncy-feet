@@ -6,6 +6,7 @@
   import Popup from '$lib/components/ui/Popup.svelte';
   import DanceEditorSteps from './DanceEditorSteps.svelte';
   import { goto } from '$app/navigation';
+  import { dynamicCounter } from '$lib/timer';
 
   /** @type {import("$lib/instructor/bouncy_instructor").StepInfo[]} */
   export let availableSteps;
@@ -14,9 +15,12 @@
   /** @type {string} */
   let danceName = danceBuilder.danceInfo().id;
 
-  const bpm = 200;
-  const stepTime = 60_000 / bpm;
-  const animationTime = stepTime * 0.85;
+  let bpm = 200;
+  $: stepTime = 60_000 / bpm;
+  $: animationTime = stepTime * 0.85;
+
+  const beatCounter = dynamicCounter(-1, 1, stepTime);
+  $: beatCounter.setDelay(stepTime);
 
   const danceSize = 250;
 
@@ -85,14 +89,20 @@
     style="max-width: {danceSize}px; max-height: {danceSize}px"
   >
     {#if dancePreview.length() > 0}
-      <DanceAnimation dance={dancePreview} {animationTime} {stepTime} />
+      <DanceAnimation dance={dancePreview} {animationTime} beat={beatCounter} />
     {/if}
   </div>
+
+  <label class="config">
+    <div>{$t('editor.speed')}</div>
+    <input type="range" bind:value={bpm} min="30" max="300" class="range" />
+  </label>
 
   <DanceEditorSteps
     {availableSteps}
     {animationTime}
     {stepTime}
+    {beatCounter}
     bind:danceBuilder
   />
 </div>
@@ -128,5 +138,14 @@
   }
   button {
     width: 50%;
+  }
+  .config {
+    display: grid;
+    grid-template-columns: auto;
+    /* margin: auto; */
+    padding: 10px;
+  }
+  .config input {
+    font-size: unset;
   }
 </style>

@@ -38,6 +38,7 @@
         "save-copy-button": "Kopie speichern",
         "overwrite-existing-button": "Überschreiben",
         "direction": "Richtung",
+        "speed": "Tempo",
         "new-dance": {
             "default-dance-name": "Mein Tanz",
             "pick-name-prompt": "Wähle einen Namen",

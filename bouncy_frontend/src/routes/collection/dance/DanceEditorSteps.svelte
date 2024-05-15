@@ -20,7 +20,7 @@
   const stepSize = 100;
   const borderRadius = '25px';
 
-  const beatCounter = counter(-1, 1, stepTime);
+  export let beatCounter = counter(-1, 1, stepTime);
 
   /**
    * @type {import('$lib/instructor/bouncy_instructor').StepInfo[]}
