@@ -103,9 +103,11 @@
     event.preventDefault();
 
     if (draggedStep && draggedStepIndex !== -1 && draggedStepIndex !== index) {
+      let flipped = danceBuilder.isFlipped(draggedStepIndex);
       danceBuilder.removeStep(draggedStepIndex);
       draggedStepIndex = index;
       danceBuilder.insertStep(index, draggedStep);
+      danceBuilder.setOrientation(index, flipped);
       danceBuilder = danceBuilder;
       steps = danceBuilder.danceInfo().steps();
     }

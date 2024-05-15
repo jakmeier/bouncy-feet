@@ -41,6 +41,7 @@ impl DanceBuilder {
             return Err(format!("step index {pos} out of bound"));
         }
         let step = self.step_ids.remove(pos);
+        self.flip_orientation.remove(pos);
         Ok(step)
     }
 
@@ -50,12 +51,13 @@ impl DanceBuilder {
             return Err(format!("step index {pos} out of bound"));
         }
         self.step_ids.insert(pos, step_id);
+        self.flip_orientation.insert(pos, false);
         Ok(())
     }
 
     #[wasm_bindgen(js_name = "setOrientation")]
     pub fn set_orientation(&mut self, pos: usize, flipped: bool) -> Result<(), String> {
-        if pos > self.flip_orientation.len() {
+        if pos >= self.flip_orientation.len() {
             return Err(format!("step index {pos} out of bound"));
         }
         self.flip_orientation[pos] = flipped;
@@ -64,7 +66,7 @@ impl DanceBuilder {
 
     #[wasm_bindgen(js_name = "isFlipped")]
     pub fn is_flipped(&mut self, pos: usize) -> Result<bool, String> {
-        if pos > self.flip_orientation.len() {
+        if pos >= self.flip_orientation.len() {
             return Err(format!("step index {pos} out of bound"));
         }
         Ok(self.flip_orientation[pos])
@@ -72,6 +74,7 @@ impl DanceBuilder {
 
     pub fn clear(&mut self) {
         self.step_ids.clear();
+        self.flip_orientation.clear();
     }
 
     #[wasm_bindgen(js_name = "danceInfo")]
