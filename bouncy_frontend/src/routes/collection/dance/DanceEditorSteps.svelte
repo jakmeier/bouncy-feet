@@ -114,12 +114,16 @@
   }
 
   /**
-   * @param {DragEvent & { currentTarget: EventTarget & HTMLDivElement; }} event
+   * @param {TouchEvent | DragEvent } event
    */
   function handleDrop(event) {
     event.preventDefault();
     draggedStep = null;
     draggedStepIndex = -1;
+    if (touchDrag.element) {
+      document.body.removeChild(touchDrag.element);
+      touchDrag.element = null;
+    }
   }
 
   function clickAddButton() {
@@ -138,6 +142,114 @@
       stepSelectionActive = false;
     }
   }
+
+  // Drag and drop doesn't work natively on mobile.
+  // I tried libraries but they don't work well with the level of interactivity I want.
+  // And I got tons of undocumented behavior, if not straight up bugs.
+  // So... Rolling my own drag and drop on mobile!
+  /**
+   *  @type {{  element: HTMLElement | null, clientX: number, clientY: number}}s
+   */
+  const touchDrag = {
+    element: null,
+    clientX: 0,
+    clientY: 0,
+  };
+
+  /**
+   * @param {TouchEvent} event
+   * @param {number} index
+   */
+  function handleTouchStart(event, index) {
+    if (
+      touchDrag.element ||
+      // @ts-ignore
+      !(event.target && event.target.classList.contains('draggable'))
+    ) {
+      return;
+    }
+    if (event.touches.length === 1) {
+      event.preventDefault();
+      selectedStepIndex = -1;
+      draggedStep = steps[index].id;
+      draggedStepIndex = index;
+
+      touchDrag.clientX = event.touches[0].clientX;
+      touchDrag.clientY = event.touches[0].clientY;
+
+      // @ts-ignore
+      touchDrag.element = event.target.cloneNode(true);
+      // @ts-ignore
+      touchDrag.element.style.position = 'fixed';
+      // @ts-ignore
+      touchDrag.element.style['z-index'] = '1000';
+      // @ts-ignore
+      document.body.appendChild(touchDrag.element);
+
+      // @ts-ignore
+      touchDrag.element.style.top = `${-touchDrag.element.offsetHeight / 2}px`;
+      // @ts-ignore
+      touchDrag.element.style.left = `${-touchDrag.element.offsetWidth / 2}px`;
+
+      setTouchDragTranslate();
+    }
+  }
+
+  function setTouchDragTranslate() {
+    if (touchDrag.element) {
+      const x = touchDrag.clientX;
+      const y = touchDrag.clientY;
+      touchDrag.element.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+    }
+  }
+
+  /**
+   * @param {TouchEvent} event
+   */
+  function handleTouchMove(event) {
+    if (touchDrag.element) {
+      event.preventDefault();
+
+      touchDrag.clientX = event.touches[0].clientX;
+      touchDrag.clientY = event.touches[0].clientY;
+
+      setTouchDragTranslate();
+
+      const dropZone = isOverDropzone(touchDrag.clientX, touchDrag.clientY);
+      if (dropZone && draggedStep) {
+        let index = parseInt(dropZone.id);
+        let flipped = danceBuilder.isFlipped(draggedStepIndex);
+        danceBuilder.removeStep(draggedStepIndex);
+        draggedStepIndex = index;
+        danceBuilder.insertStep(index, draggedStep);
+        danceBuilder.setOrientation(index, flipped);
+        danceBuilder = danceBuilder;
+        steps = danceBuilder.danceInfo().steps();
+      }
+    }
+  }
+
+  /**
+   * @param {number} x
+   * @param {number} y
+   */
+  function isOverDropzone(x, y) {
+    let dropZones = document.getElementsByClassName('drop-zone');
+    for (let i = 0; i < dropZones.length; i++) {
+      const dropZone = dropZones[i];
+      const dropzoneRect = dropZone.getBoundingClientRect();
+      if (
+        touchDrag.element &&
+        x + touchDrag.element.offsetWidth / 2 > dropzoneRect.left &&
+        x + touchDrag.element.offsetWidth / 2 < dropzoneRect.right &&
+        y + touchDrag.element.offsetHeight / 2 > dropzoneRect.top &&
+        y + touchDrag.element.offsetHeight / 2 < dropzoneRect.bottom
+      ) {
+        return dropZone;
+      }
+    }
+    return null;
+  }
 </script>
 
 <div class="outer">
@@ -146,8 +258,9 @@
       <!-- svelte-ignore a11y-no-static-element-interactions -->
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <div
-        class="step"
+        class="step drop-zone"
         draggable="true"
+        id={`${i}`}
         on:dragstart={(event) => handleDragStart(event, i)}
         on:dragover={(event) => handleDragOver(event, i)}
         on:drop={handleDrop}
@@ -170,10 +283,18 @@
         <div class="delete-button" on:click={(event) => handleRemove(event, i)}>
           <span class="material-symbols-outlined">close</span>
         </div>
-        <p class="handle" style="width: {stepSize}px">
-          <span class="material-symbols-outlined">open_with</span>
+        <p
+          class="handle draggable"
+          style="width: {stepSize}px"
+          on:touchstart={(event) => handleTouchStart(event, i)}
+          on:touchend={handleDrop}
+          on:touchmove={handleTouchMove}
+        >
+          <span class="material-symbols-outlined" style="pointer-events: none;"
+            >open_with</span
+          >
         </p>
-        <p style="width: {stepSize}px">{step.name}</p>
+        <p class="label" style="width: {stepSize}px">{step.name}</p>
       </div>
     {/each}
 
@@ -225,7 +346,8 @@
     margin: 2px;
     transition: all 0.2s ease-in-out;
   }
-  .step p,
+  .handle,
+  .label,
   div.delete-button {
     border-radius: 5px;
     text-align: center;
