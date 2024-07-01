@@ -5,7 +5,7 @@
 
   /** @type import('@mediapipe/tasks-vision').NormalizedLandmark[] */
   export let landmarks = [];
-  /** @type import('$lib/instructor/bouncy_instructor').Skeleton */
+  /** @type {import('$lib/instructor/bouncy_instructor').Skeleton | null}*/
   export let skeleton;
   export let width = 100;
   export let height = 100;
@@ -21,8 +21,9 @@
 
   $: sideway = skeleton ? skeleton.sideway : false;
 
-  const mainColor = '#382eeb';
-  const secondColor = '#c2bfff';
+  export let mainColor = '#382eeb';
+  export let secondColor = '#c2bfff';
+  export let headColor = mainColor;
 
   getContext('canvas').addItem(draw);
 
@@ -44,22 +45,16 @@
 
   /**
    * @param {CanvasRenderingContext2D} ctx
+   *
+   * Draws a stick figure from landmarks, exactly where they were detected on
+   * the original image. Useful for overlapping a video stream.
    */
   function drawLandmarks(ctx) {
     if (landmarks.length === 0) {
       return;
     }
-    // Goal: Scale the avatar to fit the canvas height even if it doesn't fill
-    // the camera field.
-    // Note: Something is fishy. I thought landmarks are normalized to [0,1]? So
-    // using 1 instead of 2 below should scale the body beyond what fits in the
-    // frame. But in all testing I've done so far, using 2 looks pretty good. It
-    // scales the figure to fill about 80% of the height. Which makes no sense.
-    // Probably I'm being stupid. For now, use 2 as it produces good results.
-    const scaling =
-      2 / Math.abs(landmarks[I.NOSE].y - landmarks[I.LEFT_FOOT_INDEX].y);
-    const h = height * scaling;
-    const w = width * scaling;
+    const h = height;
+    const w = width;
 
     bodyOutlinePairs.forEach(([a, b]) => {
       drawLine(
@@ -81,7 +76,11 @@
       landmarks[I.LEFT_SHOULDER],
       landmarks[I.RIGHT_SHOULDER]
     );
-    const headRadius = 0.4 * shoulder * w;
+    const eyeDist = Math.max(
+      distance2d(landmarks[I.RIGHT_EYE_OUTER], landmarks[I.NOSE]),
+      distance2d(landmarks[I.LEFT_EYE_OUTER], landmarks[I.NOSE])
+    );
+    const headRadius = Math.max(0.05, 0.4 * shoulder, eyeDist * 2) * w;
     const x = landmarks[I.NOSE].x * w;
     const y = landmarks[I.NOSE].y * h;
     drawHead(ctx, x, y, headRadius);
@@ -177,7 +176,7 @@
    * @param {number} headRadius
    */
   function drawHead(ctx, x, y, headRadius) {
-    ctx.fillStyle = mainColor;
+    ctx.fillStyle = headColor;
     ctx.beginPath();
     ctx.arc(x, y, headRadius, 0, 2 * Math.PI);
     ctx.fill();

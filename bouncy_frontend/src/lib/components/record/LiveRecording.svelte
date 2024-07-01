@@ -1,13 +1,13 @@
 <script>
   import Area from '$lib/components/ui/Area.svelte';
-  import Banner from '$lib/components/review/Banner.svelte';
   import Camera from '$lib/components/record/Camera.svelte';
-  import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
-  import Svg from '$lib/components/avatar/Svg.svelte';
+  import Canvas from '$lib/components/Canvas.svelte';
+  import Avatar from '$lib/components/avatar/Avatar.svelte';
   import { hideNavigation } from '$lib/stores/UiState';
   import { getContext, onMount } from 'svelte';
   import { landmarksToKeypoints } from '$lib/pose';
   import BackgroundTask from '../BackgroundTask.svelte';
+  import { writable } from 'svelte/store';
 
   export let cameraOn = false;
   /** @type {undefined | number} */
@@ -42,6 +42,8 @@
   let cameraVideoElement;
   /** @type {import("$lib/instructor/bouncy_instructor").Skeleton | undefined} */
   let skeleton;
+  /** @type {import("@mediapipe/tasks-vision").NormalizedLandmark[]} */
+  let landmarks = [];
   /** @type {{ trackFrame: (arg0: HTMLVideoElement) => void; }} */
   let dataListener;
 
@@ -53,6 +55,10 @@
   $: width = outerWidth - 2 * borderWidth;
   /** @type {number} */
   $: height = (width * 4) / 3;
+  /** @type {import('svelte/store').Writable<number>} */
+  let videoSrcWidth = writable(100);
+  /** @type {import('svelte/store').Writable<number>} */
+  let videoSrcHeight = writable(150);
 
   function onFrame() {
     if (cameraOn && dataListener) {
@@ -78,15 +84,24 @@
       recordingStart = timestamp;
     }
     if (result.landmarks && result.landmarks.length >= 1) {
+      landmarks = result.landmarks[0];
       const kp = landmarksToKeypoints(result.landmarks[0]);
       const skeletons = tracker.addKeypoints(kp, timestamp);
       skeleton = skeletons.front;
       recordingEnd = timestamp;
     }
+    // TODO(performance): do this less often
+    onVideoResized();
   };
+
+  function onVideoResized() {
+    $videoSrcWidth = cameraVideoElement.clientWidth;
+    $videoSrcHeight = cameraVideoElement.clientHeight;
+  }
 
   onMount(async () => {
     dataListener = await poseCtx.newPoseDetection(onPoseDetection);
+    onVideoResized();
   });
 </script>
 
@@ -101,5 +116,30 @@
       bind:cameraOn
       bind:this={camera}
     />
+    <div
+      class="avatar-container"
+      style="left: {(width - $videoSrcWidth) / 2}px"
+    >
+      <Canvas width={$videoSrcWidth} height={$videoSrcHeight}>
+        <Avatar
+          skeleton={null}
+          {landmarks}
+          width={$videoSrcWidth}
+          height={$videoSrcHeight}
+          mainColor={'#382eebC0'}
+          headColor={'#382eeb60'}
+          secondColor={'#c2bfff40'}
+        ></Avatar>
+      </Canvas>
+    </div>
   </Area>
 </div>
+
+<style>
+  .avatar-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+  }
+</style>
