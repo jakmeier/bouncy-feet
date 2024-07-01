@@ -45,6 +45,15 @@
   /** @type {{ trackFrame: (arg0: HTMLVideoElement) => void; }} */
   let dataListener;
 
+  /** @type {number} */
+  const borderWidth = 5;
+  /** @type {number} */
+  let outerWidth;
+  /** @type {number} */
+  $: width = outerWidth - 2 * borderWidth;
+  /** @type {number} */
+  $: height = (width * 4) / 3;
+
   function onFrame() {
     if (cameraOn && dataListener) {
       const start = performance.now();
@@ -61,12 +70,6 @@
     }
   }
 
-  // Communicate a cursor seek from the video to the banner.
-  /**
-   * @type {(cursor: number) => void}
-   */
-  let setCursor;
-
   const onPoseDetection = (
     /** @type {{ landmarks: import('@mediapipe/tasks-vision').Landmark[][]; }} */ result,
     /** @type {number} */ timestamp
@@ -79,7 +82,6 @@
       const skeletons = tracker.addKeypoints(kp, timestamp);
       skeleton = skeletons.front;
       recordingEnd = timestamp;
-      setCursor(1.0);
     }
   };
 
@@ -88,34 +90,16 @@
   });
 </script>
 
-<BackgroundTask {onFrame}></BackgroundTask>
+<div bind:clientWidth={outerWidth} style="width: 100%;">
+  <BackgroundTask {onFrame}></BackgroundTask>
 
-<Area width="{282}px" height="{376}px">
-  <Camera
-    width={282}
-    height={376}
-    bind:videoElement={cameraVideoElement}
-    bind:cameraOn
-    bind:this={camera}
-  />
-</Area>
-
-<Area width="{avatarSize}px" height="{avatarSize}px">
-  <Svg height={avatarSize} width={avatarSize}>
-    {#if skeleton}
-      <SvgAvatar
-        width={avatarSize}
-        height={avatarSize}
-        lineWidth={avatarLineWidth}
-        {skeleton}
-      />
-    {/if}
-  </Svg>
-</Area>
-
-<Banner
-  bind:setCursor
-  steps={detectedSteps}
-  reviewStart={recordingStart || 0}
-  reviewEnd={recordingEnd || 1}
-></Banner>
+  <Area width="{width}px" height="{height}px" borderWidth="{borderWidth}px">
+    <Camera
+      {width}
+      {height}
+      bind:videoElement={cameraVideoElement}
+      bind:cameraOn
+      bind:this={camera}
+    />
+  </Area>
+</div>
