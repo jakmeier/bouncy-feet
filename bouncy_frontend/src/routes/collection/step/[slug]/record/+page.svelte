@@ -8,6 +8,7 @@
   import VideoReview from '$lib/components/review/VideoReview.svelte';
   import Header from '$lib/components/ui/Header.svelte';
   import { hideNavigation } from '$lib/stores/UiState';
+  import LiveRecordingSettings from '$lib/components/record/LiveRecordingSettings.svelte';
 
   const danceName = $page.params.slug;
   const tracker = Tracker.StepTracker(danceName);
@@ -22,6 +23,7 @@
   let recordingStart = undefined;
   /** @type {number | undefined} */
   let recordingEnd = undefined;
+  let enableLiveAvatar = false;
 
   /** @type {import("$lib/instructor/bouncy_instructor").DetectedStep[]} */
   let detectedSteps = [];
@@ -105,6 +107,7 @@
       bind:endRecording
       bind:recordingStart
       bind:recordingEnd
+      {enableLiveAvatar}
     ></LiveRecording>
   {/if}
 
@@ -128,6 +131,7 @@
       </a> -->
     {/if}
   </div>
+  <LiveRecordingSettings bind:enableLiveAvatar />
   <p style="width: 100px; height: 50px;"></p>
 </div>
 

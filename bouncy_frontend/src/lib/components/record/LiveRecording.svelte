@@ -30,6 +30,8 @@
     return await camera.endRecording();
   };
 
+  export let enableLiveAvatar = false;
+
   const poseCtx = getContext('pose');
   let tracker = getContext('tracker').tracker;
   const avatarSize = 140;
@@ -108,7 +110,7 @@
 <div bind:clientWidth={outerWidth} style="width: 100%;">
   <BackgroundTask {onFrame}></BackgroundTask>
 
-  <Area width="{width}px" height="{height}px" borderWidth="{borderWidth}px">
+  <Area width="{width}px" height="{height}px" borderWidth="{borderWidth}px" zIndex={3}>
     <Camera
       {width}
       {height}
@@ -116,21 +118,24 @@
       bind:cameraOn
       bind:this={camera}
     />
+
     <div
       class="avatar-container"
-      style="left: {(width - $videoSrcWidth) / 2}px"
+      style="left: {(width - $videoSrcWidth) / 2}px; top: 10px;"
     >
-      <Canvas width={$videoSrcWidth} height={$videoSrcHeight}>
-        <Avatar
-          skeleton={null}
-          {landmarks}
-          width={$videoSrcWidth}
-          height={$videoSrcHeight}
-          mainColor={'#382eebC0'}
-          headColor={'#382eeb60'}
-          secondColor={'#c2bfff40'}
-        ></Avatar>
-      </Canvas>
+      {#if enableLiveAvatar}
+        <Canvas width={$videoSrcWidth} height={$videoSrcHeight}>
+          <Avatar
+            skeleton={null}
+            {landmarks}
+            width={$videoSrcWidth}
+            height={$videoSrcHeight}
+            mainColor={'#382eebC0'}
+            headColor={'#382eeb60'}
+            secondColor={'#c2bfff40'}
+          ></Avatar>
+        </Canvas>
+      {/if}
     </div>
   </Area>
 </div>
