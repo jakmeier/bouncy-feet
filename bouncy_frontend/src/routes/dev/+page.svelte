@@ -89,7 +89,7 @@
   }
 
   function logDance() {
-    detectedSteps = tracker.detectDance();
+    detectedSteps = tracker.detectDance().steps();
     detectedSteps.forEach((step) => {
       console.log(step.name, step.start, step.end);
     });

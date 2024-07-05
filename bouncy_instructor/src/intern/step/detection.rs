@@ -1,5 +1,5 @@
 use crate::intern::dance_collection::DanceCollection;
-use crate::public::tracker::PoseApproximation;
+use crate::public::tracker::{DetectionResult, PoseApproximation};
 use crate::tracker::DetectedStep;
 use crate::Tracker;
 
@@ -11,6 +11,39 @@ impl DetectedStep {
             end: poses.last().map(|p| p.timestamp).unwrap_or(0),
             error: poses.iter().map(|p| p.error).sum::<f32>() / poses.len() as f32,
             poses,
+        }
+    }
+
+    pub(crate) fn update_stats(&mut self) {
+        self.start = self.poses.first().map(|p| p.timestamp).unwrap_or(0);
+        self.end = self.poses.last().map(|p| p.timestamp).unwrap_or(0);
+        self.error = self.poses.iter().map(|p| p.error).sum::<f32>() / self.poses.len() as f32;
+    }
+}
+
+impl DetectionResult {
+    pub(crate) fn add_pose(&mut self, pose: PoseApproximation) {
+        if self.partial.is_none() {
+            self.partial = Default::default();
+        }
+
+        let partial = self.partial.get_or_insert_with(|| {
+            let step_name = self
+                .target_step
+                .as_ref()
+                .map(|s| s.name())
+                .expect("add_pose requires target step");
+            DetectedStep::new(step_name.to_string(), vec![])
+        });
+        partial.poses.push(pose);
+        partial.update_stats();
+    }
+
+    pub(crate) fn update_partial(&mut self) {
+        if let (Some(target), Some(partial)) = (&mut self.target_step, &mut self.partial) {
+            if target.skeletons.len() == partial.poses.len() {
+                self.steps.push(self.partial.take().unwrap());
+            }
         }
     }
 }
@@ -135,6 +168,15 @@ impl Tracker {
             }
         }
         result
+    }
+
+    pub(crate) fn add_pose(&mut self, pose: PoseApproximation) {
+        let detection = self
+            .intermediate_result
+            .as_mut()
+            .expect("requires intermediate_result");
+        detection.add_pose(pose);
+        detection.update_partial();
     }
 }
 

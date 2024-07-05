@@ -87,6 +87,18 @@ pub fn step_by_id(id: String, flipped: bool) -> Option<StepInfo> {
     Some(StepInfo::from(step))
 }
 
+#[wasm_bindgen(js_name = "stepsByName")]
+pub fn steps_by_name(step_name: String) -> Vec<StepInfo> {
+    STATE.with_borrow(|state| {
+        state
+            .db
+            .steps_by_name(&step_name)
+            .cloned()
+            .map(|step| StepInfo::from(step))
+            .collect()
+    })
+}
+
 #[wasm_bindgen]
 pub fn dances() -> Vec<DanceInfo> {
     STATE.with_borrow(|state| {

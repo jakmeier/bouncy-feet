@@ -11,7 +11,7 @@
   style="height: {height}; width: {width}; border-radius: {borderRadius}; border: {borderWidth} var(--theme-neutral-dark) solid; {zIndex ===
   0
     ? ''
-    : 'z-index: {zIndex}'}"
+    : 'z-index: ' + zIndex}"
 >
   <slot />
 </div>

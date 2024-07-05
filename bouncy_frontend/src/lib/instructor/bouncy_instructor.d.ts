@@ -38,6 +38,11 @@ export function steps(): (StepInfo)[];
 */
 export function stepById(id: string, flipped: boolean): StepInfo | undefined;
 /**
+* @param {string} step_name
+* @returns {(StepInfo)[]}
+*/
+export function stepsByName(step_name: string): (StepInfo)[];
+/**
 * @returns {(DanceInfo)[]}
 */
 export function dances(): (DanceInfo)[];
@@ -228,6 +233,23 @@ export class DetectedStep {
   start: number;
 }
 /**
+* Result of a step or dance detection.
+*
+* A detection potentially includes a list of steps. It can be displayed in the
+* frontend as is, or provided to a tracker to update the detection after more
+* data has been added.
+*/
+export class DetectionResult {
+  free(): void;
+/**
+*/
+  constructor();
+/**
+* @returns {(DetectedStep)[]}
+*/
+  steps(): (DetectedStep)[];
+}
+/**
 * Information of a recorded frame in RON format.
 *
 * Can be useful for creating new poses, new keypoint inputs for tests, or just
@@ -392,6 +414,10 @@ export class Skeleton {
 */
   static resting(sideway: boolean): Skeleton;
 /**
+* @returns {string}
+*/
+  debugString(): string;
+/**
 * Does the dancer face away more than they face the camera?
 */
   backwards: boolean;
@@ -513,6 +539,15 @@ export class Tracker {
 */
   static StepTracker(step_name: string): Tracker;
 /**
+* Track one specific step, by ID, excluding its variations (with the same name).
+*
+* This is not intended for general dance detection but rather for a
+* specific training session without much regard for timing etc.
+* @param {string} step_id
+* @returns {Tracker}
+*/
+  static UniqueStepTracker(step_id: string): Tracker;
+/**
 */
   clear(): void;
 /**
@@ -529,9 +564,34 @@ export class Tracker {
 */
   setBpm(bpm: number): void;
 /**
-* @returns {(DetectedStep)[]}
+* Goes over all data and detects the best fitting dance.
+*
+* There is no re-use or consistency between calls. It always starts at 0
+* and computes the global best fit.
+*
+* Use [`Tracker::detect_next_pose`] for incremental detection.
+* @returns {DetectionResult}
 */
-  detectDance(): (DetectedStep)[];
+  detectDance(): DetectionResult;
+/**
+* Take a previous detection and try adding one more pose to it.
+*
+* For now this only looks at the very last frame, but this is an
+* implementation detail. Callers should assume it reads everything since
+* the last detected step.
+* @returns {DetectionResult}
+*/
+  detectNextPose(): DetectionResult;
+/**
+* Return a skeleton that's expected next.
+*
+* Only implemented to work properly for trackers of unique steps.
+*
+* (experimenting with live instructor, I probably want to change this when cleaning up the impl)
+* TODO: include body shift
+* @returns {Skeleton}
+*/
+  expectedPoseSkeleton(): Skeleton;
 /**
 * Fit frames in a time interval against all poses and return the best fit.
 *

@@ -2,6 +2,7 @@
   import { getContext, onDestroy, onMount, setContext, tick } from 'svelte';
   import { t } from '$lib/i18n';
   import { Tracker } from '$lib/instructor/bouncy_instructor';
+  import { stepsByName } from '$lib/instructor/bouncy_instructor';
   import { page } from '$app/stores';
   import LiveRecording from '$lib/components/record/LiveRecording.svelte';
   import DanceStats from '../../../../profile/DanceStats.svelte';
@@ -10,8 +11,9 @@
   import { hideNavigation } from '$lib/stores/UiState';
   import LiveRecordingSettings from '$lib/components/record/LiveRecordingSettings.svelte';
 
-  const danceName = $page.params.slug;
-  const tracker = Tracker.StepTracker(danceName);
+  const stepName = $page.params.slug;
+  const instructorStep = stepsByName(stepName)[0];
+  const tracker = Tracker.UniqueStepTracker(instructorStep.id);
   setContext('tracker', { tracker });
 
   const userCtx = getContext('user');
@@ -24,6 +26,7 @@
   /** @type {number | undefined} */
   let recordingEnd = undefined;
   let enableLiveAvatar = false;
+  let enableInstructorAvatar = false;
 
   /** @type {import("$lib/instructor/bouncy_instructor").DetectedStep[]} */
   let detectedSteps = [];
@@ -55,7 +58,7 @@
 
   async function stopCameraAndRecording() {
     stop();
-    detectedSteps = tracker.detectDance();
+    detectedSteps = tracker.detectDance().steps();
     const result = userCtx.addDanceToStats(detectedSteps);
     if (result) {
       reviewStatsNumSteps = result.numSteps;
@@ -86,9 +89,9 @@
 
 <!-- TODO: translate danceName -->
 {#if $hideNavigation}
-  <div class="title">{danceName}</div>
+  <div class="title">{stepName}</div>
 {:else}
-  <Header title="{$t('record.train-dance-prefix')} {danceName}" />
+  <Header title="{$t('record.train-dance-prefix')} {stepName}" />
 {/if}
 
 <div id="outer">
@@ -108,6 +111,7 @@
       bind:recordingStart
       bind:recordingEnd
       {enableLiveAvatar}
+      {enableInstructorAvatar}
     ></LiveRecording>
   {/if}
 
@@ -131,7 +135,7 @@
       </a> -->
     {/if}
   </div>
-  <LiveRecordingSettings bind:enableLiveAvatar />
+  <LiveRecordingSettings bind:enableLiveAvatar bind:enableInstructorAvatar />
   <p style="width: 100px; height: 50px;"></p>
 </div>
 

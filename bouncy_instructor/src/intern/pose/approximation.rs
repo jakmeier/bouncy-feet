@@ -6,6 +6,7 @@ use crate::tracker::PoseApproximation;
 type Timestamp = u32;
 
 impl Tracker {
+    /// Find the least-error pose in a range of recorded frames.
     pub(crate) fn best_fit_pose_impl(
         &self,
         first: usize,

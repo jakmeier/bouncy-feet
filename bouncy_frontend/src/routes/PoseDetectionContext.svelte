@@ -5,6 +5,8 @@
    *
    * Provides access to a PoseDetection factory and manages the cleaning up of
    * resources related to it.
+   * 
+   * This is about raw media pipe poses, not bouncy feet poses.
    */
   import { setContext, onDestroy, getContext } from 'svelte';
 

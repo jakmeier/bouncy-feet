@@ -85,6 +85,11 @@ impl Skeleton {
             backwards: false,
         }
     }
+
+    #[wasm_bindgen(js_name = "debugString")]
+    pub fn debug_string(&self) -> String {
+        format!("{self:?}")
+    }
 }
 
 impl Skeleton {

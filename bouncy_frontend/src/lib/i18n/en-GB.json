@@ -60,6 +60,8 @@
         "download": "save",
         "settings": {
             "title": "Settings",
+            "enable-tracking": "Tracking",
+            "enable-instructor": "Instructor",
             "description": "How fast will you dance?",
             "bpm-unit": "BPM",
             "bpm-setting": "BPM (approximately)",

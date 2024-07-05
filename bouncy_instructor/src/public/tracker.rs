@@ -1,7 +1,9 @@
+mod detection_output;
 mod frame_output;
 mod pose_output;
 mod step_output;
 
+pub use detection_output::DetectionResult;
 pub use pose_output::PoseApproximation;
 pub use step_output::DetectedStep;
 
@@ -9,6 +11,7 @@ use crate::intern::dance_collection::{DanceCollection, ForeignCollectionError};
 use crate::intern::skeleton_3d::Skeleton3d;
 use crate::keypoints::Keypoints;
 use crate::skeleton::Skeleton;
+use crate::{web_utils, StepInfo};
 use std::rc::Rc;
 use wasm_bindgen::prelude::wasm_bindgen;
 
@@ -29,6 +32,9 @@ pub struct Tracker {
     pub(crate) bpm: f32,
     // todo: head and tail for what was already detected, to not re-compute all every time
     // todo: active steps filter instead of global steps
+    /// (experimenting with live instructor, I probably want to change this when cleaning up the impl)
+    /// only set for unique step tracking
+    pub(crate) intermediate_result: Option<DetectionResult>,
 }
 
 #[wasm_bindgen]
@@ -49,6 +55,7 @@ impl Tracker {
             keypoints: vec![],
             skeletons: vec![],
             bpm: 120.0,
+            intermediate_result: None,
         }
     }
 
@@ -73,6 +80,34 @@ impl Tracker {
             keypoints: vec![],
             skeletons: vec![],
             bpm: 120.0,
+            intermediate_result: None,
+        })
+    }
+
+    /// Track one specific step, by ID, excluding its variations (with the same name).
+    ///
+    /// This is not intended for general dance detection but rather for a
+    /// specific training session without much regard for timing etc.
+    #[wasm_bindgen(js_name = "UniqueStepTracker")]
+    pub fn new_unique_step_tracker(step_id: String) -> Result<Tracker, ForeignCollectionError> {
+        let mut db = DanceCollection::default();
+        crate::STATE.with_borrow(|state| {
+            db.add_foreign_step(&state.db, &step_id)?;
+            Ok(())
+        })?;
+        let step_info = db
+            .step(&step_id)
+            .cloned()
+            .expect("just added the step")
+            .into();
+        Ok(Tracker {
+            db: Rc::new(db),
+            // order by timestamp satisfied for empty list
+            timestamps: vec![],
+            keypoints: vec![],
+            skeletons: vec![],
+            bpm: 120.0,
+            intermediate_result: Some(DetectionResult::for_unique_step_tracker(step_info)),
         })
     }
 
@@ -108,8 +143,14 @@ impl Tracker {
         self.bpm = bpm;
     }
 
+    /// Goes over all data and detects the best fitting dance.
+    ///
+    /// There is no re-use or consistency between calls. It always starts at 0
+    /// and computes the global best fit.
+    ///
+    /// Use [`Tracker::detect_next_pose`] for incremental detection.
     #[wasm_bindgen(js_name = detectDance)]
-    pub fn detect_dance(&self) -> Vec<DetectedStep> {
+    pub fn detect_dance(&self) -> DetectionResult {
         let mut start = 0;
         let end = self.timestamps.len();
 
@@ -119,7 +160,67 @@ impl Tracker {
             start = start + self.timestamps[start..end].partition_point(|t| *t <= end_t);
             out.push(step);
         }
-        out
+        DetectionResult::new(out)
+    }
+
+    /// Take a previous detection and try adding one more pose to it.
+    ///
+    /// For now this only looks at the very last frame, but this is an
+    /// implementation detail. Callers should assume it reads everything since
+    /// the last detected step.
+    #[wasm_bindgen(js_name = detectNextPose)]
+    pub fn detect_next_pose(&mut self) -> DetectionResult {
+        let prev_detection = self
+            .intermediate_result
+            .as_ref()
+            .expect("requires intermediate_result");
+
+        let end_t = *self.timestamps.last().unwrap_or(&0);
+        let start_t = prev_detection.steps.last().map_or(0, |step| step.end);
+
+        // skip at least a quarter beat
+        if end_t < start_t + ((1000.0 / (self.bpm * 4.0 * 60.0)).round() as u32) {
+            return prev_detection.clone();
+        }
+
+        if let Some(tracked_skeleton) = self.skeletons.last() {
+            let beat = self.expected_pose();
+            let step_info = self.tracked_step();
+            let step = self
+                .db
+                .step(&step_info.id())
+                .expect("tracked step must exist");
+
+            let pose_idx = step.poses[beat % step.poses.len()];
+            let pose = &self.db.poses()[pose_idx];
+            let error_details = pose.error(tracked_skeleton.angles(), tracked_skeleton.positions());
+            let error = error_details.error_score();
+            web_utils::println!("error is at {:.3}", error);
+            // TODO threshold config
+            if error < 0.075 {
+                self.add_pose(PoseApproximation {
+                    name: self.db.pose_name(pose_idx).to_owned(),
+                    error,
+                    timestamp: end_t,
+                    error_details,
+                });
+            }
+        }
+
+        self.intermediate_result.clone().unwrap()
+    }
+
+    /// Return a skeleton that's expected next.
+    ///
+    /// Only implemented to work properly for trackers of unique steps.
+    ///
+    /// (experimenting with live instructor, I probably want to change this when cleaning up the impl)
+    /// TODO: include body shift
+    #[wasm_bindgen(js_name = expectedPoseSkeleton)]
+    pub fn expected_pose_skeleton(&self) -> Skeleton {
+        let beat = self.expected_pose();
+        let step_info = self.tracked_step();
+        step_info.skeleton(beat)
     }
 
     /// Fit frames in a time interval against all poses and return the best fit.
@@ -152,5 +253,38 @@ impl Tracker {
         self.skeletons
             .get(i)
             .map(|skeleton_info| skeleton_info.to_skeleton(0.0))
+    }
+}
+
+impl Tracker {
+    /// Return a pose that's expected next.
+    ///
+    /// Only implemented to work properly for trackers of unique steps.
+    ///
+    /// returns a beat number
+    /// (experimenting with live instructor, I probably want to change this when cleaning up the impl)
+    fn expected_pose(&self) -> usize {
+        let detection = self
+            .intermediate_result
+            .as_ref()
+            .expect("requires intermediate_result");
+
+        if let Some(partial_step) = &detection.partial {
+            let beat = partial_step.poses.len();
+            beat
+        } else {
+            0
+        }
+    }
+
+    /// Returns the single tracked step.
+    ///
+    /// (experimenting with live instructor, I probably want to change this when cleaning up the impl)
+    fn tracked_step(&self) -> StepInfo {
+        let detection = self
+            .intermediate_result
+            .as_ref()
+            .expect("requires intermediate_result");
+        detection.target_step.clone().expect("requires target_step")
     }
 }
