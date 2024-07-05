@@ -593,6 +593,10 @@ export class Tracker {
 */
   expectedPoseSkeleton(): Skeleton;
 /**
+* @returns {number}
+*/
+  numDetectedPoses(): number;
+/**
 * Fit frames in a time interval against all poses and return the best fit.
 *
 * This API is exported mostly for debugging. To extract fitted dances, use

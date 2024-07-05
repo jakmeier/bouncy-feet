@@ -9,6 +9,7 @@
   import BackgroundTask from '../BackgroundTask.svelte';
   import { writable } from 'svelte/store';
   import { DetectionResult } from '$lib/instructor/bouncy_instructor';
+  import { playSuccessSound } from '$lib/stores/SoundEffects';
 
   export let cameraOn = false;
   /** @type {undefined | number} */
@@ -74,12 +75,16 @@
       if (t > 50) {
         console.debug(`trackFrame took ${t}ms`);
       }
+      const before = tracker.numDetectedPoses();
       detectionResult = tracker.detectNextPose();
       instructorSkeleton = tracker.expectedPoseSkeleton();
       console.assert(
         instructorSkeleton,
         'tracker returned no next expected pose'
       );
+      if (tracker.numDetectedPoses() > before) {
+        playSuccessSound();
+      }
 
       const t2 = performance.now() - start;
       if (t2 - t > 30) {

@@ -223,6 +223,22 @@ impl Tracker {
         step_info.skeleton(beat)
     }
 
+    #[wasm_bindgen(js_name = numDetectedPoses)]
+    pub fn num_detected_poses(&self) -> u32 {
+        if let Some(detection) = &self.intermediate_result {
+            let mut out = 0;
+            for step in &detection.steps {
+                out += step.poses.len();
+            }
+            if let Some(partial) = &detection.partial {
+                out += partial.poses.len();
+            }
+            out as u32
+        } else {
+            0
+        }
+    }
+
     /// Fit frames in a time interval against all poses and return the best fit.
     ///
     /// This API is exported mostly for debugging. To extract fitted dances, use
