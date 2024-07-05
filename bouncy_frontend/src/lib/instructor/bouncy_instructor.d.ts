@@ -588,10 +588,13 @@ export class Tracker {
 * Only implemented to work properly for trackers of unique steps.
 *
 * (experimenting with live instructor, I probably want to change this when cleaning up the impl)
-* TODO: include body shift
 * @returns {Skeleton}
 */
   expectedPoseSkeleton(): Skeleton;
+/**
+* @returns {Cartesian2d}
+*/
+  expectedPoseBodyShift(): Cartesian2d;
 /**
 * @returns {number}
 */

@@ -10,8 +10,8 @@ pub use step_output::DetectedStep;
 use crate::intern::dance_collection::{DanceCollection, ForeignCollectionError};
 use crate::intern::skeleton_3d::Skeleton3d;
 use crate::keypoints::Keypoints;
-use crate::skeleton::Skeleton;
-use crate::{web_utils, StepInfo};
+use crate::skeleton::{Cartesian2d, Skeleton};
+use crate::StepInfo;
 use std::rc::Rc;
 use wasm_bindgen::prelude::wasm_bindgen;
 
@@ -185,7 +185,7 @@ impl Tracker {
         }
 
         if let Some(tracked_skeleton) = self.skeletons.last() {
-            let beat = self.expected_pose();
+            let beat = self.expected_pose_beat();
             let step_info = self.tracked_step();
             let step = self
                 .db
@@ -215,12 +215,18 @@ impl Tracker {
     /// Only implemented to work properly for trackers of unique steps.
     ///
     /// (experimenting with live instructor, I probably want to change this when cleaning up the impl)
-    /// TODO: include body shift
     #[wasm_bindgen(js_name = expectedPoseSkeleton)]
     pub fn expected_pose_skeleton(&self) -> Skeleton {
-        let beat = self.expected_pose();
+        let beat = self.expected_pose_beat();
         let step_info = self.tracked_step();
         step_info.skeleton(beat)
+    }
+
+    #[wasm_bindgen(js_name = expectedPoseBodyShift)]
+    pub fn expected_pose_body_shift(&self) -> Cartesian2d {
+        let beat = self.expected_pose_beat();
+        let step_info = self.tracked_step();
+        step_info.body_shift(beat)
     }
 
     #[wasm_bindgen(js_name = numDetectedPoses)]
@@ -279,17 +285,25 @@ impl Tracker {
     ///
     /// returns a beat number
     /// (experimenting with live instructor, I probably want to change this when cleaning up the impl)
-    fn expected_pose(&self) -> usize {
+    fn expected_pose_beat(&self) -> usize {
         let detection = self
             .intermediate_result
             .as_ref()
             .expect("requires intermediate_result");
 
-        if let Some(partial_step) = &detection.partial {
+        let full = detection.steps.len()
+            * detection
+                .target_step
+                .as_ref()
+                .expect("must have target step")
+                .beats();
+
+        let partial = if let Some(partial_step) = &detection.partial {
             partial_step.poses.len()
         } else {
             0
-        }
+        };
+        full + partial
     }
 
     /// Returns the single tracked step.

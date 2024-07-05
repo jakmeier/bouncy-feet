@@ -8,8 +8,13 @@
   import { landmarksToKeypoints } from '$lib/pose';
   import BackgroundTask from '../BackgroundTask.svelte';
   import { writable } from 'svelte/store';
-  import { DetectionResult } from '$lib/instructor/bouncy_instructor';
+  import {
+    Cartesian2d,
+    DetectionResult,
+  } from '$lib/instructor/bouncy_instructor';
   import { playSuccessSound } from '$lib/stores/SoundEffects';
+  import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
+  import Svg from '../avatar/Svg.svelte';
 
   export let cameraOn = false;
   /** @type {undefined | number} */
@@ -49,6 +54,7 @@
   let skeleton;
   /** @type {import("$lib/instructor/bouncy_instructor").Skeleton | null} */
   let instructorSkeleton = null;
+  let instructorSkeletonBodyShift = new Cartesian2d();
   /** @type {import("@mediapipe/tasks-vision").NormalizedLandmark[]} */
   let landmarks = [];
   /** @type {{ trackFrame: (arg0: HTMLVideoElement) => void; }} */
@@ -78,6 +84,7 @@
       const before = tracker.numDetectedPoses();
       detectionResult = tracker.detectNextPose();
       instructorSkeleton = tracker.expectedPoseSkeleton();
+      instructorSkeletonBodyShift = tracker.expectedPoseBodyShift();
       console.assert(
         instructorSkeleton,
         'tracker returned no next expected pose'
@@ -140,37 +147,41 @@
       bind:this={camera}
     />
 
-    <div
-      class="avatar-container"
-      style="left: {(width - $videoSrcWidth) / 2}px; top: 10px;"
-    >
-      {#if enableInstructorAvatar || enableLiveAvatar}
+    {#if enableInstructorAvatar && instructorSkeleton !== null}
+      <div class="avatar-container">
+        <Svg width={$videoSrcWidth} height={$videoSrcHeight}>
+          <SvgAvatar
+            skeleton={instructorSkeleton}
+            width={$videoSrcWidth}
+            height={$videoSrcHeight}
+            leftColor={'#e97516C0'}
+            rightColor={'#e97516C0'}
+            headColor={'#ffad6960'}
+            bodyColor={'#ffad6940'}
+            lineWidth={avatarLineWidth}
+            bodyShift={instructorSkeletonBodyShift}
+          ></SvgAvatar>
+        </Svg>
+      </div>
+    {/if}
+    {#if enableLiveAvatar}
+      <div
+        class="avatar-container"
+        style="left: {(width - $videoSrcWidth) / 2}px;"
+      >
         <Canvas width={$videoSrcWidth} height={$videoSrcHeight}>
-          {#if enableInstructorAvatar}
-            <Avatar
-              skeleton={instructorSkeleton}
-              width={$videoSrcWidth}
-              height={$videoSrcHeight}
-              mainColor={'#e97516C0'}
-              headColor={'#ffad6960'}
-              secondColor={'#ffad6940'}
-              lineWidth={avatarLineWidth}
-            ></Avatar>
-          {/if}
-          {#if enableLiveAvatar}
-            <Avatar
-              skeleton={null}
-              {landmarks}
-              width={$videoSrcWidth}
-              height={$videoSrcHeight}
-              mainColor={'#382eebC0'}
-              headColor={'#382eeb60'}
-              secondColor={'#c2bfff40'}
-            ></Avatar>
-          {/if}
+          <Avatar
+            skeleton={null}
+            {landmarks}
+            width={$videoSrcWidth}
+            height={$videoSrcHeight}
+            mainColor={'#382eebC0'}
+            headColor={'#382eeb60'}
+            secondColor={'#c2bfff40'}
+          ></Avatar>
         </Canvas>
-      {/if}
-    </div>
+      </div>
+    {/if}
   </Area>
 </div>
 

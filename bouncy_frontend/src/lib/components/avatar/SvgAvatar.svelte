@@ -88,18 +88,17 @@
   $: headRadius = 0.075 * size;
 </script>
 
-<SvgPolygon
-  id="torso"
-  points={[leftHip, rightHip, rightShoulder, leftShoulder]}
-  style={{
-    color: headColor,
-    fill: bodyColor,
-    linecap: 'round',
-    lineWidth: lineWidth * 0.9,
-  }}
-/>
-
 {#if skeleton}
+  <SvgPolygon
+    id="torso"
+    points={[leftHip, rightHip, rightShoulder, leftShoulder]}
+    style={{
+      color: headColor,
+      fill: bodyColor,
+      linecap: 'round',
+      lineWidth: lineWidth * 0.9,
+    }}
+  />
   <SvgCircle
     id="head"
     cx={shoulder.x}
