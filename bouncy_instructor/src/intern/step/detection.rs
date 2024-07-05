@@ -317,7 +317,11 @@ mod tests {
 
         let dance = tracker.detect_dance();
         println!("{dance:?}");
-        let step_names = dance.into_iter().map(|d| d.step_name).collect::<Vec<_>>();
+        let step_names = dance
+            .steps()
+            .into_iter()
+            .map(|d| d.step_name)
+            .collect::<Vec<_>>();
         let expected_steps = expected_steps
             .iter()
             .map(|s| s.to_owned())
