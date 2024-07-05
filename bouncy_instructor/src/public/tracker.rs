@@ -90,18 +90,15 @@ impl Tracker {
     /// specific training session without much regard for timing etc.
     #[wasm_bindgen(js_name = "UniqueStepTracker")]
     pub fn new_unique_step_tracker(step_id: String) -> Result<Tracker, ForeignCollectionError> {
-        let mut db = DanceCollection::default();
-        crate::STATE.with_borrow(|state| {
-            db.add_foreign_step(&state.db, &step_id)?;
-            Ok(())
-        })?;
+        // FIXME: using only a part of it reveals some bugs in how pose indics are used...
+        let db = crate::STATE.with_borrow(|state| Rc::clone(&state.db));
         let step_info = db
             .step(&step_id)
             .cloned()
             .expect("just added the step")
             .into();
         Ok(Tracker {
-            db: Rc::new(db),
+            db,
             // order by timestamp satisfied for empty list
             timestamps: vec![],
             keypoints: vec![],
@@ -176,10 +173,14 @@ impl Tracker {
             .expect("requires intermediate_result");
 
         let end_t = *self.timestamps.last().unwrap_or(&0);
-        let start_t = prev_detection.steps.last().map_or(0, |step| step.end);
+        let last_step = prev_detection
+            .partial
+            .as_ref()
+            .or_else(|| prev_detection.steps.last());
+        let start_t = last_step.map_or(0, |step| step.end);
 
         // skip at least a quarter beat
-        if end_t < start_t + ((1000.0 / (self.bpm * 4.0 * 60.0)).round() as u32) {
+        if end_t < start_t + ((1000.0 / (self.bpm * 4.0 / 60.0)).round() as u32) {
             return prev_detection.clone();
         }
 
@@ -195,7 +196,6 @@ impl Tracker {
             let pose = &self.db.poses()[pose_idx];
             let error_details = pose.error(tracked_skeleton.angles(), tracked_skeleton.positions());
             let error = error_details.error_score();
-            web_utils::println!("error is at {:.3}", error);
             // TODO threshold config
             if error < 0.075 {
                 self.add_pose(PoseApproximation {
