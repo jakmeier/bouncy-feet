@@ -286,8 +286,7 @@ impl Tracker {
             .expect("requires intermediate_result");
 
         if let Some(partial_step) = &detection.partial {
-            let beat = partial_step.poses.len();
-            beat
+            partial_step.poses.len()
         } else {
             0
         }

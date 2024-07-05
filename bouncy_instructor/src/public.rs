@@ -94,7 +94,7 @@ pub fn steps_by_name(step_name: String) -> Vec<StepInfo> {
             .db
             .steps_by_name(&step_name)
             .cloned()
-            .map(|step| StepInfo::from(step))
+            .map(StepInfo::from)
             .collect()
     })
 }
