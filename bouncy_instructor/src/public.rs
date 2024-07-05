@@ -114,6 +114,7 @@ pub fn dance_builder_from_dance(dance_id: String) -> Result<DanceBuilder, String
 }
 
 pub fn load_pose_str(text: &str) -> Result<(), ParseFileError> {
+    console_error_panic_hook::set_once();
     let parsed = PoseFile::from_str(text)?;
     STATE.with(|state| state.borrow_mut().add_poses(parsed.poses))?;
     Ok(())
