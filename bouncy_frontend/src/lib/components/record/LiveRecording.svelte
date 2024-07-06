@@ -8,10 +8,7 @@
   import { landmarksToKeypoints } from '$lib/pose';
   import BackgroundTask from '../BackgroundTask.svelte';
   import { writable } from 'svelte/store';
-  import {
-    Cartesian2d,
-    DetectionResult,
-  } from '$lib/instructor/bouncy_instructor';
+  import { DetectionResult } from '$lib/instructor/bouncy_instructor';
   import { playSuccessSound } from '$lib/stores/SoundEffects';
   import InstructorAvatar from '../avatar/InstructorAvatar.svelte';
 
@@ -49,9 +46,10 @@
   let cameraVideoElement;
   /** @type {import("$lib/instructor/bouncy_instructor").Skeleton | undefined} */
   let skeleton;
-  /** @type {import("$lib/instructor/bouncy_instructor").Skeleton | null} */
-  let instructorSkeleton = null;
-  let instructorSkeletonBodyShift = new Cartesian2d();
+  /** @type {import("$lib/instructor/bouncy_instructor").Skeleton} */
+  let instructorSkeleton = tracker.expectedPoseSkeleton();
+  let instructorSkeletonBodyShift = tracker.expectedPoseBodyShift();
+
   /** @type {import("@mediapipe/tasks-vision").NormalizedLandmark[]} */
   let landmarks = [];
   /** @type {{ trackFrame: (arg0: HTMLVideoElement) => void; }} */
@@ -80,14 +78,14 @@
       }
       const before = tracker.numDetectedPoses();
       detectionResult = tracker.detectNextPose();
-      instructorSkeleton = tracker.expectedPoseSkeleton();
-      instructorSkeletonBodyShift = tracker.expectedPoseBodyShift();
-      console.assert(
-        instructorSkeleton,
-        'tracker returned no next expected pose'
-      );
       if (tracker.numDetectedPoses() > before) {
         playSuccessSound();
+        instructorSkeleton = tracker.expectedPoseSkeleton();
+        instructorSkeletonBodyShift = tracker.expectedPoseBodyShift();
+        console.assert(
+          instructorSkeleton,
+          'tracker returned no next expected pose'
+        );
       }
 
       const t2 = performance.now() - start;
