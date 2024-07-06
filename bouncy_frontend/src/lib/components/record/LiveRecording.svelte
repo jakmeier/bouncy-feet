@@ -13,8 +13,7 @@
     DetectionResult,
   } from '$lib/instructor/bouncy_instructor';
   import { playSuccessSound } from '$lib/stores/SoundEffects';
-  import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
-  import Svg from '../avatar/Svg.svelte';
+  import InstructorAvatar from '../avatar/InstructorAvatar.svelte';
 
   export let cameraOn = false;
   /** @type {undefined | number} */
@@ -42,8 +41,6 @@
 
   const poseCtx = getContext('pose');
   let tracker = getContext('tracker').tracker;
-  const avatarSize = 140;
-  const avatarLineWidth = 5;
   $: $hideNavigation = cameraOn;
 
   /** @type {Camera} */
@@ -149,19 +146,12 @@
 
     {#if enableInstructorAvatar && instructorSkeleton !== null}
       <div class="avatar-container">
-        <Svg width={$videoSrcWidth} height={$videoSrcHeight}>
-          <SvgAvatar
-            skeleton={instructorSkeleton}
-            width={$videoSrcWidth}
-            height={$videoSrcHeight}
-            leftColor={'#e97516C0'}
-            rightColor={'#e97516C0'}
-            headColor={'#ffad6960'}
-            bodyColor={'#ffad6940'}
-            lineWidth={avatarLineWidth}
-            bodyShift={instructorSkeletonBodyShift}
-          ></SvgAvatar>
-        </Svg>
+        <InstructorAvatar
+          width={$videoSrcWidth}
+          height={$videoSrcHeight}
+          nextSkeleton={instructorSkeleton}
+          nextBodyShift={instructorSkeletonBodyShift}
+        />
       </div>
     {/if}
     {#if enableLiveAvatar}
