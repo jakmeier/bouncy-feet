@@ -1,11 +1,17 @@
 
 import { writable, get } from 'svelte/store';
 import { base } from '$app/paths';
+import { browser } from '$app/environment';
 
-const audioContext = new AudioContext();
+/** @type {AudioContext} */
+let audioContext;
 const soundEffects = writable({ success: undefined });
 
 async function initAudioContext() {
+  if (!browser) {
+    return;
+  }
+  audioContext = new AudioContext();
   const sounds = {
     success: await loadSound(`${base}/audio/correct-soft-beep.mp3`),
   };
