@@ -5,12 +5,16 @@
   import Avatar from '$lib/components/avatar/Avatar.svelte';
   import { hideNavigation } from '$lib/stores/UiState';
   import { getContext, onMount } from 'svelte';
-  import { landmarksToKeypoints } from '$lib/pose';
+  import { I, landmarksToKeypoints } from '$lib/pose';
   import BackgroundTask from '../BackgroundTask.svelte';
   import { writable } from 'svelte/store';
-  import { DetectionResult } from '$lib/instructor/bouncy_instructor';
+  import {
+    Cartesian2d,
+    DetectionResult,
+  } from '$lib/instructor/bouncy_instructor';
   import { playSuccessSound } from '$lib/stores/SoundEffects';
   import InstructorAvatar from '../avatar/InstructorAvatar.svelte';
+  import { distance2d } from '$lib/math';
 
   export let cameraOn = false;
   /** @type {undefined | number} */
@@ -68,6 +72,9 @@
   /** @type {import('svelte/store').Writable<number>} */
   let videoSrcHeight = writable(150);
 
+  let lastSuccessSkeletonSize = 1.0;
+  let lastSuccessSkeletonOrigin = new Cartesian2d(0.0, 0.0);
+
   function onFrame() {
     if (cameraOn && dataListener) {
       const start = performance.now();
@@ -86,6 +93,10 @@
           instructorSkeleton,
           'tracker returned no next expected pose'
         );
+        lastSuccessSkeletonSize =
+          distance2d(landmarks[I.LEFT_SHOULDER], landmarks[I.LEFT_HIP]) * 8;
+        const hip = tracker.hipPosition(recordingEnd);
+        lastSuccessSkeletonOrigin = new Cartesian2d(hip.x - 0.5, hip.y - 0.5);
       }
 
       const t2 = performance.now() - start;
@@ -147,8 +158,10 @@
         <InstructorAvatar
           width={$videoSrcWidth}
           height={$videoSrcHeight}
-          nextSkeleton={instructorSkeleton}
-          nextBodyShift={instructorSkeletonBodyShift}
+          avatarSize={lastSuccessSkeletonSize}
+          skeleton={instructorSkeleton}
+          bodyShift={instructorSkeletonBodyShift}
+          origin={lastSuccessSkeletonOrigin}
         />
       </div>
     {/if}

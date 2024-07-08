@@ -1,6 +1,8 @@
 /* eslint-disable */
 export const memory: WebAssembly.Memory;
 export const __wbindgen_export_2: WebAssembly.Table;
+export function cartesian2d_add(a: number, b: number): number;
+export function cartesian2d_new(a: number, b: number): number;
 export function cartesian3d_new(a: number, b: number, c: number): number;
 export function dancebuilder_addStep(a: number, b: number, c: number): void;
 export function dancebuilder_clear(a: number): void;
@@ -70,6 +72,7 @@ export function tracker_detectNextPose(a: number): number;
 export function tracker_expectedPoseBodyShift(a: number): number;
 export function tracker_expectedPoseSkeleton(a: number): number;
 export function tracker_exportFrame(a: number, b: number): number;
+export function tracker_hipPosition(a: number, b: number): number;
 export function tracker_new(): number;
 export function tracker_numDetectedPoses(a: number): number;
 export function tracker_setBpm(a: number, b: number): void;

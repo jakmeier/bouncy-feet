@@ -1,12 +1,21 @@
 use super::{Angle3d, SignedAngle};
 use crate::keypoints::Cartesian3d;
 use crate::skeleton::Cartesian2d;
+use wasm_bindgen::prelude::wasm_bindgen;
 
+#[wasm_bindgen]
 impl Cartesian2d {
+    #[wasm_bindgen(constructor)]
     pub fn new(x: f32, y: f32) -> Self {
         Self { x, y }
     }
+    #[wasm_bindgen(js_name = "add")]
+    pub fn js_add(&self, other: &Cartesian2d) -> Self {
+        *self + *other
+    }
+}
 
+impl Cartesian2d {
     pub fn mirror(&self) -> Self {
         Self {
             x: -self.x,

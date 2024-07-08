@@ -9,7 +9,7 @@ pub use step_output::DetectedStep;
 
 use crate::intern::dance_collection::{DanceCollection, ForeignCollectionError};
 use crate::intern::skeleton_3d::Skeleton3d;
-use crate::keypoints::Keypoints;
+use crate::keypoints::{Cartesian3d, Keypoints};
 use crate::skeleton::{Cartesian2d, Skeleton};
 use crate::StepInfo;
 use std::rc::Rc;
@@ -112,6 +112,10 @@ impl Tracker {
         self.keypoints.clear();
         self.timestamps.clear();
         self.skeletons.clear();
+        if let Some(intermediate) = self.intermediate_result.as_mut() {
+            intermediate.partial = None;
+            intermediate.steps.clear();
+        }
     }
 
     /// Insert keypoints of a new frame for tracking.
@@ -243,6 +247,15 @@ impl Tracker {
         } else {
             0
         }
+    }
+
+    #[wasm_bindgen(js_name = hipPosition)]
+    pub fn hip_position(&self, timestamp: Timestamp) -> Cartesian3d {
+        let i = self.timestamps.partition_point(|t| *t < timestamp);
+        self.keypoints
+            .get(i)
+            .map(|kp| (kp.left.hip + kp.right.hip) * 0.5)
+            .unwrap_or_default()
     }
 
     /// Fit frames in a time interval against all poses and return the best fit.

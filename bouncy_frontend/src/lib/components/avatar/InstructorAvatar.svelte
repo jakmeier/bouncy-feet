@@ -4,6 +4,7 @@
   // where users look at the video feed and position themselves as shown
   // by the instructor stick figure.
   import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
+  import { Cartesian2d } from '$lib/instructor/bouncy_instructor';
   import Svg from '../avatar/Svg.svelte';
   import { onMount } from 'svelte';
 
@@ -12,11 +13,25 @@
   /** @type {number} */
   export let height;
   /** @type {import("$lib/instructor/bouncy_instructor").Skeleton} */
-  export let nextSkeleton;
-  export let nextBodyShift;
+  export let skeleton;
+  export let bodyShift;
 
-  const avatarLineWidth = 5;
-  const correctAvatarLineWidth = 10;
+  /** @type {Cartesian2d} */
+  export let origin = new Cartesian2d(0.0, 0.0);
+  export let avatarSize = 1.0;
+  $: lengths = {
+    thigh: 0.2 * avatarSize,
+    shin: 0.2 * avatarSize,
+    torso: 0.25 * avatarSize,
+    arm: 0.1 * avatarSize,
+    forearm: 0.15 * avatarSize,
+    foot: 0.05 * avatarSize,
+    shoulder: 0.1 * avatarSize,
+    hip: 0.06 * avatarSize,
+  };
+
+  $: avatarLineWidth = 8 * avatarSize;
+  $: correctAvatarLineWidth = 10 * avatarSize;
 
   /** @type {import("$lib/instructor/bouncy_instructor").Skeleton | null} */
   let prevSkeleton = null;
@@ -29,11 +44,11 @@
   let correctBodyShift = null;
   let showCorrectPosition = false;
 
-  $: if (nextSkeleton !== prevSkeleton) {
+  $: if (skeleton !== prevSkeleton) {
     correctSkeleton = prevSkeleton;
     correctBodyShift = prevBodyShift;
-    prevSkeleton = nextSkeleton;
-    prevBodyShift = nextBodyShift;
+    prevSkeleton = skeleton;
+    prevBodyShift = bodyShift;
     displayCorrectPosition();
   }
 
@@ -46,8 +61,8 @@
   }
 
   onMount(() => {
-    prevSkeleton = nextSkeleton;
-    prevBodyShift = nextBodyShift;
+    prevSkeleton = skeleton;
+    prevBodyShift = bodyShift;
   });
 </script>
 
@@ -55,33 +70,35 @@
   {#if !showCorrectPosition}
     <Svg {width} {height}>
       <SvgAvatar
-        skeleton={nextSkeleton}
+        {skeleton}
         {width}
         {height}
+        {lengths}
         leftColor={'#e97516C0'}
         rightColor={'#e97516C0'}
         headColor={'#ffad6960'}
         bodyColor={'#ffad6940'}
         lineWidth={avatarLineWidth}
-        bodyShift={nextBodyShift}
+        bodyShift={bodyShift.add(origin)}
       ></SvgAvatar>
     </Svg>
   {/if}
 </div>
 
 <div class="avatar-container front">
-  {#if showCorrectPosition && correctSkeleton}
+  {#if showCorrectPosition && correctSkeleton && correctBodyShift}
     <Svg {width} {height}>
       <SvgAvatar
         {width}
         {height}
+        {lengths}
         skeleton={correctSkeleton}
         leftColor={'#4caf50'}
         rightColor={'#4caf50'}
         headColor={'#8bc34a'}
         bodyColor={'#c8e6c9'}
         lineWidth={correctAvatarLineWidth}
-        bodyShift={correctBodyShift}
+        bodyShift={correctBodyShift.add(origin)}
       ></SvgAvatar>
     </Svg>
   {/if}

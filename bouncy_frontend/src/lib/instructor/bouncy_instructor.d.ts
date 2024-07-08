@@ -56,6 +56,16 @@ export function danceBuilderFromDance(dance_id: string): DanceBuilder;
 export class Cartesian2d {
   free(): void;
 /**
+* @param {number} x
+* @param {number} y
+*/
+  constructor(x: number, y: number);
+/**
+* @param {Cartesian2d} other
+* @returns {Cartesian2d}
+*/
+  add(other: Cartesian2d): Cartesian2d;
+/**
 */
   x: number;
 /**
@@ -524,11 +534,6 @@ export class StepInfo {
 export class Tracker {
   free(): void;
 /**
-* @param {number} timestamp
-* @returns {ExportedFrame}
-*/
-  exportFrame(timestamp: number): ExportedFrame;
-/**
 * Create a tracker for all known steps.
 */
   constructor();
@@ -600,6 +605,11 @@ export class Tracker {
 */
   numDetectedPoses(): number;
 /**
+* @param {number} timestamp
+* @returns {Cartesian3d}
+*/
+  hipPosition(timestamp: number): Cartesian3d;
+/**
 * Fit frames in a time interval against all poses and return the best fit.
 *
 * This API is exported mostly for debugging. To extract fitted dances, use
@@ -620,6 +630,11 @@ export class Tracker {
 * @returns {Skeleton | undefined}
 */
   skeletonAt(timestamp: number): Skeleton | undefined;
+/**
+* @param {number} timestamp
+* @returns {ExportedFrame}
+*/
+  exportFrame(timestamp: number): ExportedFrame;
 }
 /**
 */
