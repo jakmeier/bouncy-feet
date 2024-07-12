@@ -133,9 +133,9 @@ async function initMediaPipeBackend() {
             },
             runningMode: "VIDEO",
             numPoses: 1,
-            minPoseDetectionConfidence: 0.2,
-            minPosePresenceConfidence: 0.2,
-            minTrackingConfidence: 0.2,
+            minPoseDetectionConfidence: 0.4,
+            minPosePresenceConfidence: 0.4,
+            minTrackingConfidence: 0.4,
             outputSegmentationMasks: false,
         });
 }
@@ -219,6 +219,46 @@ export const bodyOutlinePairs = [
     [I.LEFT_WRIST, I.LEFT_THUMB],
     [I.LEFT_WRIST, I.LEFT_PINKY],
     [I.LEFT_WRIST, I.LEFT_INDEX],
+
+    // right arm
+    [I.RIGHT_SHOULDER, I.RIGHT_ELBOW],
+    [I.RIGHT_ELBOW, I.RIGHT_WRIST],
+    [I.RIGHT_WRIST, I.RIGHT_THUMB],
+    [I.RIGHT_WRIST, I.RIGHT_PINKY],
+    [I.RIGHT_WRIST, I.RIGHT_INDEX],
+];
+
+
+export const torsoPairs = [
+    [I.LEFT_SHOULDER, I.RIGHT_SHOULDER],
+    [I.LEFT_SHOULDER, I.LEFT_HIP],
+    [I.RIGHT_SHOULDER, I.RIGHT_HIP],
+    [I.LEFT_HIP, I.RIGHT_HIP],
+];
+
+export const leftSidePairs = [
+    // left leg
+    [I.LEFT_HIP, I.LEFT_KNEE],
+    [I.LEFT_KNEE, I.LEFT_ANKLE],
+    [I.LEFT_ANKLE, I.LEFT_FOOT_INDEX],
+    [I.LEFT_ANKLE, I.LEFT_HEEL],
+    [I.LEFT_FOOT_INDEX, I.LEFT_HEEL],
+
+    // left arm
+    [I.LEFT_SHOULDER, I.LEFT_ELBOW],
+    [I.LEFT_ELBOW, I.LEFT_WRIST],
+    [I.LEFT_WRIST, I.LEFT_THUMB],
+    [I.LEFT_WRIST, I.LEFT_PINKY],
+    [I.LEFT_WRIST, I.LEFT_INDEX],
+];
+
+export const rightSidePairs = [
+    // right leg
+    [I.RIGHT_HIP, I.RIGHT_KNEE],
+    [I.RIGHT_KNEE, I.RIGHT_ANKLE],
+    [I.RIGHT_ANKLE, I.RIGHT_FOOT_INDEX],
+    [I.RIGHT_ANKLE, I.RIGHT_HEEL],
+    [I.RIGHT_FOOT_INDEX, I.RIGHT_HEEL],
 
     // right arm
     [I.RIGHT_SHOULDER, I.RIGHT_ELBOW],
