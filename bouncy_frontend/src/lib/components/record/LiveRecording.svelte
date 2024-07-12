@@ -94,7 +94,7 @@
           'tracker returned no next expected pose'
         );
         lastSuccessSkeletonSize =
-          distance2d(landmarks[I.LEFT_SHOULDER], landmarks[I.LEFT_HIP]) * 8;
+          distance2d(landmarks[I.LEFT_SHOULDER], landmarks[I.LEFT_HIP]) * 7.5;
         const hip = tracker.hipPosition(recordingEnd);
         lastSuccessSkeletonOrigin = new Cartesian2d(hip.x - 0.5, hip.y - 0.5);
       }
@@ -176,7 +176,10 @@
             {landmarks}
             width={$videoSrcWidth}
             height={$videoSrcHeight}
-            mainColor={'#382eebC0'}
+            mainColor={'#FFFFFFC0'}
+            leftColor={'#e97516C0'}
+            rightColor={'#382eebC0'}
+            torsoLineWidth={3}
             headColor={'#382eeb60'}
             secondColor={'#c2bfff40'}
           ></Avatar>

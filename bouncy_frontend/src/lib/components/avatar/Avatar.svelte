@@ -1,6 +1,13 @@
 <script>
   import { add2dVector, distance2d } from '$lib/math';
-  import { I, TORSO, bodyOutlinePairs } from '$lib/pose';
+  import {
+    I,
+    TORSO,
+    bodyOutlinePairs,
+    leftSidePairs,
+    rightSidePairs,
+    torsoPairs,
+  } from '$lib/pose';
   import { getContext } from 'svelte';
 
   /** @type import('@mediapipe/tasks-vision').NormalizedLandmark[] */
@@ -10,6 +17,7 @@
   export let width = 100;
   export let height = 100;
   export let lineWidth = 10;
+  export let torsoLineWidth = lineWidth;
   export let lengths = {
     thigh: 0.2,
     shin: 0.2,
@@ -22,6 +30,10 @@
   $: sideway = skeleton ? skeleton.sideway : false;
 
   export let mainColor = '#382eeb';
+  /** @type {string | CanvasGradient | CanvasPattern | undefined} */
+  export let leftColor = undefined;
+  /** @type {string | CanvasGradient | CanvasPattern | undefined} */
+  export let rightColor = undefined;
   export let secondColor = '#c2bfff';
   export let headColor = mainColor;
 
@@ -56,7 +68,20 @@
     const h = height;
     const w = width;
 
-    bodyOutlinePairs.forEach(([a, b]) => {
+    ctx.lineWidth = torsoLineWidth;
+    torsoPairs.forEach(([a, b]) => {
+      drawLine(
+        ctx,
+        { x: landmarks[a].x * w, y: landmarks[a].y * h },
+        { x: landmarks[b].x * w, y: landmarks[b].y * h }
+      );
+    });
+    ctx.lineWidth = lineWidth;
+
+    if (leftColor) {
+      ctx.strokeStyle = leftColor;
+    }
+    leftSidePairs.forEach(([a, b]) => {
       drawLine(
         ctx,
         { x: landmarks[a].x * w, y: landmarks[a].y * h },
@@ -64,7 +89,18 @@
       );
     });
 
-    // torso
+    if (rightColor) {
+      ctx.strokeStyle = rightColor;
+    }
+    rightSidePairs.forEach(([a, b]) => {
+      drawLine(
+        ctx,
+        { x: landmarks[a].x * w, y: landmarks[a].y * h },
+        { x: landmarks[b].x * w, y: landmarks[b].y * h }
+      );
+    });
+
+    // torso fill
     ctx.beginPath();
     ctx.moveTo(landmarks[TORSO[0]].x * w, landmarks[TORSO[0]].y * h);
     TORSO.slice(1).forEach((i) => {
@@ -99,10 +135,17 @@
     // right body part is left on screen
     const leftHip = { x: hip.x + hipLen, y: hip.y };
     const leftShoulder = { x: shoulder.x + shoulderLen, y: shoulder.y };
+    if (leftColor) {
+      ctx.strokeStyle = leftColor;
+    }
     drawSide(ctx, leftHip, leftShoulder, skeleton.left, s);
     const rightHip = { x: hip.x - hipLen, y: hip.y };
     const rightShoulder = { x: shoulder.x - shoulderLen, y: shoulder.y };
+    if (rightColor) {
+      ctx.strokeStyle = rightColor;
+    }
     drawSide(ctx, rightHip, rightShoulder, skeleton.right, s);
+    ctx.strokeStyle = mainColor;
     drawHead(ctx, shoulder.x, shoulder.y - 0.1 * s, 0.075 * s);
 
     if (!sideway) {

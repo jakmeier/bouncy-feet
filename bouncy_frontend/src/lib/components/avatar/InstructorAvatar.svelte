@@ -30,7 +30,7 @@
     hip: 0.06 * avatarSize,
   };
 
-  $: avatarLineWidth = 8 * avatarSize;
+  $: avatarLineWidth = 4 * avatarSize;
   $: correctAvatarLineWidth = 10 * avatarSize;
 
   /** @type {import("$lib/instructor/bouncy_instructor").Skeleton | null} */
@@ -74,10 +74,10 @@
         {width}
         {height}
         {lengths}
-        leftColor={'#e97516C0'}
-        rightColor={'#e97516C0'}
-        headColor={'#ffad6960'}
-        bodyColor={'#ffad6940'}
+        leftColor={'#e97516D0'}
+        rightColor={'#382eebD0'}
+        headColor={'#ffad6940'}
+        bodyColor={'#ffad6910'}
         lineWidth={avatarLineWidth}
         bodyShift={bodyShift.add(origin)}
       ></SvgAvatar>
