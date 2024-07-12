@@ -3,7 +3,6 @@
   import {
     I,
     TORSO,
-    bodyOutlinePairs,
     leftSidePairs,
     rightSidePairs,
     torsoPairs,

@@ -210,8 +210,7 @@ impl Tracker {
             let pose = &self.db.poses()[pose_idx];
             let error_details = pose.error(tracked_skeleton.angles(), tracked_skeleton.positions());
             let error = error_details.error_score();
-            // TODO threshold config
-            if error < self.error_threshold {
+            if error_details.z_order_errors.is_empty() && error < self.error_threshold {
                 self.add_pose(PoseApproximation {
                     name: self.db.pose_name(pose_idx).to_owned(),
                     error,
