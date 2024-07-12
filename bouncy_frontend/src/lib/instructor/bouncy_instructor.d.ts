@@ -569,6 +569,10 @@ export class Tracker {
 */
   setBpm(bpm: number): void;
 /**
+* @param {number} error_threshold
+*/
+  setErrorThreshold(error_threshold: number): void;
+/**
 * Goes over all data and detects the best fitting dance.
 *
 * There is no re-use or consistency between calls. It always starts at 0

@@ -30,6 +30,7 @@ pub struct Tracker {
 
     // below are "Dance Detector" fields, maybe it should be its own struct?
     pub(crate) bpm: f32,
+    pub(crate) error_threshold: f32,
     // todo: head and tail for what was already detected, to not re-compute all every time
     // todo: active steps filter instead of global steps
     /// (experimenting with live instructor, I probably want to change this when cleaning up the impl)
@@ -43,6 +44,22 @@ pub struct Skeletons {
     pub side: Skeleton,
 }
 
+impl Default for Tracker {
+    fn default() -> Self {
+        let db = DanceCollection::default();
+        Tracker {
+            db: Rc::new(db),
+            // order by timestamp satisfied for empty list
+            timestamps: vec![],
+            keypoints: vec![],
+            skeletons: vec![],
+            bpm: 120.0,
+            error_threshold: 0.05,
+            intermediate_result: None,
+        }
+    }
+}
+
 #[wasm_bindgen]
 impl Tracker {
     /// Create a tracker for all known steps.
@@ -50,12 +67,8 @@ impl Tracker {
     pub fn new() -> Self {
         Tracker {
             db: crate::STATE.with_borrow(|state| Rc::clone(&state.db)),
-            // order by timestamp satisfied for empty list
-            timestamps: vec![],
-            keypoints: vec![],
-            skeletons: vec![],
-            bpm: 120.0,
             intermediate_result: None,
+            ..Default::default()
         }
     }
 
@@ -75,12 +88,8 @@ impl Tracker {
         })?;
         Ok(Tracker {
             db: Rc::new(db),
-            // order by timestamp satisfied for empty list
-            timestamps: vec![],
-            keypoints: vec![],
-            skeletons: vec![],
-            bpm: 120.0,
             intermediate_result: None,
+            ..Default::default()
         })
     }
 
@@ -99,12 +108,8 @@ impl Tracker {
             .into();
         Ok(Tracker {
             db,
-            // order by timestamp satisfied for empty list
-            timestamps: vec![],
-            keypoints: vec![],
-            skeletons: vec![],
-            bpm: 120.0,
             intermediate_result: Some(DetectionResult::for_unique_step_tracker(step_info)),
+            ..Default::default()
         })
     }
 
@@ -142,6 +147,11 @@ impl Tracker {
     #[wasm_bindgen(js_name = setBpm)]
     pub fn set_bpm(&mut self, bpm: f32) {
         self.bpm = bpm;
+    }
+
+    #[wasm_bindgen(js_name = setErrorThreshold)]
+    pub fn set_error_threshold(&mut self, error_threshold: f32) {
+        self.error_threshold = error_threshold;
     }
 
     /// Goes over all data and detects the best fitting dance.
@@ -201,7 +211,7 @@ impl Tracker {
             let error_details = pose.error(tracked_skeleton.angles(), tracked_skeleton.positions());
             let error = error_details.error_score();
             // TODO threshold config
-            if error < 0.075 {
+            if error < self.error_threshold {
                 self.add_pose(PoseApproximation {
                     name: self.db.pose_name(pose_idx).to_owned(),
                     error,
