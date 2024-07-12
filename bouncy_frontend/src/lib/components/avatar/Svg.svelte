@@ -78,6 +78,15 @@
     }
   }
 
+  /**
+   * @param {string} id
+   */
+  function removeCircle(id) {
+    let index = circles.findIndex((x) => x.id === id);
+    circles.splice(index, 1);
+    circles = circles;
+  }
+
   async function update() {
     displayedLines = lines;
     if (orderByZ) {
@@ -85,7 +94,14 @@
     }
   }
 
-  setContext('svg', { setLine, setPolygon, removePolygon, setCircle, update });
+  setContext('svg', {
+    setLine,
+    setPolygon,
+    removePolygon,
+    setCircle,
+    removeCircle,
+    update,
+  });
 </script>
 
 <svg viewBox="0 0 {width} {height}">

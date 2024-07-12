@@ -1,5 +1,5 @@
 <script>
-  import { getContext } from 'svelte';
+  import { getContext, onDestroy, onMount } from 'svelte';
 
   /* @type{number} */
   export let cx;
@@ -14,4 +14,7 @@
 
   const svg = getContext('svg');
   $: svg.setCircle(id, { cx, cy, r, fill });
+
+  onMount(() => svg.setCircle(id, { cx, cy, r, fill }));
+  onDestroy(() => svg.removeCircle(id));
 </script>

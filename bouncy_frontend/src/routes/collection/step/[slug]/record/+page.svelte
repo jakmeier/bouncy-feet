@@ -25,8 +25,8 @@
   let recordingStart = undefined;
   /** @type {number | undefined} */
   let recordingEnd = undefined;
-  let enableLiveAvatar = false;
-  let enableInstructorAvatar = false;
+  let enableLiveAvatar = true;
+  let enableInstructorAvatar = true;
 
   /** @type {import("$lib/instructor/bouncy_instructor").DetectedStep[]} */
   let detectedSteps = [];
@@ -58,7 +58,7 @@
 
   async function stopCameraAndRecording() {
     stop();
-    detectedSteps = tracker.detectDance().steps();
+    detectedSteps = tracker.detectNextPose().steps();
     const result = userCtx.addDanceToStats(detectedSteps);
     if (result) {
       reviewStatsNumSteps = result.numSteps;
@@ -135,7 +135,9 @@
       </a> -->
     {/if}
   </div>
-  <LiveRecordingSettings bind:enableLiveAvatar bind:enableInstructorAvatar />
+  {#if isModelOn}
+    <LiveRecordingSettings bind:enableLiveAvatar bind:enableInstructorAvatar />
+  {/if}
   <p style="width: 100px; height: 50px;"></p>
 </div>
 
