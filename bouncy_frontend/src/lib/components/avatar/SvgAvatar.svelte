@@ -3,7 +3,7 @@
   import SvgPolygon from './SvgPolygon.svelte';
   import SvgStyle from './SvgStyle.svelte';
   import SvgCircle from './SvgCircle.svelte';
-  import { add2dVector } from '$lib/math';
+  import { Cartesian2d } from '$lib/instructor/bouncy_instructor';
 
   /** @type import('$lib/instructor/bouncy_instructor').Skeleton */
   export let skeleton;
@@ -11,16 +11,7 @@
   export let height = 100;
   export let lineWidth = 10;
   export let bodyShift = { x: 0, y: 0 };
-  export let lengths = {
-    thigh: 0.2,
-    shin: 0.2,
-    torso: 0.25,
-    arm: 0.1,
-    forearm: 0.15,
-    foot: 0.05,
-    shoulder: 0.1,
-    hip: 0.06,
-  };
+  export let avatarSize = 1.0;
 
   export let leftColor = 'var(--theme-main)';
   export let rightColor = 'var(--theme-main)';
@@ -40,52 +31,41 @@
     return wrapped + min;
   }
 
-  $: size = Math.min(height, width);
+  $: avatarSizePixels = Math.min(height, width) * avatarSize;
   $: hip = {
     x: (0.5 + wrap(bodyShift.x, -0.75, 0.75)) * width,
     y: (0.5 + bodyShift.y) * height,
   };
-  $: shoulder = { x: hip.x, y: hip.y - lengths.torso * size };
 
-  /** @type {{ x: number; y: number; }} */
+  /** @type {Cartesian2d} */
   let leftHip;
-  /** @type {{ x: number; y: number; }} */
+  /** @type {Cartesian2d} */
   let rightHip;
-  /** @type {{ x: number; y: number; }} */
+  /** @type {Cartesian2d} */
   let rightShoulder;
-  /** @type {{ x: number; y: number; }} */
+  /** @type {Cartesian2d} */
   let leftShoulder;
+  /** @type {Cartesian2d} */
+  let headPosition;
+  /** @type {import("$lib/instructor/bouncy_instructor").SkeletonV2} */
+  let renderedSkeleton;
 
-  // right body part is left on screen
   $: if (skeleton) {
-    leftHip = add2dVector(
-      hip,
-      skeleton.hip.angle,
-      -size * skeleton.hip.r * (lengths.hip / 2)
+    renderedSkeleton = skeleton.render(
+      new Cartesian2d(hip.x, hip.y),
+      avatarSizePixels
     );
-    leftShoulder = add2dVector(
-      shoulder,
-      skeleton.shoulder.angle,
-      -size * skeleton.shoulder.r * (lengths.shoulder / 2)
+    leftHip = renderedSkeleton.hip.start;
+    leftShoulder = renderedSkeleton.shoulder.start;
+    rightHip = renderedSkeleton.hip.end;
+    rightShoulder = renderedSkeleton.shoulder.end;
+    headPosition = new Cartesian2d(
+      (leftShoulder.x + rightShoulder.x) / 2,
+      leftShoulder.y - avatarSizePixels * 0.1
     );
-    rightHip = add2dVector(
-      hip,
-      skeleton.hip.angle,
-      size * skeleton.hip.r * (lengths.hip / 2)
-    );
-    rightShoulder = add2dVector(
-      shoulder,
-      skeleton.shoulder.angle,
-      size * skeleton.shoulder.r * (lengths.shoulder / 2)
-    );
-    // when the dance looks away from the camera, we need to switch sides
-    if (skeleton.backwards) {
-      [leftHip, rightHip] = [rightHip, leftHip];
-      [leftShoulder, rightShoulder] = [rightShoulder, leftShoulder];
-    }
   }
 
-  $: headRadius = 0.075 * size;
+  $: headRadius = 0.075 * avatarSizePixels;
 </script>
 
 {#if skeleton}
@@ -101,29 +81,16 @@
   />
   <SvgCircle
     id="head"
-    cx={shoulder.x}
-    cy={shoulder.y - 0.1 * size}
+    cx={headPosition.x}
+    cy={headPosition.y}
     r={headRadius}
     fill={headColor}
   />
   <SvgStyle color={leftColor} linecap="round" {lineWidth}>
-    <SvgAvatarSide
-      {lengths}
-      {size}
-      side={skeleton.left}
-      shoulder={leftShoulder}
-      hip={leftHip}
-      sideId={'left'}
-    ></SvgAvatarSide>
+    <SvgAvatarSide side={renderedSkeleton.left} sideId={'left'}></SvgAvatarSide>
   </SvgStyle>
   <SvgStyle color={rightColor} linecap="round" {lineWidth}>
-    <SvgAvatarSide
-      {lengths}
-      {size}
-      side={skeleton.right}
-      shoulder={rightShoulder}
-      hip={rightHip}
-      sideId={'right'}
+    <SvgAvatarSide side={renderedSkeleton.right} sideId={'right'}
     ></SvgAvatarSide>
   </SvgStyle>
 {/if}

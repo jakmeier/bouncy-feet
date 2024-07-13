@@ -94,7 +94,7 @@
           'tracker returned no next expected pose'
         );
         lastSuccessSkeletonSize =
-          distance2d(landmarks[I.LEFT_SHOULDER], landmarks[I.LEFT_HIP]) * 7.5;
+          distance2d(landmarks[I.LEFT_SHOULDER], landmarks[I.LEFT_HIP]) * 6;
         const hip = tracker.hipPosition(recordingEnd);
         lastSuccessSkeletonOrigin = new Cartesian2d(hip.x - 0.5, hip.y - 0.5);
       }

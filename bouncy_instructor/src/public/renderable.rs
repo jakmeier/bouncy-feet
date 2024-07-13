@@ -52,8 +52,6 @@ impl RenderableSegment {
 }
 
 impl RenderableSkeleton {
-    // These number must be in sync with those in SvgAvatar.svelte
-    // TODO: make this the source of truth
     pub(crate) const THIGH_LEN: f32 = 0.2;
     pub(crate) const SHIN_LEN: f32 = 0.2;
     pub(crate) const TORSO_LEN: f32 = 0.25;

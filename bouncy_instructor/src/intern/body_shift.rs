@@ -25,9 +25,7 @@ impl BodyShift {
             self.pose_body_shift.push(db.poses()[pose].shift);
         }
 
-        // Compute how far the body shifts after 0,1,2,3... transitions. For
-        // this, we have to calculate 2D coordinates of skeletons. This usd to
-        // be JS only... Now it's also in Rust! (Maybe we can make it Rust only?)
+        // Compute how far the body shifts after 0,1,2,3... transitions.
         for (pivot, skeleton) in step.pivots[1..].iter().zip(skeletons.windows(2)) {
             let before = skeleton[0].position(*pivot);
             let after = skeleton[1].position(*pivot);

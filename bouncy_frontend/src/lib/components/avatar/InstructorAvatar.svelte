@@ -19,16 +19,6 @@
   /** @type {Cartesian2d} */
   export let origin = new Cartesian2d(0.0, 0.0);
   export let avatarSize = 1.0;
-  $: lengths = {
-    thigh: 0.2 * avatarSize,
-    shin: 0.2 * avatarSize,
-    torso: 0.25 * avatarSize,
-    arm: 0.1 * avatarSize,
-    forearm: 0.15 * avatarSize,
-    foot: 0.05 * avatarSize,
-    shoulder: 0.1 * avatarSize,
-    hip: 0.06 * avatarSize,
-  };
 
   $: avatarLineWidth = 4 * avatarSize;
   $: correctAvatarLineWidth = 10 * avatarSize;
@@ -73,7 +63,7 @@
         {skeleton}
         {width}
         {height}
-        {lengths}
+        {avatarSize}
         leftColor={'#e97516D0'}
         rightColor={'#382eebD0'}
         headColor={'#ffad6940'}
@@ -91,7 +81,7 @@
       <SvgAvatar
         {width}
         {height}
-        {lengths}
+        {avatarSize}
         skeleton={correctSkeleton}
         leftColor={'#4caf50'}
         rightColor={'#4caf50'}
