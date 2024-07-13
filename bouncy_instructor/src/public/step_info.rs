@@ -1,3 +1,4 @@
+use super::renderable::RenderableSkeleton;
 use crate::intern::body_shift::BodyShift;
 use crate::intern::pose::{BodyPart, BodyPoint};
 use crate::intern::skeleton_3d::Skeleton3d;
@@ -106,14 +107,6 @@ impl From<Step> for StepInfo {
 }
 
 impl Skeleton {
-    // These number must be in sync with those in SvgAvatar.svelte
-    const THIGH_LEN: f32 = 0.2;
-    const SHIN_LEN: f32 = 0.2;
-    // const TORSO_LEN: f32 = 0.25;
-    // const ARM_LEN: f32 = 0.1;
-    // const FOREARM_LEN: f32 = 0.15;
-    const FOOT_LEN: f32 = 0.05;
-
     pub(crate) fn position(&self, body_point: BodyPoint) -> Cartesian2d {
         let side = match body_point.side {
             crate::intern::pose::BodySide::Left => &self.left,
@@ -134,12 +127,12 @@ impl Skeleton {
 impl Side {
     #[inline]
     fn knee_position(&self) -> Cartesian2d {
-        Cartesian2d::from(self.thigh) * Skeleton::THIGH_LEN
+        Cartesian2d::from(self.thigh) * RenderableSkeleton::THIGH_LEN
     }
 
     #[inline]
     fn ankle_position(&self) -> Cartesian2d {
-        self.knee_position() + Cartesian2d::from(self.shin) * Skeleton::SHIN_LEN
+        self.knee_position() + Cartesian2d::from(self.shin) * RenderableSkeleton::SHIN_LEN
     }
 
     #[inline]
@@ -149,6 +142,6 @@ impl Side {
 
     #[inline]
     fn toes_position(&self) -> Cartesian2d {
-        self.heel_position() + Cartesian2d::from(self.foot) * Skeleton::FOOT_LEN
+        self.heel_position() + Cartesian2d::from(self.foot) * RenderableSkeleton::FOOT_LEN
     }
 }

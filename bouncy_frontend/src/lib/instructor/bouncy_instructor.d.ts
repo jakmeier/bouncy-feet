@@ -382,9 +382,29 @@ export class PoseApproximation {
   timestamp: number;
 }
 /**
-* Projected lin segment, with a x-y angle and a length factor.
+* Projected line segment with two coordinates and a Z index.
 *
 * This format is perfect for 2D drawing.
+*/
+export class RenderableSegment {
+  free(): void;
+/**
+* End of the line segment in the xy plane.
+*/
+  end: Cartesian2d;
+/**
+* Start of the line segment in the xy plane.
+*/
+  start: Cartesian2d;
+/**
+* Z-Index for draw order
+*/
+  z: number;
+}
+/**
+* Projected line segment, with a x-y angle and a length factor.
+*
+* This format is usable for 2D drawing.
 */
 export class Segment {
   free(): void;
@@ -403,7 +423,8 @@ export class Segment {
   z: number;
 }
 /**
-* A self-sufficient description of a body position snapshot for 2d rendering.
+* A position- and size-independent description of a body pose snapshot for 2d
+* rendering. An intermediate step for [`RenderableSkeleton`].
 *
 * Each limb has a 2D angle in the x-y plane plus a length factor to simulate
 * the third dimension in a 2D projection. X grows to the right, y grows down.
@@ -415,9 +436,24 @@ export class Segment {
 * Note that the skeleton is stripped of position information, it only has
 * angles of all body parts. This means it cannot be used to overlay a video.
 * Use the original keypoints for such matters.
+*
+* TODO: I  don't think there is a good reason to expose internals of this. JS
+* should only worry about final coordinates, which it gets from the
+* RenderableSkeleton struct.
 */
 export class Skeleton {
   free(): void;
+/**
+* Compute 2d coordinates for the skeleton for rendering.
+*
+* The skeleton will be rendered assuming hard-coded values for body part
+* proportional lengths, multiplied with the size parameter. The hip
+* segment will have its center at the given position.
+* @param {Cartesian2d} hip_center
+* @param {number} size
+* @returns {SkeletonV2}
+*/
+  render(hip_center: Cartesian2d, size: number): SkeletonV2;
 /**
 * @param {boolean} sideway
 * @returns {Skeleton}
@@ -467,6 +503,58 @@ export class SkeletonSide {
 /**
 */
   thigh: Segment;
+}
+/**
+*/
+export class SkeletonSideV2 {
+  free(): void;
+/**
+*/
+  arm: RenderableSegment;
+/**
+*/
+  foot: RenderableSegment;
+/**
+*/
+  forearm: RenderableSegment;
+/**
+*/
+  shin: RenderableSegment;
+/**
+*/
+  thigh: RenderableSegment;
+}
+/**
+* A self-sufficient description of a body position snapshot for 2.5d
+* rendering.
+*
+* In this format, x,y,z values have been computed to fit in a specific area,
+* assuming specific body part lengths. JS code can take it and directly draw
+* it on a Canvas or as an SVG. The z information is an integer describing draw
+* order conditions for the renderer to respect.
+*/
+export class SkeletonV2 {
+  free(): void;
+/**
+* Does the dancer face away more than they face the camera?
+*/
+  backwards: boolean;
+/**
+*/
+  hip: RenderableSegment;
+/**
+*/
+  left: SkeletonSideV2;
+/**
+*/
+  right: SkeletonSideV2;
+/**
+*/
+  shoulder: RenderableSegment;
+/**
+* Does the dancer look more to the side han they face the camera?
+*/
+  sideway: boolean;
 }
 /**
 */

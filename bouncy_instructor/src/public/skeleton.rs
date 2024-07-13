@@ -3,9 +3,11 @@ use crate::intern::geom::Angle3d;
 use crate::intern::pose::Pose;
 use crate::intern::skeleton_3d::{Direction, Skeleton3d};
 use std::f32::consts::TAU;
+use std::fmt::Debug;
 use wasm_bindgen::prelude::wasm_bindgen;
 
-/// A self-sufficient description of a body position snapshot for 2d rendering.
+/// A position- and size-independent description of a body pose snapshot for 2d
+/// rendering. An intermediate step for [`RenderableSkeleton`].
 ///
 /// Each limb has a 2D angle in the x-y plane plus a length factor to simulate
 /// the third dimension in a 2D projection. X grows to the right, y grows down.
@@ -17,7 +19,11 @@ use wasm_bindgen::prelude::wasm_bindgen;
 /// Note that the skeleton is stripped of position information, it only has
 /// angles of all body parts. This means it cannot be used to overlay a video.
 /// Use the original keypoints for such matters.
-#[wasm_bindgen]
+///
+/// TODO: I  don't think there is a good reason to expose internals of this. JS
+/// should only worry about final coordinates, which it gets from the
+/// RenderableSkeleton struct.
+#[wasm_bindgen(js_name = "Skeleton")]
 #[derive(Clone, Copy, Debug)]
 pub struct Skeleton {
     pub left: Side,
@@ -42,10 +48,10 @@ pub struct Side {
     // head?
 }
 
-/// Projected lin segment, with a x-y angle and a length factor.
+/// Projected line segment, with a x-y angle and a length factor.
 ///
-/// This format is perfect for 2D drawing.
-#[wasm_bindgen]
+/// This format is usable for 2D drawing.
+#[wasm_bindgen(js_name = Segment)]
 #[derive(Clone, Copy, PartialEq, Debug)]
 pub struct Segment {
     /// The 2D projected angle of the segment, counter-clock wise to the x-axis,
@@ -58,7 +64,7 @@ pub struct Segment {
 }
 
 #[wasm_bindgen]
-#[derive(Clone, Copy, PartialEq, Debug, Default)]
+#[derive(Clone, Copy, PartialEq, Default)]
 pub struct Cartesian2d {
     pub x: f32,
     pub y: f32,
@@ -138,6 +144,15 @@ impl Default for Segment {
             r: 1.0,
             z: 0,
         }
+    }
+}
+
+// Custom debug mainly for better floats. Used in snapshot tests.
+impl Debug for Cartesian2d {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let x = self.x;
+        let y = self.y;
+        write!(f, "({x:.3}, {y:.3})")
     }
 }
 

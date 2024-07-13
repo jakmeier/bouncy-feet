@@ -4,6 +4,7 @@ pub(crate) mod dance_info;
 pub(crate) mod editor;
 pub(crate) mod keypoints;
 pub(crate) mod parsing;
+pub(crate) mod renderable;
 pub(crate) mod skeleton;
 pub(crate) mod step_info;
 pub(crate) mod tracker;
