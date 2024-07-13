@@ -20,7 +20,7 @@
   export let origin = new Cartesian2d(0.0, 0.0);
   export let avatarSize = 1.0;
 
-  $: avatarLineWidth = 4 * avatarSize;
+  $: avatarLineWidth = 6 * avatarSize;
   $: correctAvatarLineWidth = 10 * avatarSize;
 
   /** @type {import("$lib/instructor/bouncy_instructor").Skeleton | null} */
@@ -58,7 +58,7 @@
 
 <div class="avatar-container back">
   {#if !showCorrectPosition}
-    <Svg {width} {height}>
+    <Svg {width} {height} orderByZ>
       <SvgAvatar
         {skeleton}
         {width}
@@ -77,7 +77,7 @@
 
 <div class="avatar-container front">
   {#if showCorrectPosition && correctSkeleton && correctBodyShift}
-    <Svg {width} {height}>
+    <Svg {width} {height} orderByZ>
       <SvgAvatar
         {width}
         {height}

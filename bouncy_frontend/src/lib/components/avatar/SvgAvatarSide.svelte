@@ -7,7 +7,6 @@
   /** @type{string} */
   export let sideId;
 
-  const svg = getContext('svg');
   const svgStyle = getContext('svg-style');
 
   /**
