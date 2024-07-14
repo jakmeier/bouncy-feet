@@ -136,7 +136,7 @@
   });
 </script>
 
-<div bind:clientWidth={outerWidth} style="width: 100%;">
+<div bind:clientWidth={outerWidth} style="width: 100%; transform: scaleX(-1);">
   <BackgroundTask {onFrame}></BackgroundTask>
 
   <Area
