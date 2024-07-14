@@ -10,12 +10,11 @@
   const svgStyle = getContext('svg-style');
 
   /**
-     * @param {string} id
-     * @param {import("$lib/instructor/bouncy_instructor").RenderableSegment} segment
-     * @param {any} style
-     */
+   * @param {string} id
+   * @param {import("$lib/instructor/bouncy_instructor").RenderableSegment} segment
+   * @param {any} style
+   */
   function svgLine(id, segment, style) {
-    console.log("svgline with style", style);
     return {
       id,
       start: segment.start,
