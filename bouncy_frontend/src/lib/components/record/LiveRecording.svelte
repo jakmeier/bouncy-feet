@@ -49,8 +49,6 @@
   let camera;
   /** @type {HTMLVideoElement} */
   let cameraVideoElement;
-  /** @type {import("$lib/instructor/bouncy_instructor").Skeleton | undefined} */
-  let skeleton;
   /** @type {import("$lib/instructor/bouncy_instructor").Skeleton} */
   let instructorSkeleton = tracker.expectedPoseSkeleton();
   let instructorSkeletonBodyShift = tracker.expectedPoseBodyShift();
@@ -120,8 +118,7 @@
     if (result.landmarks && result.landmarks.length >= 1) {
       landmarks = result.landmarks[0];
       const kp = landmarksToKeypoints(result.landmarks[0]);
-      const skeletons = tracker.addKeypoints(kp, timestamp);
-      skeleton = skeletons.front;
+      tracker.addKeypoints(kp, timestamp);
       recordingEnd = timestamp;
     }
     // TODO(performance): do this less often
