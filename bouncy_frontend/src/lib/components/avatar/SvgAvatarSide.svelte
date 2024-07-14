@@ -10,25 +10,27 @@
   const svgStyle = getContext('svg-style');
 
   /**
-   * @param {string} id
-   * @param {import("$lib/instructor/bouncy_instructor").RenderableSegment} segment
-   */
-  function svgLine(id, segment) {
+     * @param {string} id
+     * @param {import("$lib/instructor/bouncy_instructor").RenderableSegment} segment
+     * @param {any} style
+     */
+  function svgLine(id, segment, style) {
+    console.log("svgline with style", style);
     return {
       id,
       start: segment.start,
       end: segment.end,
       z: segment.z,
-      style: svgStyle,
+      style,
     };
   }
 
   $: lines = [
-    svgLine('thigh', side.thigh),
-    svgLine('shin', side.shin),
-    svgLine('arm', side.arm),
-    svgLine('forearm', side.forearm),
-    svgLine('foot', side.foot),
+    svgLine('thigh', side.thigh, $svgStyle),
+    svgLine('shin', side.shin, $svgStyle),
+    svgLine('arm', side.arm, $svgStyle),
+    svgLine('forearm', side.forearm, $svgStyle),
+    svgLine('foot', side.foot, $svgStyle),
   ];
 </script>
 
