@@ -76,6 +76,7 @@ export function tracker_exportFrame(a: number, b: number): number;
 export function tracker_hipPosition(a: number, b: number): number;
 export function tracker_new(): number;
 export function tracker_numDetectedPoses(a: number): number;
+export function tracker_poseHint(a: number): number;
 export function tracker_setBpm(a: number, b: number): void;
 export function tracker_setErrorThreshold(a: number, b: number): void;
 export function tracker_skeletonAt(a: number, b: number): number;

@@ -4,7 +4,7 @@
   // where users look at the video feed and position themselves as shown
   // by the instructor stick figure.
   import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
-  import { Cartesian2d } from '$lib/instructor/bouncy_instructor';
+  import { Cartesian2d, PoseHint } from '$lib/instructor/bouncy_instructor';
   import Svg from '../avatar/Svg.svelte';
   import { onMount } from 'svelte';
 
@@ -19,6 +19,8 @@
   /** @type {Cartesian2d} */
   export let origin = new Cartesian2d(0.0, 0.0);
   export let avatarSize = 1.0;
+  /** @type {PoseHint} */
+  export let hint = PoseHint.DontKnow;
 
   $: avatarLineWidth = 6 * avatarSize;
   $: correctAvatarLineWidth = 10 * avatarSize;
@@ -33,6 +35,35 @@
   /** @type {import('$lib/instructor/bouncy_instructor').Cartesian2d | null} */
   let correctBodyShift = null;
   let showCorrectPosition = false;
+
+  const baseStyle = {
+    leftColor: '#ffffffFF',
+    rightColor: '#ffffffFF',
+    headColor: '#ffffff40',
+    bodyColor: '#ffffff10',
+  };
+
+  const leftRightColoring = {
+    leftColor: '#e97516D0',
+    rightColor: '#382eebD0',
+    headColor: '#ffad6940',
+    bodyColor: '#ffad6910',
+  };
+
+  /**
+   * @param {PoseHint} inputHint
+   */
+  function selectStyle(inputHint) {
+    switch (inputHint) {
+      case PoseHint.LeftRight:
+        return leftRightColoring;
+      case PoseHint.ZOrder:
+        return baseStyle;
+      default:
+        return baseStyle;
+    }
+  }
+  $: instructorStyle = selectStyle(hint);
 
   $: if (skeleton !== prevSkeleton) {
     correctSkeleton = prevSkeleton;
@@ -64,10 +95,10 @@
         {width}
         {height}
         {avatarSize}
-        leftColor={'#e97516D0'}
-        rightColor={'#382eebD0'}
-        headColor={'#ffad6940'}
-        bodyColor={'#ffad6910'}
+        leftColor={instructorStyle.leftColor}
+        rightColor={instructorStyle.rightColor}
+        headColor={instructorStyle.headColor}
+        bodyColor={instructorStyle.bodyColor}
         lineWidth={avatarLineWidth}
         bodyShift={bodyShift.add(origin)}
       ></SvgAvatar>

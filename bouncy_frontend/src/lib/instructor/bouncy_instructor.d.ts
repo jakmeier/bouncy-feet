@@ -52,6 +52,14 @@ export function dances(): (DanceInfo)[];
 */
 export function danceBuilderFromDance(dance_id: string): DanceBuilder;
 /**
+* Best guess for what the dancer needs to change to fit the pose.
+*/
+export enum PoseHint {
+  DontKnow = 0,
+  LeftRight = 1,
+  ZOrder = 2,
+}
+/**
 */
 export class Cartesian2d {
   free(): void;
@@ -679,6 +687,10 @@ export class Tracker {
 * @returns {DetectionResult}
 */
   detectNextPose(): DetectionResult;
+/**
+* @returns {PoseHint}
+*/
+  poseHint(): PoseHint;
 /**
 * Return a skeleton that's expected next.
 *

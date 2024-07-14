@@ -45,7 +45,7 @@ pub(crate) struct DanceCollection {
 }
 
 /// For accessing LimbPositionDatabase::limbs
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub(crate) struct LimbIndex(usize);
 
 #[derive(Debug)]
@@ -253,6 +253,15 @@ impl DanceCollection {
         &self.dances
     }
 
+    /// The pose at the given index but with left and right switched.
+    pub(crate) fn pose_left_right_switched(&self, index: usize) -> Pose {
+        let mut pose = self.poses[index].clone();
+        for limb_position in &mut pose.limbs {
+            limb_position.limb = limb_position.limb.mirror()
+        }
+        pose
+    }
+
     pub(crate) fn add_steps(&mut self, steps: &[step_file::Step]) -> Result<(), AddStepError> {
         for def in steps {
             let poses = def
@@ -426,6 +435,22 @@ impl Limb {
 impl LimbIndex {
     pub(crate) fn as_usize(&self) -> usize {
         self.0
+    }
+
+    pub(crate) fn mirror(&self) -> Self {
+        match *self {
+            i if i == Limb::LEFT_THIGH => Limb::RIGHT_THIGH,
+            i if i == Limb::LEFT_SHIN => Limb::RIGHT_SHIN,
+            i if i == Limb::LEFT_FOOT => Limb::RIGHT_FOOT,
+            i if i == Limb::LEFT_ARM => Limb::RIGHT_ARM,
+            i if i == Limb::LEFT_FOREARM => Limb::RIGHT_FOREARM,
+            i if i == Limb::RIGHT_THIGH => Limb::LEFT_THIGH,
+            i if i == Limb::RIGHT_SHIN => Limb::LEFT_SHIN,
+            i if i == Limb::RIGHT_FOOT => Limb::LEFT_FOOT,
+            i if i == Limb::RIGHT_ARM => Limb::LEFT_ARM,
+            i if i == Limb::RIGHT_FOREARM => Limb::LEFT_FOREARM,
+            other => other,
+        }
     }
 }
 

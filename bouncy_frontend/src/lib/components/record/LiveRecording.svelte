@@ -11,6 +11,7 @@
   import {
     Cartesian2d,
     DetectionResult,
+    PoseHint,
   } from '$lib/instructor/bouncy_instructor';
   import { playSuccessSound } from '$lib/stores/SoundEffects';
   import InstructorAvatar from '../avatar/InstructorAvatar.svelte';
@@ -74,6 +75,7 @@
 
   let lastSuccessSkeletonSize = 1.0;
   let lastSuccessSkeletonOrigin = new Cartesian2d(0.0, 0.0);
+  let lastPoseHint = PoseHint.DontKnow;
 
   function onFrame() {
     if (cameraOn && dataListener) {
@@ -85,6 +87,7 @@
       }
       const before = tracker.numDetectedPoses();
       detectionResult = tracker.detectNextPose();
+      lastPoseHint = tracker.poseHint();
       if (tracker.numDetectedPoses() > before) {
         playSuccessSound();
         instructorSkeleton = tracker.expectedPoseSkeleton();
@@ -162,6 +165,7 @@
           skeleton={instructorSkeleton}
           bodyShift={instructorSkeletonBodyShift}
           origin={lastSuccessSkeletonOrigin}
+          hint={lastPoseHint}
         />
       </div>
     {/if}

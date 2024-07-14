@@ -8,6 +8,7 @@ pub use pose_output::PoseApproximation;
 pub use step_output::DetectedStep;
 
 use crate::intern::dance_collection::{DanceCollection, ForeignCollectionError};
+use crate::intern::pose_score::ErrorDetails;
 use crate::intern::skeleton_3d::Skeleton3d;
 use crate::keypoints::{Cartesian3d, Keypoints};
 use crate::skeleton::{Cartesian2d, Skeleton};
@@ -36,12 +37,22 @@ pub struct Tracker {
     /// (experimenting with live instructor, I probably want to change this when cleaning up the impl)
     /// only set for unique step tracking
     pub(crate) intermediate_result: Option<DetectionResult>,
+    pub(crate) last_error: Option<(PoseHint, ErrorDetails)>,
 }
 
 #[wasm_bindgen]
 pub struct Skeletons {
     pub front: Skeleton,
     pub side: Skeleton,
+}
+
+/// Best guess for what the dancer needs to change to fit the pose.
+#[wasm_bindgen]
+#[derive(Clone, Copy, Debug)]
+pub enum PoseHint {
+    DontKnow,
+    LeftRight,
+    ZOrder,
 }
 
 impl Default for Tracker {
@@ -56,6 +67,7 @@ impl Default for Tracker {
             bpm: 120.0,
             error_threshold: 0.05,
             intermediate_result: None,
+            last_error: None,
         }
     }
 }
@@ -121,6 +133,7 @@ impl Tracker {
             intermediate.partial = None;
             intermediate.steps.clear();
         }
+        self.last_error = None;
     }
 
     /// Insert keypoints of a new frame for tracking.
@@ -217,10 +230,37 @@ impl Tracker {
                     timestamp: end_t,
                     error_details,
                 });
+                self.last_error = None;
+            } else {
+                let hint = {
+                    if !error_details.z_order_errors.is_empty() {
+                        PoseHint::ZOrder
+                    } else {
+                        let left_right_pose = self.db.pose_left_right_switched(pose_idx);
+                        let lr_error = left_right_pose
+                            .error(tracked_skeleton.angles(), tracked_skeleton.positions());
+                        let lr_error_score = lr_error.error_score();
+                        // TODO: fine-tune 0.5
+                        if lr_error_score < error * 0.5 {
+                            PoseHint::LeftRight
+                        } else {
+                            PoseHint::DontKnow
+                        }
+                    }
+                };
+                self.last_error = Some((hint, error_details));
             }
         }
 
         self.intermediate_result.clone().unwrap()
+    }
+
+    #[wasm_bindgen(js_name = poseHint)]
+    pub fn pose_hint(&self) -> PoseHint {
+        match &self.last_error {
+            Some((hint, _err)) => *hint,
+            None => PoseHint::DontKnow,
+        }
     }
 
     /// Return a skeleton that's expected next.
