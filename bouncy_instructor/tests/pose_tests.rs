@@ -29,7 +29,12 @@ fn check_pose_in_keypoints(keypoints: &str, expected_pose: &str) {
         }
         println!();
     }
-    assert_eq!(expected_pose, approximation.name(), "wrong pose detected");
+    assert_eq!(
+        expected_pose,
+        approximation.name(),
+        "wrong pose detected {:?}",
+        approximation
+    );
     assert_eq!(timestamp, approximation.timestamp, "timestamp mangled");
     let threshold = 0.15;
     assert!(

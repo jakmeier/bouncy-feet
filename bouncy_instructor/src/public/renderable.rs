@@ -150,13 +150,13 @@ mod tests {
                 RenderableSkeleton {
                     left: RenderableSide {
                         thigh: RenderableSegment {
-                            start: (0.000, -3.000),
-                            end: (-0.000, 17.000),
+                            start: (0.000, -3.750),
+                            end: (-0.000, 16.250),
                             z: 0,
                         },
                         shin: RenderableSegment {
-                            start: (-0.000, 17.000),
-                            end: (-0.000, 37.000),
+                            start: (-0.000, 16.250),
+                            end: (-0.000, 36.250),
                             z: 0,
                         },
                         arm: RenderableSegment {
@@ -170,20 +170,20 @@ mod tests {
                             z: 0,
                         },
                         foot: RenderableSegment {
-                            start: (-0.000, 37.000),
-                            end: (-5.000, 37.000),
+                            start: (-0.000, 36.250),
+                            end: (-7.500, 36.250),
                             z: 0,
                         },
                     },
                     right: RenderableSide {
                         thigh: RenderableSegment {
-                            start: (-0.000, 3.000),
-                            end: (-0.000, 23.000),
+                            start: (-0.000, 3.750),
+                            end: (-0.000, 23.750),
                             z: 0,
                         },
                         shin: RenderableSegment {
-                            start: (-0.000, 23.000),
-                            end: (-0.000, 43.000),
+                            start: (-0.000, 23.750),
+                            end: (-0.000, 43.750),
                             z: 0,
                         },
                         arm: RenderableSegment {
@@ -197,14 +197,14 @@ mod tests {
                             z: 0,
                         },
                         foot: RenderableSegment {
-                            start: (-0.000, 43.000),
-                            end: (-5.000, 43.000),
+                            start: (-0.000, 43.750),
+                            end: (-7.500, 43.750),
                             z: 0,
                         },
                     },
                     hip: RenderableSegment {
-                        start: (0.000, -3.000),
-                        end: (-0.000, 3.000),
+                        start: (0.000, -3.750),
+                        end: (-0.000, 3.750),
                         z: 0,
                     },
                     shoulder: RenderableSegment {
@@ -223,13 +223,13 @@ mod tests {
                 RenderableSkeleton {
                     left: RenderableSide {
                         thigh: RenderableSegment {
-                            start: (0.000, -3.000),
-                            end: (-0.000, 17.000),
+                            start: (0.000, -3.750),
+                            end: (-0.000, 16.250),
                             z: 0,
                         },
                         shin: RenderableSegment {
-                            start: (-0.000, 17.000),
-                            end: (-0.000, 37.000),
+                            start: (-0.000, 16.250),
+                            end: (-0.000, 36.250),
                             z: 0,
                         },
                         arm: RenderableSegment {
@@ -243,20 +243,20 @@ mod tests {
                             z: 0,
                         },
                         foot: RenderableSegment {
-                            start: (-0.000, 37.000),
-                            end: (2.500, 41.330),
+                            start: (-0.000, 36.250),
+                            end: (3.750, 42.745),
                             z: 0,
                         },
                     },
                     right: RenderableSide {
                         thigh: RenderableSegment {
-                            start: (-0.000, 3.000),
-                            end: (-0.000, 23.000),
+                            start: (-0.000, 3.750),
+                            end: (-0.000, 23.750),
                             z: 0,
                         },
                         shin: RenderableSegment {
-                            start: (-0.000, 23.000),
-                            end: (-0.000, 43.000),
+                            start: (-0.000, 23.750),
+                            end: (-0.000, 43.750),
                             z: 0,
                         },
                         arm: RenderableSegment {
@@ -270,14 +270,14 @@ mod tests {
                             z: 0,
                         },
                         foot: RenderableSegment {
-                            start: (-0.000, 43.000),
-                            end: (-2.500, 47.330),
+                            start: (-0.000, 43.750),
+                            end: (-3.750, 50.245),
                             z: 0,
                         },
                     },
                     hip: RenderableSegment {
-                        start: (0.000, -3.000),
-                        end: (-0.000, 3.000),
+                        start: (0.000, -3.750),
+                        end: (-0.000, 3.750),
                         z: 0,
                     },
                     shoulder: RenderableSegment {
