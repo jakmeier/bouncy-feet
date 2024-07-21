@@ -57,9 +57,9 @@ impl RenderableSkeleton {
     pub(crate) const TORSO_LEN: f32 = 0.25;
     pub(crate) const ARM_LEN: f32 = 0.1;
     pub(crate) const FOREARM_LEN: f32 = 0.15;
-    pub(crate) const FOOT_LEN: f32 = 0.05;
+    pub(crate) const FOOT_LEN: f32 = 0.075;
     pub(crate) const SHOULDER_LEN: f32 = 0.1;
-    pub(crate) const HIP_LEN: f32 = 0.06;
+    pub(crate) const HIP_LEN: f32 = 0.075;
 }
 
 #[wasm_bindgen]
