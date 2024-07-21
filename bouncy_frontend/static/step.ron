@@ -274,5 +274,38 @@
         (pose: "standing-straight-front", orientation: ToCamera),
       ]
     ),
+    (
+      name: "Gangsta Running Man",
+      id: "grm-0",
+      variation: "right-first",
+      keyframes: [
+        (pose: "right-forward-heel", orientation: Right),
+        (pose: "gangsta-left-up", orientation: Right),
+        (pose: "left-forward-heel", orientation: Right),
+        (pose: "gangsta-right-up", orientation: Right),
+      ]
+    ),
+    (
+      name: "Gangsta Hop",
+      id: "ghop-0",
+      variation: "left-first",
+      keyframes: [
+        (pose: "gangsta-hop-left", orientation: ToCamera),
+        (pose: "gangsta-right-up-front", orientation: ToCamera),
+        (pose: "gangsta-hop-right", orientation: ToCamera),
+        (pose: "gangsta-left-up-front", orientation: ToCamera),
+      ]
+    ),
+    (
+      name: "Gangsta Hop",
+      id: "ghop-1",
+      variation: "right-first",
+      keyframes: [
+        (pose: "gangsta-hop-right", orientation: ToCamera),
+        (pose: "gangsta-left-up-front", orientation: ToCamera),
+        (pose: "gangsta-hop-left", orientation: ToCamera),
+        (pose: "gangsta-right-up-front", orientation: ToCamera),
+      ]
+    ),
   ]
 )

@@ -44,7 +44,7 @@
         (limb: RightLeg, angle: 0, tolerance: 5, weight: 0.5),
         (limb: RightShin, angle: -30, tolerance: 5, weight: 1.0),
         (limb: RightThigh, angle: 70, tolerance: 5, weight: 1.0),
-        // jsut for the db view
+        // just for the db view
         (limb: RightArm, angle: 6, tolerance: 0, weight: 0.0),
         (limb: RightForearm, angle: 18, tolerance: 0, weight: 0.0),
         (limb: LeftArm, angle: -12, tolerance: 0, weight: 0.0),
@@ -401,5 +401,77 @@
         ( limb: RightForearm, weight: 0.0, angle: -7, tolerance: 0),
       ],
     ),
+    (
+      name: "gangsta-right-up",
+      direction: Right,
+      turn_shoulder: 30,
+      turn_hip: 20,
+      limbs: [
+        // left leg has to stand straight, but it doesn't matter if the knee is angled
+        (limb: LeftLeg, angle: 0, tolerance: 3, weight: 1.0),
+        // right leg is also somewhere around being straight down, but with a slight angle at the knee
+        (limb: RightLeg, angle: 0, tolerance: 5, weight: 0.5),
+        (limb: RightShin, angle: -35, tolerance: 5, weight: 0.5),
+        (limb: RightThigh, angle: 35, tolerance: 5, weight: 0.5),
+        // gangsta rm has the toes tipping the ground with the foot straight up
+        (limb: RightFoot, angle: 5, tolerance: 10, weight: 1.0),
+        // just for the db view
+        (limb: RightArm, angle: 6, tolerance: 0, weight: 0.0),
+        (limb: RightForearm, angle: 18, tolerance: 0, weight: 0.0),
+        (limb: LeftArm, angle: -12, tolerance: 0, weight: 0.0),
+        (limb: LeftForearm, angle: 6, tolerance: 0, weight: 0.0),
+        (limb: LeftFoot, angle: 90, tolerance: 0, weight: 0.0),
+      ]
+    ),
+    ( name: "gangsta-left-up", mirror_of: "gangsta-right-up", direction: Front ),
+    (
+      name: "gangsta-right-up-front",
+      direction: Front,
+      turn_shoulder: 0,
+      turn_hip: 0,
+      limbs: [
+        (limb: LeftLeg, angle: 0, tolerance: 3, weight: 1.0),
+        (limb: RightLeg, angle: 0, tolerance: 5, weight: 0.5),
+        (limb: RightShin, angle: 30, tolerance: 5, weight: 0.5),
+        (limb: RightThigh, angle: -30, tolerance: 5, weight: 0.5),
+        (limb: RightFoot, angle: 0, tolerance: 10, weight: 1.0),
+        // just for the db view
+        (limb: LeftShin, angle: 15, tolerance: 0, weight: 0.0),
+        (limb: LeftThigh, angle: -7, tolerance: 0, weight: 0.0),
+        (limb: RightArm, angle: 91, tolerance: 0, weight: 0.0),
+        (limb: RightForearm, angle: -74, tolerance: 0, weight: 0.0),
+        (limb: LeftArm, angle: -92, tolerance: 0, weight: 0.0),
+        (limb: LeftForearm, angle: 79, tolerance: 0, weight: 0.0),
+        (limb: LeftFoot, angle: -60, tolerance: 0, weight: 0.0),
+      ],
+      z: (
+        order: [
+          ( forward: (side: Right, part: Ankle), backward: (side: Left, part: Ankle) ),
+          ( forward: (side: Right, part: Knee), backward: (side: Left, part: Knee) ),
+        ]
+      ),
+    ),
+    ( name: "gangsta-left-up-front", mirror_of: "gangsta-right-up-front", direction: Front ),
+    (
+      name: "gangsta-hop-left",
+      direction: Front,
+      y_shift: -0.04,
+      turn_shoulder: -20,
+      turn_hip: -45,
+      limbs: [
+        (limb: LeftThigh, weight: 1.0, angle: -20, tolerance: 2),
+        (limb: LeftShin, weight: 1.0, angle: -20, tolerance: 2),
+        (limb: LeftFoot, weight: 1.0, angle: -120, tolerance: 5),
+        (limb: RightThigh, weight: 1.0, angle: 20, tolerance: 3),
+        (limb: RightShin, weight: 1.0, angle: 30, tolerance: 3),
+        (limb: RightLeg, weight: 1.0, angle: 25, tolerance: 2),
+        (limb: RightFoot, weight: 0.2, angle: -60, tolerance: 10),
+        (limb: RightArm, angle: 90, tolerance: 0, weight: 0.0),
+        (limb: RightForearm, angle: -80, tolerance: 0, weight: 0.0),
+        (limb: LeftArm, angle: -90, tolerance: 0, weight: 0.0),
+        (limb: LeftForearm, angle: 80, tolerance: 0, weight: 0.0),
+      ],
+    ),
+    ( name: "gangsta-hop-right", mirror_of: "gangsta-hop-left", direction: Front ),
   ]
 )
