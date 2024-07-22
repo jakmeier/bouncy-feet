@@ -2,6 +2,7 @@
   import Animation from '$lib/components/avatar/Animation.svelte';
   import Svg from '$lib/components/avatar/Svg.svelte';
   import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
+  import { MAIN_THEME_COLORING } from '$lib/constants';
   import { Skeleton } from '$lib/instructor/bouncy_instructor';
   import { counter } from '$lib/timer';
 
@@ -13,14 +14,8 @@
   export let animationTime = stepTime * 0.85;
   export let size = 100;
 
-  /** @type{undefined|string} */
-  export let leftColor = undefined;
-  /** @type{undefined|string} */
-  export let rightColor = undefined;
-  /** @type{undefined|string} */
-  export let headColor = undefined;
-  /** @type{undefined|string} */
-  export let bodyColor = undefined;
+  /** @type{AvatarColoring} */
+  export let style = MAIN_THEME_COLORING;
 
   // When the beat is negative, it should show a resting position
   // according to the orientation of the first pose.
@@ -48,10 +43,7 @@
         {skeleton}
         {bodyShift}
         lineWidth={4}
-        {leftColor}
-        {rightColor}
-        {headColor}
-        {bodyColor}
+        {style}
       />
     {/if}
   </Svg>

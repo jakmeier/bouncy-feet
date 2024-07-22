@@ -4,6 +4,7 @@
   import SvgStyle from './SvgStyle.svelte';
   import SvgCircle from './SvgCircle.svelte';
   import { Cartesian2d } from '$lib/instructor/bouncy_instructor';
+  import { MAIN_THEME_COLORING } from '$lib/constants';
 
   /** @type import('$lib/instructor/bouncy_instructor').Skeleton */
   export let skeleton;
@@ -14,12 +15,7 @@
   export let avatarSize = 1.0;
 
   /** @type {AvatarColoring} */
-  export let style = {
-    leftColor: 'var(--theme-main)',
-    rightColor: 'var(--theme-main)',
-    headColor: 'var(--theme-main)',
-    bodyColor: 'var(--theme-neutral-light)',
-  };
+  export let style = MAIN_THEME_COLORING;
 
   /**
    * @param {number} s

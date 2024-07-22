@@ -3,6 +3,7 @@
   import { onDestroy, onMount } from 'svelte';
   import DanceAnimation from './DanceAnimation.svelte';
   import { backgroundColor } from '$lib/stores/UiState';
+  import { BOLD_MAIN_THEME_COLORING } from '$lib/constants';
 
   /** @type{null|import("$lib/instructor/bouncy_instructor").DanceInfo} */
   export let featuredDance;
@@ -26,13 +27,7 @@
 <div class="dancers" style="grid-template-columns: repeat({numDancers}, 1fr);">
   {#if featuredDance}
     {#each { length: numDancers } as _}
-      <DanceAnimation
-        dance={featuredDance}
-        leftColor={'var(--theme-main)'}
-        rightColor={'var(--theme-main)'}
-        headColor={'var(--theme-main)'}
-        bodyColor={'var(--theme-main)'}
-      />
+      <DanceAnimation dance={featuredDance} style={BOLD_MAIN_THEME_COLORING} />
     {/each}
   {/if}
 </div>

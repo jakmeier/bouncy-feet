@@ -16,7 +16,7 @@
   import { playSuccessSound } from '$lib/stores/SoundEffects';
   import InstructorAvatar from '../avatar/InstructorAvatar.svelte';
   import { distance2d } from '$lib/math';
-  import { LEFT_RIGHT_COLORING, BASE_STYLE } from '$lib/constants';
+  import { BLACK_COLORING, LEFT_RIGHT_COLORING_LIGHT } from '$lib/constants';
 
   export let cameraOn = false;
   /** @type {undefined | number} */
@@ -82,11 +82,11 @@
   function selectStyle(inputHint) {
     switch (inputHint) {
       case PoseHint.LeftRight:
-        return LEFT_RIGHT_COLORING;
+        return LEFT_RIGHT_COLORING_LIGHT;
       case PoseHint.ZOrder:
-        return BASE_STYLE;
+        return BLACK_COLORING;
       default:
-        return BASE_STYLE;
+        return BLACK_COLORING;
     }
   }
   let avatarStyle = selectStyle(PoseHint.DontKnow);
@@ -180,7 +180,7 @@
           skeleton={instructorSkeleton}
           bodyShift={instructorSkeletonBodyShift}
           origin={lastSuccessSkeletonOrigin}
-          instructorStyle={LEFT_RIGHT_COLORING}
+          instructorStyle={LEFT_RIGHT_COLORING_LIGHT}
         />
       </div>
     {/if}

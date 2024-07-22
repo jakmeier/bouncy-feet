@@ -47,8 +47,8 @@
   /** @type {import('$lib/instructor/bouncy_instructor').Cartesian2d | null} */
   let correctBodyShift = null;
 
-  let avatarStyle = instructorStyle;
-  let lineWidth = avatarLineWidth;
+  let displayedStyle = instructorStyle;
+  let displayedLineWidth = avatarLineWidth;
   let displayedSkeleton = skeleton;
   let displayedBodyShift = bodyShift;
 
@@ -61,13 +61,13 @@
   }
 
   function displayCorrectPosition() {
-    avatarStyle = CORRECT_COLORING;
-    lineWidth = correctAvatarLineWidth;
+    displayedStyle = CORRECT_COLORING;
+    displayedLineWidth = correctAvatarLineWidth;
     displayedBodyShift = correctBodyShift || bodyShift;
     setTimeout(() => {
       // TODO: handle reentrance
-      avatarStyle = instructorStyle;
-      lineWidth = avatarLineWidth;
+      displayedStyle = instructorStyle;
+      displayedLineWidth = avatarLineWidth;
       displayedBodyShift = bodyShift;
       displayedSkeleton = skeleton;
     }, showCorrectTime);
@@ -87,7 +87,7 @@
         {width}
         {height}
         {avatarSize}
-        style={avatarStyle}
+        style={displayedStyle}
         lineWidth={avatarLineWidth}
         bodyShift={displayedBodyShift.add(origin)}
       ></SvgAvatar>
