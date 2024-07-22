@@ -191,7 +191,6 @@
       >
         <Canvas width={$videoSrcWidth} height={$videoSrcHeight}>
           <Avatar
-            skeleton={null}
             {landmarks}
             width={$videoSrcWidth}
             height={$videoSrcHeight}
