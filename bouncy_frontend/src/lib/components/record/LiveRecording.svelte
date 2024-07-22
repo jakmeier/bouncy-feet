@@ -3,7 +3,7 @@
   import Camera from '$lib/components/record/Camera.svelte';
   import Canvas from '$lib/components/Canvas.svelte';
   import Avatar from '$lib/components/avatar/Avatar.svelte';
-  import { hideNavigation } from '$lib/stores/UiState';
+  import { hideNavigation, wideView } from '$lib/stores/UiState';
   import { getContext, onMount } from 'svelte';
   import { I, landmarksToKeypoints } from '$lib/pose';
   import BackgroundTask from '../BackgroundTask.svelte';
@@ -45,6 +45,7 @@
   const poseCtx = getContext('pose');
   let tracker = getContext('tracker').tracker;
   $: $hideNavigation = cameraOn;
+  $: $wideView = cameraOn;
 
   /** @type {Camera} */
   let camera;
@@ -60,7 +61,7 @@
   let dataListener;
 
   /** @type {number} */
-  const borderWidth = 5;
+  const borderWidth = 2;
   /** @type {number} */
   let outerWidth;
   /** @type {number} */
