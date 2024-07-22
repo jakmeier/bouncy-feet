@@ -39,6 +39,7 @@ export function exportedframe_pose(a: number, b: number): void;
 export function keypoints_new(a: number, b: number): number;
 export function keypointsside_new(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number): number;
 export function limberror_name(a: number, b: number): void;
+export function limberror_render(a: number, b: number, c: number): void;
 export function loadDanceFile(a: number, b: number): number;
 export function loadDanceString(a: number, b: number, c: number): void;
 export function loadPoseFile(a: number, b: number): number;

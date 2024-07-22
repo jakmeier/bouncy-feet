@@ -344,6 +344,11 @@ export class KeypointsSide {
 export class LimbError {
   free(): void;
 /**
+* @param {SkeletonV2} skeleton
+* @returns {RenderableSegment}
+*/
+  render(skeleton: SkeletonV2): RenderableSegment;
+/**
 */
   error: number;
 /**
@@ -630,6 +635,11 @@ export class StepInfo {
 export class Tracker {
   free(): void;
 /**
+* @param {number} timestamp
+* @returns {ExportedFrame}
+*/
+  exportFrame(timestamp: number): ExportedFrame;
+/**
 * Create a tracker for all known steps.
 */
   constructor();
@@ -734,11 +744,6 @@ export class Tracker {
 * @returns {Skeleton | undefined}
 */
   skeletonAt(timestamp: number): Skeleton | undefined;
-/**
-* @param {number} timestamp
-* @returns {ExportedFrame}
-*/
-  exportFrame(timestamp: number): ExportedFrame;
 }
 /**
 */

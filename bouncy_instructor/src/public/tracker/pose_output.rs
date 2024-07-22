@@ -1,6 +1,8 @@
 use super::Timestamp;
-use crate::intern::pose::BodyPoint;
+use crate::intern::dance_collection::LimbIndex;
+use crate::intern::pose::{BodyPoint, Limb};
 use crate::intern::pose_score::ErrorDetails;
+use crate::renderable::{RenderableSegment, RenderableSkeleton};
 use crate::STATE;
 use wasm_bindgen::prelude::wasm_bindgen;
 
@@ -21,6 +23,8 @@ pub struct PoseApproximation {
 #[wasm_bindgen]
 pub struct LimbError {
     name: String,
+    limb: Limb,
+    limb_index: LimbIndex,
     pub error: f32,
     pub weight: f32,
 }
@@ -98,12 +102,15 @@ impl PoseApproximation {
         self.error_details
             .sorted_by_error(increasing, weighted)
             .into_iter()
-            .map(|i| LimbError {
-                name: STATE.with_borrow(|state| {
-                    state.db.limb_name(self.error_details.limbs[i]).to_owned()
-                }),
-                error: self.error_details.errors[i],
-                weight: self.error_details.weights[i],
+            .map(|i| {
+                let limb_index = self.error_details.limbs[i];
+                STATE.with_borrow(|state| LimbError {
+                    name: state.db.limb_name(limb_index).to_owned(),
+                    limb: *state.db.limb(limb_index),
+                    limb_index,
+                    error: self.error_details.errors[i],
+                    weight: self.error_details.weights[i],
+                })
             })
     }
 }
@@ -113,6 +120,24 @@ impl LimbError {
     #[wasm_bindgen(getter)]
     pub fn name(&self) -> String {
         self.name.clone()
+    }
+
+    #[wasm_bindgen(js_name=render)]
+    pub fn render(&self, skeleton: &RenderableSkeleton) -> Result<RenderableSegment, String> {
+        let segment = match self.limb_index {
+            i if i == Limb::LEFT_THIGH => skeleton.left.thigh,
+            i if i == Limb::LEFT_SHIN => skeleton.left.shin,
+            i if i == Limb::LEFT_FOOT => skeleton.left.foot,
+            i if i == Limb::LEFT_ARM => skeleton.left.arm,
+            i if i == Limb::LEFT_FOREARM => skeleton.left.forearm,
+            i if i == Limb::RIGHT_THIGH => skeleton.right.thigh,
+            i if i == Limb::RIGHT_SHIN => skeleton.right.shin,
+            i if i == Limb::RIGHT_FOOT => skeleton.right.foot,
+            i if i == Limb::RIGHT_ARM => skeleton.right.arm,
+            i if i == Limb::RIGHT_FOREARM => skeleton.right.forearm,
+            _else => return Err(format!("Cannot render limb {:?}", self.limb)),
+        };
+        Ok(segment)
     }
 }
 
