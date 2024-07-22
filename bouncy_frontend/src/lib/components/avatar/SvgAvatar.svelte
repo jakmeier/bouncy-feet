@@ -13,10 +13,13 @@
   export let bodyShift = { x: 0, y: 0 };
   export let avatarSize = 1.0;
 
-  export let leftColor = 'var(--theme-main)';
-  export let rightColor = 'var(--theme-main)';
-  export let headColor = 'var(--theme-main)';
-  export let bodyColor = 'var(--theme-neutral-light)';
+  /** @type {AvatarColoring} */
+  export let style = {
+    leftColor: 'var(--theme-main)',
+    rightColor: 'var(--theme-main)',
+    headColor: 'var(--theme-main)',
+    bodyColor: 'var(--theme-neutral-light)',
+  };
 
   /**
    * @param {number} s
@@ -73,8 +76,8 @@
     id="torso"
     points={[leftHip, rightHip, rightShoulder, leftShoulder]}
     style={{
-      color: headColor,
-      fill: bodyColor,
+      color: style.headColor,
+      fill: style.bodyColor,
       linecap: 'round',
       lineWidth: lineWidth * 0.9,
     }}
@@ -84,12 +87,12 @@
     cx={headPosition.x}
     cy={headPosition.y}
     r={headRadius}
-    fill={headColor}
+    fill={style.headColor}
   />
-  <SvgStyle color={leftColor} linecap="round" {lineWidth}>
+  <SvgStyle color={style.leftColor} linecap="round" {lineWidth}>
     <SvgAvatarSide side={renderedSkeleton.left} sideId={'left'}></SvgAvatarSide>
   </SvgStyle>
-  <SvgStyle color={rightColor} linecap="round" {lineWidth}>
+  <SvgStyle color={style.rightColor} linecap="round" {lineWidth}>
     <SvgAvatarSide side={renderedSkeleton.right} sideId={'right'}
     ></SvgAvatarSide>
   </SvgStyle>

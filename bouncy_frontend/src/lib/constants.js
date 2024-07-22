@@ -11,3 +11,10 @@ export const LEFT_RIGHT_COLORING = {
     headColor: '#00000040',
     bodyColor: '#00000040',
 };
+
+export const CORRECT_COLORING = {
+    leftColor: '#4caf50',
+    rightColor: '#4caf50',
+    headColor: '#8bc34a',
+    bodyColor: '#c8e6c9',
+};
