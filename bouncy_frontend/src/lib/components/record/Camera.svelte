@@ -9,6 +9,7 @@
 
   export let width = 360;
   export let height = 480;
+  export let opacity = 1.0;
 
   let stream;
   /**
@@ -107,7 +108,11 @@
 </script>
 
 <!-- svelte-ignore a11y-media-has-caption -->
-<video bind:this={videoElement} class:hidden={!cameraOn}></video>
+<video
+  bind:this={videoElement}
+  class:hidden={!cameraOn}
+  style="opacity: {opacity}"
+></video>
 {#if !cameraOn}
   <span class="material-symbols-outlined"> videocam </span>
 {/if}

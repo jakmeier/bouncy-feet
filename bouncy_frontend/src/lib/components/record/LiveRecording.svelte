@@ -16,6 +16,7 @@
   import { playSuccessSound } from '$lib/stores/SoundEffects';
   import InstructorAvatar from '../avatar/InstructorAvatar.svelte';
   import { distance2d } from '$lib/math';
+  import { LEFT_RIGHT_COLORING, BASE_STYLE } from '$lib/constants';
 
   export let cameraOn = false;
   /** @type {undefined | number} */
@@ -73,7 +74,21 @@
 
   let lastSuccessSkeletonSize = 1.0;
   let lastSuccessSkeletonOrigin = new Cartesian2d(0.0, 0.0);
-  let lastPoseHint = PoseHint.DontKnow;
+
+  /**
+   * @param {PoseHint} inputHint
+   */
+  function selectStyle(inputHint) {
+    switch (inputHint) {
+      case PoseHint.LeftRight:
+        return LEFT_RIGHT_COLORING;
+      case PoseHint.ZOrder:
+        return BASE_STYLE;
+      default:
+        return BASE_STYLE;
+    }
+  }
+  let avatarStyle = selectStyle(PoseHint.DontKnow);
 
   function onFrame() {
     if (cameraOn && dataListener) {
@@ -85,7 +100,8 @@
       }
       const before = tracker.numDetectedPoses();
       detectionResult = tracker.detectNextPose();
-      lastPoseHint = tracker.poseHint();
+      const poseHint = tracker.poseHint();
+      avatarStyle = selectStyle(poseHint);
       if (tracker.numDetectedPoses() > before) {
         playSuccessSound();
         instructorSkeleton = tracker.expectedPoseSkeleton();
@@ -148,6 +164,7 @@
     <Camera
       {width}
       {height}
+      opacity={0.0}
       bind:videoElement={cameraVideoElement}
       bind:cameraOn
       bind:this={camera}
@@ -162,7 +179,7 @@
           skeleton={instructorSkeleton}
           bodyShift={instructorSkeletonBodyShift}
           origin={lastSuccessSkeletonOrigin}
-          hint={lastPoseHint}
+          instructorStyle={LEFT_RIGHT_COLORING}
         />
       </div>
     {/if}
@@ -177,12 +194,8 @@
             {landmarks}
             width={$videoSrcWidth}
             height={$videoSrcHeight}
-            mainColor={'#FFFFFFC0'}
-            leftColor={'#e97516C0'}
-            rightColor={'#382eebC0'}
+            style={avatarStyle}
             torsoLineWidth={3}
-            headColor={'#382eeb60'}
-            secondColor={'#c2bfff40'}
           ></Avatar>
         </Canvas>
       </div>

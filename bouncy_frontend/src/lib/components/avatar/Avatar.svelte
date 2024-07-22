@@ -28,13 +28,13 @@
 
   $: sideway = skeleton ? skeleton.sideway : false;
 
-  export let mainColor = '#382eeb';
-  /** @type {string | CanvasGradient | CanvasPattern | undefined} */
-  export let leftColor = undefined;
-  /** @type {string | CanvasGradient | CanvasPattern | undefined} */
-  export let rightColor = undefined;
-  export let secondColor = '#c2bfff';
-  export let headColor = mainColor;
+  /** @type {AvatarColoring} */
+  export let style = {
+    leftColor: '#000000FF',
+    rightColor: '#000000FF',
+    headColor: '#00000040',
+    bodyColor: '#00000010',
+  };
 
   getContext('canvas').addItem(draw);
 
@@ -42,10 +42,10 @@
    * @param {CanvasRenderingContext2D} ctx
    */
   function draw(ctx) {
-    ctx.strokeStyle = mainColor;
+    ctx.strokeStyle = style.bodyColor;
     ctx.lineWidth = lineWidth;
     ctx.lineCap = 'round';
-    ctx.fillStyle = secondColor;
+    ctx.fillStyle = style.headColor;
 
     if (skeleton) {
       drawSkeleton(ctx);
@@ -77,9 +77,7 @@
     });
     ctx.lineWidth = lineWidth;
 
-    if (leftColor) {
-      ctx.strokeStyle = leftColor;
-    }
+    ctx.strokeStyle = style.leftColor;
     leftSidePairs.forEach(([a, b]) => {
       drawLine(
         ctx,
@@ -88,9 +86,7 @@
       );
     });
 
-    if (rightColor) {
-      ctx.strokeStyle = rightColor;
-    }
+    ctx.strokeStyle = style.rightColor;
     rightSidePairs.forEach(([a, b]) => {
       drawLine(
         ctx,
@@ -134,17 +130,13 @@
     // right body part is left on screen
     const leftHip = { x: hip.x + hipLen, y: hip.y };
     const leftShoulder = { x: shoulder.x + shoulderLen, y: shoulder.y };
-    if (leftColor) {
-      ctx.strokeStyle = leftColor;
-    }
+    ctx.strokeStyle = style.leftColor;
     drawSide(ctx, leftHip, leftShoulder, skeleton.left, s);
     const rightHip = { x: hip.x - hipLen, y: hip.y };
     const rightShoulder = { x: shoulder.x - shoulderLen, y: shoulder.y };
-    if (rightColor) {
-      ctx.strokeStyle = rightColor;
-    }
+    ctx.strokeStyle = style.rightColor;
     drawSide(ctx, rightHip, rightShoulder, skeleton.right, s);
-    ctx.strokeStyle = mainColor;
+    ctx.strokeStyle = style.bodyColor;
     drawHead(ctx, shoulder.x, shoulder.y - 0.1 * s, 0.075 * s);
 
     if (!sideway) {
@@ -218,7 +210,7 @@
    * @param {number} headRadius
    */
   function drawHead(ctx, x, y, headRadius) {
-    ctx.fillStyle = headColor;
+    ctx.fillStyle = style.headColor;
     ctx.beginPath();
     ctx.arc(x, y, headRadius, 0, 2 * Math.PI);
     ctx.fill();

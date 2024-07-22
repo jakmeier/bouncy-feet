@@ -19,8 +19,14 @@
   /** @type {Cartesian2d} */
   export let origin = new Cartesian2d(0.0, 0.0);
   export let avatarSize = 1.0;
-  /** @type {PoseHint} */
-  export let hint = PoseHint.DontKnow;
+  
+  /** @type {AvatarColoring} */
+  export let instructorStyle = {
+    leftColor: '#000000FF',
+    rightColor: '#000000FF',
+    headColor: '#00000040',
+    bodyColor: '#00000010',
+  };
 
   $: avatarLineWidth = 6 * avatarSize;
   $: correctAvatarLineWidth = 10 * avatarSize;
@@ -36,34 +42,6 @@
   let correctBodyShift = null;
   let showCorrectPosition = false;
 
-  const baseStyle = {
-    leftColor: '#ffffffFF',
-    rightColor: '#ffffffFF',
-    headColor: '#ffffff40',
-    bodyColor: '#ffffff10',
-  };
-
-  const leftRightColoring = {
-    leftColor: '#e97516D0',
-    rightColor: '#382eebD0',
-    headColor: '#ffad6940',
-    bodyColor: '#ffad6910',
-  };
-
-  /**
-   * @param {PoseHint} inputHint
-   */
-  function selectStyle(inputHint) {
-    switch (inputHint) {
-      case PoseHint.LeftRight:
-        return leftRightColoring;
-      case PoseHint.ZOrder:
-        return baseStyle;
-      default:
-        return baseStyle;
-    }
-  }
-  $: instructorStyle = selectStyle(hint);
 
   $: if (skeleton !== prevSkeleton) {
     correctSkeleton = prevSkeleton;

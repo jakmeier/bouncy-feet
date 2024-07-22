@@ -35,4 +35,9 @@
  * @property {"inherit" | "round" | "butt" | "square"} linecap
  * @property {number} lineWidth
  * 
+ * @typedef {Object} AvatarColoring
+ * @property {string} leftColor
+ * @property {string} rightColor
+ * @property {string} headColor
+ * @property {string} bodyColor
  */
