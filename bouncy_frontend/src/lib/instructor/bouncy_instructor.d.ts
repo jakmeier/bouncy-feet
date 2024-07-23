@@ -702,6 +702,10 @@ export class Tracker {
 */
   poseHint(): PoseHint;
 /**
+* @returns {PoseApproximation | undefined}
+*/
+  currentPoseError(): PoseApproximation | undefined;
+/**
 * Return a skeleton that's expected next.
 *
 * Only implemented to work properly for trackers of unique steps.

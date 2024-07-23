@@ -3,8 +3,9 @@
   import SvgPolygon from './SvgPolygon.svelte';
   import SvgStyle from './SvgStyle.svelte';
   import SvgCircle from './SvgCircle.svelte';
-  import { Cartesian2d } from '$lib/instructor/bouncy_instructor';
+  import { Cartesian2d, LimbError } from '$lib/instructor/bouncy_instructor';
   import { MAIN_THEME_COLORING } from '$lib/constants';
+  import SvgLine from './SvgLine.svelte';
 
   /** @type import('$lib/instructor/bouncy_instructor').Skeleton */
   export let skeleton;
@@ -13,9 +14,14 @@
   export let lineWidth = 10;
   export let bodyShift = { x: 0, y: 0 };
   export let avatarSize = 1.0;
+  /** @type LimbError[] */
+  export let markedLimbs = [];
 
   /** @type {AvatarColoring} */
   export let style = MAIN_THEME_COLORING;
+
+  const markerColor = '#ff111188';
+  const markerLineWidth = 20;
 
   /**
    * @param {number} s
@@ -63,6 +69,7 @@
       leftShoulder.y - avatarSizePixels * 0.1
     );
   }
+  $: markedSegments = markedLimbs.map((limb) => limb.render(renderedSkeleton));
 
   $: headRadius = 0.075 * avatarSizePixels;
 </script>
@@ -92,4 +99,20 @@
     <SvgAvatarSide side={renderedSkeleton.right} sideId={'right'}
     ></SvgAvatarSide>
   </SvgStyle>
+  {#each markedSegments as segment, i}
+    <SvgLine
+      id="{`marker${i}`},"
+      line={{
+        id: `marker${i}`,
+        start: segment.start,
+        end: segment.end,
+        z: segment.z,
+        style: {
+          color: markerColor,
+          linecap: 'butt',
+          lineWidth: markerLineWidth,
+        },
+      }}
+    ></SvgLine>
+  {/each}
 {/if}

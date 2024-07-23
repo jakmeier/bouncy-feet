@@ -8,7 +8,6 @@ pub use pose_output::PoseApproximation;
 pub use step_output::DetectedStep;
 
 use crate::intern::dance_collection::{DanceCollection, ForeignCollectionError};
-use crate::intern::pose_score::ErrorDetails;
 use crate::intern::skeleton_3d::Skeleton3d;
 use crate::keypoints::{Cartesian3d, Keypoints};
 use crate::skeleton::{Cartesian2d, Skeleton};
@@ -37,7 +36,7 @@ pub struct Tracker {
     /// (experimenting with live instructor, I probably want to change this when cleaning up the impl)
     /// only set for unique step tracking
     pub(crate) intermediate_result: Option<DetectionResult>,
-    pub(crate) last_error: Option<(PoseHint, ErrorDetails)>,
+    pub(crate) last_error: Option<(PoseHint, PoseApproximation)>,
 }
 
 #[wasm_bindgen]
@@ -223,17 +222,19 @@ impl Tracker {
             let pose = &self.db.poses()[pose_idx];
             let error_details = pose.error(tracked_skeleton.angles(), tracked_skeleton.positions());
             let error = error_details.error_score();
-            if error_details.z_order_errors.is_empty() && error < self.error_threshold {
-                self.add_pose(PoseApproximation {
-                    name: self.db.pose_name(pose_idx).to_owned(),
-                    error,
-                    timestamp: end_t,
-                    error_details,
-                });
+            let has_z_error = !error_details.z_order_errors.is_empty();
+            let pose_approximation = PoseApproximation {
+                name: self.db.pose_name(pose_idx).to_owned(),
+                error,
+                timestamp: end_t,
+                error_details,
+            };
+            if !has_z_error && error < self.error_threshold {
+                self.add_pose(pose_approximation);
                 self.last_error = None;
             } else {
                 let hint = {
-                    if !error_details.z_order_errors.is_empty() {
+                    if has_z_error {
                         PoseHint::ZOrder
                     } else {
                         let left_right_pose = self.db.pose_left_right_switched(pose_idx);
@@ -248,7 +249,7 @@ impl Tracker {
                         }
                     }
                 };
-                self.last_error = Some((hint, error_details));
+                self.last_error = Some((hint, pose_approximation));
             }
         }
 
@@ -261,6 +262,11 @@ impl Tracker {
             Some((hint, _err)) => *hint,
             None => PoseHint::DontKnow,
         }
+    }
+
+    #[wasm_bindgen(js_name = currentPoseError)]
+    pub fn current_pose_error(&self) -> Option<PoseApproximation> {
+        self.last_error.as_ref().map(|(_hint, err)| err.clone())
     }
 
     /// Return a skeleton that's expected next.

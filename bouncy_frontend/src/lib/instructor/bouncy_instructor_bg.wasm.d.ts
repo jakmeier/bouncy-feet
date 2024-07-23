@@ -69,6 +69,7 @@ export function tracker_addKeypoints(a: number, b: number, c: number): number;
 export function tracker_allPoseErrors(a: number, b: number, c: number): void;
 export function tracker_bestFitPose(a: number, b: number, c: number): number;
 export function tracker_clear(a: number): void;
+export function tracker_currentPoseError(a: number): number;
 export function tracker_detectDance(a: number): number;
 export function tracker_detectNextPose(a: number): number;
 export function tracker_expectedPoseBodyShift(a: number): number;

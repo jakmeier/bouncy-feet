@@ -11,6 +11,7 @@
   import {
     Cartesian2d,
     DetectionResult,
+    LimbError,
     PoseHint,
   } from '$lib/instructor/bouncy_instructor';
   import { playSuccessSound } from '$lib/stores/SoundEffects';
@@ -75,6 +76,8 @@
 
   let lastSuccessSkeletonSize = 1.0;
   let lastSuccessSkeletonOrigin = new Cartesian2d(0.0, 0.0);
+  /** @type {LimbError[]} */
+  let worstLimbs = [];
 
   /**
    * @param {PoseHint} inputHint
@@ -101,8 +104,20 @@
       }
       const before = tracker.numDetectedPoses();
       detectionResult = tracker.detectNextPose();
+
+      // gather data for visual hints for the error
       const poseHint = tracker.poseHint();
       avatarStyle = selectStyle(poseHint);
+      const poseError = tracker.currentPoseError();
+      if (poseError) {
+        worstLimbs = poseError
+          .worstLimbs(3)
+          .filter(
+            (/** @type {LimbError} */ limb) => limb.error * limb.weight > 0.2
+          );
+      }
+
+      // correct skeleton tracking
       if (tracker.numDetectedPoses() > before) {
         playSuccessSound();
         instructorSkeleton = tracker.expectedPoseSkeleton();
@@ -117,6 +132,7 @@
         lastSuccessSkeletonOrigin = new Cartesian2d(hip.x - 0.5, hip.y - 0.5);
       }
 
+      // debug info for slow frames
       const t2 = performance.now() - start;
       if (t2 - t > 30) {
         console.debug(`detectDance took ${t2 - t}ms`);
@@ -196,6 +212,7 @@
             height={$videoSrcHeight}
             style={avatarStyle}
             torsoLineWidth={3}
+            markedLimbs={worstLimbs}
           ></Avatar>
         </Canvas>
       </div>
