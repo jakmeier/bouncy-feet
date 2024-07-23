@@ -58,6 +58,7 @@ export enum PoseHint {
   DontKnow = 0,
   LeftRight = 1,
   ZOrder = 2,
+  WrongDirection = 3,
 }
 /**
 */

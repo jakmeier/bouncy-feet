@@ -10,6 +10,7 @@ mod conversion;
 use super::dance_collection::{DanceCollection, LimbIndex};
 use super::geom::SignedAngle;
 use super::pose_score::AngleTarget;
+use super::skeleton_3d::Direction;
 use crate::intern::geom::Angle3d;
 use crate::public::keypoints::Cartesian3d;
 use crate::skeleton::Cartesian2d;
@@ -191,6 +192,16 @@ impl LimbPosition {
 
     pub(crate) fn weight(&self) -> f32 {
         self.target.weight()
+    }
+}
+
+impl PoseDirection {
+    pub(crate) fn matches_direction(&self, direction: Direction) -> bool {
+        match direction {
+            Direction::North | Direction::South => matches!(self, Self::Front),
+            Direction::East | Direction::West => matches!(self, Self::Right),
+            Direction::Unknown => true,
+        }
     }
 }
 

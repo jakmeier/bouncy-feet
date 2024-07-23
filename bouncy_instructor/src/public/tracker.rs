@@ -52,6 +52,7 @@ pub enum PoseHint {
     DontKnow,
     LeftRight,
     ZOrder,
+    WrongDirection,
 }
 
 impl Default for Tracker {
@@ -234,7 +235,12 @@ impl Tracker {
                 self.last_error = None;
             } else {
                 let hint = {
-                    if has_z_error {
+                    if !pose
+                        .direction
+                        .matches_direction(tracked_skeleton.direction())
+                    {
+                        PoseHint::WrongDirection
+                    } else if has_z_error {
                         PoseHint::ZOrder
                     } else {
                         let left_right_pose = self.db.pose_left_right_switched(pose_idx);
