@@ -42,6 +42,7 @@
 
   export let enableLiveAvatar = false;
   export let enableInstructorAvatar = false;
+  export let videoOpacity = 0.0;
 
   const poseCtx = getContext('pose');
   let tracker = getContext('tracker').tracker;
@@ -181,7 +182,7 @@
     <Camera
       {width}
       {height}
-      opacity={0.0}
+      bind:opacity={videoOpacity}
       bind:videoElement={cameraVideoElement}
       bind:cameraOn
       bind:this={camera}

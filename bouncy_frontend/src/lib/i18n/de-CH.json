@@ -62,6 +62,7 @@
             "title": "Einstellungen",
             "enable-tracking": "Tracking",
             "enable-instructor": "Vorzeigen",
+            "opacity": "Video Sichtbarkeit",
             "description": "Wie schnell wirst du tanzen?",
             "bpm-unit": "BPM",
             "bpm-setting": "BPM (ungefähr)",

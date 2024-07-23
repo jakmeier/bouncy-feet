@@ -62,6 +62,7 @@
             "title": "Settings",
             "enable-tracking": "Tracking",
             "enable-instructor": "Instructor",
+            "opacity": "Video Opacity",
             "description": "How fast will you dance?",
             "bpm-unit": "BPM",
             "bpm-setting": "BPM (approximately)",

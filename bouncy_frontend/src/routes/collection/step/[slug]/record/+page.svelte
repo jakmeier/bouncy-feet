@@ -27,6 +27,7 @@
   let recordingEnd = undefined;
   let enableLiveAvatar = true;
   let enableInstructorAvatar = true;
+  let videoOpacity = 0.25;
 
   /** @type {import("$lib/instructor/bouncy_instructor").DetectedStep[]} */
   let detectedSteps = [];
@@ -110,6 +111,7 @@
       bind:endRecording
       bind:recordingStart
       bind:recordingEnd
+      {videoOpacity}
       {enableLiveAvatar}
       {enableInstructorAvatar}
     ></LiveRecording>
@@ -136,7 +138,11 @@
     {/if}
   </div>
   {#if isModelOn}
-    <LiveRecordingSettings bind:enableLiveAvatar bind:enableInstructorAvatar />
+    <LiveRecordingSettings
+      bind:enableLiveAvatar
+      bind:enableInstructorAvatar
+      bind:videoOpacity
+    />
   {/if}
   <p style="width: 100px; height: 50px;"></p>
 </div>
