@@ -263,6 +263,15 @@ impl From<Direction> for PoseDirection {
     }
 }
 
+impl From<PoseDirection> for Direction {
+    fn from(other: PoseDirection) -> Self {
+        match other {
+            PoseDirection::Front => Self::North,
+            PoseDirection::Right => Self::East,
+        }
+    }
+}
+
 impl From<Direction> for pose_file::PoseDirection {
     fn from(other: Direction) -> Self {
         PoseDirection::from(other).into()

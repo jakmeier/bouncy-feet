@@ -8,6 +8,7 @@ pub use pose_output::PoseApproximation;
 pub use step_output::DetectedStep;
 
 use crate::intern::dance_collection::{DanceCollection, ForeignCollectionError};
+use crate::intern::pose::PoseDirection;
 use crate::intern::skeleton_3d::Skeleton3d;
 use crate::keypoints::{Cartesian3d, Keypoints};
 use crate::skeleton::{Cartesian2d, Skeleton};
@@ -221,7 +222,20 @@ impl Tracker {
 
             let pose_idx = step.poses[beat % step.poses.len()];
             let pose = &self.db.poses()[pose_idx];
-            let error_details = pose.error(tracked_skeleton.angles(), tracked_skeleton.positions());
+
+            // If we detected a different direction than the expected one, it
+            // might make more sense to compare with the original angles rather
+            // than the normalized angles.
+            let has_direction_error = !pose
+                .direction
+                .matches_direction(tracked_skeleton.direction());
+            let error_details = if has_direction_error && pose.direction == PoseDirection::Front {
+                let original_angles = tracked_skeleton.original_angles();
+                pose.error(&original_angles, tracked_skeleton.positions())
+            } else {
+                pose.error(tracked_skeleton.angles(), tracked_skeleton.positions())
+            };
+
             let error = error_details.error_score();
             let has_z_error = !error_details.z_order_errors.is_empty();
             let pose_approximation = PoseApproximation {
@@ -235,12 +249,7 @@ impl Tracker {
                 self.last_error = None;
             } else {
                 let hint = {
-                    if !pose
-                        .direction
-                        .matches_direction(tracked_skeleton.direction())
-                    {
-                        PoseHint::WrongDirection
-                    } else if has_z_error {
+                    if has_z_error {
                         PoseHint::ZOrder
                     } else {
                         let left_right_pose = self.db.pose_left_right_switched(pose_idx);
@@ -250,6 +259,8 @@ impl Tracker {
                         // TODO: fine-tune 0.5
                         if lr_error_score < error * 0.5 {
                             PoseHint::LeftRight
+                        } else if has_direction_error {
+                            PoseHint::WrongDirection
                         } else {
                             PoseHint::DontKnow
                         }

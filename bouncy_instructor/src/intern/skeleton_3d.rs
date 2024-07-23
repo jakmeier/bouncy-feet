@@ -108,7 +108,7 @@ impl Skeleton3d {
     ) -> Self {
         // Shoulder defines where the person is looking
         let direction = Direction::from_shoulder(shoulder_angle);
-        // This means, by definition, turn shoulder" is zero
+        // This means, by definition, turn shoulder is zero
         let turn_shoulder = SignedAngle::ZERO;
         let turn_hip = hip_angle - shoulder_angle;
 
@@ -137,6 +137,22 @@ impl Skeleton3d {
 
     pub(crate) fn angles(&self) -> &[SignedAngle] {
         &self.limb_angles
+    }
+
+    /// Undo the normalization done when the skeleton was added.
+    ///
+    /// For comparing to camera-facing poses, this is better. Otherwise,
+    /// slightly west looking skeletons will have messed up all angles by 180°.
+    pub(crate) fn original_angles(&self) -> Vec<SignedAngle> {
+        self.limb_angles_3d
+            .iter()
+            .cloned()
+            .map(|mut angle| {
+                angle.azimuth = angle.azimuth + self.azimuth_correction;
+                angle
+            })
+            .map(|angle| angle.project_2d())
+            .collect()
     }
 
     pub(crate) fn positions(&self) -> &HashMap<BodyPoint, Cartesian3d> {
