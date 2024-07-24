@@ -18,8 +18,9 @@
   });
 
   let degree = 0;
-  let bpm = 240;
-  $: stepTime = 60_000 / bpm;
+  let bpm = 120;
+  // step time is a half-beat
+  $: stepTime = 30_000 / bpm;
   $: animationTime = stepTime * 0.85;
 
   const beatCounter = dynamicCounter(-1, 1, stepTime);
@@ -40,8 +41,8 @@
 
 <label>
   {$t('collection.step.speed')}
-  <input type="number" bind:value={bpm} min="30" max="300" class="number" />
-  <input type="range" bind:value={bpm} min="30" max="300" class="range" />
+  <input type="number" bind:value={bpm} min="15" max="200" class="number" />
+  <input type="range" bind:value={bpm} min="15" max="200" class="range" />
 </label>
 
 {#if $features.enableAvatarRotation}

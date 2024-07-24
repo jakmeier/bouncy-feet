@@ -15,8 +15,9 @@
   /** @type {string} */
   let danceName = danceBuilder.danceInfo().id;
 
-  let bpm = 200;
-  $: stepTime = 60_000 / bpm;
+  let bpm = 100;
+  // step time is a half-beat
+  $: stepTime = 30_000 / bpm;
   $: animationTime = stepTime * 0.85;
 
   const beatCounter = dynamicCounter(-1, 1, stepTime);
@@ -95,7 +96,7 @@
 
   <label class="config">
     <div>{$t('editor.speed')}</div>
-    <input type="range" bind:value={bpm} min="30" max="300" class="range" />
+    <input type="range" bind:value={bpm} min="15" max="200" class="range" />
   </label>
 
   <DanceEditorSteps
