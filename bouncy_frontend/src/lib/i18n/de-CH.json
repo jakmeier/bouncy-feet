@@ -54,6 +54,8 @@
         "start-button": "Starten",
         "record-button": "Video aufnehmen",
         "done-button": "fertig",
+        "learn-button": "Lernen",
+        "train-button": "Üben",
         "stop-camera": "Kamera stoppen",
         "stop-record": "Video stoppen",
         "train-dance-prefix": "Übe",
@@ -67,6 +69,10 @@
             "bpm-unit": "BPM",
             "bpm-setting": "BPM (ungefähr)",
             "double-speed": "Auch auf den Off-Beat tanzen (doppelte Geschwindigkeit)"
+        },
+        "info": {
+            "learn": "Lerne die einzelnen Positionen des Schrittes ohne Musik.",
+            "train": "Übe den Schritt zu Musik und tracke deinen Fortschritt."
         }
     },
     "stats": {

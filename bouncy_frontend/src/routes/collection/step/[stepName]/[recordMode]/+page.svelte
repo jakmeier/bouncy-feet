@@ -11,7 +11,9 @@
   import { hideNavigation } from '$lib/stores/UiState';
   import LiveRecordingSettings from '$lib/components/record/LiveRecordingSettings.svelte';
 
-  const stepName = $page.params.slug;
+  const stepName = $page.params.stepName;
+  // 'learn' | 'train'
+  const mode = $page.params.recordMode;
   const instructorStep = stepsByName(stepName)[0];
   const tracker = Tracker.UniqueStepTracker(instructorStep.id);
   setContext('tracker', { tracker });

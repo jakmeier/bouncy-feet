@@ -54,6 +54,8 @@
         "start-button": "start",
         "record-button": "record video",
         "done-button": "done",
+        "learn-button": "Learn",
+        "train-button": "Train",
         "stop-camera": "stop camera",
         "stop-record": "stop video",
         "train-dance-prefix": "Train",
@@ -67,6 +69,10 @@
             "bpm-unit": "BPM",
             "bpm-setting": "BPM (approximately)",
             "double-speed": "Also dance to the offbeat (double speed)"
+        },
+        "info": {
+            "learn": "Learn each position of the step without music.",
+            "train": "Practice the step with music and track your progress."
         }
     },
     "stats": {

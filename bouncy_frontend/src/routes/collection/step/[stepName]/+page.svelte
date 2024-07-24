@@ -7,11 +7,12 @@
   import { dynamicCounter } from '$lib/timer';
   import { features } from '$lib/stores/FeatureSelection';
   import { browser } from '$app/environment';
+  import Info from '$lib/components/ui/Info.svelte';
 
   /** @type {import('./$types').PageData} */
   export let data;
 
-  const name = $page.params.slug;
+  const name = $page.params.stepName;
   const variations = data.allSteps.filter((step) => step.name === name);
   const selectItems = variations.map((step) => {
     return { value: step, label: $t(`step.variation.${step.variation}`) };
@@ -92,13 +93,21 @@
 {/if}
 
 {#if $features.enableStepRecording || !browser}
-  <div class="label">
-    <a href="./record">
+  <div class="label buttons">
+    <a href="./learn">
       <button class="light">
-        <span class="material-symbols-outlined"> videocam </span>
-        <p>{$t('record.start-button')}</p>
+        <span class="material-symbols-outlined"> school </span>
+        <p>{$t('record.learn-button')}</p>
       </button>
     </a>
+    <a href="./train">
+      <button class="light">
+        <span class="material-symbols-outlined"> exercise </span>
+        <p>{$t('record.train-button')}</p>
+      </button>
+    </a>
+    <Info title="record.learn-button" text="record.info.learn" />
+    <Info title="record.train-button" text="record.info.train" />
   </div>
 {/if}
 
@@ -113,7 +122,11 @@
     border-radius: 10px;
     padding: 10px;
   }
+  .buttons {
+    grid-template-columns: auto auto;
+    row-gap: 10px;
+  }
   button {
-    width: 200px;
+    width: 120px;
   }
 </style>
