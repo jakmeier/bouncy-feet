@@ -61,9 +61,9 @@
   }
 
   .tracking {
-    color: var(--theme-main);
+    color: var(--theme-neutral-dark);
   }
   .instructor {
-    color: var(--theme-accent);
+    color: var(--theme-main);
   }
 </style>

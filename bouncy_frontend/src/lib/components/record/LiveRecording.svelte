@@ -43,6 +43,7 @@
   export let enableLiveAvatar = false;
   export let enableInstructorAvatar = false;
   export let videoOpacity = 0.0;
+  export let slowInstructor = false;
 
   const poseCtx = getContext('pose');
   let tracker = getContext('tracker').tracker;
@@ -198,6 +199,7 @@
           bodyShift={instructorSkeletonBodyShift}
           origin={lastSuccessSkeletonOrigin}
           instructorStyle={LEFT_RIGHT_COLORING_LIGHT}
+          {slowInstructor}
         />
       </div>
     {/if}

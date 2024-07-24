@@ -10,12 +10,17 @@
   import Header from '$lib/components/ui/Header.svelte';
   import { hideNavigation } from '$lib/stores/UiState';
   import LiveRecordingSettings from '$lib/components/record/LiveRecordingSettings.svelte';
+  import Popup from '$lib/components/ui/Popup.svelte';
 
   const stepName = $page.params.stepName;
+  const instructorStep = stepsByName(stepName)[0];
   // 'learn' | 'train'
   const mode = $page.params.recordMode;
-  const instructorStep = stepsByName(stepName)[0];
+  const isLearnMode = mode === 'learn';
+  const isTrainMode = mode === 'train';
+
   const tracker = Tracker.UniqueStepTracker(instructorStep.id);
+  tracker.setBpm(isLearnMode ? 120 : 250);
   setContext('tracker', { tracker });
 
   const userCtx = getContext('user');
@@ -23,13 +28,19 @@
   /** @type {undefined | string} */
   let reviewVideoSrc;
   let isModelOn = false;
+  let showReview = false;
+  let showSummary = false;
+  /** @type {import("svelte/store").Writable<boolean>} */
+  let showLearnModeHint;
+  /** @type {import("svelte/store").Writable<boolean>} */
+  let showTrainModeHint;
   /** @type {number | undefined} */
   let recordingStart = undefined;
   /** @type {number | undefined} */
   let recordingEnd = undefined;
-  let enableLiveAvatar = true;
+  let enableLiveAvatar = isLearnMode;
   let enableInstructorAvatar = true;
-  let videoOpacity = 0.25;
+  let videoOpacity = isTrainMode ? 0.25 : 0.0;
 
   /** @type {import("$lib/instructor/bouncy_instructor").DetectedStep[]} */
   let detectedSteps = [];
@@ -61,7 +72,15 @@
 
   async function stopCameraAndRecording() {
     stop();
-    detectedSteps = tracker.detectNextPose().steps();
+    if (isLearnMode) {
+      // Reuse all previous detections and show exactly that in the review.
+      detectedSteps = tracker.detectNextPose().steps();
+    } else if (isTrainMode) {
+      // In train mode, we want to find the best match after the fact, rather
+      // than the greedy live-search.
+      detectedSteps = tracker.detectDance().steps();
+    }
+    showSummary = true;
     const result = userCtx.addDanceToStats(detectedSteps);
     if (result) {
       reviewStatsNumSteps = result.numSteps;
@@ -80,31 +99,87 @@
     reviewVideoSrc = undefined;
     recordingStart = undefined;
     recordingEnd = undefined;
+    showReview = false;
+    showSummary = false;
     // wait for LiveRecording component to be mounted again
     await tick();
     await turnOnRecording();
   }
 
+  function openReview() {
+    showReview = true;
+  }
+
+  function goBack() {
+    window.history.back();
+  }
+
   onMount(() => {
-    turnOnRecording();
+    if (isLearnMode) {
+      showLearnModeHint.set(true);
+      showLearnModeHint.subscribe((hintShown) => {
+        if (!$showLearnModeHint && isLearnMode && !isModelOn) {
+          turnOnRecording();
+        }
+      });
+    }
+
+    if (isTrainMode) {
+      showTrainModeHint.set(true);
+      showTrainModeHint.subscribe((hintShown) => {
+        if (!$showTrainModeHint && isTrainMode && !isModelOn) {
+          turnOnRecording();
+        }
+      });
+    }
   });
 </script>
 
 <!-- TODO: translate danceName -->
 {#if $hideNavigation}
   <div class="title">{stepName}</div>
+{:else if isLearnMode}
+  <Header title="{$t('record.learn-dance-prefix')} {stepName}" />
 {:else}
   <Header title="{$t('record.train-dance-prefix')} {stepName}" />
 {/if}
 
 <div id="outer">
-  {#if reviewVideoSrc !== undefined && recordingStart !== undefined && recordingEnd !== undefined}
-    <VideoReview
-      {reviewVideoSrc}
-      {detectedSteps}
-      {recordingStart}
-      {recordingEnd}
-    ></VideoReview>
+  {#if showReview}
+    {#if reviewVideoSrc !== undefined && recordingStart !== undefined && recordingEnd !== undefined}
+      <VideoReview
+        {reviewVideoSrc}
+        {detectedSteps}
+        {recordingStart}
+        {recordingEnd}
+      ></VideoReview>
+      <div>
+        <a href={reviewVideoSrc} download>
+          <button>
+            <span class="material-symbols-outlined"> download </span>
+            <p>{$t('record.download')}</p>
+          </button>
+        </a>
+      </div>
+    {:else}
+      Could not show review, something failed.
+    {/if}
+  {:else if showSummary}
+    <DanceStats numSteps={reviewStatsNumSteps} seconds={reviewStatsSeconds} />
+    <div class="buttons">
+      <button class="light" on:click={openReview}>
+        <span class="material-symbols-outlined"> tv </span>
+        <p>{$t('record.review-button')}</p>
+      </button>
+      <button class="light" on:click={reset}>
+        <span class="material-symbols-outlined"> videocam </span>
+        <p>{$t('record.reset-button')}</p>
+      </button>
+      <button class="light" on:click={goBack}>
+        <span class="material-symbols-outlined"> arrow_back </span>
+        <p>{$t('record.back-button')}</p>
+      </button>
+    </div>
   {:else}
     <LiveRecording
       bind:startCamera
@@ -116,30 +191,17 @@
       {videoOpacity}
       {enableLiveAvatar}
       {enableInstructorAvatar}
+      slowInstructor={isLearnMode}
     ></LiveRecording>
   {/if}
 
-  <div>
-    {#if isModelOn}
+  {#if isModelOn}
+    <div>
       <button on:click={stopCameraAndRecording}>
         <span class="material-symbols-outlined"> camera </span>
         <p>{$t('record.stop-record')}</p>
       </button>
-    {:else}
-      <DanceStats numSteps={reviewStatsNumSteps} seconds={reviewStatsSeconds} />
-      <button class="light" on:click={reset}>
-        <span class="material-symbols-outlined"> videocam </span>
-        <p>{$t('record.start-button')}</p>
-      </button>
-      <!-- <a href={reviewVideoSrc} download>
-        <button>
-          <span class="material-symbols-outlined"> download </span>
-          <p>{$t('record.download')}</p>
-        </button>
-      </a> -->
-    {/if}
-  </div>
-  {#if isModelOn}
+    </div>
     <LiveRecordingSettings
       bind:enableLiveAvatar
       bind:enableInstructorAvatar
@@ -149,6 +211,26 @@
   <p style="width: 100px; height: 50px;"></p>
 </div>
 
+<Popup
+  title="record.learn-hint-title"
+  bind:isOpen={showLearnModeHint}
+  showOkButton
+>
+  <div>{$t('record.learn-hint')}</div>
+  <div>{$t('record.general-hint')}</div>
+  <div>{$t('record.no-upload-hint')}</div>
+</Popup>
+
+<Popup
+  title="record.train-hint-title"
+  bind:isOpen={showTrainModeHint}
+  showOkButton
+>
+  <div>{$t('record.train-hint')}</div>
+  <div>{$t('record.general-hint')}</div>
+  <div>{$t('record.no-upload-hint')}</div>
+</Popup>
+
 <style>
   #outer {
     margin: auto;
@@ -156,8 +238,12 @@
     justify-items: center;
   }
 
+  .buttons {
+    display: grid;
+    grid-template-columns: auto auto auto;
+  }
   button {
-    width: 152px;
+    width: 100px;
     height: 80px;
     margin: 10px;
   }

@@ -19,10 +19,6 @@
       $isOpen = !$isOpen;
     }
   }
-
-  function close() {
-    $isOpen = false;
-  }
 </script>
 
 <div class="info">
@@ -38,24 +34,16 @@
   </span>
 </div>
 
-<Popup {title} bind:isOpen>
+<Popup {title} bind:isOpen showOkButton>
   <div>
     {$t(text)}
   </div>
   <slot />
-  <button on:click={close}>OK</button>
 </Popup>
 
 <style>
   .info span {
     font-size: 32px;
     cursor: pointer;
-  }
-
-  button {
-    width: 50px;
-    height: 50px;
-    padding: auto;
-    background-color: var(--theme-accent-light);
   }
 </style>

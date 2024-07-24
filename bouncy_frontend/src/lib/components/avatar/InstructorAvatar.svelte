@@ -31,11 +31,12 @@
     bodyColor: '#00000010',
   };
 
+  export let slowInstructor = false;
   $: avatarLineWidth = 6 * avatarSize;
   $: correctAvatarLineWidth = 10 * avatarSize;
 
-  const showCorrectTime = 500;
-  const animationTime = 400;
+  const showCorrectTime = slowInstructor ? 500 : 100;
+  const animationTime = slowInstructor ? 400 : 200;
 
   /** @type {import("$lib/instructor/bouncy_instructor").Skeleton | null} */
   let prevSkeleton = null;

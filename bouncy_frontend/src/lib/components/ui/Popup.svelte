@@ -3,9 +3,11 @@
   import { writable } from 'svelte/store';
   import UiBox from '$lib/components/ui/UiBox.svelte';
 
+  /** @type {import("svelte/store").Writable<boolean>} */
   export let isOpen = writable(false);
   /** @type{String|undefined} */
   export let title = undefined;
+  export let showOkButton = false;
 
   function handleClose() {
     isOpen.set(false);
@@ -24,6 +26,9 @@
     <div class="popup-content">
       <UiBox {title}>
         <slot />
+        {#if showOkButton}
+          <button on:click={handleClose}>OK</button>
+        {/if}
       </UiBox>
     </div>
   </div>
@@ -50,5 +55,12 @@
     overflow: auto;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     z-index: 10000;
+  }
+
+  button {
+    width: 50px;
+    height: 50px;
+    padding: auto;
+    background-color: var(--theme-accent-light);
   }
 </style>
