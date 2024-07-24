@@ -74,18 +74,21 @@ pub fn steps() -> Vec<StepInfo> {
             .steps()
             .iter()
             .cloned()
-            .map(StepInfo::from)
+            .map(|step| StepInfo::from_step(step, &state.db))
             .collect::<Vec<_>>()
     })
 }
 
 #[wasm_bindgen(js_name = "stepById")]
 pub fn step_by_id(id: String, flipped: bool) -> Option<StepInfo> {
-    let mut step = STATE.with_borrow(|state| state.db.step(&id).cloned())?;
-    if flipped {
-        step = step.flipped();
-    }
-    Some(StepInfo::from(step))
+    STATE.with_borrow(|state| {
+        let mut step = state.db.step(&id).cloned()?;
+
+        if flipped {
+            step = step.flipped();
+        }
+        Some(StepInfo::from_step(step, &state.db))
+    })
 }
 
 #[wasm_bindgen(js_name = "stepsByName")]
@@ -95,7 +98,7 @@ pub fn steps_by_name(step_name: String) -> Vec<StepInfo> {
             .db
             .steps_by_name(&step_name)
             .cloned()
-            .map(StepInfo::from)
+            .map(|step| StepInfo::from_step(step, &state.db))
             .collect()
     })
 }

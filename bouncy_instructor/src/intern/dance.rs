@@ -1,6 +1,6 @@
 use crate::dance_file;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub(crate) struct Dance {
     pub id: String,
     pub step_ids: Vec<String>,

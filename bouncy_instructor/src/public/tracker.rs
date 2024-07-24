@@ -112,15 +112,16 @@ impl Tracker {
     /// specific training session without much regard for timing etc.
     #[wasm_bindgen(js_name = "UniqueStepTracker")]
     pub fn new_unique_step_tracker(step_id: String) -> Result<Tracker, ForeignCollectionError> {
-        // FIXME: using only a part of it reveals some bugs in how pose indics are used...
-        let db = crate::STATE.with_borrow(|state| Rc::clone(&state.db));
-        let step_info = db
-            .step(&step_id)
-            .cloned()
-            .expect("just added the step")
-            .into();
+        let mut db = DanceCollection::default();
+        crate::STATE.with_borrow(|state| {
+            db.add_foreign_step(&state.db, &step_id)?;
+            Ok(())
+        })?;
+        let step = db.step(&step_id).cloned().expect("just added the step");
+        let step_info = StepInfo::from_step(step, &db);
+
         Ok(Tracker {
-            db,
+            db: Rc::new(db),
             intermediate_result: Some(DetectionResult::for_unique_step_tracker(step_info)),
             ..Default::default()
         })

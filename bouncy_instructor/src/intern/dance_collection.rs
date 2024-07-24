@@ -26,7 +26,7 @@ use crate::{dance_file, pose_file, AddDanceError, AddStepError};
 /// Actual poses are defined in external files and loaded in at runtime. Here
 /// data they are stored in the most convenient way, which will see many
 /// refactorings over time.
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub(crate) struct DanceCollection {
     /// Pose definitions
     poses: Vec<Pose>,
@@ -95,8 +95,8 @@ impl DanceCollection {
     }
 
     /// Copies a pose from a different dance collection
-    fn add_foreign_pose(&mut self, other: &Self, pose_index: usize) -> usize {
-        let pose = &other.poses()[pose_index];
+    fn add_foreign_pose(&mut self, other: &Self, foreign_pose_index: usize) -> usize {
+        let pose = &other.poses()[foreign_pose_index];
 
         let limbs = pose
             .limbs
@@ -122,7 +122,8 @@ impl DanceCollection {
 
         let new_index = self.poses.len();
         self.poses.push(new_pose);
-        self.names.push(other.pose_name(pose_index).to_owned());
+        self.names
+            .push(other.pose_name(foreign_pose_index).to_owned());
         new_index
     }
 

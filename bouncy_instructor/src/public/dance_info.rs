@@ -72,7 +72,7 @@ impl From<&Dance> for DanceInfo {
                 if flipped {
                     step = step.flipped();
                 }
-                let step_info: StepInfo = step.clone().into();
+                let step_info = StepInfo::from_step(step.clone(), &state.db);
                 body_shift.add_step(&step, &step_info.skeletons, &state.db);
                 steps.push(step_info);
             }

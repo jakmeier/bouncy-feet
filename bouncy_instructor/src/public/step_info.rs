@@ -1,5 +1,6 @@
 use super::renderable::RenderableSkeleton;
 use crate::intern::body_shift::BodyShift;
+use crate::intern::dance_collection::DanceCollection;
 use crate::intern::pose::{BodyPart, BodyPoint};
 use crate::intern::skeleton_3d::Skeleton3d;
 use crate::intern::step::Step;
@@ -83,18 +84,16 @@ impl StepInfo {
     }
 }
 
-impl From<Step> for StepInfo {
-    fn from(step: Step) -> Self {
+impl StepInfo {
+    pub(crate) fn from_step(step: Step, db: &DanceCollection) -> Self {
         let mut skeletons = vec![];
         let mut body_shift = BodyShift::new();
 
-        STATE.with_borrow(|state| {
-            for (pose_index, direction) in step.poses.iter().zip(&step.directions) {
-                let pose = &state.db.poses()[*pose_index];
-                skeletons.push(Skeleton::from_pose(pose, &state.db, *direction));
-            }
-            body_shift.add_step(&step, &skeletons, &state.db);
-        });
+        for (pose_index, direction) in step.poses.iter().zip(&step.directions) {
+            let pose = &db.poses()[*pose_index];
+            skeletons.push(Skeleton::from_pose(pose, db, *direction));
+        }
+        body_shift.add_step(&step, &skeletons, db);
 
         Self {
             id: step.id,
