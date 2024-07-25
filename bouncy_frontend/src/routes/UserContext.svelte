@@ -42,7 +42,7 @@
    * @param {import("$lib/instructor/bouncy_instructor").DetectedStep[]} dance
    * @returns {DanceSessionResult?}
    */
-  function addDanceToStats(dance) {
+  function computeDanceStats(dance) {
     if (dance.length < 1) {
       return null;
     }
@@ -77,10 +77,30 @@
     }
 
     const duration = dance[dance.length - 1].end - dance[0].start;
-    $user.recordedDances += 1;
-    $user.recordedSteps += totalSteps;
-    $user.recordedSeconds += duration;
+
     for (let [key, stat] of Object.entries(stats)) {
+      const stepGainedExp =
+        stat.slow * 10 + stat.mid * 15 + stat.fast * 20 + stat.veryFast * 25;
+      totalExp += stepGainedExp;
+    }
+
+    return {
+      numSteps: totalSteps,
+      experience: totalExp,
+      duration,
+      stats,
+      bpms,
+    };
+  }
+
+  /**
+   * @param {DanceSessionResult} result
+   */
+  function addDanceToStats(result) {
+    $user.recordedDances += 1;
+    $user.recordedSteps += result.numSteps;
+    $user.recordedSeconds += result.duration;
+    for (let [key, stat] of Object.entries(result.stats)) {
       if (!$user.userSteps[key]) {
         $user.userSteps[key] = {
           experience: 0,
@@ -93,7 +113,6 @@
         stat.slow * 10 + stat.mid * 15 + stat.fast * 20 + stat.veryFast * 25;
       $user.userSteps[key].experience =
         $user.userSteps[key].count + stepGainedExp;
-      totalExp += stepGainedExp;
     }
 
     // trigger subscribers
@@ -104,18 +123,11 @@
     } catch (err) {
       console.warn('Submitting stats failed', err);
     }
-
-    return {
-      numSteps: totalSteps,
-      experience: totalExp,
-      duration,
-      stats,
-      bpms,
-    };
   }
 
   setContext('user', {
     store: user,
+    computeDanceStats,
     addDanceToStats,
   });
 </script>

@@ -40,4 +40,12 @@
  * @property {string} rightColor
  * @property {string} headColor
  * @property {string} bodyColor
+ * 
+ * @typedef {Object} DanceSessionResult
+ * @property {number} numSteps
+ * @property {number} experience
+ * @property {number} duration
+ * @property {any} stats
+ * @property {number[]} bpms
+ *
  */

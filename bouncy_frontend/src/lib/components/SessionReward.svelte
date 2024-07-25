@@ -45,7 +45,6 @@
   <Step {step} size={225} poseIndex={$i} {animationTime} />
 </div>
 {#if data}
-  <div></div>
   <DanceStats
     numSteps={data.numSteps}
     seconds={data.duration / 1000}

@@ -72,7 +72,8 @@
   async function stopCameraAndRecording() {
     stopCamera();
     detectedSteps = tracker.detectDance().steps();
-    const result = userCtx.addDanceToStats(detectedSteps);
+    const result = userCtx.computeDanceStats(detectedSteps);
+    userCtx.addDanceToStats(result);
     if (result) {
       reviewStatsNumSteps = result.numSteps;
       reviewStatsSeconds = result.duration;

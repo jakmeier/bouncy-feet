@@ -55,7 +55,7 @@
     background-color: var(--theme-main);
     border-radius: 5px;
     width: 0;
-    transition: width 0.5s;
+    transition: width 1.0s;
   }
 
   .level {

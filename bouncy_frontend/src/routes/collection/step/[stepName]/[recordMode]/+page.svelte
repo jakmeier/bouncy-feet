@@ -88,7 +88,10 @@
       detectedSteps = tracker.detectNextPose().steps();
     }
     showSummary = true;
-    sessionResult = userCtx.addDanceToStats(detectedSteps);
+    sessionResult = userCtx.computeDanceStats(detectedSteps);
+    setTimeout(() => {
+      userCtx.addDanceToStats(sessionResult);
+    }, 1000);
     const videoBlob = await endRecording();
 
     if (videoBlob) {
