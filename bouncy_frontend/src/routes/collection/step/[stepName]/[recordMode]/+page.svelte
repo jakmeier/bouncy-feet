@@ -1,5 +1,5 @@
 <script>
-  import { getContext, onDestroy, onMount, setContext, tick } from 'svelte';
+  import { getContext, onMount, setContext, tick } from 'svelte';
   import { t } from '$lib/i18n';
   import { Tracker } from '$lib/instructor/bouncy_instructor';
   import { stepsByName } from '$lib/instructor/bouncy_instructor';
@@ -11,6 +11,7 @@
   import { hideNavigation } from '$lib/stores/UiState';
   import LiveRecordingSettings from '$lib/components/record/LiveRecordingSettings.svelte';
   import Popup from '$lib/components/ui/Popup.svelte';
+  import SessionReward from '$lib/components/SessionReward.svelte';
 
   const stepName = $page.params.stepName;
   const instructorStep = stepsByName(stepName)[0];
@@ -44,9 +45,8 @@
 
   /** @type {import("$lib/instructor/bouncy_instructor").DetectedStep[]} */
   let detectedSteps = [];
-
-  let reviewStatsNumSteps = 0;
-  let reviewStatsSeconds = 0;
+  /** @type {DanceSessionResult?} */
+  let sessionResult;
 
   /** @type {() => any}*/
   let startCamera;
@@ -76,16 +76,19 @@
       // Reuse all previous detections and show exactly that in the review.
       detectedSteps = tracker.detectNextPose().steps();
     } else if (isTrainMode) {
+      // FIXME: this below doesn't work as expected, needs more testing
       // In train mode, we want to find the best match after the fact, rather
       // than the greedy live-search.
-      detectedSteps = tracker.detectDance().steps();
+      // detectedSteps = tracker
+      // .detectDance()
+      // .steps()
+      // .filter((step) => {
+      //   step.error <= 0.5;
+      // });
+      detectedSteps = tracker.detectNextPose().steps();
     }
     showSummary = true;
-    const result = userCtx.addDanceToStats(detectedSteps);
-    if (result) {
-      reviewStatsNumSteps = result.numSteps;
-      reviewStatsSeconds = result.duration;
-    }
+    sessionResult = userCtx.addDanceToStats(detectedSteps);
     const videoBlob = await endRecording();
 
     if (videoBlob) {
@@ -165,7 +168,9 @@
       Could not show review, something failed.
     {/if}
   {:else if showSummary}
-    <DanceStats numSteps={reviewStatsNumSteps} seconds={reviewStatsSeconds} />
+    <div>
+      <SessionReward data={sessionResult} step={instructorStep}></SessionReward>
+    </div>
     <div class="buttons">
       <button class="light" on:click={openReview}>
         <span class="material-symbols-outlined"> tv </span>

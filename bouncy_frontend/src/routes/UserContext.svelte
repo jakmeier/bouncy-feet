@@ -40,15 +40,17 @@
 
   /**
    * @param {import("$lib/instructor/bouncy_instructor").DetectedStep[]} dance
+   * @returns {DanceSessionResult?}
    */
   function addDanceToStats(dance) {
     if (dance.length < 1) {
-      return;
+      return null;
     }
 
     let stats = {};
     let totalSteps = 0;
     let totalExp = 0;
+    const bpms = [];
     for (const step of dance) {
       if (!step.name.includes('Idle')) {
         totalSteps += 1;
@@ -60,7 +62,8 @@
             veryFast: 0,
           };
         }
-        const halfBeat = (step.end - step.start) / step.poses.length;
+        const halfBeat = (step.end - step.start) / (step.poses.length - 1);
+        bpms.push(60000 / halfBeat);
         if (halfBeat < 231) {
           stats[step.name].veryFast += 1;
         } else if (halfBeat < 300) {
@@ -90,6 +93,7 @@
         stat.slow * 10 + stat.mid * 15 + stat.fast * 20 + stat.veryFast * 25;
       $user.userSteps[key].experience =
         $user.userSteps[key].count + stepGainedExp;
+      totalExp += stepGainedExp;
     }
 
     // trigger subscribers
@@ -103,9 +107,10 @@
 
     return {
       numSteps: totalSteps,
-      exp: totalExp,
+      experience: totalExp,
       duration,
       stats,
+      bpms,
     };
   }
 
