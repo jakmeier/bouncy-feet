@@ -7,12 +7,14 @@
   import Step from './Step.svelte';
   import { features } from '$lib/stores/FeatureSelection';
   import { browser } from '$app/environment';
+  import Experience from '$lib/components/Experience.svelte';
 
   /** @type {import('./$types').PageData} */
   export let data;
 
   const localCollection = getContext('localCollection');
   const localDances = localCollection.dances;
+  const user = getContext('user').store;
 
   const stepTime = 300;
   // animationTime < stepTime will freeze the position for a moment, which makes
@@ -24,10 +26,10 @@
   const borderRadius = '25px';
 </script>
 
-<h1 class=colored>{$t('collection.title')}</h1>
+<h1 class="colored">{$t('collection.title')}</h1>
 
 {#if !browser || $features.enableDanceCollection}
-  <h2 class=box>{$t('collection.dances-subtitle')}</h2>
+  <h2 class="box">{$t('collection.dances-subtitle')}</h2>
   <div class="dance-table">
     {#each [...data.officialDances, ...$localDances] as dance}
       <div>
@@ -55,15 +57,22 @@
   </div>
 {/if}
 
-<h2 class=box>{$t('collection.steps-subtitle')}</h2>
+<h2 class="box">{$t('collection.steps-subtitle')}</h2>
 <div class="step-table">
   {#each data.uniqueNameSteps as step}
     {#if !step.name.includes('Idle')}
-      <a href={`./step/${step.name}`}>
-        <Step {step} poseIndex={$i} {animationTime} />
-        <!-- TODO: translations -->
-        <h3>{step.name}</h3>
-      </a>
+      <div class="step">
+        <a href={`./step/${step.name}`}>
+          <Step {step} poseIndex={$i} {animationTime} />
+          <!-- TODO: translations -->
+          <h3>{step.name}</h3>
+        </a>
+        <Experience
+          xp={$user.userSteps[step.name]
+            ? $user.userSteps[step.name].experience
+            : 0}
+        ></Experience>
+      </div>
     {/if}
   {/each}
 </div>
@@ -71,6 +80,9 @@
 <style>
   h1 {
     margin: 5px 0;
+  }
+  h3 {
+    margin: 5px;
   }
   .step-table,
   .dance-table {
@@ -83,6 +95,10 @@
   }
   .dance-table {
     grid-template-columns: 1fr 1fr;
+  }
+  .step {
+    display: grid;
+    align-content: space-between;
   }
 
   .add-button {

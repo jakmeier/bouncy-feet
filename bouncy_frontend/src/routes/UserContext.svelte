@@ -20,6 +20,9 @@
   if (stored && !stored.id) {
     stored.id = crypto.randomUUID();
   }
+  if (stored && !stored.userSteps) {
+    stored.userSteps = {};
+  }
   const user = writable(
     stored || {
       id: crypto.randomUUID(),
@@ -28,6 +31,7 @@
       recordedDances: 0,
       recordedSeconds: 0,
       recordedSteps: 0,
+      userSteps: {},
     }
   );
   if (browser) {
@@ -38,26 +42,58 @@
    * @param {import("$lib/instructor/bouncy_instructor").DetectedStep[]} dance
    */
   function addDanceToStats(dance) {
-    if (dance.length < 2) {
+    if (dance.length < 1) {
       return;
     }
 
-    // we are actually counting pose changes, not steps in the usual sense
-    let steps = 0;
-    let prevPoseName = '';
+    let stats = {};
+    let totalSteps = 0;
+    let totalExp = 0;
     for (const step of dance) {
-      for (const pose of step.poses) {
-        if (pose.name !== prevPoseName) {
-          steps += 1;
-          prevPoseName = pose.name;
+      if (!step.name.includes('Idle')) {
+        totalSteps += 1;
+        if (!stats[step.name]) {
+          stats[step.name] = {
+            slow: 0,
+            mid: 0,
+            fast: 0,
+            veryFast: 0,
+          };
+        }
+        const halfBeat = (step.end - step.start) / step.poses.length;
+        if (halfBeat < 231) {
+          stats[step.name].veryFast += 1;
+        } else if (halfBeat < 300) {
+          stats[step.name].fast += 1;
+        } else if (halfBeat < 500) {
+          stats[step.name].mid += 1;
+        } else {
+          stats[step.name].slow += 1;
         }
       }
     }
 
     const duration = dance[dance.length - 1].end - dance[0].start;
     $user.recordedDances += 1;
-    $user.recordedSteps += steps;
+    $user.recordedSteps += totalSteps;
     $user.recordedSeconds += duration;
+    for (let [key, stat] of Object.entries(stats)) {
+      if (!$user.userSteps[key]) {
+        $user.userSteps[key] = {
+          experience: 0,
+          count: 0,
+        };
+      }
+      const numSteps = stat.slow + stat.mid + stat.fast + stat.veryFast;
+      $user.userSteps[key].count = $user.userSteps[key].count + numSteps;
+      const stepGainedExp =
+        stat.slow * 10 + stat.mid * 15 + stat.fast * 20 + stat.veryFast * 25;
+      $user.userSteps[key].experience =
+        $user.userSteps[key].count + stepGainedExp;
+    }
+
+    // trigger subscribers
+    $user = $user;
 
     try {
       submitStats($user);
@@ -66,8 +102,10 @@
     }
 
     return {
-      numSteps: steps,
+      numSteps: totalSteps,
+      exp: totalExp,
       duration,
+      stats,
     };
   }
 
