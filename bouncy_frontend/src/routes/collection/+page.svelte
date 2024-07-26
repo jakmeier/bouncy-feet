@@ -16,8 +16,6 @@
   const localDances = localCollection.dances;
   const user = getContext('user').store;
 
-  const uniqueNameSteps = data.lookupSteps({ uniqueNames: true });
-
   const stepTime = 300;
   // animationTime < stepTime will freeze the position for a moment, which makes
   // it clearer. If the difference is too much, it looks robotic.
@@ -30,8 +28,82 @@
 
 <h1 class="colored">{$t('collection.title')}</h1>
 
+<h2 class="box"><b>{$t('collection.steps-subtitle')}</b></h2>
+<h2 class="box">{$t('collection.basic-steps-subtitle')}</h2>
+<div class="step-table">
+  {#each data.lookupSteps({ uniqueNames: true, sources: ['basic'] }) as step}
+    <div class="step">
+      <a href={`./step/${step.name}`}>
+        <Step {step} poseIndex={$i} {animationTime} />
+        <!-- TODO: translations -->
+        <h3>{step.name}</h3>
+      </a>
+      <Experience
+        xp={$user.userSteps[step.name]
+          ? $user.userSteps[step.name].experience
+          : 0}
+      ></Experience>
+    </div>
+  {/each}
+</div>
+
+<h2 class="box">{$t('collection.shapes-steps-subtitle')}</h2>
+<div class="step-table">
+  {#each data.lookupSteps({ uniqueNames: true, sources: ['shapes'] }) as step}
+    <div class="step">
+      <a href={`./step/${step.name}`}>
+        <Step {step} poseIndex={$i} {animationTime} />
+        <!-- TODO: translations -->
+        <h3>{step.name}</h3>
+      </a>
+      <Experience
+        xp={$user.userSteps[step.name]
+          ? $user.userSteps[step.name].experience
+          : 0}
+      ></Experience>
+    </div>
+  {/each}
+</div>
+
+<h2 class="box">{$t('collection.rm-steps-subtitle')}</h2>
+<div class="step-table">
+  {#each data.lookupSteps( { uniqueNames: true, sources: ['rm_variations'] } ) as step}
+    <div class="step">
+      <a href={`./step/${step.name}`}>
+        <Step {step} poseIndex={$i} {animationTime} />
+        <!-- TODO: translations -->
+        <h3>{step.name}</h3>
+      </a>
+      <Experience
+        xp={$user.userSteps[step.name]
+          ? $user.userSteps[step.name].experience
+          : 0}
+      ></Experience>
+    </div>
+  {/each}
+</div>
+
+<h2 class="box">{$t('collection.footwork-steps-subtitle')}</h2>
+
+<div class="step-table">
+  {#each data.lookupSteps({ uniqueNames: true, sources: ['footwork'] }) as step}
+    <div class="step">
+      <a href={`./step/${step.name}`}>
+        <Step {step} poseIndex={$i} {animationTime} />
+        <!-- TODO: translations -->
+        <h3>{step.name}</h3>
+      </a>
+      <Experience
+        xp={$user.userSteps[step.name]
+          ? $user.userSteps[step.name].experience
+          : 0}
+      ></Experience>
+    </div>
+  {/each}
+</div>
+
 {#if !browser || $features.enableDanceCollection}
-  <h2 class="box">{$t('collection.dances-subtitle')}</h2>
+  <h2 class="box"><b>{$t('collection.dances-subtitle')}</b></h2>
   <div class="dance-table">
     {#each [...data.officialDances, ...$localDances] as dance}
       <div>
@@ -58,26 +130,6 @@
     {/if}
   </div>
 {/if}
-
-<h2 class="box">{$t('collection.steps-subtitle')}</h2>
-<div class="step-table">
-  {#each uniqueNameSteps as step}
-    {#if !step.name.includes('Idle')}
-      <div class="step">
-        <a href={`./step/${step.name}`}>
-          <Step {step} poseIndex={$i} {animationTime} />
-          <!-- TODO: translations -->
-          <h3>{step.name}</h3>
-        </a>
-        <Experience
-          xp={$user.userSteps[step.name]
-            ? $user.userSteps[step.name].experience
-            : 0}
-        ></Experience>
-      </div>
-    {/if}
-  {/each}
-</div>
 
 <style>
   h1 {

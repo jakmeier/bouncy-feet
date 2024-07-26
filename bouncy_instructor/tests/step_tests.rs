@@ -15,7 +15,7 @@ fn test_listing_static_steps() {
 
     step_names.sort();
 
-    let expect = expect!["Criss-Cross,Criss-Cross,Diagonal Running Man,Diagonal Running Man,Double RM,Double RM,Gangsta Hop,Gangsta Hop,Gangsta RM,Happy Feet,Idle,Idle Side,Knee Up,Open RM,Open RM,Open RM on Heels,Open RM on Heels,Pendulum,Pendulum,RM on Heels,RM on Heels,Running Man,Running Man,Simple Heels,Simple Heels,T-Step,T-Step,V-Step,V-Step"];
+    let expect = expect!["Criss-Cross,Criss-Cross,Diagonal Running Man,Diagonal Running Man,Double RM,Double RM,Gangsta Hop,Gangsta Hop,Gangsta RM,Happy Feet,Idle,Idle Side,Knee Up,Open RM on Heels,Open RM on Heels,Open Running Man,Open Running Man,Pendulum,Pendulum,RM on Heels,RM on Heels,Running Man,Running Man,Simple Heels,Simple Heels,T-Step,T-Step,V-Step,V-Step"];
     expect.assert_eq(&step_names.join(","));
 }
 

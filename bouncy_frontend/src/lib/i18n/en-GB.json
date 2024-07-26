@@ -17,8 +17,12 @@
     "collection": {
         "title": "Collection",
         "nav": "Collection",
-        "dances-subtitle": "Dances",
+        "dances-subtitle": "Choreographies",
         "steps-subtitle": "Steps",
+        "basic-steps-subtitle": "Melbourne Shuffle Basics",
+        "rm-steps-subtitle": "Running Man Variations",
+        "shapes-steps-subtitle": "Cutting Shapes",
+        "footwork-steps-subtitle": "Footwork",
         "new-dance-button": "Create New",
         "step": {
             "rotation": "Rotate (experimental)",

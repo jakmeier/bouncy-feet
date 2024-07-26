@@ -46,5 +46,27 @@
         (pose: "light-outward-stance", orientation: ToCamera),
       ]
     ),
+        (
+      name: "Open Running Man",
+      id: "open-rm-0",
+      variation: "right-first",
+      keyframes: [
+        (pose: "t-closed-right", orientation: ToCamera),
+        (pose: "open-rm-right", orientation: ToCamera),
+        (pose: "t-closed-left", orientation: ToCamera),
+        (pose: "open-rm-left", orientation: ToCamera),
+      ]
+    ),
+    (
+      name: "Open Running Man",
+      id: "open-rm-1",
+      variation: "left-first",
+      keyframes: [
+        (pose: "t-closed-left", orientation: ToCamera),
+        (pose: "open-rm-left", orientation: ToCamera),
+        (pose: "t-closed-right", orientation: ToCamera),
+        (pose: "open-rm-right", orientation: ToCamera),
+      ]
+    ),
   ]
 )
