@@ -50,6 +50,11 @@ export const load = async ({ data }) => {
 
 function loadOnce(data) {
     loadPoseString(data.poseFileString);
-    loadStepString(data.stepFileString);
+    loadStepString(data.stepFileStrings.basic);
+    loadStepString(data.stepFileStrings.footwork);
+    loadStepString(data.stepFileStrings.idle_steps);
+    loadStepString(data.stepFileStrings.misc);
+    loadStepString(data.stepFileStrings.rm_variations);
+    loadStepString(data.stepFileStrings.shapes);
     loadDanceString(data.danceFileString);
 }

@@ -1,0 +1,50 @@
+#![enable(implicit_some)]
+(
+  version: 0,
+  steps: [
+    (
+      name: "Diagonal Running Man",
+      id: "pp-0",
+      variation: "right-first",
+      keyframes: [
+        (pose: "polly-right", orientation: ToCamera),
+        (pose: "t-closed-left", orientation: ToCamera),
+        (pose: "polly-left", orientation: ToCamera),
+        (pose: "t-closed-right", orientation: ToCamera),
+      ]
+    ),
+    (
+      name: "Diagonal Running Man",
+      id: "pp-1",
+      variation: "left-first",
+      keyframes: [
+        (pose: "polly-left", orientation: ToCamera),
+        (pose: "t-closed-right", orientation: ToCamera),
+        (pose: "polly-right", orientation: ToCamera),
+        (pose: "t-closed-left", orientation: ToCamera),
+      ]
+    ),
+    (
+      name: "Criss-Cross",
+      id: "cc-0",
+      variation: "right-first",
+      keyframes: [
+        (pose: "staggered-stance-right", orientation: ToCamera),
+        (pose: "light-outward-stance", orientation: ToCamera),
+        (pose: "staggered-stance-left", orientation: ToCamera),
+        (pose: "light-outward-stance", orientation: ToCamera),
+      ]
+    ),
+    (
+      name: "Criss-Cross",
+      id: "cc-1",
+      variation: "left-first",
+      keyframes: [
+        (pose: "staggered-stance-left", orientation: ToCamera),
+        (pose: "light-outward-stance", orientation: ToCamera),
+        (pose: "staggered-stance-right", orientation: ToCamera),
+        (pose: "light-outward-stance", orientation: ToCamera),
+      ]
+    ),
+  ]
+)

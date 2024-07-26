@@ -28,15 +28,38 @@ export const load = async ({ fetch, url, cookies, request }) => {
 
     await loadTranslations(locale, pathname); // keep this just before the `return`
 
-    const poseFile = await fetch('/pose.ron').catch((e) => console.error(e));
-    const stepFile = await fetch('/step.ron').catch((e) => console.error(e));
-    const danceFile = await fetch('/dance.ron').catch((e) => console.error(e));
+    const poseFile = fetch('/pose.ron').catch((e) => console.error(e));
+    const danceFile = fetch('/dance.ron').catch((e) => console.error(e));
+
+    const stepFiles = [
+        'basic.ron',
+        'footwork.ron',
+        'idle_steps.ron',
+        'misc.ron',
+        'rm_variations.ron',
+        'shapes.ron'
+    ].map(filename => fetch(`/steps/${filename}`).catch((e) => console.error(e)));
+
+    const [
+        poseFileResponse,
+        danceFileResponse,
+        ...stepFileResponses
+    ] = await Promise.all([poseFile, danceFile, ...stepFiles]);
+
+    const stepFileStrings = await Promise.all(stepFileResponses.map(response => response.text()));
 
     return {
         i18n: { locale, route: pathname },
         translations: translations.get(), // `translations` on server contain all translations loaded by different clients
-        poseFileString: await poseFile.text(),
-        stepFileString: await stepFile.text(),
-        danceFileString: await danceFile.text(),
+        poseFileString: await poseFileResponse.text(),
+        danceFileString: await danceFileResponse.text(),
+        stepFileStrings: {
+            basic: stepFileStrings[0],
+            footwork: stepFileStrings[1],
+            idle_steps: stepFileStrings[2],
+            misc: stepFileStrings[3],
+            rm_variations: stepFileStrings[4],
+            shapes: stepFileStrings[5]
+        }
     };
 };

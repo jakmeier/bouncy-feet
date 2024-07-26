@@ -1,0 +1,22 @@
+#![enable(implicit_some)]
+(
+  version: 0,
+  steps: [
+    (
+      name: "Idle",
+      id: "idle-0",
+      keyframes: [
+        (pose: "standing-straight-front", orientation: ToCamera),
+        (pose: "standing-straight-front", orientation: ToCamera),
+      ]
+    ),
+    (
+      name: "Idle Side",
+      id: "idle-1",
+      keyframes: [
+        (pose: "standing-straight-side", orientation: Right),
+        (pose: "standing-straight-side", orientation: Right),
+      ]
+    ),
+  ]
+)

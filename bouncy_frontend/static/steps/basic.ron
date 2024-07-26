@@ -1,0 +1,46 @@
+#![enable(implicit_some)]
+(
+  version: 0,
+  steps: [
+    (
+      name: "Running Man",
+      id: "rm-0",
+      variation: "right-first",
+      keyframes: [
+        (pose: "right-forward", orientation: Right),
+        (pose: "left-up", orientation: Right),
+        (pose: "left-forward", orientation: Right),
+        (pose: "right-up", orientation: Right),
+      ]
+    ),
+    (
+      name: "Running Man",
+      id: "rm-1",
+      variation: "left-first",
+      keyframes: [
+        (pose: "left-forward", orientation: Right),
+        (pose: "right-up", orientation: Right),
+        (pose: "right-forward", orientation: Right),
+        (pose: "left-up", orientation: Right),
+      ]
+    ),
+    (
+      name: "T-Step",
+      id: "t-0",
+      variation: "right-out",
+      keyframes: [
+        (pose: "t-open-right", orientation: ToCamera, pivot: (side: Left, part: Toes)),
+        (pose: "t-closed-right", orientation: ToCamera, pivot: (side: Left, part: Heel)),
+      ]
+    ),
+    (
+      name: "T-Step",
+      id: "t-1",
+      variation: "left-out",
+      keyframes: [
+        (pose: "t-open-left", orientation: ToCamera, pivot: (side: Right, part: Toes)),
+        (pose: "t-closed-left", orientation: ToCamera, pivot: (side: Right, part: Heel)),
+      ]
+    ),
+  ]
+)

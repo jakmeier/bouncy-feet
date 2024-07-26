@@ -1,0 +1,57 @@
+#![enable(implicit_some)]
+(
+  version: 0,
+  steps: [
+    (
+      name: "Happy Feet",
+      id: "happy-feet-0",
+      variation: "right-first",
+      keyframes: [
+        (pose: "closed-x", orientation: ToCamera),
+        (pose: "happy-right", orientation: ToCamera),
+        (pose: "closed-x", orientation: ToCamera),
+        (pose: "happy-left", orientation: ToCamera),
+      ]
+    ),
+    (
+      name: "V-Step",
+      id: "v-0",
+      variation: "right-out",
+      keyframes: [
+        (pose: "v-open-right", orientation: ToCamera, pivot: (side: Right, part: Toes)),
+        (pose: "v-closed", orientation: ToCamera, pivot: (side: Right, part: Heel)),
+      ]
+    ),
+    (
+      name: "V-Step",
+      id: "v-1",
+      variation: "left-out",
+      keyframes: [
+        (pose: "v-open-left", orientation: ToCamera, pivot: (side: Left, part: Toes)),
+        (pose: "v-closed", orientation: ToCamera, pivot: (side: Left, part: Heel)),
+      ]
+    ),
+    (
+      name: "Gangsta Hop",
+      id: "ghop-0",
+      variation: "left-first",
+      keyframes: [
+        (pose: "gangsta-hop-left", orientation: ToCamera),
+        (pose: "gangsta-right-up-front", orientation: ToCamera),
+        (pose: "gangsta-hop-right", orientation: ToCamera),
+        (pose: "gangsta-left-up-front", orientation: ToCamera),
+      ]
+    ),
+    (
+      name: "Gangsta Hop",
+      id: "ghop-1",
+      variation: "right-first",
+      keyframes: [
+        (pose: "gangsta-hop-right", orientation: ToCamera),
+        (pose: "gangsta-left-up-front", orientation: ToCamera),
+        (pose: "gangsta-hop-left", orientation: ToCamera),
+        (pose: "gangsta-right-up-front", orientation: ToCamera),
+      ]
+    ),
+  ]
+)
