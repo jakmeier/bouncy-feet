@@ -13,7 +13,10 @@
   export let data;
 
   const name = $page.params.stepName;
-  const variations = data.allSteps.filter((step) => step.name === name);
+  const variations = data.lookupSteps({
+    uniqueNames: false,
+    stepName: name,
+  });
   const selectItems = variations.map((step) => {
     return { value: step, label: $t(`step.variation.${step.variation}`) };
   });

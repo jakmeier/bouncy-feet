@@ -16,6 +16,8 @@
   const localDances = localCollection.dances;
   const user = getContext('user').store;
 
+  const uniqueNameSteps = data.lookupSteps({ uniqueNames: true });
+
   const stepTime = 300;
   // animationTime < stepTime will freeze the position for a moment, which makes
   // it clearer. If the difference is too much, it looks robotic.
@@ -59,7 +61,7 @@
 
 <h2 class="box">{$t('collection.steps-subtitle')}</h2>
 <div class="step-table">
-  {#each data.uniqueNameSteps as step}
+  {#each uniqueNameSteps as step}
     {#if !step.name.includes('Idle')}
       <div class="step">
         <a href={`./step/${step.name}`}>

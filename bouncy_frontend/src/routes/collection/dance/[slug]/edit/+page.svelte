@@ -42,4 +42,7 @@
   }
 </script>
 
-<DanceEditor availableSteps={data.allSteps} {danceBuilder} />
+<DanceEditor
+  availableSteps={data.lookupSteps({ uniqueNames: false })}
+  {danceBuilder}
+/>

@@ -9,6 +9,8 @@
   let danceName = $t('editor.new-dance.default-dance-name');
   /** @type {DanceBuilder} */
   let danceBuilder = new DanceBuilder(danceName);
+
+  const uniqueNameSteps = data.lookupSteps({ uniqueNames: true });
 </script>
 
-<DanceEditor availableSteps={data.uniqueNameSteps} {danceBuilder} />
+<DanceEditor availableSteps={uniqueNameSteps} {danceBuilder} />

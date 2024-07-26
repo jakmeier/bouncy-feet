@@ -48,4 +48,9 @@
  * @property {any} stats
  * @property {number[]} bpms
  *
+ * @typedef {Object} StepFilter
+ * @property {boolean} uniqueNames
+ * @property {string[]} [sources]
+ * @property {string} [stepName]
+ * 
  */

@@ -6,6 +6,7 @@ import {
     dances,
     steps,
     stepsBySource,
+    StepInfo,
 } from '$lib/instructor/bouncy_instructor';
 
 export const prerender = true;
@@ -28,33 +29,74 @@ export const load = async ({ data }) => {
         loadOnce(data);
     }
 
-    const allSteps = steps();
-    const stepBySourceData = {
-        basic: stepsBySource('basic'),
-        footwork: stepsBySource('footwork'),
-        idle_steps: stepsBySource('idle_steps'),
-        misc: stepsBySource('misc'),
-        rm_variations: stepsBySource('rm_variations'),
-        shapes: stepsBySource('shapes'),
-    };
-    const officialDances = dances();
-    const uniqueNameSteps = [];
-
-    const seenNames = new Set();
-    for (const step of allSteps) {
-        if (!seenNames.has(step.name)) {
-            seenNames.add(step.name);
-            uniqueNameSteps.push(step);
+    const stepData = {
+        allSteps: steps(),
+        bySource: {
+            basic: stepsBySource('basic'),
+            footwork: stepsBySource('footwork'),
+            idle_steps: stepsBySource('idle_steps'),
+            misc: stepsBySource('misc'),
+            rm_variations: stepsBySource('rm_variations'),
+            shapes: stepsBySource('shapes'),
         }
     }
+
+    const officialDances = dances();
+
+    /** 
+     * Exported function to lookup a filtered list of steps.
+     *
+     * (Note: I might want to move this to Rust code.)
+     * @param {StepFilter} filter 
+     * @returns {StepInfo[]}
+    */
+    function lookupSteps(filter) {
+        // collect all steps to include from sources
+        let stepLists = [];
+        if (filter.sources) {
+            for (let i = 0; i < filter.sources.length; i++) {
+                const sourceName = filter.sources[i];
+                const list = stepData.bySource[sourceName];
+                if (list) {
+                    stepLists.push(list);
+                } else {
+                    console.warn("could not load step source", sourceName)
+                }
+            }
+        } else {
+            stepLists.push(stepData.allSteps);
+        }
+
+        // if there are no additional filters, flatten the lists and return
+        const needsNoFiltering = !filter.uniqueNames && !filter.stepName;
+        if (needsNoFiltering) {
+            return stepLists.flat();
+        }
+
+        // filter by given criteria
+        const out = [];
+        const seenNames = new Set();
+        for (const stepList of stepLists) {
+            for (const step of stepList) {
+                if (filter.uniqueNames && seenNames.has(step.name)) {
+                    continue;
+                }
+                if (filter.stepName && step.name !== filter.stepName) {
+                    continue;
+                }
+                seenNames.add(step.name);
+                out.push(step);
+            }
+        }
+
+        return out;
+    };
 
     return {
         i18n,
         translations,
-        uniqueNameSteps,
-        allSteps,
-        steps: stepBySourceData,
         officialDances,
+        lookupSteps,
     };
 };
 
