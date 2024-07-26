@@ -13,18 +13,18 @@ pub(crate) fn load_static_files() {
     const MISC_STEP_STR: &str = include_str!("../data/steps/misc.ron");
     const DANCE_STR: &str = include_str!("../data/dance.ron");
     load_pose_str(POSE_STR).expect("loading static poses should work");
-    for (i, step_str) in [
-        IDLE_STEP_STR,
-        BASIC_STEP_STR,
-        FOOTWORK_STEP_STR,
-        RM_STEP_STR,
-        SHAPES_STEP_STR,
-        MISC_STEP_STR,
+    for (i, (step_str, source)) in [
+        (IDLE_STEP_STR, "idle_steps"),
+        (BASIC_STEP_STR, "basic"),
+        (FOOTWORK_STEP_STR, "footwork"),
+        (RM_STEP_STR, "rm_variations"),
+        (SHAPES_STEP_STR, "shapes"),
+        (MISC_STEP_STR, "misc"),
     ]
     .iter()
     .enumerate()
     {
-        load_step_str(step_str)
+        load_step_str(step_str, source.to_string())
             .inspect_err(|_e| println!("failed in file {i} with input: {step_str}"))
             .expect("loading static steps should work");
     }

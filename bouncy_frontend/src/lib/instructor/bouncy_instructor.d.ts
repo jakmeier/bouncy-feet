@@ -15,9 +15,10 @@ export function loadPoseString(data: string): void;
 export function loadDanceString(data: string): void;
 /**
 * @param {string} url
+* @param {string} source
 * @returns {Promise<void>}
 */
-export function loadStepFile(url: string): Promise<void>;
+export function loadStepFile(url: string, source: string): Promise<void>;
 /**
 * @param {string} url
 * @returns {Promise<void>}
@@ -25,12 +26,18 @@ export function loadStepFile(url: string): Promise<void>;
 export function loadDanceFile(url: string): Promise<void>;
 /**
 * @param {string} data
+* @param {string} source
 */
-export function loadStepString(data: string): void;
+export function loadStepString(data: string, source: string): void;
 /**
 * @returns {(StepInfo)[]}
 */
 export function steps(): (StepInfo)[];
+/**
+* @param {string} source
+* @returns {(StepInfo)[]}
+*/
+export function stepsBySource(source: string): (StepInfo)[];
 /**
 * @param {string} id
 * @param {boolean} flipped
@@ -629,7 +636,7 @@ export class StepInfo {
 * as the original but instead of starting with the right foot, it starts
 * with the left foot first. The app shows a translated text like "Left Leg First".
 */
-  readonly variation: string | undefined;
+  readonly variation: string;
 }
 /**
 */

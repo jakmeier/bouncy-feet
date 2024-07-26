@@ -10,7 +10,7 @@ use super::dance::Dance;
 use super::geom::SignedAngle;
 use super::pose::{BodyPartOrdering, BodyPoint, Limb, LimbPosition, Pose, PoseDirection};
 use super::skeleton_3d::Direction;
-use super::step::Step;
+use super::step::{Step, StepSource};
 use crate::parsing::ParseFileError;
 use crate::pose_file::PoseZ;
 use crate::skeleton::Cartesian2d;
@@ -263,7 +263,12 @@ impl DanceCollection {
         pose
     }
 
-    pub(crate) fn add_steps(&mut self, steps: &[step_file::Step]) -> Result<(), AddStepError> {
+    pub(crate) fn add_steps(
+        &mut self,
+        steps: &[step_file::Step],
+        source: String,
+    ) -> Result<(), AddStepError> {
+        let source = StepSource::new(source);
         for def in steps {
             let poses = def
                 .keyframes
@@ -299,6 +304,7 @@ impl DanceCollection {
                 poses,
                 directions,
                 pivots,
+                source: source.clone(),
             };
             self.steps.push(new_step);
         }
@@ -330,6 +336,7 @@ impl DanceCollection {
             poses,
             directions: step.directions.clone(),
             pivots: step.pivots.clone(),
+            source: step.source.clone(),
         };
         self.steps.push(new_step);
         Ok(())

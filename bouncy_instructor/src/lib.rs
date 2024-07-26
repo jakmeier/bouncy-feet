@@ -36,8 +36,8 @@ impl State {
         Rc::make_mut(&mut self.db).add_poses(poses)
     }
 
-    fn add_steps(&mut self, steps: &[step_file::Step]) -> Result<(), AddStepError> {
-        Rc::make_mut(&mut self.db).add_steps(steps)
+    fn add_steps(&mut self, steps: &[step_file::Step], source: String) -> Result<(), AddStepError> {
+        Rc::make_mut(&mut self.db).add_steps(steps, source)
     }
 
     fn add_dances(&mut self, dances: Vec<dance_file::Dance>) -> Result<(), AddDanceError> {

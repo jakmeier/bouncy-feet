@@ -47,9 +47,9 @@ pub fn load_dance_string(data: &str) -> Result<(), JsValue> {
 }
 
 #[wasm_bindgen(js_name = loadStepFile)]
-pub async fn load_step_file(url: &str) -> Result<(), JsValue> {
+pub async fn load_step_file(url: &str, source: String) -> Result<(), JsValue> {
     let text = load_text_file(url).await?;
-    load_step_str(&text)?;
+    load_step_str(&text, source)?;
     Ok(())
 }
 
@@ -61,8 +61,8 @@ pub async fn load_dance_file(url: &str) -> Result<(), JsValue> {
 }
 
 #[wasm_bindgen(js_name = loadStepString)]
-pub fn load_step_string(data: &str) -> Result<(), JsValue> {
-    load_step_str(data)?;
+pub fn load_step_string(data: &str, source: String) -> Result<(), JsValue> {
+    load_step_str(data, source)?;
     Ok(())
 }
 
@@ -73,6 +73,20 @@ pub fn steps() -> Vec<StepInfo> {
             .db
             .steps()
             .iter()
+            .cloned()
+            .map(|step| StepInfo::from_step(step, &state.db))
+            .collect::<Vec<_>>()
+    })
+}
+
+#[wasm_bindgen(js_name = "stepsBySource")]
+pub fn steps_by_source(source: &str) -> Vec<StepInfo> {
+    STATE.with_borrow(|state| {
+        state
+            .db
+            .steps()
+            .iter()
+            .filter(|step| &*step.source == source)
             .cloned()
             .map(|step| StepInfo::from_step(step, &state.db))
             .collect::<Vec<_>>()
@@ -136,9 +150,9 @@ pub fn load_pose_str(text: &str) -> Result<(), ParseFileError> {
     Ok(())
 }
 
-pub fn load_step_str(text: &str) -> Result<(), ParseFileError> {
+pub fn load_step_str(text: &str, source: String) -> Result<(), ParseFileError> {
     let parsed = StepFile::from_str(text)?;
-    STATE.with(|state| state.borrow_mut().add_steps(&parsed.steps))?;
+    STATE.with(|state| state.borrow_mut().add_steps(&parsed.steps, source))?;
     Ok(())
 }
 

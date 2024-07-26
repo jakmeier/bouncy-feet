@@ -435,6 +435,7 @@ mod tests {
             ),
           ]
         )"#,
+            "test".to_owned(),
         )
         .unwrap();
     }

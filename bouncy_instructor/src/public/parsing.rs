@@ -103,7 +103,7 @@ mod tests {
     #[test]
     fn test_valid_pose_reference() {
         load_pose_str(POSE_STR).unwrap();
-        load_step_str(STEP_STR).unwrap();
+        load_step_str(STEP_STR, "test".to_owned()).unwrap();
         let num_poses = STATE.with_borrow(|state| state.db.poses().len());
         assert_eq!(num_poses, 2);
     }
@@ -111,7 +111,7 @@ mod tests {
     #[test]
     fn test_basic_step_loading() {
         load_pose_str(POSE_STR).unwrap();
-        load_step_str(STEP_STR).unwrap();
+        load_step_str(STEP_STR, "test".to_owned()).unwrap();
 
         let step_ids = steps()
             .into_iter()
@@ -129,7 +129,7 @@ mod tests {
     #[test]
     fn test_basic_dance_loading() {
         load_pose_str(POSE_STR).unwrap();
-        load_step_str(STEP_STR).unwrap();
+        load_step_str(STEP_STR, "test".to_owned()).unwrap();
         load_dance_str(DANCE_STR).unwrap();
 
         let dance_ids = dances()
@@ -192,7 +192,7 @@ mod tests {
         )
         "#;
         load_pose_str(POSE_STR).unwrap();
-        load_step_str(STEP_STR).unwrap();
+        load_step_str(STEP_STR, "test".to_owned()).unwrap();
         match load_dance_str(input) {
             Err(ParseFileError::UnknownStepName(id)) if id == "fake-id" => (),
             Err(other) => panic!("wrong error {other}"),

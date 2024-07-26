@@ -5,6 +5,7 @@ import {
     loadStepString,
     dances,
     steps,
+    stepsBySource,
 } from '$lib/instructor/bouncy_instructor';
 
 export const prerender = true;
@@ -28,6 +29,14 @@ export const load = async ({ data }) => {
     }
 
     const allSteps = steps();
+    const stepBySourceData = {
+        basic: stepsBySource('basic'),
+        footwork: stepsBySource('footwork'),
+        idle_steps: stepsBySource('idle_steps'),
+        misc: stepsBySource('misc'),
+        rm_variations: stepsBySource('rm_variations'),
+        shapes: stepsBySource('shapes'),
+    };
     const officialDances = dances();
     const uniqueNameSteps = [];
 
@@ -44,17 +53,18 @@ export const load = async ({ data }) => {
         translations,
         uniqueNameSteps,
         allSteps,
+        steps: stepBySourceData,
         officialDances,
     };
 };
 
 function loadOnce(data) {
     loadPoseString(data.poseFileString);
-    loadStepString(data.stepFileStrings.basic);
-    loadStepString(data.stepFileStrings.footwork);
-    loadStepString(data.stepFileStrings.idle_steps);
-    loadStepString(data.stepFileStrings.misc);
-    loadStepString(data.stepFileStrings.rm_variations);
-    loadStepString(data.stepFileStrings.shapes);
+    loadStepString(data.stepFileStrings.basic, 'basic');
+    loadStepString(data.stepFileStrings.footwork, 'footwork');
+    loadStepString(data.stepFileStrings.idle_steps, 'idle_steps');
+    loadStepString(data.stepFileStrings.misc, 'misc');
+    loadStepString(data.stepFileStrings.rm_variations, 'rm_variations');
+    loadStepString(data.stepFileStrings.shapes, 'shapes');
     loadDanceString(data.danceFileString);
 }
