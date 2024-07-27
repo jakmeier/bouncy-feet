@@ -61,7 +61,7 @@ export async function fetchLeaderboard() {
 // local storage and the server, this as good as any place to put it.
 
 /// Accumulated experience per level for levels 0-9.
-const LEVEL_ACC_EXP = [0, 10, 300, 1500, 3000, 9000, 13500, 20250, 30375, 45000]
+const LEVEL_ACC_EXP = [0, 10, 200, 450, 750, 1200, 1750, 2250, 3375, 4500];
 /**
  * Convert from a total experience amount to a level.
  * 
@@ -97,7 +97,7 @@ export function incrementalExperienceForLevel(level) {
     else if (level < LEVEL_ACC_EXP.length) {
         return LEVEL_ACC_EXP[level] - LEVEL_ACC_EXP[level - 1];
     } else {
-        // Above 9, each level requires additional 150*i² experience, where i is
+        // Above 9, each level requires additional 15*i² experience, where i is
         // the level.
         return level * level * 150;
     }
@@ -116,14 +116,14 @@ export function totalExperienceForLevel(level) {
     else if (level < LEVEL_ACC_EXP.length) {
         return LEVEL_ACC_EXP[level] - LEVEL_ACC_EXP[level - 1];
     } else {
-        // Above 9, each level requires additional 150*i² experience, where i is
+        // Above 9, each level requires additional 15*i² experience, where i is
         // the level.
 
         // WolframAlpha: 1/6(2n³ + 3n² + n - 1710) = accumulated sum of i^2 for i=10..n.
-        // Hence, total_exp(lvl) = 45000 + 150/6 * (2n³ + 3n² + n - 1710)
-        //        total_exp(lvl) =  2250 +    25 * (2n³ + 3n² + n)
+        // Hence, total_exp(lvl) = 4500 + 15/6 * (2n³ + 3n² + n - 1710)
+        //        total_exp(lvl) =  225 +  2.5 * (2n³ + 3n² + n)
         const squared = level * level;
         const cubed = squared * level;
-        return 2250 + 25 * (2 * cubed + 3 * squared + level);
+        return 225 + 2.5 * (2 * cubed + 3 * squared + level);
     }
 }
