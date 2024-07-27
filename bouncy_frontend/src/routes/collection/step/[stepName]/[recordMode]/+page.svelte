@@ -5,7 +5,6 @@
   import { stepsByName } from '$lib/instructor/bouncy_instructor';
   import { page } from '$app/stores';
   import LiveRecording from '$lib/components/record/LiveRecording.svelte';
-  import DanceStats from '../../../../profile/DanceStats.svelte';
   import VideoReview from '$lib/components/review/VideoReview.svelte';
   import Header from '$lib/components/ui/Header.svelte';
   import { hideNavigation } from '$lib/stores/UiState';
@@ -118,7 +117,11 @@
     showReview = true;
   }
 
-  function goBack() {
+  function closeReview() {
+    showReview = false;
+  }
+
+  function goBackToStep() {
     window.history.back();
   }
 
@@ -163,11 +166,15 @@
       ></VideoReview>
       <div>
         <a href={reviewVideoSrc} download>
-          <button>
+          <button class="light">
             <span class="material-symbols-outlined"> download </span>
             <p>{$t('record.download')}</p>
           </button>
         </a>
+        <button class="light" on:click={closeReview}>
+          <span class="material-symbols-outlined"> arrow_back </span>
+          <p>{$t('record.back-button')}</p>
+        </button>
       </div>
     {:else}
       Could not show review, something failed.
@@ -185,7 +192,7 @@
         <span class="material-symbols-outlined"> videocam </span>
         <p>{$t('record.reset-button')}</p>
       </button>
-      <button class="light" on:click={goBack}>
+      <button class="light" on:click={goBackToStep}>
         <span class="material-symbols-outlined"> arrow_back </span>
         <p>{$t('record.back-button')}</p>
       </button>
