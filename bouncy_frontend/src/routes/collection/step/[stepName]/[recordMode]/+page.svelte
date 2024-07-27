@@ -89,9 +89,11 @@
     }
     showSummary = true;
     sessionResult = userCtx.computeDanceStats(detectedSteps);
-    setTimeout(() => {
-      userCtx.addDanceToStats(sessionResult);
-    }, 1000);
+    if (sessionResult) {
+      setTimeout(() => {
+        userCtx.addDanceToStats(sessionResult);
+      }, 1000);
+    }
     const videoBlob = await endRecording();
 
     if (videoBlob) {
@@ -272,9 +274,10 @@
   }
 
   @media (max-width: 360px) {
-    /* Two buttons must fit next to each other, including margin */
+    /* Three buttons must fit next to each other, including margin */
     button {
-      width: 120px;
+      width: 75px;
+      height: fit-content;
     }
   }
 </style>
