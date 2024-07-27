@@ -63,7 +63,7 @@
           };
         }
         const halfBeat = (step.end - step.start) / (step.poses.length - 1);
-        bpms.push(60000 / halfBeat);
+        bpms.push(30000 / halfBeat);
         if (halfBeat < 231) {
           stats[step.name].veryFast += 1;
         } else if (halfBeat < 300) {

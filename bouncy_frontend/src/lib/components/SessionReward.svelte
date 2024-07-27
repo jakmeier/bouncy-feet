@@ -25,7 +25,7 @@
   $: if (data) {
     stats = data.stats[step.name];
     averageBpm =
-      data.bpms.reduce((acc, bpm) => acc + bpm, 0) / data.bpms.length / 2;
+      data.bpms.reduce((acc, bpm) => acc + bpm, 0) / data.bpms.length;
     gainedXp = data.experience;
   }
 </script>
