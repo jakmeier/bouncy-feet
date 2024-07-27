@@ -4,13 +4,23 @@
   import { t } from '$lib/i18n';
   import { submitStats, fetchLeaderboard } from '$lib/stats';
   import Leaderboard from './Leaderboard.svelte';
+  import Popup from '$lib/components/ui/Popup.svelte';
+  import { writable } from 'svelte/store';
 
   const user = getContext('user').store;
   let scoreboardData = [];
+  let showStatsSharingPopup = writable(!$user.consentSendingStats);
 
   async function submit() {
     await submitStats($user);
     refreshLeaderboard();
+  }
+
+  function consent(yes) {
+    if (yes === true) {
+      $user.consentSendingStats = true;
+    }
+    $showStatsSharingPopup = false;
   }
 
   async function refreshLeaderboard() {
@@ -28,14 +38,14 @@
   </span>
   {$user.publicName}
 </div>
-<h2 class=box>{$t('profile.stats-title')}</h2>
+<h2 class="box">{$t('profile.stats-title')}</h2>
 <DanceStats
   seconds={$user.recordedSeconds}
   numSteps={$user.recordedSteps}
   numDances={$user.recordedDances}
 />
 
-<h2 class=box>{$t('profile.leaderboard-title')}</h2>
+<h2 class="box">{$t('profile.leaderboard-title')}</h2>
 <Leaderboard users={scoreboardData} />
 <form class="inputs">
   <button on:click={submit} class="light">{$t('profile.submit-stats')}</button>
@@ -44,6 +54,21 @@
   <label for="publicName">{$t('profile.public-name')}</label>
   <input id="publicName" type="text" bind:value={$user.publicName} />
 </form>
+
+<Popup title={$t('profile.consent.title')} bind:isOpen={showStatsSharingPopup}>
+  <div>{$t('profile.consent.text0')}</div>
+  <div>{$t('profile.consent.question')}</div>
+
+  <div class="buttons">
+    <button class="light" on:click={() => consent(true)}>
+      <p>{$t('profile.consent.yes')}</p>
+    </button>
+
+    <button class="light" on:click={() => consent(false)}>
+      <p>{$t('profile.consent.no')}</p>
+    </button>
+  </div>
+</Popup>
 
 <style>
   .profile-pic {
@@ -59,5 +84,11 @@
     display: grid;
     gap: 5px;
     margin: 25px 5px;
+  }
+
+  .buttons {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 30px;
   }
 </style>

@@ -8,9 +8,12 @@ if (dev) {
 }
 
 /**
- * @param {{ id: string; publicName: string; recordedSteps: number; recordedSeconds: number; recordedDances: number; }} user
+ * @param {UserData} user
  */
 export async function submitStats(user) {
+    if (!user.consentSendingStats) {
+        return;
+    }
     const apiUrl = STATS_API_BASE + '/user/stats';
 
     const payload = {
