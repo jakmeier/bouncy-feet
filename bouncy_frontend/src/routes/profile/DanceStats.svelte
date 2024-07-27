@@ -1,5 +1,5 @@
 <script>
-  import { formatDuration, intervalToDuration } from 'date-fns';
+  import { formatDistanceStrict } from 'date-fns';
   import { t } from '$lib/i18n';
 
   export let seconds = 0;
@@ -45,7 +45,7 @@
     <div>{$t('stats.time-danced')}</div>
     <div class="right">
       <!-- TODO: use locale for duration formatting -->
-      {formatDuration(intervalToDuration({ start: 0, end: seconds * 1000 }))}
+      {formatDistanceStrict(0, seconds * 1000)}
     </div>
   {/if}
 

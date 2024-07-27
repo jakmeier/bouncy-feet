@@ -99,7 +99,7 @@
   function addDanceToStats(result) {
     $user.recordedDances += 1;
     $user.recordedSteps += result.numSteps;
-    $user.recordedSeconds += result.duration;
+    $user.recordedSeconds += result.duration / 1000;
     for (let [key, stat] of Object.entries(result.stats)) {
       if (!$user.userSteps[key]) {
         $user.userSteps[key] = {
