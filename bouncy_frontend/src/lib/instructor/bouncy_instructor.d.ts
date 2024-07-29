@@ -244,6 +244,9 @@ export class DetectedStep {
   free(): void;
 /**
 */
+  readonly bpm: number;
+/**
+*/
   end: number;
 /**
 */

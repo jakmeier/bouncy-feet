@@ -23,6 +23,10 @@
   if (stored && !stored.userSteps) {
     stored.userSteps = {};
   }
+  if (stored && !stored.consentSendingStats === undefined) {
+    stored.userSteps = false;
+  }
+  /** @type {import('svelte/store').Writable<UserData>} */
   const user = writable(
     stored || {
       id: crypto.randomUUID(),
@@ -32,6 +36,7 @@
       recordedSeconds: 0,
       recordedSteps: 0,
       userSteps: {},
+      consentSendingStats: false,
     }
   );
   if (browser) {
@@ -62,13 +67,12 @@
             veryFast: 0,
           };
         }
-        const halfBeat = (step.end - step.start) / (step.poses.length - 1);
-        bpms.push(30000 / halfBeat);
-        if (halfBeat < 231) {
+        const bpm = step.bpm;
+        if (bpm > 130) {
           stats[step.name].veryFast += 1;
-        } else if (halfBeat < 300) {
+        } else if (bpm > 100) {
           stats[step.name].fast += 1;
-        } else if (halfBeat < 500) {
+        } else if (bpm > 60) {
           stats[step.name].mid += 1;
         } else {
           stats[step.name].slow += 1;

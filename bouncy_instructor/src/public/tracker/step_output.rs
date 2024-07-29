@@ -24,4 +24,14 @@ impl DetectedStep {
     pub fn poses(&self) -> Vec<PoseApproximation> {
         self.poses.clone()
     }
+
+    #[wasm_bindgen(getter)]
+    pub fn bpm(&self) -> f32 {
+        let duration = (self.end - self.start) as f32;
+        let intervals = self.poses.len() - 1;
+        //   1 s / beatDuration
+        // = 60'000 ms  / (duration / intervals / 2)
+        // = 60'000 ms * 2 * intervals / duration
+        30_000.0 * intervals as f32 / duration
+    }
 }

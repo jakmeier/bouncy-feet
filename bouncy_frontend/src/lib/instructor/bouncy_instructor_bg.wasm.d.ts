@@ -30,6 +30,7 @@ export function danceinfo_length(a: number): number;
 export function danceinfo_skeleton(a: number, b: number): number;
 export function danceinfo_steps(a: number, b: number): void;
 export function dances(a: number): void;
+export function detectedstep_bpm(a: number): number;
 export function detectedstep_name(a: number, b: number): void;
 export function detectedstep_poses(a: number, b: number): void;
 export function detectionresult_new_default(): number;
