@@ -651,6 +651,10 @@ export class Tracker {
 */
   exportFrame(timestamp: number): ExportedFrame;
 /**
+* @returns {string}
+*/
+  exportKeypoints(): string;
+/**
 * Create a tracker for all known steps.
 */
   constructor();

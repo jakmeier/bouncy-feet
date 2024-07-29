@@ -12,7 +12,7 @@ pub(crate) mod tracker;
 pub use dance_info::DanceInfo;
 pub use keypoints::{Keypoints, Side as KeypointsSide};
 pub use step_info::StepInfo;
-pub use tracker::Tracker;
+pub use tracker::{DetectionResult, Tracker};
 
 pub(crate) use parsing::{dance_file, pose_file, step_file};
 

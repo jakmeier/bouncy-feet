@@ -1,4 +1,4 @@
-use super::{Timestamp, Tracker};
+use super::{Keypoints, Timestamp, Tracker};
 use wasm_bindgen::prelude::wasm_bindgen;
 
 /// Information of a recorded frame in RON format.
@@ -31,6 +31,21 @@ impl Tracker {
                 .unwrap(),
             },
         }
+    }
+
+    #[wasm_bindgen(js_name = exportKeypoints)]
+    pub fn export_keypoints(&self) -> String {
+        let mut config = ron::ser::PrettyConfig::default();
+        config.indentor = "  ".to_string();
+
+        let timestamp_keypoint_tuples: Vec<(Timestamp, &Keypoints)> = self
+            .timestamps
+            .iter()
+            .copied()
+            .zip(self.keypoints.iter())
+            .collect();
+
+        ron::ser::to_string_pretty(&timestamp_keypoint_tuples, config).unwrap()
     }
 }
 

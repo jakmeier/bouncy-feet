@@ -77,6 +77,7 @@ export function tracker_detectNextPose(a: number): number;
 export function tracker_expectedPoseBodyShift(a: number): number;
 export function tracker_expectedPoseSkeleton(a: number): number;
 export function tracker_exportFrame(a: number, b: number): number;
+export function tracker_exportKeypoints(a: number, b: number): void;
 export function tracker_hipPosition(a: number, b: number): number;
 export function tracker_new(): number;
 export function tracker_numDetectedPoses(a: number): number;

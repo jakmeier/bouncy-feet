@@ -35,3 +35,8 @@ pub(crate) fn setup_tracker() -> Tracker {
     load_static_files();
     Tracker::new()
 }
+
+pub(crate) fn setup_step_tracker(step_name: &str) -> Tracker {
+    load_static_files();
+    Tracker::new_step_tracker(step_name.to_owned()).unwrap()
+}

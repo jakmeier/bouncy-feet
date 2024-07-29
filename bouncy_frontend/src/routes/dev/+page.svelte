@@ -84,6 +84,11 @@
     downloadTextFile('pose.ron', exported.pose);
   }
 
+  function downloadKeypoints() {
+    const exported = tracker.exportKeypoints();
+    downloadTextFile('keypoints.ron', exported);
+  }
+
   function computePoseErrors() {
     poseErrors = tracker.allPoseErrors(video.currentTime * 1000);
   }
@@ -109,6 +114,7 @@
   />
 </p>
 <button on:click={downloadFrame}> Download Keypoints of Frame </button>
+<button on:click={downloadKeypoints}> Download Keypoints of Video </button>
 <h2>Dance Evaluation</h2>
 <button on:click={logDance}> Log Dance </button>
 {#if detectedSteps.length > 0 && video}

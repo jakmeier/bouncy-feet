@@ -7,7 +7,7 @@
  * @property {boolean} enableDanceCollection
  * @property {boolean} enableDanceCreator
  * @property {boolean} enableDevView
- * 
+ *
  * @typedef {Object} Point
  * @property {number} x 
  * @property {number} y
@@ -34,13 +34,13 @@
  * @property {String} color
  * @property {"inherit" | "round" | "butt" | "square"} linecap
  * @property {number} lineWidth
- * 
+ *
  * @typedef {Object} AvatarColoring
  * @property {string} leftColor
  * @property {string} rightColor
  * @property {string} headColor
  * @property {string} bodyColor
- * 
+ *
  * @typedef {Object} DanceSessionResult
  * @property {number} numSteps
  * @property {number} experience
@@ -52,5 +52,15 @@
  * @property {boolean} uniqueNames
  * @property {string[]} [sources]
  * @property {string} [stepName]
- * 
+ *
+ * @typedef {Object} UserData
+ * @property {string} id 
+ * @property {string} publicName 
+ * @property {number} recordedSteps 
+ * @property {number} recordedSeconds 
+ * @property {number} recordedDances 
+ * @property {number} score 
+ * @property {Object} userSteps 
+ * @property {boolean} consentSendingStats 
+ *
  */
