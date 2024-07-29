@@ -104,7 +104,14 @@
         "leaderboard-title": "Rangliste",
         "public-name": "Mein Anzeigename",
         "submit-stats": "Rangliste aktualisieren",
-        "nav": "Profil"
+        "nav": "Profil",
+        "consent": {
+            "title": "Rangliste beitreten",
+            "text0": "Um auf der Rangliste zu erschienen, müssen wir deine tanzstatisken übermitteln. Videos werden nie hochgeladen.",
+            "question": "Willst du deine Statistiken übermitteln und auf der öffentlichen Rangliste erscheinen?",
+            "yes": "Ja",
+            "no": "Nein"
+        }
     },
     "step": {
         "variation": {
