@@ -64,6 +64,15 @@ core business logic (dance detection).
 
 ## Progress Status
 
+- 30 July 2024: Released v0.4.0.
+    - Live camera detection for a selected set of steps. (Running Man, Reverse Running Man, Kicking Reverse Running Man, Happy Feet.)
+      - Learn mode: Learn each position without timing.
+      - Train mode: Dance the move at your own speed with your own music.
+    - Per step experience and levels that increase the more you dance it.
+    - Steps are now categorized in groups: Melbourne Shuffle Basics, Cutting Shapes, Footwork, and Running Man variations.
+    - A few more steps were added while some of the most basic steps are now hidden in the collection. (But still available in the choreography editor.)
+    - A global leaderboard to compare how many steps you have recorded with other dancers. (Opt-in, by default zero data is transmitted.)
+    - A profile settings page. Currently only allows to to opt-in to experimental features and manage the leaderboard participation settings.
 -  7 May 2024: Released v0.3.0 to the live demo.
     - Collection now shows *dances*, which are choreographies that consist of
       multiple steps in a row.
