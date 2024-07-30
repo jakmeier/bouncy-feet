@@ -114,6 +114,7 @@
         }
     },
     "step": {
+        "wip-tracking": "Video tracking this step is still under development.",
         "variation": {
             "undefined": "undefined",
             "right-first": "Right leg first",

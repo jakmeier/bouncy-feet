@@ -114,6 +114,7 @@
         }
     },
     "step": {
+        "wip-tracking": "Video-Tracking für diesen Schritt ist noch in Entwicklung.",
         "variation": {
             "undefined": "undefiniert",
             "right-first": "Rechtes Bein zuerst",

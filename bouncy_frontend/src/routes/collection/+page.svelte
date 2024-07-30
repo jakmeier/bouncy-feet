@@ -65,9 +65,10 @@
   {/each}
 </div>
 
-<h2 class="box">{$t('collection.rm-steps-subtitle')}</h2>
+<h2 class="box">{$t('collection.footwork-steps-subtitle')}</h2>
+
 <div class="step-table">
-  {#each data.lookupSteps( { uniqueNames: true, sources: ['rm_variations'] } ) as step}
+  {#each data.lookupSteps({ uniqueNames: true, sources: ['footwork'] }) as step}
     <div class="step">
       <a href={`./step/${step.name}`}>
         <Step {step} poseIndex={$i} {animationTime} />
@@ -83,10 +84,9 @@
   {/each}
 </div>
 
-<h2 class="box">{$t('collection.footwork-steps-subtitle')}</h2>
-
+<h2 class="box">{$t('collection.rm-steps-subtitle')}</h2>
 <div class="step-table">
-  {#each data.lookupSteps({ uniqueNames: true, sources: ['footwork'] }) as step}
+  {#each data.lookupSteps( { uniqueNames: true, sources: ['rm_variations'] } ) as step}
     <div class="step">
       <a href={`./step/${step.name}`}>
         <Step {step} poseIndex={$i} {animationTime} />

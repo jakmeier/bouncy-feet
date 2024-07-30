@@ -95,7 +95,7 @@
   </div>
 {/if}
 
-{#if $features.enableStepRecording || !browser}
+{#if $features.enableStepRecording(name) || !browser}
   <div class="label buttons">
     <a href="./learn">
       <button class="light">
@@ -111,6 +111,11 @@
     </a>
     <Info title="record.learn-button" text="record.info.learn" />
     <Info title="record.train-button" text="record.info.train" />
+  </div>
+{:else}
+  <div class="note">
+    <span class="material-symbols-outlined"> info </span>
+    {$t('step.wip-tracking')}
   </div>
 {/if}
 
@@ -131,5 +136,13 @@
   }
   button {
     width: 120px;
+  }
+  .note {
+    display: grid;
+    max-width: 300px;
+    margin: 10px auto;
+    justify-items: space-around;
+    font-style: italic;
+    grid-template-columns: auto auto;
   }
 </style>
