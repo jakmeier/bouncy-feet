@@ -8,10 +8,12 @@
   import { features } from '$lib/stores/FeatureSelection';
   import { browser } from '$app/environment';
   import Info from '$lib/components/ui/Info.svelte';
+  import { getContext } from 'svelte';
 
   /** @type {import('./$types').PageData} */
   export let data;
 
+  const user = getContext('user').store;
   const name = $page.params.stepName;
   const variations = data.lookupSteps({
     uniqueNames: false,
@@ -95,7 +97,13 @@
   </div>
 {/if}
 
-{#if $features.enableStepRecording(name) || !browser}
+{#if !$features.enableStepRecording(name)}
+  <div class="note">
+    <span class="material-symbols-outlined"> info </span>
+    {$t('step.wip-tracking')}
+  </div>
+{/if}
+{#if $features.enableStepRecording(name) || $user.experimentalFeatures || !browser}
   <div class="label buttons">
     <a href="./learn">
       <button class="light">
@@ -111,11 +119,6 @@
     </a>
     <Info title="record.learn-button" text="record.info.learn" />
     <Info title="record.train-button" text="record.info.train" />
-  </div>
-{:else}
-  <div class="note">
-    <span class="material-symbols-outlined"> info </span>
-    {$t('step.wip-tracking')}
   </div>
 {/if}
 

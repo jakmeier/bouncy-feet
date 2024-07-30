@@ -61,6 +61,7 @@
  * @property {number} recordedDances 
  * @property {number} score 
  * @property {Object} userSteps 
- * @property {boolean} consentSendingStats 
+ * @property {boolean} consentSendingStats
+ * @property {boolean} experimentalFeatures
  *
  */

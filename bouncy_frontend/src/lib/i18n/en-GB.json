@@ -100,6 +100,7 @@
         "time-danced": "Danced for"
     },
     "profile": {
+        "title": "Profile",
         "stats-title": "My Progress",
         "leaderboard-title": "Leaderboard",
         "public-name": "My display name",
@@ -111,6 +112,11 @@
             "question": "Do you want to send your statistics and have an entry on the public leaderboard?",
             "yes": "Yes",
             "no": "No"
+        },
+        "settings": {
+            "title": "Settings",
+            "consent-title": "Show my progress in public leaderboard",
+            "experimental-title": "Experimental Features"
         }
     },
     "step": {

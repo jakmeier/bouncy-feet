@@ -6,6 +6,8 @@
   import Leaderboard from './Leaderboard.svelte';
   import Popup from '$lib/components/ui/Popup.svelte';
   import { writable } from 'svelte/store';
+  import Header from '$lib/components/ui/Header.svelte';
+  import { goto } from '$app/navigation';
 
   const user = getContext('user').store;
   let scoreboardData = [];
@@ -30,7 +32,18 @@
     }
   }
   refreshLeaderboard();
+
+  function openSettings() {
+    goto('./settings');
+  }
 </script>
+
+<Header
+  title={$t('profile.title')}
+  backButton={false}
+  button="menu"
+  on:click={openSettings}
+/>
 
 <div class="profile-pic">
   <span class="material-symbols-outlined" style="font-size:100px">

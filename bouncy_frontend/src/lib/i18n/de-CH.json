@@ -100,6 +100,7 @@
         "time-danced": "Getanzt für"
     },
     "profile": {
+        "title": "Profil",
         "stats-title": "Mein Fortschritt",
         "leaderboard-title": "Rangliste",
         "public-name": "Mein Anzeigename",
@@ -111,6 +112,11 @@
             "question": "Willst du deine Statistiken übermitteln und auf der öffentlichen Rangliste erscheinen?",
             "yes": "Ja",
             "no": "Nein"
+        },
+        "settings": {
+            "title": "Einstellungen",
+            "consent-title": "Zeige mein Fortschritt in der öffentlichen Rangliste",
+            "experimental-title": "Experimentelle Funktionen"
         }
     },
     "step": {

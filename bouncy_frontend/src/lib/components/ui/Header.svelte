@@ -5,10 +5,15 @@
   export let title;
   /** @type {null|string} */
   export let button = null;
+  export let backButton = true;
 </script>
 
 <header>
-  <BackButton />
+  {#if backButton}
+    <BackButton />
+  {:else}
+    <div></div>
+  {/if}
   <span class="title">{title}</span>
   {#if button !== null}
     <button on:click>

@@ -24,7 +24,10 @@
     stored.userSteps = {};
   }
   if (stored && !stored.consentSendingStats === undefined) {
-    stored.userSteps = false;
+    stored.consentSendingStats = false;
+  }
+  if (stored && !stored.experimentalFeatures === undefined) {
+    stored.experimentalFeatures = false;
   }
   /** @type {import('svelte/store').Writable<UserData>} */
   const user = writable(
@@ -37,6 +40,7 @@
       recordedSteps: 0,
       userSteps: {},
       consentSendingStats: false,
+      experimentalFeatures: false,
     }
   );
   if (browser) {
