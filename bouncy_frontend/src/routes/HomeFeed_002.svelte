@@ -34,6 +34,11 @@
 
 <div class="light-box">
   <div>
+    {$t('home.description1')}
+  </div>
+</div>
+<div class="light-box">
+  <div>
     {$t('home.description2')}
   </div>
   <div class="centered">
@@ -58,6 +63,7 @@
     padding: 20px;
     background-color: var(--theme-neutral-light);
     border-radius: 10px;
+    margin: 5px 0;
   }
   .centered {
     margin-top: 15px;

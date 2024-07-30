@@ -4,9 +4,9 @@
     },
     "home": {
         "title": "Bouncy Feet!",
-        "description0": "Willkommen in der Tanzapp Bouncy Feet. Die App unterstützt dich dabei, Shuffle Schritte zu vertiefen.",
-        "description1": "Platziere dein Telefon so, dass die Kamera deinen ganzen Körper beim Tanzen sieht. Dann tanzt du Freestyle und die App versucht die Schritte zu erkennen.",
-        "description2": "Diese Version von Bouncy Feet ist ein Prototyp. Die Inhalte sind sehr begrenzt und noch nicht wirklich ausgereift. Falls du Probleme mit der App hast, öffne bitte ein Issue auf GitHub.",
+        "description0": "Willkommen in der Tanzapp Bouncy Feet.",
+        "description1": "Mein Ziel ist es möglichst viele Leute zum Shuffle-Tanz zu motivieren. Die App macht es einfach neue Schritte zu finden und damit loszulegen diese zu üben. Vielleicht packt dich dann auch das Sammeln von Punkten und der Kampf um die obersten Plätze auf der globalen Rangliste.",
+        "description2": "Allerdings bin ich noch am ausprobieren, was überhaupt in eine Tanz-App passt. Ich würde es als Alpha Version von Bouncy Feet beschreiben. Falls du Probleme mit der App hast, öffne bitte ein Issue auf GitHub.",
         "go-button": "Los gehts",
         "nav": "Home"
     },
