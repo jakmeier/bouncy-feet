@@ -93,8 +93,8 @@
         "num-dances": "Anzahl Tänze",
         "num-steps": "Anzahl Schritte",
         "average-bpm": "BPM",
-        "slow": "Langsam (<60)",
-        "mid": "Normal (60-100)",
+        "slow": "Langsam (<50)",
+        "mid": "Normal (50-100)",
         "fast": "Schnell (100-130)",
         "very-fast": "Übertrieben schnell (>130)",
         "time-danced": "Getanzt für"

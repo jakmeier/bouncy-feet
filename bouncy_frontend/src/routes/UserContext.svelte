@@ -76,7 +76,7 @@
           stats[step.name].veryFast += 1;
         } else if (bpm > 100) {
           stats[step.name].fast += 1;
-        } else if (bpm > 60) {
+        } else if (bpm > 50) {
           stats[step.name].mid += 1;
         } else {
           stats[step.name].slow += 1;
