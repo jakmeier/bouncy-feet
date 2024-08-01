@@ -1,31 +1,70 @@
 {
+    "id": "bouncy-feet",
     "name": "Bouncy Feet Dance App",
     "short_name": "Bouncy Feet",
     "start_url": "/",
     "icons": [
-      {
-        "src": "icons/512x512.png",
-        "type": "image/png",
-        "sizes": "512x512"
-      },
-      {
-        "src": "icons/192x192.png",
-        "type": "image/png",
-        "sizes": "192x192"
-      },
-      {
-        "src": "icons/48x48.png",
-        "type": "image/png",
-        "sizes": "48x48"
-      },
-      {
-        "src": "icons/logo.svg",
-        "sizes": "any"
-      }
+        {
+            "src": "icons/512x512.png",
+            "type": "image/png",
+            "sizes": "512x512"
+        },
+        {
+            "src": "icons/192x192.png",
+            "type": "image/png",
+            "sizes": "192x192"
+        },
+        {
+            "src": "icons/48x48.png",
+            "type": "image/png",
+            "sizes": "48x48"
+        },
+        {
+            "src": "icons/logo.svg",
+            "sizes": "any"
+        }
     ],
     "background_color": "#ffffff",
     "display": "fullscreen",
     "scope": "/",
     "theme_color": "#382eeb",
-    "description": "Learn to shuffle dance with the interactive app experience of Bouncy Feet."
+    "description": "Learn to shuffle dance with the interactive app experience of Bouncy Feet.",
+    "orientation": "portrait",
+    "categories": [
+        "sports",
+        "education",
+        "games"
+    ],
+    "launch_handler": {
+        "client_mode": [
+            "navigate-existing",
+            "auto"
+        ]
+    },
+    "screenshots": [
+        {
+            "src": "screenshots/00_step.jpg",
+            "sizes": "1080x2400",
+            "type": "image/jpg",
+            "platform": "narrow"
+        },
+        {
+            "src": "screenshots/01_collection.jpg",
+            "sizes": "1080x2400",
+            "type": "image/jpg",
+            "platform": "narrow"
+        },
+        {
+            "src": "screenshots/02_choreo.jpg",
+            "sizes": "1080x2400",
+            "type": "image/jpg",
+            "platform": "narrow"
+        },
+        {
+            "src": "screenshots/03_leaderboard.jpg",
+            "sizes": "1080x2400",
+            "type": "image/jpg",
+            "platform": "narrow"
+        }
+    ]
 }
