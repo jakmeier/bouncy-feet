@@ -8,6 +8,10 @@ web page. It should work in all major browsers, on the phone or on laptops and
 workstations. You only need a camera which you can position in a way where your
 full body is clearly visible while you dance.
 
+Check out the video below to see it in action.
+
+https://github.com/user-attachments/assets/e327061d-69b1-40e4-9731-6cb322f77109
+
 ## Why would I need an app for dancing?
 
 Let's be honest, dancing is best without interacting with your phone or laptop.
@@ -73,6 +77,7 @@ core business logic (dance detection).
     - A few more steps were added while some of the most basic steps are now hidden in the collection. (But still available in the choreography editor.)
     - A global leaderboard to compare how many steps you have recorded with other dancers. (Opt-in, by default zero data is transmitted.)
     - A profile settings page. Currently only allows to to opt-in to experimental features and manage the leaderboard participation settings.
+    - Shared a quick promo video [on Reddit](https://www.reddit.com/r/shuffle/comments/1eglao3/bouncy_feet_app_update/) that shows the idea of dancing and leveling up each move in the app.
 -  7 May 2024: Released v0.3.0 to the live demo.
     - Collection now shows *dances*, which are choreographies that consist of
       multiple steps in a row.
@@ -82,6 +87,7 @@ core business logic (dance detection).
     - More steps to the collection, now there are 13 steps.
     - Many improvements to drawing, such as z-perspective for limbs, the torso
       no longer being fixed to the center, and smooth shoulder/hip angles.
+- 20 Mar 2024: Teaser Video on [Reddit](https://www.reddit.com/r/shuffle/comments/1bjdl1y/teaser_video_for_my_little_sideproject/)
 - 19 Mar 2024: Created live demo with more stable features to https://app.bouncy-feet.ch.
 - 26 Dec 2023: Started hosting a live demo on https://demos.jakobmeier.ch/bouncy-feet.
 - 23 Dec 2023: Update README to better describe the project ambitions. The
