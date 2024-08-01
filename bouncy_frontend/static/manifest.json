@@ -1,0 +1,31 @@
+{
+    "name": "Bouncy Feet Dance App",
+    "short_name": "Bouncy Feet",
+    "start_url": "/",
+    "icons": [
+      {
+        "src": "icon/512x512.png",
+        "type": "image/png",
+        "sizes": "512x512"
+      },
+      {
+        "src": "icon/192x192.png",
+        "type": "image/png",
+        "sizes": "192x192"
+      },
+      {
+        "src": "icon/48x48.png",
+        "type": "image/png",
+        "sizes": "48x48"
+      },
+      {
+        "src": "icon/logo.svg",
+        "sizes": "any"
+      }
+    ],
+    "background_color": "#ffffff",
+    "display": "fullscreen",
+    "scope": "/",
+    "theme_color": "#382eeb",
+    "description": "Learn to shuffle dance with the interactive app experience of Bouncy Feet."
+}
