@@ -1,5 +1,6 @@
 //! Wrapper module for all types and methods that are exported by the WASM
 //! module.
+mod course;
 pub(crate) mod dance_info;
 pub(crate) mod editor;
 pub(crate) mod keypoints;
@@ -9,8 +10,10 @@ pub(crate) mod skeleton;
 pub(crate) mod step_info;
 pub(crate) mod tracker;
 
+pub use crate::public::course::Course;
 pub use dance_info::DanceInfo;
 pub use keypoints::{Keypoints, Side as KeypointsSide};
+use parsing::course_file::CourseFile;
 pub use step_info::StepInfo;
 pub use tracker::{DetectionResult, Tracker};
 
@@ -64,6 +67,12 @@ pub async fn load_dance_file(url: &str) -> Result<(), JsValue> {
 pub fn load_step_string(data: &str, source: String) -> Result<(), JsValue> {
     load_step_str(data, source)?;
     Ok(())
+}
+
+#[wasm_bindgen(js_name = parseCourseString)]
+pub fn parse_course_string(data: &str, lang: &str) -> Result<Course, JsValue> {
+    let course = parse_course_str(data, lang)?;
+    Ok(course)
 }
 
 #[wasm_bindgen]
@@ -160,6 +169,11 @@ pub fn load_dance_str(text: &str) -> Result<(), ParseFileError> {
     let parsed = DanceFile::from_str(text)?;
     STATE.with(|state| state.borrow_mut().add_dances(parsed.dances))?;
     Ok(())
+}
+
+pub fn parse_course_str(text: &str, lang: &str) -> Result<Course, ParseFileError> {
+    let parsed = CourseFile::from_str(text)?;
+    parsed.into_course(lang)
 }
 
 async fn load_text_file(url: &str) -> Result<String, JsValue> {

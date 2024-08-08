@@ -5,12 +5,18 @@
 //! logic. Instead, translate to internal types. This allows refactoring
 //! internal without changing the external formats.
 
+pub(crate) mod course_file;
 pub(crate) mod dance_file;
 pub(crate) mod pose_file;
 pub(crate) mod step_file;
 
 use thiserror::Error;
 use wasm_bindgen::JsValue;
+
+#[derive(serde::Serialize, serde::Deserialize, Debug)]
+struct VersionCheck {
+    pub version: u16,
+}
 
 #[derive(Error, Debug)]
 pub enum ParseFileError {
@@ -22,6 +28,8 @@ pub enum ParseFileError {
     UnknownPoseReference(String),
     #[error("unknown step reference `{0}`")]
     UnknownStepName(String),
+    #[error("missing translation for `{id}` with lang `{lang}`")]
+    MissingTranslation { id: String, lang: String },
 }
 
 impl From<ParseFileError> for JsValue {
@@ -32,7 +40,9 @@ impl From<ParseFileError> for JsValue {
 
 #[cfg(test)]
 mod tests {
-    use crate::{dances, load_dance_str, load_pose_str, load_step_str, steps, STATE};
+    use crate::{
+        dances, load_dance_str, load_pose_str, load_step_str, parse_course_str, steps, STATE,
+    };
 
     use super::*;
     use expect_test::expect;
@@ -99,6 +109,31 @@ mod tests {
         ]
       )
       "#;
+
+    const COURSE_STR: &str = r#"
+    #![enable(implicit_some)]
+    (
+      version: 0,
+      id: "running-man-basics",
+      names: {
+        "de": "Running Man Anfängerkurs",
+        "en": "Running Man beginner's course",
+      },
+      lessons: [
+        (
+          names: {
+            "de": "Micro Bounce",
+            "en": "Micro Bounce",
+          },
+          icon: "todo.svg",
+          parts: [
+            (step: "run-in-place", bpms: [60, 100, 280]),
+            (step: "micro-bounce", bpms: [1, 100, 130]),
+          ]
+        ),
+      ]
+    )
+    "#;
 
     #[test]
     fn test_valid_pose_reference() {
@@ -198,5 +233,43 @@ mod tests {
             Err(other) => panic!("wrong error {other}"),
             Ok(()) => panic!("expected an error when loading invalid reference"),
         }
+    }
+
+    #[test]
+    fn test_basic_course_loading() {
+        load_pose_str(POSE_STR).unwrap();
+        load_step_str(STEP_STR, "test".to_owned()).unwrap();
+
+        let en_course = parse_course_str(COURSE_STR, "en").unwrap();
+        expect![[r#"
+            Course {
+                id: "running-man-basics",
+                name: "Running Man beginner's course",
+                lessons: [
+                    Lesson {
+                        name: "Micro Bounce",
+                        icon: "todo.svg",
+                        parts: [
+                            LessonPart {
+                                step: "run-in-place",
+                                bpms: [
+                                    60,
+                                    100,
+                                    280,
+                                ],
+                            },
+                            LessonPart {
+                                step: "micro-bounce",
+                                bpms: [
+                                    1,
+                                    100,
+                                    130,
+                                ],
+                            },
+                        ],
+                    },
+                ],
+            }
+        "#]].assert_debug_eq(&en_course);
     }
 }

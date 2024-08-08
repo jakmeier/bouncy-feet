@@ -1,6 +1,7 @@
 //! Defines the external format for defining dances, which are a sequence of
 //! steps.
 
+use super::VersionCheck;
 use crate::parsing::ParseFileError;
 use serde::{Deserialize, Serialize};
 
@@ -45,11 +46,6 @@ impl DanceFile {
         let parsed: DanceFile = ron::from_str(text)?;
         Ok(parsed)
     }
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct VersionCheck {
-    pub version: u16,
 }
 
 mod v0 {
