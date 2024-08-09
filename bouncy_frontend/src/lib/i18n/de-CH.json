@@ -10,6 +10,18 @@
         "go-button": "Los gehts",
         "nav": "Home"
     },
+    "courses": {
+        "nav": "Lernen",
+        "title": "Kurse",
+        "more-coming": "Mehr Kurse in Entwicklung",
+        "course-overview": {
+            "title": "Kursüberblick",
+            "start-lesson": "Los gehts!",
+            "lesson": "Lektion mit",
+            "part": "Teil",
+            "parts": "Teilen"
+        }
+    },
     "leaderboard": {
         "user-header": "Tänzer/in",
         "steps-header": "Schritte"

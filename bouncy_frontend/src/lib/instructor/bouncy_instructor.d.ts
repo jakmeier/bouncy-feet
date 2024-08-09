@@ -30,6 +30,12 @@ export function loadDanceFile(url: string): Promise<void>;
 */
 export function loadStepString(data: string, source: string): void;
 /**
+* @param {string} data
+* @param {string} lang
+* @returns {Course}
+*/
+export function parseCourseString(data: string, lang: string): Course;
+/**
 * @returns {(StepInfo)[]}
 */
 export function steps(): (StepInfo)[];
@@ -117,6 +123,20 @@ export class Cartesian3d {
 * distance to camera
 */
   z: number;
+}
+/**
+*/
+export class Course {
+  free(): void;
+/**
+*/
+  readonly id: string;
+/**
+*/
+  readonly lessons: (Lesson)[];
+/**
+*/
+  readonly name: string;
 }
 /**
 */
@@ -348,6 +368,28 @@ export class KeypointsSide {
 /**
 */
   wrist: Cartesian3d;
+}
+/**
+*/
+export class Lesson {
+  free(): void;
+/**
+*/
+  readonly name: string;
+/**
+*/
+  readonly parts: (LessonPart)[];
+}
+/**
+*/
+export class LessonPart {
+  free(): void;
+/**
+*/
+  readonly bpms: Uint16Array;
+/**
+*/
+  readonly step: string;
 }
 /**
 * Self-describing error score for a specific limb

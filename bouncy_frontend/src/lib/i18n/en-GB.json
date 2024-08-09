@@ -10,6 +10,18 @@
         "go-button": "Let's Go",
         "nav": "Home"
     },
+    "courses": {
+        "nav": "Learn",
+        "title": "Courses",
+        "more-coming": "More courses coming soon",
+        "course-overview": {
+            "title": "Course Overview",
+            "start-lesson": "Let's go",
+            "lesson": "lesson with",
+            "part": "part",
+            "parts": "parts"
+        }
+    },
     "leaderboard": {
         "user-header": "Dancer",
         "steps-header": "Steps"

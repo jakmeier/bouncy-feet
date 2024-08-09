@@ -1,0 +1,55 @@
+#![enable(implicit_some)]
+(
+  version: 0,
+  id: "running-man-basics",
+  names: {
+    "de": "Running Man Anfängerkurs",
+    "en": "Running Man beginner's course",
+  },
+  lessons: [
+    (
+      names: {
+        "de": "Micro Bounce",
+        "en": "Micro Bounce",
+      },
+      icon: "todo.svg",
+      parts: [
+        (step: "run-in-place", bpms: [60, 100, 120, 130]),
+        (step: "micro-bounce", bpms: [100, 110, 120, 130]),
+      ]
+    ),
+    (
+      names: {
+        "de": "Balance",
+        "en": "Balance",
+      },
+      icon: "todo.svg",
+      parts: [
+        (step: "kick-forward-unbalanced", bpms: [60, 100, 120, 130]),
+        (step: "kick-forward", bpms: [60, 100, 120, 130]),
+      ]
+    ),
+    (
+      names: {
+        "de": "Flacher Schritt",
+        "en": "Flat Step",
+      },
+      icon: "todo.svg",
+      parts: [
+        (step: "flat-man-3-pause", bpms: [60, 100, 120, 130]),
+        (step: "flat-man", bpms: [60, 100, 120, 130]),
+      ]
+    ),
+    (
+      names: {
+        "de": "Running Man",
+        "en": "Running Man",
+      },
+      icon: "todo.svg",
+      parts: [
+        (step: "run-high-in-place", bpms: [60, 100, 120, 130]),
+        (step: "running-man", bpms: [60, 100, 120, 130]),
+      ]
+    ),
+  ]
+)

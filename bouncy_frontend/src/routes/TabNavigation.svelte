@@ -12,6 +12,7 @@
   function buildTabs(features) {
     const tabs = [];
     tabs.push({ label: $t('home.nav'), icon: 'home', route: `${base}/` });
+    tabs.push({ label: $t('courses.nav'), icon: 'school', route: `${base}/courses` });
     if (features.enableFreestyleRecording) {
       tabs.push({
         label: $t('record.nav'),

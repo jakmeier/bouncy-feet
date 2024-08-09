@@ -41,3 +41,29 @@ impl Course {
         self.lessons.clone()
     }
 }
+
+#[wasm_bindgen]
+impl Lesson {
+    #[wasm_bindgen(getter)]
+    pub fn name(&self) -> String {
+        self.name.clone()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn parts(&self) -> Vec<LessonPart> {
+        self.parts.clone()
+    }
+}
+
+#[wasm_bindgen]
+impl LessonPart {
+    #[wasm_bindgen(getter)]
+    pub fn step(&self) -> String {
+        self.step.clone()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn bpms(&self) -> Vec<u16> {
+        self.bpms.clone()
+    }
+}
