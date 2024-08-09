@@ -129,6 +129,10 @@ export class Cartesian3d {
 export class Course {
   free(): void;
 /**
+* @returns {StepInfo | undefined}
+*/
+  featuredStep(): StepInfo | undefined;
+/**
 */
   readonly id: string;
 /**

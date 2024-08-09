@@ -6,6 +6,7 @@
     "de": "Running Man Anfängerkurs",
     "en": "Running Man beginner's course",
   },
+  featured_step: "rm-0",
   lessons: [
     (
       names: {
@@ -48,7 +49,7 @@
       icon: "todo.svg",
       parts: [
         (step: "run-high-in-place", bpms: [60, 100, 120, 130]),
-        (step: "running-man", bpms: [60, 100, 120, 130]),
+        (step: "rm-0", bpms: [60, 100, 120, 130]),
       ]
     ),
   ]

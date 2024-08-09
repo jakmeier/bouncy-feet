@@ -4,6 +4,7 @@ export const __wbindgen_export_2: WebAssembly.Table;
 export function cartesian2d_add(a: number, b: number): number;
 export function cartesian2d_new(a: number, b: number): number;
 export function cartesian3d_new(a: number, b: number, c: number): number;
+export function course_featuredStep(a: number): number;
 export function course_id(a: number, b: number): void;
 export function course_lessons(a: number, b: number): void;
 export function course_name(a: number, b: number): void;

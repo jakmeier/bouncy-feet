@@ -12,6 +12,7 @@ pub struct CourseFile {
     version: u8,
     id: String,
     names: TranslatedString,
+    featured_step: String,
     lessons: Vec<Lesson>,
 }
 
@@ -81,6 +82,7 @@ impl CourseFile {
                     lang: lang.to_owned(),
                 })?,
             id: self.id,
+            featured_step_id: self.featured_step,
             lessons,
         };
         Ok(course)

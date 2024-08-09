@@ -6,6 +6,7 @@ use wasm_bindgen::prelude::wasm_bindgen;
 pub struct Course {
     pub(crate) id: String,
     pub(crate) name: String,
+    pub(crate) featured_step_id: String,
     pub(crate) lessons: Vec<Lesson>,
 }
 
@@ -39,6 +40,11 @@ impl Course {
     #[wasm_bindgen(getter)]
     pub fn lessons(&self) -> Vec<Lesson> {
         self.lessons.clone()
+    }
+
+    #[wasm_bindgen(js_name = "featuredStep")]
+    pub fn featured_step(&self) -> Option<crate::StepInfo> {
+        crate::step_by_id(self.featured_step_id.clone(), false)
     }
 }
 

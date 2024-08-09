@@ -119,6 +119,7 @@ mod tests {
         "de": "Running Man Anfängerkurs",
         "en": "Running Man beginner's course",
       },
+      featured_step: "rm-0",
       lessons: [
         (
           names: {
@@ -245,6 +246,7 @@ mod tests {
             Course {
                 id: "running-man-basics",
                 name: "Running Man beginner's course",
+                featured_step_id: "rm-0",
                 lessons: [
                     Lesson {
                         name: "Micro Bounce",
@@ -270,6 +272,7 @@ mod tests {
                     },
                 ],
             }
-        "#]].assert_debug_eq(&en_course);
+        "#]]
+        .assert_debug_eq(&en_course);
     }
 }
