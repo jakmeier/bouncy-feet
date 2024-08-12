@@ -81,7 +81,7 @@
 </script>
 
 <div class="avatar-container">
-  <Animation {animationTime}>
+  <Animation {animationTime} jumpHeight={height * 0.05}>
     <Svg {width} {height} orderByZ>
       <SvgAvatar
         skeleton={displayedSkeleton}

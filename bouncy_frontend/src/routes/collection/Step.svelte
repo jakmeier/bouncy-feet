@@ -4,7 +4,7 @@
   import Svg from '$lib/components/avatar/Svg.svelte';
   import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
   import { Skeleton } from '$lib/instructor/bouncy_instructor';
-    import { LEFT_RIGHT_COLORING } from '$lib/constants';
+  import { LEFT_RIGHT_COLORING } from '$lib/constants';
 
   /** @type {import('$lib/instructor/bouncy_instructor').StepInfo} */
   export let step;
@@ -46,7 +46,7 @@
   borderRadius="20px"
   borderWidth="{borderWidth}px"
 >
-  <Animation {animationTime}>
+  <Animation {animationTime} jumpHeight={size * 0.05}>
     <Svg width={size} height={size} orderByZ>
       <SvgAvatar
         width={size}

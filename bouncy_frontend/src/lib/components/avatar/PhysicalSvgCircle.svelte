@@ -19,7 +19,7 @@
 
   // use svelte/motion.tweened for smoothly changing x,y values
   const cxStore = tweened(cx);
-  const cyStore = tweened(cy);
+  const cyStore = animationCtx.tweenedJump(cy);
   const rStore = tweened(r);
 
   $: cx, updateX();

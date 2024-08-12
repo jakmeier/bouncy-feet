@@ -34,7 +34,7 @@
   }
 </script>
 
-<Animation {animationTime}>
+<Animation {animationTime} jumpHeight={size * 0.05}>
   <Svg height={size} width={size} orderByZ>
     {#if skeleton}
       <SvgAvatar

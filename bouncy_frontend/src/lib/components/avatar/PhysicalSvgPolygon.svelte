@@ -46,8 +46,8 @@
     return p.map((point, i) => {
       const x = tweened(point.x, $animation);
       x.subscribe((x) => setX(i, x));
-      const y = tweened(point.y, $animation);
-      y.subscribe((y) => setY(i, y));
+      const y = animationCtx.tweenedJump(point.y);
+      y.subscribe((/** @type {number} */ y) => setY(i, y));
       return {
         x,
         y,

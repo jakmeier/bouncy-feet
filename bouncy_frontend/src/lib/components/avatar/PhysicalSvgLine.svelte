@@ -13,20 +13,24 @@
   export let style;
 
   const animationCtx = getContext('animation');
-  const animation = animationCtx ? animationCtx.animation : writable({duration: 0});
+  const animation = animationCtx
+    ? animationCtx.animation
+    : writable({ duration: 0 });
 
   // use svelte/motion.tweened for smoothly changing x,y values
   const startX = tweened(start.x, $animation);
-  const startY = tweened(start.y, $animation);
+  const startY = animationCtx.tweenedJump(start.y);
   const endX = tweened(end.x, $animation);
-  const endY = tweened(end.y, $animation);
+  const endY = animationCtx.tweenedJump(end.y);
+  const animationTimeZero = animationCtx.animationTimeZero;
 
   // listen to prop changes and then update tweens
   function updatePosition() {
     startX.set(start.x, $animation);
-    startY.set(start.y, $animation);
+    startY.set(start.y);
     endX.set(end.x, $animation);
-    endY.set(end.y, $animation);
+    endY.set(end.y);
+    animationTimeZero.set(Date.now());
   }
   $: start, end, updatePosition();
 </script>
