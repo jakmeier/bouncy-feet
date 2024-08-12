@@ -19,35 +19,58 @@
 
 <Header title={$t('courses.course-overview.title')} />
 
-<h2>{course.name}</h2>
+<h3>{course.name}</h3>
 
-<Step {step} poseIndex={$i} {animationTime} size={150}></Step>
+<Step {step} poseIndex={$i} {animationTime} size={100} borderWidth={0}></Step>
 
-<ol>
-  {#each course.lessons as lesson, i}
-    <li>
-      {lesson.name}
-    </li>
-    <div class="note">
-      {$t('courses.course-overview.lesson')}
-      {lesson.parts.length}
-      {#if lesson.parts.length === 1}
-        {$t('courses.course-overview.part')}
-      {:else}
-        {$t('courses.course-overview.parts')}
+<div class="ol">
+  {#each course.lessons as lesson, index}
+    <div class="index">{index + 1}</div>
+    <div>
+      {#if lesson.parts.length > 0}
+        <Step
+          step={lesson.parts[lesson.parts.length - 1].step}
+          poseIndex={$i}
+          {animationTime}
+          size={75}
+          borderWidth={1}
+          lineWidth={2.5}
+        ></Step>
       {/if}
     </div>
-    <a href="./{i}">
-      {$t('courses.course-overview.start-lesson')}
-    </a>
+    <div class="li">
+      {lesson.name}
+      <div class="note">
+        {$t('courses.course-overview.lesson')}
+        {lesson.parts.length}
+        {#if lesson.parts.length === 1}
+          {$t('courses.course-overview.part')}
+        {:else}
+          {$t('courses.course-overview.parts')}
+        {/if}
+      </div>
+      <a href="./{index}">
+        {$t('courses.course-overview.start-lesson')}
+      </a>
+    </div>
   {/each}
-</ol>
+</div>
 
 <style>
   .note {
     font-style: italic;
   }
-  li {
-    margin-top: 20px;
+  .ol {
+    display: grid;
+    margin: 15px 10px 10px;
+    grid-template-columns: min-content 75px auto;
+    gap: 10px;
+    align-items: center;
+  }
+  .li {
+    padding: 10px;
+  }
+  .index {
+    padding: 10px;
   }
 </style>
