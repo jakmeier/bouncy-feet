@@ -46,7 +46,7 @@
   borderRadius="20px"
   borderWidth="{borderWidth}px"
 >
-  <Animation {animationTime} jumpHeight={size * 0.05}>
+  <Animation {animationTime} jumpHeight={size * 0.025}>
     <Svg width={size} height={size} orderByZ>
       <SvgAvatar
         width={size}
