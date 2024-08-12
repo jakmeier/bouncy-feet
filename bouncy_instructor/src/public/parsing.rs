@@ -115,24 +115,65 @@ mod tests {
     (
       version: 0,
       id: "running-man-basics",
-      names: {
-        "de": "Running Man Anfängerkurs",
-        "en": "Running Man beginner's course",
-      },
+      names: {"de": "Running Man Anfängerkurs", "en": "Running Man beginner's course"},
       featured_step: "rm-0",
       lessons: [
         (
-          names: {
-            "de": "Micro Bounce",
-            "en": "Micro Bounce",
-          },
+          names: {"de": "Micro Bounce", "en": "Micro Bounce"},
           icon: "todo.svg",
           parts: [
             (step: "run-in-place", bpms: [60, 100, 280]),
-            (step: "micro-bounce", bpms: [1, 100, 130]),
-          ]
+            (step: "another-step", bpms: [1, 100, 130]),
+          ],
         ),
-      ]
+      ],
+      poses: [
+        (
+          name: "in-place-right-up",
+          direction: Front,
+          limbs: [
+            (limb: LeftThigh, weight: 1.0, angle: -1, tolerance: 0),
+            (limb: LeftShin, weight: 1.0, angle: 3, tolerance: 0),
+            (limb: LeftFoot, weight: 1.0, angle: -7, tolerance: 0),
+          ],
+          z: (
+            absolute: {(side: Right, part: Knee): -1.0, (side: Left, part: Heel): 1.0},
+          ),
+        ),
+        (
+          name: "in-place-left-up",
+          direction: Front,
+          limbs: [
+            (limb: RightThigh, weight: 1.0, angle: 0, tolerance: 0),
+            (limb: RightShin, weight: 1.0, angle: -1, tolerance: 0),
+            (limb: RightFoot, weight: 1.0, angle: 9, tolerance: 0),
+          ],
+          z: (
+            absolute: {(side: Left, part: Knee): -1.0, (side: Right, part: Heel): 1.0},
+          ),
+        ),
+      ],
+      steps: [
+        (
+          name: "Run in place",
+          id: "run-in-place",
+          variation: "left-first",
+          keyframes: [
+            (pose: "in-place-left-up", orientation: ToCamera),
+            (pose: "in-place-right-up", orientation: ToCamera),
+          ],
+        ),
+        (
+          name: "Another step for testing",
+          id: "another-step",
+          keyframes: [
+            (pose: "in-place-left-up", orientation: ToCamera),
+            (pose: "in-place-left-up", orientation: ToCamera),
+            (pose: "in-place-right-up", orientation: ToCamera),
+            (pose: "in-place-right-up", orientation: ToCamera),
+          ],
+        ),
+      ],
     )
     "#;
 
@@ -238,9 +279,6 @@ mod tests {
 
     #[test]
     fn test_basic_course_loading() {
-        load_pose_str(POSE_STR).unwrap();
-        load_step_str(STEP_STR, "test".to_owned()).unwrap();
-
         let en_course = parse_course_str(COURSE_STR, "en").unwrap();
         expect![[r#"
             Course {
@@ -253,7 +291,7 @@ mod tests {
                         icon: "todo.svg",
                         parts: [
                             LessonPart {
-                                step: "run-in-place",
+                                step_name: "run-in-place",
                                 bpms: [
                                     60,
                                     100,
@@ -261,7 +299,7 @@ mod tests {
                                 ],
                             },
                             LessonPart {
-                                step: "micro-bounce",
+                                step_name: "another-step",
                                 bpms: [
                                     1,
                                     100,
@@ -271,8 +309,43 @@ mod tests {
                         ],
                     },
                 ],
+                collection: "DanceCollection { limbs: (10): [\"LeftThigh\", \"LeftShin\", \"LeftFoot\", \"LeftArm\", \"LeftForearm\", \"RightThigh\", \"RightShin\", \"RightFoot\", \"RightArm\", \"RightForearm\"], poses(2): [\"in-place-right-up\", \"in-place-left-up\"], steps(2): [\"Run in place\", \"Another step for testing\"], dances(0): []}",
             }
         "#]]
         .assert_debug_eq(&en_course);
+    }
+
+    #[test]
+    fn test_missing_step_course_loading() {
+        let input = r#"
+          #![enable(implicit_some)]
+          (
+            version: 0,
+            id: "running-man-basics",
+            names: {
+              "de": "Running Man Anfängerkurs",
+              "en": "Running Man beginner's course",
+            },
+            featured_step: "rm-0",
+            lessons: [
+              (
+                names: {
+                  "de": "Micro Bounce",
+                  "en": "Micro Bounce",
+                },
+                icon: "todo.svg",
+                parts: [
+                  (step: "run-in-place", bpms: [60, 100, 280]),
+                  (step: "micro-bounce", bpms: [1, 100, 130]),
+                ]
+              ),
+            ],
+            poses: [],
+            steps: [],
+          )
+        "#;
+
+        let result = parse_course_str(input, "en");
+        assert!(matches!(result, Err(ParseFileError::UnknownStepName(_))));
     }
 }

@@ -1,16 +1,18 @@
-use serde::{Deserialize, Serialize};
+use super::parsing::ParseFileError;
+use super::{parsing, StepInfo};
+use crate::intern::dance_collection::DanceCollection;
 use wasm_bindgen::prelude::wasm_bindgen;
 
-#[derive(Debug)]
 #[wasm_bindgen]
 pub struct Course {
     pub(crate) id: String,
     pub(crate) name: String,
     pub(crate) featured_step_id: String,
     pub(crate) lessons: Vec<Lesson>,
+    pub(crate) collection: DanceCollection,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Clone)]
 #[wasm_bindgen]
 pub struct Lesson {
     pub(crate) name: String,
@@ -18,11 +20,17 @@ pub struct Lesson {
     pub(crate) parts: Vec<LessonPart>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Clone)]
 #[wasm_bindgen]
 pub struct LessonPart {
-    pub(crate) step: String,
+    pub(crate) step_name: String,
+    pub(crate) step_info: StepInfo,
     pub(crate) bpms: Vec<u16>,
+}
+
+#[derive(Debug)]
+pub(crate) enum CourseError {
+    MissingStep(String),
 }
 
 #[wasm_bindgen]
@@ -59,17 +67,97 @@ impl Lesson {
     pub fn parts(&self) -> Vec<LessonPart> {
         self.parts.clone()
     }
+
+    #[wasm_bindgen(getter, js_name = "iconUrl")]
+    pub fn icon_url(&self) -> String {
+        self.icon.clone()
+    }
 }
 
 #[wasm_bindgen]
 impl LessonPart {
     #[wasm_bindgen(getter)]
-    pub fn step(&self) -> String {
-        self.step.clone()
+    #[wasm_bindgen(js_name = "stepName")]
+    pub fn step_name(&self) -> String {
+        self.step_name.clone()
     }
 
     #[wasm_bindgen(getter)]
+    pub fn step(&self) -> StepInfo {
+        self.step_info.clone()
+    }
+    #[wasm_bindgen(getter)]
     pub fn bpms(&self) -> Vec<u16> {
         self.bpms.clone()
+    }
+}
+
+impl Course {
+    pub(crate) fn add_lesson(
+        &mut self,
+        lesson_name: String,
+        lesson_icon: String,
+        lesson_parts: Vec<parsing::course_file::Part>,
+    ) -> Result<(), CourseError> {
+        let parts = lesson_parts
+            .into_iter()
+            .map(|p| LessonPart::new(p.step, p.bpms, &self.collection))
+            .collect::<Result<_, _>>()?;
+        let lesson = Lesson {
+            name: lesson_name,
+            icon: lesson_icon,
+            parts,
+        };
+        self.lessons.push(lesson);
+        Ok(())
+    }
+}
+
+impl LessonPart {
+    fn new(
+        step_name: String,
+        bpms: Vec<u16>,
+        state: &DanceCollection,
+    ) -> Result<Self, CourseError> {
+        let step = state
+            .step(&step_name)
+            .ok_or_else(|| CourseError::MissingStep(step_name.clone()))?;
+        let step_info = StepInfo::from_step(step.clone(), state);
+        Ok(LessonPart {
+            step_name,
+            step_info,
+            bpms,
+        })
+    }
+}
+
+impl From<CourseError> for ParseFileError {
+    fn from(err: CourseError) -> Self {
+        match err {
+            CourseError::MissingStep(s) => ParseFileError::UnknownStepName(s),
+        }
+    }
+}
+
+impl std::fmt::Debug for Course {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Course")
+            .field("id", &self.id)
+            .field("name", &self.name)
+            .field("featured_step_id", &self.featured_step_id)
+            .field("lessons", &self.lessons)
+            .field("collection", &self.collection.short_debug_string())
+            .finish()
+    }
+}
+
+impl std::fmt::Debug for LessonPart {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("LessonPart")
+            .field("step_name", &self.step_name)
+            // intentionally omitted for brevity
+            // .field("step_info", &self.step_info)
+            .field("bpms", &self.bpms)
+            .finish()
     }
 }

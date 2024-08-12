@@ -2,55 +2,173 @@
 (
   version: 0,
   id: "running-man-basics",
-  names: {
-    "de": "Running Man Anfängerkurs",
-    "en": "Running Man beginner's course",
-  },
+  names: {"de": "Running Man Anfängerkurs", "en": "Running Man beginner's course"},
   featured_step: "rm-0",
   lessons: [
     (
-      names: {
-        "de": "Micro Bounce",
-        "en": "Micro Bounce",
-      },
+      names: {"de": "Micro Bounce", "en": "Micro Bounce"},
       icon: "todo.svg",
       parts: [
         (step: "run-in-place", bpms: [60, 100, 120, 130]),
         (step: "micro-bounce", bpms: [100, 110, 120, 130]),
-      ]
+      ],
     ),
     (
-      names: {
-        "de": "Balance",
-        "en": "Balance",
-      },
+      names: {"de": "Balance", "en": "Balance"},
       icon: "todo.svg",
       parts: [
-        (step: "kick-forward-unbalanced", bpms: [60, 100, 120, 130]),
-        (step: "kick-forward", bpms: [60, 100, 120, 130]),
-      ]
+        // (step: "kick-forward-unbalanced", bpms: [60, 100, 120, 130]),
+        // (step: "kick-forward", bpms: [60, 100, 120, 130]),
+      ],
     ),
     (
-      names: {
-        "de": "Flacher Schritt",
-        "en": "Flat Step",
-      },
+      names: {"de": "Flacher Schritt", "en": "Flat Step"},
       icon: "todo.svg",
       parts: [
-        (step: "flat-man-3-pause", bpms: [60, 100, 120, 130]),
-        (step: "flat-man", bpms: [60, 100, 120, 130]),
-      ]
+        // (step: "flat-man-3-pause", bpms: [60, 100, 120, 130]),
+        // (step: "flat-man", bpms: [60, 100, 120, 130]),
+      ],
     ),
     (
-      names: {
-        "de": "Running Man",
-        "en": "Running Man",
-      },
+      names: {"de": "Running Man", "en": "Running Man"},
       icon: "todo.svg",
       parts: [
-        (step: "run-high-in-place", bpms: [60, 100, 120, 130]),
-        (step: "rm-0", bpms: [60, 100, 120, 130]),
-      ]
+        (step: "run-in-place", bpms: [60, 100, 120, 130]),
+        // (step: "rm-0", bpms: [60, 100, 120, 130]),
+      ],
     ),
-  ]
+  ],
+  poses: [
+    (
+      name: "in-place-right-up",
+      direction: Front,
+      limbs: [
+        (limb: LeftThigh, weight: 1.0, angle: -1, tolerance: 0),
+        (limb: LeftShin, weight: 1.0, angle: 3, tolerance: 0),
+        (limb: LeftFoot, weight: 1.0, angle: -7, tolerance: 0),
+        (limb: LeftArm, weight: 1.0, angle: -2, tolerance: 0),
+        (limb: LeftForearm, weight: 1.0, angle: -4, tolerance: 0),
+        (limb: RightThigh, weight: 1.0, angle: 1, tolerance: 0),
+        (limb: RightShin, weight: 1.0, angle: 5, tolerance: 0),
+        (limb: RightFoot, weight: 1.0, angle: 10, tolerance: 0),
+        (limb: RightArm, weight: 1.0, angle: 16, tolerance: 0),
+        (limb: RightForearm, weight: 1.0, angle: -49, tolerance: 0),
+        (limb: LeftLeg, weight: 1.0, angle: 1, tolerance: 0),
+        (limb: RightLeg, weight: 1.0, angle: 3, tolerance: 0),
+      ],
+      turn_hip: 1,
+      z: (
+        absolute: {(side: Right, part: Knee): -1.0, (side: Left, part: Heel): 1.0},
+      ),
+    ),
+    (
+      name: "in-place-left-up",
+      direction: Front,
+      limbs: [
+        (limb: LeftThigh, weight: 1.0, angle: 2, tolerance: 0),
+        (limb: LeftShin, weight: 1.0, angle: 5, tolerance: 0),
+        (limb: LeftFoot, weight: 1.0, angle: -1, tolerance: 0),
+        (limb: LeftArm, weight: 1.0, angle: -3, tolerance: 0),
+        (limb: LeftForearm, weight: 1.0, angle: 130, tolerance: 0),
+        (limb: RightThigh, weight: 1.0, angle: 0, tolerance: 0),
+        (limb: RightShin, weight: 1.0, angle: -1, tolerance: 0),
+        (limb: RightFoot, weight: 1.0, angle: 9, tolerance: 0),
+        (limb: RightArm, weight: 1.0, angle: 9, tolerance: 0),
+        (limb: RightForearm, weight: 1.0, angle: 4, tolerance: 0),
+        (limb: LeftLeg, weight: 1.0, angle: 3, tolerance: 0),
+        (limb: RightLeg, weight: 1.0, angle: 0, tolerance: 0),
+      ],
+      turn_hip: -28,
+      z: (
+        absolute: {(side: Left, part: Knee): -1.0, (side: Right, part: Heel): 1.0},
+      ),
+    ),
+    (
+      name: "small-in-place-right-up",
+      direction: Front,
+      limbs: [
+        (limb: LeftThigh, weight: 1.0, angle: 2, tolerance: 0),
+        (limb: LeftShin, weight: 1.0, angle: 3, tolerance: 0),
+        (limb: LeftFoot, weight: 1.0, angle: 11, tolerance: 0),
+        (limb: LeftArm, weight: 1.0, angle: -5, tolerance: 0),
+        (limb: LeftForearm, weight: 1.0, angle: 7, tolerance: 0),
+        (limb: RightThigh, weight: 1.0, angle: 6, tolerance: 0),
+        (limb: RightShin, weight: 1.0, angle: -11, tolerance: 0),
+        (limb: RightFoot, weight: 1.0, angle: 25, tolerance: 0),
+        (limb: RightArm, weight: 1.0, angle: 9, tolerance: 0),
+        (limb: RightForearm, weight: 1.0, angle: -9, tolerance: 0),
+        (limb: LeftLeg, weight: 1.0, angle: 3, tolerance: 0),
+        (limb: RightLeg, weight: 1.0, angle: -2, tolerance: 0),
+      ],
+      turn_hip: 11,
+      z: (
+        absolute: {(side: Right, part: Knee): -0.75, (side: Left, part: Heel): 0.75},
+      ),
+    ),
+    (
+      name: "small-in-place-left-up",
+      direction: Front,
+      limbs: [
+        (limb: LeftThigh, weight: 1.0, angle: 0, tolerance: 0),
+        (limb: LeftShin, weight: 1.0, angle: 6, tolerance: 0),
+        (limb: LeftFoot, weight: 1.0, angle: -8, tolerance: 0),
+        (limb: LeftArm, weight: 1.0, angle: -5, tolerance: 0),
+        (limb: LeftForearm, weight: 1.0, angle: 7, tolerance: 0),
+        (limb: RightThigh, weight: 1.0, angle: -1, tolerance: 0),
+        (limb: RightShin, weight: 1.0, angle: -6, tolerance: 0),
+        (limb: RightFoot, weight: 1.0, angle: 25, tolerance: 0),
+        (limb: RightArm, weight: 1.0, angle: 12, tolerance: 0),
+        (limb: RightForearm, weight: 1.0, angle: -6, tolerance: 0),
+        (limb: LeftLeg, weight: 1.0, angle: 3, tolerance: 0),
+        (limb: RightLeg, weight: 1.0, angle: -3, tolerance: 0),
+      ],
+      turn_hip: 12,
+      z: (
+        absolute: {(side: Left, part: Knee): -0.75, (side: Right, part: Heel): 0.75},
+      ),
+    ),
+    (
+      name: "mirco-bounce-standing",
+      direction: Front,
+      limbs: [
+        (limb: LeftThigh, weight: 1.0, angle: 0, tolerance: 0),
+        (limb: LeftShin, weight: 1.0, angle: 8, tolerance: 0),
+        (limb: LeftFoot, weight: 1.0, angle: -9, tolerance: 0),
+        (limb: LeftArm, weight: 1.0, angle: -6, tolerance: 0),
+        (limb: LeftForearm, weight: 1.0, angle: 18, tolerance: 0),
+        (limb: RightThigh, weight: 1.0, angle: 1, tolerance: 0),
+        (limb: RightShin, weight: 1.0, angle: -6, tolerance: 0),
+        (limb: RightFoot, weight: 1.0, angle: 16, tolerance: 0),
+        (limb: RightArm, weight: 1.0, angle: 14, tolerance: 0),
+        (limb: RightForearm, weight: 1.0, angle: -21, tolerance: 0),
+        (limb: LeftLeg, weight: 1.0, angle: 4, tolerance: 0),
+        (limb: RightLeg, weight: 1.0, angle: -2, tolerance: 0),
+      ],
+    ),
+  ],
+  steps: [
+    (
+      name: "Run in place",
+      id: "run-in-place",
+      keyframes: [
+        (pose: "in-place-left-up", orientation: ToCamera),
+        (pose: "in-place-right-up", orientation: ToCamera),
+      ],
+    ),
+    (
+      name: "Run in place (small)",
+      id: "small-run-in-place",
+      keyframes: [
+        (pose: "small-in-place-left-up", orientation: ToCamera),
+        (pose: "small-in-place-right-up", orientation: ToCamera),
+      ],
+    ),
+    (
+      name: "Micro bounce",
+      id: "micro-bounce",
+      keyframes: [
+        (pose: "mirco-bounce-standing", orientation: ToCamera),
+      ],
+    ),
+  ],
 )

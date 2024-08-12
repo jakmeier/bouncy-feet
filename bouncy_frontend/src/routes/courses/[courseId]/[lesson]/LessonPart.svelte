@@ -3,5 +3,5 @@
   export let lessonPart;
 </script>
 
-<div>{lessonPart.step}</div>
+<div>{lessonPart.stepName}</div>
 <div>{lessonPart.bpms}</div>

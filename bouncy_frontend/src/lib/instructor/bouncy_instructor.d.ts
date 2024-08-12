@@ -379,6 +379,9 @@ export class Lesson {
   free(): void;
 /**
 */
+  readonly iconUrl: string;
+/**
+*/
   readonly name: string;
 /**
 */
@@ -393,7 +396,10 @@ export class LessonPart {
   readonly bpms: Uint16Array;
 /**
 */
-  readonly step: string;
+  readonly step: StepInfo;
+/**
+*/
+  readonly stepName: string;
 }
 /**
 * Self-describing error score for a specific limb
@@ -692,15 +698,6 @@ export class StepInfo {
 export class Tracker {
   free(): void;
 /**
-* @param {number} timestamp
-* @returns {ExportedFrame}
-*/
-  exportFrame(timestamp: number): ExportedFrame;
-/**
-* @returns {string}
-*/
-  exportKeypoints(): string;
-/**
 * Create a tracker for all known steps.
 */
   constructor();
@@ -809,6 +806,15 @@ export class Tracker {
 * @returns {Skeleton | undefined}
 */
   skeletonAt(timestamp: number): Skeleton | undefined;
+/**
+* @param {number} timestamp
+* @returns {ExportedFrame}
+*/
+  exportFrame(timestamp: number): ExportedFrame;
+/**
+* @returns {string}
+*/
+  exportKeypoints(): string;
 }
 /**
 */

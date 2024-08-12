@@ -393,6 +393,26 @@ impl DanceCollection {
             ..Default::default()
         }
     }
+
+    pub(crate) fn short_debug_string(&self) -> String {
+        format!(
+            "DanceCollection {{ limbs: ({0}): {1:?}, poses({2}): {3:?}, steps({4}): {5:?}, dances({6}): {7:?}}}",
+            self.limbs.len(),
+            self.limb_names,
+            self.poses.len(),
+            self.names,
+            self.steps.len(),
+            self.steps()
+                .iter()
+                .map(|step| &step.name)
+                .collect::<Vec<_>>(),
+            self.dances.len(),
+            self.dances
+                .iter()
+                .map(|dance| &dance.id)
+                .collect::<Vec<_>>(),
+        )
+    }
 }
 
 impl Limb {

@@ -1,8 +1,10 @@
-use crate::public::course::LessonPart;
+use crate::intern::dance_collection::DanceCollection;
 use crate::public::Course;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+use super::pose_file::Pose;
+use super::step_file::Step;
 use super::{ParseFileError, VersionCheck};
 
 pub(crate) const CURRENT_VERSION: u16 = 0;
@@ -14,6 +16,8 @@ pub struct CourseFile {
     names: TranslatedString,
     featured_step: String,
     lessons: Vec<Lesson>,
+    poses: Vec<Pose>,
+    steps: Vec<Step>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -25,8 +29,8 @@ pub(crate) struct Lesson {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub(crate) struct Part {
-    step: String,
-    bpms: Vec<u16>,
+    pub(crate) step: String,
+    pub(crate) bpms: Vec<u16>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -50,30 +54,12 @@ impl CourseFile {
     }
 
     pub(crate) fn into_course(self, lang: &str) -> Result<Course, ParseFileError> {
-        let lessons = self
-            .lessons
-            .into_iter()
-            .map(|lesson| {
-                Ok::<_, ParseFileError>(crate::public::course::Lesson {
-                    name: lesson.names.take(lang).ok_or_else(|| {
-                        ParseFileError::MissingTranslation {
-                            id: format!("lesson of {}", self.id.clone()),
-                            lang: lang.to_owned(),
-                        }
-                    })?,
-                    icon: lesson.icon,
-                    parts: lesson
-                        .parts
-                        .into_iter()
-                        .map(|p| LessonPart {
-                            step: p.step,
-                            bpms: p.bpms,
-                        })
-                        .collect(),
-                })
-            })
-            .collect::<Result<Vec<_>, ParseFileError>>()?;
-        let course = Course {
+        // The course object uses its own collection of poses and steps.
+        let mut collection = DanceCollection::default();
+        collection.add_poses(self.poses)?;
+        collection.add_steps(&self.steps, "course".to_owned())?;
+
+        let mut course = Course {
             name: self
                 .names
                 .take(lang)
@@ -81,10 +67,23 @@ impl CourseFile {
                     id: self.id.clone(),
                     lang: lang.to_owned(),
                 })?,
-            id: self.id,
+            id: self.id.clone(),
             featured_step_id: self.featured_step,
-            lessons,
+            lessons: vec![],
+            collection,
         };
+
+        for lesson in self.lessons {
+            let name =
+                lesson
+                    .names
+                    .take(lang)
+                    .ok_or_else(|| ParseFileError::MissingTranslation {
+                        id: format!("lesson of {}", self.id.clone()),
+                        lang: lang.to_owned(),
+                    })?;
+            course.add_lesson(name, lesson.icon, lesson.parts)?;
+        }
         Ok(course)
     }
 }
