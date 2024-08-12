@@ -42,77 +42,65 @@
     y: (0.5 + bodyShift.y) * height,
   };
 
-  /** @type {Cartesian2d} */
-  let leftHip;
-  /** @type {Cartesian2d} */
-  let rightHip;
-  /** @type {Cartesian2d} */
-  let rightShoulder;
-  /** @type {Cartesian2d} */
-  let leftShoulder;
-  /** @type {Cartesian2d} */
-  let headPosition;
   /** @type {import("$lib/instructor/bouncy_instructor").SkeletonV2} */
-  let renderedSkeleton;
-
-  $: if (skeleton) {
-    renderedSkeleton = skeleton.render(
-      new Cartesian2d(hip.x, hip.y),
-      avatarSizePixels
-    );
-    leftHip = renderedSkeleton.hip.start;
-    leftShoulder = renderedSkeleton.shoulder.start;
-    rightHip = renderedSkeleton.hip.end;
-    rightShoulder = renderedSkeleton.shoulder.end;
-    headPosition = new Cartesian2d(
-      (leftShoulder.x + rightShoulder.x) / 2,
-      leftShoulder.y - avatarSizePixels * 0.1
-    );
-  }
+  $: renderedSkeleton = skeleton.render(
+    new Cartesian2d(hip.x, hip.y),
+    avatarSizePixels
+  );
+  /** @type {Cartesian2d} */
+  $: leftHip = renderedSkeleton.hip.start;
+  /** @type {Cartesian2d} */
+  $: leftShoulder = renderedSkeleton.shoulder.start;
+  /** @type {Cartesian2d} */
+  $: rightHip = renderedSkeleton.hip.end;
+  /** @type {Cartesian2d} */
+  $: rightShoulder = renderedSkeleton.shoulder.end;
+  /** @type {Cartesian2d} */
+  $: headPosition = new Cartesian2d(
+    (leftShoulder.x + rightShoulder.x) / 2,
+    leftShoulder.y - avatarSizePixels * 0.1
+  );
   $: markedSegments = markedLimbs.map((limb) => limb.render(renderedSkeleton));
 
   $: headRadius = 0.075 * avatarSizePixels;
 </script>
 
-{#if skeleton}
-  <SvgPolygon
-    id="torso"
-    points={[leftHip, rightHip, rightShoulder, leftShoulder]}
-    style={{
-      color: style.headColor,
-      fill: style.bodyColor,
-      linecap: 'round',
-      lineWidth: lineWidth * 0.9,
+<SvgPolygon
+  id="torso"
+  points={[leftHip, rightHip, rightShoulder, leftShoulder]}
+  style={{
+    color: style.headColor,
+    fill: style.bodyColor,
+    linecap: 'round',
+    lineWidth: lineWidth * 0.9,
+  }}
+/>
+<SvgCircle
+  id="head"
+  cx={headPosition.x}
+  cy={headPosition.y}
+  r={headRadius}
+  fill={style.headColor}
+/>
+<SvgStyle color={style.leftColor} linecap="round" {lineWidth}>
+  <SvgAvatarSide side={renderedSkeleton.left} sideId={'left'}></SvgAvatarSide>
+</SvgStyle>
+<SvgStyle color={style.rightColor} linecap="round" {lineWidth}>
+  <SvgAvatarSide side={renderedSkeleton.right} sideId={'right'}></SvgAvatarSide>
+</SvgStyle>
+{#each markedSegments as segment, i}
+  <SvgLine
+    id="{`marker${i}`},"
+    line={{
+      id: `marker${i}`,
+      start: segment.start,
+      end: segment.end,
+      z: segment.z,
+      style: {
+        color: markerColor,
+        linecap: 'butt',
+        lineWidth: markerLineWidth,
+      },
     }}
-  />
-  <SvgCircle
-    id="head"
-    cx={headPosition.x}
-    cy={headPosition.y}
-    r={headRadius}
-    fill={style.headColor}
-  />
-  <SvgStyle color={style.leftColor} linecap="round" {lineWidth}>
-    <SvgAvatarSide side={renderedSkeleton.left} sideId={'left'}></SvgAvatarSide>
-  </SvgStyle>
-  <SvgStyle color={style.rightColor} linecap="round" {lineWidth}>
-    <SvgAvatarSide side={renderedSkeleton.right} sideId={'right'}
-    ></SvgAvatarSide>
-  </SvgStyle>
-  {#each markedSegments as segment, i}
-    <SvgLine
-      id="{`marker${i}`},"
-      line={{
-        id: `marker${i}`,
-        start: segment.start,
-        end: segment.end,
-        z: segment.z,
-        style: {
-          color: markerColor,
-          linecap: 'butt',
-          lineWidth: markerLineWidth,
-        },
-      }}
-    ></SvgLine>
-  {/each}
-{/if}
+  ></SvgLine>
+{/each}
