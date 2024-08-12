@@ -27,7 +27,13 @@
 
   // constructor for tweened jump stores
   const tweenedJump = (/** @type {number} */ start) => {
-    const yStore = tweened(start, $animation);
+    // yStore stores the (usually Y coordinate) value itself and an extra ID just
+    // to hack around svelte optimizations. Without the id, the jump is only
+    // shown if the value changes. But I need a jump from y=0 to y=0 to still be
+    // a jump. By providing a unique id for each update, the tweening and
+    // derived jump is triggered as needed.
+    let id = 0;
+    const yStore = tweened({ value: start, id }, $animation);
 
     // This is the jump math.
     const createDerivedStore = () =>
@@ -38,13 +44,16 @@
         // Parabolic jump with a peak at t = 0.5.
         // This might not be ideal for all moves but it's a good start.
         const jumpOffset = -4 * jumpHeight * t * (t - 1);
-        set($y - jumpOffset);
+        set($y.value - jumpOffset);
       });
 
     // Return a custom store that can be user to set/get single numbers without
     // worrying about all the animation context.
     return {
-      set: (/** @type {number} */ value) => yStore.set(value, $animation),
+      set: (/** @type {number} */ value) => {
+        id += 1;
+        yStore.set({ value, id }, $animation);
+      },
       subscribe: (
         /** @type {import("svelte/store").Subscriber<any>} */ run,
         /** @type {import("svelte/store").Invalidator<any> | undefined} */ invalidate
