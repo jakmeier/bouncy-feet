@@ -20,4 +20,6 @@
 
 <h2>{course.name} {lessonIndex + 1}</h2>
 
+<p>{lesson.explanation}</p>
+
 <LessonPart {lessonPart}></LessonPart>

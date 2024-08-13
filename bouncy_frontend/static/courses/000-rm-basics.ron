@@ -4,13 +4,35 @@
   id: "running-man-basics",
   names: {"de": "Running Man Anfängerkurs", "en": "Running Man beginner's course"},
   featured_step: "rm-0",
+  explanations: {
+    "de": "Lerne den Basisschritt des Shuffelns, den Running Man.",
+    "en": "Learn the basic step for all shuffle dance, the Running Man.",
+  },
   lessons: [
     (
-      names: {"de": "Einwärmen", "en": "Warm up"},
+      names: {"de": "Einstieg", "en": "Getting started"},
+      explanations: {
+        "de": "Als Anfang bewegen wir uns zur Musik und verschieben das Gewicht von Bein zu Bein im Rhythmus.",
+        "en": "To begin with, we will move our body to the music and rhythmically shift the weight from leg to leg.",
+      },
       icon: "todo.svg",
       parts: [
-        (step: "run-in-place", bpms: [60, 100]),
-        (step: "double-run-in-place", bpms: [60, 90]),
+        (
+          step: "run-in-place",
+          bpms: [60, 100],
+          explanations: {
+            "de": "Fangen wir an mit leichten hüpfern, abwechselnd auf dem linken und rechten Bein. Such dir das langsame oder schnelle Tempo aus, was besser für dich passt.",
+            "en": "Let's start with light jumps, switching between the left and the right leg. Pick the speed that works best for you.",
+          },
+        ),
+        (
+          step: "double-run-in-place",
+          bpms: [60, 90],
+          explanations: {
+            "de": "Beim Running Man ist das tragende Bein zwei Mal hintereinander das Gleiche. Daher gewöhnen wir uns jetzt an einen Doppelrhythmus. Zwei mal richts dann zwei mal links. ",
+            "en": "In the Running Man, the weight stays on the same leg for two jumps before switching to the other leg. Get your body used to this double-rhythm. Jump twice on the right leg, then twice on the left leg.",
+          },
+        ),
       ],
     ),
     (
@@ -262,8 +284,8 @@
         (limb: RightFoot, angle: 70, tolerance: 0, weight: 0.0),
         (limb: RightArm, angle: -12, tolerance: 0, weight: 0.0),
         (limb: RightForearm, angle: 6, tolerance: 0, weight: 0.0),
-      ]
+      ],
     ),
-    ( name: "left-up", mirror_of: "right-up", direction: Right ),
+    (name: "left-up", mirror_of: "right-up", direction: Right),
   ],
 )

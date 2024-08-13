@@ -23,6 +23,8 @@
 
 <Step {step} poseIndex={$i} {animationTime} size={100} borderWidth={0}></Step>
 
+<p>{course.explanation}</p>
+
 <div class="ol">
   {#each course.lessons as lesson, index}
     <div class="index">{index + 1}</div>
