@@ -75,18 +75,24 @@ impl Skeleton {
     pub fn resting(sideway: bool) -> Self {
         let mut left = Side::default();
         let mut right = Side::default();
+        let shoulder;
+        let hip;
         if sideway {
             left.foot.angle = 180.0_f32.to_radians();
             right.foot.angle = 180.0_f32.to_radians();
+            shoulder = Segment::default();
+            hip = Segment::default();
         } else {
             left.foot.angle = 60.0_f32.to_radians();
             right.foot.angle = 120.0_f32.to_radians();
+            shoulder = Segment::from(Angle3d::degree(90.0, 90.0));
+            hip = Segment::from(Angle3d::degree(90.0, 90.0));
         }
         Skeleton {
             left,
             right,
-            shoulder: Segment::default(),
-            hip: Segment::default(),
+            shoulder,
+            hip,
             sideway,
             backwards: false,
         }
