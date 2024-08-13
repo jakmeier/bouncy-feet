@@ -17,6 +17,7 @@ pub struct StepInfo {
     name: String,
     step_variation: Option<String>,
     pub(crate) skeletons: Vec<Skeleton>,
+    pub(crate) jump_heights: Vec<Option<f32>>,
     body_shift: BodyShift,
 }
 
@@ -57,6 +58,14 @@ impl StepInfo {
             let pose = &state.db.poses()[pose_index];
             Skeleton3d::from_with_db(pose, &state.db, direction).to_skeleton(rotation)
         })
+    }
+
+    #[wasm_bindgen(js_name = "jumpHeight")]
+    pub fn jump_height(&self, beat: usize) -> Option<f32> {
+        if self.jump_heights.is_empty() {
+            return None;
+        }
+        self.jump_heights[beat % self.jump_heights.len()]
     }
 
     /// Description identifier for the translated text which describes how the
@@ -100,6 +109,7 @@ impl StepInfo {
             name: step.name,
             step_variation: step.variation,
             skeletons,
+            jump_heights: step.jump_heights,
             body_shift,
         }
     }

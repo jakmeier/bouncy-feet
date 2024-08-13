@@ -667,6 +667,11 @@ export class StepInfo {
 */
   rotatedSkeleton(beat: number, rotation: number): Skeleton;
 /**
+* @param {number} beat
+* @returns {number | undefined}
+*/
+  jumpHeight(beat: number): number | undefined;
+/**
 * @returns {StepInfo}
 */
   rustClone(): StepInfo;
@@ -697,6 +702,15 @@ export class StepInfo {
 */
 export class Tracker {
   free(): void;
+/**
+* @param {number} timestamp
+* @returns {ExportedFrame}
+*/
+  exportFrame(timestamp: number): ExportedFrame;
+/**
+* @returns {string}
+*/
+  exportKeypoints(): string;
 /**
 * Create a tracker for all known steps.
 */
@@ -806,15 +820,6 @@ export class Tracker {
 * @returns {Skeleton | undefined}
 */
   skeletonAt(timestamp: number): Skeleton | undefined;
-/**
-* @param {number} timestamp
-* @returns {ExportedFrame}
-*/
-  exportFrame(timestamp: number): ExportedFrame;
-/**
-* @returns {string}
-*/
-  exportKeypoints(): string;
 }
 /**
 */

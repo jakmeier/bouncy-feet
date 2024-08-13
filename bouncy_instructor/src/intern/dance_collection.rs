@@ -297,6 +297,12 @@ impl DanceCollection {
                 .map(|frame| BodyPoint::from(frame.pivot.clone()))
                 .collect();
 
+            let jump_heights = def
+                .keyframes
+                .iter()
+                .map(|frame| frame.jump_height)
+                .collect();
+
             let new_step = Step {
                 id: def.id.clone(),
                 name: def.name.clone(),
@@ -304,6 +310,7 @@ impl DanceCollection {
                 poses,
                 directions,
                 pivots,
+                jump_heights,
                 source: source.clone(),
             };
             self.steps.push(new_step);
@@ -336,6 +343,7 @@ impl DanceCollection {
             poses,
             directions: step.directions.clone(),
             pivots: step.pivots.clone(),
+            jump_heights: step.jump_heights.clone(),
             source: step.source.clone(),
         };
         self.steps.push(new_step);

@@ -14,6 +14,7 @@ pub(crate) struct Step {
     pub poses: Vec<usize>,
     pub directions: Vec<Direction>,
     pub pivots: Vec<BodyPoint>,
+    pub jump_heights: Vec<Option<f32>>,
     pub source: StepSource,
 }
 
@@ -47,6 +48,7 @@ impl Step {
                 })
                 .collect(),
             pivots: self.pivots,
+            jump_heights: self.jump_heights,
             source: self.source,
         }
     }

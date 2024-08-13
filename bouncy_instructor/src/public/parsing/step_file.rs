@@ -55,6 +55,10 @@ pub(crate) struct StepPosition {
         skip_serializing_if = "BodyPoint::is_default_pivot"
     )]
     pub pivot: BodyPoint,
+    /// How high to jump when transitioning into this step, relative to the full
+    /// body size.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub jump_height: Option<f32>,
 }
 
 /// Define in which direction a pose should be oriented.

@@ -30,6 +30,9 @@
       : restingStep;
   $: bodyShift =
     poseIndex >= 0 ? stepBodyShift(step, poseIndex) : { x: 0, y: 0 };
+  $: maybeJumpHeight = step.jumpHeight(poseIndex);
+  $: jumpHeight =
+    size * (maybeJumpHeight === undefined ? 0.025 : maybeJumpHeight);
 
   /**
    * @param {import("$lib/instructor/bouncy_instructor").StepInfo} step
@@ -47,7 +50,7 @@
   borderRadius="20px"
   borderWidth="{borderWidth}px"
 >
-  <Animation {animationTime} jumpHeight={size * 0.025}>
+  <Animation {animationTime} {jumpHeight}>
     <Svg width={size} height={size} orderByZ>
       <SvgAvatar
         width={size}

@@ -70,6 +70,7 @@ export function stepById(a: number, b: number, c: number): number;
 export function stepinfo_beats(a: number): number;
 export function stepinfo_bodyShift(a: number, b: number): number;
 export function stepinfo_id(a: number, b: number): void;
+export function stepinfo_jumpHeight(a: number, b: number, c: number): void;
 export function stepinfo_name(a: number, b: number): void;
 export function stepinfo_rotatedSkeleton(a: number, b: number, c: number): number;
 export function stepinfo_rustClone(a: number): number;
