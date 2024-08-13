@@ -7,6 +7,7 @@ use wasm_bindgen::prelude::wasm_bindgen;
 pub struct Course {
     pub(crate) id: String,
     pub(crate) name: String,
+    pub(crate) explanation: Option<String>,
     pub(crate) featured_step_id: String,
     pub(crate) lessons: Vec<Lesson>,
     pub(crate) collection: DanceCollection,
@@ -16,6 +17,7 @@ pub struct Course {
 #[wasm_bindgen]
 pub struct Lesson {
     pub(crate) name: String,
+    pub(crate) explanation: Option<String>,
     pub(crate) icon: String,
     pub(crate) parts: Vec<LessonPart>,
 }
@@ -23,6 +25,7 @@ pub struct Lesson {
 #[derive(Clone)]
 #[wasm_bindgen]
 pub struct LessonPart {
+    pub(crate) explanation: Option<String>,
     pub(crate) step_name: String,
     pub(crate) step_info: StepInfo,
     pub(crate) bpms: Vec<u16>,
@@ -46,6 +49,11 @@ impl Course {
     }
 
     #[wasm_bindgen(getter)]
+    pub fn explanation(&self) -> Option<String> {
+        self.explanation.clone()
+    }
+
+    #[wasm_bindgen(getter)]
     pub fn lessons(&self) -> Vec<Lesson> {
         self.lessons.clone()
     }
@@ -61,6 +69,11 @@ impl Lesson {
     #[wasm_bindgen(getter)]
     pub fn name(&self) -> String {
         self.name.clone()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn explanation(&self) -> Option<String> {
+        self.explanation.clone()
     }
 
     #[wasm_bindgen(getter)]
@@ -83,6 +96,11 @@ impl LessonPart {
     }
 
     #[wasm_bindgen(getter)]
+    pub fn explanation(&self) -> Option<String> {
+        self.explanation.clone()
+    }
+
+    #[wasm_bindgen(getter)]
     pub fn step(&self) -> StepInfo {
         self.step_info.clone()
     }
@@ -96,14 +114,24 @@ impl Course {
     pub(crate) fn add_lesson(
         &mut self,
         lesson_name: String,
+        explanation: Option<String>,
         lesson_icon: String,
         lesson_parts: Vec<parsing::course_file::Part>,
+        lang: &str,
     ) -> Result<(), CourseError> {
         let parts = lesson_parts
             .into_iter()
-            .map(|p| LessonPart::new(p.step, p.bpms, &self.collection))
+            .map(|p| {
+                LessonPart::new(
+                    p.step,
+                    p.explanations.and_then(|translated| translated.take(lang)),
+                    p.bpms,
+                    &self.collection,
+                )
+            })
             .collect::<Result<_, _>>()?;
         let lesson = Lesson {
+            explanation,
             name: lesson_name,
             icon: lesson_icon,
             parts,
@@ -116,6 +144,7 @@ impl Course {
 impl LessonPart {
     fn new(
         step_name: String,
+        explanation: Option<String>,
         bpms: Vec<u16>,
         state: &DanceCollection,
     ) -> Result<Self, CourseError> {
@@ -124,6 +153,7 @@ impl LessonPart {
             .ok_or_else(|| CourseError::MissingStep(step_name.clone()))?;
         let step_info = StepInfo::from_step(step.clone(), state);
         Ok(LessonPart {
+            explanation,
             step_name,
             step_info,
             bpms,

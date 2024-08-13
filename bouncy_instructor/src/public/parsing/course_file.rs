@@ -14,6 +14,8 @@ pub struct CourseFile {
     version: u8,
     id: String,
     names: TranslatedString,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    explanations: Option<TranslatedString>,
     featured_step: String,
     lessons: Vec<Lesson>,
     poses: Vec<Pose>,
@@ -23,6 +25,8 @@ pub struct CourseFile {
 #[derive(Debug, Serialize, Deserialize)]
 pub(crate) struct Lesson {
     names: TranslatedString,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    explanations: Option<TranslatedString>,
     icon: String,
     parts: Vec<Part>,
 }
@@ -31,9 +35,11 @@ pub(crate) struct Lesson {
 pub(crate) struct Part {
     pub(crate) step: String,
     pub(crate) bpms: Vec<u16>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub(crate) explanations: Option<TranslatedString>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Default)]
 #[serde(transparent)]
 pub(crate) struct TranslatedString {
     inner: HashMap<String, String>,
@@ -59,14 +65,27 @@ impl CourseFile {
         collection.add_poses(self.poses)?;
         collection.add_steps(&self.steps, "course".to_owned())?;
 
+        let name = self
+            .names
+            .take(lang)
+            .ok_or_else(|| ParseFileError::MissingTranslation {
+                id: self.id.clone(),
+                lang: lang.to_owned(),
+            })?;
+        let explanation = self
+            .explanations
+            .map(|translated| {
+                translated
+                    .take(lang)
+                    .ok_or_else(|| ParseFileError::MissingTranslation {
+                        id: self.id.clone(),
+                        lang: lang.to_owned(),
+                    })
+            })
+            .transpose()?;
         let mut course = Course {
-            name: self
-                .names
-                .take(lang)
-                .ok_or_else(|| ParseFileError::MissingTranslation {
-                    id: self.id.clone(),
-                    lang: lang.to_owned(),
-                })?,
+            name,
+            explanation,
             id: self.id.clone(),
             featured_step_id: self.featured_step,
             lessons: vec![],
@@ -79,10 +98,21 @@ impl CourseFile {
                     .names
                     .take(lang)
                     .ok_or_else(|| ParseFileError::MissingTranslation {
-                        id: format!("lesson of {}", self.id.clone()),
+                        id: format!("lesson name of {}", self.id.clone()),
                         lang: lang.to_owned(),
                     })?;
-            course.add_lesson(name, lesson.icon, lesson.parts)?;
+            let lesson_explanation = lesson
+                .explanations
+                .map(|translated| {
+                    translated
+                        .take(lang)
+                        .ok_or_else(|| ParseFileError::MissingTranslation {
+                            id: format!("explanation of lesson in {}", self.id.clone()),
+                            lang: lang.to_owned(),
+                        })
+                })
+                .transpose()?;
+            course.add_lesson(name, lesson_explanation, lesson.icon, lesson.parts, lang)?;
         }
         Ok(course)
     }

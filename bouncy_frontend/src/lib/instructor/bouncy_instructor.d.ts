@@ -134,6 +134,9 @@ export class Course {
   featuredStep(): StepInfo | undefined;
 /**
 */
+  readonly explanation: string;
+/**
+*/
   readonly id: string;
 /**
 */
@@ -379,6 +382,9 @@ export class Lesson {
   free(): void;
 /**
 */
+  readonly explanation: string;
+/**
+*/
   readonly iconUrl: string;
 /**
 */
@@ -394,6 +400,9 @@ export class LessonPart {
 /**
 */
   readonly bpms: Uint16Array;
+/**
+*/
+  readonly explanation: string;
 /**
 */
   readonly step: StepInfo;
