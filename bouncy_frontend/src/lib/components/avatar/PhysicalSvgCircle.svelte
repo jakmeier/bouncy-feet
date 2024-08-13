@@ -3,14 +3,8 @@
   import { getContext } from 'svelte';
   import { writable } from 'svelte/store';
 
-  /** @type{number} */
-  export let cx;
-  /** @type{number} */
-  export let cy;
-  /** @type{number} */
-  export let r;
-  /** @type{string} */
-  export let fill;
+  /** @type{Circle} */
+  export let circle;
 
   const animationCtx = getContext('animation');
   const animation = animationCtx
@@ -18,26 +12,13 @@
     : writable({ duration: 0 });
 
   // use svelte/motion.tweened for smoothly changing x,y values
-  const cxStore = tweened(cx);
-  const cyStore = animationCtx.tweenedJump(cy);
-  const rStore = tweened(r);
+  const cxStore = tweened(circle.cx, $animation);
+  const cyStore = animationCtx.tweenedJump(circle.cy);
+  const rStore = tweened(circle.r, $animation);
 
-  $: cx, updateX();
-  $: cy, updateY();
-  $: r, updateR();
-
-  // somehow this indirection is necessary for reactivity to kick in as desired
-  function updateX() {
-    cxStore.set(cx, $animation);
-  }
-
-  function updateY() {
-    cyStore.set(cy, $animation);
-  }
-
-  function updateR() {
-    rStore.set(r, $animation);
-  }
+  $: circle, cxStore.set(circle.cx, $animation);
+  $: circle, cyStore.set(circle.cy);
+  $: circle, rStore.set(circle.r, $animation);
 </script>
 
-<circle cx={$cxStore} cy={$cyStore} r={$rStore} {fill} />
+<circle cx={$cxStore} cy={$cyStore} r={$rStore} fill={circle.fill} />

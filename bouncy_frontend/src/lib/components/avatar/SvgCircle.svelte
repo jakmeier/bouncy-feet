@@ -12,8 +12,11 @@
   /** @type {string} */
   export let id;
 
+  // To trigger reactivity even when values are the same. Needed for jumps.
+  export let dummyUpdate = 0;
+
   const svg = getContext('svg');
-  $: svg.setCircle(id, { cx, cy, r, fill });
+  $: dummyUpdate, svg.setCircle(id, { cx, cy, r, fill, dummyUpdate });
 
   onMount(() => svg.setCircle(id, { cx, cy, r, fill }));
   onDestroy(() => svg.removeCircle(id));

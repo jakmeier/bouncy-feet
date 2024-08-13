@@ -55,11 +55,12 @@
   $: rightHip = renderedSkeleton.hip.end;
   /** @type {Cartesian2d} */
   $: rightShoulder = renderedSkeleton.shoulder.end;
-  /** @type {Cartesian2d} */
-  $: headPosition = new Cartesian2d(
-    (leftShoulder.x + rightShoulder.x) / 2,
-    leftShoulder.y - avatarSizePixels * 0.1
-  );
+  /** @type {number} */
+  $: cx = (leftShoulder.x + rightShoulder.x) / 2;
+  /** @type {number} */
+  $: cy = leftShoulder.y - avatarSizePixels * 0.1;
+  let dummyUpdate = 0;
+  $: renderedSkeleton, dummyUpdate += 1;
   $: markedSegments = markedLimbs.map((limb) => limb.render(renderedSkeleton));
 
   $: headRadius = 0.075 * avatarSizePixels;
@@ -75,13 +76,7 @@
     lineWidth: lineWidth * 0.9,
   }}
 />
-<SvgCircle
-  id="head"
-  cx={headPosition.x}
-  cy={headPosition.y}
-  r={headRadius}
-  fill={style.headColor}
-/>
+<SvgCircle id="head" {cx} {cy} r={headRadius} fill={style.headColor} {dummyUpdate} />
 <SvgStyle color={style.leftColor} linecap="round" {lineWidth}>
   <SvgAvatarSide side={renderedSkeleton.left} sideId={'left'}></SvgAvatarSide>
 </SvgStyle>

@@ -115,12 +115,7 @@
   {/each}
 
   {#each circles as circle}
-    <PhysicalSvgCircle
-      cx={circle.cx}
-      cy={circle.cy}
-      r={circle.r}
-      fill={circle.fill}
-    />
+    <PhysicalSvgCircle {circle} />
   {/each}
 
   {#each displayedLines as line (line.id)}
