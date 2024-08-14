@@ -27,7 +27,8 @@
             "start-button": "Start exercise",
             "stop-button": "Stop exercise",
             "back-button": "Back to overview",
-            "done-text": "Lesson complete"
+            "done-text": "Lesson complete",
+            "bpm-label": "Speed"
         }
     },
     "leaderboard": {

@@ -14,6 +14,3 @@
 {:else}
   <HomeFeed_002 {featuredDance} />
 {/if}
-
-<style>
-</style>

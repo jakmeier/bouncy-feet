@@ -27,7 +27,8 @@
             "start-button": "Übung beginnen",
             "stop-button": "Übung stoppen",
             "back-button": "Zurück zur Übersicht",
-            "done-text": "Lektion abgeschlossen"
+            "done-text": "Lektion abgeschlossen",
+            "bpm-label": "Tempo"
         }
     },
     "leaderboard": {

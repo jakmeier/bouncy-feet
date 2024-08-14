@@ -32,7 +32,7 @@
         ),
         (
           step: "double-run-in-place",
-          bpms: [60, 90],
+          bpms: [60, 100, 120],
           explanations: {
             "de": "Beim Running Man ist das tragende Bein zwei Mal hintereinander das Gleiche. Daher gewöhnen wir uns jetzt an einen Doppelrhythmus. Zwei mal richts dann zwei mal links. ",
             "en": "In the Running Man, the weight stays on the same leg for two jumps before switching to the other leg. Get your body used to this double-rhythm. Jump twice on the right leg, then twice on the left leg.",
@@ -78,10 +78,10 @@
       name: "Double run in place",
       id: "double-run-in-place",
       keyframes: [
-        (pose: "in-place-left-up", orientation: ToCamera),
-        (pose: "in-place-left-up", orientation: ToCamera),
-        (pose: "in-place-right-up", orientation: ToCamera),
-        (pose: "in-place-right-up", orientation: ToCamera),
+        (pose: "in-place-left-up", orientation: ToCamera, jump_height: 0.05),
+        (pose: "in-place-left-up", orientation: ToCamera, jump_height: 0.05),
+        (pose: "in-place-right-up", orientation: ToCamera, jump_height: 0.05),
+        (pose: "in-place-right-up", orientation: ToCamera, jump_height: 0.05),
       ],
     ),
     (
