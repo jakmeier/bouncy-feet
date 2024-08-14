@@ -4,5 +4,5 @@
 </script>
 
 <div>{lessonPart.stepName}</div>
-<div>{lessonPart.explanation}</div>
+<div>TODO</div>
 <div>{lessonPart.bpms}</div>

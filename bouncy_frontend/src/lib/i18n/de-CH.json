@@ -20,6 +20,14 @@
             "lesson": "Lektion mit",
             "part": "Teil",
             "parts": "Teilen"
+        },
+        "lesson": {
+            "title": "Lektion",
+            "next-button": "Weiter",
+            "start-button": "Übung beginnen",
+            "stop-button": "Übung stoppen",
+            "back-button": "Zurück zur Übersicht",
+            "done-text": "Lektion abgeschlossen"
         }
     },
     "leaderboard": {

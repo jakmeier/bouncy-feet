@@ -12,8 +12,13 @@
     (
       names: {"de": "Einstieg", "en": "Getting started"},
       explanations: {
-        "de": "Als Anfang bewegen wir uns zur Musik und verschieben das Gewicht von Bein zu Bein im Rhythmus.",
-        "en": "To begin with, we will move our body to the music and rhythmically shift the weight from leg to leg.",
+        "de": "Hallo!
+        Wilkommen beim Running Man Anfängerkurs.
+        Fangen wir mit einer Übung an, um den Körper an den Ryhthmus des Running Mans zu gewöhnen.",
+        "en": "Hello!
+        Welcome to the Running Man beginners course.
+        Let's start with a few excericses to accustom your body to the rhythm of the Running Man move.
+        ",
       },
       icon: "todo.svg",
       parts: [

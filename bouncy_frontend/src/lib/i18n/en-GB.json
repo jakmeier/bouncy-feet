@@ -20,6 +20,14 @@
             "lesson": "lesson with",
             "part": "part",
             "parts": "parts"
+        },
+        "lesson": {
+            "title": "Lesson",
+            "next-button": "Next",
+            "start-button": "Start exercise",
+            "stop-button": "Stop exercise",
+            "back-button": "Back to overview",
+            "done-text": "Lesson complete"
         }
     },
     "leaderboard": {
