@@ -16,13 +16,16 @@
   const animation = animationCtx
     ? animationCtx.animation
     : writable({ duration: 0 });
+  const tweenedJump = animationCtx ? animationCtx.tweenedJump : writable;
 
   // use svelte/motion.tweened for smoothly changing x,y values
   const startX = tweened(start.x, $animation);
-  const startY = animationCtx.tweenedJump(start.y);
+  const startY = tweenedJump(start.y);
   const endX = tweened(end.x, $animation);
-  const endY = animationCtx.tweenedJump(end.y);
-  const animationTimeZero = animationCtx.animationTimeZero;
+  const endY = tweenedJump(end.y);
+  const animationTimeZero = animationCtx
+    ? animationCtx.animationTimeZero
+    : null;
 
   // listen to prop changes and then update tweens
   function updatePosition() {
@@ -30,7 +33,9 @@
     startY.set(start.y);
     endX.set(end.x, $animation);
     endY.set(end.y);
-    animationTimeZero.set(Date.now());
+    if (animationTimeZero) {
+      animationTimeZero.set(Date.now());
+    }
   }
   $: start, end, updatePosition();
 </script>

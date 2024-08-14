@@ -13,7 +13,9 @@
 
   // use svelte/motion.tweened for smoothly changing x,y values
   const cxStore = tweened(circle.cx, $animation);
-  const cyStore = animationCtx.tweenedJump(circle.cy);
+  const cyStore = animationCtx
+    ? animationCtx.tweenedJump(circle.cy)
+    : tweened(circle.cy, $animation);
   const rStore = tweened(circle.r, $animation);
 
   $: circle, cxStore.set(circle.cx, $animation);

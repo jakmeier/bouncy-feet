@@ -46,7 +46,9 @@
     return p.map((point, i) => {
       const x = tweened(point.x, $animation);
       x.subscribe((x) => setX(i, x));
-      const y = animationCtx.tweenedJump(point.y);
+      const y = animationCtx
+        ? animationCtx.tweenedJump(point.y)
+        : writable(point.y);
       y.subscribe((/** @type {number} */ y) => setY(i, y));
       return {
         x,
