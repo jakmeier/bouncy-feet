@@ -28,6 +28,7 @@
             "stop-button": "Stop exercise",
             "back-button": "Back to overview",
             "done-text": "Lesson complete",
+            "audio-label": "Play beat",
             "bpm-label": "Speed"
         }
     },

@@ -70,8 +70,8 @@
       name: "Run in place",
       id: "run-in-place",
       keyframes: [
-        (pose: "in-place-left-up", orientation: ToCamera),
-        (pose: "in-place-right-up", orientation: ToCamera),
+        (pose: "in-place-left-up", orientation: ToCamera, jump_height: 0.05),
+        (pose: "in-place-right-up", orientation: ToCamera, jump_height: 0.05),
       ],
     ),
     (

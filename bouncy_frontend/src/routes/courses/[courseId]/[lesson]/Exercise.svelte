@@ -1,4 +1,6 @@
 <script>
+  import Audio from '$lib/components/Audio.svelte';
+  import Toggle from '$lib/components/ui/Toggle.svelte';
   import { t } from '$lib/i18n';
   import { counter } from '$lib/timer';
   import Step from '../../../collection/Step.svelte';
@@ -7,11 +9,13 @@
   export let lessonPart;
 
   let outerWidth = 300;
+  /** @type {boolean} */
+  let audioOn;
 
   $: step = lessonPart.step;
   let bpmIndex = 0;
   $: bpm = lessonPart.bpms[bpmIndex];
-  $: stepTime = 60_000 / bpm;
+  $: stepTime = 30_000 / bpm;
   $: animationTime = Math.min(stepTime * 0.7, 300);
   $: i = counter(-1, 1, stepTime);
 
@@ -71,26 +75,38 @@
         </div>
       {/each}
     </div>
+    <div>{$t('courses.lesson.audio-label')}</div>
+    <div class="audio-selector">
+      <Toggle bind:isOn={audioOn} border></Toggle>
+      {#if audioOn}
+        <span class="material-symbols-outlined"> volume_up </span>
+      {:else}
+        <span class="material-symbols-outlined"> volume_off </span>
+      {/if}
+    </div>
   </div>
+
+  <Audio {bpm} bind:isOn={audioOn}></Audio>
 </div>
 
 <style>
   .controls {
     display: grid;
-    grid-template-columns: 1fr 4fr;
+    grid-template-columns: 1fr 2fr;
     margin: 10px auto;
     max-width: 300px;
     background-color: var(--theme-neutral-light);
     border-radius: 10px;
     padding: 10px;
   }
-  .bpm-selector {
+
+  .bpm-selector,
+  .audio-selector {
     height: 50px;
-    display: grid;
-    justify-content: space-around;
-    align-items: start;
     margin-top: 10px;
-    justify-items: center;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
   }
 
   .bpm-option {
@@ -114,5 +130,11 @@
 
   .bpm-option:not(.selected):hover {
     transform: scale(1.2);
+  }
+
+  .audio-selector span {
+    color: var(--theme-main);
+    font-size: 40px;
+    margin: 15px;
   }
 </style>

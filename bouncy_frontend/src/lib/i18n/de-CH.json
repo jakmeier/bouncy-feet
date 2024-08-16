@@ -28,6 +28,7 @@
             "stop-button": "Übung stoppen",
             "back-button": "Zurück zur Übersicht",
             "done-text": "Lektion abgeschlossen",
+            "audio-label": "Takt abspielen",
             "bpm-label": "Tempo"
         }
     },

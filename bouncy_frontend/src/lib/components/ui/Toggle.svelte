@@ -1,5 +1,6 @@
 <script>
   export let isOn = false;
+  export let border = false;
 
   /** @param {{ key: string; preventDefault: () => void; }} event */
   function handleKeydown(event) {
@@ -11,7 +12,7 @@
 </script>
 
 <div
-  class="toggle {isOn ? 'on' : ''}"
+  class="toggle {isOn ? 'on' : ''} {border ? 'border' : ''}"
   on:click={() => (isOn = !isOn)}
   on:keydown={handleKeydown}
   role="switch"
@@ -49,5 +50,9 @@
 
   .toggle.on .toggle-circle {
     transform: translateX(40px);
+  }
+
+  .toggle.border {
+    border: solid 1px var(--theme-main);
   }
 </style>
