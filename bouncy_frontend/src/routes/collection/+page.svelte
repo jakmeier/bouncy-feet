@@ -6,7 +6,7 @@
   import Area from '$lib/components/ui/Area.svelte';
   import Step from './Step.svelte';
   import { features } from '$lib/stores/FeatureSelection';
-  import { browser } from '$app/environment';
+  import { browser, dev } from '$app/environment';
   import Experience from '$lib/components/Experience.svelte';
 
   /** @type {import('./$types').PageData} */
@@ -101,6 +101,25 @@
     </div>
   {/each}
 </div>
+
+{#if dev}
+  <h2 class="box">DEV STEPS</h2>
+  <div class="step-table">
+    {#each data.lookupSteps({ uniqueNames: true, sources: ['misc'] }) as step}
+      <div class="step">
+        <a href={`./step/${step.name}`}>
+          <Step {step} poseIndex={$i} {animationTime} />
+          <h3>{step.name}</h3>
+        </a>
+        <Experience
+          xp={$user.userSteps[step.name]
+            ? $user.userSteps[step.name].experience
+            : 0}
+        ></Experience>
+      </div>
+    {/each}
+  </div>
+{/if}
 
 {#if !browser || $features.enableDanceCollection}
   <h2 class="box"><b>{$t('collection.dances-subtitle')}</b></h2>
