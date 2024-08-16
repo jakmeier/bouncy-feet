@@ -1,8 +1,10 @@
 <script>
   import Audio from '$lib/components/Audio.svelte';
+  import Popup from '$lib/components/ui/Popup.svelte';
   import Toggle from '$lib/components/ui/Toggle.svelte';
   import { t } from '$lib/i18n';
   import { counter } from '$lib/timer';
+  import { writable } from 'svelte/store';
   import Step from '../../../collection/Step.svelte';
 
   /** @type {import("$lib/instructor/bouncy_instructor").LessonPart} */
@@ -11,6 +13,8 @@
   let outerWidth = 300;
   /** @type {boolean} */
   let audioOn;
+  /** @type {import('svelte/store').Writable<boolean>} */
+  let popUpIsOpen = writable(true);
 
   $: step = lessonPart.step;
   let bpmIndex = 0;
@@ -49,12 +53,16 @@
         return '⚡';
     }
   }
+
+  function closePopUp() {
+    $popUpIsOpen = false;
+  }
 </script>
 
 <div bind:clientWidth={outerWidth}>
   <Step {step} poseIndex={$i} {animationTime} {size}></Step>
   <div class="controls">
-    <div>{$t('courses.lesson.bpm-label')}</div>
+    <div class="label">{$t('courses.lesson.bpm-label')}</div>
     <div
       class="bpm-selector"
       style="grid-template-columns: repeat({lessonPart.bpms.length}, 1fr);"
@@ -75,7 +83,7 @@
         </div>
       {/each}
     </div>
-    <div>{$t('courses.lesson.audio-label')}</div>
+    <div class="label">{$t('courses.lesson.audio-label')}</div>
     <div class="audio-selector">
       <Toggle bind:isOn={audioOn} border></Toggle>
       {#if audioOn}
@@ -87,6 +95,23 @@
   </div>
 
   <Audio {bpm} bind:isOn={audioOn}></Audio>
+
+  <Popup isOpen={popUpIsOpen} title={$t('courses.lesson.exercise-popup-title')}>
+    <div>
+      {$t('courses.lesson.exercise-start-description')}
+    </div>
+    <button class="light" on:click={closePopUp}
+      >{$t('courses.lesson.own-music-button')}</button
+    >
+    <button
+      class="light"
+      on:click={() => {
+        audioOn = true;
+        closePopUp();
+      }}>{$t('courses.lesson.play-beat-button')}</button
+    >
+    <slot />
+  </Popup>
 </div>
 
 <style>
@@ -98,6 +123,10 @@
     background-color: var(--theme-neutral-light);
     border-radius: 10px;
     padding: 10px;
+  }
+
+  .label {
+    line-height: 60px;
   }
 
   .bpm-selector,

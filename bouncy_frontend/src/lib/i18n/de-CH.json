@@ -29,7 +29,11 @@
             "back-button": "Zurück zur Übersicht",
             "done-text": "Lektion abgeschlossen",
             "audio-label": "Takt abspielen",
-            "bpm-label": "Tempo"
+            "bpm-label": "Tempo",
+            "exercise-popup-title": "ÜBung beginnen",
+            "exercise-start-description": "Bitte stehe an eine Stelle mit Platz zum Tanzen. Am besten hörst du dazu deine eigene Musik.",
+            "play-beat-button": "Spiel ein Takt für mich",
+            "own-music-button": "Ich habe meine eigene Musik"
         }
     },
     "leaderboard": {

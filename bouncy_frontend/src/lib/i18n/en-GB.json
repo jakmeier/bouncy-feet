@@ -29,7 +29,11 @@
             "back-button": "Back to overview",
             "done-text": "Lesson complete",
             "audio-label": "Play beat",
-            "bpm-label": "Speed"
+            "bpm-label": "Speed",
+            "exercise-popup-title": "Start exercise",
+            "exercise-start-description": "Please stand in an empty are to can dance along with the exercise. I recommend playing your own music for maximum fun.",
+            "play-beat-button": "Play a beat",
+            "own-music-button": "I have my own music"
         }
     },
     "leaderboard": {
