@@ -14,7 +14,7 @@
     LimbError,
     PoseHint,
   } from '$lib/instructor/bouncy_instructor';
-  import { playSuccessSound } from '$lib/stores/SoundEffects';
+  import { playSuccessSound, loadSuccessSound } from '$lib/stores/Audio';
   import InstructorAvatar from '../avatar/InstructorAvatar.svelte';
   import { distance2d } from '$lib/math';
   import { BLACK_COLORING, LEFT_RIGHT_COLORING_LIGHT } from '$lib/constants';
@@ -168,6 +168,7 @@
   onMount(async () => {
     dataListener = await poseCtx.newPoseDetection(onPoseDetection);
     onVideoResized();
+    loadSuccessSound();
   });
 </script>
 

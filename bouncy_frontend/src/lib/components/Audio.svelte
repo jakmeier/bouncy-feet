@@ -2,6 +2,7 @@
   import { base } from '$app/paths';
   import { onDestroy, onMount } from 'svelte';
   import BackgroundTask from './BackgroundTask.svelte';
+  import { audioContext, loadAudio, getAudio } from '$lib/stores/Audio';
 
   export let bpm = 120;
   export let isOn = false;
@@ -13,16 +14,8 @@
   let countAudioFiles = ['one.mp3', 'two.mp3', 'three.mp3', 'four.mp3'];
   let andAudioFiles = ['and_0.mp3', 'and_1.mp3', 'and_2.mp3'];
   let kickAudioFiles = ['kick.mp3', 'kick2.mp3'];
-  /** @type {AudioContext} */
-  let audioContext;
   /** @type {GainNode} */
   let audioOutput;
-  /** @type {AudioBuffer[]} */
-  let countsSounds = [];
-  /** @type {AudioBuffer[]} */
-  let andSounds = [];
-  /** @type {AudioBuffer[]} */
-  let kickSounds = [];
   /** @type {number} seconds in audio context, when the first unscheduled note
    * should be scheduled */
   let nextNoteTime = 0.0;
@@ -38,11 +31,10 @@
   let connectedNodes = [];
 
   onMount(async () => {
-    audioContext = new AudioContext();
     audioOutput = new GainNode(audioContext);
-    countsSounds = await Promise.all(countAudioFiles.map(loadAudioSource));
-    andSounds = await Promise.all(andAudioFiles.map(loadAudioSource));
-    kickSounds = await Promise.all(kickAudioFiles.map(loadAudioSource));
+    await Promise.all(countAudioFiles.map(loadAudioSource));
+    await Promise.all(andAudioFiles.map(loadAudioSource));
+    await Promise.all(kickAudioFiles.map(loadAudioSource));
 
     if (isOn) startAudio();
     nextNoteTime = audioContext.currentTime;
@@ -56,26 +48,23 @@
 
   /**
    * @param {any} filename
-   * @returns {Promise<AudioBuffer>}
    */
   async function loadAudioSource(filename) {
     const url = `${base}/audio/${filename}`;
-    const response = await fetch(url);
-    const arrayBuffer = await response.arrayBuffer();
-    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-    return audioBuffer;
+    return loadAudio(filename, url);
   }
 
   /**
    * @param {number} time
-   * @param {AudioBuffer} buffer
+   * @param {string} id
    * @return {AudioBufferSourceNode}
    */
-  function scheduleNote(time, buffer) {
-    const bufferSource = audioContext.createBufferSource();
-    bufferSource.buffer = buffer;
-    bufferSource.connect(audioOutput);
-    bufferSource.start(time);
+  function scheduleNote(time, id) {
+    const bufferSource = getAudio(id);
+    if (bufferSource) {
+      bufferSource.connect(audioOutput);
+      bufferSource.start(time);
+    }
     return bufferSource;
   }
 
@@ -95,13 +84,14 @@
         continue;
       }
       // counts
-      const count = noteBuffer(note);
+      const count = noteAudioId(note);
       if (count) {
         const node = scheduleNote(time, count);
         nodes.push(node);
       }
       // also add a kick
-      const node = scheduleNote(time, kickSounds[halfBeat % 2]);
+      const fileName = kickAudioFiles[halfBeat % 2];
+      const node = scheduleNote(time, fileName);
       nodes.push(node);
       time += beatDuration;
       halfBeat++;
@@ -112,15 +102,15 @@
   let andCounter = 0;
   /**
    * @param {string} note
-   * @returns {AudioBuffer|undefined}
+   * @returns {string|undefined}
    */
-  function noteBuffer(note) {
+  function noteAudioId(note) {
     if (note >= '0' && note <= '9') {
-      return countsSounds[parseInt(note) - 1];
+      return countAudioFiles[parseInt(note) - 1];
     }
     if (note === 'a') {
       andCounter++;
-      return andSounds[(andCounter - 1) % andSounds.length];
+      return andAudioFiles[(andCounter - 1) % andAudioFiles.length];
     }
   }
 
