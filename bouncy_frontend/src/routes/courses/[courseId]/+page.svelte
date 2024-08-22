@@ -51,9 +51,10 @@
           {$t('courses.course-overview.parts')}
         {/if}
       </div>
-      <a href="./{index}">
+      <a href="./exercise/{index}">
         {$t('courses.course-overview.start-lesson')}
       </a>
+      <a href="./{index}">explanation (WIP) </a>
     </div>
   {/each}
 </div>

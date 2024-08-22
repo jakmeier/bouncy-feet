@@ -1,6 +1,8 @@
 use super::parsing::ParseFileError;
 use super::{parsing, StepInfo};
 use crate::intern::dance_collection::DanceCollection;
+use crate::{DetectionResult, Tracker};
+use std::rc::Rc;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 #[wasm_bindgen]
@@ -62,6 +64,12 @@ impl Course {
     pub fn featured_step(&self) -> Option<crate::StepInfo> {
         crate::step_by_id(self.featured_step_id.clone(), false)
     }
+
+    pub fn tracker(&self, lesson_index: usize) -> Option<Tracker> {
+        self.lessons
+            .get(lesson_index)
+            .map(|lesson| lesson.tracker(self.collection.clone()))
+    }
 }
 
 #[wasm_bindgen]
@@ -84,6 +92,19 @@ impl Lesson {
     #[wasm_bindgen(getter, js_name = "iconUrl")]
     pub fn icon_url(&self) -> String {
         self.icon.clone()
+    }
+}
+
+impl Lesson {
+    pub(crate) fn tracker(&self, db: impl Into<Rc<DanceCollection>>) -> crate::Tracker {
+        let first_step = self
+            .parts
+            .first()
+            .expect("no step in lesson to track")
+            .step_info
+            .clone();
+        let intermediate_result = DetectionResult::init_for_unique_step_tracker(first_step);
+        Tracker::new(db, Some(intermediate_result))
     }
 }
 

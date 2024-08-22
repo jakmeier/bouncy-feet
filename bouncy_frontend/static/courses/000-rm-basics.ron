@@ -53,6 +53,7 @@
       icon: "todo.svg",
       parts: [
         (step: "flat-man-3-pause", bpms: [60, 90]),
+        (step: "flat-man-2-2", bpms: [60, 90]),
         (step: "flat-man", bpms: [60, 90]),
       ],
     ),
@@ -70,18 +71,18 @@
       name: "Run in place",
       id: "run-in-place",
       keyframes: [
-        (pose: "in-place-left-up", orientation: ToCamera, jump_height: 0.05),
         (pose: "in-place-right-up", orientation: ToCamera, jump_height: 0.05),
+        (pose: "in-place-left-up", orientation: ToCamera, jump_height: 0.05),
       ],
     ),
     (
       name: "Double run in place",
       id: "double-run-in-place",
       keyframes: [
-        (pose: "in-place-left-up", orientation: ToCamera, jump_height: 0.05),
-        (pose: "in-place-left-up", orientation: ToCamera, jump_height: 0.05),
         (pose: "in-place-right-up", orientation: ToCamera, jump_height: 0.05),
         (pose: "in-place-right-up", orientation: ToCamera, jump_height: 0.05),
+        (pose: "in-place-left-up", orientation: ToCamera, jump_height: 0.05),
+        (pose: "in-place-left-up", orientation: ToCamera, jump_height: 0.05),
       ],
     ),
     (
@@ -116,6 +117,20 @@
         (pose: "centered-sideway", orientation: Right, jump_height: 0.05),
         (pose: "centered-sideway", orientation: Right, jump_height: 0.05),
         (pose: "left-forward", orientation: Right, jump_height: 0.05),
+      ],
+    ),
+    (
+      name: "Flat man 2-2",
+      id: "flat-man-2-2",
+      keyframes: [
+        (pose: "right-forward", orientation: Right, jump_height: 0.05),
+        (pose: "centered-sideway", orientation: Right, jump_height: 0.05),
+        (pose: "left-forward", orientation: Right, jump_height: 0.05),
+        (pose: "centered-sideway", orientation: Right, jump_height: 0.05),
+        (pose: "centered-sideway", orientation: Right, jump_height: 0.05),
+        (pose: "centered-sideway", orientation: Right, jump_height: 0.05),
+        (pose: "centered-sideway", orientation: Right, jump_height: 0.05),
+        (pose: "centered-sideway", orientation: Right, jump_height: 0.05),
       ],
     ),
     (

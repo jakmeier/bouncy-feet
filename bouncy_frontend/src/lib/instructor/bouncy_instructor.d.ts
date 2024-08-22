@@ -133,6 +133,11 @@ export class Course {
 */
   featuredStep(): StepInfo | undefined;
 /**
+* @param {number} lesson_index
+* @returns {Tracker | undefined}
+*/
+  tracker(lesson_index: number): Tracker | undefined;
+/**
 */
   readonly explanation: string;
 /**
@@ -712,15 +717,6 @@ export class StepInfo {
 export class Tracker {
   free(): void;
 /**
-* @param {number} timestamp
-* @returns {ExportedFrame}
-*/
-  exportFrame(timestamp: number): ExportedFrame;
-/**
-* @returns {string}
-*/
-  exportKeypoints(): string;
-/**
 * Create a tracker for all known steps.
 */
   constructor();
@@ -829,6 +825,15 @@ export class Tracker {
 * @returns {Skeleton | undefined}
 */
   skeletonAt(timestamp: number): Skeleton | undefined;
+/**
+* @param {number} timestamp
+* @returns {ExportedFrame}
+*/
+  exportFrame(timestamp: number): ExportedFrame;
+/**
+* @returns {string}
+*/
+  exportKeypoints(): string;
 }
 /**
 */

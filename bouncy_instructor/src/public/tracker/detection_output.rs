@@ -39,7 +39,7 @@ impl DetectionResult {
         }
     }
 
-    pub(crate) fn for_unique_step_tracker(target_step: StepInfo) -> Self {
+    pub(crate) fn init_for_unique_step_tracker(target_step: StepInfo) -> Self {
         Self {
             steps: vec![],
             partial: None,

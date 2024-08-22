@@ -23,6 +23,7 @@
         },
         "lesson": {
             "title": "Lektion",
+            "steps-subtitle": "Schritte",
             "next-button": "Weiter",
             "start-button": "Übung beginnen",
             "stop-button": "Übung stoppen",

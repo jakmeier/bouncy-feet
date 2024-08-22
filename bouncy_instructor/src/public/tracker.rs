@@ -75,14 +75,22 @@ impl Default for Tracker {
 
 #[wasm_bindgen]
 impl Tracker {
-    /// Create a tracker for all known steps.
-    #[wasm_bindgen(constructor)]
-    pub fn new() -> Self {
+    pub(crate) fn new(
+        db: impl Into<Rc<DanceCollection>>,
+        intermediate_result: Option<DetectionResult>,
+    ) -> Self {
         Tracker {
-            db: crate::STATE.with_borrow(|state| Rc::clone(&state.db)),
-            intermediate_result: None,
+            db: db.into(),
+            intermediate_result,
             ..Default::default()
         }
+    }
+
+    /// Create a tracker for all known steps.
+    #[wasm_bindgen(constructor)]
+    pub fn new_from_global_collection() -> Self {
+        let db = crate::STATE.with_borrow(|state| Rc::clone(&state.db));
+        Tracker::new(db, None)
     }
 
     /// Track one specific step, by name, including its variations (with the same name).
@@ -99,11 +107,7 @@ impl Tracker {
             }
             Ok(())
         })?;
-        Ok(Tracker {
-            db: Rc::new(db),
-            intermediate_result: None,
-            ..Default::default()
-        })
+        Ok(Tracker::new(db, None))
     }
 
     /// Track one specific step, by ID, excluding its variations (with the same name).
@@ -120,11 +124,8 @@ impl Tracker {
         let step = db.step(&step_id).cloned().expect("just added the step");
         let step_info = StepInfo::from_step(step, &db);
 
-        Ok(Tracker {
-            db: Rc::new(db),
-            intermediate_result: Some(DetectionResult::for_unique_step_tracker(step_info)),
-            ..Default::default()
-        })
+        let intermediate_result = DetectionResult::init_for_unique_step_tracker(step_info);
+        Ok(Tracker::new(db, Some(intermediate_result)))
     }
 
     pub fn clear(&mut self) {
