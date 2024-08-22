@@ -48,7 +48,8 @@
   @media (min-width: 730px) {
     main {
       max-width: 720px;
-      margin: auto;
+      /* !important to overrule the inline style */
+      margin: auto !important;
     }
   }
 </style>

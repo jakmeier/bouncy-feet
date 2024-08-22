@@ -12,7 +12,11 @@
   function buildTabs(features) {
     const tabs = [];
     tabs.push({ label: $t('home.nav'), icon: 'home', route: `${base}/` });
-    tabs.push({ label: $t('courses.nav'), icon: 'school', route: `${base}/courses` });
+    tabs.push({
+      label: $t('courses.nav'),
+      icon: 'school',
+      route: `${base}/courses`,
+    });
     if (features.enableFreestyleRecording) {
       tabs.push({
         label: $t('record.nav'),
@@ -37,29 +41,36 @@
   }
 </script>
 
-<nav class="navbar" style="height:{height}px">
-  {#each tabs as { label, route, icon }}
-    <a
-      class="tab"
-      class:active-tab={$page.url.pathname === route}
-      href={route}
-      title={label}
-    >
-      <span class="material-symbols-outlined">{icon}</span>
-    </a>
-  {/each}
-</nav>
+<div class="nav-background">
+  <nav class="navbar" style="height:{height}px">
+    {#each tabs as { label, route, icon }}
+      <a
+        class="tab"
+        class:active-tab={$page.url.pathname === route}
+        href={route}
+        title={label}
+      >
+        <span class="material-symbols-outlined">{icon}</span>
+      </a>
+    {/each}
+  </nav>
+</div>
 
 <style>
-  .navbar {
-    display: flex;
-    flex-flow: row;
-    justify-content: space-around;
+  .nav-background {
     overflow: hidden;
     background-color: var(--theme-neutral-dark);
     position: fixed;
     bottom: 0;
     width: 100%;
+  }
+
+  .navbar {
+    max-width: 720px;
+    margin: auto;
+    display: flex;
+    flex-flow: row;
+    justify-content: space-around;
   }
 
   a.tab {
