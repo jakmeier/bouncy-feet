@@ -101,6 +101,10 @@
         "general-hint": "Get ready! Find a spot with enough space to dance and then place the phone such that you can see the screen and the camera can see you.",
         "no-upload-hint": "Hint: The recording is evaluated on your device and never uploaded or shared with the developers.",
         "download": "save",
+        "bpm-tap-button": "Touch on beat of your music to synchronize the tracker",
+        "estimated-bpm-label": "estimated BPM",
+        "estimate-bpm-hint": "You have to tap the button to detect the beat before starting the exercise.",
+        "prepare-title": "Prepare dance tracking",
         "settings": {
             "title": "Settings",
             "enable-tracking": "Tracking",
@@ -157,5 +161,8 @@
             "left-forward": "Left leg forward",
             "left-out": "Left leg outwards"
         }
+    },
+    "common": {
+        "hint-popup-title": "Hint"
     }
 }

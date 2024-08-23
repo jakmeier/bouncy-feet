@@ -4,6 +4,8 @@
   import { getContext, setContext, tick } from 'svelte';
   import LiveRecording from '$lib/components/record/LiveRecording.svelte';
   import { Tracker } from '$lib/instructor/bouncy_instructor';
+  import BeatSelector from '$lib/components/record/BeatSelector.svelte';
+  import Popup from '$lib/components/ui/Popup.svelte';
 
   const { getCourse } = getContext('courses');
 
@@ -20,6 +22,14 @@
   let recordingStart = undefined;
   /** @type {number | undefined} */
   let recordingEnd = undefined;
+
+  /** @type {number } */
+  let bpmDetectionCounter;
+  /** @type {number } */
+  let beatStart;
+  $: beatDetected = bpmDetectionCounter >= 3;
+  /** @type {import('svelte/store').Writable<boolean>} */
+  let showHint;
 
   /** @type {() => any}*/
   let startCamera;
@@ -70,8 +80,15 @@
 
 <div class="outer">
   {#if !live}
-    <p>TODO: tap to select bpm and sync to beat</p>
-    <button class="light" on:click={start}>
+    <BeatSelector
+      bind:bpm
+      bind:counter={bpmDetectionCounter}
+      bind:lastTap={beatStart}
+    ></BeatSelector>
+    <button
+      class={beatDetected ? 'light' : 'locked'}
+      on:click={beatDetected ? start : () => showHint.set(true)}
+    >
       <span class="material-symbols-outlined button"> play_arrow </span>
       <p>{$t('courses.lesson.start-button')}</p>
     </button>
@@ -85,7 +102,7 @@
       bind:recordingEnd
       videoOpacity={0.5}
       enableLiveAvatar={true}
-      enableInstructorAvatar={false}
+      enableInstructorAvatar={true}
       slowInstructor={false}
     ></LiveRecording>
 
@@ -95,6 +112,10 @@
     </button>
   {/if}
 </div>
+
+<Popup bind:isOpen={showHint} showOkButton title={'common.hint-popup-title'}>
+  {$t('record.estimate-bpm-hint')}
+</Popup>
 
 <style>
   .outer {
@@ -107,5 +128,11 @@
   }
   button span {
     font-size: 42px;
+  }
+  .locked {
+    background-color: var(--theme-neutral-gray);
+    color: var(--theme-neutral-dark);
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 </style>
