@@ -5,7 +5,7 @@
   import Avatar from '$lib/components/avatar/Avatar.svelte';
   import { hideNavigation, wideView } from '$lib/stores/UiState';
   import { getContext, onMount } from 'svelte';
-  import { I, landmarksToKeypoints } from '$lib/pose';
+  import { I, landmarksToKeypoints, PoseDetection } from '$lib/pose';
   import BackgroundTask from '../BackgroundTask.svelte';
   import { writable } from 'svelte/store';
   import {
@@ -44,11 +44,17 @@
   export let enableInstructorAvatar = false;
   export let videoOpacity = 0.0;
   export let slowInstructor = false;
+  /** @type {number|null} */
+  export let beatStart = null;
 
   const poseCtx = getContext('pose');
   let tracker = getContext('tracker').tracker;
   $: $hideNavigation = cameraOn;
   $: $wideView = cameraOn;
+
+  $: if (beatStart && dataListener) {
+    tracker.alignBeat(beatStart - dataListener.tZero);
+  }
 
   /** @type {Camera} */
   let camera;
@@ -60,7 +66,7 @@
 
   /** @type {import("@mediapipe/tasks-vision").NormalizedLandmark[]} */
   let landmarks = [];
-  /** @type {{ trackFrame: (arg0: HTMLVideoElement) => void; }} */
+  /** @type {PoseDetection} */
   let dataListener;
 
   /** @type {number} */

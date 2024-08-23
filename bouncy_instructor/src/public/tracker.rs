@@ -3,6 +3,7 @@ mod frame_output;
 mod pose_output;
 mod step_output;
 
+use detection_output::DetectionFailureReason;
 pub use detection_output::DetectionResult;
 pub use pose_output::PoseApproximation;
 pub use step_output::DetectedStep;
@@ -33,11 +34,13 @@ pub struct Tracker {
     pub(crate) bpm: f32,
     pub(crate) error_threshold: f32,
     // todo: head and tail for what was already detected, to not re-compute all every time
-    // todo: active steps filter instead of global steps
     /// (experimenting with live instructor, I probably want to change this when cleaning up the impl)
     /// only set for unique step tracking
     pub(crate) intermediate_result: Option<DetectionResult>,
     pub(crate) last_error: Option<(PoseHint, PoseApproximation)>,
+
+    /// When this is set, pose detection happens on the beat only.
+    pub(crate) beat_alignment: Option<Timestamp>,
 }
 
 #[wasm_bindgen]
@@ -69,6 +72,7 @@ impl Default for Tracker {
             error_threshold: 0.05,
             intermediate_result: None,
             last_error: None,
+            beat_alignment: None,
         }
     }
 }
@@ -165,6 +169,11 @@ impl Tracker {
         self.bpm = bpm;
     }
 
+    #[wasm_bindgen(js_name = alignBeat)]
+    pub fn align_beat(&mut self, first_beat: Timestamp) {
+        self.beat_alignment = Some(first_beat);
+    }
+
     #[wasm_bindgen(js_name = setErrorThreshold)]
     pub fn set_error_threshold(&mut self, error_threshold: f32) {
         self.error_threshold = error_threshold;
@@ -210,8 +219,23 @@ impl Tracker {
         let start_t = last_step.map_or(0, |step| step.end);
 
         // skip at least a quarter beat
-        if end_t < start_t + ((1000.0 / (self.bpm * 4.0 / 60.0)).round() as u32) {
-            return prev_detection.clone();
+        let min_delay = (1000.0 / (self.bpm * 4.0 / 60.0)).round() as u32;
+        if end_t < start_t + min_delay {
+            return prev_detection
+                .clone()
+                .with_failure_reason(DetectionFailureReason::TooEarly);
+        }
+
+        // check we are on beat, if aligned to beat
+        if let Some(first_beat) = self.beat_alignment {
+            let half_beat = 1000.0 / (self.bpm * 2.0 / 60.0);
+            let t_total = end_t - first_beat;
+            let relative_beat_distance = (t_total as f32 / half_beat).fract();
+            if relative_beat_distance > 0.2 {
+                return prev_detection
+                    .clone()
+                    .with_failure_reason(DetectionFailureReason::NotOnBeat);
+            }
         }
 
         if let Some(tracked_skeleton) = self.skeletons.last() {
@@ -272,7 +296,12 @@ impl Tracker {
             }
         }
 
-        self.intermediate_result.clone().unwrap()
+        let mut detection_result = self.intermediate_result.clone().unwrap();
+        if self.last_error.is_some() {
+            detection_result =
+                detection_result.with_failure_reason(DetectionFailureReason::WrongPose)
+        }
+        detection_result
     }
 
     #[wasm_bindgen(js_name = poseHint)]

@@ -50,11 +50,9 @@
     live = true;
     await tick();
     startCamera();
-    // await startRecording();
   }
 
   function stop() {
-    // await startRecording();
     stopCamera();
     tracker?.clear();
     live = false;
@@ -76,6 +74,16 @@
     }
   }
   loadCourse();
+
+  function updateBeat() {
+    if (tracker) {
+      tracker.setBpm(bpm);
+    } else {
+      console.warn('tracker not set');
+    }
+  }
+
+  $: beatStart, updateBeat();
 </script>
 
 <div class="outer">
@@ -100,6 +108,7 @@
       bind:endRecording
       bind:recordingStart
       bind:recordingEnd
+      {beatStart}
       videoOpacity={0.5}
       enableLiveAvatar={true}
       enableInstructorAvatar={true}

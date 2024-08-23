@@ -285,7 +285,7 @@ mod tests {
     ) {
         setup();
 
-        let mut tracker = Tracker::new();
+        let mut tracker = Tracker::new_from_global_collection();
         tracker.bpm = 60.0;
 
         for (degree, time) in degrees.iter().zip(times) {

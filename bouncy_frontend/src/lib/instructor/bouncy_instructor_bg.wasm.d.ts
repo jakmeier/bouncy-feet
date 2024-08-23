@@ -84,6 +84,7 @@ export function steps(a: number): void;
 export function stepsByName(a: number, b: number, c: number): void;
 export function stepsBySource(a: number, b: number, c: number): void;
 export function tracker_addKeypoints(a: number, b: number, c: number): number;
+export function tracker_alignBeat(a: number, b: number): void;
 export function tracker_allPoseErrors(a: number, b: number, c: number): void;
 export function tracker_bestFitPose(a: number, b: number, c: number): number;
 export function tracker_clear(a: number): void;

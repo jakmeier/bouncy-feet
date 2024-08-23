@@ -17,6 +17,17 @@ pub struct DetectionResult {
     pub(crate) partial: Option<DetectedStep>,
     /// The expected step for unique step tracking
     pub(crate) target_step: Option<StepInfo>,
+    /// If the newest detection was negative, this fields contains information
+    /// about the reason.
+    pub(crate) failure_reason: Option<DetectionFailureReason>,
+}
+
+#[derive(Debug, Clone)]
+#[wasm_bindgen]
+pub enum DetectionFailureReason {
+    TooEarly = 1,
+    NotOnBeat = 2,
+    WrongPose = 3,
 }
 
 #[wasm_bindgen]
@@ -36,6 +47,7 @@ impl DetectionResult {
             steps,
             partial: None,
             target_step: None,
+            failure_reason: None,
         }
     }
 
@@ -44,6 +56,12 @@ impl DetectionResult {
             steps: vec![],
             partial: None,
             target_step: Some(target_step),
+            failure_reason: None,
         }
+    }
+
+    pub(crate) fn with_failure_reason(mut self, reason: DetectionFailureReason) -> Self {
+        self.failure_reason = Some(reason);
+        self
     }
 }

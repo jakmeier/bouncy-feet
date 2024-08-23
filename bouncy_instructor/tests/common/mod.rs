@@ -33,7 +33,7 @@ pub(crate) fn load_static_files() {
 
 pub(crate) fn setup_tracker() -> Tracker {
     load_static_files();
-    Tracker::new()
+    Tracker::new_from_global_collection()
 }
 
 pub(crate) fn setup_step_tracker(step_name: &str) -> Tracker {
