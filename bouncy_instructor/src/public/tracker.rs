@@ -8,7 +8,7 @@ pub use pose_output::PoseApproximation;
 pub use step_output::DetectedStep;
 
 use crate::intern::dance_collection::{DanceCollection, ForeignCollectionError};
-use crate::intern::dance_detector::DanceDetector;
+use crate::intern::dance_detector::{DanceDetector, DetectionState};
 use crate::intern::skeleton_3d::Skeleton3d;
 use crate::keypoints::{Cartesian3d, Keypoints};
 use crate::skeleton::{Cartesian2d, Skeleton};
@@ -54,13 +54,10 @@ impl Default for Tracker {
 
 #[wasm_bindgen]
 impl Tracker {
-    pub(crate) fn new(
-        db: impl Into<Rc<DanceCollection>>,
-        intermediate_result: Option<DetectionResult>,
-    ) -> Self {
+    pub(crate) fn new(db: impl Into<Rc<DanceCollection>>, target_step: Option<StepInfo>) -> Self {
         Tracker {
             db: db.into(),
-            detector: DanceDetector::new(intermediate_result),
+            detector: DanceDetector::new(target_step),
             ..Default::default()
         }
     }
@@ -103,8 +100,7 @@ impl Tracker {
         let step = db.step(&step_id).cloned().expect("just added the step");
         let step_info = StepInfo::from_step(step, &db);
 
-        let intermediate_result = DetectionResult::init_for_unique_step_tracker(step_info);
-        Ok(Tracker::new(db, Some(intermediate_result)))
+        Ok(Tracker::new(db, Some(step_info)))
     }
 
     pub fn clear(&mut self) {
@@ -187,7 +183,7 @@ impl Tracker {
 
     #[wasm_bindgen(js_name = poseHint)]
     pub fn pose_hint(&self) -> PoseHint {
-        match &self.detector.last_error {
+        match &self.detector.detected.last_error {
             Some((hint, _err)) => *hint,
             None => PoseHint::DontKnow,
         }
@@ -196,9 +192,15 @@ impl Tracker {
     #[wasm_bindgen(js_name = currentPoseError)]
     pub fn current_pose_error(&self) -> Option<PoseApproximation> {
         self.detector
+            .detected
             .last_error
             .as_ref()
             .map(|(_hint, err)| err.clone())
+    }
+
+    #[wasm_bindgen(getter, js_name = detectionState)]
+    pub fn detection_state(&self) -> DetectionState {
+        self.detector.detection_state
     }
 
     /// Return a skeleton that's expected next.
@@ -222,18 +224,14 @@ impl Tracker {
 
     #[wasm_bindgen(js_name = numDetectedPoses)]
     pub fn num_detected_poses(&self) -> u32 {
-        if let Some(detection) = &self.detector.intermediate_result {
-            let mut out = 0;
-            for step in &detection.steps {
-                out += step.poses.len();
-            }
-            if let Some(partial) = &detection.partial {
-                out += partial.poses.len();
-            }
-            out as u32
-        } else {
-            0
+        let mut out = 0;
+        for step in &self.detector.detected.steps {
+            out += step.poses.len();
         }
+        if let Some(partial) = &self.detector.detected.partial {
+            out += partial.poses.len();
+        }
+        out as u32
     }
 
     #[wasm_bindgen(js_name = hipPosition)]

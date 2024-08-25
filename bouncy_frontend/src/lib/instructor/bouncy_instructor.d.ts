@@ -65,6 +65,19 @@ export function dances(): (DanceInfo)[];
 */
 export function danceBuilderFromDance(dance_id: string): DanceBuilder;
 /**
+*/
+export enum DetectionFailureReason {
+  TooEarly = 1,
+  NotOnBeat = 2,
+  WrongPose = 3,
+  NoData = 4,
+}
+/**
+*/
+export enum DetectionState {
+  Init = 1,
+}
+/**
 * Best guess for what the dancer needs to change to fit the pose.
 */
 export enum PoseHint {
@@ -72,14 +85,6 @@ export enum PoseHint {
   LeftRight = 1,
   ZOrder = 2,
   WrongDirection = 3,
-}
-/**
-*/
-export enum DetectionFailureReason {
-  TooEarly = 1,
-  NotOnBeat = 2,
-  WrongPose = 3,
-  NoData = 4,
 }
 /**
 */
@@ -858,6 +863,9 @@ export class Tracker {
 * @returns {string}
 */
   exportKeypoints(): string;
+/**
+*/
+  readonly detectionState: DetectionState;
 }
 /**
 */

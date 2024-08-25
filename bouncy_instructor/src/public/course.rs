@@ -1,7 +1,7 @@
 use super::parsing::ParseFileError;
 use super::{parsing, StepInfo};
 use crate::intern::dance_collection::DanceCollection;
-use crate::{DetectionResult, Tracker};
+use crate::Tracker;
 use std::rc::Rc;
 use wasm_bindgen::prelude::wasm_bindgen;
 
@@ -103,8 +103,7 @@ impl Lesson {
             .expect("no step in lesson to track")
             .step_info
             .clone();
-        let intermediate_result = DetectionResult::init_for_unique_step_tracker(first_step);
-        Tracker::new(db, Some(intermediate_result))
+        Tracker::new(db, Some(first_step))
     }
 }
 

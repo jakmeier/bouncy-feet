@@ -1,7 +1,7 @@
 use crate::intern::dance_collection::DanceCollection;
 use crate::public::tracker::{DetectionResult, PoseApproximation};
 use crate::tracker::DetectedStep;
-use crate::Tracker;
+use crate::{StepInfo, Tracker};
 
 impl DetectedStep {
     pub(crate) fn new(step_name: String, poses: Vec<PoseApproximation>) -> Self {
@@ -23,26 +23,22 @@ impl DetectedStep {
 
 impl DetectionResult {
     pub(crate) fn add_pose(&mut self, pose: PoseApproximation) {
-        if self.partial.is_none() {
-            self.partial = Default::default();
+        if let Some(partial) = &mut self.partial {
+            partial.poses.push(pose);
+            partial.update_stats();
+        } else {
+            let mut new_partial = DetectedStep::new("unknown".to_owned(), vec![pose]);
+            new_partial.update_stats();
+            self.partial = Some(new_partial);
         }
-
-        let partial = self.partial.get_or_insert_with(|| {
-            let step_name = self
-                .target_step
-                .as_ref()
-                .map(|s| s.name())
-                .expect("add_pose requires target step");
-            DetectedStep::new(step_name.to_string(), vec![])
-        });
-        partial.poses.push(pose);
-        partial.update_stats();
     }
 
-    pub(crate) fn update_partial(&mut self) {
-        if let (Some(target), Some(partial)) = (&mut self.target_step, &mut self.partial) {
+    pub(crate) fn match_step(&mut self, target_step: &StepInfo) {
+        if let (target, Some(partial)) = (target_step, &mut self.partial) {
             if target.skeletons.len() == partial.poses.len() {
-                self.steps.push(self.partial.take().unwrap());
+                let mut full_step = self.partial.take().unwrap();
+                full_step.step_name = target_step.name();
+                self.steps.push(full_step);
             }
         }
     }
@@ -277,7 +273,7 @@ mod tests {
         setup();
 
         let mut tracker = Tracker::new_from_global_collection();
-        tracker.bpm = 60.0;
+        tracker.detector.bpm = 60.0;
 
         for (degree, time) in degrees.iter().zip(times) {
             match degree {

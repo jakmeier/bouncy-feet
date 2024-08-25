@@ -1,6 +1,4 @@
-use crate::StepInfo;
-
-use super::DetectedStep;
+use super::{DetectedStep, PoseApproximation};
 use wasm_bindgen::prelude::wasm_bindgen;
 
 /// Result of a step or dance detection.
@@ -15,12 +13,13 @@ pub struct DetectionResult {
     pub(crate) steps: Vec<DetectedStep>,
     /// partially detected step
     pub(crate) partial: Option<DetectedStep>,
-    /// The expected step for unique step tracking
-    pub(crate) target_step: Option<StepInfo>,
     /// If the newest detection was negative, this fields contains information
     /// about the reason.
     #[wasm_bindgen(js_name = "failureReason")]
     pub failure_reason: Option<DetectionFailureReason>,
+    /// This contains computed details about the mismatched pose, if the latest
+    /// detection failed because of it.
+    pub(crate) last_error: Option<(PoseHint, PoseApproximation)>,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -58,17 +57,8 @@ impl DetectionResult {
         Self {
             steps,
             partial: None,
-            target_step: None,
             failure_reason: None,
-        }
-    }
-
-    pub(crate) fn init_for_unique_step_tracker(target_step: StepInfo) -> Self {
-        Self {
-            steps: vec![],
-            partial: None,
-            target_step: Some(target_step),
-            failure_reason: None,
+            last_error: None,
         }
     }
 

@@ -13,18 +13,28 @@ type Timestamp = u32;
 /// to be used by a Tracker to match tracked skeletons to it.
 #[wasm_bindgen]
 pub(crate) struct DanceDetector {
+    // config
     pub(crate) bpm: f32,
     pub(crate) error_threshold: f32,
-    // todo: head and tail for what was already detected, to not re-compute all every time
-    /// (experimenting with live instructor, I probably want to change this when cleaning up the impl)
-    /// only set for unique step tracking
-    pub(crate) intermediate_result: Option<DetectionResult>,
-    pub(crate) last_error: Option<(PoseHint, PoseApproximation)>,
-
     /// When this is set, pose detection happens on the beat only.
     pub(crate) beat_alignment: Option<Timestamp>,
     /// Enforce that a pose is evaluated on beat, regardless of how well it matches.
     pub(crate) force_beat: bool,
+    /// The expected step for unique step tracking
+    pub(crate) target_step: Option<StepInfo>,
+
+    // state
+    /// Data about detection so far.
+    pub(crate) detected: DetectionResult,
+    /// State machine of the detector.
+    pub(crate) detection_state: DetectionState,
+}
+
+#[wasm_bindgen]
+#[derive(Clone, Copy)]
+pub enum DetectionState {
+    // TODO: add different states for finding the initial pose, counting down, etc
+    Init = 1,
 }
 
 impl Default for DanceDetector {
@@ -32,28 +42,27 @@ impl Default for DanceDetector {
         Self {
             bpm: 120.0,
             error_threshold: 0.05,
-            intermediate_result: None,
-            last_error: None,
+            detected: DetectionResult::default(),
+            target_step: None,
             beat_alignment: None,
             force_beat: false,
+            detection_state: DetectionState::Init,
         }
     }
 }
 
 impl DanceDetector {
-    pub(crate) fn new(intermediate_result: Option<DetectionResult>) -> Self {
+    pub(crate) fn new(target_step: Option<StepInfo>) -> Self {
         Self {
-            intermediate_result,
+            target_step,
             ..Default::default()
         }
     }
 
     pub(crate) fn clear(&mut self) {
-        if let Some(intermediate) = self.intermediate_result.as_mut() {
-            intermediate.partial = None;
-            intermediate.steps.clear();
-        }
-        self.last_error = None;
+        self.detected.partial = None;
+        self.detected.steps.clear();
+        self.detected.last_error = None;
     }
 
     /// Take a previous detection and try adding one more pose to it.
@@ -63,10 +72,7 @@ impl DanceDetector {
         skeleton: &Skeleton3d,
         now: Timestamp,
     ) -> DetectionResult {
-        let prev_detection = self
-            .intermediate_result
-            .as_ref()
-            .expect("requires intermediate_result");
+        let prev_detection = &mut self.detected;
 
         let end_t = now;
         let last_step = prev_detection
@@ -123,7 +129,7 @@ impl DanceDetector {
         };
         if !has_z_error && error < self.error_threshold {
             self.add_pose(pose_approximation);
-            self.last_error = None;
+            self.detected.last_error = None;
         } else {
             let hint = {
                 if has_z_error {
@@ -142,11 +148,11 @@ impl DanceDetector {
                     }
                 }
             };
-            self.last_error = Some((hint, pose_approximation));
+            self.detected.last_error = Some((hint, pose_approximation));
         }
 
-        let mut detection_result = self.intermediate_result.clone().unwrap();
-        if let Some((_hint, pose_approximation)) = &self.last_error {
+        let mut detection_result = self.detected.clone();
+        if let Some((_hint, pose_approximation)) = &self.detected.last_error {
             // Provide extra information about why there is an error, which is a
             // high pose error score if we haven't returned earlier.
             detection_result =
@@ -166,19 +172,13 @@ impl DanceDetector {
     /// returns a beat number
     /// (experimenting with live instructor, I probably want to change this when cleaning up the impl)
     pub(crate) fn expected_pose_beat(&self) -> usize {
-        let detection = self
-            .intermediate_result
+        let full = self.detected.steps.len();
+        self.target_step
             .as_ref()
-            .expect("requires intermediate_result");
+            .expect("must have target step")
+            .beats();
 
-        let full = detection.steps.len()
-            * detection
-                .target_step
-                .as_ref()
-                .expect("must have target step")
-                .beats();
-
-        let partial = if let Some(partial_step) = &detection.partial {
+        let partial = if let Some(partial_step) = &self.detected.partial {
             partial_step.poses.len()
         } else {
             0
@@ -190,19 +190,13 @@ impl DanceDetector {
     ///
     /// (experimenting with live instructor, I probably want to change this when cleaning up the impl)
     pub(crate) fn tracked_step(&self) -> StepInfo {
-        let detection = self
-            .intermediate_result
-            .as_ref()
-            .expect("requires intermediate_result");
-        detection.target_step.clone().expect("requires target_step")
+        self.target_step.clone().expect("requires target_step")
     }
 
     pub(crate) fn add_pose(&mut self, pose: PoseApproximation) {
-        let detection = self
-            .intermediate_result
-            .as_mut()
-            .expect("requires intermediate_result");
-        detection.add_pose(pose);
-        detection.update_partial();
+        self.detected.add_pose(pose);
+        if let Some(target_step) = &self.target_step {
+            self.detected.match_step(target_step);
+        }
     }
 }
