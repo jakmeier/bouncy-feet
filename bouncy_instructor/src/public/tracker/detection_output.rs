@@ -25,10 +25,16 @@ pub struct DetectionResult {
 #[derive(Debug, Clone, Copy)]
 #[wasm_bindgen]
 pub enum DetectionFailureReason {
+    /// The last match was too recent to have another match.
     TooEarly = 1,
+    /// The timing is off.
     NotOnBeat = 2,
+    /// Detection did not match an expected pose.
     WrongPose = 3,
+    /// No data to run detection against.
     NoData = 4,
+    /// Currently in a state that does not detect.
+    DetectionDisabled = 5,
 }
 
 /// Best guess for what the dancer needs to change to fit the pose.

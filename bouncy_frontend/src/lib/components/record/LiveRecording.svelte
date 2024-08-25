@@ -119,7 +119,7 @@
       if (t > 50) console.debug(`trackFrame took ${t}ms`);
 
       const before = tracker.numDetectedPoses();
-      let detectionResult = tracker.detectNextPose();
+      let detectionResult = tracker.runDetection();
       if (tracker.numDetectedPoses() > before) {
         onStepDetection(detectionResult);
       }
@@ -143,8 +143,10 @@
     if (result.landmarks && result.landmarks.length >= 1) {
       landmarks = result.landmarks[0];
       const kp = landmarksToKeypoints(result.landmarks[0]);
-      tracker.addKeypoints(kp, timestamp);
-      recordingEnd = timestamp;
+      if (kp.fullyVisible) {
+        tracker.addKeypoints(kp, timestamp);
+        recordingEnd = timestamp;
+      }
     }
     // TODO(performance): do this less often
     onVideoResized();

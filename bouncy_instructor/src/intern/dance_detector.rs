@@ -33,8 +33,17 @@ pub(crate) struct DanceDetector {
 #[wasm_bindgen]
 #[derive(Clone, Copy)]
 pub enum DetectionState {
-    // TODO: add different states for finding the initial pose, counting down, etc
+    /// Neutral state, not detecting anything.
+    ///
+    /// TODO: is this needed?
     Init = 1,
+    /// Dance is positioning themselves, detecting the idle position.
+    Positioning = 2,
+    /// Tracking current movements.
+    LiveTracking = 3,
+    /// No longer tracking but the results of the previous tracking are
+    /// available.
+    TrackingDone = 4,
 }
 
 impl Default for DanceDetector {
@@ -46,7 +55,7 @@ impl Default for DanceDetector {
             target_step: None,
             beat_alignment: None,
             force_beat: false,
-            detection_state: DetectionState::Init,
+            detection_state: DetectionState::Positioning,
         }
     }
 }

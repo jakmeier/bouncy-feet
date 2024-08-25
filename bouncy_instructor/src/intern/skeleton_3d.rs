@@ -340,6 +340,7 @@ mod tests {
                 elbow: Cartesian3d::new(1.0, 2.0, 1.0),
                 wrist: Cartesian3d::new(0.0, 3.0, 1.0),
             },
+            fully_visible: true,
         }
     }
 }

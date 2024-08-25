@@ -156,7 +156,7 @@ impl Tracker {
     /// There is no re-use or consistency between calls. It always starts at 0
     /// and computes the global best fit.
     ///
-    /// Use [`Tracker::detect_next_pose`] for incremental detection.
+    /// Use [`Tracker::run_detection`] for incremental detection.
     #[wasm_bindgen(js_name = detectDance)]
     pub fn detect_dance(&self) -> DetectionResult {
         let mut start = 0;
@@ -171,14 +171,49 @@ impl Tracker {
         DetectionResult::new(out)
     }
 
-    #[wasm_bindgen(js_name = detectNextPose)]
-    pub fn detect_next_pose(&mut self) -> DetectionResult {
-        if let Some(skeleton) = self.skeletons.last() {
-            let now = *self.timestamps.last().unwrap_or(&0);
-            self.detector.detect_next_pose(&self.db, skeleton, now)
-        } else {
-            DetectionResult::default().with_failure_reason(DetectionFailureReason::NoData)
+    #[wasm_bindgen(js_name = runDetection)]
+    pub fn run_detection(&mut self) -> DetectionResult {
+        match self.detector.detection_state {
+            DetectionState::Init => (),
+            DetectionState::Positioning => {
+                // TODO: return match to idle step for first step
+                if let Some(target) = &self.detector.target_step {
+                    if let Some(skeleton) = self.skeletons.last() {
+                        let resting_pose_idx = if target.skeletons[0].sideway {
+                            self.db
+                                .pose_by_id("standing-straight-side")
+                                .expect("missing resting pose")
+                        } else {
+                            self.db
+                                .pose_by_id("standing-straight-front")
+                                .expect("missing side resting pose")
+                        };
+                        let resting_pose = &self.db.poses()[resting_pose_idx];
+                        let error_details =
+                            resting_pose.error(skeleton.angles(), skeleton.positions());
+                        // self.detector.detected.last_error = Some((None, error));
+                        if error_details.error_score() < 0.001 {
+                            // TODO: first go to counting down, which should
+                            // emit some sort of timed audio event for the JS
+                            // side to pick up, only start tracking after that
+                            self.detector.detection_state = DetectionState::LiveTracking
+                        }
+                    }
+                }
+            }
+            DetectionState::LiveTracking => {
+                if let Some(skeleton) = self.skeletons.last() {
+                    let now = *self.timestamps.last().unwrap_or(&0);
+                    return self.detector.detect_next_pose(&self.db, skeleton, now);
+                } else {
+                    return DetectionResult::default()
+                        .with_failure_reason(DetectionFailureReason::NoData);
+                }
+                // TODO: allow setting a timer
+            }
+            DetectionState::TrackingDone => (),
         }
+        DetectionResult::default().with_failure_reason(DetectionFailureReason::DetectionDisabled)
     }
 
     #[wasm_bindgen(js_name = poseHint)]

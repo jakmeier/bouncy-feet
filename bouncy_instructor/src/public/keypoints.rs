@@ -9,6 +9,9 @@ use wasm_bindgen::prelude::wasm_bindgen;
 pub struct Keypoints {
     pub left: Side,
     pub right: Side,
+    #[serde(default = "true_fn")]
+    #[wasm_bindgen(js_name = fullyVisible)]
+    pub fully_visible: bool,
 }
 
 #[wasm_bindgen(js_name = KeypointsSide)]
@@ -52,8 +55,12 @@ pub struct Cartesian3d {
 #[wasm_bindgen]
 impl Keypoints {
     #[wasm_bindgen(constructor)]
-    pub fn new(left: Side, right: Side) -> Self {
-        Self { left, right }
+    pub fn new(left: Side, right: Side, fully_visible: bool) -> Self {
+        Self {
+            left,
+            right,
+            fully_visible,
+        }
     }
 }
 
@@ -90,4 +97,8 @@ impl Cartesian3d {
     pub fn new(x: f32, y: f32, z: f32) -> Self {
         Self { x, y, z }
     }
+}
+
+fn true_fn() -> bool {
+    true
 }

@@ -41,7 +41,8 @@ export function landmarksToKeypoints(landmarks) {
         coordinate(I.RIGHT_ELBOW, landmarks),
         coordinate(I.RIGHT_WRIST, landmarks),
     );
-    return new Keypoints(left, right);
+    const fullyVisible = landmarks.find((landmark) => landmark.visibility < 0.5) === undefined;
+    return new Keypoints(left, right, fullyVisible);
 }
 
 export class PoseDetection {

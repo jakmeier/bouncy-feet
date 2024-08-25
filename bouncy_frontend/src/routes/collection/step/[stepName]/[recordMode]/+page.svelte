@@ -73,7 +73,7 @@
     stop();
     if (isLearnMode) {
       // Reuse all previous detections and show exactly that in the review.
-      detectedSteps = tracker.detectNextPose().steps();
+      detectedSteps = tracker.runDetection().steps();
     } else if (isTrainMode) {
       // FIXME: this below doesn't work as expected, needs more testing
       // In train mode, we want to find the best match after the fact, rather
@@ -84,7 +84,7 @@
       // .filter((step) => {
       //   step.error <= 0.5;
       // });
-      detectedSteps = tracker.detectNextPose().steps();
+      detectedSteps = tracker.runDetection().steps();
     }
     showSummary = true;
     sessionResult = userCtx.computeDanceStats(detectedSteps);

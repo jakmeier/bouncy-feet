@@ -65,19 +65,6 @@ export function dances(): (DanceInfo)[];
 */
 export function danceBuilderFromDance(dance_id: string): DanceBuilder;
 /**
-*/
-export enum DetectionFailureReason {
-  TooEarly = 1,
-  NotOnBeat = 2,
-  WrongPose = 3,
-  NoData = 4,
-}
-/**
-*/
-export enum DetectionState {
-  Init = 1,
-}
-/**
 * Best guess for what the dancer needs to change to fit the pose.
 */
 export enum PoseHint {
@@ -85,6 +72,53 @@ export enum PoseHint {
   LeftRight = 1,
   ZOrder = 2,
   WrongDirection = 3,
+}
+/**
+*/
+export enum DetectionFailureReason {
+/**
+* The last match was too recent to have another match.
+*/
+  TooEarly = 1,
+/**
+* The timing is off.
+*/
+  NotOnBeat = 2,
+/**
+* Detection did not match an expected pose.
+*/
+  WrongPose = 3,
+/**
+* No data to run detection against.
+*/
+  NoData = 4,
+/**
+* Currently in a state that does not detect.
+*/
+  DetectionDisabled = 5,
+}
+/**
+*/
+export enum DetectionState {
+/**
+* Netural state, not detecting anything.
+*
+* TODO: is this needed?
+*/
+  Init = 1,
+/**
+* Dance is positioning themselves, detecting the idle position.
+*/
+  Positioning = 2,
+/**
+* Tracking current movements.
+*/
+  LiveTracking = 3,
+/**
+* No longer tracking but the results of the previous tracking are
+* available.
+*/
+  TrackingDone = 4,
 }
 /**
 */
@@ -357,8 +391,12 @@ export class Keypoints {
 /**
 * @param {KeypointsSide} left
 * @param {KeypointsSide} right
+* @param {boolean} fully_visible
 */
-  constructor(left: KeypointsSide, right: KeypointsSide);
+  constructor(left: KeypointsSide, right: KeypointsSide, fully_visible: boolean);
+/**
+*/
+  fullyVisible: boolean;
 /**
 */
   left: KeypointsSide;
@@ -795,14 +833,14 @@ export class Tracker {
 * There is no re-use or consistency between calls. It always starts at 0
 * and computes the global best fit.
 *
-* Use [`Tracker::detect_next_pose`] for incremental detection.
+* Use [`Tracker::run_detection`] for incremental detection.
 * @returns {DetectionResult}
 */
   detectDance(): DetectionResult;
 /**
 * @returns {DetectionResult}
 */
-  detectNextPose(): DetectionResult;
+  runDetection(): DetectionResult;
 /**
 * @returns {PoseHint}
 */
