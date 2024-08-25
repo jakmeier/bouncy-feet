@@ -79,6 +79,7 @@ export enum DetectionFailureReason {
   TooEarly = 1,
   NotOnBeat = 2,
   WrongPose = 3,
+  NoData = 4,
 }
 /**
 */
@@ -204,6 +205,13 @@ export class DanceBuilder {
 * @returns {DanceInfo}
 */
   danceInfo(): DanceInfo;
+}
+/**
+* Contains all information about a dance to be detected and has an interface
+* to be used by a Tracker to match tracked skeletons to it.
+*/
+export class DanceDetector {
+  free(): void;
 }
 /**
 */
@@ -725,18 +733,10 @@ export class StepInfo {
   readonly variation: string;
 }
 /**
+* A Tracker gathers skeletons over time and passes it on to a DanceDetector.
 */
 export class Tracker {
   free(): void;
-/**
-* @param {number} timestamp
-* @returns {ExportedFrame}
-*/
-  exportFrame(timestamp: number): ExportedFrame;
-/**
-* @returns {string}
-*/
-  exportKeypoints(): string;
 /**
 * Create a tracker for all known steps.
 */
@@ -795,11 +795,6 @@ export class Tracker {
 */
   detectDance(): DetectionResult;
 /**
-* Take a previous detection and try adding one more pose to it.
-*
-* For now this only looks at the very last frame, but this is an
-* implementation detail. Callers should assume it reads everything since
-* the last detected step.
 * @returns {DetectionResult}
 */
   detectNextPose(): DetectionResult;
@@ -854,6 +849,15 @@ export class Tracker {
 * @returns {Skeleton | undefined}
 */
   skeletonAt(timestamp: number): Skeleton | undefined;
+/**
+* @param {number} timestamp
+* @returns {ExportedFrame}
+*/
+  exportFrame(timestamp: number): ExportedFrame;
+/**
+* @returns {string}
+*/
+  exportKeypoints(): string;
 }
 /**
 */

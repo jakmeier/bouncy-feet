@@ -55,7 +55,7 @@ impl Tracker {
             return None;
         }
         let end = end.min(self.timestamps.len());
-        let dt = 60_000.0 / self.bpm;
+        let dt = 60_000.0 / self.detector.bpm;
         let min_dt = (dt * 0.5).round() as u32;
         let max_dt = (dt * 1.5).round() as u32;
 
@@ -168,15 +168,6 @@ impl Tracker {
             }
         }
         result
-    }
-
-    pub(crate) fn add_pose(&mut self, pose: PoseApproximation) {
-        let detection = self
-            .intermediate_result
-            .as_mut()
-            .expect("requires intermediate_result");
-        detection.add_pose(pose);
-        detection.update_partial();
     }
 }
 

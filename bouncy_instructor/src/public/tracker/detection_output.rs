@@ -29,6 +29,17 @@ pub enum DetectionFailureReason {
     TooEarly = 1,
     NotOnBeat = 2,
     WrongPose = 3,
+    NoData = 4,
+}
+
+/// Best guess for what the dancer needs to change to fit the pose.
+#[wasm_bindgen]
+#[derive(Clone, Copy, Debug)]
+pub enum PoseHint {
+    DontKnow,
+    LeftRight,
+    ZOrder,
+    WrongDirection,
 }
 
 #[wasm_bindgen]

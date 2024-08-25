@@ -15,7 +15,7 @@ pub use dance_info::DanceInfo;
 pub use keypoints::{Keypoints, Side as KeypointsSide};
 use parsing::course_file::CourseFile;
 pub use step_info::StepInfo;
-pub use tracker::{DetectionResult, Tracker};
+pub use tracker::{DetectionFailureReason, DetectionResult, PoseHint, Tracker};
 
 pub(crate) use parsing::{dance_file, pose_file, step_file};
 

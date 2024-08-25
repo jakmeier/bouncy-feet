@@ -109,6 +109,7 @@ export function __wbg_cartesian2d_free(a: number): void;
 export function __wbg_cartesian3d_free(a: number): void;
 export function __wbg_course_free(a: number): void;
 export function __wbg_dancebuilder_free(a: number): void;
+export function __wbg_dancedetector_free(a: number): void;
 export function __wbg_dancefilebuilder_free(a: number): void;
 export function __wbg_danceinfo_free(a: number): void;
 export function __wbg_detectedstep_free(a: number): void;
