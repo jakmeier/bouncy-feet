@@ -30,8 +30,6 @@
   export let recordingStart;
   /** @type {undefined | number} */
   export let recordingEnd;
-  /** @type {DetectionResult} */
-  let detectionResult = new DetectionResult();
 
   export const startCamera = async () => {
     await camera.startCamera();
@@ -112,49 +110,21 @@
   }
   let avatarStyle = selectStyle(PoseHint.DontKnow);
 
+  // this is called periodically in a background task
   function onFrame() {
     if (cameraOn && dataListener) {
       const start = performance.now();
       dataListener.trackFrame(cameraVideoElement);
       const t = performance.now() - start;
-      if (t > 50) {
-        console.debug(`trackFrame took ${t}ms`);
-      }
+      if (t > 50) console.debug(`trackFrame took ${t}ms`);
+
       const before = tracker.numDetectedPoses();
-      detectionResult = tracker.detectNextPose();
-
-      // gather data for visual hints for the error
-      const poseHint = tracker.poseHint();
-      avatarStyle = selectStyle(poseHint);
-      const poseError = tracker.currentPoseError();
-      if (poseError) {
-        worstLimbs = poseError
-          .worstLimbs(3)
-          .filter(
-            (/** @type {LimbError} */ limb) => limb.error * limb.weight > 0.2
-          );
-      }
-
-      // correct skeleton tracking
+      let detectionResult = tracker.detectNextPose();
       if (tracker.numDetectedPoses() > before) {
-        if (detectionResult.failureReason === undefined) {
-          playSuccessSound();
-        } else {
-          playAudio('mistake');
-        }
-        instructorSkeleton = tracker.expectedPoseSkeleton();
-        instructorSkeletonBodyShift = tracker.expectedPoseBodyShift();
-        console.assert(
-          instructorSkeleton,
-          'tracker returned no next expected pose'
-        );
-        lastSuccessSkeletonSize =
-          distance2d(landmarks[I.LEFT_SHOULDER], landmarks[I.LEFT_HIP]) * 6;
-        const hip = tracker.hipPosition(recordingEnd);
-        lastSuccessSkeletonOrigin = new Cartesian2d(hip.x - 0.5, hip.y - 0.5);
+        onStepDetection(detectionResult);
       }
+      displayPoseHint();
 
-      // debug info for slow frames
       const t2 = performance.now() - start;
       if (t2 - t > 30) {
         console.debug(`detectDance took ${t2 - t}ms`);
@@ -179,6 +149,42 @@
     // TODO(performance): do this less often
     onVideoResized();
   };
+
+  /**
+   * this is called anytime the tracker adds a pose to the detected step
+   * @param {DetectionResult} detectionResult
+   */
+  function onStepDetection(detectionResult) {
+    if (detectionResult.failureReason === undefined) {
+      playSuccessSound();
+    } else {
+      playAudio('mistake');
+    }
+    instructorSkeleton = tracker.expectedPoseSkeleton();
+    instructorSkeletonBodyShift = tracker.expectedPoseBodyShift();
+    console.assert(
+      instructorSkeleton,
+      'tracker returned no next expected pose'
+    );
+    lastSuccessSkeletonSize =
+      distance2d(landmarks[I.LEFT_SHOULDER], landmarks[I.LEFT_HIP]) * 6;
+    const hip = tracker.hipPosition(recordingEnd);
+    lastSuccessSkeletonOrigin = new Cartesian2d(hip.x - 0.5, hip.y - 0.5);
+  }
+
+  /** Display visual clues on the avatar to show what the correct position is. */
+  function displayPoseHint() {
+    const poseHint = tracker.poseHint();
+    avatarStyle = selectStyle(poseHint);
+    const poseError = tracker.currentPoseError();
+    if (poseError) {
+      worstLimbs = poseError
+        .worstLimbs(3)
+        .filter(
+          (/** @type {LimbError} */ limb) => limb.error * limb.weight > 0.2
+        );
+    }
+  }
 
   function onVideoResized() {
     $videoSrcWidth = cameraVideoElement.clientWidth;
