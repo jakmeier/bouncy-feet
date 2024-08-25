@@ -41,6 +41,8 @@ pub struct Tracker {
 
     /// When this is set, pose detection happens on the beat only.
     pub(crate) beat_alignment: Option<Timestamp>,
+    /// Enforce that a pose is evaluated on beat, regardless of how well it matches.
+    pub(crate) force_beat: bool,
 }
 
 #[wasm_bindgen]
@@ -73,6 +75,7 @@ impl Default for Tracker {
             intermediate_result: None,
             last_error: None,
             beat_alignment: None,
+            force_beat: false,
         }
     }
 }
@@ -172,6 +175,11 @@ impl Tracker {
     #[wasm_bindgen(js_name = alignBeat)]
     pub fn align_beat(&mut self, first_beat: Timestamp) {
         self.beat_alignment = Some(first_beat);
+    }
+
+    #[wasm_bindgen(js_name = enforceBeat)]
+    pub fn enforce_beat(&mut self, yes: bool) {
+        self.force_beat = yes;
     }
 
     #[wasm_bindgen(js_name = setErrorThreshold)]
@@ -297,9 +305,15 @@ impl Tracker {
         }
 
         let mut detection_result = self.intermediate_result.clone().unwrap();
-        if self.last_error.is_some() {
+        if let Some((_hint, pose_approximation)) = &self.last_error {
+            // Provide extra information about why there is an error, which is a
+            // high pose error score if we haven't returned earlier.
             detection_result =
-                detection_result.with_failure_reason(DetectionFailureReason::WrongPose)
+                detection_result.with_failure_reason(DetectionFailureReason::WrongPose);
+            // Despite the error, if forced, the pose should still be added to the detection.
+            if self.force_beat {
+                self.add_pose(pose_approximation.clone());
+            }
         }
         detection_result
     }

@@ -65,13 +65,6 @@ export function dances(): (DanceInfo)[];
 */
 export function danceBuilderFromDance(dance_id: string): DanceBuilder;
 /**
-*/
-export enum DetectionFailureReason {
-  TooEarly = 1,
-  NotOnBeat = 2,
-  WrongPose = 3,
-}
-/**
 * Best guess for what the dancer needs to change to fit the pose.
 */
 export enum PoseHint {
@@ -79,6 +72,13 @@ export enum PoseHint {
   LeftRight = 1,
   ZOrder = 2,
   WrongDirection = 3,
+}
+/**
+*/
+export enum DetectionFailureReason {
+  TooEarly = 1,
+  NotOnBeat = 2,
+  WrongPose = 3,
 }
 /**
 */
@@ -316,6 +316,11 @@ export class DetectionResult {
 * @returns {(DetectedStep)[]}
 */
   steps(): (DetectedStep)[];
+/**
+* If the newest detection was negative, this fields contains information
+* about the reason.
+*/
+  failureReason?: DetectionFailureReason;
 }
 /**
 * Information of a recorded frame in RON format.
@@ -724,6 +729,15 @@ export class StepInfo {
 export class Tracker {
   free(): void;
 /**
+* @param {number} timestamp
+* @returns {ExportedFrame}
+*/
+  exportFrame(timestamp: number): ExportedFrame;
+/**
+* @returns {string}
+*/
+  exportKeypoints(): string;
+/**
 * Create a tracker for all known steps.
 */
   constructor();
@@ -762,6 +776,10 @@ export class Tracker {
 * @param {number} first_beat
 */
   alignBeat(first_beat: number): void;
+/**
+* @param {boolean} yes
+*/
+  enforceBeat(yes: boolean): void;
 /**
 * @param {number} error_threshold
 */
@@ -836,15 +854,6 @@ export class Tracker {
 * @returns {Skeleton | undefined}
 */
   skeletonAt(timestamp: number): Skeleton | undefined;
-/**
-* @param {number} timestamp
-* @returns {ExportedFrame}
-*/
-  exportFrame(timestamp: number): ExportedFrame;
-/**
-* @returns {string}
-*/
-  exportKeypoints(): string;
 }
 /**
 */

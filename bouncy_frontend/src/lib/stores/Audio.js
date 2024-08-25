@@ -58,17 +58,22 @@ export async function loadSuccessSound() {
 }
 
 export function playSuccessSound() {
+  playAudio('success');
+}
+
+/** @param {string} id */
+export function playAudio(id) {
   if (audioContext.state === 'suspended') {
     // on a page reload, the audio context is usually prevented from starting
     // automatically, we have to wait for a user interaction.
     audioContext.resume();
   }
-  const source = getAudio('success');
+  const source = getAudio(id);
   if (source) {
     source.connect(audioContext.destination);
     source.start(0);
   } else {
-    console.warn("no success sound buffer");
+    console.warn("no sound buffer for", id);
   }
 }
 

@@ -19,10 +19,11 @@ pub struct DetectionResult {
     pub(crate) target_step: Option<StepInfo>,
     /// If the newest detection was negative, this fields contains information
     /// about the reason.
-    pub(crate) failure_reason: Option<DetectionFailureReason>,
+    #[wasm_bindgen(js_name = "failureReason")]
+    pub failure_reason: Option<DetectionFailureReason>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 #[wasm_bindgen]
 pub enum DetectionFailureReason {
     TooEarly = 1,

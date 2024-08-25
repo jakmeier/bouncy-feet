@@ -113,6 +113,7 @@
       enableLiveAvatar={true}
       enableInstructorAvatar={true}
       slowInstructor={false}
+      forceBeat
     ></LiveRecording>
 
     <button class="light" on:click={stop}>

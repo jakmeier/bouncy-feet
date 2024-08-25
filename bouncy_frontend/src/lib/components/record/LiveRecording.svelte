@@ -14,10 +14,16 @@
     LimbError,
     PoseHint,
   } from '$lib/instructor/bouncy_instructor';
-  import { playSuccessSound, loadSuccessSound } from '$lib/stores/Audio';
+  import {
+    playSuccessSound,
+    playAudio,
+    loadSuccessSound,
+    loadAudio,
+  } from '$lib/stores/Audio';
   import InstructorAvatar from '../avatar/InstructorAvatar.svelte';
   import { distance2d } from '$lib/math';
   import { BLACK_COLORING, LEFT_RIGHT_COLORING_LIGHT } from '$lib/constants';
+  import { base } from '$app/paths';
 
   export let cameraOn = false;
   /** @type {undefined | number} */
@@ -42,6 +48,9 @@
 
   export let enableLiveAvatar = false;
   export let enableInstructorAvatar = false;
+  /** always evaluate the pose on beat and move on to the next pose, even when
+   * it does not match */
+  export let forceBeat = false;
   export let videoOpacity = 0.0;
   export let slowInstructor = false;
   /** @type {number|null} */
@@ -49,6 +58,7 @@
 
   const poseCtx = getContext('pose');
   let tracker = getContext('tracker').tracker;
+  tracker.enforceBeat(forceBeat);
   $: $hideNavigation = cameraOn;
   $: $wideView = cameraOn;
 
@@ -127,7 +137,11 @@
 
       // correct skeleton tracking
       if (tracker.numDetectedPoses() > before) {
-        playSuccessSound();
+        if (detectionResult.failureReason === undefined) {
+          playSuccessSound();
+        } else {
+          playAudio('mistake');
+        }
         instructorSkeleton = tracker.expectedPoseSkeleton();
         instructorSkeletonBodyShift = tracker.expectedPoseBodyShift();
         console.assert(
@@ -175,6 +189,7 @@
     dataListener = await poseCtx.newPoseDetection(onPoseDetection);
     onVideoResized();
     loadSuccessSound();
+    loadAudio('mistake', `${base}/audio/one-shot-kick.mp3`);
   });
 </script>
 
