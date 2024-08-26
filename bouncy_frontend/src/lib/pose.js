@@ -41,7 +41,18 @@ export function landmarksToKeypoints(landmarks) {
         coordinate(I.RIGHT_ELBOW, landmarks),
         coordinate(I.RIGHT_WRIST, landmarks),
     );
-    const fullyVisible = landmarks.find((landmark) => landmark.visibility < 0.5) === undefined;
+    // This uses visibility from mediapipe. It doesn't work well, since the body
+    // itself may block visibility to other parts of the body, for example when
+    // standing sideways, only half the body is visible.
+    // const fullyVisible = landmarks.find((landmark) => landmark.visibility < 0.5) === undefined;
+
+    // Instead, check if all relevant body parts are in the frame.
+    const fullyVisible = MAIN_LANDMARKS.find((index) => {
+        const c =
+            coordinate(index, landmarks);
+        return Math.abs(c.x) > 1.0 ||
+            Math.abs(c.y) > 1.0;
+    }) === undefined;
     return new Keypoints(left, right, fullyVisible);
 }
 
@@ -185,6 +196,26 @@ export const I = {
     LEFT_FOOT_INDEX: 31,
     RIGHT_FOOT_INDEX: 32,
 };
+
+/** The landmarks that are relevant for pose tracking. */
+export const MAIN_LANDMARKS = [
+    I.LEFT_SHOULDER,
+    I.RIGHT_SHOULDER,
+    I.LEFT_ELBOW,
+    I.RIGHT_ELBOW,
+    I.LEFT_WRIST,
+    I.RIGHT_WRIST,
+    I.LEFT_HIP,
+    I.RIGHT_HIP,
+    I.LEFT_KNEE,
+    I.RIGHT_KNEE,
+    I.LEFT_ANKLE,
+    I.RIGHT_ANKLE,
+    I.LEFT_HEEL,
+    I.RIGHT_HEEL,
+    I.LEFT_FOOT_INDEX,
+    I.RIGHT_FOOT_INDEX,
+];
 
 export const TORSO = [
     I.LEFT_SHOULDER,
