@@ -165,19 +165,19 @@ impl DanceDetector {
                     }
                 }
             };
-            self.detected.last_error = Some((hint, pose_approximation));
-        }
-
-        let mut detection_result = self.detected.clone();
-        if let Some((_hint, pose_approximation)) = &self.detected.last_error {
-            // Provide extra information about why there is an error, which is a
-            // high pose error score if we haven't returned earlier.
-            detection_result =
-                detection_result.with_failure_reason(DetectionFailureReason::WrongPose);
             // Despite the error, if forced, the pose should still be added to the detection.
             if self.force_beat {
                 self.add_pose(pose_approximation.clone());
             }
+            self.detected.last_error = Some((hint, pose_approximation));
+        }
+
+        let mut detection_result = self.detected.clone();
+        if self.detected.last_error.is_some() {
+            // Provide extra information about why there is an error, which is a
+            // high pose error score if we haven't returned earlier.
+            detection_result =
+                detection_result.with_failure_reason(DetectionFailureReason::WrongPose);
         }
         detection_result
     }
@@ -189,11 +189,12 @@ impl DanceDetector {
     /// returns a beat number
     /// (experimenting with live instructor, I probably want to change this when cleaning up the impl)
     pub(crate) fn expected_pose_beat(&self) -> usize {
-        let full = self.detected.steps.len();
-        self.target_step
-            .as_ref()
-            .expect("must have target step")
-            .beats();
+        let full = self.detected.steps.len()
+            * self
+                .target_step
+                .as_ref()
+                .expect("must have target step")
+                .beats();
 
         let partial = if let Some(partial_step) = &self.detected.partial {
             partial_step.poses.len()
