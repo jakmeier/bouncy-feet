@@ -18,6 +18,8 @@
   export let skeleton;
   /** @type {Cartesian2d} */
   export let bodyShift;
+  /** @type {boolean} */
+  export let lastPoseWasCorrect = true;
 
   /** @type {Cartesian2d} */
   export let origin = new Cartesian2d(0.0, 0.0);
@@ -58,7 +60,9 @@
     correctBodyShift = prevBodyShift;
     prevSkeleton = skeleton;
     prevBodyShift = bodyShift;
-    displayCorrectPosition();
+    if (lastPoseWasCorrect) {
+      displayCorrectPosition();
+    }
   }
 
   function displayCorrectPosition() {

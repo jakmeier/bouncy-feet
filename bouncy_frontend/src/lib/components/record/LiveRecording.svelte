@@ -54,6 +54,7 @@
   export let slowInstructor = false;
   /** @type {number|null} */
   export let beatStart = null;
+  let lastPoseWasCorrect = true;
 
   const poseCtx = getContext('pose');
   let tracker = getContext('tracker').tracker;
@@ -167,8 +168,10 @@
   function onStepDetection(detectionResult) {
     if (detectionResult.failureReason === undefined) {
       playSuccessSound();
+      lastPoseWasCorrect = true;
     } else {
       playAudio('mistake');
+      lastPoseWasCorrect = false;
     }
     instructorSkeleton = tracker.expectedPoseSkeleton();
     instructorSkeletonBodyShift = tracker.expectedPoseBodyShift();
@@ -243,6 +246,7 @@
           origin={lastSuccessSkeletonOrigin}
           instructorStyle={LEFT_RIGHT_COLORING_LIGHT}
           {slowInstructor}
+          {lastPoseWasCorrect}
         />
       </div>
     {/if}

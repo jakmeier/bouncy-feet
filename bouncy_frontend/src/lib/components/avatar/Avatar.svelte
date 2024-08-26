@@ -182,7 +182,7 @@
           end = I.RIGHT_WRIST;
           break;
         default:
-          console.warn('could not draw marked limb', markedLimbs[i].name);
+          console.debug('could not draw marked limb', markedLimbs[i].name);
           continue;
       }
       drawLine(
