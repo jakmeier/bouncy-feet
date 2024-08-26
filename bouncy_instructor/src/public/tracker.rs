@@ -12,7 +12,7 @@ use crate::intern::dance_detector::{DanceDetector, DetectionState};
 use crate::intern::skeleton_3d::Skeleton3d;
 use crate::keypoints::{Cartesian3d, Keypoints};
 use crate::skeleton::{Cartesian2d, Skeleton};
-use crate::StepInfo;
+use crate::{AudioEffect, StepInfo};
 use std::rc::Rc;
 use wasm_bindgen::prelude::wasm_bindgen;
 
@@ -197,18 +197,18 @@ impl Tracker {
                             resting_pose.error(skeleton.angles(), skeleton.positions());
                         // self.detector.detected.last_error = Some((None, error));
                         if error_details.error_score() < 0.001 {
-                            // TODO: first go to counting down, which should
-                            // emit some sort of timed audio event for the JS
-                            // side to pick up, only start tracking after that
                             self.detector
                                 .transition_to_state(DetectionState::CountDown, now);
-                            // TODO: sound events
+                            self.detector.emit_countdown_audio(now);
                         }
                     }
                 }
             }
             DetectionState::CountDown => {
-                if now > (self.detector.half_beat_duration() * 16.0).floor() as u32 {
+                if now
+                    > self.detector.detection_state_start
+                        + (self.detector.half_beat_duration() * 16.0).floor() as u32
+                {
                     self.detector
                         .transition_to_state(DetectionState::LiveTracking, now);
                 }
@@ -247,6 +247,11 @@ impl Tracker {
     #[wasm_bindgen(getter, js_name = detectionState)]
     pub fn detection_state(&self) -> DetectionState {
         self.detector.detection_state
+    }
+
+    #[wasm_bindgen(js_name = nextAudioEffect)]
+    pub fn next_audio_effect(&mut self) -> Option<AudioEffect> {
+        self.detector.ui_events.next_audio()
     }
 
     /// Return a skeleton that's expected next.

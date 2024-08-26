@@ -64,7 +64,7 @@ export class PoseDetection {
      */
     constructor(consumer, mp) {
         this.consumer = consumer;
-        this.tZero = new Date().getTime();
+        this.tZero = Date.now();
         this.tPrev = -1;
         // media pipe `PoseLandmarker`
         this.mp = mp;

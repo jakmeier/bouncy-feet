@@ -1,6 +1,7 @@
 use wasm_bindgen::prelude::wasm_bindgen;
 
 use crate::tracker::PoseApproximation;
+use crate::ui_event::UiEvents;
 use crate::{DetectionFailureReason, DetectionResult, PoseHint, StepInfo};
 
 use super::dance_collection::DanceCollection;
@@ -30,6 +31,7 @@ pub(crate) struct DanceDetector {
     pub(crate) detection_state: DetectionState,
     /// When the tracker entered the current state.
     pub(crate) detection_state_start: Timestamp,
+    pub(crate) ui_events: UiEvents,
 }
 
 #[wasm_bindgen]
@@ -59,6 +61,7 @@ impl Default for DanceDetector {
             force_beat: false,
             detection_state: DetectionState::Init,
             detection_state_start: 0,
+            ui_events: UiEvents::default(),
         }
     }
 }
@@ -221,5 +224,24 @@ impl DanceDetector {
 
     pub(crate) fn half_beat_duration(&self) -> f32 {
         30_000.0 / self.bpm
+    }
+
+    pub(crate) fn emit_countdown_audio(&mut self, not_before: Timestamp) {
+        let t0 = self.beat_alignment.unwrap_or(0);
+        let beat = (2.0 * self.half_beat_duration()).round() as u32;
+        let next_beat = t0 + ((not_before - t0 + beat - 1) / beat) * beat;
+
+        self.ui_events.add_audio(next_beat, "and".to_owned());
+        self.ui_events.add_audio(next_beat + beat, "one".to_owned());
+        self.ui_events
+            .add_audio(next_beat + 3 * beat, "two".to_owned());
+        self.ui_events
+            .add_audio(next_beat + 5 * beat, "one".to_owned());
+        self.ui_events
+            .add_audio(next_beat + 6 * beat, "two".to_owned());
+        self.ui_events
+            .add_audio(next_beat + 7 * beat, "three".to_owned());
+        self.ui_events
+            .add_audio(next_beat + 8 * beat, "four".to_owned());
     }
 }

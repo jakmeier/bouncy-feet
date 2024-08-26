@@ -124,6 +124,18 @@ export enum PoseHint {
 }
 /**
 */
+export class AudioEffect {
+  free(): void;
+/**
+*/
+  readonly soundId: string;
+/**
+* When the sound should be played, could be in the future.
+*/
+  timestamp: number;
+}
+/**
+*/
 export class Cartesian2d {
   free(): void;
 /**
@@ -783,6 +795,15 @@ export class StepInfo {
 export class Tracker {
   free(): void;
 /**
+* @param {number} timestamp
+* @returns {ExportedFrame}
+*/
+  exportFrame(timestamp: number): ExportedFrame;
+/**
+* @returns {string}
+*/
+  exportKeypoints(): string;
+/**
 * Create a tracker for all known steps.
 */
   constructor();
@@ -852,6 +873,10 @@ export class Tracker {
 */
   currentPoseError(): PoseApproximation | undefined;
 /**
+* @returns {AudioEffect | undefined}
+*/
+  nextAudioEffect(): AudioEffect | undefined;
+/**
 * Return a skeleton that's expected next.
 *
 * Only implemented to work properly for trackers of unique steps.
@@ -894,15 +919,6 @@ export class Tracker {
 * @returns {Skeleton | undefined}
 */
   skeletonAt(timestamp: number): Skeleton | undefined;
-/**
-* @param {number} timestamp
-* @returns {ExportedFrame}
-*/
-  exportFrame(timestamp: number): ExportedFrame;
-/**
-* @returns {string}
-*/
-  exportKeypoints(): string;
 /**
 */
   readonly detectionState: DetectionState;

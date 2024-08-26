@@ -19,6 +19,7 @@
     playAudio,
     loadSuccessSound,
     loadAudio,
+    scheduleAudio,
   } from '$lib/stores/Audio';
   import InstructorAvatar from '../avatar/InstructorAvatar.svelte';
   import { distance2d } from '$lib/math';
@@ -130,6 +131,13 @@
         console.debug(`detectDance took ${t2 - t}ms`);
       }
     }
+    for (
+      let audio = tracker.nextAudioEffect();
+      audio !== undefined;
+      audio = tracker.nextAudioEffect()
+    ) {
+      scheduleAudio(audio.soundId, dataListener.tZero + audio.timestamp);
+    }
   }
 
   // this is called anytime media pipe has a frame with landmarks
@@ -198,6 +206,11 @@
     onVideoResized();
     loadSuccessSound();
     loadAudio('mistake', `${base}/audio/one-shot-kick.mp3`);
+    loadAudio('and', `${base}/audio/and_0.mp3`);
+    loadAudio('one', `${base}/audio/one.mp3`);
+    loadAudio('two', `${base}/audio/two.mp3`);
+    loadAudio('three', `${base}/audio/three.mp3`);
+    loadAudio('four', `${base}/audio/four.mp3`);
   });
 </script>
 

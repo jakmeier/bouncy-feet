@@ -11,9 +11,9 @@
   $: initialized && (isOn ? startAudio() : stopAudio());
   $: initialized && bpm && resetAudio();
 
-  let countAudioFiles = ['one.mp3', 'two.mp3', 'three.mp3', 'four.mp3'];
-  let andAudioFiles = ['and_0.mp3', 'and_1.mp3', 'and_2.mp3'];
-  let kickAudioFiles = ['kick.mp3', 'kick2.mp3'];
+  let countAudioFiles = ['one', 'two', 'three', 'four'];
+  let andAudioFiles = ['and_0', 'and_1', 'and_2'];
+  let kickAudioFiles = ['kick', 'kick2'];
   /** @type {GainNode} */
   let audioOutput;
   /** @type {number} seconds in audio context, when the first unscheduled note
@@ -50,7 +50,7 @@
    * @param {any} filename
    */
   async function loadAudioSource(filename) {
-    const url = `${base}/audio/${filename}`;
+    const url = `${base}/audio/${filename}.mp3`;
     return loadAudio(filename, url);
   }
 

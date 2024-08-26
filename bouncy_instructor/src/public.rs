@@ -9,6 +9,7 @@ pub(crate) mod renderable;
 pub(crate) mod skeleton;
 pub(crate) mod step_info;
 pub(crate) mod tracker;
+pub(crate) mod ui_event;
 
 pub use crate::public::course::Course;
 pub use dance_info::DanceInfo;
@@ -16,6 +17,7 @@ pub use keypoints::{Keypoints, Side as KeypointsSide};
 use parsing::course_file::CourseFile;
 pub use step_info::StepInfo;
 pub use tracker::{DetectionFailureReason, DetectionResult, PoseHint, Tracker};
+pub use ui_event::AudioEffect;
 
 pub(crate) use parsing::{dance_file, pose_file, step_file};
 

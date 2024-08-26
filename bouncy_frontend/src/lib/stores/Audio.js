@@ -63,6 +63,14 @@ export function playSuccessSound() {
 
 /** @param {string} id */
 export function playAudio(id) {
+  scheduleAudio(id, Date.now())
+}
+
+/** 
+ * @param {string} id 
+ * @param {number} timestamp in ms as UNIX timestamp 
+*/
+export function scheduleAudio(id, timestamp) {
   if (audioContext.state === 'suspended') {
     // on a page reload, the audio context is usually prevented from starting
     // automatically, we have to wait for a user interaction.
@@ -71,7 +79,8 @@ export function playAudio(id) {
   const source = getAudio(id);
   if (source) {
     source.connect(audioContext.destination);
-    source.start(0);
+    const audioOffset = Date.now() / 1000.0 - audioContext.currentTime;
+    source.start(timestamp / 1000.0 - audioOffset);
   } else {
     console.warn("no sound buffer for", id);
   }
