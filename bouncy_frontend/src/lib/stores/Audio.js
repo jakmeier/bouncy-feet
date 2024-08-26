@@ -80,7 +80,7 @@ export function scheduleAudio(id, timestamp) {
   if (source) {
     source.connect(audioContext.destination);
     const audioOffset = Date.now() / 1000.0 - audioContext.currentTime;
-    source.start(timestamp / 1000.0 - audioOffset);
+    source.start(timestamp / 1000.0 - audioOffset - audioContext.outputLatency);
   } else {
     console.warn("no sound buffer for", id);
   }
