@@ -173,10 +173,14 @@ impl Tracker {
 
     #[wasm_bindgen(js_name = runDetection)]
     pub fn run_detection(&mut self) -> DetectionResult {
+        let now = *self.timestamps.last().unwrap_or(&0);
+
         match self.detector.detection_state {
-            DetectionState::Init => (),
+            DetectionState::Init => {
+                self.detector
+                    .transition_to_state(DetectionState::Positioning, now);
+            }
             DetectionState::Positioning => {
-                // TODO: return match to idle step for first step
                 if let Some(target) = &self.detector.target_step {
                     if let Some(skeleton) = self.skeletons.last() {
                         let resting_pose_idx = if target.skeletons[0].sideway {
@@ -196,14 +200,21 @@ impl Tracker {
                             // TODO: first go to counting down, which should
                             // emit some sort of timed audio event for the JS
                             // side to pick up, only start tracking after that
-                            self.detector.detection_state = DetectionState::LiveTracking
+                            self.detector
+                                .transition_to_state(DetectionState::CountDown, now);
+                            // TODO: sound events
                         }
                     }
                 }
             }
+            DetectionState::CountDown => {
+                if now > (self.detector.half_beat_duration() * 16.0).floor() as u32 {
+                    self.detector
+                        .transition_to_state(DetectionState::LiveTracking, now);
+                }
+            }
             DetectionState::LiveTracking => {
                 if let Some(skeleton) = self.skeletons.last() {
-                    let now = *self.timestamps.last().unwrap_or(&0);
                     return self.detector.detect_next_pose(&self.db, skeleton, now);
                 } else {
                     return DetectionResult::default()

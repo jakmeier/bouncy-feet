@@ -28,22 +28,24 @@ pub(crate) struct DanceDetector {
     pub(crate) detected: DetectionResult,
     /// State machine of the detector.
     pub(crate) detection_state: DetectionState,
+    /// When the tracker entered the current state.
+    pub(crate) detection_state_start: Timestamp,
 }
 
 #[wasm_bindgen]
 #[derive(Clone, Copy)]
 pub enum DetectionState {
     /// Neutral state, not detecting anything.
-    ///
-    /// TODO: is this needed?
     Init = 1,
     /// Dance is positioning themselves, detecting the idle position.
     Positioning = 2,
+    /// About to go over to live tracking, playing a countdown audio.
+    CountDown = 3,
     /// Tracking current movements.
-    LiveTracking = 3,
+    LiveTracking = 4,
     /// No longer tracking but the results of the previous tracking are
     /// available.
-    TrackingDone = 4,
+    TrackingDone = 5,
 }
 
 impl Default for DanceDetector {
@@ -55,7 +57,8 @@ impl Default for DanceDetector {
             target_step: None,
             beat_alignment: None,
             force_beat: false,
-            detection_state: DetectionState::Positioning,
+            detection_state: DetectionState::Init,
+            detection_state_start: 0,
         }
     }
 }
@@ -91,20 +94,22 @@ impl DanceDetector {
         let start_t = last_step.map_or(0, |step| step.end);
 
         // skip at least a quarter beat
-        let min_delay = (1000.0 / (self.bpm * 4.0 / 60.0)).round() as u32;
+        let min_delay = (self.half_beat_duration() / 2.0).round() as u32;
         if end_t < start_t + min_delay {
-            return prev_detection
+            return self
+                .detected
                 .clone()
                 .with_failure_reason(DetectionFailureReason::TooEarly);
         }
 
         // check we are on beat, if aligned to beat
         if let Some(first_beat) = self.beat_alignment {
-            let half_beat = 1000.0 / (self.bpm * 2.0 / 60.0);
+            let half_beat = self.half_beat_duration();
             let t_total = end_t - first_beat;
             let relative_beat_distance = (t_total as f32 / half_beat).fract();
             if relative_beat_distance > 0.2 {
-                return prev_detection
+                return self
+                    .detected
                     .clone()
                     .with_failure_reason(DetectionFailureReason::NotOnBeat);
             }
@@ -207,5 +212,14 @@ impl DanceDetector {
         if let Some(target_step) = &self.target_step {
             self.detected.match_step(target_step);
         }
+    }
+
+    pub(crate) fn transition_to_state(&mut self, state: DetectionState, t: Timestamp) {
+        self.detection_state = state;
+        self.detection_state_start = t;
+    }
+
+    pub(crate) fn half_beat_duration(&self) -> f32 {
+        30_000.0 / self.bpm
     }
 }
