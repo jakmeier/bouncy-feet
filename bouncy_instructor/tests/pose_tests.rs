@@ -110,6 +110,14 @@ fn test_standing_3() {
 }
 
 #[test]
+fn test_standing_4() {
+    let keypoints = include_str!("./data/test_poses/standing_front.keypoints.ron");
+    check_pose_not_in_keypoints(keypoints, "standing-straight-side");
+    check_pose_not_in_keypoints(keypoints, "right-forward");
+    check_pose_not_in_keypoints(keypoints, "left-forward");
+}
+
+#[test]
 fn test_right_forward_1() {
     let keypoints = include_str!("./data/test_poses/right_forward_1.keypoints.ron");
     check_pose_in_keypoints(keypoints, "right-forward");

@@ -33,6 +33,8 @@ pub(crate) struct ErrorDetails {
     pub errors: Vec<f32>,
     /// weights to compute full error score
     pub weights: Vec<f32>,
+    /// an extra penalty on the error score if the direction is wrong
+    pub direction_error: f32,
     /// Ordering of body parts is off
     pub z_order_errors: Vec<BodyPartOrdering>,
     /// All z-tracked body points
@@ -59,7 +61,7 @@ pub(crate) fn best_fit_pose(skeleton: &Skeleton3d, poses: &[Pose]) -> (f32, Erro
         .enumerate()
         .filter(|(_i, p)| p.direction == direction)
     {
-        let details = pose.error(skeleton.angles(), skeleton.positions());
+        let details = pose.skeleton_error(skeleton);
         let err = details.error_score();
         if err < best_error {
             best_error = err;
@@ -114,11 +116,19 @@ impl AngleTarget {
 }
 
 impl Pose {
-    /// Error is between 0.0  and 1.0
+    pub(crate) fn skeleton_error(&self, skeleton: &Skeleton3d) -> ErrorDetails {
+        self.error(
+            skeleton.angles(),
+            skeleton.positions(),
+            skeleton.direction(),
+        )
+    }
+
     pub(crate) fn error(
         &self,
         angles: &[SignedAngle],
         positions: &HashMap<BodyPoint, Cartesian3d>,
+        detected_direction: super::skeleton_3d::Direction,
     ) -> ErrorDetails {
         let mut errors = Vec::with_capacity(2 * self.limbs.len());
         let mut weights = Vec::with_capacity(2 * self.limbs.len());
@@ -148,10 +158,14 @@ impl Pose {
                 (z_error, quadrant_error)
             })
             .unzip();
+        // Ad-hoc way of ensuring a person looking the wrong direction won't match accidentally.
+        let has_direction_error = !self.direction.matches_direction(detected_direction);
+        let direction_error = if has_direction_error { 0.2 } else { 0.0 };
         ErrorDetails {
             limbs,
             errors,
             weights,
+            direction_error,
             body_points,
             z_order_errors,
             z_absolute_errors,
@@ -161,6 +175,7 @@ impl Pose {
 }
 
 impl ErrorDetails {
+    /// Error is between 0.0  and 1.0
     pub(crate) fn error_score(&self) -> f32 {
         let (total_err, total_weight) = self
             .errors
@@ -170,7 +185,7 @@ impl ErrorDetails {
                 (e_acc + e * w, w_acc + w)
             });
         if total_weight > 0.0 {
-            total_err / total_weight
+            f32::min(1.0, (total_err / total_weight) + self.direction_error)
         } else {
             1.0
         }
@@ -245,7 +260,7 @@ mod tests {
         );
         let mut angles = zero_skeleton();
         angles[Limb::LEFT_THIGH.as_usize()] = polar;
-        let error = pose.error(&angles, &Default::default());
+        let error = pose.error(&angles, &Default::default(), pose.direction.into());
         assert_eq!(0.0, error.error_score());
     }
 
@@ -336,7 +351,9 @@ mod tests {
     #[track_caller]
     fn check_score_fixed_skeleton(pose: &Pose, expect: expect_test::Expect) {
         let angles = fixed_skeleton();
-        let error = pose.error(&angles, &Default::default()).error_score();
+        let error = pose
+            .error(&angles, &Default::default(), pose.direction.into())
+            .error_score();
         expect.assert_eq(&error.to_string());
     }
 
@@ -344,7 +361,9 @@ mod tests {
     #[track_caller]
     fn check_score_fixed_pose(skeleton: &[SignedAngle], expect: expect_test::Expect) {
         let pose = fixed_pose(5.0);
-        let error = pose.error(skeleton, &Default::default()).error_score();
+        let error = pose
+            .error(skeleton, &Default::default(), pose.direction.into())
+            .error_score();
         expect.assert_eq(&error.to_string());
     }
 

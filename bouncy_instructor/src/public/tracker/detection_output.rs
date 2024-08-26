@@ -53,8 +53,22 @@ impl DetectionResult {
     pub fn new_default() -> Self {
         Self::default()
     }
+
     pub fn steps(&self) -> Vec<DetectedStep> {
         self.steps.clone()
+    }
+
+    #[wasm_bindgen(js_name = poseHint)]
+    pub fn pose_hint(&self) -> PoseHint {
+        match &self.last_error {
+            Some((hint, _err)) => *hint,
+            None => PoseHint::DontKnow,
+        }
+    }
+
+    #[wasm_bindgen(js_name = poseError)]
+    pub fn pose_error(&self) -> Option<PoseApproximation> {
+        self.last_error.as_ref().map(|(_hint, err)| err.clone())
     }
 }
 

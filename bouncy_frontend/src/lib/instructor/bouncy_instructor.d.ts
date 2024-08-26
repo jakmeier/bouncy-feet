@@ -66,31 +66,6 @@ export function dances(): (DanceInfo)[];
 export function danceBuilderFromDance(dance_id: string): DanceBuilder;
 /**
 */
-export enum DetectionState {
-/**
-* Neutral state, not detecting anything.
-*/
-  Init = 1,
-/**
-* Dance is positioning themselves, detecting the idle position.
-*/
-  Positioning = 2,
-/**
-* About to go over to live tracking, playing a countdown audio.
-*/
-  CountDown = 3,
-/**
-* Tracking current movements.
-*/
-  LiveTracking = 4,
-/**
-* No longer tracking but the results of the previous tracking are
-* available.
-*/
-  TrackingDone = 5,
-}
-/**
-*/
 export enum DetectionFailureReason {
 /**
 * The last match was too recent to have another match.
@@ -121,6 +96,31 @@ export enum PoseHint {
   LeftRight = 1,
   ZOrder = 2,
   WrongDirection = 3,
+}
+/**
+*/
+export enum DetectionState {
+/**
+* Neutral state, not detecting anything.
+*/
+  Init = 1,
+/**
+* Dance is positioning themselves, detecting the idle position.
+*/
+  Positioning = 2,
+/**
+* About to go over to live tracking, playing a countdown audio.
+*/
+  CountDown = 3,
+/**
+* Tracking current movements.
+*/
+  LiveTracking = 4,
+/**
+* No longer tracking but the results of the previous tracking are
+* available.
+*/
+  TrackingDone = 5,
 }
 /**
 */
@@ -378,6 +378,14 @@ export class DetectionResult {
 */
   steps(): (DetectedStep)[];
 /**
+* @returns {PoseHint}
+*/
+  poseHint(): PoseHint;
+/**
+* @returns {PoseApproximation | undefined}
+*/
+  poseError(): PoseApproximation | undefined;
+/**
 * If the newest detection was negative, this fields contains information
 * about the reason.
 */
@@ -536,6 +544,10 @@ export class PoseApproximation {
 * @returns {(LimbError)[]}
 */
   worstLimbs(n: number): (LimbError)[];
+/**
+* @returns {string}
+*/
+  debugString(): string;
 /**
 * Total error between 0.0 and 1.0.
 */
@@ -795,15 +807,6 @@ export class StepInfo {
 export class Tracker {
   free(): void;
 /**
-* @param {number} timestamp
-* @returns {ExportedFrame}
-*/
-  exportFrame(timestamp: number): ExportedFrame;
-/**
-* @returns {string}
-*/
-  exportKeypoints(): string;
-/**
 * Create a tracker for all known steps.
 */
   constructor();
@@ -919,6 +922,15 @@ export class Tracker {
 * @returns {Skeleton | undefined}
 */
   skeletonAt(timestamp: number): Skeleton | undefined;
+/**
+* @param {number} timestamp
+* @returns {ExportedFrame}
+*/
+  exportFrame(timestamp: number): ExportedFrame;
+/**
+* @returns {string}
+*/
+  exportKeypoints(): string;
 /**
 */
   readonly detectionState: DetectionState;

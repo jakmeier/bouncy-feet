@@ -94,6 +94,8 @@ impl Tracker {
     pub fn new_unique_step_tracker(step_id: String) -> Result<Tracker, ForeignCollectionError> {
         let mut db = DanceCollection::default();
         crate::STATE.with_borrow(|state| {
+            db.add_foreign_pose_by_id(&state.db, "standing-straight-side");
+            db.add_foreign_pose_by_id(&state.db, "standing-straight-front");
             db.add_foreign_step(&state.db, &step_id)?;
             Ok(())
         })?;
@@ -193,9 +195,7 @@ impl Tracker {
                                 .expect("missing side resting pose")
                         };
                         let resting_pose = &self.db.poses()[resting_pose_idx];
-                        let error_details =
-                            resting_pose.error(skeleton.angles(), skeleton.positions());
-                        // self.detector.detected.last_error = Some((None, error));
+                        let error_details = resting_pose.skeleton_error(skeleton);
                         if error_details.error_score() < 0.001 {
                             self.detector
                                 .transition_to_state(DetectionState::CountDown, now);
@@ -229,19 +229,12 @@ impl Tracker {
 
     #[wasm_bindgen(js_name = poseHint)]
     pub fn pose_hint(&self) -> PoseHint {
-        match &self.detector.detected.last_error {
-            Some((hint, _err)) => *hint,
-            None => PoseHint::DontKnow,
-        }
+        self.detector.detected.pose_hint()
     }
 
     #[wasm_bindgen(js_name = currentPoseError)]
     pub fn current_pose_error(&self) -> Option<PoseApproximation> {
-        self.detector
-            .detected
-            .last_error
-            .as_ref()
-            .map(|(_hint, err)| err.clone())
+        self.detector.detected.pose_error()
     }
 
     #[wasm_bindgen(getter, js_name = detectionState)]

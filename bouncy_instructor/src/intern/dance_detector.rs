@@ -131,9 +131,9 @@ impl DanceDetector {
         let has_direction_error = !pose.direction.matches_direction(skeleton.direction());
         let error_details = if has_direction_error && pose.direction == PoseDirection::Front {
             let original_angles = skeleton.original_angles();
-            pose.error(&original_angles, skeleton.positions())
+            pose.error(&original_angles, skeleton.positions(), skeleton.direction())
         } else {
-            pose.error(skeleton.angles(), skeleton.positions())
+            pose.skeleton_error(skeleton)
         };
 
         let error = error_details.error_score();
@@ -153,7 +153,7 @@ impl DanceDetector {
                     PoseHint::ZOrder
                 } else {
                     let left_right_pose = db.pose_left_right_switched(pose_idx);
-                    let lr_error = left_right_pose.error(skeleton.angles(), skeleton.positions());
+                    let lr_error = left_right_pose.skeleton_error(skeleton);
                     let lr_error_score = lr_error.error_score();
                     // TODO: fine-tune 0.5
                     if lr_error_score < error * 0.5 {

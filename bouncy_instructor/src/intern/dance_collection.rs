@@ -94,6 +94,12 @@ impl DanceCollection {
         Ok(())
     }
 
+    pub(crate) fn add_foreign_pose_by_id(&mut self, other: &Self, foreign_pose_id: &str) {
+        if let Some(index) = other.pose_by_id(foreign_pose_id) {
+            self.add_foreign_pose(other, index);
+        }
+    }
+
     /// Copies a pose from a different dance collection
     fn add_foreign_pose(&mut self, other: &Self, foreign_pose_index: usize) -> usize {
         let pose = &other.poses()[foreign_pose_index];
