@@ -61,13 +61,14 @@ export class PoseDetection {
     /**
      * @param {(result: import("@mediapipe/tasks-vision").PoseLandmarkerResult, timestamp: number) => void} consumer
      * @param {PoseLandmarker} mp
+     * @param {number} tZero
      */
-    constructor(consumer, mp) {
+    constructor(consumer, mp, tZero) {
         this.consumer = consumer;
         // Used to be an offset subtracted from all timestamps. But this was
         // removed to simplify timestamp handling. Now it's only used internally
         // because mediapipe seems to have problems with absolute timestamps.
-        this.tZero = Date.now();
+        this.tZero = tZero;
         this.tPrev = -1;
         // media pipe `PoseLandmarker`
         this.mp = mp;
@@ -77,11 +78,13 @@ export class PoseDetection {
      * Start a detector with a callback that is called on every frame result.
      * 
      * @param {(result: import( '@mediapipe/tasks-vision').PoseLandmarkerResult, timestamp: number) => void} consumer 
+     * @param {number|undefined} tZero
      * @returns PoseDetection
      */
-    static async new(consumer) {
+    static async new(consumer, tZero) {
         const mp = await initMediaPipeBackend();
-        return new PoseDetection(consumer, mp);
+        tZero = tZero === undefined ? Date.now() : tZero;
+        return new PoseDetection(consumer, mp, tZero);
     }
 
 
@@ -92,7 +95,7 @@ export class PoseDetection {
     */
     trackFrame(videoElement, timestamp) {
         if (timestamp === undefined || timestamp === null) {
-            timestamp = this.currentTimestamp();
+            timestamp = Date.now();
         }
         if (timestamp <= this.tPrev) {
             if (timestamp < this.tPrev) {
@@ -105,10 +108,6 @@ export class PoseDetection {
         }
         this.tPrev = timestamp;
         this.mp.detectForVideo(videoElement, timestamp - this.tZero, ((result) => this.resultCallback(result, timestamp)));
-    }
-
-    currentTimestamp() {
-        return new Date().getTime();
     }
 
     /**

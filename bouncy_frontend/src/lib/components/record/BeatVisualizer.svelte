@@ -16,8 +16,8 @@
     const now = Date.now();
     if (duration !== 2 * tracker.halfBeatDuration) {
       duration = 2 * tracker.halfBeatDuration;
-      const start = tracker.nextHalfBeat(now);
-      delay = start - now;
+      const start = tracker.nextHalfBeat(BigInt(now));
+      delay = Number(start) - now;
     }
   }
 </script>

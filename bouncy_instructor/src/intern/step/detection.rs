@@ -52,8 +52,8 @@ impl Tracker {
         }
         let end = end.min(self.timestamps.len());
         let dt = 60_000.0 / self.detector.bpm;
-        let min_dt = (dt * 0.5).round() as u32;
-        let max_dt = (dt * 1.5).round() as u32;
+        let min_dt = (dt * 0.5).round() as u64;
+        let max_dt = (dt * 1.5).round() as u64;
 
         let threshold = 0.2;
         let pose_window_ms = max_dt;
@@ -95,7 +95,7 @@ impl Tracker {
                 // satisfies v0
                 start = step_start_index + 1;
                 // recover i0 and i1
-                start_t = *self.timestamps.get(start).unwrap_or(&u32::MAX);
+                start_t = *self.timestamps.get(start).unwrap_or(&u64::MAX);
             } else {
                 // couldn't even match a pose, shift search window by one window length
                 start_t += pose_window_ms;
@@ -126,8 +126,8 @@ impl Tracker {
     fn detect_step(
         &self,
         start: usize,
-        min_dt: u32,
-        max_dt: u32,
+        min_dt: u64,
+        max_dt: u64,
         db: &DanceCollection,
     ) -> Option<DetectedStep> {
         let mut best_error = f32::INFINITY;
@@ -218,7 +218,7 @@ mod tests {
     #[test]
     fn test_detect_dance_multi_step() {
         let degrees = [0, -90, 0, -90, -90, 90, 0, -90, 0, -90, 0, 90];
-        let times = (0..degrees.len()).map(|n| (n * 1000) as u32);
+        let times = (0..degrees.len()).map(|n| (n * 1000) as u64);
         let expected_steps = [
             "Test-Step-1", // 0,-90
             "Test-Step-1", // 0,-90
@@ -238,7 +238,7 @@ mod tests {
             -90, -45, -45, -45, 0, 0, 0, 0, 0, 0, 0, // 0 - 900ms
             0, 45, 45, 90, 90, 90, 90, 90, 90, 90, // 1000 - 1900ms
         ];
-        let times = (0..degrees.len()).map(|n| (n * 100) as u32);
+        let times = (0..degrees.len()).map(|n| (n * 100) as u64);
         let expected_steps = ["Test-Step-2"];
 
         check_detect_front_dance(&degrees, times, &expected_steps);
@@ -247,7 +247,7 @@ mod tests {
     #[track_caller]
     fn check_detect_side_dance(
         degrees: &[i16],
-        times: impl IntoIterator<Item = u32>,
+        times: impl IntoIterator<Item = u64>,
         expected_steps: &[&str],
     ) {
         let kp = facing_right_keypoints();
@@ -256,7 +256,7 @@ mod tests {
     #[track_caller]
     fn check_detect_front_dance(
         degrees: &[i16],
-        times: impl IntoIterator<Item = u32>,
+        times: impl IntoIterator<Item = u64>,
         expected_steps: &[&str],
     ) {
         let kp = facing_camera_keypoints();
@@ -267,7 +267,7 @@ mod tests {
     fn check_detect_dance(
         mut kp: Keypoints,
         degrees: &[i16],
-        times: impl Iterator<Item = u32>,
+        times: impl Iterator<Item = u64>,
         expected_steps: &[&str],
     ) {
         setup();

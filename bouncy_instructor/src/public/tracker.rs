@@ -16,7 +16,7 @@ use crate::{AudioEffect, StepInfo};
 use std::rc::Rc;
 use wasm_bindgen::prelude::wasm_bindgen;
 
-type Timestamp = u32;
+type Timestamp = u64;
 
 /// A Tracker gathers skeletons over time and passes it on to a DanceDetector.
 #[wasm_bindgen]
@@ -207,7 +207,7 @@ impl Tracker {
             DetectionState::CountDown => {
                 if now
                     > self.detector.detection_state_start
-                        + (self.detector.half_beat_duration() * 16.0).floor() as u32
+                        + (self.detector.half_beat_duration() * 16.0).floor() as u64
                 {
                     self.detector
                         .transition_to_state(DetectionState::LiveTracking, now);

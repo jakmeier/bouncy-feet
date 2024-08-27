@@ -23,9 +23,9 @@
   /** @type {number | undefined} */
   let recordingEnd = undefined;
 
-  /** @type {number } */
+  /** @type {number} */
   let bpmDetectionCounter;
-  /** @type {number } */
+  /** @type {number} */
   let beatStart;
   $: beatDetected = bpmDetectionCounter >= 3;
   /** @type {import('svelte/store').Writable<boolean>} */

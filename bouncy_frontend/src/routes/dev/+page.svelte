@@ -57,7 +57,7 @@
       }
       if (result.landmarks && result.landmarks.length >= 1) {
         const kp = landmarksToKeypoints(result.landmarks[0]);
-        tracker.addKeypoints(kp, timestamp);
+        tracker.addKeypoints(kp, BigInt(timestamp));
         recordingEnd = timestamp;
       }
     });
@@ -79,7 +79,7 @@
   }
 
   function downloadFrame() {
-    const exported = tracker.exportFrame(video.currentTime * 1000);
+    const exported = tracker.exportFrame(BigInt(video.currentTime * 1000));
     downloadTextFile('keypoints.ron', exported.keypoints);
     downloadTextFile('pose.ron', exported.pose);
   }
@@ -90,7 +90,7 @@
   }
 
   function computePoseErrors() {
-    poseErrors = tracker.allPoseErrors(video.currentTime * 1000);
+    poseErrors = tracker.allPoseErrors(BigInt(video.currentTime * 1000));
   }
 
   function logDance() {

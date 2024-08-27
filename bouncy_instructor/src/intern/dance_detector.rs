@@ -8,7 +8,7 @@ use super::dance_collection::DanceCollection;
 use super::pose::PoseDirection;
 use super::skeleton_3d::Skeleton3d;
 
-type Timestamp = u32;
+type Timestamp = u64;
 
 /// Contains all information about a dance to be detected and has an interface
 /// to be used by a Tracker to match tracked skeletons to it.
@@ -97,7 +97,7 @@ impl DanceDetector {
         let start_t = last_step.map_or(0, |step| step.end);
 
         // skip at least a quarter beat
-        let min_delay = (self.half_beat_duration() / 2.0).round() as u32;
+        let min_delay = (self.half_beat_duration() / 2.0).round() as u64;
         if end_t < start_t + min_delay {
             return self
                 .detected
@@ -229,12 +229,13 @@ impl DanceDetector {
 
     pub(crate) fn next_half_beat_start(&self, not_before: Timestamp) -> Timestamp {
         let t0 = self.beat_alignment.unwrap_or(0);
-        let half_beat = self.half_beat_duration().round() as u32;
-        t0 + ((not_before - t0 + half_beat - 1) / half_beat) * half_beat
+        let half_beat_duration = self.half_beat_duration().round() as u64;
+        let half_beats = (not_before - t0 + half_beat_duration - 1) / half_beat_duration;
+        t0 + half_beats * half_beat_duration
     }
 
     pub(crate) fn emit_countdown_audio(&mut self, not_before: Timestamp) {
-        let beat = (2.0 * self.half_beat_duration()).round() as u32;
+        let beat = (2.0 * self.half_beat_duration()).round() as u64;
         let next_beat = self.next_half_beat_start(not_before);
 
         self.ui_events.add_audio(next_beat, "and".to_owned());

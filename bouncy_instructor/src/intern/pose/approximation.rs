@@ -3,7 +3,7 @@ use crate::intern::pose_score::{best_fit_pose, ErrorDetails};
 use crate::public::Tracker;
 use crate::tracker::PoseApproximation;
 
-type Timestamp = u32;
+type Timestamp = u64;
 
 impl Tracker {
     /// Find the least-error pose in a range of recorded frames.

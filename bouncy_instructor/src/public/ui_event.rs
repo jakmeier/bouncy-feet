@@ -4,7 +4,7 @@ use std::collections::VecDeque;
 
 use wasm_bindgen::prelude::wasm_bindgen;
 
-type Timestamp = u32;
+type Timestamp = u64;
 
 #[derive(Default, Debug)]
 pub(crate) struct UiEvents {

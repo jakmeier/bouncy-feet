@@ -63,7 +63,7 @@
   // let { animationTime } = getContext('animation');
   const animationTime = readable(200); // TODO sync with instructor
   $: if (beatStart && dataListener) {
-    tracker.alignBeat(beatStart);
+    tracker.alignBeat(BigInt(beatStart));
   }
 
   /** @type {Camera} */
@@ -153,7 +153,7 @@
       landmarks = result.landmarks[0];
       const kp = landmarksToKeypoints(result.landmarks[0]);
       if (kp.fullyVisible) {
-        tracker.addKeypoints(kp, timestamp);
+        tracker.addKeypoints(kp, BigInt(timestamp));
         recordingEnd = timestamp;
       }
     }
