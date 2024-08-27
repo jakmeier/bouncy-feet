@@ -137,7 +137,7 @@
       audio !== undefined;
       audio = tracker.nextAudioEffect()
     ) {
-      scheduleAudio(audio.soundId, audio.timestamp + $animationTime);
+      scheduleAudio(audio.soundId, Number(audio.timestamp) + $animationTime);
     }
   }
 
@@ -172,7 +172,7 @@
       // output latency, playing it immediately sounds most irritating as it will
       // be heard between beats. Playing on the next beat is better for the flow
       // dataListener.tZero + audio.timestamp + $animationTime
-      soundTimestamp = tracker.nextHalfBeat() + $animationTime;
+      soundTimestamp = Number(tracker.nextHalfBeat()) + $animationTime;
     }
     if (detectionResult.failureReason === undefined) {
       scheduleAudio('success', soundTimestamp);
@@ -189,7 +189,7 @@
     );
     lastSuccessSkeletonSize =
       distance2d(landmarks[I.LEFT_SHOULDER], landmarks[I.LEFT_HIP]) * 6;
-    const hip = tracker.hipPosition(recordingEnd);
+    const hip = tracker.hipPosition(BigInt(recordingEnd || 0));
     lastSuccessSkeletonOrigin = new Cartesian2d(hip.x - 0.5, hip.y - 0.5);
   }
 
