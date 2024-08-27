@@ -1,6 +1,7 @@
 <script>
   import { t } from '$lib/i18n';
   import Header from '../ui/Header.svelte';
+  import BeatVisualizer from './BeatVisualizer.svelte';
 
   export let counter = -1;
   let start = Date.now();
@@ -37,6 +38,10 @@
     <button class="reset" on:click={reset}>
       <span class="material-symbols-outlined button"> cancel </span>
     </button>
+  </div>
+
+  <div class="visualizer">
+    <BeatVisualizer size={100} />
   </div>
 
   <div class="tap-container">
@@ -94,5 +99,8 @@
   span {
     line-height: 30px;
     font-size: 28px;
+  }
+  .visualizer {
+    padding: 20px;
   }
 </style>

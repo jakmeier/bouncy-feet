@@ -9,6 +9,9 @@ const audioBuffers = {};
 const audioStore = writable(audioBuffers);
 
 async function initAudioContext() {
+  if (audioContext) {
+    return;
+  }
   if (!browser) {
     return;
   }
@@ -51,6 +54,10 @@ export function getAudio(id) {
   } else {
     console.warn(`sound ${id} not loaded`);
   }
+}
+
+export function getAudioContext() {
+  return audioContext;
 }
 
 export async function loadSuccessSound() {

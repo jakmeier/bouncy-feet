@@ -242,6 +242,17 @@ impl Tracker {
         self.detector.detection_state
     }
 
+    #[wasm_bindgen(js_name = nextHalfBeat)]
+    pub fn next_half_beat(&self, now: Option<Timestamp>) -> Timestamp {
+        let now = now.unwrap_or_else(|| *self.timestamps.last().unwrap_or(&0));
+        self.detector.next_half_beat_start(now)
+    }
+
+    #[wasm_bindgen(getter, js_name = halfBeatDuration)]
+    pub fn half_beat_duration(&self) -> f32 {
+        self.detector.half_beat_duration()
+    }
+
     #[wasm_bindgen(js_name = nextAudioEffect)]
     pub fn next_audio_effect(&mut self) -> Option<AudioEffect> {
         self.detector.ui_events.next_audio()

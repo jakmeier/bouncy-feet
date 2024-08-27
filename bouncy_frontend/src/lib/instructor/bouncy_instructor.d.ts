@@ -89,15 +89,6 @@ export enum DetectionFailureReason {
   DetectionDisabled = 5,
 }
 /**
-* Best guess for what the dancer needs to change to fit the pose.
-*/
-export enum PoseHint {
-  DontKnow = 0,
-  LeftRight = 1,
-  ZOrder = 2,
-  WrongDirection = 3,
-}
-/**
 */
 export enum DetectionState {
 /**
@@ -121,6 +112,15 @@ export enum DetectionState {
 * available.
 */
   TrackingDone = 5,
+}
+/**
+* Best guess for what the dancer needs to change to fit the pose.
+*/
+export enum PoseHint {
+  DontKnow = 0,
+  LeftRight = 1,
+  ZOrder = 2,
+  WrongDirection = 3,
 }
 /**
 */
@@ -876,6 +876,11 @@ export class Tracker {
 */
   currentPoseError(): PoseApproximation | undefined;
 /**
+* @param {number | undefined} [now]
+* @returns {number}
+*/
+  nextHalfBeat(now?: number): number;
+/**
 * @returns {AudioEffect | undefined}
 */
   nextAudioEffect(): AudioEffect | undefined;
@@ -934,6 +939,9 @@ export class Tracker {
 /**
 */
   readonly detectionState: DetectionState;
+/**
+*/
+  readonly halfBeatDuration: number;
 }
 /**
 */

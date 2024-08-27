@@ -64,6 +64,9 @@ export class PoseDetection {
      */
     constructor(consumer, mp) {
         this.consumer = consumer;
+        // Used to be an offset subtracted from all timestamps. But this was
+        // removed to simplify timestamp handling. Now it's only used internally
+        // because mediapipe seems to have problems with absolute timestamps.
         this.tZero = Date.now();
         this.tPrev = -1;
         // media pipe `PoseLandmarker`
@@ -101,11 +104,11 @@ export class PoseDetection {
             timestamp = 1;
         }
         this.tPrev = timestamp;
-        this.mp.detectForVideo(videoElement, timestamp, ((result) => this.resultCallback(result, timestamp)));
+        this.mp.detectForVideo(videoElement, timestamp - this.tZero, ((result) => this.resultCallback(result, timestamp)));
     }
 
     currentTimestamp() {
-        return new Date().getTime() - this.tZero;
+        return new Date().getTime();
     }
 
     /**

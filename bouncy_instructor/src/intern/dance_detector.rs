@@ -227,10 +227,15 @@ impl DanceDetector {
         30_000.0 / self.bpm
     }
 
-    pub(crate) fn emit_countdown_audio(&mut self, not_before: Timestamp) {
+    pub(crate) fn next_half_beat_start(&self, not_before: Timestamp) -> Timestamp {
         let t0 = self.beat_alignment.unwrap_or(0);
+        let half_beat = self.half_beat_duration().round() as u32;
+        t0 + ((not_before - t0 + half_beat - 1) / half_beat) * half_beat
+    }
+
+    pub(crate) fn emit_countdown_audio(&mut self, not_before: Timestamp) {
         let beat = (2.0 * self.half_beat_duration()).round() as u32;
-        let next_beat = t0 + ((not_before - t0 + beat - 1) / beat) * beat;
+        let next_beat = self.next_half_beat_start(not_before);
 
         self.ui_events.add_audio(next_beat, "and".to_owned());
         self.ui_events.add_audio(next_beat + beat, "one".to_owned());

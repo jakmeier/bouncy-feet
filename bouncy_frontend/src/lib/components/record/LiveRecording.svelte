@@ -7,7 +7,7 @@
   import { getContext, onMount } from 'svelte';
   import { I, landmarksToKeypoints, PoseDetection } from '$lib/pose';
   import BackgroundTask from '../BackgroundTask.svelte';
-  import { writable } from 'svelte/store';
+  import { readable, writable } from 'svelte/store';
   import {
     Cartesian2d,
     DetectionResult,
@@ -15,8 +15,6 @@
     PoseHint,
   } from '$lib/instructor/bouncy_instructor';
   import {
-    playSuccessSound,
-    playAudio,
     loadSuccessSound,
     loadAudio,
     scheduleAudio,
@@ -62,8 +60,10 @@
   $: $hideNavigation = cameraOn;
   $: $wideView = cameraOn;
 
+  // let { animationTime } = getContext('animation');
+  const animationTime = readable(200); // TODO sync with instructor
   $: if (beatStart && dataListener) {
-    tracker.alignBeat(beatStart - dataListener.tZero);
+    tracker.alignBeat(beatStart);
   }
 
   /** @type {Camera} */
@@ -137,7 +137,7 @@
       audio !== undefined;
       audio = tracker.nextAudioEffect()
     ) {
-      scheduleAudio(audio.soundId, dataListener.tZero + audio.timestamp);
+      scheduleAudio(audio.soundId, audio.timestamp + $animationTime);
     }
   }
 
@@ -166,11 +166,19 @@
    * @param {DetectionResult} detectionResult
    */
   function onStepDetection(detectionResult) {
+    let soundTimestamp = 0;
+    if (forceBeat) {
+      // Play a sound on the next beat. The current beat is long over after the
+      // output latency, playing it immediately sounds most irritating as it will
+      // be heard between beats. Playing on the next beat is better for the flow
+      // dataListener.tZero + audio.timestamp + $animationTime
+      soundTimestamp = tracker.nextHalfBeat() + $animationTime;
+    }
     if (detectionResult.failureReason === undefined) {
-      playSuccessSound();
+      scheduleAudio('success', soundTimestamp);
       lastPoseWasCorrect = true;
     } else {
-      playAudio('mistake');
+      scheduleAudio('mistake', soundTimestamp);
       lastPoseWasCorrect = false;
     }
     instructorSkeleton = tracker.expectedPoseSkeleton();
