@@ -68,6 +68,15 @@ core business logic (dance detection).
 
 ## Progress Status
 
+- 28 Aug 2024: Released v0.4.1.
+    - Improved dance animations: They now make a little jump between poses.
+    - Change to live step detection:
+        - Wait for proper positioning before detecting steps.
+        - Voice countdown once the initial position has been reached.
+        - Ignore frames where the dancer is not in the frame with legs and arms.
+        - Count looking 90° in the wrong direction as an error, even if all angles match.
+    - UI fixes:
+      - Proper centering on wide screens.
 - 30 July 2024: Released v0.4.0.
     - Live camera detection for a selected set of steps. (Running Man, Reverse Running Man, Kicking Reverse Running Man, Happy Feet.)
       - Learn mode: Learn each position without timing.
