@@ -135,7 +135,7 @@ impl DanceDetector {
                 }
 
                 if let Some(skeleton) = skeletons.last() {
-                    return self.detect_next_pose(&db, skeleton, now);
+                    return self.detect_next_pose(db, skeleton, now);
                 } else {
                     return self
                         .detected
