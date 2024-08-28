@@ -28,7 +28,7 @@
   async function onSeek() {
     const ms = reviewVideoElement.currentTime * 1000;
     const reviewTimestamp = ms + recordingStart;
-    skeleton = tracker.skeletonAt(reviewTimestamp);
+    skeleton = tracker.skeletonAt(BigInt(Math.round(reviewTimestamp)));
     const cursor = ms / (recordingEnd - recordingStart);
     setCursor(cursor);
   }

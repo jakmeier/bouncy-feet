@@ -31,8 +31,8 @@
   class="step"
   title={step.name}
   style="left: {scrollOffset +
-    timeToPixel(step.start - reviewStart)}px; width: {timeToPixel(
-    step.end - step.start
+    timeToPixel(Number(step.start) - reviewStart)}px; width: {timeToPixel(
+    Number(step.end) - Number(step.start)
   ) + avatarSize}px"
 >
   <div
@@ -44,7 +44,7 @@
       <div
         class="pose"
         style="left: {timeToPixel(
-          pose.timestamp - step.start
+          Number(pose.timestamp) - Number(step.start)
         )}px; width: {avatarSize}px; height: {avatarSize}px"
       >
         <Svg height={avatarSize} width={avatarSize}>
