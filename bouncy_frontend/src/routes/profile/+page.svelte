@@ -88,7 +88,7 @@
   <input id="publicName" type="text" bind:value={$user.publicName} />
 </form>
 
-<Popup title={$t('profile.consent.title')} bind:isOpen={showStatsSharingPopup}>
+<Popup title={'profile.consent.title'} bind:isOpen={showStatsSharingPopup}>
   <div>{$t('profile.consent.text0')}</div>
   <div>{$t('profile.consent.question')}</div>
 
