@@ -208,7 +208,6 @@
       {videoOpacity}
       {enableLiveAvatar}
       {enableInstructorAvatar}
-      slowInstructor={isLearnMode}
     ></LiveRecording>
   {/if}
 

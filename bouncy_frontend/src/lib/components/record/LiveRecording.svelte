@@ -23,6 +23,7 @@
   import { distance2d } from '$lib/math';
   import { BLACK_COLORING, LEFT_RIGHT_COLORING_LIGHT } from '$lib/constants';
   import { base } from '$app/paths';
+  import ProgressBar from './ProgressBar.svelte';
 
   export let cameraOn = false;
   /** @type {undefined | number} */
@@ -48,8 +49,8 @@
   /** always evaluate the pose on beat and move on to the next pose, even when
    * it does not match */
   export let forceBeat = false;
+  export let bpm = 132;
   export let videoOpacity = 0.0;
-  export let slowInstructor = false;
   /** @type {number|null} */
   export let beatStart = null;
   let lastPoseWasCorrect = true;
@@ -57,8 +58,10 @@
   const poseCtx = getContext('pose');
   let tracker = getContext('tracker').tracker;
   tracker.enforceBeat(forceBeat);
+  $: timeBetweenMoves = 30_000 / bpm;
   $: $hideNavigation = cameraOn;
   $: $wideView = cameraOn;
+  let progress = 0.0;
 
   // let { animationTime } = getContext('animation');
   const animationTime = readable(200); // TODO sync with instructor
@@ -191,6 +194,10 @@
       distance2d(landmarks[I.LEFT_SHOULDER], landmarks[I.LEFT_HIP]) * 6;
     const hip = tracker.hipPosition(BigInt(recordingEnd || 0));
     lastSuccessSkeletonOrigin = new Cartesian2d(hip.x - 0.5, hip.y - 0.5);
+
+    // TODO: implement a arget per exercise with auto finish etc
+    const target = 20;
+    progress = Math.min(tracker.numDetectedPoses() / target, 1.0);
   }
 
   /** Display visual clues on the avatar to show what the correct position is. */
@@ -253,8 +260,8 @@
           bodyShift={instructorSkeletonBodyShift}
           origin={lastSuccessSkeletonOrigin}
           instructorStyle={LEFT_RIGHT_COLORING_LIGHT}
-          {slowInstructor}
           {lastPoseWasCorrect}
+          {timeBetweenMoves}
         />
       </div>
     {/if}
@@ -276,6 +283,8 @@
       </div>
     {/if}
   </Area>
+
+  <ProgressBar {progress}></ProgressBar>
 </div>
 
 <style>

@@ -5,6 +5,7 @@
   import { derived, writable } from 'svelte/store';
 
   export let animationTime = 0;
+  export let delay = 0;
   export let easing = quadIn;
   export let jumpHeight = 10;
 
@@ -12,11 +13,15 @@
   $: animationTimeStore.set(animationTime);
   const easingStore = writable(easing);
   $: easingStore.set(easing);
+  const delayStore = writable(delay);
+  $: delayStore.set(delay);
+
   const animation = derived(
-    [animationTimeStore, easingStore],
-    ([$animationTime, $easing]) => {
+    [animationTimeStore, delayStore, easingStore],
+    ([$animationTime, $delay, $easing]) => {
       return {
         duration: $animationTime,
+        delay: $delay,
         easing: $easing,
       };
     }

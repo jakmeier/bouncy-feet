@@ -33,12 +33,13 @@
     bodyColor: '#00000010',
   };
 
-  export let slowInstructor = false;
+  export let showCorrectTime = 100;
+  export let timeBetweenMoves = 300;
+  $: animationTime = Math.min(timeBetweenMoves / 4, 300);
+  let animationDelay = timeBetweenMoves - animationTime;
+
   $: avatarLineWidth = 6 * avatarSize;
   $: correctAvatarLineWidth = 10 * avatarSize;
-
-  const showCorrectTime = slowInstructor ? 500 : 100;
-  const animationTime = slowInstructor ? 400 : 200;
 
   /** @type {import("$lib/instructor/bouncy_instructor").Skeleton | null} */
   let prevSkeleton = null;
@@ -62,6 +63,10 @@
     prevBodyShift = bodyShift;
     if (lastPoseWasCorrect) {
       displayCorrectPosition();
+    } else {
+      animationDelay = timeBetweenMoves - animationTime;
+      displayedBodyShift = bodyShift;
+      displayedSkeleton = skeleton;
     }
   }
 
@@ -71,6 +76,7 @@
     displayedBodyShift = correctBodyShift || bodyShift;
     setTimeout(() => {
       // TODO: handle reentrance
+      animationDelay = timeBetweenMoves - animationTime - showCorrectTime;
       displayedStyle = instructorStyle;
       displayedLineWidth = avatarLineWidth;
       displayedBodyShift = bodyShift;
@@ -85,7 +91,7 @@
 </script>
 
 <div class="avatar-container">
-  <Animation {animationTime} jumpHeight={height * 0.025}>
+  <Animation {animationTime} delay={animationDelay} jumpHeight={height * 0.025}>
     <Svg {width} {height} orderByZ>
       <SvgAvatar
         skeleton={displayedSkeleton}

@@ -109,10 +109,10 @@
       bind:recordingStart
       bind:recordingEnd
       {beatStart}
+      {bpm}
       videoOpacity={0.5}
       enableLiveAvatar={true}
       enableInstructorAvatar={true}
-      slowInstructor={false}
       forceBeat
     ></LiveRecording>
 
