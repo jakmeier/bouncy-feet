@@ -66,6 +66,30 @@ export function dances(): (DanceInfo)[];
 export function danceBuilderFromDance(dance_id: string): DanceBuilder;
 /**
 */
+export enum DetectionFailureReason {
+/**
+* The last match was too recent to have another match.
+*/
+  TooEarly = 1,
+/**
+* The timing is off.
+*/
+  NotOnBeat = 2,
+/**
+* Detection did not match an expected pose.
+*/
+  WrongPose = 3,
+/**
+* No data to run detection against.
+*/
+  NoData = 4,
+/**
+* Currently in a state that does not detect.
+*/
+  DetectionDisabled = 5,
+}
+/**
+*/
 export enum DetectionState {
 /**
 * Neutral state, not detecting anything.
@@ -98,30 +122,12 @@ export enum PoseHint {
   ZOrder = 2,
   WrongDirection = 3,
 }
-/**
-*/
-export enum DetectionFailureReason {
-/**
-* The last match was too recent to have another match.
-*/
-  TooEarly = 1,
-/**
-* The timing is off.
-*/
-  NotOnBeat = 2,
-/**
-* Detection did not match an expected pose.
-*/
-  WrongPose = 3,
-/**
-* No data to run detection against.
-*/
-  NoData = 4,
-/**
-* Currently in a state that does not detect.
-*/
-  DetectionDisabled = 5,
-}
+
+import type { Readable } from "svelte/store";
+
+type ReadableDetectionState = Readable<DetectionState>;
+
+
 /**
 */
 export class AudioEffect {
@@ -390,6 +396,12 @@ export class DetectionResult {
 * about the reason.
 */
   failureReason?: DetectionFailureReason;
+/**
+*/
+  poseMatches: number;
+/**
+*/
+  poseMisses: number;
 }
 /**
 * Information of a recorded frame in RON format.
@@ -807,6 +819,15 @@ export class StepInfo {
 export class Tracker {
   free(): void;
 /**
+* @param {bigint} timestamp
+* @returns {ExportedFrame}
+*/
+  exportFrame(timestamp: bigint): ExportedFrame;
+/**
+* @returns {string}
+*/
+  exportKeypoints(): string;
+/**
 * Create a tracker for all known steps.
 */
   constructor();
@@ -943,20 +964,17 @@ export class Tracker {
 */
   skeletonAt(timestamp: bigint): Skeleton | undefined;
 /**
-* @param {bigint} timestamp
-* @returns {ExportedFrame}
 */
-  exportFrame(timestamp: bigint): ExportedFrame;
-/**
-* @returns {string}
-*/
-  exportKeypoints(): string;
-/**
-*/
-  readonly detectionState: DetectionState;
+  readonly detectionState: ReadableDetectionState;
 /**
 */
   readonly halfBeatDuration: number;
+/**
+*/
+  readonly lastDetection: DetectionResult;
+/**
+*/
+  readonly trackedBeats: number | undefined;
 }
 /**
 */

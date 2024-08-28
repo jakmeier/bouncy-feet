@@ -20,6 +20,10 @@ pub struct DetectionResult {
     /// This contains computed details about the mismatched pose, if the latest
     /// detection failed because of it.
     pub(crate) last_error: Option<(PoseHint, PoseApproximation)>,
+    #[wasm_bindgen(js_name = poseMatches)]
+    pub pose_matches: u32,
+    #[wasm_bindgen(js_name = poseMisses)]
+    pub pose_misses: u32,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -79,6 +83,8 @@ impl DetectionResult {
             partial: None,
             failure_reason: None,
             last_error: None,
+            pose_matches: 0,
+            pose_misses: 0,
         }
     }
 

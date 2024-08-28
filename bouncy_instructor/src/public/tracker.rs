@@ -8,7 +8,7 @@ pub use pose_output::PoseApproximation;
 pub use step_output::DetectedStep;
 
 use crate::intern::dance_collection::{DanceCollection, ForeignCollectionError};
-use crate::intern::dance_detector::{DanceDetector, DetectionState};
+use crate::intern::dance_detector::DanceDetector;
 use crate::intern::skeleton_3d::Skeleton3d;
 use crate::keypoints::{Cartesian3d, Keypoints};
 use crate::skeleton::{Cartesian2d, Skeleton};
@@ -54,10 +54,14 @@ impl Default for Tracker {
 
 #[wasm_bindgen]
 impl Tracker {
-    pub(crate) fn new(db: impl Into<Rc<DanceCollection>>, target_step: Option<StepInfo>) -> Self {
+    pub(crate) fn new(
+        db: impl Into<Rc<DanceCollection>>,
+        target_step: Option<StepInfo>,
+        tracked_beats: Option<u32>,
+    ) -> Self {
         Tracker {
             db: db.into(),
-            detector: DanceDetector::new(target_step),
+            detector: DanceDetector::new(target_step, tracked_beats),
             ..Default::default()
         }
     }
@@ -66,7 +70,7 @@ impl Tracker {
     #[wasm_bindgen(constructor)]
     pub fn new_from_global_collection() -> Self {
         let db = crate::STATE.with_borrow(|state| Rc::clone(&state.db));
-        Tracker::new(db, None)
+        Tracker::new(db, None, None)
     }
 
     /// Track one specific step, by name, including its variations (with the same name).
@@ -83,7 +87,7 @@ impl Tracker {
             }
             Ok(())
         })?;
-        Ok(Tracker::new(db, None))
+        Ok(Tracker::new(db, None, None))
     }
 
     /// Track one specific step, by ID, excluding its variations (with the same name).
@@ -102,7 +106,7 @@ impl Tracker {
         let step = db.step(&step_id).cloned().expect("just added the step");
         let step_info = StepInfo::from_step(step, &db);
 
-        Ok(Tracker::new(db, Some(step_info)))
+        Ok(Tracker::new(db, Some(step_info), None))
     }
 
     pub fn clear(&mut self) {
@@ -176,55 +180,9 @@ impl Tracker {
     #[wasm_bindgen(js_name = runDetection)]
     pub fn run_detection(&mut self) -> DetectionResult {
         let now = *self.timestamps.last().unwrap_or(&0);
-
-        match self.detector.detection_state {
-            DetectionState::Init => {
-                self.detector
-                    .transition_to_state(DetectionState::Positioning, now);
-            }
-            DetectionState::Positioning => {
-                if let Some(target) = &self.detector.target_step {
-                    if let Some(skeleton) = self.skeletons.last() {
-                        let resting_pose_idx = if target.skeletons[0].sideway {
-                            self.db
-                                .pose_by_id("standing-straight-side")
-                                .expect("missing resting pose")
-                        } else {
-                            self.db
-                                .pose_by_id("standing-straight-front")
-                                .expect("missing side resting pose")
-                        };
-                        let resting_pose = &self.db.poses()[resting_pose_idx];
-                        let error_details = resting_pose.skeleton_error(skeleton);
-                        if error_details.error_score() < 0.001 {
-                            self.detector
-                                .transition_to_state(DetectionState::CountDown, now);
-                            self.detector.emit_countdown_audio(now);
-                        }
-                    }
-                }
-            }
-            DetectionState::CountDown => {
-                if now
-                    > self.detector.detection_state_start
-                        + (self.detector.half_beat_duration() * 16.0).floor() as u64
-                {
-                    self.detector
-                        .transition_to_state(DetectionState::LiveTracking, now);
-                }
-            }
-            DetectionState::LiveTracking => {
-                if let Some(skeleton) = self.skeletons.last() {
-                    return self.detector.detect_next_pose(&self.db, skeleton, now);
-                } else {
-                    return DetectionResult::default()
-                        .with_failure_reason(DetectionFailureReason::NoData);
-                }
-                // TODO: allow setting a timer
-            }
-            DetectionState::TrackingDone => (),
-        }
-        DetectionResult::default().with_failure_reason(DetectionFailureReason::DetectionDisabled)
+        let db = &self.db;
+        let skeletons = &self.skeletons;
+        self.detector.tick(now, db, skeletons)
     }
 
     #[wasm_bindgen(js_name = poseHint)]
@@ -238,8 +196,13 @@ impl Tracker {
     }
 
     #[wasm_bindgen(getter, js_name = detectionState)]
-    pub fn detection_state(&self) -> DetectionState {
-        self.detector.detection_state
+    pub fn detection_state(&self) -> ReadableDetectionState {
+        self.detector.detection_state_store.get_store().into()
+    }
+
+    #[wasm_bindgen(getter, js_name = trackedBeats)]
+    pub fn tracked_beats(&self) -> Option<u32> {
+        self.detector.tracked_beats
     }
 
     #[wasm_bindgen(js_name = nextHalfBeat)]
@@ -290,6 +253,11 @@ impl Tracker {
         let beat = self.detector.num_detected_poses();
         let step_info = self.detector.tracked_step();
         step_info.body_shift(beat + offset)
+    }
+
+    #[wasm_bindgen(getter, js_name = lastDetection)]
+    pub fn last_detection(&self) -> DetectionResult {
+        self.detector.detected.clone()
     }
 
     #[wasm_bindgen(js_name = numDetectedPoses)]
@@ -344,4 +312,17 @@ impl Tracker {
             .get(i)
             .map(|skeleton_info| skeleton_info.to_skeleton(0.0))
     }
+}
+
+#[wasm_bindgen(typescript_custom_section)]
+const TYPESCRIPT_TYPES: &str = r#"
+import type { Readable } from "svelte/store";
+
+type ReadableDetectionState = Readable<DetectionState>;
+"#;
+
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(typescript_type = "ReadableDetectionState")]
+    pub type ReadableDetectionState;
 }

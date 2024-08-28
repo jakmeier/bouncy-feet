@@ -5,6 +5,7 @@
   import { getContext } from 'svelte';
   import Step from '../../collection/Step.svelte';
   import { counter } from '$lib/timer';
+  import { dev } from '$lib/stores/FeatureSelection.js';
 
   const { getCourse } = getContext('courses');
 
@@ -42,19 +43,13 @@
     </div>
     <div class="li">
       {lesson.name}
-      <div class="note">
-        {$t('courses.course-overview.lesson')}
-        {lesson.parts.length}
-        {#if lesson.parts.length === 1}
-          {$t('courses.course-overview.part')}
-        {:else}
-          {$t('courses.course-overview.parts')}
-        {/if}
-      </div>
+      <div class="note"></div>
       <a href="./exercise/{index}">
         {$t('courses.course-overview.start-lesson')}
       </a>
-      <a href="./{index}">explanation (WIP) </a>
+      {#if $dev}
+        <a href="./{index}">explanation (WIP) </a>
+      {/if}
     </div>
   {/each}
 </div>

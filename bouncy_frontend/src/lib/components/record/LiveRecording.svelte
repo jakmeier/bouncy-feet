@@ -11,6 +11,7 @@
   import {
     Cartesian2d,
     DetectionResult,
+    DetectionState,
     LimbError,
     PoseHint,
   } from '$lib/instructor/bouncy_instructor';
@@ -25,6 +26,7 @@
   import { base } from '$app/paths';
   import ProgressBar from './ProgressBar.svelte';
 
+  /** @type {import('svelte/store').Writable<DetectionState>} */
   export let cameraOn = false;
   /** @type {undefined | number} */
   export let recordingStart;
@@ -200,8 +202,7 @@
     const hip = tracker.hipPosition(BigInt(recordingEnd || 0));
     lastSuccessSkeletonOrigin = new Cartesian2d(hip.x - 0.5, hip.y - 0.5);
 
-    // TODO: implement a arget per exercise with auto finish etc
-    const target = 20;
+    const target = tracker.trackedBeats * 2;
     progress = Math.min(tracker.numDetectedPoses() / target, 1.0);
   }
 

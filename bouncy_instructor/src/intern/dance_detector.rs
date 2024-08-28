@@ -1,3 +1,4 @@
+use svelte_store::Readable;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 use crate::tracker::PoseApproximation;
@@ -23,12 +24,16 @@ pub(crate) struct DanceDetector {
     pub(crate) force_beat: bool,
     /// The expected step for unique step tracking
     pub(crate) target_step: Option<StepInfo>,
+    /// How many beats to track for, counting only in LiveTracking state.
+    pub(crate) tracked_beats: Option<u32>,
 
     // state
     /// Data about detection so far.
     pub(crate) detected: DetectionResult,
     /// State machine of the detector.
-    pub(crate) detection_state: DetectionState,
+    detection_state: DetectionState,
+    /// A svelte store that can be subscribed to for state updates.
+    pub(crate) detection_state_store: Readable<DetectionState>,
     /// When the tracker entered the current state.
     pub(crate) detection_state_start: Timestamp,
     pub(crate) ui_events: UiEvents,
@@ -57,9 +62,11 @@ impl Default for DanceDetector {
             error_threshold: 0.05,
             detected: DetectionResult::default(),
             target_step: None,
+            tracked_beats: None,
             beat_alignment: None,
             force_beat: false,
             detection_state: DetectionState::Init,
+            detection_state_store: Readable::new(DetectionState::Init),
             detection_state_start: 0,
             ui_events: UiEvents::default(),
         }
@@ -67,9 +74,10 @@ impl Default for DanceDetector {
 }
 
 impl DanceDetector {
-    pub(crate) fn new(target_step: Option<StepInfo>) -> Self {
+    pub(crate) fn new(target_step: Option<StepInfo>, tracked_beats: Option<u32>) -> Self {
         Self {
             target_step,
+            tracked_beats,
             ..Default::default()
         }
     }
@@ -80,6 +88,68 @@ impl DanceDetector {
         self.detected.last_error = None;
     }
 
+    /// Make progress, depending on detection state and new data added since last tick.
+    pub(crate) fn tick(
+        &mut self,
+        now: Timestamp,
+        db: &DanceCollection,
+        skeletons: &[Skeleton3d],
+    ) -> DetectionResult {
+        match self.detection_state {
+            DetectionState::Init => {
+                self.transition_to_state(DetectionState::Positioning, now);
+            }
+            DetectionState::Positioning => {
+                if let Some(target) = &self.target_step {
+                    if let Some(skeleton) = skeletons.last() {
+                        let resting_pose_idx = if target.skeletons[0].sideway {
+                            db.pose_by_id("standing-straight-side")
+                                .expect("missing resting pose")
+                        } else {
+                            db.pose_by_id("standing-straight-front")
+                                .expect("missing side resting pose")
+                        };
+                        let resting_pose = &db.poses()[resting_pose_idx];
+                        let error_details = resting_pose.skeleton_error(skeleton);
+                        if error_details.error_score() < 0.001 {
+                            self.transition_to_state(DetectionState::CountDown, now);
+                            self.emit_countdown_audio(now);
+                        }
+                    }
+                }
+            }
+            DetectionState::CountDown => {
+                if now
+                    > self.detection_state_start + (self.half_beat_duration() * 16.0).floor() as u64
+                {
+                    self.transition_to_state(DetectionState::LiveTracking, now);
+                }
+            }
+            DetectionState::LiveTracking => {
+                if let Some(num_beats) = self.tracked_beats {
+                    let end = self.detection_state_start
+                        + (1 + num_beats) as u64 * (self.half_beat_duration() * 2.0).round() as u64;
+                    if now >= end {
+                        self.transition_to_state(DetectionState::TrackingDone, now);
+                    }
+                }
+
+                if let Some(skeleton) = skeletons.last() {
+                    return self.detect_next_pose(&db, skeleton, now);
+                } else {
+                    return self
+                        .detected
+                        .clone()
+                        .with_failure_reason(DetectionFailureReason::NoData);
+                }
+            }
+            DetectionState::TrackingDone => (),
+        }
+        self.detected
+            .clone()
+            .with_failure_reason(DetectionFailureReason::DetectionDisabled)
+    }
+
     /// Take a previous detection and try adding one more pose to it.
     pub fn detect_next_pose(
         &mut self,
@@ -88,7 +158,6 @@ impl DanceDetector {
         now: Timestamp,
     ) -> DetectionResult {
         let prev_detection = &mut self.detected;
-
         let end_t = now;
         let last_step = prev_detection
             .partial
@@ -147,6 +216,7 @@ impl DanceDetector {
         if !has_z_error && error < self.error_threshold {
             self.add_pose(pose_approximation);
             self.detected.last_error = None;
+            self.detected.pose_matches += 1;
         } else {
             let hint = {
                 if has_z_error {
@@ -168,6 +238,7 @@ impl DanceDetector {
             // Despite the error, if forced, the pose should still be added to the detection.
             if self.force_beat {
                 self.add_pose(pose_approximation.clone());
+                self.detected.pose_misses += 1;
             }
             self.detected.last_error = Some((hint, pose_approximation));
         }
@@ -216,6 +287,7 @@ impl DanceDetector {
     pub(crate) fn transition_to_state(&mut self, state: DetectionState, t: Timestamp) {
         self.detection_state = state;
         self.detection_state_start = t;
+        self.detection_state_store.set(state);
     }
 
     pub(crate) fn half_beat_duration(&self) -> f32 {

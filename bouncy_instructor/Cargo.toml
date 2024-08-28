@@ -22,6 +22,7 @@ strum = { version = "0.26", features = ["derive"] }
 ron = "0.8.1"
 thiserror = "1.0.50"
 console_error_panic_hook = "0.1.7"
+svelte-store = "0.1.3"
 
 [dependencies.web-sys]
 version = "0.3.65"

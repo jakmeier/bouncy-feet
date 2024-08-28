@@ -3,9 +3,10 @@
   import { t } from '$lib/i18n.js';
   import { getContext, setContext, tick } from 'svelte';
   import LiveRecording from '$lib/components/record/LiveRecording.svelte';
-  import { Tracker } from '$lib/instructor/bouncy_instructor';
+  import { DetectionState, Tracker } from '$lib/instructor/bouncy_instructor';
   import BeatSelector from '$lib/components/record/BeatSelector.svelte';
   import Popup from '$lib/components/ui/Popup.svelte';
+  import Header from '$lib/components/ui/Header.svelte';
 
   const { getCourse } = getContext('courses');
 
@@ -41,6 +42,8 @@
   let endRecording;
   /** @type {Tracker | undefined} */
   let tracker;
+  /** @type {import('svelte/store').Readable<DetectionState> | null} */
+  $: trackingState = tracker ? tracker.detectionState : null;
 
   let live = false;
 
@@ -100,6 +103,15 @@
       <span class="material-symbols-outlined button"> play_arrow </span>
       <p>{$t('courses.lesson.start-button')}</p>
     </button>
+  {:else if $trackingState === DetectionState.TrackingDone}
+    <Header backButton title={''}></Header>
+    <p>done</p>
+    <!-- TODO: clean this up -->
+    <p>{tracker.lastDetection.poseMatches} hits</p>
+    <p>{tracker.lastDetection.poseMisses} misses</p>
+    <p>{tracker.trackedBeats} tracked beats</p>
+
+    <!-- show how many i got right anf how much i got wrong -->
   {:else}
     <LiveRecording
       bind:startCamera

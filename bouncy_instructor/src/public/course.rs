@@ -103,7 +103,8 @@ impl Lesson {
             .expect("no step in lesson to track")
             .step_info
             .clone();
-        Tracker::new(db, Some(first_step))
+        // TODO: make this number configurable
+        Tracker::new(db, Some(first_step), Some(10))
     }
 }
 
