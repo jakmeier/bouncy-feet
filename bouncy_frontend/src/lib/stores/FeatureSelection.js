@@ -1,6 +1,6 @@
 
 
-import { derived, readable } from "svelte/store";
+import { derived, readable, writable } from "svelte/store";
 import { dev as envDev, browser } from '$app/environment';
 
 let privDev = envDev;
@@ -10,7 +10,8 @@ export const dev = readable(privDev, (set) => {
         window.toggleDev = () => { privDev = !privDev; set(privDev); };
     }
 });
-export const version = derived(dev, ($dev) => $dev ? 0.999 : 0.004);
+export const displayedVersion = writable(0.004);
+export const version = derived([dev, displayedVersion], ([$dev, $version]) => $dev ? 0.999 : $version);
 
 /** @type {import("svelte/motion").Readable<Features>} */
 export const features = derived([version, dev], ([$v, $dev]) => {

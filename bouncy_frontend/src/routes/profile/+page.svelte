@@ -8,6 +8,8 @@
   import { writable } from 'svelte/store';
   import Header from '$lib/components/ui/Header.svelte';
   import { goto } from '$app/navigation';
+  import Toggle from '$lib/components/ui/Toggle.svelte';
+  import { dev, displayedVersion } from '$lib/stores/FeatureSelection';
 
   const user = getContext('user').store;
   let scoreboardData = [];
@@ -36,6 +38,22 @@
   function openSettings() {
     goto('./settings');
   }
+
+  let unlockHiddenFeatures = 0;
+  let lastIncrease = Date.now();
+  function clickProfile() {
+    if (lastIncrease + 500 > Date.now()) {
+      unlockHiddenFeatures += 1;
+    } else {
+      unlockHiddenFeatures = 0;
+    }
+    lastIncrease = Date.now();
+  }
+  let devFeaturesOn = $dev;
+  let version005 = false;
+  let standardVersion = $displayedVersion;
+  $: devFeaturesOn ? $dev || window.toggleDev() : $dev && window.toggleDev();
+  $: version005, displayedVersion.set(version005 ? 0.005 : standardVersion);
 </script>
 
 <Header
@@ -45,7 +63,9 @@
   on:click={openSettings}
 />
 
-<div class="profile-pic">
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+<div class="profile-pic" on:click={clickProfile}>
   <span class="material-symbols-outlined" style="font-size:100px">
     person
   </span>
@@ -83,6 +103,15 @@
   </div>
 </Popup>
 
+{#if unlockHiddenFeatures > 6}
+  <div class="hidden-features">
+    <div>Dev Features</div>
+    <Toggle bind:isOn={devFeaturesOn} />
+    <div>Version 0.005</div>
+    <Toggle bind:isOn={version005} />
+  </div>
+{/if}
+
 <style>
   .profile-pic {
     display: grid;
@@ -103,5 +132,18 @@
     display: grid;
     grid-template-columns: auto auto;
     gap: 30px;
+  }
+
+  .hidden-features {
+    background-color: var(--theme-neutral-dark);
+    color: var(--theme-neutral-white);
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 10px;
+    margin: 5px;
   }
 </style>
