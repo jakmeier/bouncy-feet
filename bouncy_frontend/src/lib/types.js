@@ -3,9 +3,10 @@
  * @typedef {Object} Features
  * @property {boolean} enableAvatarRotation
  * @property {boolean} enableFreestyleRecording
- * @property {boolean} enableStepRecording
+ * @property {(step: string)=>boolean} enableStepRecording
  * @property {boolean} enableDanceCollection
  * @property {boolean} enableDanceCreator
+ * @property {boolean} enableCourses
  * @property {boolean} enableDevView
  *
  * @typedef {Object} Point

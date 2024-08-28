@@ -84,7 +84,7 @@
       }
     }
 
-    const duration = dance[dance.length - 1].end - dance[0].start;
+    const duration = Number(dance[dance.length - 1].end - dance[0].start);
 
     for (let [key, stat] of Object.entries(stats)) {
       const stepGainedExp =
