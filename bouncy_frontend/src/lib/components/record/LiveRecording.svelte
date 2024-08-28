@@ -184,8 +184,13 @@
       scheduleAudio('mistake', soundTimestamp);
       lastPoseWasCorrect = false;
     }
-    instructorSkeleton = tracker.expectedPoseSkeleton();
-    instructorSkeletonBodyShift = tracker.expectedPoseBodyShift();
+    if (forceBeat) {
+      instructorSkeleton = tracker.futurePoseSkeleton(1);
+      instructorSkeletonBodyShift = tracker.futurePoseBodyShift();
+    } else {
+      instructorSkeleton = tracker.expectedPoseSkeleton();
+      instructorSkeletonBodyShift = tracker.expectedPoseBodyShift();
+    }
     console.assert(
       instructorSkeleton,
       'tracker returned no next expected pose'

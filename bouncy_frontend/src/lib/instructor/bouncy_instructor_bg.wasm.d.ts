@@ -100,6 +100,8 @@ export function tracker_expectedPoseBodyShift(a: number): number;
 export function tracker_expectedPoseSkeleton(a: number): number;
 export function tracker_exportFrame(a: number, b: number): number;
 export function tracker_exportKeypoints(a: number, b: number): void;
+export function tracker_futurePoseBodyShift(a: number, b: number): number;
+export function tracker_futurePoseSkeleton(a: number, b: number): number;
 export function tracker_halfBeatDuration(a: number): number;
 export function tracker_hipPosition(a: number, b: number): number;
 export function tracker_new_from_global_collection(): number;

@@ -118,7 +118,7 @@ impl DanceDetector {
             }
         }
 
-        let beat = self.expected_pose_beat();
+        let beat = self.num_detected_poses();
         let step_info = self.tracked_step();
         let step = db.step(&step_info.id()).expect("tracked step must exist");
 
@@ -182,13 +182,8 @@ impl DanceDetector {
         detection_result
     }
 
-    /// Return a pose that's expected next.
-    ///
-    /// Only implemented to work properly for trackers of unique steps.
-    ///
-    /// returns a beat number
-    /// (experimenting with live instructor, I probably want to change this when cleaning up the impl)
-    pub(crate) fn expected_pose_beat(&self) -> usize {
+    /// Return how many poses have been detected so far.
+    pub(crate) fn num_detected_poses(&self) -> usize {
         let full = self.detected.steps.len()
             * self
                 .target_step

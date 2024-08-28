@@ -258,23 +258,38 @@ impl Tracker {
         self.detector.ui_events.next_audio()
     }
 
-    /// Return a skeleton that's expected next.
+    /// Return a skeleton that's expected now.
     ///
     /// Only implemented to work properly for trackers of unique steps.
     ///
     /// (experimenting with live instructor, I probably want to change this when cleaning up the impl)
     #[wasm_bindgen(js_name = expectedPoseSkeleton)]
     pub fn expected_pose_skeleton(&self) -> Skeleton {
-        let beat = self.detector.expected_pose_beat();
+        self.future_pose_skeleton(0)
+    }
+
+    /// Return a skeleton that's expected after n poses.
+    ///
+    /// Only implemented to work properly for trackers of unique steps.
+    ///
+    /// (experimenting with live instructor, I probably want to change this when cleaning up the impl)
+    #[wasm_bindgen(js_name = futurePoseSkeleton)]
+    pub fn future_pose_skeleton(&self, offset: usize) -> Skeleton {
+        let beat = self.detector.num_detected_poses();
         let step_info = self.detector.tracked_step();
-        step_info.skeleton(beat)
+        step_info.skeleton(beat + offset)
     }
 
     #[wasm_bindgen(js_name = expectedPoseBodyShift)]
     pub fn expected_pose_body_shift(&self) -> Cartesian2d {
-        let beat = self.detector.expected_pose_beat();
+        self.future_pose_body_shift(0)
+    }
+
+    #[wasm_bindgen(js_name = futurePoseBodyShift)]
+    pub fn future_pose_body_shift(&self, offset: usize) -> Cartesian2d {
+        let beat = self.detector.num_detected_poses();
         let step_info = self.detector.tracked_step();
-        step_info.body_shift(beat)
+        step_info.body_shift(beat + offset)
     }
 
     #[wasm_bindgen(js_name = numDetectedPoses)]

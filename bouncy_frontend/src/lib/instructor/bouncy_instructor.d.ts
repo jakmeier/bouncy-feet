@@ -90,6 +90,15 @@ export enum DetectionState {
   TrackingDone = 5,
 }
 /**
+* Best guess for what the dancer needs to change to fit the pose.
+*/
+export enum PoseHint {
+  DontKnow = 0,
+  LeftRight = 1,
+  ZOrder = 2,
+  WrongDirection = 3,
+}
+/**
 */
 export enum DetectionFailureReason {
 /**
@@ -112,15 +121,6 @@ export enum DetectionFailureReason {
 * Currently in a state that does not detect.
 */
   DetectionDisabled = 5,
-}
-/**
-* Best guess for what the dancer needs to change to fit the pose.
-*/
-export enum PoseHint {
-  DontKnow = 0,
-  LeftRight = 1,
-  ZOrder = 2,
-  WrongDirection = 3,
 }
 /**
 */
@@ -885,7 +885,7 @@ export class Tracker {
 */
   nextAudioEffect(): AudioEffect | undefined;
 /**
-* Return a skeleton that's expected next.
+* Return a skeleton that's expected now.
 *
 * Only implemented to work properly for trackers of unique steps.
 *
@@ -894,9 +894,24 @@ export class Tracker {
 */
   expectedPoseSkeleton(): Skeleton;
 /**
+* Return a skeleton that's expected after n poses.
+*
+* Only implemented to work properly for trackers of unique steps.
+*
+* (experimenting with live instructor, I probably want to change this when cleaning up the impl)
+* @param {number} offset
+* @returns {Skeleton}
+*/
+  futurePoseSkeleton(offset: number): Skeleton;
+/**
 * @returns {Cartesian2d}
 */
   expectedPoseBodyShift(): Cartesian2d;
+/**
+* @param {number} offset
+* @returns {Cartesian2d}
+*/
+  futurePoseBodyShift(offset: number): Cartesian2d;
 /**
 * @returns {number}
 */

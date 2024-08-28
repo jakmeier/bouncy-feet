@@ -1,7 +1,5 @@
 <script>
   export let progress = 0.0;
-
-  $: progress, console.log('progress is now', progress);
   $: percent = (1.0 - progress) * 100;
 </script>
 
