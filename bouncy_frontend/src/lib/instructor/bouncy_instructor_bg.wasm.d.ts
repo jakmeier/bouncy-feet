@@ -56,6 +56,7 @@ export function lessonpart_explanation(a: number, b: number): void;
 export function lesson_parts(a: number, b: number): void;
 export function lessonpart_step(a: number): number;
 export function lessonpart_stepName(a: number, b: number): void;
+export function lesson_video(a: number, b: number): void;
 export function limberror_name(a: number, b: number): void;
 export function limberror_render(a: number, b: number, c: number): void;
 export function loadDanceFile(a: number, b: number): number;

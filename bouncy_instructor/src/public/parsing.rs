@@ -289,6 +289,7 @@ mod tests {
                     Lesson {
                         name: "Micro Bounce",
                         explanation: None,
+                        video: None,
                         icon: "todo.svg",
                         parts: [
                             LessonPart {

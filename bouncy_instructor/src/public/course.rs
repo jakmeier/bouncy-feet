@@ -20,6 +20,7 @@ pub struct Course {
 pub struct Lesson {
     pub(crate) name: String,
     pub(crate) explanation: Option<String>,
+    pub(crate) video: Option<String>,
     pub(crate) icon: String,
     pub(crate) parts: Vec<LessonPart>,
 }
@@ -85,6 +86,11 @@ impl Lesson {
     }
 
     #[wasm_bindgen(getter)]
+    pub fn video(&self) -> Option<String> {
+        self.video.clone()
+    }
+
+    #[wasm_bindgen(getter)]
     pub fn parts(&self) -> Vec<LessonPart> {
         self.parts.clone()
     }
@@ -136,6 +142,7 @@ impl Course {
         &mut self,
         lesson_name: String,
         explanation: Option<String>,
+        video: Option<String>,
         lesson_icon: String,
         lesson_parts: Vec<parsing::course_file::Part>,
         lang: &str,
@@ -153,6 +160,7 @@ impl Course {
             .collect::<Result<_, _>>()?;
         let lesson = Lesson {
             explanation,
+            video,
             name: lesson_name,
             icon: lesson_icon,
             parts,

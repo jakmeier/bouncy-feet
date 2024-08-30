@@ -27,6 +27,8 @@ pub(crate) struct Lesson {
     names: TranslatedString,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     explanations: Option<TranslatedString>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    video: Option<String>,
     icon: String,
     parts: Vec<Part>,
 }
@@ -112,7 +114,14 @@ impl CourseFile {
                         })
                 })
                 .transpose()?;
-            course.add_lesson(name, lesson_explanation, lesson.icon, lesson.parts, lang)?;
+            course.add_lesson(
+                name,
+                lesson_explanation,
+                lesson.video,
+                lesson.icon,
+                lesson.parts,
+                lang,
+            )?;
         }
         Ok(course)
     }

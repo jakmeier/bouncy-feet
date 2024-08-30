@@ -65,28 +65,13 @@ export function dances(): (DanceInfo)[];
 */
 export function danceBuilderFromDance(dance_id: string): DanceBuilder;
 /**
+* Best guess for what the dancer needs to change to fit the pose.
 */
-export enum DetectionFailureReason {
-/**
-* The last match was too recent to have another match.
-*/
-  TooEarly = 1,
-/**
-* The timing is off.
-*/
-  NotOnBeat = 2,
-/**
-* Detection did not match an expected pose.
-*/
-  WrongPose = 3,
-/**
-* No data to run detection against.
-*/
-  NoData = 4,
-/**
-* Currently in a state that does not detect.
-*/
-  DetectionDisabled = 5,
+export enum PoseHint {
+  DontKnow = 0,
+  LeftRight = 1,
+  ZOrder = 2,
+  WrongDirection = 3,
 }
 /**
 */
@@ -114,13 +99,28 @@ export enum DetectionState {
   TrackingDone = 5,
 }
 /**
-* Best guess for what the dancer needs to change to fit the pose.
 */
-export enum PoseHint {
-  DontKnow = 0,
-  LeftRight = 1,
-  ZOrder = 2,
-  WrongDirection = 3,
+export enum DetectionFailureReason {
+/**
+* The last match was too recent to have another match.
+*/
+  TooEarly = 1,
+/**
+* The timing is off.
+*/
+  NotOnBeat = 2,
+/**
+* Detection did not match an expected pose.
+*/
+  WrongPose = 3,
+/**
+* No data to run detection against.
+*/
+  NoData = 4,
+/**
+* Currently in a state that does not detect.
+*/
+  DetectionDisabled = 5,
 }
 
 import type { Readable } from "svelte/store";
@@ -494,6 +494,9 @@ export class Lesson {
 /**
 */
   readonly parts: (LessonPart)[];
+/**
+*/
+  readonly video: string;
 }
 /**
 */

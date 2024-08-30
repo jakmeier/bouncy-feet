@@ -46,7 +46,7 @@
 
 <Header {title} />
 
-<Video></Video>
+<Video path={lesson.video}></Video>
 
 <h1>{$t('courses.lesson.steps-subtitle')}</h1>
 <div class="overview">
