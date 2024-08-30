@@ -1,12 +1,15 @@
 # Bouncy Feet
 
+Try it: [app.bouncy-feet.ch](https://app.bouncy-feet.ch)
+
 A web app that assists you in learning to shuffle dance. Bouncy Feet shows you
 new moves and checks if you are doing it right.
 
 The app can be installed as a Progressive Web App or just used directly like a
 web page. It should work in all major browsers, on the phone or on laptops and
 workstations. You only need a camera which you can position in a way where your
-full body is clearly visible while you dance.
+full body is clearly visible while you dance. Listings in common app stores are
+in the working.
 
 Check out the video below to see it in action.
 
@@ -54,12 +57,17 @@ of a plan. After a few weeks, this idea of a dance app came to me and I decided
 to start working on it for the majority of my time, while doing other gigs on the
 side to keep my personal finances in balance.
 
-It is unclear where this project will end up. But right now, I am convinced the
-first version of the app will be free for everyone and without adds. It might
-make sense to add monetization later. But only if this ever turns from a fun
-project to something that needs to be profitable to put food on the table for me
-and others. But that is a far dream and too unlikely at this moment to be worth
-thinking about too much.
+In August 2024, Bouncy Feet GmbH was founded in Switzerland as a private limited
+company, with the purpose to promote (shuffle) dance by means of software
+assistance. Practically speaking, it's still just me running the show. But it
+opens the door to commercial partnerships and brings legal clarity for an upcoming
+release to the Play Store and the App Store.
+
+It is still a bit unclear where this project will end up exactly. I am pretty
+certain that to reach as many people as possible, the app should always be
+available for free in some form. Monetization could work through content, like
+courses by professional dance teachers, directly integrated with the software.
+Paid premium features are also a possibility but let's see how things turn out.
 
 Regarding tech, the project uses [SvelteKit](https://kit.svelte.dev/) for
 everything UI, [MediaPipe](https://developers.google.com/mediapipe) with
@@ -68,6 +76,10 @@ core business logic (dance detection).
 
 ## Progress Status
 
+- 30 Aug 2024: Overhaul README and change license
+    - Describe the latest project goals, such as potential monetization ideas
+      and take a clear stance on free and open-source software.
+    - Relicense from permissive MIT / Apache 2.0 dual license to single a license, AGPL version 3.
 - 28 Aug 2024: Released v0.4.1.
     - Improved dance animations: They now make a little jump between poses.
     - Change to live step detection:
@@ -106,9 +118,14 @@ core business logic (dance detection).
 - Oct - Nov 2023: Tried out the core concepts in a
   [prototype](https://github.com/jakmeier/dance-app-poc-playground).
 
-# Open-Source Commitment
+# Free and Open-Source Commitment
 
-I am a strong proponent of open-source software for two main reasons.
+Bouncy Feet is developed according to Free and Open-Source principles. I found
+that my own opinions align well with those values, as I will elaborate a bit
+more below.
+
+I am a strong proponent of software with openly accessible source code, for two
+main reasons.
 
 1. I personally love it when I am able to look at the source code of software I
    use. It can be a great learning experience to look at real code and the
@@ -118,53 +135,58 @@ I am a strong proponent of open-source software for two main reasons.
    possible at a day-to-day job. This is the perfect counterweight to big
    cooperations in the software space.
 
-With this mindset, I want this project to be as open and welcoming as possible.
-Even in the unlikely event where I want to monetize some form of Bouncy Feet, I
-would still want to keep all the source code free and open-source. I would want
-to monetize the content inside the app (think dance courses), if anything. But
-access to the software itself should always remain free.
+I also believe that software should serve its users, rather than the oppress
+them. It annoys me when software does things I don't want, without any way for
+me to fix it. Consequently, I will avoid creating such software as much as I
+can.
+
+In other words, I support the free software movement and want this project to
+adhere to its philosophy.
 
 ## License
 
-This project is developed under permissive licenses. You may freely reuse the
-code for your own projects. If you do, I would love to hear about it. Open an
-issue, say hello and describe your project. Or drop me a private message. Of
-course, there is no obligation to do so but I would appreciate it.
+This project is developed under a free and open-source license.
+Specifically, AGPL version 3 or later. ([LICENSE](./AGPL-3.0-or-later.md))
 
-For exact licensing details, please refer to the license files. There are
-multiple licenses available to choose from, just to give you more options and
-have this code fit better in your project. If you find the licenses available
-unsuitable for your project, please open an issue.
+In layman's terms, you may reuse the code of Bouncy Feet for other projects,
+commercial or not, as long as you don't distribute that project in ways that
+disrespect the freedom of their users. In particular, your project also has to
+be free and open-source under AGPL version 3 or later, if you distribute it.
+
+The purpose of this license is to ensure all users of the software developed for
+the Bouncy Feet app will always have unrestricted access to the source code,
+including the freedom to modify it to their desire. I hope that means any
+attempt to produce derivative work with privacy invading data trackers or other
+types of malware will simply be met by the community removing the offending code
+and releasing the cleaned up version in a fork.
+
+If you find the AGPL version 3 unsuitable for your use case, please contact
+inbox@jakobmeier.ch and describe what you want to do with the software.
+Additional licenses can be granted on a case-by-case basis. But for the general
+public, it's only AGPL for now.
 
 ## Contribution
 
-The current status is **source available** without proper documentation that
-would be necessary to encourage a wider community to contribute. Hopefully, this
-will improve over time. But if the lack of documentation does not bother you, I
-am happy to answer pull requests and issues if you open them.
+Contributions of all kinds are highly welcome!
 
-If you are interested in helping out by implementing features, the first place
-to look is the list of [issues with contribution
-encouraged](https://github.com/jakmeier/bouncy-feet/issues?q=is%3Aissue+is%3Aopen+label%3A%22contribution+encouraged%22).
+If you want to help out with the dance content, or with translations, or
+something else, please drop me a message inbox@jakobmeier.ch and I am more than
+happy to discuss further. 
+
+If you would like to help out on the coding side, that is great! Just to be
+upfront about it, a lack of documentation might make it hard to get started.
+Sadly, there is a chicken and egg problem here, since keeping good documentation
+up to date is not worth my time until there is actual interest of contributors.
+
+However, if you are willing to push through a lack of documentation, I am happy
+to help you get started and create the necessary docs as we go. Even if you lack
+experience using Rust and/or Svelte, I can help you learn. Ideally, introduce
+yourself in an issue or email and let me know what you would like to work on and
+we take it from there.
+
+You may also have a look at
+[issues with contribution encouraged](https://github.com/jakmeier/bouncy-feet/issues?q=is%3Aissue+is%3Aopen+label%3A%22contribution+encouraged%22).
 These are typically long-term features which I know I want in the app eventually
 but I don't have the capacity to work on them right now. If you want to work on
 them, I will give my best to help you help me and make it a pleasant
 collaboration experience for both of us.
-
-But the list of issues is never complete and there are certainly other ways to
-contribute, too. If you are interested in getting involved but don't see an
-issue that suits you, please drop me a quick message at inbox@jakobmeier.ch and
-describe your level of experience with Rust/Svelte and let me know what kind of
-contribution interests you.
-
-I myself have decent experience using Rust and can also mentor you a bit on your
-journey learning it if that's what you are looking for. But with Svelte, I am
-very new and could probably use some mentoring by you. :P Or we can learn it
-side by side, you don't need to be professional with Svelte to contribute.
-
-Oh and there are certainly non-technical ways to contribute, too! If you want to
-help out with the dance content, or with translations, or something else, please
-drop me a message inbox@jakobmeier.ch and I am more than happy to discuss
-further.
-
-
