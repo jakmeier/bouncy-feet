@@ -46,9 +46,13 @@
 
 <Header {title} />
 
-<Video path={lesson.video}></Video>
+<div class="background-strip">
+  {#if lesson.video && lesson.video.length > 0}
+    <Video path={lesson.video}></Video>
+  {/if}
+</div>
 
-<h1>{$t('courses.lesson.steps-subtitle')}</h1>
+<h3>{$t('courses.lesson.steps-subtitle')}</h3>
 <div class="overview">
   {#each lesson.parts as part, index}
     <div class="exercise-part">
@@ -94,5 +98,12 @@
   }
   button span {
     font-size: 42px;
+  }
+
+  .background-strip {
+    margin: 10px -100%;
+    padding: 5px;
+    background-color: var(--theme-neutral-light);
+    display: grid;
   }
 </style>

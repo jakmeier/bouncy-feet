@@ -1,7 +1,8 @@
 <script>
   /** @type {string} */
   export let path;
-  let videoReady = false;
+  let showVideo = false;
+  /** @type {HTMLVideoElement} */
   let videoElement;
 
   function toggleFullscreen() {
@@ -15,32 +16,36 @@
       document.exitFullscreen();
     }
   }
+
+  function videoExists() {
+    showVideo = true;
+  }
 </script>
 
-{#if videoReady}
-  <div class="video-mock">
-    <span class="material-symbols-outlined"> play_arrow </span>
-  </div>
-{:else}
-  <div class="video-container">
-    <video bind:this={videoElement} controls>
-      <source src={path} type="video/mp4" />
-      Your browser does not support the video tag.
-    </video>
+<div class="video-container {showVideo ? '' : 'hide'}">
+  <video bind:this={videoElement} controls on:loadedmetadata={videoExists}>
+    <source src={path} type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+</div>
+{#if !showVideo}
+  <div class="video-unavailable">
+    <span class="material-symbols-outlined"> disabled_by_default </span>
   </div>
 {/if}
 
 <style>
-  .video-mock {
-    width: 90%;
+  .video-unavailable {
+    width: 200px;
     height: 300px;
     margin: 20px auto;
-    background-color: black;
-    color: whitesmoke;
+    background-color: var(--theme-neutral-dark);
+    color: var(--theme-neutral-white);
     text-align: center;
     line-height: 370px;
+    border-radius: 25px;
   }
-  .video-mock span {
+  .video-unavailable span {
     font-size: 100px;
   }
 
@@ -53,9 +58,14 @@
 
   video {
     max-width: 80vw;
-    max-height: 70vw;
+    max-height: 300px;
     height: auto;
     margin: auto;
-    border: 1px solid #ccc;
+    border: 4px solid var(--theme-main);
+    border-radius: 25px;
+  }
+
+  .hide {
+    display: none;
   }
 </style>
