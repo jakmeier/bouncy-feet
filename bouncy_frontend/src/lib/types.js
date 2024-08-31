@@ -62,7 +62,12 @@
  * @property {number} recordedDances 
  * @property {number} score 
  * @property {Object} userSteps 
+ * @property {UserLessonProgress} userLessonProgress 
  * @property {boolean} consentSendingStats
  * @property {boolean} experimentalFeatures
  *
+ * @typedef {Object} UserLessonProgress
+ * @property {LessonProgress[]} lessons
+ * 
+ * @typedef {number} LessonProgress
  */

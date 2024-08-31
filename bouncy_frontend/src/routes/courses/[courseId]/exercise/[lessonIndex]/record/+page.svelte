@@ -6,10 +6,12 @@
   import { DetectionState, Tracker } from '$lib/instructor/bouncy_instructor';
   import BeatSelector from '$lib/components/record/BeatSelector.svelte';
   import Popup from '$lib/components/ui/Popup.svelte';
-  import Header from '$lib/components/ui/Header.svelte';
+  import LessonEnd from './LessonEnd.svelte';
 
   const { getCourse } = getContext('courses');
+  const { recordFinishedLesson } = getContext('user');
 
+  /** @type {string} */
   let id;
   /** @type {import('$lib/instructor/bouncy_instructor').Course } */
   let course;
@@ -85,8 +87,21 @@
       console.warn('tracker not set');
     }
   }
-
   $: beatStart, updateBeat();
+
+  let hitRate = 0.0;
+  let passed = false;
+  function trackingDone() {
+    // TODO: use bpm and accuracy stats to give star rating
+    const detected = tracker.lastDetection;
+    hitRate =
+      detected.poseMatches / (detected.poseMisses + detected.poseMatches);
+    passed = hitRate > 0.6;
+    if (passed) {
+      recordFinishedLesson(id, lessonIndex, 1);
+    }
+  }
+  $: if ($trackingState === DetectionState.TrackingDone) trackingDone();
 </script>
 
 <div class="outer">
@@ -104,14 +119,12 @@
       <p>{$t('courses.lesson.start-button')}</p>
     </button>
   {:else if $trackingState === DetectionState.TrackingDone}
-    <Header backButton title={''}></Header>
-    <p>done</p>
-    <!-- TODO: clean this up -->
-    <p>{tracker.lastDetection.poseMatches} hits</p>
-    <p>{tracker.lastDetection.poseMisses} misses</p>
-    <p>{tracker.trackedBeats} tracked beats</p>
-
-    <!-- show how many i got right anf how much i got wrong -->
+    <LessonEnd
+      {hitRate}
+      {passed}
+      hits={tracker?.lastDetection.poseMatches}
+      misses={tracker?.lastDetection.poseMisses}
+    ></LessonEnd>
   {:else}
     <LiveRecording
       bind:startCamera

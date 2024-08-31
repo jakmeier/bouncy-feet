@@ -8,6 +8,7 @@
   import { dev } from '$lib/stores/FeatureSelection.js';
 
   const { getCourse } = getContext('courses');
+  const user = getContext('user').store;
 
   const id = $page.params.courseId;
   const course = getCourse(id);
@@ -16,6 +17,8 @@
   const stepTime = 300;
   const animationTime = stepTime * 0.7;
   const i = counter(-1, 1, stepTime);
+
+  $: courseProgress = $user.userLessonProgress[id];
 </script>
 
 <Header title={$t('courses.course-overview.title')} />
@@ -40,6 +43,17 @@
           lineWidth={2.5}
         ></Step>
       {/if}
+      <div class="rank">
+        {#if courseProgress && courseProgress.lessons}
+          {#if courseProgress.lessons[index] > 0}
+            <span class="material-symbols-outlined done"> verified </span>
+          {/if}
+
+          {#each Array(Math.max(0, courseProgress.lessons[index] - 1 || 0)) as _}
+            <span class="material-symbols-outlined"> star </span>
+          {/each}
+        {/if}
+      </div>
     </div>
     <div class="li">
       {lesson.name}
@@ -70,5 +84,13 @@
   }
   .index {
     padding: 10px;
+  }
+  .rank {
+    display: flex;
+    justify-content: center;
+    margin-top: -5px;
+  }
+  .done {
+    color: var(--theme-main);
   }
 </style>

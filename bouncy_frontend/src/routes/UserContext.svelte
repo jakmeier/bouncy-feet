@@ -23,6 +23,9 @@
   if (stored && !stored.userSteps) {
     stored.userSteps = {};
   }
+  if (stored && !stored.userLessonProgress) {
+    stored.userLessonProgress = {};
+  }
   if (stored && !stored.consentSendingStats === undefined) {
     stored.consentSendingStats = false;
   }
@@ -39,6 +42,7 @@
       recordedSeconds: 0,
       recordedSteps: 0,
       userSteps: {},
+      userLessonProgress: {},
       consentSendingStats: false,
       experimentalFeatures: false,
     }
@@ -59,6 +63,9 @@
     let stats = {};
     let totalSteps = 0;
     let totalExp = 0;
+    /**
+     * @type {never[]}
+     */
     const bpms = [];
     for (const step of dance) {
       if (!step.name.includes('Idle')) {
@@ -133,10 +140,29 @@
     }
   }
 
+  /**
+   * @param {string} courseId
+   * @param {number} lessonIndex
+   * @param {number} level
+   */
+  function recordFinishedLesson(courseId, lessonIndex, level) {
+    if (!$user.userLessonProgress[courseId]) {
+      $user.userLessonProgress[courseId] = {
+        lessons: {},
+      };
+    }
+    const before = $user.userLessonProgress[courseId].lessons[lessonIndex] || 0;
+    const newLevel = Math.max(before, level);
+    $user.userLessonProgress[courseId].lessons[lessonIndex] = newLevel;
+    // trigger subscribers
+    $user = $user;
+  }
+
   setContext('user', {
     store: user,
     computeDanceStats,
     addDanceToStats,
+    recordFinishedLesson,
   });
 </script>
 

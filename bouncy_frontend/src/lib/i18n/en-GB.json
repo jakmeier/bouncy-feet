@@ -21,6 +21,12 @@
             "part": "part",
             "parts": "parts"
         },
+        "end": {
+            "back-button": "Back to course",
+            "failed-hard": "Not quite...",
+            "failed": "Almost 60%, let's try again!",
+            "success": "Success!"
+        },
         "lesson": {
             "title": "Lesson",
             "steps-subtitle": "Steps",
