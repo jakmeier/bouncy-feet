@@ -6,6 +6,7 @@
   import { counter } from '$lib/timer';
   import Step from '../../../../collection/Step.svelte';
   import Video from '$lib/components/ui/Video.svelte';
+  import { base } from '$app/paths';
 
   const { getCourse } = getContext('courses');
 
@@ -48,7 +49,7 @@
 
 <div class="background-strip">
   {#if lesson.video && lesson.video.length > 0}
-    <Video path={lesson.video}></Video>
+    <Video path={`${base}${lesson.video}`}></Video>
   {/if}
 </div>
 
