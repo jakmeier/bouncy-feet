@@ -22,6 +22,7 @@
             "parts": "parts"
         },
         "end": {
+            "again-button": "Dance again",
             "back-button": "Back to course",
             "failed-hard": "Not quite...",
             "failed": "Almost 60%, let's try again!",

@@ -83,8 +83,9 @@
     }
   }
 
-  function reset() {
+  function restart() {
     tracker?.clear();
+    showReview = false;
     live = false;
   }
 
@@ -94,6 +95,11 @@
 
   function closeReview() {
     showReview = false;
+  }
+
+  function goBack() {
+    window.history.back();
+    window.history.back();
   }
 
   function loadCourse() {
@@ -166,10 +172,18 @@
         hits={tracker?.lastDetection.poseMatches}
         misses={tracker?.lastDetection.poseMisses}
       ></LessonEnd>
-      <button class="light" on:click={openReview}>
-        <span class="material-symbols-outlined"> tv </span>
-        <p>{$t('record.review-button')}</p>
-      </button>
+
+      <div class="buttons">
+        <button class="light" on:click={restart}
+          >{$t('courses.end.again-button')}</button
+        >
+        <button class="light" on:click={openReview}>
+          {$t('record.review-button')}
+        </button>
+        <button class="light" on:click={goBack}
+          >{$t('courses.end.back-button')}</button
+        >
+      </div>
     {:else if recordingStart !== undefined && recordingEnd !== undefined}
       <VideoReview
         reviewVideoSrc={videoUrl}
@@ -221,8 +235,11 @@
   .outer {
     text-align: center;
   }
+  .buttons {
+    display: flex;
+    flex-direction: column;
+  }
   button {
-    width: 152px;
     height: 80px;
     margin: 10px;
   }

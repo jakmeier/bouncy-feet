@@ -13,11 +13,6 @@
       : hitRate > 0.44
         ? 'courses.end.failed'
         : 'courses.end.failed-hard';
-
-  function goBack() {
-    window.history.back();
-    window.history.back();
-  }
 </script>
 
 <div class="outer">
@@ -33,24 +28,19 @@
     </p>
   {/if}
 
-  <p>{hitRate.toPrecision(2) * 100}%</p>
+  <p>{(hitRate * 100).toFixed(0)}%</p>
   <p>{hits} / {hits + misses}</p>
 
   <div class="explanation">
     <Explanation text={$t(text)}></Explanation>
   </div>
-
-  <button class="light" on:click={goBack}
-    >{$t('courses.end.back-button')}</button
-  >
-  <!-- TODO try again button -->
 </div>
 
 <style>
   .outer {
     display: flex;
     flex-direction: column;
-    margin-top: 100px;
+    margin-top: 10px;
   }
   p {
     font-size: 36px;

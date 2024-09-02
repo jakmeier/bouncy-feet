@@ -58,7 +58,7 @@
   {#each lesson.parts as part, index}
     <div class="exercise-part">
       <Step step={part.step} poseIndex={$i} {animationTime} {size}></Step>
-      <b>8x</b>
+      <b>10x</b>
     </div>
     {#if index !== lesson.parts.length - 1}
       <div class="arrow">→</div>

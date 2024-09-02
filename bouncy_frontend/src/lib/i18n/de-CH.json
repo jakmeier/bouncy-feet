@@ -22,6 +22,7 @@
             "parts": "Teilen"
         },
         "end": {
+            "again-button": "Nochmals tanzen",
             "back-button": "Zurück zum Kurs",
             "failed-hard": "Das musst du nochmals versuchen.",
             "failed": "Beinahe 60% geschafft!",

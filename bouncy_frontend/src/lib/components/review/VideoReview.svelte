@@ -131,6 +131,11 @@ once per 250ms. -->
 {/if}
 
 <style>
+  video {
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
   .upper {
     display: grid;
     grid-template-columns: 2fr 1fr;
