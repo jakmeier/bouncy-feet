@@ -17,6 +17,7 @@ type Timestamp = u64;
 pub(crate) struct DanceDetector {
     // config
     pub(crate) bpm: f32,
+    pub(crate) half_speed: bool,
     pub(crate) error_threshold: f32,
     /// When this is set, pose detection happens on the beat only.
     pub(crate) beat_alignment: Option<Timestamp>,
@@ -59,6 +60,7 @@ impl Default for DanceDetector {
     fn default() -> Self {
         Self {
             bpm: 120.0,
+            half_speed: false,
             error_threshold: 0.05,
             detected: DetectionResult::default(),
             target_step: None,
@@ -120,7 +122,7 @@ impl DanceDetector {
             }
             DetectionState::CountDown => {
                 if now
-                    > self.detection_state_start + (self.half_beat_duration() * 16.0).floor() as u64
+                    > self.detection_state_start + (self.time_between_poses() * 16.0).floor() as u64
                 {
                     self.transition_to_state(DetectionState::LiveTracking, now);
                 }
@@ -128,7 +130,7 @@ impl DanceDetector {
             DetectionState::LiveTracking => {
                 if let Some(num_beats) = self.tracked_beats {
                     let end = self.detection_state_start
-                        + (1 + num_beats) as u64 * (self.half_beat_duration() * 2.0).round() as u64;
+                        + (1 + num_beats) as u64 * (self.time_between_poses() * 2.0).round() as u64;
                     if now >= end {
                         self.transition_to_state(DetectionState::TrackingDone, now);
                     }
@@ -166,7 +168,7 @@ impl DanceDetector {
         let start_t = last_step.map_or(0, |step| step.end);
 
         // skip at least a quarter beat
-        let min_delay = (self.half_beat_duration() / 2.0).round() as u64;
+        let min_delay = (self.time_between_poses() / 2.0).round() as u64;
         if end_t < start_t + min_delay {
             return self
                 .detected
@@ -176,7 +178,7 @@ impl DanceDetector {
 
         // check we are on beat, if aligned to beat
         if let Some(first_beat) = self.beat_alignment {
-            let half_beat = self.half_beat_duration();
+            let half_beat = self.time_between_poses();
             let t_total = end_t - first_beat;
             let relative_beat_distance = (t_total as f32 / half_beat).fract();
             if relative_beat_distance > 0.2 {
@@ -290,20 +292,24 @@ impl DanceDetector {
         self.detection_state_store.set(state);
     }
 
-    pub(crate) fn half_beat_duration(&self) -> f32 {
-        30_000.0 / self.bpm
+    pub(crate) fn time_between_poses(&self) -> f32 {
+        if self.half_speed {
+            2.0 * 30_000.0 / self.bpm
+        } else {
+            30_000.0 / self.bpm
+        }
     }
 
-    pub(crate) fn next_half_beat_start(&self, not_before: Timestamp) -> Timestamp {
+    pub(crate) fn next_pose_time(&self, not_before: Timestamp) -> Timestamp {
         let t0 = self.beat_alignment.unwrap_or(0);
-        let half_beat_duration = self.half_beat_duration().round() as u64;
+        let half_beat_duration = self.time_between_poses().round() as u64;
         let half_beats = (not_before - t0 + half_beat_duration - 1) / half_beat_duration;
         t0 + half_beats * half_beat_duration
     }
 
     pub(crate) fn emit_countdown_audio(&mut self, not_before: Timestamp) {
-        let beat = (2.0 * self.half_beat_duration()).round() as u64;
-        let next_beat = self.next_half_beat_start(not_before);
+        let beat = (2.0 * self.time_between_poses()).round() as u64;
+        let next_beat = self.next_pose_time(not_before);
 
         self.ui_events.add_audio(next_beat, "and".to_owned());
         self.ui_events.add_audio(next_beat + beat, "one".to_owned());

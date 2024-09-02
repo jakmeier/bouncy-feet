@@ -208,12 +208,12 @@ impl Tracker {
     #[wasm_bindgen(js_name = nextHalfBeat)]
     pub fn next_half_beat(&self, now: Option<Timestamp>) -> Timestamp {
         let now = now.unwrap_or_else(|| *self.timestamps.last().unwrap_or(&0));
-        self.detector.next_half_beat_start(now)
+        self.detector.next_pose_time(now)
     }
 
     #[wasm_bindgen(getter, js_name = halfBeatDuration)]
     pub fn half_beat_duration(&self) -> f32 {
-        self.detector.half_beat_duration()
+        self.detector.time_between_poses()
     }
 
     #[wasm_bindgen(js_name = nextAudioEffect)]
@@ -226,7 +226,7 @@ impl Tracker {
     pub fn pose_skeleton(&self, id: String) -> Option<Skeleton> {
         let index = self.db.pose_by_id(&id)?;
         let pose = &self.db.poses()[index];
-        // TODO: set correct direction
+        // TODO: set correct direction 
         let direction = Direction::East;
         Some(Skeleton::from_pose(pose, &self.db, direction))
     }

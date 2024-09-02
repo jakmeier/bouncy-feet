@@ -110,7 +110,10 @@ impl Lesson {
             .step_info
             .clone();
         // TODO: make this number configurable
-        Tracker::new(db, Some(first_step), Some(20))
+        let mut tracker = Tracker::new(db, Some(first_step), Some(20));
+        // TODO: make half speed property configurable
+        tracker.detector.half_speed = true;
+        tracker
     }
 }
 
