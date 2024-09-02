@@ -110,7 +110,7 @@ impl Lesson {
             .step_info
             .clone();
         // TODO: make this number configurable
-        Tracker::new(db, Some(first_step), Some(10))
+        Tracker::new(db, Some(first_step), Some(20))
     }
 }
 

@@ -6,6 +6,8 @@
   import Banner from './Banner.svelte';
   import { getContext } from 'svelte';
   import BackgroundTask from '$lib/components/BackgroundTask.svelte';
+  import PoseReview from './PoseReview.svelte';
+  import { LEFT_RIGHT_COLORING } from '$lib/constants';
 
   /** @type {string} URL (usually local) to the video for review  */
   export let reviewVideoSrc;
@@ -54,6 +56,14 @@
    */
   let setCursor;
 
+  // Set the position in the video and the banner to the specified recording timestamp.
+  /** @param {bigint} timestamp */
+  function selectTimestamp(timestamp) {
+    const videoTime = (Number(timestamp) - recordingStart) / 1000;
+    reviewVideoElement.currentTime = videoTime;
+    onSeek();
+  }
+
   function togglePlay() {
     if (reviewVideoElement.paused) {
       reviewVideoElement.play();
@@ -89,6 +99,7 @@ once per 250ms. -->
           height={avatarSize}
           lineWidth={avatarLineWidth}
           {skeleton}
+          style={LEFT_RIGHT_COLORING}
         />
       {/if}
     </Svg>
@@ -103,6 +114,18 @@ once per 250ms. -->
   onScroll={seekVideoToCursor}
 ></Banner>
 
+<div class="poses-details">
+  {#each detectedSteps as step}
+    {#each step.poses as pose}
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
+      <div on:click={() => selectTimestamp(pose.timestamp)}>
+        <PoseReview {pose}></PoseReview>
+      </div>
+    {/each}
+  {/each}
+</div>
+
 {#if $dev}
   <AllPoseErrors {reviewVideoElement} {recordingStart}></AllPoseErrors>
 {/if}
@@ -112,5 +135,10 @@ once per 250ms. -->
     display: grid;
     grid-template-columns: 2fr 1fr;
     align-items: center;
+  }
+
+  .poses-details {
+    display: flex;
+    overflow-x: auto;
   }
 </style>

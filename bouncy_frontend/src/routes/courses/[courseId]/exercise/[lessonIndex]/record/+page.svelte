@@ -1,12 +1,13 @@
 <script>
   import { page } from '$app/stores';
   import { t } from '$lib/i18n.js';
-  import { getContext, setContext, tick } from 'svelte';
+  import { getContext, onDestroy, setContext, tick } from 'svelte';
   import LiveRecording from '$lib/components/record/LiveRecording.svelte';
   import { DetectionState, Tracker } from '$lib/instructor/bouncy_instructor';
   import BeatSelector from '$lib/components/record/BeatSelector.svelte';
   import Popup from '$lib/components/ui/Popup.svelte';
   import LessonEnd from './LessonEnd.svelte';
+  import VideoReview from '$lib/components/review/VideoReview.svelte';
 
   const { getCourse } = getContext('courses');
   const { recordFinishedLesson } = getContext('user');
@@ -34,6 +35,12 @@
   /** @type {import('svelte/store').Writable<boolean>} */
   let showHint;
 
+  let detectionResult;
+  /** @type {string} */
+  let videoUrl;
+  /** @type {import("$lib/instructor/bouncy_instructor").DetectedStep[] | undefined} */
+  let detectedSteps;
+
   /** @type {() => any}*/
   let startCamera;
   /** @type {() => any}*/
@@ -48,19 +55,45 @@
   $: trackingState = tracker ? tracker.detectionState : null;
 
   let live = false;
+  let showReview = false;
 
   let bpm = 132;
 
   async function start() {
     live = true;
     await tick();
-    startCamera();
+    await startCamera();
+    await startRecording();
   }
 
-  function stop() {
+  async function stop() {
     stopCamera();
+
+    detectionResult = tracker?.lastDetection;
+    detectedSteps = detectionResult?.steps();
+    const videoBlob = await endRecording();
+
+    if (videoBlob) {
+      if (videoUrl) {
+        URL.revokeObjectURL(videoUrl);
+      }
+      videoUrl = URL.createObjectURL(videoBlob);
+    } else {
+      console.warn('ended recording and did not get video blob', videoBlob);
+    }
+  }
+
+  function reset() {
     tracker?.clear();
     live = false;
+  }
+
+  function openReview() {
+    showReview = true;
+  }
+
+  function closeReview() {
+    showReview = false;
   }
 
   function loadCourse() {
@@ -91,7 +124,8 @@
 
   let hitRate = 0.0;
   let passed = false;
-  function trackingDone() {
+  async function trackingDone() {
+    await stop();
     // TODO: use bpm and accuracy stats to give star rating
     const detected = tracker.lastDetection;
     hitRate =
@@ -102,6 +136,12 @@
     }
   }
   $: if ($trackingState === DetectionState.TrackingDone) trackingDone();
+
+  onDestroy(() => {
+    if (videoUrl) {
+      URL.revokeObjectURL(videoUrl);
+    }
+  });
 </script>
 
 <div class="outer">
@@ -119,12 +159,37 @@
       <p>{$t('courses.lesson.start-button')}</p>
     </button>
   {:else if $trackingState === DetectionState.TrackingDone}
-    <LessonEnd
-      {hitRate}
-      {passed}
-      hits={tracker?.lastDetection.poseMatches}
-      misses={tracker?.lastDetection.poseMisses}
-    ></LessonEnd>
+    {#if !showReview}
+      <LessonEnd
+        {hitRate}
+        {passed}
+        hits={tracker?.lastDetection.poseMatches}
+        misses={tracker?.lastDetection.poseMisses}
+      ></LessonEnd>
+      <button class="light" on:click={openReview}>
+        <span class="material-symbols-outlined"> tv </span>
+        <p>{$t('record.review-button')}</p>
+      </button>
+    {:else if recordingStart !== undefined && recordingEnd !== undefined}
+      <VideoReview
+        reviewVideoSrc={videoUrl}
+        {detectedSteps}
+        {recordingStart}
+        {recordingEnd}
+      ></VideoReview>
+      <div>
+        <button class="light" on:click={closeReview}>
+          <span class="material-symbols-outlined"> arrow_back </span>
+          <p>{$t('record.back-button')}</p>
+        </button>
+      </div>
+    {:else}
+      Failed to load review
+      <button class="light" on:click={closeReview}>
+        <span class="material-symbols-outlined"> arrow_back </span>
+        <p>{$t('record.back-button')}</p>
+      </button>
+    {/if}
   {:else}
     <LiveRecording
       bind:startCamera

@@ -111,6 +111,7 @@ export function tracker_nextAudioEffect(a: number): number;
 export function tracker_nextHalfBeat(a: number, b: number, c: number): number;
 export function tracker_numDetectedPoses(a: number): number;
 export function tracker_poseHint(a: number): number;
+export function tracker_poseSkeleton(a: number, b: number, c: number): number;
 export function tracker_runDetection(a: number): number;
 export function tracker_setBpm(a: number, b: number): void;
 export function tracker_setErrorThreshold(a: number, b: number): void;

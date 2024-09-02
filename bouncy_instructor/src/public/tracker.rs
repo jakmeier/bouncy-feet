@@ -9,7 +9,7 @@ pub use step_output::DetectedStep;
 
 use crate::intern::dance_collection::{DanceCollection, ForeignCollectionError};
 use crate::intern::dance_detector::DanceDetector;
-use crate::intern::skeleton_3d::Skeleton3d;
+use crate::intern::skeleton_3d::{Direction, Skeleton3d};
 use crate::keypoints::{Cartesian3d, Keypoints};
 use crate::skeleton::{Cartesian2d, Skeleton};
 use crate::{AudioEffect, StepInfo};
@@ -219,6 +219,16 @@ impl Tracker {
     #[wasm_bindgen(js_name = nextAudioEffect)]
     pub fn next_audio_effect(&mut self) -> Option<AudioEffect> {
         self.detector.ui_events.next_audio()
+    }
+
+    /// Return a skeleton for a pose.
+    #[wasm_bindgen(js_name = poseSkeleton)]
+    pub fn pose_skeleton(&self, id: String) -> Option<Skeleton> {
+        let index = self.db.pose_by_id(&id)?;
+        let pose = &self.db.poses()[index];
+        // TODO: set correct direction
+        let direction = Direction::East;
+        Some(Skeleton::from_pose(pose, &self.db, direction))
     }
 
     /// Return a skeleton that's expected now.

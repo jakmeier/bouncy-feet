@@ -1,6 +1,5 @@
 <script>
   import Explanation from '$lib/components/ui/Explanation.svelte';
-  import SpeechBubble from '$lib/components/ui/SpeechBubble.svelte';
   import { t } from '$lib/i18n';
 
   export let hits;
@@ -8,8 +7,8 @@
   export let hitRate;
   export let passed;
 
-  let text =
-    hitRate > 0.6
+  $: text =
+    hitRate >= 0.6
       ? 'courses.end.success'
       : hitRate > 0.44
         ? 'courses.end.failed'

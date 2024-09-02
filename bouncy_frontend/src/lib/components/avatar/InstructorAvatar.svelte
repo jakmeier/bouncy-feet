@@ -17,7 +17,7 @@
   /** @type {import("$lib/instructor/bouncy_instructor").Skeleton} */
   export let skeleton;
   /** @type {Cartesian2d} */
-  export let bodyShift;
+  export let bodyShift = new Cartesian2d(0, 0);
   /** @type {boolean} */
   export let lastPoseWasCorrect = true;
 
