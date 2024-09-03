@@ -27,6 +27,14 @@
   /** @type {import("$lib/instructor/bouncy_instructor").Skeleton} */
   let skeleton;
 
+  let prevTime = 0;
+  function onFrame() {
+    if (prevTime !== reviewVideoElement.currentTime) {
+      onSeek();
+    }
+    prevTime = reviewVideoElement.currentTime;
+  }
+
   async function onSeek() {
     const ms = reviewVideoElement.currentTime * 1000;
     const reviewTimestamp = ms + recordingStart;
@@ -61,7 +69,6 @@
   function selectTimestamp(timestamp) {
     const videoTime = (Number(timestamp) - recordingStart) / 1000;
     reviewVideoElement.currentTime = videoTime;
-    onSeek();
   }
 
   function togglePlay() {
@@ -77,7 +84,7 @@
 even when it is playing. In theory, `on:timeupdate={onSeek}` in the video would
 be better, however, this fires at different rates per browser and often only
 once per 250ms. -->
-<BackgroundTask onFrame={onSeek}></BackgroundTask>
+<BackgroundTask {onFrame}></BackgroundTask>
 
 <div class="upper">
   <div>
