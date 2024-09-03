@@ -64,10 +64,6 @@ export async function loadSuccessSound() {
   return loadAudio('success', `${base}/audio/correct-soft-beep.mp3`);
 }
 
-export function playSuccessSound() {
-  playAudio('success');
-}
-
 /** @param {string} id */
 export function playAudio(id) {
   scheduleAudio(id, Date.now())

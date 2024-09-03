@@ -85,6 +85,8 @@
 
   function restart() {
     tracker?.clear();
+    bpmDetectionCounter = -1;
+    beatStart = 0;
     showReview = false;
     live = false;
   }

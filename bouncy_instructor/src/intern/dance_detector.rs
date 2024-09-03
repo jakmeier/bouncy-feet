@@ -88,6 +88,10 @@ impl DanceDetector {
         self.detected.partial = None;
         self.detected.steps.clear();
         self.detected.last_error = None;
+        self.detected.failure_reason = None;
+        self.detected.pose_matches = 0;
+        self.detected.pose_misses = 0;
+        self.transition_to_state(DetectionState::Init, self.detection_state_start);
     }
 
     /// Make progress, depending on detection state and new data added since last tick.
@@ -129,9 +133,7 @@ impl DanceDetector {
             }
             DetectionState::LiveTracking => {
                 if let Some(num_beats) = self.tracked_beats {
-                    let end = self.detection_state_start
-                        + (1 + num_beats) as u64 * (self.time_between_poses() * 2.0).round() as u64;
-                    if now >= end {
+                    if self.num_detected_poses() as u32 >= num_beats * self.poses_per_beat() {
                         self.transition_to_state(DetectionState::TrackingDone, now);
                     }
                 }
@@ -177,11 +179,13 @@ impl DanceDetector {
         }
 
         // check we are on beat, if aligned to beat
-        if let Some(first_beat) = self.beat_alignment {
-            let half_beat = self.time_between_poses();
-            let t_total = end_t - first_beat;
-            let relative_beat_distance = (t_total as f32 / half_beat).fract();
-            if relative_beat_distance > 0.2 {
+        let num_detected_poses = self.num_detected_poses();
+        if self.force_beat {
+            let time_delta = self.time_between_poses();
+            let first_beat = self.next_pose_time(self.detection_state_start);
+            let expected_next_pose =
+                first_beat + (num_detected_poses as f32 * time_delta).round() as u64;
+            if now < expected_next_pose {
                 return self
                     .detected
                     .clone()
@@ -189,11 +193,10 @@ impl DanceDetector {
             }
         }
 
-        let beat = self.num_detected_poses();
         let step_info = self.tracked_step();
         let step = db.step(&step_info.id()).expect("tracked step must exist");
 
-        let pose_idx = step.poses[beat % step.poses.len()];
+        let pose_idx = step.poses[num_detected_poses % step.poses.len()];
         let pose = &db.poses()[pose_idx];
 
         // If we detected a different direction than the expected one, it
@@ -300,6 +303,15 @@ impl DanceDetector {
         }
     }
 
+    #[inline]
+    pub(crate) fn poses_per_beat(&self) -> u32 {
+        if self.half_speed {
+            1
+        } else {
+            2
+        }
+    }
+
     pub(crate) fn next_pose_time(&self, not_before: Timestamp) -> Timestamp {
         let t0 = self.beat_alignment.unwrap_or(0);
         let half_beat_duration = self.time_between_poses().round() as u64;
@@ -308,7 +320,7 @@ impl DanceDetector {
     }
 
     pub(crate) fn emit_countdown_audio(&mut self, not_before: Timestamp) {
-        let beat = (2.0 * self.time_between_poses()).round() as u64;
+        let beat = self.time_between_poses().round() as u64;
         let next_beat = self.next_pose_time(not_before);
 
         self.ui_events.add_audio(next_beat, "and".to_owned());
