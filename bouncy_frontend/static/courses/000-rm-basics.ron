@@ -116,9 +116,9 @@
       id: "kick-forward-unbalanced",
       keyframes: [
         (pose: "kick-right-unbalanced", orientation: Right),
-        (pose: "centered-sideway", orientation: Right),
+        (pose: "left-slightly-up", orientation: Right),
         (pose: "kick-left-unbalanced", orientation: Right),
-        (pose: "centered-sideway", orientation: Right),
+        (pose: "right-slightly-up", orientation: Right),
       ],
     ),
     (
@@ -126,9 +126,9 @@
       id: "kick-forward",
       keyframes: [
         (pose: "kick-right", orientation: Right),
-        (pose: "centered-sideway", orientation: Right),
+        (pose: "left-slightly-up", orientation: Right),
         (pose: "kick-left", orientation: Right),
-        (pose: "centered-sideway", orientation: Right),
+        (pose: "right-slightly-up", orientation: Right),
       ],
     ),
     (
@@ -173,14 +173,14 @@
       name: "Running man 3",
       id: "running-man-3",
       keyframes: [
-        (pose: "right-up", orientation: Right),
-        (pose: "right-up", orientation: Right),
-        (pose: "right-up", orientation: Right),
         (pose: "right-forward", orientation: Right, jump_height: 0.125),
-        (pose: "left-up", orientation: Right),
-        (pose: "left-up", orientation: Right),
-        (pose: "left-up", orientation: Right),
+        (pose: "left-up", orientation: Right, jump_height: 0.05),
+        (pose: "left-up", orientation: Right, jump_height: 0.05),
+        (pose: "left-up", orientation: Right, jump_height: 0.05),
         (pose: "left-forward", orientation: Right, jump_height: 0.125),
+        (pose: "right-up", orientation: Right, jump_height: 0.05),
+        (pose: "right-up", orientation: Right, jump_height: 0.05),
+        (pose: "right-up", orientation: Right, jump_height: 0.05),
       ],
     ),
     (
@@ -273,8 +273,8 @@
         (limb: RightFoot, angle: 100, tolerance: 10, weight: 0.0),
         (limb: LeftFoot, angle: 90, tolerance: 0, weight: 0.0),
         (limb: LeftArm, angle: 0, tolerance: 0, weight: 0.0),
-        (limb: LeftForearm, angle: 96, tolerance: 0, weight: 0.0),
-        (limb: RightArm, angle: -25, tolerance: 0, weight: 0.0),
+        (limb: LeftForearm, angle: 36, tolerance: 0, weight: 0.0),
+        (limb: RightArm, angle: -15, tolerance: 0, weight: 0.0),
         (limb: RightForearm, angle: -20, tolerance: 0, weight: 0.0),
       ],
     ),
@@ -333,6 +333,38 @@
       ],
     ),
     (name: "left-up", mirror_of: "right-up", direction: Right),
+    (
+      name: "right-slightly-up",
+      direction: Right,
+      limbs: [
+        (limb: LeftShin, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: LeftThigh, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: LeftFoot, angle: 90, tolerance: 0, weight: 0.0),
+        (limb: RightShin, angle: -80, tolerance: 5, weight: 1.0),
+        (limb: RightThigh, angle: 10, tolerance: 5, weight: 1.0),
+        (limb: RightArm, angle: 6, tolerance: 0, weight: 0.0),
+        (limb: RightForearm, angle: 18, tolerance: 0, weight: 0.0),
+        (limb: RightFoot, angle: 10, tolerance: 0, weight: 0.0),
+        (limb: LeftArm, angle: -12, tolerance: 0, weight: 0.0),
+        (limb: LeftForearm, angle: 6, tolerance: 0, weight: 0.0),
+      ],
+      z: (
+        absolute: {
+          (side: Right, part: Ankle): -0.5,
+          (side: Right, part: Knee): -0.5,
+          (side: Right, part: Toes): -0.5,
+          (side: Right, part: Heel): -0.5,
+          (side: Right, part: Hip): -0.5,
+          (side: Right, part: Shoulder): -0.5,
+        },
+          order: [
+          ( forward: (side: Left, part: Knee), backward: (side: Right, part: Knee) ),
+          ( forward: (side: Left, part: Ankle), backward: (side: Right, part: Ankle) ),
+          ( forward: (side: Left, part: Toes), backward: (side: Right, part: Toes) ),
+        ]
+      )
+    ),
+    (name: "left-slightly-up", mirror_of: "right-slightly-up", direction: Right),
     // TODO: Resting poses should either be added by default or not be required
     // to exist with exactly these names
     (
