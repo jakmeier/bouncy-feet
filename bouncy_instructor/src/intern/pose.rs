@@ -39,8 +39,8 @@ pub(crate) struct LimbPosition {
 
 #[derive(PartialEq, Eq, Hash, Debug, Clone, Copy)]
 pub(crate) struct Limb {
-    start: BodyPoint,
-    end: BodyPoint,
+    pub(crate) start: BodyPoint,
+    pub(crate) end: BodyPoint,
 }
 
 #[derive(PartialEq, Eq, Hash, Debug, Clone, Copy)]

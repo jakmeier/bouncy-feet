@@ -240,6 +240,16 @@ impl DanceCollection {
         (0..self.limbs.len()).map(LimbIndex).zip(self.limbs.iter())
     }
 
+    pub(crate) fn limbs_by_side(
+        &self,
+        side: super::pose::BodySide,
+    ) -> impl Iterator<Item = (LimbIndex, &Limb)> {
+        (0..self.limbs.len())
+            .map(LimbIndex)
+            .zip(self.limbs.iter())
+            .filter(move |(_i, limb)| limb.start.side == side)
+    }
+
     pub(crate) fn limb(&self, index: LimbIndex) -> &Limb {
         &self.limbs[index.as_usize()]
     }

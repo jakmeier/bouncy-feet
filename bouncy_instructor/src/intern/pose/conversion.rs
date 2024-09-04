@@ -367,6 +367,20 @@ impl Skeleton3d {
             };
             limb_angles[limb_pos.limb.as_usize()] = computed_angle;
         }
+
+        // Implicitly order body parts if seen from the side.
+        let left_side_delta = match direction {
+            Direction::East => Some(1.0),
+            Direction::West => Some(-1.0),
+            _ => None,
+        };
+        if let Some(left_side_delta) = left_side_delta {
+            for (limb_index, _limb) in db.limbs_by_side(BodySide::Left) {
+                limbs_z[limb_index.as_usize()] += left_side_delta;
+            }
+        }
+
+        // Use explicit orderings to construct z values.
         for z_ordering in &pose.z_order {
             for (limb_index, _limb) in z_ordering.forward.attached_limbs(db) {
                 limbs_z[limb_index.as_usize()] += 1.0;
