@@ -16,31 +16,30 @@
   function computePoseErrors() {
     const ms = reviewVideoElement.currentTime * 1000;
     const reviewTimestamp = ms + recordingStart;
-    poseErrors = tracker.allPoseErrors(reviewTimestamp);
-    console.log('pose errors are', poseErrors);
+    poseErrors = tracker.allPoseErrors(BigInt(Math.round(reviewTimestamp)));
   }
 
   const tracker = getContext('tracker').tracker;
 </script>
 
 <div class="dev-area">
-    <h2>Dev Area</h2>
-    <button on:click={computePoseErrors}>
-        <span class="material-symbols-outlined"> unfold_more_double </span>
-        <p>Print Frame Details</p>
-    </button>
-    
-    {#if poseErrors}
+  <h2>Dev Area</h2>
+  <button on:click={computePoseErrors}>
+    <span class="material-symbols-outlined"> unfold_more_double </span>
+    <p>Print Frame Details</p>
+  </button>
+
+  {#if poseErrors}
     {#each poseErrors as pose}
-    <PoseError data={pose} />
+      <PoseError data={pose} />
     {/each}
-    {/if}
+  {/if}
 </div>
 
 <style>
-    .dev-area {
-        text-align: center;
-        padding: 10px;
-        background-color: var(--theme-neutral-light);
-    }
+  .dev-area {
+    text-align: center;
+    padding: 10px;
+    background-color: var(--theme-neutral-light);
+  }
 </style>

@@ -19,7 +19,7 @@
     {/each}
     {#each data.zErrors() as zError}
       <li>
-        Z-Error: {zError.error}{zError.quadrant_error ? 'wrong quadrant' : ''}
+        Z-Error: {zError.error}{zError.quadrant_error ? ' wrong quadrant' : ''}
       </li>
     {/each}
     {#each data.zOrderErrors() as orderError}
