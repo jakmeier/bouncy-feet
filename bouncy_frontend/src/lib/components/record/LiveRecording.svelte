@@ -25,6 +25,7 @@
   import { BLACK_COLORING, LEFT_RIGHT_COLORING_LIGHT } from '$lib/constants';
   import { base } from '$app/paths';
   import ProgressBar from './ProgressBar.svelte';
+  import { locale } from '$lib/i18n';
 
   /** @type {import('svelte/store').Writable<DetectionState>} */
   export let cameraOn = false;
@@ -64,6 +65,9 @@
   $: $hideNavigation = cameraOn;
   $: $wideView = cameraOn;
   let progress = 0.0;
+
+  let lastAudioHint = Date.now() - 2000;
+  let audioHintDelay = 5000;
 
   // let { animationTime } = getContext('animation');
   const animationTime = readable(200); // TODO sync with instructor
@@ -160,6 +164,9 @@
       if (kp.fullyVisible) {
         tracker.addKeypoints(kp, BigInt(timestamp));
         recordingEnd = timestamp;
+      } else if (lastAudioHint + audioHintDelay < Date.now()) {
+        lastAudioHint = Date.now();
+        scheduleAudio('take-position', lastAudioHint);
       }
     }
     // TODO(performance): do this less often
@@ -187,8 +194,8 @@
       lastPoseWasCorrect = false;
     }
     if (forceBeat) {
-      instructorSkeleton = tracker.futurePoseSkeleton(1);
-      instructorSkeletonBodyShift = tracker.futurePoseBodyShift();
+      instructorSkeleton = tracker.futurePoseSkeleton(0);
+      instructorSkeletonBodyShift = tracker.futurePoseBodyShift(0);
     } else {
       instructorSkeleton = tracker.expectedPoseSkeleton();
       instructorSkeletonBodyShift = tracker.expectedPoseBodyShift();
@@ -229,12 +236,25 @@
     dataListener = await poseCtx.newPoseDetection(onPoseDetection);
     onVideoResized();
     loadSuccessSound();
-    loadAudio('mistake', `${base}/audio/one-shot-kick.mp3`);
-    loadAudio('and', `${base}/audio/and_0.mp3`);
-    loadAudio('one', `${base}/audio/one.mp3`);
-    loadAudio('two', `${base}/audio/two.mp3`);
-    loadAudio('three', `${base}/audio/three.mp3`);
-    loadAudio('four', `${base}/audio/four.mp3`);
+    const promises = [
+      loadAudio('mistake', `${base}/audio/one-shot-kick.mp3`),
+      loadAudio('and', `${base}/audio/and_0.mp3`),
+      loadAudio('one', `${base}/audio/one.mp3`),
+      loadAudio('two', `${base}/audio/two.mp3`),
+      loadAudio('three', `${base}/audio/three.mp3`),
+      loadAudio('four', `${base}/audio/four.mp3`),
+    ];
+
+    if ($locale.startsWith('de')) {
+      promises.push(
+        loadAudio('take-position', `${base}/audio/de-take-position.mp3`)
+      );
+    } else {
+      promises.push(
+        loadAudio('take-position', `${base}/audio/en-take-position.mp3`)
+      );
+    }
+    Promise.allSettled(promises);
   });
 </script>
 

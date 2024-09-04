@@ -90,6 +90,7 @@
     showReview = false;
     live = false;
     recordingStart = undefined;
+    recordingEnd = undefined;
   }
 
   function openReview() {
