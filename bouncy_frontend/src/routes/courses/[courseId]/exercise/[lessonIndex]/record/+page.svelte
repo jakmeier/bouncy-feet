@@ -89,6 +89,7 @@
     beatStart = 0;
     showReview = false;
     live = false;
+    recordingStart = undefined;
   }
 
   function openReview() {

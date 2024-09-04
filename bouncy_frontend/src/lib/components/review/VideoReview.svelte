@@ -35,7 +35,7 @@
     prevTime = reviewVideoElement.currentTime;
   }
 
-  async function onSeek() {
+  function onSeek() {
     const ms = reviewVideoElement.currentTime * 1000;
     const reviewTimestamp = ms + recordingStart;
     skeleton = tracker.skeletonAt(BigInt(Math.round(reviewTimestamp)));

@@ -126,7 +126,7 @@ impl DanceDetector {
             }
             DetectionState::CountDown => {
                 if now
-                    > self.detection_state_start + (self.time_between_poses() * 16.0).floor() as u64
+                    > self.detection_state_start + (self.time_between_poses() * 8.0).floor() as u64
                 {
                     self.transition_to_state(DetectionState::LiveTracking, now);
                 }

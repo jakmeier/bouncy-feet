@@ -58,7 +58,6 @@
    * @param {number} cursor
    */
   async function adjustScroll(scrollableWidth, cursor) {
-    // avoid cyclic update
     if (stepsDiv) {
       stepsDiv.scrollLeft = scrollableWidth * cursor;
     }
