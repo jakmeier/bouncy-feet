@@ -211,8 +211,8 @@ impl Tracker {
         self.detector.next_pose_time(now)
     }
 
-    #[wasm_bindgen(getter, js_name = halfBeatDuration)]
-    pub fn half_beat_duration(&self) -> f32 {
+    #[wasm_bindgen(getter, js_name = timeBetweenPoses)]
+    pub fn time_between_poses(&self) -> f32 {
         self.detector.time_between_poses()
     }
 
@@ -226,7 +226,7 @@ impl Tracker {
     pub fn pose_skeleton(&self, id: String) -> Option<Skeleton> {
         let index = self.db.pose_by_id(&id)?;
         let pose = &self.db.poses()[index];
-        // TODO: set correct direction 
+        // TODO: set correct direction
         let direction = Direction::East;
         Some(Skeleton::from_pose(pose, &self.db, direction))
     }

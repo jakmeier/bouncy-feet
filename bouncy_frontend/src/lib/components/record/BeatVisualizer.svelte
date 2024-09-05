@@ -1,33 +1,83 @@
 <script>
   import { Tracker } from '$lib/instructor/bouncy_instructor';
-  import { getContext } from 'svelte';
+  import { getContext, onMount } from 'svelte';
   import BackgroundTask from '../BackgroundTask.svelte';
 
   export let size = 50;
-  $: innerSize = size * 0.6;
-  $: bigInnerSize = innerSize * 1.2;
+  $: innerSize = size * 0.8;
+  $: bigInnerSize = innerSize * 1.1;
+  $: padding = (bigInnerSize - innerSize) * 2 + 10;
+  $: slotSize = size - 2 * padding;
 
   /** @type {{tracker: Tracker}} */
   const { tracker } = getContext('tracker');
-  let duration = tracker.halfBeatDuration;
-  let delay = 0;
+  let duration = tracker.timeBetweenPoses;
+  /** @type {Element} */
+  let disk;
+
+  const keyframes = [
+    {
+      offset: 0.0,
+      width: 'var(--big-inner-size)',
+      height: 'var(--big-inner-size)',
+    },
+    {
+      offset: 0.1,
+      width: 'var(--inner-size)',
+      height: 'var(--inner-size)',
+    },
+    {
+      offset: 1.0,
+      width: 'var(--inner-size)',
+      height: 'var(--inner-size)',
+    },
+  ];
+
+  /** @type {Animation} */
+  let animation;
+
+  /** @param {number} duration */
+  function replaceAnimation(duration) {
+    if (animation) {
+      animation.cancel();
+    }
+    const effect = new KeyframeEffect(disk, keyframes, {
+      duration,
+      easing: 'cubic-bezier(0.65, 0.05, 0.36, 1)',
+      iterations: Infinity,
+    });
+    const now = Date.now();
+    animation = new Animation(effect);
+    const start = tracker.nextHalfBeat(BigInt(now));
+    animation.startTime = Number(start);
+    animation.play();
+  }
 
   function onFrame() {
-    const now = Date.now();
-    if (duration !== 2 * tracker.halfBeatDuration) {
-      duration = 2 * tracker.halfBeatDuration;
-      const start = tracker.nextHalfBeat(BigInt(now));
-      delay = Number(start) - now;
+    if (duration !== tracker.timeBetweenPoses) {
+      duration = tracker.timeBetweenPoses;
+      replaceAnimation(duration);
     }
   }
+
+  onMount(() => {
+    replaceAnimation(duration);
+  });
 </script>
 
 <div class="container" style="--outer-size: {size}px;">
   <div class="outer container circle" style="--outer-size: {size}px;">
     <div
+      bind:this={disk}
       class="inner circle"
-      style="--inner-size: {innerSize}px; --big-inner-size: {bigInnerSize}px; animation-duration: {duration}ms; animation-delay: {delay}ms;"
+      style="--inner-size: {innerSize}px; --big-inner-size: {bigInnerSize}px;"
     ></div>
+    <div
+      class="slot"
+      style="width: {slotSize}px; height: {slotSize}; padding: {padding}px"
+    >
+      <slot />
+    </div>
   </div>
 </div>
 
@@ -44,32 +94,19 @@
   .outer {
     height: var(--outer-size);
     width: var(--outer-size);
-    background-color: var(--theme-main);
+    background-color: var(--theme-neutral-dark);
   }
   .inner {
     width: var(--inner-size);
     height: var(--inner-size);
-    animation: my_animation;
-    animation-iteration-count: infinite;
-    animation-timing-function: cubic-bezier(0.65, 0.05, 0.36, 1);
-    background-color: var(--theme-neutral-light);
+    background-color: var(--theme-accent-light);
   }
   .circle {
     border-radius: 50%;
   }
-
-  @keyframes my_animation {
-    0% {
-      width: var(--inner-size);
-      height: var(--inner-size);
-    }
-    50% {
-      width: var(--big-inner-size);
-      height: var(--big-inner-size);
-    }
-    100% {
-      width: var(--inner-size);
-      height: var(--inner-size);
-    }
+  .slot {
+    position: absolute;
+    display: grid;
+    align-self: center;
   }
 </style>
