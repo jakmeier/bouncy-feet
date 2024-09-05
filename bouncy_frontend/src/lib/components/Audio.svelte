@@ -63,7 +63,7 @@
     const bufferSource = getAudio(id);
     if (bufferSource) {
       bufferSource.connect(audioOutput);
-      bufferSource.start(time);
+      bufferSource.start(time - audioContext.outputLatency);
     }
     if (audioContext.state === 'suspended') {
       // on a page reload, the audio context is usually prevented from starting

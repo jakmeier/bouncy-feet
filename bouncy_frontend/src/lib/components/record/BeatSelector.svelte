@@ -20,6 +20,7 @@
   function reset() {
     counter = -1;
     lastTap = Date.now();
+    useFixedBpm = false;
   }
 
   function tap() {
