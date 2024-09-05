@@ -111,6 +111,7 @@
         "bpm-tap-button": "Touch on beat of your music to synchronize the tracker",
         "estimated-bpm-label": "estimated BPM",
         "estimate-bpm-hint": "You have to tap the button to detect the beat before starting the exercise.",
+        "metronome-subtitle": "No music? Play a metronome:",
         "prepare-title": "Prepare dance tracking",
         "settings": {
             "title": "Settings",

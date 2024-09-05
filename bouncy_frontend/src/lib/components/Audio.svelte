@@ -6,6 +6,7 @@
 
   export let bpm = 120;
   export let isOn = false;
+  export let voice = false;
 
   let initialized = false;
   $: initialized && (isOn ? startAudio() : stopAudio());
@@ -84,10 +85,12 @@
         continue;
       }
       // counts
-      const count = noteAudioId(note);
-      if (count) {
-        const node = scheduleNote(time, count);
-        nodes.push(node);
+      if (voice) {
+        const count = noteAudioId(note);
+        if (count) {
+          const node = scheduleNote(time, count);
+          nodes.push(node);
+        }
       }
       // also add a kick
       const fileName = kickAudioFiles[halfBeat % 2];

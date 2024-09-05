@@ -8,6 +8,7 @@
   import Popup from '$lib/components/ui/Popup.svelte';
   import LessonEnd from './LessonEnd.svelte';
   import VideoReview from '$lib/components/review/VideoReview.svelte';
+  import Audio from '$lib/components/Audio.svelte';
 
   const { getCourse } = getContext('courses');
   const { recordFinishedLesson } = getContext('user');
@@ -31,7 +32,7 @@
   let bpmDetectionCounter;
   /** @type {number} */
   let beatStart;
-  $: beatDetected = bpmDetectionCounter >= 3;
+  let beatDetected = false;
   /** @type {import('svelte/store').Writable<boolean>} */
   let showHint;
 
@@ -58,6 +59,7 @@
   let showReview = false;
 
   let bpm = 132;
+  let useFixedBpm = false;
 
   async function start() {
     live = true;
@@ -130,7 +132,7 @@
       console.warn('tracker not set');
     }
   }
-  $: beatStart, updateBeat();
+  $: bpm, updateBeat();
 
   let hitRate = 0.0;
   let passed = false;
@@ -160,6 +162,8 @@
       bind:bpm
       bind:counter={bpmDetectionCounter}
       bind:lastTap={beatStart}
+      bind:bpmSelected={beatDetected}
+      bind:useFixedBpm
     ></BeatSelector>
     <button
       class={beatDetected ? 'light' : 'locked'}
@@ -231,6 +235,10 @@
   {/if}
 </div>
 
+{#if useFixedBpm}
+  <Audio {bpm} isOn={$trackingState !== DetectionState.TrackingDone}></Audio>
+{/if}
+
 <Popup bind:isOpen={showHint} showOkButton title={'common.hint-popup-title'}>
   {$t('record.estimate-bpm-hint')}
 </Popup>
@@ -246,6 +254,8 @@
   button {
     height: 80px;
     margin: 10px;
+    width: 90%;
+    margin-top: 30px;
   }
   button span {
     font-size: 42px;

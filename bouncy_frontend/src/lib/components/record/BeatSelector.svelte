@@ -7,9 +7,15 @@
   let start = Date.now();
   export let lastTap = Date.now();
   export let bpm = 0;
+  export let bpmSelected = false;
+  export let useFixedBpm = false;
 
-  $: if (counter > 0) bpm = Math.round((counter * 60_000) / (lastTap - start));
-  $: displayedBpm = counter > 0 ? bpm : '?';
+  const fixedBpmOptions = [80, 100, 120, 132];
+
+  $: if (counter > 0 && !useFixedBpm)
+    bpm = Math.round((counter * 60_000) / (lastTap - start));
+  $: bpmSelected = (counter > 0 || useFixedBpm) && bpm > 0;
+  $: displayedBpm = bpmSelected ? bpm : '?';
 
   function reset() {
     counter = -1;
@@ -18,10 +24,19 @@
 
   function tap() {
     lastTap = Date.now();
+    if (useFixedBpm) {
+      useFixedBpm = false;
+      counter = -1;
+    }
     if (counter === -1) {
       start = lastTap;
     }
     counter += 1;
+  }
+
+  function setFixedBpm(value) {
+    useFixedBpm = true;
+    bpm = value;
   }
 </script>
 
@@ -44,6 +59,19 @@
     <BeatVisualizer size={200}>
       {$t('record.bpm-tap-button')}
     </BeatVisualizer>
+  </div>
+
+  <div class="fixed-bpm">
+    <div>{$t('record.metronome-subtitle')}</div>
+    <div class="fixed-bpm-options">
+      {#each fixedBpmOptions as value}
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <!-- svelte-ignore a11y-no-static-element-interactions -->
+        <div class="fixed-bpm-option" on:click={() => setFixedBpm(value)}>
+          {value}
+        </div>
+      {/each}
+    </div>
   </div>
 </div>
 
@@ -76,5 +104,18 @@
   }
   .visualizer {
     padding: 20px;
+  }
+  .fixed-bpm-options {
+    display: flex;
+    justify-content: center;
+  }
+  .fixed-bpm-option {
+    padding: 5px;
+    margin: 5px;
+    font-size: 28px;
+    cursor: pointer;
+    background-color: var(--theme-main);
+    color: var(--theme-neutral-white);
+    border-radius: 4px;
   }
 </style>
