@@ -23,7 +23,12 @@
 </script>
 
 <div class="video-container {showVideo ? '' : 'hide'}">
-  <video bind:this={videoElement} controls on:loadedmetadata={videoExists}>
+  <video
+    bind:this={videoElement}
+    controls
+    on:loadedmetadata={videoExists}
+    preload="metadata"
+  >
     <source src={path} type="video/mp4" />
     Your browser does not support the video tag.
   </video>
