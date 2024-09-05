@@ -4,13 +4,13 @@
   import BackgroundTask from './BackgroundTask.svelte';
   import { audioContext, loadAudio, getAudio } from '$lib/stores/Audio';
 
-  export let bpm = 120;
+  export let secondsPerNote = 0.5;
   export let isOn = false;
   export let voice = false;
 
   let initialized = false;
   $: initialized && (isOn ? startAudio() : stopAudio());
-  $: initialized && bpm && resetAudio();
+  $: initialized && secondsPerNote && resetAudio();
 
   let countAudioFiles = ['one', 'two', 'three', 'four'];
   let andAudioFiles = ['and_0', 'and_1', 'and_2'];
@@ -24,7 +24,7 @@
   let isPlaying = false;
   let slowNoteString = '    1 2 12341234';
   let fastNoteString = '    1 a 2 a 1a2a3a4a1a2a3a4a';
-  $: noteString = bpm > 109 ? fastNoteString : slowNoteString;
+  $: noteString = secondsPerNote < 0.55 ? fastNoteString : slowNoteString;
   /**
    * batches of connected audio nodes that should be disconnected at some point
    * @type {AudioBufferSourceNode[][]}
@@ -145,7 +145,6 @@
 
   function onFrame() {
     if (!isPlaying) return;
-    const secondsPerNote = 30.0 / bpm;
     const secondsPerString = noteString.length * secondsPerNote;
 
     while (nextNoteTime < audioContext.currentTime + secondsPerString) {

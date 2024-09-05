@@ -59,6 +59,7 @@
   let showReview = false;
 
   let bpm = 132;
+  let secondsPerNote = 30 / 132;
   let useFixedBpm = false;
 
   async function start() {
@@ -118,6 +119,7 @@
     tracker = course.tracker(lessonIndex);
     if (tracker) {
       tracker.setBpm(bpm);
+      secondsPerNote = tracker.timeBetweenPoses / 1000;
       setContext('tracker', { tracker });
     } else {
       console.error('could not construct tracker for lesson');
@@ -128,6 +130,7 @@
   function updateBeat() {
     if (tracker) {
       tracker.setBpm(bpm);
+      secondsPerNote = tracker.timeBetweenPoses / 1000;
     } else {
       console.warn('tracker not set');
     }
@@ -236,7 +239,7 @@
 </div>
 
 <Audio
-  {bpm}
+  {secondsPerNote}
   isOn={useFixedBpm && $trackingState !== DetectionState.TrackingDone}
 ></Audio>
 
