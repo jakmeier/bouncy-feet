@@ -347,22 +347,7 @@
         (limb: RightFoot, angle: 10, tolerance: 0, weight: 0.0),
         (limb: LeftArm, angle: -12, tolerance: 0, weight: 0.0),
         (limb: LeftForearm, angle: 6, tolerance: 0, weight: 0.0),
-      ],
-      z: (
-        absolute: {
-          (side: Right, part: Ankle): -0.5,
-          (side: Right, part: Knee): -0.5,
-          (side: Right, part: Toes): -0.5,
-          (side: Right, part: Heel): -0.5,
-          (side: Right, part: Hip): -0.5,
-          (side: Right, part: Shoulder): -0.5,
-        },
-          order: [
-          ( forward: (side: Left, part: Knee), backward: (side: Right, part: Knee) ),
-          ( forward: (side: Left, part: Ankle), backward: (side: Right, part: Ankle) ),
-          ( forward: (side: Left, part: Toes), backward: (side: Right, part: Toes) ),
-        ]
-      )
+      ]
     ),
     (name: "left-slightly-up", mirror_of: "right-slightly-up", direction: Right),
     // TODO: Resting poses should either be added by default or not be required
