@@ -111,7 +111,7 @@
         "bpm-tap-button": "Tippe im Takt deiner Musik zur Beat-Synchronisierung",
         "estimated-bpm-label": "geschätzter BPM",
         "estimate-bpm-hint": "Du musst zuerst den Takt erkennen indem du zur Musik auf den Knopf drückst.",
-        "metronome-subtitle": "Keine Musik? Spiel ein Metronom:",
+        "metronome-subtitle": "Keine Musik? Spiel einen Takt:",
         "prepare-title": "Vorbereitung fürs Tracken",
         "settings": {
             "title": "Einstellungen",

@@ -44,7 +44,6 @@
 
   onDestroy(() => {
     stopAudio();
-    audioContext.close();
   });
 
   /**
@@ -65,6 +64,11 @@
     if (bufferSource) {
       bufferSource.connect(audioOutput);
       bufferSource.start(time);
+    }
+    if (audioContext.state === 'suspended') {
+      // on a page reload, the audio context is usually prevented from starting
+      // automatically, we have to wait for a user interaction.
+      audioContext.resume();
     }
     return bufferSource;
   }

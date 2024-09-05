@@ -235,9 +235,10 @@
   {/if}
 </div>
 
-{#if useFixedBpm}
-  <Audio {bpm} isOn={$trackingState !== DetectionState.TrackingDone}></Audio>
-{/if}
+<Audio
+  {bpm}
+  isOn={useFixedBpm && $trackingState !== DetectionState.TrackingDone}
+></Audio>
 
 <Popup bind:isOpen={showHint} showOkButton title={'common.hint-popup-title'}>
   {$t('record.estimate-bpm-hint')}

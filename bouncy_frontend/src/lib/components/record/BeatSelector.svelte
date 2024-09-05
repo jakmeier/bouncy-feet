@@ -34,6 +34,7 @@
     counter += 1;
   }
 
+  /** @param {number} value */
   function setFixedBpm(value) {
     useFixedBpm = true;
     bpm = value;

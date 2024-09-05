@@ -72,6 +72,7 @@ export function playAudio(id) {
 /** 
  * @param {string} id 
  * @param {number} timestamp in ms as UNIX timestamp 
+ * @return {AudioBufferSourceNode}
 */
 export function scheduleAudio(id, timestamp) {
   if (audioContext.state === 'suspended') {
@@ -88,6 +89,7 @@ export function scheduleAudio(id, timestamp) {
   } else {
     console.warn("no sound buffer for", id);
   }
+  return source;
 }
 
 await initAudioContext();
