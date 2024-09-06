@@ -19,6 +19,8 @@
     loadSuccessSound,
     loadAudio,
     scheduleAudio,
+    scheduleAudioOnChannel,
+    setChannelGain,
   } from '$lib/stores/Audio';
   import InstructorAvatar from '../avatar/InstructorAvatar.svelte';
   import { distance2d } from '$lib/math';
@@ -146,7 +148,7 @@
       audio !== undefined;
       audio = tracker.nextAudioEffect()
     ) {
-      scheduleAudio(audio.soundId, Number(audio.timestamp) + $animationTime);
+      scheduleAudio(audio.soundId, Number(audio.timestamp));
     }
   }
 
@@ -166,7 +168,7 @@
         recordingEnd = timestamp;
       } else if (lastAudioHint + audioHintDelay < Date.now()) {
         lastAudioHint = Date.now();
-        scheduleAudio('take-position', lastAudioHint);
+        scheduleAudioOnChannel('take-position', lastAudioHint, 'audio-guide');
       }
     }
     // TODO(performance): do this less often
@@ -178,19 +180,15 @@
    * @param {DetectionResult} detectionResult
    */
   function onStepDetection(detectionResult) {
+    // The sound is played as fast as possible, even if that means it will be
+    // between beats. I tried playing it on the next beat but that makes it
+    // confusing about when an error happens.
     let soundTimestamp = 0;
-    if (forceBeat) {
-      // Play a sound on the next beat. The current beat is long over after the
-      // output latency, playing it immediately sounds most irritating as it will
-      // be heard between beats. Playing on the next beat is better for the flow
-      // dataListener.tZero + audio.timestamp + $animationTime
-      soundTimestamp = Number(tracker.nextHalfBeat()) + $animationTime;
-    }
     if (detectionResult.failureReason === undefined) {
-      scheduleAudio('success', soundTimestamp);
+      scheduleAudioOnChannel('success', soundTimestamp, 'live-feedback');
       lastPoseWasCorrect = true;
     } else {
-      scheduleAudio('mistake', soundTimestamp);
+      // scheduleAudioOnChannel('mistake', soundTimestamp, 'live-feedback');
       lastPoseWasCorrect = false;
     }
     if (forceBeat) {
@@ -254,7 +252,10 @@
         loadAudio('take-position', `${base}/audio/en-take-position.mp3`)
       );
     }
-    Promise.allSettled(promises);
+    await Promise.allSettled(promises);
+    // Low volume to not be louder than the music or beat.
+    setChannelGain('live-feedback', 0.1);
+    setChannelGain('audio-guide', 2.0);
   });
 </script>
 

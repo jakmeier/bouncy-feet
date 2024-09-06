@@ -2,7 +2,14 @@
   import { base } from '$app/paths';
   import { onDestroy, onMount } from 'svelte';
   import BackgroundTask from './BackgroundTask.svelte';
-  import { audioContext, loadAudio, getAudio } from '$lib/stores/Audio';
+  import {
+    audioContext,
+    loadAudio,
+    setChannelGain,
+    cleanupAudioNode,
+    scheduleAudioEx,
+    loadBeatSounds,
+  } from '$lib/stores/Audio';
 
   export let secondsPerNote = 0.5;
   export let isOn = false;
@@ -32,11 +39,7 @@
   let connectedNodes = [];
 
   onMount(async () => {
-    audioOutput = new GainNode(audioContext);
-    await Promise.all(countAudioFiles.map(loadAudioSource));
-    await Promise.all(andAudioFiles.map(loadAudioSource));
-    await Promise.all(kickAudioFiles.map(loadAudioSource));
-
+    await loadBeatSounds();
     if (isOn) startAudio();
     nextNoteTime = audioContext.currentTime;
     initialized = true;
@@ -44,6 +47,7 @@
 
   onDestroy(() => {
     stopAudio();
+    resetAudio();
   });
 
   /**
@@ -60,17 +64,7 @@
    * @return {AudioBufferSourceNode}
    */
   function scheduleNote(time, id) {
-    const bufferSource = getAudio(id);
-    if (bufferSource) {
-      bufferSource.connect(audioOutput);
-      bufferSource.start(time - audioContext.outputLatency);
-    }
-    if (audioContext.state === 'suspended') {
-      // on a page reload, the audio context is usually prevented from starting
-      // automatically, we have to wait for a user interaction.
-      audioContext.resume();
-    }
-    return bufferSource;
+    return scheduleAudioEx(id, time, 'audio-component');
   }
 
   /**
@@ -123,24 +117,24 @@
 
   function startAudio() {
     if (isPlaying) return;
-    audioOutput.connect(audioContext.destination);
+    setChannelGain('audio-component', 1.0);
     isPlaying = true;
   }
 
   function stopAudio() {
     if (!isPlaying) return;
-    audioOutput.disconnect(audioContext.destination);
+    setChannelGain('audio-component', 0.0);
     isPlaying = false;
   }
 
   function resetAudio() {
     for (const nodes of connectedNodes) {
       for (const node of nodes) {
-        node.disconnect(audioOutput);
+        cleanupAudioNode(node, 'audio-component');
       }
     }
     connectedNodes = [];
-    nextNoteTime = audioContext.currentTime;
+    nextNoteTime = audioContext?.currentTime;
   }
 
   function onFrame() {
@@ -160,7 +154,7 @@
     while (connectedNodes.length > 3) {
       const nodes = connectedNodes.shift();
       for (const node of nodes) {
-        node.disconnect(audioOutput);
+        cleanupAudioNode(node, 'audio-component');
       }
     }
   }

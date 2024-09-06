@@ -7,6 +7,7 @@ import { browser } from '$app/environment';
 export let audioContext;
 const audioBuffers = {};
 const audioStore = writable(audioBuffers);
+const channels = {};
 
 async function initAudioContext() {
   if (audioContext) {
@@ -16,6 +17,10 @@ async function initAudioContext() {
     return;
   }
   audioContext = new AudioContext();
+  // @ts-ignore
+  channels.default = new GainNode(audioContext, { gain: 1.0 });
+  // @ts-ignore
+  channels.default.connect(audioContext.destination);
 }
 
 /** 
@@ -64,17 +69,40 @@ export async function loadSuccessSound() {
   return loadAudio('success', `${base}/audio/correct-soft-beep.mp3`);
 }
 
+export async function loadBeatSounds() {
+  let kickAudioFiles = ['kick', 'kick2'];
+  return Promise.all(kickAudioFiles.map((name) => loadAudio(name, `${base}/audio/${name}.mp3`)));
+}
+
 /** @param {string} id */
 export function playAudio(id) {
-  scheduleAudio(id, Date.now())
+  scheduleAudio(id, Date.now());
 }
+
 
 /** 
  * @param {string} id 
  * @param {number} timestamp in ms as UNIX timestamp 
+ * @param {string} channel
  * @return {AudioBufferSourceNode}
 */
-export function scheduleAudio(id, timestamp) {
+export function scheduleAudioOnChannel(id, timestamp, channel) {
+  const delay = (timestamp - Date.now()) / 1000.0;
+  const start = audioContext.currentTime + delay - audioContext.outputLatency;
+  return scheduleAudioEx(id, start, channel);
+}
+
+/** 
+ * @param {string} id 
+ * @param {number} audioTime in time of audio context
+ * @param {string} channel
+ * @return {AudioBufferSourceNode}
+*/
+export function scheduleAudioEx(id, audioTime, channel) {
+  if (!channels[channel]) {
+    channels[channel] = new GainNode(audioContext, { gain: 1.0 });
+  }
+
   if (audioContext.state === 'suspended') {
     // on a page reload, the audio context is usually prevented from starting
     // automatically, we have to wait for a user interaction.
@@ -82,14 +110,45 @@ export function scheduleAudio(id, timestamp) {
   }
   const source = getAudio(id);
   if (source) {
-    source.connect(audioContext.destination);
-    const delay = (timestamp - Date.now()) / 1000.0;
-    const start = audioContext.currentTime + delay - audioContext.outputLatency;
-    source.start(Math.max(0, start));
+    source.connect(channels[channel]);
+    source.start(Math.max(0, audioTime));
   } else {
     console.warn("no sound buffer for", id);
   }
   return source;
+}
+
+/** 
+ * @param {string} id 
+ * @param {number} timestamp in ms as UNIX timestamp 
+ * @param {number} gain 1.0 is normal volume
+ * @return {AudioBufferSourceNode}
+*/
+export function scheduleAudio(id, timestamp) {
+  return scheduleAudioOnChannel(id, timestamp, 'default');
+}
+
+/** 
+ * @param {AudioNode} node
+ * @param {string} channel
+*/
+export function cleanupAudioNode(node, channel) {
+  if (channels[channel]) {
+    node.disconnect(channels[channel]);
+  }
+}
+
+/** 
+ * @param {string} channel
+ * @param {number} gain
+*/
+export function setChannelGain(channel, gain) {
+  if (!channels[channel]) {
+    channels[channel] = new GainNode(audioContext, { gain });
+    channels[channel].connect(audioContext.destination);
+  } else {
+    channels[channel].gain.value = gain;
+  }
 }
 
 await initAudioContext();
