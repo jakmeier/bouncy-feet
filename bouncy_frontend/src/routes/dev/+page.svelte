@@ -2,10 +2,10 @@
   import { Tracker } from '$lib/instructor/bouncy_instructor';
   import { landmarksToKeypoints } from '$lib/pose';
   import { fileToUrl, waitForVideoMetaLoaded } from '$lib/promise_util';
-  import { getContext, onMount, setContext } from 'svelte';
+  import { getContext, onMount } from 'svelte';
   import PoseError from '$lib/components/dev/PoseError.svelte';
-  import Banner from '$lib/components/review/Banner.svelte';
   import VideoReview from '$lib/components/review/VideoReview.svelte';
+  import { registerTracker } from '$lib/stores/Beat';
 
   /** @type {HTMLInputElement}  */
   let upload;
@@ -14,9 +14,7 @@
 
   let dataListener;
   let tracker = new Tracker();
-  setContext('tracker', {
-    tracker,
-  });
+  registerTracker(tracker);
   const poseCtx = getContext('pose');
 
   /** @type {undefined | number} */

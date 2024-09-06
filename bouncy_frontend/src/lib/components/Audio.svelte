@@ -1,37 +1,26 @@
 <script>
-  import { base } from '$app/paths';
   import { onDestroy, onMount } from 'svelte';
   import BackgroundTask from './BackgroundTask.svelte';
   import {
-    audioContext,
-    loadAudio,
     setChannelGain,
     cleanupAudioNode,
-    scheduleAudioEx,
     loadBeatSounds,
+    scheduleAudioOnChannel,
   } from '$lib/stores/Audio';
+  import { beatStart, timeBetweenMoves } from '$lib/stores/Beat';
 
-  export let secondsPerNote = 0.5;
   export let isOn = false;
-  export let voice = false;
 
   let initialized = false;
   $: initialized && (isOn ? startAudio() : stopAudio());
-  $: initialized && secondsPerNote && resetAudio();
+  $: initialized && $timeBetweenMoves && resetAudio();
 
-  let countAudioFiles = ['one', 'two', 'three', 'four'];
-  let andAudioFiles = ['and_0', 'and_1', 'and_2'];
   let kickAudioFiles = ['kick', 'kick2'];
-  /** @type {GainNode} */
-  let audioOutput;
-  /** @type {number} seconds in audio context, when the first unscheduled note
-   * should be scheduled */
-  let nextNoteTime = 0.0;
+  /** @type {number} ms unix timestamp */
+  $: $beatStart, resetAudio();
+  $: nextNoteTime = $beatStart;
   let halfBeat = 0;
   let isPlaying = false;
-  let slowNoteString = '    1 2 12341234';
-  let fastNoteString = '    1 a 2 a 1a2a3a4a1a2a3a4a';
-  $: noteString = secondsPerNote < 0.55 ? fastNoteString : slowNoteString;
   /**
    * batches of connected audio nodes that should be disconnected at some point
    * @type {AudioBufferSourceNode[][]}
@@ -41,7 +30,6 @@
   onMount(async () => {
     await loadBeatSounds();
     if (isOn) startAudio();
-    nextNoteTime = audioContext.currentTime;
     initialized = true;
   });
 
@@ -51,46 +39,31 @@
   });
 
   /**
-   * @param {any} filename
-   */
-  async function loadAudioSource(filename) {
-    const url = `${base}/audio/${filename}.mp3`;
-    return loadAudio(filename, url);
-  }
-
-  /**
    * @param {number} time
    * @param {string} id
    * @return {AudioBufferSourceNode}
    */
   function scheduleNote(time, id) {
-    return scheduleAudioEx(id, time, 'audio-component');
+    return scheduleAudioOnChannel(id, time, 'audio-component');
   }
 
   /**
    * @param {number} start
    * @param {number} beatDuration
-   * @param {string} notes
+   * @param {number} numBeats
    * @return {AudioBufferSourceNode[]}
    */
-  function scheduleNoteString(start, beatDuration, notes) {
+  function scheduleNBeats(start, beatDuration, numBeats) {
     let time = start;
     let nodes = [];
-    for (const note of notes) {
-      if (time < audioContext.currentTime) {
+    let now = Date.now();
+    for (let i = 0; i < numBeats; i++) {
+      if (time < now) {
         time += beatDuration;
         halfBeat++;
         continue;
       }
-      // counts
-      if (voice) {
-        const count = noteAudioId(note);
-        if (count) {
-          const node = scheduleNote(time, count);
-          nodes.push(node);
-        }
-      }
-      // also add a kick
+
       const fileName = kickAudioFiles[halfBeat % 2];
       const node = scheduleNote(time, fileName);
       nodes.push(node);
@@ -98,21 +71,6 @@
       halfBeat++;
     }
     return nodes;
-  }
-
-  let andCounter = 0;
-  /**
-   * @param {string} note
-   * @returns {string|undefined}
-   */
-  function noteAudioId(note) {
-    if (note >= '0' && note <= '9') {
-      return countAudioFiles[parseInt(note) - 1];
-    }
-    if (note === 'a') {
-      andCounter++;
-      return andAudioFiles[(andCounter - 1) % andAudioFiles.length];
-    }
   }
 
   function startAudio() {
@@ -134,21 +92,17 @@
       }
     }
     connectedNodes = [];
-    nextNoteTime = audioContext?.currentTime;
   }
 
   function onFrame() {
     if (!isPlaying) return;
-    const secondsPerString = noteString.length * secondsPerNote;
+    const batchSize = 8;
+    const msPerBatch = batchSize * $timeBetweenMoves;
 
-    while (nextNoteTime < audioContext.currentTime + secondsPerString) {
-      const nodes = scheduleNoteString(
-        nextNoteTime,
-        secondsPerNote,
-        noteString
-      );
+    while (nextNoteTime < Date.now() + msPerBatch) {
+      const nodes = scheduleNBeats(nextNoteTime, $timeBetweenMoves, batchSize);
       connectedNodes.push(nodes);
-      nextNoteTime += secondsPerString;
+      nextNoteTime += msPerBatch;
     }
 
     while (connectedNodes.length > 3) {

@@ -245,31 +245,31 @@ impl Tracker {
     /// (experimenting with live instructor, I probably want to change this when cleaning up the impl)
     #[wasm_bindgen(js_name = expectedPoseSkeleton)]
     pub fn expected_pose_skeleton(&self) -> Skeleton {
-        self.future_pose_skeleton(0)
+        let beat = self.detector.num_detected_poses();
+        self.pose_skeleton_at_beat(beat)
     }
 
-    /// Return a skeleton that's expected after n poses.
-    ///
-    /// Only implemented to work properly for trackers of unique steps.
-    ///
-    /// (experimenting with live instructor, I probably want to change this when cleaning up the impl)
-    #[wasm_bindgen(js_name = futurePoseSkeleton)]
-    pub fn future_pose_skeleton(&self, offset: usize) -> Skeleton {
-        let beat = self.detector.num_detected_poses();
+    #[wasm_bindgen(js_name = beat)]
+    pub fn beat(&self, t: f64) -> u32 {
+        self.detector.time_to_beat(t as u64) as u32
+    }
+
+    #[wasm_bindgen(js_name = poseSkeletonAtBeat)]
+    pub fn pose_skeleton_at_beat(&self, beat: usize) -> Skeleton {
         let step_info = self.detector.tracked_step();
-        step_info.skeleton(beat + offset)
+        step_info.skeleton(beat)
     }
 
     #[wasm_bindgen(js_name = expectedPoseBodyShift)]
     pub fn expected_pose_body_shift(&self) -> Cartesian2d {
-        self.future_pose_body_shift(0)
+        let beat = self.detector.num_detected_poses();
+        self.pose_body_shift_at_beat(beat)
     }
 
-    #[wasm_bindgen(js_name = futurePoseBodyShift)]
-    pub fn future_pose_body_shift(&self, offset: usize) -> Cartesian2d {
-        let beat = self.detector.num_detected_poses();
+    #[wasm_bindgen(js_name = poseBodyShiftAtBeat)]
+    pub fn pose_body_shift_at_beat(&self, beat: usize) -> Cartesian2d {
         let step_info = self.detector.tracked_step();
-        step_info.body_shift(beat + offset)
+        step_info.body_shift(beat)
     }
 
     #[wasm_bindgen(getter, js_name = lastDetection)]
@@ -328,6 +328,11 @@ impl Tracker {
         self.skeletons
             .get(i)
             .map(|skeleton_info| skeleton_info.to_skeleton(0.0))
+    }
+
+    #[wasm_bindgen(getter, js_name = halfSpeed)]
+    pub fn half_speed(&self) -> bool {
+        self.detector.half_speed
     }
 }
 

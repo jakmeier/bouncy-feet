@@ -8,6 +8,7 @@
   import Settings from '$lib/components/record/Settings.svelte';
   import AllPoseErrors from '$lib/components/dev/AllPoseErrors.svelte';
   import { dev } from '$lib/stores/FeatureSelection.js';
+  import { registerTracker } from '$lib/stores/Beat';
 
   const userCtx = getContext('user');
 
@@ -34,9 +35,7 @@
   let reviewStatsSeconds = 0;
 
   const tracker = new Tracker();
-  setContext('tracker', {
-    tracker,
-  });
+  registerTracker(tracker);
 
   const camera = {
     startCamera: async () => {},

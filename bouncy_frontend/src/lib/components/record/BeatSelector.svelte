@@ -1,30 +1,31 @@
 <script>
   import { t } from '$lib/i18n';
+  import { bpm, setBeatStart, setBpm } from '$lib/stores/Beat';
   import Header from '../ui/Header.svelte';
   import BeatVisualizer from './BeatVisualizer.svelte';
 
   export let counter = -1;
-  let start = Date.now();
-  export let lastTap = Date.now();
-  export let bpm = 0;
   export let bpmSelected = false;
   export let useFixedBpm = false;
 
+  let start = Date.now();
+  let lastTap = Date.now();
+
   const fixedBpmOptions = [80, 100, 120, 132];
 
-  $: if (counter > 0 && !useFixedBpm)
-    bpm = Math.round((counter * 60_000) / (lastTap - start));
-  $: bpmSelected = (counter > 0 || useFixedBpm) && bpm > 0;
-  $: displayedBpm = bpmSelected ? bpm : '?';
+  $: bpmSelected = counter > 0 || useFixedBpm;
+  $: displayedBpm = bpmSelected ? $bpm : '?';
 
   function reset() {
     counter = -1;
-    lastTap = Date.now();
+    setBeatStart(Date.now());
     useFixedBpm = false;
   }
 
   function tap() {
     lastTap = Date.now();
+    setBeatStart(lastTap);
+
     if (useFixedBpm) {
       useFixedBpm = false;
       counter = -1;
@@ -33,12 +34,17 @@
       start = lastTap;
     }
     counter += 1;
+
+    if (counter > 2 && !useFixedBpm) {
+      setBpm(Math.round((counter * 60_000) / (lastTap - start)));
+    }
   }
 
-  /** @param {number} value */
-  function setFixedBpm(value) {
+  /** @param {number} bpm */
+  function setFixedBpm(bpm) {
     useFixedBpm = true;
-    bpm = value;
+    setBpm(bpm);
+    setBeatStart(Date.now());
   }
 </script>
 

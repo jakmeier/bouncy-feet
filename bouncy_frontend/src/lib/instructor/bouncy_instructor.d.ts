@@ -66,6 +66,30 @@ export function dances(): (DanceInfo)[];
 export function danceBuilderFromDance(dance_id: string): DanceBuilder;
 /**
 */
+export enum DetectionFailureReason {
+/**
+* The last match was too recent to have another match.
+*/
+  TooEarly = 1,
+/**
+* The timing is off.
+*/
+  NotOnBeat = 2,
+/**
+* Detection did not match an expected pose.
+*/
+  WrongPose = 3,
+/**
+* No data to run detection against.
+*/
+  NoData = 4,
+/**
+* Currently in a state that does not detect.
+*/
+  DetectionDisabled = 5,
+}
+/**
+*/
 export enum DetectionState {
 /**
 * Neutral state, not detecting anything.
@@ -97,30 +121,6 @@ export enum PoseHint {
   LeftRight = 1,
   ZOrder = 2,
   WrongDirection = 3,
-}
-/**
-*/
-export enum DetectionFailureReason {
-/**
-* The last match was too recent to have another match.
-*/
-  TooEarly = 1,
-/**
-* The timing is off.
-*/
-  NotOnBeat = 2,
-/**
-* Detection did not match an expected pose.
-*/
-  WrongPose = 3,
-/**
-* No data to run detection against.
-*/
-  NoData = 4,
-/**
-* Currently in a state that does not detect.
-*/
-  DetectionDisabled = 5,
 }
 
 import type { Readable } from "svelte/store";
@@ -654,6 +654,10 @@ export class Skeleton {
 */
   static resting(sideway: boolean): Skeleton;
 /**
+* @returns {Skeleton}
+*/
+  restingPose(): Skeleton;
+/**
 * @returns {string}
 */
   debugString(): string;
@@ -918,24 +922,24 @@ export class Tracker {
 */
   expectedPoseSkeleton(): Skeleton;
 /**
-* Return a skeleton that's expected after n poses.
-*
-* Only implemented to work properly for trackers of unique steps.
-*
-* (experimenting with live instructor, I probably want to change this when cleaning up the impl)
-* @param {number} offset
+* @param {number} t
+* @returns {number}
+*/
+  beat(t: number): number;
+/**
+* @param {number} beat
 * @returns {Skeleton}
 */
-  futurePoseSkeleton(offset: number): Skeleton;
+  poseSkeletonAtBeat(beat: number): Skeleton;
 /**
 * @returns {Cartesian2d}
 */
   expectedPoseBodyShift(): Cartesian2d;
 /**
-* @param {number} offset
+* @param {number} beat
 * @returns {Cartesian2d}
 */
-  futurePoseBodyShift(offset: number): Cartesian2d;
+  poseBodyShiftAtBeat(beat: number): Cartesian2d;
 /**
 * @returns {number}
 */
@@ -978,6 +982,9 @@ export class Tracker {
 /**
 */
   readonly detectionState: ReadableDetectionState;
+/**
+*/
+  readonly halfSpeed: boolean;
 /**
 */
   readonly lastDetection: DetectionResult;

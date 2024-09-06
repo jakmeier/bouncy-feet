@@ -61,7 +61,7 @@ impl Default for DanceDetector {
         Self {
             bpm: 120.0,
             half_speed: false,
-            error_threshold: 0.05,
+            error_threshold: 0.075,
             detected: DetectionResult::default(),
             target_step: None,
             tracked_beats: None,
@@ -117,7 +117,7 @@ impl DanceDetector {
                         };
                         let resting_pose = &db.poses()[resting_pose_idx];
                         let error_details = resting_pose.skeleton_error(skeleton);
-                        if error_details.error_score() < 0.001 {
+                        if error_details.error_score() < 0.05 {
                             self.transition_to_state(DetectionState::CountDown, now);
                             self.emit_countdown_audio(now);
                         }
@@ -126,7 +126,7 @@ impl DanceDetector {
             }
             DetectionState::CountDown => {
                 if now
-                    > self.detection_state_start + (self.time_between_poses() * 8.0).floor() as u64
+                    > self.detection_state_start + (self.time_between_poses() * 9.0).floor() as u64
                 {
                     self.transition_to_state(DetectionState::LiveTracking, now);
                 }
@@ -182,7 +182,8 @@ impl DanceDetector {
         let num_detected_poses = self.num_detected_poses();
         if self.force_beat {
             let time_delta = self.time_between_poses();
-            let first_beat = self.next_pose_time(self.detection_state_start);
+            let first_beat =
+                self.next_pose_time(self.detection_state_start + (time_delta / 2.0) as u64);
             let expected_next_pose =
                 first_beat + (num_detected_poses as f32 * time_delta).round() as u64;
             if now < expected_next_pose {
@@ -260,13 +261,15 @@ impl DanceDetector {
 
     /// Return how many poses have been detected so far.
     pub(crate) fn num_detected_poses(&self) -> usize {
-        let full = self.detected.steps.len()
-            * self
-                .target_step
-                .as_ref()
-                .expect("must have target step")
-                .beats();
-
+        let full = if let Some(target_step) = &self.target_step {
+            self.detected.steps.len() * target_step.beats()
+        } else {
+            self.detected
+                .steps
+                .iter()
+                .map(|step| step.poses.len())
+                .sum()
+        };
         let partial = if let Some(partial_step) = &self.detected.partial {
             partial_step.poses.len()
         } else {
@@ -312,11 +315,17 @@ impl DanceDetector {
         }
     }
 
+    pub(crate) fn time_to_beat(&self, t: Timestamp) -> u64 {
+        let t0 = self.next_pose_time(self.beat_alignment.unwrap_or(0));
+        let pose_duration = self.time_between_poses().round() as u64;
+        (t - t0) / pose_duration
+    }
+
     pub(crate) fn next_pose_time(&self, not_before: Timestamp) -> Timestamp {
         let t0 = self.beat_alignment.unwrap_or(0);
-        let half_beat_duration = self.time_between_poses().round() as u64;
-        let half_beats = (not_before - t0 + half_beat_duration - 1) / half_beat_duration;
-        t0 + half_beats * half_beat_duration
+        let pose_duration = self.time_between_poses().round() as u64;
+        let poses = (not_before - t0 + pose_duration - 1) / pose_duration;
+        t0 + poses * pose_duration
     }
 
     pub(crate) fn emit_countdown_audio(&mut self, not_before: Timestamp) {

@@ -98,6 +98,11 @@ impl Skeleton {
         }
     }
 
+    #[wasm_bindgen(js_name=restingPose)]
+    pub fn resting_pose(&self) -> Self {
+        Self::resting(self.sideway)
+    }
+
     #[wasm_bindgen(js_name = "debugString")]
     pub fn debug_string(&self) -> String {
         format!("{self:?}")

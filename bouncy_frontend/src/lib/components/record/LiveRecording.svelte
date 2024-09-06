@@ -7,7 +7,7 @@
   import { getContext, onMount } from 'svelte';
   import { I, landmarksToKeypoints, PoseDetection } from '$lib/pose';
   import BackgroundTask from '../BackgroundTask.svelte';
-  import { readable, writable } from 'svelte/store';
+  import { writable } from 'svelte/store';
   import {
     Cartesian2d,
     DetectionResult,
@@ -28,8 +28,9 @@
   import { base } from '$app/paths';
   import ProgressBar from './ProgressBar.svelte';
   import { locale } from '$lib/i18n';
+  import { timeBetweenMoves } from '$lib/stores/Beat';
 
-  /** @type {import('svelte/store').Writable<DetectionState>} */
+  /** @type {boolean} */
   export let cameraOn = false;
   /** @type {undefined | number} */
   export let recordingStart;
@@ -54,35 +55,28 @@
   /** always evaluate the pose on beat and move on to the next pose, even when
    * it does not match */
   export let forceBeat = false;
-  export let bpm = 132;
   export let videoOpacity = 0.0;
-  /** @type {number|null} */
-  export let beatStart = null;
   let lastPoseWasCorrect = true;
 
   const poseCtx = getContext('pose');
   let tracker = getContext('tracker').tracker;
+  let detectionState = tracker.detectionState;
   tracker.enforceBeat(forceBeat);
-  $: timeBetweenMoves = 30_000 / bpm;
+  $: animationTime = Math.min($timeBetweenMoves / 3, 300);
   $: $hideNavigation = cameraOn;
   $: $wideView = cameraOn;
   let progress = 0.0;
+  let currentBeat = -1;
 
   let lastAudioHint = Date.now() - 2000;
   let audioHintDelay = 5000;
-
-  // let { animationTime } = getContext('animation');
-  const animationTime = readable(200); // TODO sync with instructor
-  $: if (beatStart && dataListener) {
-    tracker.alignBeat(BigInt(beatStart));
-  }
 
   /** @type {Camera} */
   let camera;
   /** @type {HTMLVideoElement} */
   let cameraVideoElement;
   /** @type {import("$lib/instructor/bouncy_instructor").Skeleton} */
-  let instructorSkeleton = tracker.expectedPoseSkeleton();
+  let instructorSkeleton = tracker.expectedPoseSkeleton().restingPose();
   let instructorSkeletonBodyShift = tracker.expectedPoseBodyShift();
 
   /** @type {import("@mediapipe/tasks-vision").NormalizedLandmark[]} */
@@ -135,6 +129,23 @@
       let detectionResult = tracker.runDetection();
       if (tracker.numDetectedPoses() > before) {
         onStepDetection(detectionResult);
+        if (!forceBeat) {
+          instructorSkeleton = tracker.expectedPoseSkeleton();
+          instructorSkeletonBodyShift = tracker.expectedPoseBodyShift();
+        }
+        console.assert(
+          instructorSkeleton,
+          'tracker returned no next expected pose'
+        );
+      }
+      if (forceBeat && $detectionState === DetectionState.LiveTracking) {
+        const future = Date.now() + animationTime;
+        let newBeat = tracker.beat(future);
+        if (newBeat !== currentBeat) {
+          instructorSkeleton = tracker.poseSkeletonAtBeat(newBeat);
+          instructorSkeletonBodyShift = tracker.poseBodyShiftAtBeat(newBeat);
+          currentBeat = newBeat;
+        }
       }
       displayPoseHint();
 
@@ -191,17 +202,6 @@
       // scheduleAudioOnChannel('mistake', soundTimestamp, 'live-feedback');
       lastPoseWasCorrect = false;
     }
-    if (forceBeat) {
-      instructorSkeleton = tracker.futurePoseSkeleton(0);
-      instructorSkeletonBodyShift = tracker.futurePoseBodyShift(0);
-    } else {
-      instructorSkeleton = tracker.expectedPoseSkeleton();
-      instructorSkeletonBodyShift = tracker.expectedPoseBodyShift();
-    }
-    console.assert(
-      instructorSkeleton,
-      'tracker returned no next expected pose'
-    );
     lastSuccessSkeletonSize =
       distance2d(landmarks[I.LEFT_SHOULDER], landmarks[I.LEFT_HIP]) * 6;
     const hip = tracker.hipPosition(BigInt(recordingEnd || 0));
@@ -288,7 +288,7 @@
           origin={lastSuccessSkeletonOrigin}
           instructorStyle={LEFT_RIGHT_COLORING_LIGHT}
           {lastPoseWasCorrect}
-          {timeBetweenMoves}
+          {animationTime}
         />
       </div>
     {/if}

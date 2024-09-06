@@ -1,7 +1,7 @@
 <script>
   import { page } from '$app/stores';
   import { t } from '$lib/i18n.js';
-  import { getContext, onDestroy, setContext, tick } from 'svelte';
+  import { getContext, onDestroy, tick } from 'svelte';
   import LiveRecording from '$lib/components/record/LiveRecording.svelte';
   import { DetectionState, Tracker } from '$lib/instructor/bouncy_instructor';
   import BeatSelector from '$lib/components/record/BeatSelector.svelte';
@@ -9,6 +9,11 @@
   import LessonEnd from './LessonEnd.svelte';
   import VideoReview from '$lib/components/review/VideoReview.svelte';
   import Audio from '$lib/components/Audio.svelte';
+  import {
+    registerTracker,
+    timeBetweenMoves,
+    setHalfSpeed,
+  } from '$lib/stores/Beat';
 
   const { getCourse } = getContext('courses');
   const { recordFinishedLesson } = getContext('user');
@@ -57,9 +62,6 @@
 
   let live = false;
   let showReview = false;
-
-  let bpm = 132;
-  let secondsPerNote = 30 / 132;
   let useFixedBpm = false;
 
   async function start() {
@@ -119,24 +121,13 @@
 
     tracker = course.tracker(lessonIndex);
     if (tracker) {
-      tracker.setBpm(bpm);
-      secondsPerNote = tracker.timeBetweenPoses / 1000;
-      setContext('tracker', { tracker });
+      setHalfSpeed(tracker.halfSpeed);
+      registerTracker(tracker);
     } else {
       console.error('could not construct tracker for lesson');
     }
   }
   loadCourse();
-
-  function updateBeat() {
-    if (tracker) {
-      tracker.setBpm(bpm);
-      secondsPerNote = tracker.timeBetweenPoses / 1000;
-    } else {
-      console.warn('tracker not set');
-    }
-  }
-  $: bpm, updateBeat();
 
   let hitRate = 0.0;
   let passed = false;
@@ -163,9 +154,7 @@
 <div class="outer">
   {#if !live}
     <BeatSelector
-      bind:bpm
       bind:counter={bpmDetectionCounter}
-      bind:lastTap={beatStart}
       bind:bpmSelected={beatDetected}
       bind:useFixedBpm
     ></BeatSelector>
@@ -224,8 +213,6 @@
       bind:endRecording
       bind:recordingStart
       bind:recordingEnd
-      {beatStart}
-      {bpm}
       videoOpacity={0.5}
       enableLiveAvatar={true}
       enableInstructorAvatar={true}
@@ -239,9 +226,7 @@
   {/if}
 </div>
 
-<Audio
-  {secondsPerNote}
-  isOn={useFixedBpm && $trackingState !== DetectionState.TrackingDone}
+<Audio isOn={useFixedBpm && $trackingState !== DetectionState.TrackingDone}
 ></Audio>
 
 <Popup bind:isOpen={showHint} showOkButton title={'common.hint-popup-title'}>

@@ -11,6 +11,7 @@
   import LiveRecordingSettings from '$lib/components/record/LiveRecordingSettings.svelte';
   import Popup from '$lib/components/ui/Popup.svelte';
   import SessionReward from '$lib/components/SessionReward.svelte';
+  import { registerTracker, setBpm, setHalfSpeed } from '$lib/stores/Beat';
 
   const stepName = $page.params.stepName;
   const instructorStep = stepsByName(stepName)[0];
@@ -20,8 +21,9 @@
   const isTrainMode = mode === 'train';
 
   const tracker = Tracker.UniqueStepTracker(instructorStep.id);
-  tracker.setBpm(isLearnMode ? 120 : 250);
-  setContext('tracker', { tracker });
+  registerTracker(tracker);
+  setBpm(120);
+  setHalfSpeed(isLearnMode);
 
   const userCtx = getContext('user');
 

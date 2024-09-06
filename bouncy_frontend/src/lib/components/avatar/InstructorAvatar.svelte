@@ -7,6 +7,7 @@
   import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
   import { CORRECT_COLORING } from '$lib/constants';
   import { Cartesian2d } from '$lib/instructor/bouncy_instructor';
+  import { timeBetweenMoves } from '$lib/stores/Beat';
   import Svg from '../avatar/Svg.svelte';
   import { onMount } from 'svelte';
 
@@ -34,9 +35,13 @@
   };
 
   export let showCorrectTime = 100;
-  export let timeBetweenMoves = 300;
-  $: animationTime = Math.min(timeBetweenMoves / 4, 300);
-  let animationDelay = timeBetweenMoves - animationTime;
+  export let animationTime = 100;
+
+  // This would work to show one pose ahead of time.
+  // But currently, the pose is switched right when the animation should start,
+  // so the delay can be 0.
+  // let animationDelay = $timeBetweenMoves - animationTime;
+  let animationDelay = 0;
 
   $: avatarLineWidth = 6 * avatarSize;
   $: correctAvatarLineWidth = 10 * avatarSize;
@@ -61,13 +66,15 @@
     correctBodyShift = prevBodyShift;
     prevSkeleton = skeleton;
     prevBodyShift = bodyShift;
-    if (lastPoseWasCorrect) {
-      displayCorrectPosition();
-    } else {
-      animationDelay = timeBetweenMoves - animationTime;
-      displayedBodyShift = bodyShift;
-      displayedSkeleton = skeleton;
-    }
+    // TODO: showing the correct position messes with the timing
+    // if (lastPoseWasCorrect) {
+    //   displayCorrectPosition();
+    // } else {
+    //   // animationDelay = $timeBetweenMoves - animationTime;
+    //   // animationDelay = 0;
+    displayedBodyShift = bodyShift;
+    displayedSkeleton = skeleton;
+    // }
   }
 
   function displayCorrectPosition() {
@@ -76,7 +83,7 @@
     displayedBodyShift = correctBodyShift || bodyShift;
     setTimeout(() => {
       // TODO: handle reentrance
-      animationDelay = timeBetweenMoves - animationTime - showCorrectTime;
+      animationDelay = $timeBetweenMoves - animationTime - showCorrectTime;
       displayedStyle = instructorStyle;
       displayedLineWidth = avatarLineWidth;
       displayedBodyShift = bodyShift;
