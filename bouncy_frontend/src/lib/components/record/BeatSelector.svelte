@@ -12,6 +12,7 @@
   let lastTap = Date.now();
 
   const fixedBpmOptions = [80, 100, 120, 132];
+  const timeout = 2000;
 
   $: bpmSelected = counter > 0 || useFixedBpm;
   $: displayedBpm = bpmSelected ? $bpm : '?';
@@ -23,7 +24,11 @@
   }
 
   function tap() {
-    lastTap = Date.now();
+    const now = Date.now();
+    if (lastTap + timeout < now) {
+      counter = -1;
+    }
+    lastTap = now;
     setBeatStart(lastTap);
 
     if (useFixedBpm) {
@@ -51,6 +56,12 @@
 <Header title={$t('record.prepare-title')} backButton></Header>
 
 <div class="outer">
+  <div class="visualizer" on:pointerdown={tap}>
+    <BeatVisualizer size={200}>
+      {$t('record.bpm-tap-button')}
+    </BeatVisualizer>
+  </div>
+
   <div class="bpm-container">
     <div class="bpm">
       {displayedBpm}
@@ -61,12 +72,6 @@
     <button class="reset" on:click={reset}>
       <span class="material-symbols-outlined button"> cancel </span>
     </button>
-  </div>
-
-  <div class="visualizer" on:pointerdown={tap}>
-    <BeatVisualizer size={200}>
-      {$t('record.bpm-tap-button')}
-    </BeatVisualizer>
   </div>
 
   <div class="fixed-bpm">
@@ -111,7 +116,7 @@
     font-size: 28px;
   }
   .visualizer {
-    padding: 20px;
+    padding-top: 20px;
   }
   .fixed-bpm-options {
     display: flex;
