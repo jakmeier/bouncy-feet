@@ -8,7 +8,7 @@ pub use pose_output::PoseApproximation;
 pub use step_output::DetectedStep;
 
 use crate::intern::dance_collection::{DanceCollection, ForeignCollectionError};
-use crate::intern::dance_detector::DanceDetector;
+use crate::intern::dance_detector::{DanceDetector, DetectionState};
 use crate::intern::skeleton_3d::{Direction, Skeleton3d};
 use crate::keypoints::{Cartesian3d, Keypoints};
 use crate::skeleton::{Cartesian2d, Skeleton};
@@ -107,6 +107,13 @@ impl Tracker {
         let step_info = StepInfo::from_step(step, &db);
 
         Ok(Tracker::new(db, Some(step_info), None))
+    }
+
+    #[wasm_bindgen(js_name = "finishTracking")]
+    pub fn finish_tracking(&mut self) {
+        let now = *self.timestamps.last().unwrap_or(&0);
+        self.detector
+            .transition_to_state(DetectionState::TrackingDone, now)
     }
 
     pub fn clear(&mut self) {

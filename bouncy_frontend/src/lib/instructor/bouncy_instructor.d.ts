@@ -65,15 +65,6 @@ export function dances(): (DanceInfo)[];
 */
 export function danceBuilderFromDance(dance_id: string): DanceBuilder;
 /**
-* Best guess for what the dancer needs to change to fit the pose.
-*/
-export enum PoseHint {
-  DontKnow = 0,
-  LeftRight = 1,
-  ZOrder = 2,
-  WrongDirection = 3,
-}
-/**
 */
 export enum DetectionState {
 /**
@@ -97,6 +88,15 @@ export enum DetectionState {
 * available.
 */
   TrackingDone = 5,
+}
+/**
+* Best guess for what the dancer needs to change to fit the pose.
+*/
+export enum PoseHint {
+  DontKnow = 0,
+  LeftRight = 1,
+  ZOrder = 2,
+  WrongDirection = 3,
 }
 /**
 */
@@ -822,15 +822,6 @@ export class StepInfo {
 export class Tracker {
   free(): void;
 /**
-* @param {bigint} timestamp
-* @returns {ExportedFrame}
-*/
-  exportFrame(timestamp: bigint): ExportedFrame;
-/**
-* @returns {string}
-*/
-  exportKeypoints(): string;
-/**
 * Create a tracker for all known steps.
 */
   constructor();
@@ -849,6 +840,9 @@ export class Tracker {
 * @returns {Tracker}
 */
   static UniqueStepTracker(step_id: string): Tracker;
+/**
+*/
+  finishTracking(): void;
 /**
 */
   clear(): void;
@@ -972,6 +966,15 @@ export class Tracker {
 * @returns {Skeleton | undefined}
 */
   skeletonAt(timestamp: bigint): Skeleton | undefined;
+/**
+* @param {bigint} timestamp
+* @returns {ExportedFrame}
+*/
+  exportFrame(timestamp: bigint): ExportedFrame;
+/**
+* @returns {string}
+*/
+  exportKeypoints(): string;
 /**
 */
   readonly detectionState: ReadableDetectionState;

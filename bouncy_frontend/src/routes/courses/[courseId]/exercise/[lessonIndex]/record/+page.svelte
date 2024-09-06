@@ -71,6 +71,7 @@
 
   async function stop() {
     stopCamera();
+    tracker?.finishTracking();
 
     detectionResult = tracker?.lastDetection;
     detectedSteps = detectionResult?.steps();
