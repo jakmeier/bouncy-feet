@@ -162,45 +162,32 @@
       <p>{$t('courses.lesson.start-button')}</p>
     </button>
   {:else if $trackingState === DetectionState.TrackingDone}
-    {#if !showReview}
-      <LessonEnd
-        {hitRate}
-        {passed}
-        hits={tracker?.lastDetection.poseMatches}
-        misses={tracker?.lastDetection.poseMisses}
-      ></LessonEnd>
+    <LessonEnd
+      {hitRate}
+      {passed}
+      hits={tracker?.lastDetection.poseMatches}
+      misses={tracker?.lastDetection.poseMisses}
+    ></LessonEnd>
 
-      <div class="buttons">
-        <button class="light" on:click={restart}
-          >{$t('courses.end.again-button')}</button
-        >
-        <button class="light" on:click={openReview}>
-          {$t('record.review-button')}
-        </button>
-        <button class="light" on:click={goBack}
-          >{$t('courses.end.back-button')}</button
-        >
-      </div>
-    {:else if recordingStart !== undefined && recordingEnd !== undefined}
+    {#if recordingStart !== undefined && recordingEnd !== undefined}
       <VideoReview
         reviewVideoSrc={videoUrl}
         {detectedSteps}
         {recordingStart}
         {recordingEnd}
       ></VideoReview>
-      <div>
-        <button class="light" on:click={closeReview}>
-          <span class="material-symbols-outlined"> arrow_back </span>
-          <p>{$t('record.back-button')}</p>
-        </button>
-      </div>
     {:else}
       Failed to load review
-      <button class="light" on:click={closeReview}>
-        <span class="material-symbols-outlined"> arrow_back </span>
-        <p>{$t('record.back-button')}</p>
-      </button>
     {/if}
+
+    <div class="buttons">
+      <button class="light" on:click={restart}
+        >{$t('courses.end.again-button')}</button
+      >
+      <button class="light" on:click={goBack}
+        >{$t('courses.end.back-button')}</button
+      >
+    </div>
   {:else}
     <LiveRecording
       bind:startCamera
@@ -236,12 +223,12 @@
   .buttons {
     display: flex;
     flex-direction: column;
+    margin-top: 10px;
   }
   button {
     height: 80px;
-    margin: 10px;
+    margin: 5px auto;
     width: 90%;
-    margin-top: 30px;
   }
   button span {
     font-size: 42px;

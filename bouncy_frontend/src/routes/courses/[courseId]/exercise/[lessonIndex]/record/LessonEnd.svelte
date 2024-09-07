@@ -13,27 +13,18 @@
       : hitRate > 0.44
         ? 'courses.end.failed'
         : 'courses.end.failed-hard';
+  let outerWidth;
+  $: explanationWidth = outerWidth ? outerWidth / 2 : 200;
 </script>
 
-<div class="outer">
-  {#if passed}
-    <span class="material-symbols-outlined done"> verified </span>
-  {:else if hitRate > 0.44}
-    <span class="material-symbols-outlined done"> sports_score </span>
-  {:else}
-    <p>
-      <span class="material-symbols-outlined done">
-        sentiment_dissatisfied
-      </span>
-    </p>
-  {/if}
-
-  <p>{(hitRate * 100).toFixed(0)}%</p>
-  <p>{hits} / {hits + misses}</p>
-
+<div class="outer" bind:clientWidth={outerWidth}>
   <div class="explanation">
-    <Explanation text={$t(text)}></Explanation>
+    <Explanation text={$t(text)} width={explanationWidth}></Explanation>
   </div>
+
+  <!-- TODO: would be nicer to show this visually instead of with numbers -->
+  <p>{(hitRate * 100).toFixed(0)}%</p>
+  <!-- <p>{hits} / {hits + misses}</p> -->
 </div>
 
 <style>
@@ -45,10 +36,6 @@
   p {
     font-size: 36px;
     margin: 5px;
-  }
-  span {
-    font-size: 130px;
-    color: var(--theme-neutral-dark);
   }
   .explanation {
     margin: 20px;

@@ -40,7 +40,9 @@
     const reviewTimestamp = ms + recordingStart;
     skeleton = tracker.skeletonAt(reviewTimestamp);
     const cursor = ms / (recordingEnd - recordingStart);
-    setCursor(cursor);
+    if (setCursor) {
+      setCursor(cursor);
+    }
   }
 
   /**
@@ -86,41 +88,6 @@ be better, however, this fires at different rates per browser and often only
 once per 250ms. -->
 <BackgroundTask {onFrame}></BackgroundTask>
 
-<div class="upper">
-  <div>
-    <!-- svelte-ignore a11y-media-has-caption -->
-    <video
-      bind:this={reviewVideoElement}
-      on:click={togglePlay}
-      src={reviewVideoSrc}
-      playsinline
-      style="margin-top: 10px; max-width: 100%"
-    ></video>
-  </div>
-
-  <div>
-    <Svg height={avatarSize} width={avatarSize}>
-      {#if skeleton}
-        <SvgAvatar
-          width={avatarSize}
-          height={avatarSize}
-          lineWidth={avatarLineWidth}
-          {skeleton}
-          style={LEFT_RIGHT_COLORING}
-        />
-      {/if}
-    </Svg>
-  </div>
-</div>
-
-<Banner
-  steps={detectedSteps}
-  bind:setCursor
-  reviewStart={recordingStart}
-  reviewEnd={recordingEnd}
-  onScroll={seekVideoToCursor}
-></Banner>
-
 <div class="poses-details">
   {#each detectedSteps as step}
     {#each step.poses as pose}
@@ -132,6 +99,43 @@ once per 250ms. -->
     {/each}
   {/each}
 </div>
+
+<div class="background-strip">
+  <div class="upper">
+    <div>
+      <!-- svelte-ignore a11y-media-has-caption -->
+      <video
+        bind:this={reviewVideoElement}
+        on:click={togglePlay}
+        src={reviewVideoSrc}
+        playsinline
+        style="margin-top: 10px; max-width: 100%"
+      ></video>
+    </div>
+
+    <div>
+      <Svg height={avatarSize} width={avatarSize}>
+        {#if skeleton}
+          <SvgAvatar
+            width={avatarSize}
+            height={avatarSize}
+            lineWidth={avatarLineWidth}
+            {skeleton}
+            style={LEFT_RIGHT_COLORING}
+          />
+        {/if}
+      </Svg>
+    </div>
+  </div>
+</div>
+
+<!-- <Banner
+  steps={detectedSteps}
+  bind:setCursor
+  reviewStart={recordingStart}
+  reviewEnd={recordingEnd}
+  onScroll={seekVideoToCursor}
+></Banner> -->
 
 {#if $dev}
   <AllPoseErrors {reviewVideoElement} {recordingStart}></AllPoseErrors>
@@ -152,5 +156,11 @@ once per 250ms. -->
   .poses-details {
     display: flex;
     overflow-x: auto;
+  }
+
+  .background-strip {
+    margin: 0 -45px;
+    padding: 10px 50px;
+    background-color: var(--theme-neutral-light);
   }
 </style>

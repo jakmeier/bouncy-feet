@@ -27,7 +27,7 @@
   $: scoreWidth = ((max - pose.error) / max) * width;
 </script>
 
-<div class="pose">
+<div class="pose" class:failed-pose={pose.error > threshold}>
   {#if pose.error <= threshold}
     <span class="material-symbols-outlined passed"> verified </span>
   {:else}
@@ -64,10 +64,14 @@
   .pose {
     height: 230px;
     background-color: var(--theme-neutral-light);
-    border-radius: 50px;
-    padding: 10px 30px;
+    border-radius: 5px;
+    border: solid 2px #33a86d;
+    padding: 0 10px;
     margin: 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.55);
+  }
+  .failed-pose {
+    border: solid 2px #eb3b3b;
   }
 
   .avatar-container {
@@ -103,7 +107,7 @@
     font-size: 50px;
   }
   span.failed {
-    color: rgba(0, 0, 0, 0.25);
+    color: var(--theme-neutral-white);
   }
   span.passed {
     color: var(--theme-neutral-white);
