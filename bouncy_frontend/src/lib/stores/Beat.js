@@ -1,40 +1,29 @@
 import { Tracker } from '$lib/instructor/bouncy_instructor';
 import { setContext } from 'svelte';
-import { derived, readable } from 'svelte/store';
+import { derived, writable } from 'svelte/store';
 
-let privateSetBeatStart = (/** @type {number} */ num) => { };
-let privateSetBpm = (/** @type {number} */ num) => { };
-let privateSetHalfSpeed = (/** @type {boolean} */ yes) => { };
 
-export const beatStart = readable(Date.now(), (set) => {
-    privateSetBeatStart = set;
-});
-
-export const bpm = readable(132, (set) => {
-    privateSetBpm = set;
-});
-
-export const halfSpeed = readable(false, (set) => {
-    privateSetHalfSpeed = set;
-});
+export const beatStart = writable(Date.now());
+export const bpm = writable(132);
+export const halfSpeed = writable(false);
 
 export const timeBetweenMoves = derived([bpm, halfSpeed], ([$bpm, $halfSpeed]) => {
     return ($halfSpeed ? 60_000 : 30_000) / $bpm;
 })
 
-/** @param {number} bpm */
-export function setBpm(bpm) {
-    privateSetBpm(bpm)
+/** @param {number} value */
+export function setBpm(value) {
+    bpm.set(value);
 }
 
-/** @param {number} beatStart */
-export function setBeatStart(beatStart) {
-    privateSetBeatStart(beatStart)
+/** @param {number} value */
+export function setBeatStart(value) {
+    beatStart.set(value);
 }
 
 /** @param {boolean} yes */
 export function setHalfSpeed(yes) {
-    privateSetHalfSpeed(yes)
+    halfSpeed.set(yes);
 }
 
 /** @param {Tracker} tracker */

@@ -9,11 +9,7 @@
   import LessonEnd from './LessonEnd.svelte';
   import VideoReview from '$lib/components/review/VideoReview.svelte';
   import Audio from '$lib/components/Audio.svelte';
-  import {
-    registerTracker,
-    timeBetweenMoves,
-    setHalfSpeed,
-  } from '$lib/stores/Beat';
+  import { registerTracker, setHalfSpeed } from '$lib/stores/Beat';
 
   const { getCourse } = getContext('courses');
   const { recordFinishedLesson } = getContext('user');
