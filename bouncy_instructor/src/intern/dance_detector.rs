@@ -73,7 +73,7 @@ impl Default for DanceDetector {
         Self {
             bpm: 120.0,
             half_speed: false,
-            error_threshold: 0.075,
+            error_threshold: 0.05,
             detected: DetectionResult::default(),
             target_step: None,
             tracked_beats: None,

@@ -100,11 +100,9 @@ impl Tracker {
         };
 
         // for debugging, quite useful for now
-        for (angle, name) in skeleton
-            .angles()
-            .iter()
-            .zip(crate::intern::pose::Limb::base_limb_names())
-        {
+        for (limb_index, _limb) in self.db.limbs() {
+            let name = self.db.limb_name(limb_index);
+            let angle = skeleton.angles()[limb_index.as_usize()];
             crate::println!("{name}: {angle:?}");
         }
 
