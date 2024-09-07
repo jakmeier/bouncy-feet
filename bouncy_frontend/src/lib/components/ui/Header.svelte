@@ -1,4 +1,5 @@
 <script>
+  import { afterUpdate } from 'svelte';
   import BackButton from './BackButton.svelte';
 
   /** @type {string} */
@@ -6,6 +7,25 @@
   /** @type {null|string} */
   export let button = null;
   export let backButton = true;
+
+  /** @type {Element} */
+  let titleElement;
+
+  function adjustFontSize() {
+    let initialFontSize = 28;
+    titleElement.style.fontSize = initialFontSize + 'px';
+    const maxWidth =
+      titleElement.parentElement.getBoundingClientRect().width - 20;
+    const width = titleElement.getBoundingClientRect().width;
+    const ratio = maxWidth / width;
+    if (ratio < 1) {
+      titleElement.style.fontSize = ratio * initialFontSize + 'px';
+    }
+  }
+
+  afterUpdate(() => {
+    adjustFontSize();
+  });
 </script>
 
 <header>
@@ -14,7 +34,9 @@
   {:else}
     <div></div>
   {/if}
-  <span class="title">{title}</span>
+  <div class="title-container">
+    <span class="title" bind:this={titleElement}>{title}</span>
+  </div>
   {#if button !== null}
     <button on:click>
       <span class="material-symbols-outlined button"> {button} </span>
@@ -29,7 +51,7 @@
     height: 50px;
   }
 
-  span.title {
+  .title-container {
     margin: auto;
     height: 30px;
     width: calc(100% - 25px);
@@ -39,6 +61,11 @@
     text-align: center;
     font-size: 28px;
     overflow: hidden auto;
+    white-space: nowrap;
+  }
+
+  span {
+    display: inline-block;
   }
 
   button {
