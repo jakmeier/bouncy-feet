@@ -143,7 +143,12 @@ async function initMediaPipeBackend() {
         {
             baseOptions: {
                 // loading from a path (could also load from buffer)
+                // around 20ms on desktop
+                // modelAssetPath: `${base}/models/pose_landmarker_lite.task`,
+                // around 30ms on desktop
                 modelAssetPath: `${base}/models/pose_landmarker_full.task`,
+                // around 100ms detection delay on desktop, unusable for live tracking
+                // modelAssetPath: `${base}/models/pose_landmarker_heavy.task`,
             },
             runningMode: "VIDEO",
             numPoses: 1,
