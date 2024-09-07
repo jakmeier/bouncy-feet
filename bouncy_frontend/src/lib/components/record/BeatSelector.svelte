@@ -97,11 +97,10 @@
     width: 200px;
     height: 160px;
     border-radius: 20px;
-    margin: 10px auto;
+    margin: 10px auto 30px;
   }
   .bpm {
-    font-size: 50px;
-    margin-top: 20px;
+    font-size: 90px;
   }
   .reset {
     width: 80px;

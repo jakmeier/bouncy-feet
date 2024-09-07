@@ -109,7 +109,7 @@
         "no-upload-hint": "Hint: The recording is evaluated on your device and never uploaded or shared with the developers.",
         "download": "save",
         "bpm-tap-button": "Tap along with your music to match the beat",
-        "estimated-bpm-label": "estimated BPM",
+        "estimated-bpm-label": "bpm",
         "estimate-bpm-hint": "You have to tap the button to detect the beat before starting the exercise.",
         "metronome-subtitle": "No music? Play a simple beat:",
         "prepare-title": "Prepare dance tracking",

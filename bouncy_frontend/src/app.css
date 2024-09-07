@@ -76,6 +76,15 @@ button.light {
     border-radius: 2px;
     font-size: 20px;
     padding: 10px;
+    box-shadow: 0 2px 4px #00000082;
+}
+
+button.light:hover {
+    box-shadow: 0 2px 8px #00000082;
+}
+
+button.light:active {
+    box-shadow: 0 0px 0px #00000082;
 }
 
 button.danger {

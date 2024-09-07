@@ -4,8 +4,8 @@
   import BackgroundTask from '../BackgroundTask.svelte';
 
   export let size = 50;
-  $: innerSize = size * 0.8;
-  $: bigInnerSize = innerSize * 1.1;
+  $: innerSize = size * 0.9;
+  $: bigInnerSize = size * 0.95;
   $: padding = (bigInnerSize - innerSize) * 2 + 10;
   $: slotSize = size - 2 * padding;
 

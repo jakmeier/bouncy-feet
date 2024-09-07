@@ -53,7 +53,7 @@
   {/if}
 </div>
 
-<h3>{$t('courses.lesson.steps-subtitle')}</h3>
+<!-- <h3>{$t('courses.lesson.steps-subtitle')}</h3> -->
 <div class="overview">
   {#each lesson.parts as part, index}
     <div class="exercise-part">
