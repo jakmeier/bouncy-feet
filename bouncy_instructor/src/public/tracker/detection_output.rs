@@ -39,6 +39,8 @@ pub enum DetectionFailureReason {
     NoData = 4,
     /// Currently in a state that does not detect.
     DetectionDisabled = 5,
+    /// No *new* data to run detection against.
+    NoNewData = 6,
 }
 
 /// Best guess for what the dancer needs to change to fit the pose.

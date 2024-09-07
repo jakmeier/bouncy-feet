@@ -23,6 +23,12 @@ pub(crate) struct DanceDetector {
     pub(crate) beat_alignment: Option<Timestamp>,
     /// Enforce that a pose is evaluated on beat, regardless of how well it matches.
     pub(crate) force_beat: bool,
+    /// How much time before or after the actual beat a pose can be to be
+    /// considered on beat
+    pub(crate) beat_tolerance: f64,
+    /// How long it takes from a movement of the person on camera to be visible
+    /// in an image.
+    pub(crate) camera_input_delay: f64,
     /// The expected step for unique step tracking
     pub(crate) target_step: Option<StepInfo>,
     /// How many beats to track for, counting only in LiveTracking state.
@@ -31,12 +37,18 @@ pub(crate) struct DanceDetector {
     // state
     /// Data about detection so far.
     pub(crate) detected: DetectionResult,
+    /// Within the configured tolerance, all skeletons timed on the beat are
+    /// collected here until the tolerance time frame is surpassed or a good
+    /// match is found.
+    on_beat_candidates: Vec<PoseApproximation>,
     /// State machine of the detector.
     detection_state: DetectionState,
     /// A svelte store that can be subscribed to for state updates.
     pub(crate) detection_state_store: Readable<DetectionState>,
     /// When the tracker entered the current state.
     pub(crate) detection_state_start: Timestamp,
+    /// The timestamp of the last skeleton evaluated, to avoid duplicated work on tick.
+    pub(crate) last_evaluation: Timestamp,
     pub(crate) ui_events: UiEvents,
 }
 
@@ -67,10 +79,19 @@ impl Default for DanceDetector {
             tracked_beats: None,
             beat_alignment: None,
             force_beat: false,
+            beat_tolerance: 100.0,
+            // This is what I measured on my desktop with my webcam by looking
+            // at the timestamps of claps timed on the audio output. Basically,
+            // I measured the remaining error in timing after I have considered
+            // audio output latency and computational overhead.
+            // TODO: have some kind of estimate run on the device
+            camera_input_delay: 150.0,
             detection_state: DetectionState::Init,
             detection_state_store: Readable::new(DetectionState::Init),
             detection_state_start: 0.0,
+            last_evaluation: -0.1,
             ui_events: UiEvents::default(),
+            on_beat_candidates: vec![],
         }
     }
 }
@@ -130,6 +151,13 @@ impl DanceDetector {
                 }
             }
             DetectionState::LiveTracking => {
+                if self.last_evaluation == now {
+                    return self
+                        .detected
+                        .clone()
+                        .with_failure_reason(DetectionFailureReason::NoNewData);
+                }
+                self.last_evaluation = now;
                 if let Some(num_beats) = self.tracked_beats {
                     if self.num_detected_poses() as u32 >= num_beats * self.poses_per_beat() {
                         self.transition_to_state(DetectionState::TrackingDone, now);
@@ -157,10 +185,9 @@ impl DanceDetector {
         &mut self,
         db: &DanceCollection,
         skeleton: &Skeleton3d,
-        now: Timestamp,
+        pose_timestamp: Timestamp,
     ) -> DetectionResult {
         let prev_detection = &mut self.detected;
-        let end_t = now;
         let last_step = prev_detection
             .partial
             .as_ref()
@@ -169,7 +196,7 @@ impl DanceDetector {
 
         // skip at least a quarter beat
         let min_delay = self.time_between_poses() / 2.0;
-        if end_t < start_t + min_delay {
+        if pose_timestamp < start_t + min_delay {
             return self
                 .detected
                 .clone()
@@ -178,16 +205,17 @@ impl DanceDetector {
 
         // check we are on beat, if aligned to beat
         let num_detected_poses = self.num_detected_poses();
-        if self.force_beat {
-            let time_delta = self.time_between_poses();
-            let first_beat = self.next_pose_time(self.detection_state_start + (time_delta / 2.0));
-            let expected_next_pose = first_beat + (num_detected_poses as f64 * time_delta).round();
-            if now < expected_next_pose {
-                return self
-                    .detected
-                    .clone()
-                    .with_failure_reason(DetectionFailureReason::NotOnBeat);
-            }
+        let time_delta = self.time_between_poses();
+        let first_beat = self.next_pose_time(self.detection_state_start + (time_delta / 2.0));
+        let expected_next_pose = first_beat + (num_detected_poses as f64 * time_delta).round();
+        if self.force_beat
+            && f64::abs(pose_timestamp - expected_next_pose - self.camera_input_delay)
+                < self.beat_tolerance
+        {
+            return self
+                .detected
+                .clone()
+                .with_failure_reason(DetectionFailureReason::NotOnBeat);
         }
 
         let step_info = self.tracked_step();
@@ -212,7 +240,7 @@ impl DanceDetector {
         let pose_approximation = PoseApproximation {
             name: db.pose_name(pose_idx).to_owned(),
             error,
-            timestamp: end_t,
+            timestamp: pose_timestamp,
             error_details,
         };
         if !has_z_error && error < self.error_threshold {
@@ -237,10 +265,24 @@ impl DanceDetector {
                     }
                 }
             };
-            // Despite the error, if forced, the pose should still be added to the detection.
+            // Despite the error, if forced, a pose should still be added to the
+            // detection after the tolerated deviation. In that case, select the
+            // smallest error in the tolerated range.
             if self.force_beat {
-                self.add_pose(pose_approximation.clone());
-                self.detected.pose_misses += 1;
+                self.on_beat_candidates.push(pose_approximation.clone());
+                if pose_timestamp - self.camera_input_delay
+                    > expected_next_pose + self.beat_tolerance
+                {
+                    let closest_fit = self
+                        .on_beat_candidates
+                        .drain(..)
+                        .min_by(|a, b| f32::total_cmp(&a.error, &b.error));
+                    // just added a pose above, min() can't be empty
+                    let pose_approximation =
+                        closest_fit.expect("on_beat_candidates shouldn't be empty");
+                    self.add_pose(pose_approximation);
+                    self.detected.pose_misses += 1;
+                }
             }
             self.detected.last_error = Some((hint, pose_approximation));
         }
@@ -283,6 +325,7 @@ impl DanceDetector {
 
     pub(crate) fn add_pose(&mut self, pose: PoseApproximation) {
         self.detected.add_pose(pose);
+        self.on_beat_candidates.clear();
         if let Some(target_step) = &self.target_step {
             self.detected.match_step(target_step);
         }

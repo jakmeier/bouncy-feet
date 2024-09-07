@@ -11,7 +11,7 @@
   /** @type {PoseApproximation} */
   export let pose;
   /** @type {number} */
-  export let threshold = 0.05;
+  export let threshold = 0.075;
   $: max = 3 * threshold;
 
   /** @type {number} */
