@@ -16,7 +16,7 @@
   function computePoseErrors() {
     const ms = reviewVideoElement.currentTime * 1000;
     const reviewTimestamp = ms + recordingStart;
-    poseErrors = tracker.allPoseErrors(BigInt(Math.round(reviewTimestamp)));
+    poseErrors = tracker.allPoseErrors(reviewTimestamp);
   }
 
   const tracker = getContext('tracker').tracker;

@@ -66,30 +66,6 @@ export function dances(): (DanceInfo)[];
 export function danceBuilderFromDance(dance_id: string): DanceBuilder;
 /**
 */
-export enum DetectionFailureReason {
-/**
-* The last match was too recent to have another match.
-*/
-  TooEarly = 1,
-/**
-* The timing is off.
-*/
-  NotOnBeat = 2,
-/**
-* Detection did not match an expected pose.
-*/
-  WrongPose = 3,
-/**
-* No data to run detection against.
-*/
-  NoData = 4,
-/**
-* Currently in a state that does not detect.
-*/
-  DetectionDisabled = 5,
-}
-/**
-*/
 export enum DetectionState {
 /**
 * Neutral state, not detecting anything.
@@ -112,6 +88,30 @@ export enum DetectionState {
 * available.
 */
   TrackingDone = 5,
+}
+/**
+*/
+export enum DetectionFailureReason {
+/**
+* The last match was too recent to have another match.
+*/
+  TooEarly = 1,
+/**
+* The timing is off.
+*/
+  NotOnBeat = 2,
+/**
+* Detection did not match an expected pose.
+*/
+  WrongPose = 3,
+/**
+* No data to run detection against.
+*/
+  NoData = 4,
+/**
+* Currently in a state that does not detect.
+*/
+  DetectionDisabled = 5,
 }
 /**
 * Best guess for what the dancer needs to change to fit the pose.
@@ -138,7 +138,7 @@ export class AudioEffect {
 /**
 * When the sound should be played, could be in the future.
 */
-  timestamp: bigint;
+  timestamp: number;
 }
 /**
 */
@@ -353,7 +353,7 @@ export class DetectedStep {
   readonly bpm: number;
 /**
 */
-  end: bigint;
+  end: number;
 /**
 */
   error: number;
@@ -365,7 +365,7 @@ export class DetectedStep {
   readonly poses: (PoseApproximation)[];
 /**
 */
-  start: bigint;
+  start: number;
 }
 /**
 * Result of a step or dance detection.
@@ -573,7 +573,7 @@ export class PoseApproximation {
 /**
 * Timestamp for which Keypoints were added
 */
-  timestamp: bigint;
+  timestamp: number;
 }
 /**
 * Projected line segment with two coordinates and a Z index.
@@ -855,18 +855,18 @@ export class Tracker {
 *
 * This is the main method to insert data into the tracker.
 * @param {Keypoints} keypoints
-* @param {bigint} timestamp
+* @param {number} timestamp
 * @returns {Skeletons}
 */
-  addKeypoints(keypoints: Keypoints, timestamp: bigint): Skeletons;
+  addKeypoints(keypoints: Keypoints, timestamp: number): Skeletons;
 /**
 * @param {number} bpm
 */
   setBpm(bpm: number): void;
 /**
-* @param {bigint} first_beat
+* @param {number} first_beat
 */
-  alignBeat(first_beat: bigint): void;
+  alignBeat(first_beat: number): void;
 /**
 * @param {boolean} yes
 */
@@ -898,10 +898,10 @@ export class Tracker {
 */
   currentPoseError(): PoseApproximation | undefined;
 /**
-* @param {bigint | undefined} [now]
-* @returns {bigint}
+* @param {number | undefined} [now]
+* @returns {number}
 */
-  nextHalfBeat(now?: bigint): bigint;
+  nextHalfBeat(now?: number): number;
 /**
 * @returns {AudioEffect | undefined}
 */
@@ -945,36 +945,36 @@ export class Tracker {
 */
   numDetectedPoses(): number;
 /**
-* @param {bigint} timestamp
+* @param {number} timestamp
 * @returns {Cartesian3d}
 */
-  hipPosition(timestamp: bigint): Cartesian3d;
+  hipPosition(timestamp: number): Cartesian3d;
 /**
 * Fit frames in a time interval against all poses and return the best fit.
 *
 * This API is exported mostly for debugging. To extract fitted dances, use
 * `detect_dance` instead.
-* @param {bigint} start
-* @param {bigint} end
+* @param {number} start
+* @param {number} end
 * @returns {PoseApproximation | undefined}
 */
-  bestFitPose(start: bigint, end: bigint): PoseApproximation | undefined;
+  bestFitPose(start: number, end: number): PoseApproximation | undefined;
 /**
 * Fit a single frame against all poses and return all errors
-* @param {bigint} timestamp
+* @param {number} timestamp
 * @returns {(PoseApproximation)[]}
 */
-  allPoseErrors(timestamp: bigint): (PoseApproximation)[];
+  allPoseErrors(timestamp: number): (PoseApproximation)[];
 /**
-* @param {bigint} timestamp
+* @param {number} timestamp
 * @returns {Skeleton | undefined}
 */
-  skeletonAt(timestamp: bigint): Skeleton | undefined;
+  skeletonAt(timestamp: number): Skeleton | undefined;
 /**
-* @param {bigint} timestamp
+* @param {number} timestamp
 * @returns {ExportedFrame}
 */
-  exportFrame(timestamp: bigint): ExportedFrame;
+  exportFrame(timestamp: number): ExportedFrame;
 /**
 * @returns {string}
 */

@@ -3,7 +3,7 @@ import { setContext } from 'svelte';
 import { derived, writable } from 'svelte/store';
 
 
-export const beatStart = writable(Date.now());
+export const beatStart = writable(performance.now());
 export const bpm = writable(132);
 export const halfSpeed = writable(false);
 
@@ -32,7 +32,7 @@ export function registerTracker(tracker) {
         tracker.setBpm(value);
     });
     beatStart.subscribe((value) => {
-        tracker.alignBeat(BigInt(value));
+        tracker.alignBeat(value);
     });
 
     setContext('tracker', {

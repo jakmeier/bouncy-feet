@@ -76,18 +76,18 @@ export async function loadBeatSounds() {
 
 /** @param {string} id */
 export function playAudio(id) {
-  scheduleAudio(id, Date.now());
+  scheduleAudio(id, performance.now());
 }
 
 
 /** 
  * @param {string} id 
- * @param {number} timestamp in ms as UNIX timestamp 
+ * @param {number} timestamp in ms as performance timestamp 
  * @param {string} channel
  * @return {AudioBufferSourceNode}
 */
 export function scheduleAudioOnChannel(id, timestamp, channel) {
-  const delay = (timestamp - Date.now()) / 1000.0;
+  const delay = (timestamp - performance.now()) / 1000.0;
   const start = audioContext.currentTime + delay - audioContext.outputLatency;
   return scheduleAudioEx(id, start, channel);
 }
@@ -120,8 +120,7 @@ export function scheduleAudioEx(id, audioTime, channel) {
 
 /** 
  * @param {string} id 
- * @param {number} timestamp in ms as UNIX timestamp 
- * @param {number} gain 1.0 is normal volume
+ * @param {number} timestamp in ms as performance timestamp 
  * @return {AudioBufferSourceNode}
 */
 export function scheduleAudio(id, timestamp) {

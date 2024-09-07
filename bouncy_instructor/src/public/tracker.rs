@@ -16,7 +16,7 @@ use crate::{AudioEffect, StepInfo};
 use std::rc::Rc;
 use wasm_bindgen::prelude::wasm_bindgen;
 
-type Timestamp = u64;
+type Timestamp = f64;
 
 /// A Tracker gathers skeletons over time and passes it on to a DanceDetector.
 #[wasm_bindgen]
@@ -111,7 +111,7 @@ impl Tracker {
 
     #[wasm_bindgen(js_name = "finishTracking")]
     pub fn finish_tracking(&mut self) {
-        let now = *self.timestamps.last().unwrap_or(&0);
+        let now = *self.timestamps.last().unwrap_or(&0.0);
         self.detector
             .transition_to_state(DetectionState::TrackingDone, now)
     }
@@ -186,7 +186,7 @@ impl Tracker {
 
     #[wasm_bindgen(js_name = runDetection)]
     pub fn run_detection(&mut self) -> DetectionResult {
-        let now = *self.timestamps.last().unwrap_or(&0);
+        let now = *self.timestamps.last().unwrap_or(&0.0);
         let db = &self.db;
         let skeletons = &self.skeletons;
         self.detector.tick(now, db, skeletons)
@@ -214,12 +214,12 @@ impl Tracker {
 
     #[wasm_bindgen(js_name = nextHalfBeat)]
     pub fn next_half_beat(&self, now: Option<Timestamp>) -> Timestamp {
-        let now = now.unwrap_or_else(|| *self.timestamps.last().unwrap_or(&0));
+        let now = now.unwrap_or_else(|| *self.timestamps.last().unwrap_or(&0.0));
         self.detector.next_pose_time(now)
     }
 
     #[wasm_bindgen(getter, js_name = timeBetweenPoses)]
-    pub fn time_between_poses(&self) -> f32 {
+    pub fn time_between_poses(&self) -> f64 {
         self.detector.time_between_poses()
     }
 
@@ -251,7 +251,7 @@ impl Tracker {
 
     #[wasm_bindgen(js_name = beat)]
     pub fn beat(&self, t: f64) -> u32 {
-        self.detector.time_to_beat(t as u64) as u32
+        self.detector.time_to_beat(t)
     }
 
     #[wasm_bindgen(js_name = poseSkeletonAtBeat)]

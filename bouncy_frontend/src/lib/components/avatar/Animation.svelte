@@ -28,7 +28,7 @@
   );
   // The timestamp when the current animation started, which we must know to
   // align the jump with the tweening.
-  const animationTimeZero = writable(Date.now());
+  const animationTimeZero = writable(performance.now());
 
   // constructor for tweened jump stores
   const tweenedJump = (/** @type {number} */ start) => {
@@ -44,7 +44,7 @@
     const createDerivedStore = () =>
       derived([yStore, animationTimeZero], ([$y, $timeZero], set) => {
         let t =
-          ((Date.now() - $timeZero) % $animationTimeStore) /
+          ((performance.now() - $timeZero) % $animationTimeStore) /
           $animationTimeStore;
         // Parabolic jump with a peak at t = 0.5.
         // This might not be ideal for all moves but it's a good start.

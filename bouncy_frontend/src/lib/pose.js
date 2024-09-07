@@ -83,7 +83,7 @@ export class PoseDetection {
      */
     static async new(consumer, tZero) {
         const mp = await initMediaPipeBackend();
-        tZero = tZero === undefined ? Date.now() : tZero;
+        tZero = tZero === undefined ? performance.now() : tZero;
         return new PoseDetection(consumer, mp, tZero);
     }
 
@@ -95,7 +95,7 @@ export class PoseDetection {
     */
     trackFrame(videoElement, timestamp) {
         if (timestamp === undefined || timestamp === null) {
-            timestamp = Date.now();
+            timestamp = performance.now();
         }
         if (timestamp <= this.tPrev) {
             if (timestamp < this.tPrev) {

@@ -68,7 +68,7 @@
   let progress = 0.0;
   let currentBeat = -1;
 
-  let lastAudioHint = Date.now() - 2000;
+  let lastAudioHint = performance.now() - 2000;
   let audioHintDelay = 5000;
 
   /** @type {Camera} */
@@ -139,7 +139,7 @@
         );
       }
       if (forceBeat && $detectionState === DetectionState.LiveTracking) {
-        const future = Date.now() + animationTime;
+        const future = performance.now() + animationTime;
         let newBeat = tracker.beat(future);
         if (newBeat !== currentBeat) {
           instructorSkeleton = tracker.poseSkeletonAtBeat(newBeat);
@@ -175,10 +175,10 @@
       landmarks = result.landmarks[0];
       const kp = landmarksToKeypoints(result.landmarks[0]);
       if (kp.fullyVisible) {
-        tracker.addKeypoints(kp, BigInt(timestamp));
+        tracker.addKeypoints(kp, timestamp);
         recordingEnd = timestamp;
-      } else if (lastAudioHint + audioHintDelay < Date.now()) {
-        lastAudioHint = Date.now();
+      } else if (lastAudioHint + audioHintDelay < performance.now()) {
+        lastAudioHint = performance.now();
         scheduleAudioOnChannel('take-position', lastAudioHint, 'audio-guide');
       }
     }
@@ -204,7 +204,7 @@
     }
     lastSuccessSkeletonSize =
       distance2d(landmarks[I.LEFT_SHOULDER], landmarks[I.LEFT_HIP]) * 6;
-    const hip = tracker.hipPosition(BigInt(recordingEnd || 0));
+    const hip = tracker.hipPosition(recordingEnd || 0);
     lastSuccessSkeletonOrigin = new Cartesian2d(hip.x - 0.5, hip.y - 0.5);
 
     const target = tracker.trackedBeats * 2;

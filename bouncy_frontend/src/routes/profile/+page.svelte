@@ -40,14 +40,14 @@
   }
 
   let unlockHiddenFeatures = 0;
-  let lastIncrease = Date.now();
+  let lastIncrease = performance.now();
   function clickProfile() {
-    if (lastIncrease + 500 > Date.now()) {
+    if (lastIncrease + 500 > performance.now()) {
       unlockHiddenFeatures += 1;
     } else {
       unlockHiddenFeatures = 0;
     }
-    lastIncrease = Date.now();
+    lastIncrease = performance.now();
   }
   let devFeaturesOn = $dev;
   let version005 = false;

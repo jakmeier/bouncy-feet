@@ -34,7 +34,7 @@
     endX.set(end.x, $animation);
     endY.set(end.y);
     if (animationTimeZero) {
-      animationTimeZero.set(Date.now());
+      animationTimeZero.set(performance.now());
     }
   }
   $: start, end, updatePosition();

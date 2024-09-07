@@ -3,7 +3,7 @@ use crate::intern::pose_score::{best_fit_pose, ErrorDetails};
 use crate::public::Tracker;
 use crate::tracker::PoseApproximation;
 
-type Timestamp = u64;
+type Timestamp = f64;
 
 impl Tracker {
     /// Find the least-error pose in a range of recorded frames.
@@ -92,7 +92,10 @@ impl Tracker {
             return vec![];
         }
 
-        let skeleton = match self.timestamps.binary_search(&timestamp) {
+        let skeleton = match self
+            .timestamps
+            .binary_search_by(|probe| f64::total_cmp(probe, &timestamp))
+        {
             Ok(i) | Err(i) => &self.skeletons[i],
         };
 

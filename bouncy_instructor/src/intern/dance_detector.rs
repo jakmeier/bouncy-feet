@@ -9,7 +9,7 @@ use super::dance_collection::DanceCollection;
 use super::pose::PoseDirection;
 use super::skeleton_3d::Skeleton3d;
 
-type Timestamp = u64;
+type Timestamp = f64;
 
 /// Contains all information about a dance to be detected and has an interface
 /// to be used by a Tracker to match tracked skeletons to it.
@@ -69,7 +69,7 @@ impl Default for DanceDetector {
             force_beat: false,
             detection_state: DetectionState::Init,
             detection_state_store: Readable::new(DetectionState::Init),
-            detection_state_start: 0,
+            detection_state_start: 0.0,
             ui_events: UiEvents::default(),
         }
     }
@@ -125,9 +125,7 @@ impl DanceDetector {
                 }
             }
             DetectionState::CountDown => {
-                if now
-                    > self.detection_state_start + (self.time_between_poses() * 9.0).floor() as u64
-                {
+                if now > self.detection_state_start + (self.time_between_poses() * 9.0).floor() {
                     self.transition_to_state(DetectionState::LiveTracking, now);
                 }
             }
@@ -167,10 +165,10 @@ impl DanceDetector {
             .partial
             .as_ref()
             .or_else(|| prev_detection.steps.last());
-        let start_t = last_step.map_or(0, |step| step.end);
+        let start_t = last_step.map_or(0.0, |step| step.end);
 
         // skip at least a quarter beat
-        let min_delay = (self.time_between_poses() / 2.0).round() as u64;
+        let min_delay = self.time_between_poses() / 2.0;
         if end_t < start_t + min_delay {
             return self
                 .detected
@@ -182,10 +180,8 @@ impl DanceDetector {
         let num_detected_poses = self.num_detected_poses();
         if self.force_beat {
             let time_delta = self.time_between_poses();
-            let first_beat =
-                self.next_pose_time(self.detection_state_start + (time_delta / 2.0) as u64);
-            let expected_next_pose =
-                first_beat + (num_detected_poses as f32 * time_delta).round() as u64;
+            let first_beat = self.next_pose_time(self.detection_state_start + (time_delta / 2.0));
+            let expected_next_pose = first_beat + (num_detected_poses as f64 * time_delta).round();
             if now < expected_next_pose {
                 return self
                     .detected
@@ -298,11 +294,11 @@ impl DanceDetector {
         self.detection_state_store.set(state);
     }
 
-    pub(crate) fn time_between_poses(&self) -> f32 {
+    pub(crate) fn time_between_poses(&self) -> f64 {
         if self.half_speed {
-            2.0 * 30_000.0 / self.bpm
+            2.0 * 30_000.0 / self.bpm as f64
         } else {
-            30_000.0 / self.bpm
+            30_000.0 / self.bpm as f64
         }
     }
 
@@ -315,34 +311,34 @@ impl DanceDetector {
         }
     }
 
-    pub(crate) fn time_to_beat(&self, t: Timestamp) -> u64 {
-        let t0 = self.next_pose_time(self.beat_alignment.unwrap_or(0));
-        let pose_duration = self.time_between_poses().round() as u64;
-        (t - t0) / pose_duration
+    pub(crate) fn time_to_beat(&self, t: Timestamp) -> u32 {
+        let t0 = self.next_pose_time(self.beat_alignment.unwrap_or(0.0));
+        let pose_duration = self.time_between_poses();
+        ((t - t0) / pose_duration).floor() as u32
     }
 
     pub(crate) fn next_pose_time(&self, not_before: Timestamp) -> Timestamp {
-        let t0 = self.beat_alignment.unwrap_or(0);
-        let pose_duration = self.time_between_poses().round() as u64;
-        let poses = (not_before - t0 + pose_duration - 1) / pose_duration;
+        let t0 = self.beat_alignment.unwrap_or(0.0);
+        let pose_duration = self.time_between_poses();
+        let poses = ((not_before - t0) / pose_duration).floor();
         t0 + poses * pose_duration
     }
 
     pub(crate) fn emit_countdown_audio(&mut self, not_before: Timestamp) {
-        let beat = self.time_between_poses().round() as u64;
+        let beat = self.time_between_poses();
         let next_beat = self.next_pose_time(not_before);
 
         self.ui_events.add_audio(next_beat, "and".to_owned());
         self.ui_events.add_audio(next_beat + beat, "one".to_owned());
         self.ui_events
-            .add_audio(next_beat + 3 * beat, "two".to_owned());
+            .add_audio(next_beat + 3.0 * beat, "two".to_owned());
         self.ui_events
-            .add_audio(next_beat + 5 * beat, "one".to_owned());
+            .add_audio(next_beat + 5.0 * beat, "one".to_owned());
         self.ui_events
-            .add_audio(next_beat + 6 * beat, "two".to_owned());
+            .add_audio(next_beat + 6.0 * beat, "two".to_owned());
         self.ui_events
-            .add_audio(next_beat + 7 * beat, "three".to_owned());
+            .add_audio(next_beat + 7.0 * beat, "three".to_owned());
         self.ui_events
-            .add_audio(next_beat + 8 * beat, "four".to_owned());
+            .add_audio(next_beat + 8.0 * beat, "four".to_owned());
     }
 }

@@ -16,7 +16,7 @@
   $: initialized && $timeBetweenMoves && resetAudio();
 
   let kickAudioFiles = ['kick', 'kick2'];
-  /** @type {number} ms unix timestamp */
+  /** @type {number} ms performance timestamp */
   $: $beatStart, resetAudio();
   $: nextNoteTime = $beatStart;
   let halfBeat = 0;
@@ -56,7 +56,7 @@
   function scheduleNBeats(start, beatDuration, numBeats) {
     let time = start;
     let nodes = [];
-    let now = Date.now();
+    let now = performance.now();
     for (let i = 0; i < numBeats; i++) {
       if (time < now) {
         time += beatDuration;
@@ -99,7 +99,7 @@
     const batchSize = 8;
     const msPerBatch = batchSize * $timeBetweenMoves;
 
-    while (nextNoteTime < Date.now() + msPerBatch) {
+    while (nextNoteTime < performance.now() + msPerBatch) {
       const nodes = scheduleNBeats(nextNoteTime, $timeBetweenMoves, batchSize);
       connectedNodes.push(nodes);
       nextNoteTime += msPerBatch;

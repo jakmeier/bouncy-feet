@@ -8,8 +8,8 @@
   export let bpmSelected = false;
   export let useFixedBpm = false;
 
-  let start = Date.now();
-  let lastTap = Date.now();
+  let start = performance.now();
+  let lastTap = performance.now();
 
   const fixedBpmOptions = [80, 100, 120, 132];
   const timeout = 2000;
@@ -19,12 +19,12 @@
 
   function reset() {
     counter = -1;
-    setBeatStart(Date.now());
+    setBeatStart(performance.now());
     useFixedBpm = false;
   }
 
   function tap() {
-    const now = Date.now();
+    const now = performance.now();
     if (lastTap + timeout < now) {
       counter = -1;
     }
@@ -49,7 +49,7 @@
   function setFixedBpm(bpm) {
     useFixedBpm = true;
     setBpm(bpm);
-    setBeatStart(Date.now());
+    setBeatStart(performance.now());
   }
 </script>
 

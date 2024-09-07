@@ -4,14 +4,14 @@ use std::collections::VecDeque;
 
 use wasm_bindgen::prelude::wasm_bindgen;
 
-type Timestamp = u64;
+type Timestamp = f64;
 
 #[derive(Default, Debug)]
 pub(crate) struct UiEvents {
     audio: VecDeque<AudioEffect>,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq)]
 #[wasm_bindgen]
 pub struct AudioEffect {
     /// When the sound should be played, could be in the future.

@@ -38,7 +38,7 @@
   function onSeek() {
     const ms = reviewVideoElement.currentTime * 1000;
     const reviewTimestamp = ms + recordingStart;
-    skeleton = tracker.skeletonAt(BigInt(Math.round(reviewTimestamp)));
+    skeleton = tracker.skeletonAt(reviewTimestamp);
     const cursor = ms / (recordingEnd - recordingStart);
     setCursor(cursor);
   }
@@ -65,7 +65,7 @@
   let setCursor;
 
   // Set the position in the video and the banner to the specified recording timestamp.
-  /** @param {bigint} timestamp */
+  /** @param {number} timestamp */
   function selectTimestamp(timestamp) {
     const videoTime = (Number(timestamp) - recordingStart) / 1000;
     reviewVideoElement.currentTime = videoTime;

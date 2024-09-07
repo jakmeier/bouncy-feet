@@ -17,7 +17,10 @@ impl Tracker {
     pub fn export_frame(&self, timestamp: Timestamp) -> ExportedFrame {
         let mut config = ron::ser::PrettyConfig::default();
         config.indentor = "  ".to_string();
-        match self.timestamps.binary_search(&timestamp) {
+        match self
+            .timestamps
+            .binary_search_by(|probe| f64::total_cmp(probe, &timestamp))
+        {
             Ok(i) | Err(i) => ExportedFrame {
                 keypoints: ron::ser::to_string_pretty(
                     &[(self.timestamps[i], &self.keypoints[i])],

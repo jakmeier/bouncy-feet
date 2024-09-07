@@ -54,7 +54,7 @@ fn check_step_in_keypoints_unique_tracker(
     expected_repetitions: &[usize],
     bpm: usize,
 ) {
-    let parsed: Vec<(u64, Keypoints)> = ron::from_str(keypoints).expect("parsing test input");
+    let parsed: Vec<(f64, Keypoints)> = ron::from_str(keypoints).expect("parsing test input");
     let mut step_tracker = common::setup_step_tracker(expected_step);
     step_tracker.set_bpm(2.0 * bpm as f32);
     for (timestamp, keypoints) in parsed {
@@ -70,7 +70,7 @@ fn check_step_in_keypoints_general_tracker(
     expected_repetitions: &[usize],
     bpm: usize,
 ) {
-    let parsed: Vec<(u64, Keypoints)> = ron::from_str(keypoints).expect("parsing test input");
+    let parsed: Vec<(f64, Keypoints)> = ron::from_str(keypoints).expect("parsing test input");
     let mut tracker = common::setup_tracker();
     for (timestamp, keypoints) in parsed {
         tracker.add_keypoints(keypoints, timestamp);
@@ -175,3 +175,9 @@ fn test_happy_feet_0() {
     // FIXME: Also check in general tracker (detects V-Step last time I tried)
     check_step_in_keypoints_unique_tracker(keypoints, "Happy Feet", &[1, 2], 100);
 }
+
+// #[test]
+// fn test_flat_man_0() {
+//     let keypoints = include_str!("./data/test_steps/flat-man-65bpm-2x.ron");
+//     check_single_step_in_keypoints(keypoints, "Gangsta Hop", &[2, 2], 95);
+// }

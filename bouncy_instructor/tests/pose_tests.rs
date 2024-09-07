@@ -10,7 +10,7 @@ mod common;
 /// Check that the expected pose is detected, given the choice of all standard poses.
 fn check_pose_in_keypoints(keypoints: &str, expected_pose: &str) {
     let mut tracker = common::setup_tracker();
-    let parsed: Vec<(u64, Keypoints)> = ron::from_str(keypoints).expect("parsing test input");
+    let parsed: Vec<(f64, Keypoints)> = ron::from_str(keypoints).expect("parsing test input");
     let (timestamp, keypoints) = parsed[0];
     tracker.add_keypoints(keypoints, timestamp);
     let approximation = tracker
@@ -47,7 +47,7 @@ fn check_pose_in_keypoints(keypoints: &str, expected_pose: &str) {
 /// Check that error score for a pose is above the threshold.
 fn check_pose_not_in_keypoints(keypoints: &str, unexpected_pose: &str) {
     let mut tracker = common::setup_tracker();
-    let parsed: Vec<(u64, Keypoints)> = ron::from_str(keypoints).expect("parsing test input");
+    let parsed: Vec<(f64, Keypoints)> = ron::from_str(keypoints).expect("parsing test input");
     let (timestamp, keypoints) = parsed[0];
     tracker.add_keypoints(keypoints, timestamp);
     let pose = tracker
