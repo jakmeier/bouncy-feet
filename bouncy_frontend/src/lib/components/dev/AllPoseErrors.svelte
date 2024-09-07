@@ -12,11 +12,14 @@
    * @type {import("$lib/instructor/bouncy_instructor").PoseApproximation[]}
    */
   let poseErrors = [];
+  /**  @type {number} */
+  let poseErrorTimestamp = 0.0;
 
   function computePoseErrors() {
     const ms = reviewVideoElement.currentTime * 1000;
     const reviewTimestamp = ms + recordingStart;
     poseErrors = tracker.allPoseErrors(reviewTimestamp);
+    poseErrorTimestamp = reviewTimestamp;
   }
 
   const tracker = getContext('tracker').tracker;
@@ -30,6 +33,7 @@
   </button>
 
   {#if poseErrors}
+    <p>timestamp: {poseErrorTimestamp}</p>
     {#each poseErrors as pose}
       <PoseError data={pose} />
     {/each}
