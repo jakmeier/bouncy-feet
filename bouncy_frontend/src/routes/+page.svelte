@@ -1,7 +1,7 @@
 <script>
   import { version } from '$lib/stores/FeatureSelection';
-  import HomeFeed_001 from './HomeFeed_001.svelte';
-  import HomeFeed_002 from './HomeFeed_002.svelte';
+  import HomeFeedA from './HomeFeed_a.svelte';
+  import HomeFeedB from './HomeFeed_b.svelte';
 
   /** @type {import('./$types').PageData} */
   export let data;
@@ -9,8 +9,9 @@
     data.officialDances.length > 0 ? data.officialDances[0] : null;
 </script>
 
-{#if $version <= 0.001}
-  <HomeFeed_001 {featuredDance} />
+<!-- Switch between stable and unstable HomeFeed -->
+{#if $version > 0.005}
+  <HomeFeedA {featuredDance} />
 {:else}
-  <HomeFeed_002 {featuredDance} />
+  <HomeFeedB {featuredDance} />
 {/if}
