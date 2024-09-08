@@ -20,7 +20,10 @@
   <title>{$t('meta.title')}</title>
 </svelte:head>
 
-<div style="background-color: {$backgroundColor}; padding: {outerPadding}px;">
+<div
+  class="background"
+  style="background-color: {$backgroundColor}; padding: {outerPadding}px;"
+>
   <main
     style="margin:{mainMargin}px; height: calc(100vh - {navBarHeight}px); max-width: calc(min(730px, 100vw) - {2 *
       mainMargin}px);"
@@ -43,6 +46,10 @@
 <style>
   .scroll-buffer {
     height: 100px;
+  }
+
+  .background {
+    overflow: hidden auto;
   }
 
   @media (min-width: 730px) {

@@ -10,8 +10,17 @@ export const dev = readable(privDev, (set) => {
         window.toggleDev = () => { privDev = !privDev; set(privDev); };
     }
 });
-export const displayedVersion = writable(0.004);
+export const displayedVersion = writable(0.004001);
 export const version = derived([dev, displayedVersion], ([$dev, $version]) => $dev ? 0.999 : $version);
+export const versionString = derived([dev, displayedVersion], ([$dev, $version]) => ($dev ? "DEV " : "") + versionNumberToString($version));
+
+function versionNumberToString(v) {
+    let prefix = "alpha ";
+    let major = 0;
+    let minor = Math.floor(v * 1000);
+    let patch = Math.floor(v * 1000000) % 1000;
+    return `${prefix}${major}.${minor}.${patch}`;
+}
 
 /** @type {import("svelte/motion").Readable<Features>} */
 export const features = derived([version, dev], ([$v, $dev]) => {

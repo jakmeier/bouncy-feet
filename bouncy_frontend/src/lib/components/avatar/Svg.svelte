@@ -11,6 +11,8 @@
   export let height;
   /** @type {boolean} */
   export let orderByZ = false;
+  /** @type {boolean} */
+  export let showOverflow = false;
 
   let animationCtx = getContext('animation');
   let animationTime = null;
@@ -104,7 +106,10 @@
   });
 </script>
 
-<svg viewBox="0 0 {width} {height}">
+<svg
+  viewBox="0 0 {width} {height}"
+  style="overflow: {showOverflow ? 'visible' : 'hidden'};"
+>
   <SvgStyle>
     <slot />
   </SvgStyle>

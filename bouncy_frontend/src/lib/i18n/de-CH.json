@@ -4,10 +4,16 @@
     },
     "home": {
         "title": "Bouncy Feet!",
+        "slogan0": "Tanzen ist für alle!",
         "description0": "Willkommen in der Tanzapp Bouncy Feet.",
         "description1": "Mein Ziel ist es möglichst viele Leute zum Shuffle-Tanz zu motivieren. Die App macht es einfach neue Schritte zu finden und damit loszulegen diese zu üben. Vielleicht packt dich dann auch das Sammeln von Punkten und der Kampf um die obersten Plätze auf der globalen Rangliste.",
         "description2": "Allerdings bin ich noch am ausprobieren, was überhaupt in eine Tanz-App passt. Ich würde es als Alpha Version von Bouncy Feet beschreiben. Falls du Probleme mit der App hast, öffne bitte ein Issue auf GitHub.",
+        "description3": "Alle Funktionen sind experimentell und unvollständig.",
+        "go-to-github": "Melde Probleme oder hilf mit bei der Entwicklung.",
+        "version-label": "Version",
         "go-button": "Los gehts",
+        "collection-button": "Schau dir Schritte an",
+        "courses-button": "Lerne Shuffle",
         "nav": "Home"
     },
     "courses": {

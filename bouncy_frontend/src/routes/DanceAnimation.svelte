@@ -13,6 +13,8 @@
   export let beat = counter(-5, 1, stepTime);
   export let animationTime = stepTime * 0.85;
   export let size = 100;
+  /** @type {boolean} */
+  export let showOverflow = false;
 
   /** @type{AvatarColoring} */
   export let style = MAIN_THEME_COLORING;
@@ -35,7 +37,7 @@
 </script>
 
 <Animation {animationTime} jumpHeight={size * 0.025}>
-  <Svg height={size} width={size} orderByZ>
+  <Svg height={size} width={size} orderByZ {showOverflow}>
     {#if skeleton}
       <SvgAvatar
         width={size}
