@@ -2,7 +2,7 @@
   import { page } from '$app/stores';
   import { t } from '$lib/i18n.js';
   import Header from '$lib/components/ui/Header.svelte';
-  import { getContext } from 'svelte';
+  import { getContext, onDestroy, onMount } from 'svelte';
   import Step from '../../collection/Step.svelte';
   import { counter } from '$lib/timer';
   import { dev } from '$lib/stores/FeatureSelection.js';
@@ -21,69 +21,84 @@
   $: courseProgress = $user.userLessonProgress[id];
 </script>
 
-<Header title={$t('courses.course-overview.title')} />
-
-<h3>{course.name}</h3>
-
-<Step {step} poseIndex={$i} {animationTime} size={100} borderWidth={0}></Step>
+<Header title={course.name} />
 
 <p>{course.explanation}</p>
 
 <div class="ol">
   {#each course.lessons as lesson, index}
-    <div class="index">{index + 1}</div>
-    <div>
-      {#if lesson.parts.length > 0}
-        <Step
-          step={lesson.parts[lesson.parts.length - 1].step}
-          poseIndex={$i}
-          {animationTime}
-          size={75}
-          borderWidth={1}
-          lineWidth={2.5}
-        ></Step>
-      {/if}
-      <div class="rank">
-        {#if courseProgress && courseProgress.lessons}
-          {#if courseProgress.lessons[index] > 0}
-            <span class="material-symbols-outlined done"> verified </span>
-          {/if}
+    <div class="course">
+      <div>
+        {$t('courses.lesson.title')}
+        {index + 1}
+      </div>
+      <div class="step">
+        {#if lesson.parts.length > 0}
+          <Step
+            step={lesson.parts[lesson.parts.length - 1].step}
+            poseIndex={$i}
+            {animationTime}
+            size={175}
+            borderWidth={0}
+            lineWidth={8}
+          ></Step>
+        {/if}
+        <div class="rank">
+          {#if courseProgress && courseProgress.lessons}
+            {#if courseProgress.lessons[index] > 0}
+              <span class="material-symbols-outlined done"> verified </span>
+            {/if}
 
-          {#each Array(Math.max(0, courseProgress.lessons[index] - 1 || 0)) as _}
-            <span class="material-symbols-outlined"> star </span>
-          {/each}
+            {#each Array(Math.max(0, courseProgress.lessons[index] - 1 || 0)) as _}
+              <span class="material-symbols-outlined"> star </span>
+            {/each}
+          {/if}
+        </div>
+      </div>
+      <div class="link">
+        <a href="./exercise/{index}">
+          <button class="light">
+            {$t('courses.course-overview.start-lesson')}
+          </button>
+        </a>
+        {#if $dev}
+          <a href="./{index}">
+            <button class="light"> text explanation (WIP) </button>
+          </a>
         {/if}
       </div>
-    </div>
-    <div class="li">
-      {lesson.name}
-      <div class="note"></div>
-      <a href="./exercise/{index}">
-        {$t('courses.course-overview.start-lesson')}
-      </a>
-      {#if $dev}
-        <a href="./{index}">explanation (WIP) </a>
-      {/if}
     </div>
   {/each}
 </div>
 
 <style>
-  .note {
-    font-style: italic;
+  p {
+    text-align: center;
+    box-shadow: 0 0 4px 2px var(--theme-main);
+    padding: 15px;
+    border-radius: 20px;
+    background-color: var(--theme-neutral-light);
   }
   .ol {
     display: grid;
     margin: 15px 10px 10px;
-    grid-template-columns: min-content 75px auto;
     gap: 10px;
-    align-items: center;
+    justify-content: center;
   }
-  .li {
-    padding: 10px;
+  .course {
+    box-shadow: 0 0 4px 2px var(--theme-main);
+    background-color: var(--theme-neutral-light);
+    padding: 5px 10px;
+    max-width: 400px;
+    font-size: 30px;
+    margin: 10px;
   }
-  .index {
+  .step {
+    margin: 0 15px;
+  }
+  .link {
     padding: 10px;
+    text-align: center;
   }
   .rank {
     display: flex;
@@ -92,5 +107,11 @@
   }
   .done {
     color: var(--theme-main);
+  }
+  span {
+    font-size: 50px;
+  }
+  button {
+    margin: 10px;
   }
 </style>

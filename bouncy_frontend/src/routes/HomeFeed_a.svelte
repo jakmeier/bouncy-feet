@@ -88,18 +88,7 @@
 </div>
 
 <div class="dark-stripe">
-  <div
-    class="dancers"
-    style="grid-template-columns: repeat({bigNumDancers}, 1fr);"
-  >
-    {#each { length: bigNumDancers } as _}
-      <DanceAnimation
-        dance={dance(2)}
-        style={BOLD_MAIN_THEME_COLORING}
-        showOverflow
-      />
-    {/each}
-  </div>
+  <div style="height: 40px;"></div>
 </div>
 
 <div class="light-box">
@@ -116,9 +105,9 @@
 <div class="dark-stripe">
   <div
     class="dancers"
-    style="grid-template-columns: repeat({midNumDancers}, 1fr);"
+    style="grid-template-columns: repeat({bigNumDancers}, 1fr);"
   >
-    {#each { length: midNumDancers } as _}
+    {#each { length: bigNumDancers } as _}
       <DanceAnimation
         dance={dance(3)}
         style={BOLD_MAIN_THEME_COLORING}

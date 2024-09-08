@@ -126,10 +126,10 @@
       name: "Kick forward",
       id: "kick-forward",
       keyframes: [
-        (pose: "kick-right", orientation: Right),
-        (pose: "left-slightly-up", orientation: Right),
-        (pose: "kick-left", orientation: Right),
-        (pose: "right-slightly-up", orientation: Right),
+        (pose: "kick-right", orientation: Right, jump_height: 0.05),
+        (pose: "left-slightly-up", orientation: Right, jump_height: 0.05),
+        (pose: "kick-left", orientation: Right, jump_height: 0.05),
+        (pose: "right-slightly-up", orientation: Right, jump_height: 0.05),
       ],
     ),
     (
