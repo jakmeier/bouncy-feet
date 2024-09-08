@@ -40,3 +40,10 @@ export const MAIN_THEME_COLORING = {
     headColor: 'var(--theme-main)',
     bodyColor: 'var(--theme-neutral-light)',
 };
+
+export const WHITE_COLORING = {
+    leftColor: 'var(--theme-neutral-white)',
+    rightColor: 'var(--theme-neutral-white)',
+    headColor: 'var(--theme-neutral-white)',
+    bodyColor: 'var(--theme-neutral-white)',
+};

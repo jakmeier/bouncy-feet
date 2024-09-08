@@ -1,44 +1,99 @@
 <script>
   import { t } from '$lib/i18n';
-  import { getContext } from 'svelte';
+  import { getContext, onDestroy, onMount } from 'svelte';
   import Header from '$lib/components/ui/Header.svelte';
+  import { backgroundColor } from '$lib/stores/UiState';
+  import { WHITE_COLORING } from '$lib/constants';
+  import Step from '../collection/Step.svelte';
+  import { counter } from '$lib/timer';
+  import { timeBetweenMoves } from '$lib/stores/Beat';
 
   const { courses } = getContext('courses');
+  const beat = counter(-1, 1, $timeBetweenMoves);
+
+  let swapBackgroundColor = 'var(--theme-neutral-white)';
+  onMount(() => {
+    swapBackgroundColor = $backgroundColor;
+    $backgroundColor = 'var(--theme-main)';
+  });
+  onDestroy(() => {
+    $backgroundColor = swapBackgroundColor;
+  });
 </script>
 
 <Header title={$t('courses.title')} />
 
 {#each $courses as course, i}
   <a class="course" href={course.id}>
-    <div class="course-symbol">{i + 1}</div>
+    <div class="course-rect">
+      <div class="course-symbol">{i + 1}</div>
+      <Step
+        step={course.featuredStep()}
+        poseIndex={$beat}
+        animationTime={$timeBetweenMoves * 0.6}
+        style={WHITE_COLORING}
+        borderWidth={0}
+      />
+      <div class="start-here">start here</div>
+    </div>
     <div class="course-name">{course.name}</div>
   </a>
 {/each}
 
 <div class="grayed-out">
-  <div class="course-symbol">?</div>
+  <div class="course-rect">
+    <div class="course-symbol">?</div>
+  </div>
   <div class="course-name">{$t('courses.more-coming')}</div>
 </div>
 
 <style>
   .course {
     text-decoration: none;
+    color: var(--theme-neutral-white);
+  }
+  .course-rect {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    justify-items: center;
+    align-items: center;
+    background-color: var(--theme-accent);
+    width: 80%;
+    margin: 25px auto 5px;
+    box-shadow: var(--theme-neutral-white) 0px 0px 5px;
+    line-height: 72px;
   }
   .course-symbol {
     text-align: center;
-    border: solid 1px;
-    width: 80%;
-    margin: 25px auto 5px;
-    font-size: 72px;
-    height: 120px;
-    line-height: 120px;
+    padding: 20px;
+    font-size: 48px;
   }
   .course-name {
     text-align: center;
     font-weight: 800;
     font-size: 1.25em;
+    color: var(--theme-neutral-white);
   }
   .grayed-out {
-    color: var(--theme-neutral-gray);
+    color: var(--theme-neutral-dark);
+  }
+  .grayed-out .course-rect {
+    background-color: var(--theme-neutral-gray);
+    box-shadow: var(--theme-neutral-dark) 0px 0px 5px;
+  }
+  .grayed-out .course-rect .course-symbol {
+    grid-column-start: 2;
+  }
+  .start-here {
+    background-color: var(--theme-accent-light);
+    color: var(--theme-neutral-white);
+    text-shadow: var(--theme-neutral-dark) 0px 0px 11px;
+    font-size: 28px;
+    line-height: 28px;
+    margin: 10px;
+    padding: 20px;
+    border-radius: 10px;
+    justify-self: center;
+    align-self: center;
   }
 </style>

@@ -15,6 +15,7 @@
   /** @type{number} animationTime in ms */
   export let animationTime = 500;
   export let lineWidth = 4;
+  export let style = LEFT_RIGHT_COLORING;
 
   // When the pose index is negative, it should show a resting position
   // according to the orientation of the first pose.
@@ -58,7 +59,7 @@
         {skeleton}
         {bodyShift}
         {lineWidth}
-        style={LEFT_RIGHT_COLORING}
+        {style}
       />
     </Svg>
   </Animation>
