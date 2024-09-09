@@ -20,7 +20,7 @@ export async function submitStats(user) {
         id: user.id,
         name: user.publicName,
         steps: user.recordedSteps,
-        seconds: user.recordedSeconds,
+        seconds: Math.round(user.recordedSeconds),
         dances: user.recordedDances,
     };
 
