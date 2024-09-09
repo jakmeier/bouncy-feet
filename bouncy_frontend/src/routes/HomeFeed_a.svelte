@@ -10,10 +10,6 @@
   /** @type{import("$lib/instructor/bouncy_instructor").DanceInfo[]} */
   export let featuredDances;
 
-  const bigNumDancers = 8;
-  const midNumDancers = 5;
-  const smallNumDancers = 3;
-
   let swapBackgroundColor = 'var(--theme-neutral-white)';
   onMount(() => {
     swapBackgroundColor = $backgroundColor;
@@ -40,16 +36,14 @@
 </div>
 
 <div class="dark-stripe">
-  <div
-    class="dancers"
-    style="grid-template-columns: repeat({midNumDancers}, 1fr);"
-  >
-    {#each { length: midNumDancers } as _}
+  <div class="dancers" style="grid-template-columns: repeat({7}, 1fr);">
+    {#each { length: 4 } as _}
       <DanceAnimation
         dance={dance(0)}
         style={BOLD_MAIN_THEME_COLORING}
         showOverflow
       />
+      <div></div>
     {/each}
   </div>
 </div>
@@ -57,25 +51,20 @@
 <div class="light-box slogan">{$t('home.slogan0')}</div>
 
 <div class="dark-stripe">
-  <div
-    class="dancers"
-    style="grid-template-columns: repeat({smallNumDancers}, 1fr);"
-  >
-    {#each { length: smallNumDancers } as _}
-      <DanceAnimation
-        dance={dance(1)}
-        style={BOLD_MAIN_THEME_COLORING}
-        showOverflow
-      />
-    {/each}
+  <div class="dancers" style="grid-template-columns: repeat({3}, 1fr);">
+    <div></div>
+    <DanceAnimation
+      dance={dance(0)}
+      style={BOLD_MAIN_THEME_COLORING}
+      showOverflow
+    />
+    <div></div>
   </div>
 </div>
 
 <div class="light-box">
   <div>
-    <i>
-      {$t('home.description3')}
-    </i>
+    {$t('home.description3')}
   </div>
   <div class="centered">
     <a href="./collection">
@@ -85,6 +74,11 @@
       <button class="light"> {$t('home.courses-button')} </button>
     </a>
   </div>
+  <p>
+    <i>
+      {$t('home.alpha-disclaimer')}
+    </i>
+  </p>
 </div>
 
 <div class="dark-stripe">
@@ -105,9 +99,9 @@
 <div class="dark-stripe">
   <div
     class="dancers"
-    style="grid-template-columns: repeat({bigNumDancers}, 1fr);"
+    style="grid-template-columns: repeat({9}, 1fr); margin-left: -50px;"
   >
-    {#each { length: bigNumDancers } as _}
+    {#each { length: 9 } as _}
       <DanceAnimation
         dance={dance(3)}
         style={BOLD_MAIN_THEME_COLORING}
@@ -144,11 +138,12 @@
     display: grid;
   }
   .dark-stripe {
-    /* box-shadow: var(--theme-neutral-white) 0px 0px 11px; */
-    padding: 10px 100%;
-    margin: -10px -100%;
     background-color: var(--theme-neutral-dark);
-    box-shadow: var(--theme-neutral-dark) 0px 0px 11px;
+    /* padding and margin make the strip expand outside the view on mobile */
+    padding: 10px 50px;
+    margin: -10px -50px;
+    /* on wide screens, the stripe should end with a nice rounding */
+    border-radius: 10px;
   }
   .light-box {
     padding: 20px;
@@ -158,13 +153,15 @@
     z-index: 1;
     position: relative;
     box-shadow: var(--theme-neutral-dark) 0px 0px 11px;
+    text-align: center;
   }
   .centered {
     margin-top: 15px;
     text-align: center;
   }
   .slogan {
-    box-shadow: var(--theme-neutral-white) 0px 0px 5px;
+    box-shadow: none;
+    /* box-shadow: var(--theme-neutral-white) 0px 0px 5px; */
     max-width: 400px;
     margin: auto;
     text-align: center;
