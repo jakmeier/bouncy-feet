@@ -10,7 +10,7 @@
 </script>
 
 <!-- Switch between stable and unstable HomeFeed -->
-{#if $version > 0.005}
+{#if $version >= 0.005}
   <HomeFeedA featuredDances={data.officialDances} />
 {:else}
   <HomeFeedB {featuredDance} />

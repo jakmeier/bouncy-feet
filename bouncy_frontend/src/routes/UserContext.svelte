@@ -26,10 +26,10 @@
   if (stored && !stored.userLessonProgress) {
     stored.userLessonProgress = {};
   }
-  if (stored && !stored.consentSendingStats === undefined) {
+  if (stored && stored.consentSendingStats === undefined) {
     stored.consentSendingStats = false;
   }
-  if (stored && !stored.experimentalFeatures === undefined) {
+  if (stored && stored.experimentalFeatures === undefined) {
     stored.experimentalFeatures = false;
   }
   /** @type {import('svelte/store').Writable<UserData>} */
