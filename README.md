@@ -76,6 +76,14 @@ core business logic (dance detection).
 
 ## Progress Status
 
+-  9 Sep 2024: Release version v0.5.0
+    - Introduce courses, with a running man course as a first example.
+      - Note: This is a poorly made example course for demonstration purposes. Actual courses will have better quality videos and better tracking.
+      - A course has several lessons, each with an explanation video and a tracked exercise.
+      - Hitting 60% on the traced exercise will grant the "absolved" mark on the course lesson.
+      - The last lesson can be a step or choreography that's learned incrementally throughout the course.
+    - Changed the style of the home screen quite a bit.
+    - Many bug fixes, probably many new bugs.
 - 30 Aug 2024: Overhaul README and change license
     - Describe the latest project goals, such as potential monetization ideas
       and take a clear stance on free and open-source software.

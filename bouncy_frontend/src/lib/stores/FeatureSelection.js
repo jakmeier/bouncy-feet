@@ -10,7 +10,7 @@ export const dev = readable(privDev, (set) => {
         window.toggleDev = () => { privDev = !privDev; set(privDev); };
     }
 });
-export const displayedVersion = writable(0.004001);
+export const displayedVersion = writable(0.005);
 export const version = derived([dev, displayedVersion], ([$dev, $version]) => $dev ? 0.999 : $version);
 export const versionString = derived([dev, displayedVersion], ([$dev, $version]) => ($dev ? "DEV " : "") + versionNumberToString($version));
 
@@ -28,6 +28,7 @@ export const features = derived([version, dev], ([$v, $dev]) => {
         /* Fully enabled features for now but might be disabled again*/
         enableDanceCollection: $v >= 0.003,
         enableDanceCreator: $v >= 0.003,
+        enableCourses: $v >= 0.005,
 
         /* Partially enabled features */
         enableStepRecording: (stepName) => STABLE_TRACKING_STEPS.includes(stepName),
@@ -35,7 +36,6 @@ export const features = derived([version, dev], ([$v, $dev]) => {
         /* Features that are not ready to be released */
         enableAvatarRotation: $v >= 0.999,
         enableFreestyleRecording: $v >= 0.999,
-        enableCourses: $v >= 0.005,
 
         /* Features that stay in dev */
         enableDevView: $dev,
