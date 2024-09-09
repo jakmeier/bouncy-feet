@@ -1,39 +1,43 @@
 <script>
   /** @type {string} */
   export let path;
-  let showVideo = false;
+  let videoExists = false;
+  let videoLoading = true;
   /** @type {HTMLVideoElement} */
   let videoElement;
-
-  function toggleFullscreen() {
-    if (!document.fullscreenElement) {
-      videoElement.requestFullscreen().catch((err) => {
-        console.error(
-          `Error attempting to enable fullscreen mode: ${err.message} (${err.name})`
-        );
-      });
-    } else {
-      document.exitFullscreen();
-    }
-  }
-
-  function videoExists() {
-    showVideo = true;
-  }
 </script>
 
-<div class="video-container {showVideo ? '' : 'hide'}">
+<div class="video-container" class:hide={videoLoading || !videoExists}>
   <video
     bind:this={videoElement}
     controls
-    on:loadedmetadata={videoExists}
+    on:loadedmetadata={() => {
+      videoExists = true;
+      videoLoading = false;
+    }}
     preload="metadata"
   >
-    <source src={path} type="video/mp4" />
+    <source
+      src={path}
+      type="video/mp4"
+      on:error={() => {
+        videoLoading = false;
+        videoExists = false;
+      }}
+      on:suspend={() => {
+        videoLoading = false;
+        videoExists = false;
+      }}
+    />
     Your browser does not support the video tag.
   </video>
 </div>
-{#if !showVideo}
+
+{#if videoLoading}
+  <div class="video-unavailable">
+    <span class="material-symbols-outlined rotating"> refresh </span>
+  </div>
+{:else if !videoExists}
   <div class="video-unavailable">
     <span class="material-symbols-outlined"> disabled_by_default </span>
   </div>
@@ -72,5 +76,14 @@
 
   .hide {
     display: none;
+  }
+
+  .rotating {
+    animation: rotate 1.5s linear infinite;
+  }
+  @keyframes rotate {
+    to {
+      transform: rotate(360deg);
+    }
   }
 </style>
