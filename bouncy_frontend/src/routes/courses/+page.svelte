@@ -23,10 +23,9 @@
 
 <Header title={$t('courses.title')} />
 
-{#each $courses as course, i}
+{#each $courses as course}
   <a class="course" href={course.id}>
     <div class="course-rect">
-      <div class="course-symbol">{i + 1}</div>
       <Step
         step={course.featuredStep()}
         poseIndex={$beat}
@@ -43,6 +42,7 @@
 <div class="grayed-out">
   <div class="course-rect">
     <div class="course-symbol">?</div>
+    <div class="course-symbol">?</div>
   </div>
   <div class="course-name">{$t('courses.more-coming')}</div>
 </div>
@@ -54,12 +54,13 @@
   }
   .course-rect {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
     justify-items: center;
     align-items: center;
     background-color: var(--theme-accent);
-    width: 80%;
+    width: 90%;
     margin: 25px auto 5px;
+    padding: 15px;
     box-shadow: var(--theme-neutral-white) 0px 0px 5px;
     line-height: 72px;
   }
@@ -81,19 +82,22 @@
     background-color: var(--theme-neutral-gray);
     box-shadow: var(--theme-neutral-dark) 0px 0px 5px;
   }
-  .grayed-out .course-rect .course-symbol {
-    grid-column-start: 2;
-  }
   .start-here {
     background-color: var(--theme-accent-light);
     color: var(--theme-neutral-white);
     text-shadow: var(--theme-neutral-dark) 0px 0px 11px;
     font-size: 28px;
     line-height: 28px;
-    margin: 10px;
+    text-align: center;
     padding: 20px;
     border-radius: 10px;
     justify-self: center;
     align-self: center;
+  }
+
+  @media (max-width: 360px) {
+    .course-rect {
+      grid-template-columns: 1fr min-content;
+    }
   }
 </style>

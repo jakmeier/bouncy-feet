@@ -4,7 +4,7 @@
   import Canvas from '$lib/components/Canvas.svelte';
   import Avatar from '$lib/components/avatar/Avatar.svelte';
   import { hideNavigation, wideView } from '$lib/stores/UiState';
-  import { getContext, onMount } from 'svelte';
+  import { getContext, onDestroy, onMount } from 'svelte';
   import { I, landmarksToKeypoints, PoseDetection } from '$lib/pose';
   import BackgroundTask from '../BackgroundTask.svelte';
   import { writable } from 'svelte/store';
@@ -256,6 +256,10 @@
     // Low volume to not be louder than the music or beat.
     setChannelGain('live-feedback', 0.1);
     setChannelGain('audio-guide', 2.0);
+  });
+
+  onDestroy(() => {
+    $hideNavigation = false;
   });
 </script>
 
