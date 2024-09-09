@@ -178,7 +178,7 @@ impl Skeleton3d {
             )
             .into();
 
-            let stretched_z = -self.limbs_z[i.as_usize()] * 100.0;
+            let stretched_z = self.limbs_z[i.as_usize()] * 100.0;
             s.z = stretched_z.min(i16::MAX as f32).max(i16::MIN as f32) as i16;
             s
         };

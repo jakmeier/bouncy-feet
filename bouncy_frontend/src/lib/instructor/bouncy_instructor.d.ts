@@ -93,6 +93,15 @@ export enum DetectionFailureReason {
   NoNewData = 6,
 }
 /**
+* Best guess for what the dancer needs to change to fit the pose.
+*/
+export enum PoseHint {
+  DontKnow = 0,
+  LeftRight = 1,
+  ZOrder = 2,
+  WrongDirection = 3,
+}
+/**
 */
 export enum DetectionState {
 /**
@@ -116,15 +125,6 @@ export enum DetectionState {
 * available.
 */
   TrackingDone = 5,
-}
-/**
-* Best guess for what the dancer needs to change to fit the pose.
-*/
-export enum PoseHint {
-  DontKnow = 0,
-  LeftRight = 1,
-  ZOrder = 2,
-  WrongDirection = 3,
 }
 
 import type { Readable } from "svelte/store";
@@ -830,6 +830,15 @@ export class StepInfo {
 export class Tracker {
   free(): void;
 /**
+* @param {number} timestamp
+* @returns {ExportedFrame}
+*/
+  exportFrame(timestamp: number): ExportedFrame;
+/**
+* @returns {string}
+*/
+  exportKeypoints(): string;
+/**
 * Create a tracker for all known steps.
 */
   constructor();
@@ -974,15 +983,6 @@ export class Tracker {
 * @returns {Skeleton | undefined}
 */
   skeletonAt(timestamp: number): Skeleton | undefined;
-/**
-* @param {number} timestamp
-* @returns {ExportedFrame}
-*/
-  exportFrame(timestamp: number): ExportedFrame;
-/**
-* @returns {string}
-*/
-  exportKeypoints(): string;
 /**
 */
   readonly detectionState: ReadableDetectionState;

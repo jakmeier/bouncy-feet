@@ -165,7 +165,7 @@ impl Limb {
     pub(crate) fn z(self, kp: &Keypoints) -> f32 {
         let start = self.start.keypoint(kp);
         let end = self.end.keypoint(kp);
-        (start.z + end.z) / 2.0
+        -(start.z + end.z) / 2.0
     }
 
     pub(crate) fn mirror(&self) -> Self {
