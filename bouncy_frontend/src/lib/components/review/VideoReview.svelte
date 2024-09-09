@@ -129,7 +129,7 @@ once per 250ms. -->
     </div>
 
     <div>
-      <Svg height={avatarSize} width={avatarSize}>
+      <Svg height={avatarSize} width={avatarSize} orderByZ>
         {#if skeleton}
           <SvgAvatar
             width={avatarSize}
