@@ -162,12 +162,7 @@
       <p>{$t('courses.lesson.start-button')}</p>
     </button>
   {:else if $trackingState === DetectionState.TrackingDone}
-    <LessonEnd
-      {hitRate}
-      {passed}
-      hits={tracker?.lastDetection.poseMatches}
-      misses={tracker?.lastDetection.poseMisses}
-    ></LessonEnd>
+    <LessonEnd {hitRate} {passed}></LessonEnd>
 
     {#if recordingStart !== undefined && recordingEnd !== undefined}
       <VideoReview

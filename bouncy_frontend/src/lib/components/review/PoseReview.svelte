@@ -73,6 +73,12 @@
   .failed-pose {
     border: solid 2px #eb3b3b;
   }
+  .pose:hover {
+    box-shadow: 0 8px 16px var(--theme-neutral-light);
+  }
+  .pose:active {
+    box-shadow: none;
+  }
 
   .avatar-container {
     position: relative;
@@ -85,7 +91,7 @@
   }
   .background {
     border: solid 1px;
-    border-radius: 7px;
+    border-radius: var(--h);
     height: var(--h);
     overflow: hidden;
   }

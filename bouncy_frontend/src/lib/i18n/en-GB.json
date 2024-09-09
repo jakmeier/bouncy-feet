@@ -31,7 +31,7 @@
         "end": {
             "again-button": "Dance again",
             "back-button": "Back to course",
-            "failed-hard": "Not quite...",
+            "failed-hard": "Try again",
             "failed": "Almost 60%, let's try again!",
             "success": "Success!"
         },

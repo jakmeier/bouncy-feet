@@ -1,12 +1,26 @@
 <script>
+  import Animation from '$lib/components/avatar/Animation.svelte';
   import SpeechBubble from '$lib/components/ui/SpeechBubble.svelte';
   import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
   import Svg from '$lib/components/avatar/Svg.svelte';
-  import { Skeleton } from '$lib/instructor/bouncy_instructor';
+  import {
+    Cartesian2d,
+    Skeleton,
+    DanceInfo,
+  } from '$lib/instructor/bouncy_instructor';
+  import { onMount } from 'svelte';
+  import { counter } from '$lib/timer';
 
   export let text;
-  export let width = 300;
-  const skeleton = Skeleton.resting(false);
+  export let width = 250;
+  /** @type { null | DanceInfo } */
+  export let entryDance = null;
+  export let entryDanceRepetitions = 1;
+  /** @type { undefined | Skeleton } */
+  let skeleton = Skeleton.resting(false);
+  let bodyShift = new Cartesian2d(0, 0);
+  const beat = counter(-1, 1, 227);
+
   const tailSize = 18;
   $: figureWidth = (width * 2) / 3;
   $: bubbleTailRightOffset = `${figureWidth / 2 - 2 * tailSize}px`;
@@ -25,6 +39,26 @@
     return 10;
   }
   $: lineWidth = selectLineWidth(width);
+
+  let firstDancedBeat = Infinity;
+  const dancedBeats = (entryDance?.beats || 0) * entryDanceRepetitions;
+  $: $beat, updateSkeleton();
+
+  function updateSkeleton() {
+    if (entryDance) {
+      const n = $beat - firstDancedBeat;
+      if (n >= 0 && n < dancedBeats) {
+        skeleton = entryDance.skeleton(n);
+        bodyShift = entryDance.bodyShift(n);
+      } else if (n === dancedBeats) {
+        skeleton = Skeleton.resting(false);
+        bodyShift = entryDance.bodyShift(n);
+      }
+    }
+  }
+  onMount(() => {
+    firstDancedBeat = $beat + 2;
+  });
 </script>
 
 <div class="explanation" style="width: {width}px">
@@ -38,14 +72,19 @@
 
   <div class="figure-cell" style="height: {figureWidth + tailSize}px">
     <div class="figure" style="max-width: {figureWidth}px;">
-      <Svg width={figureWidth} height={figureWidth}>
-        <SvgAvatar
-          {skeleton}
-          width={figureWidth}
-          height={figureWidth}
-          {lineWidth}
-        ></SvgAvatar>
-      </Svg>
+      <Animation animationTime={200} jumpHeight={0.025}>
+        <Svg width={figureWidth} height={figureWidth} showOverflow>
+          {#if skeleton}
+            <SvgAvatar
+              {skeleton}
+              width={figureWidth}
+              height={figureWidth}
+              {lineWidth}
+              {bodyShift}
+            ></SvgAvatar>
+          {/if}
+        </Svg>
+      </Animation>
     </div>
   </div>
 </div>

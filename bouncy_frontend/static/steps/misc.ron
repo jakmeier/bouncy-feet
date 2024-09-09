@@ -57,5 +57,13 @@
         (pose: "standing-straight-front", orientation: ToCamera),
       ]
     ),
+    (
+      name: "Yeah!",
+      id: "jump-hands-up",
+      keyframes: [
+        (pose: "standing-straight-front", orientation: ToCamera),
+        (pose: "hands-up", orientation: ToCamera),
+      ]
+    ),
   ]
 )

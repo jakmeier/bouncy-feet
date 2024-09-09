@@ -3,8 +3,7 @@
   import AllPoseErrors from '$lib/components/dev/AllPoseErrors.svelte';
   import Svg from '$lib/components/avatar/Svg.svelte';
   import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
-  import Banner from './Banner.svelte';
-  import { getContext } from 'svelte';
+  import { getContext, onMount } from 'svelte';
   import BackgroundTask from '$lib/components/BackgroundTask.svelte';
   import PoseReview from './PoseReview.svelte';
   import { LEFT_RIGHT_COLORING } from '$lib/constants';
@@ -17,6 +16,9 @@
   export let recordingEnd;
   /** @type {import("$lib/instructor/bouncy_instructor").DetectedStep[]} */
   export let detectedSteps = [];
+
+  $: firstPoseTime = detectedSteps[0].start;
+  $: lastPoseTime = detectedSteps[detectedSteps.length - 1].end;
 
   let tracker = getContext('tracker').tracker;
   const avatarSize = 140;
@@ -80,6 +82,19 @@
       reviewVideoElement.pause();
     }
   }
+
+  /** @type {HTMLDivElement} */
+  let poseCards;
+  function onScrollPoseCards() {
+    const r =
+      poseCards.scrollLeft / (poseCards.scrollWidth - poseCards.clientWidth);
+    const t = firstPoseTime + (lastPoseTime - firstPoseTime) * r;
+    selectTimestamp(t);
+  }
+
+  onMount(() => {
+    selectTimestamp(firstPoseTime);
+  });
 </script>
 
 <!-- update banner position on every frame, to keep it in sync with the video
@@ -88,7 +103,7 @@ be better, however, this fires at different rates per browser and often only
 once per 250ms. -->
 <BackgroundTask {onFrame}></BackgroundTask>
 
-<div class="poses-details">
+<div class="poses-details" bind:this={poseCards} on:scroll={onScrollPoseCards}>
   {#each detectedSteps as step}
     {#each step.poses as pose}
       <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -159,8 +174,9 @@ once per 250ms. -->
   }
 
   .background-strip {
-    margin: 0 -45px;
-    padding: 10px 50px;
+    margin: 0 -25px;
+    padding: 10px 30px;
     background-color: var(--theme-neutral-light);
+    border-radius: 10px;
   }
 </style>

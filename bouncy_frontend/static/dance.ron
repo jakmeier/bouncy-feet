@@ -42,6 +42,18 @@
         (id:"t-0"),
         (id:"v-1"),
         (id:"v-1"),
-      ]),
+      ]
+    ),
+    (
+      id:"Celebrate",
+      steps:[
+        (id:"jump-hands-up"),
+        (id:"happy-feet-0"),
+        (id:"ghop-0"),
+        (id:"ghop-0"),
+        (id:"happy-feet-0"),
+        (id:"jump-hands-up"),
+      ]
+    ),
   ]
 )
