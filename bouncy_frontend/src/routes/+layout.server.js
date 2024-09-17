@@ -8,18 +8,17 @@ export const load = async ({ fetch, url, cookies, request }) => {
 
     // Try to get the locale from cookie
     let locale = (cookies.get('lang') || '');
+    // Get defined locales
+    const supportedLocales = locales.get();
 
     // Get user preferred locale
     if (!locale) {
         // TODO: better locale detection: find closest match instead of exact match only
         const header = request.headers.get('accept-language');
         if (header) {
-            locale = header.split(/,/)[0];
+            locale = findBestLocale(header, supportedLocales);
         }
     }
-
-    // Get defined locales
-    const supportedLocales = locales.get();
 
     // Use default locale if current locale is not supported
     if (!supportedLocales.includes(locale)) {
@@ -63,3 +62,36 @@ export const load = async ({ fetch, url, cookies, request }) => {
         }
     };
 };
+
+/**
+ * @param {string} header
+ * @param {string[]} supportedLocales
+ */
+function findBestLocale(header, supportedLocales) {
+
+    // The accept-language header may have multiple locales separated by ",",
+    // each item potentially given a quality weight after a ";".
+    // Example:
+    // Accept-Language: fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5
+    const preferredLocales = header.split(',').map(locale => {
+        const parts = locale.trim().split(';');
+        const lang = parts[0];
+        const quality = parts[1] ? parseFloat(parts[1].split('=')[1]) : 1.0; // Defaults to 1 if no quality value
+        return { lang, quality };
+    }).sort((a, b) => b.quality - a.quality); // Sort by quality
+
+    // language + region match > language match > lower priority locale
+    for (const { lang } of preferredLocales) {
+        if (supportedLocales.includes(lang)) {
+            return lang;
+        }
+
+        const baseLang = lang.split('-')[0];
+        const closestMatch = supportedLocales.find(supported => supported.startsWith(baseLang));
+        if (closestMatch) {
+            return closestMatch;
+        }
+    }
+
+    return null;
+}
