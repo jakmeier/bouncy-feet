@@ -12,6 +12,7 @@
   import Popup from '$lib/components/ui/Popup.svelte';
   import SessionReward from '$lib/components/SessionReward.svelte';
   import { registerTracker, setBpm, setHalfSpeed } from '$lib/stores/Beat';
+  import Button from '$lib/components/ui/Button.svelte';
 
   const stepName = $page.params.stepName;
   const instructorStep = stepsByName(stepName)[0];
@@ -168,15 +169,14 @@
       ></VideoReview>
       <div>
         <a href={reviewVideoSrc} download>
-          <button class="light">
-            <span class="material-symbols-outlined"> download </span>
-            <p>{$t('record.download')}</p>
-          </button>
+          <Button class="light" symbol="download" text="record.download" />
         </a>
-        <button class="light" on:click={closeReview}>
-          <span class="material-symbols-outlined"> arrow_back </span>
-          <p>{$t('record.back-button')}</p>
-        </button>
+        <Button
+          class="light"
+          on:click={closeReview}
+          symbol="arrow_back"
+          text="record.back-button"
+        />
       </div>
     {:else}
       Could not show review, something failed.
@@ -186,18 +186,24 @@
       <SessionReward data={sessionResult} step={instructorStep}></SessionReward>
     </div>
     <div class="buttons">
-      <button class="light" on:click={openReview}>
-        <span class="material-symbols-outlined"> tv </span>
-        <p>{$t('record.review-button')}</p>
-      </button>
-      <button class="light" on:click={reset}>
-        <span class="material-symbols-outlined"> videocam </span>
-        <p>{$t('record.reset-button')}</p>
-      </button>
-      <button class="light" on:click={goBackToStep}>
-        <span class="material-symbols-outlined"> arrow_back </span>
-        <p>{$t('record.back-button')}</p>
-      </button>
+      <Button
+        class="light"
+        on:click={openReview}
+        symbol="tv"
+        text="record.review-button"
+      />
+      <Button
+        class="light"
+        on:click={reset}
+        symbol="videocam"
+        text="record.reset-button"
+      />
+      <Button
+        class="light"
+        on:click={goBackToStep}
+        symbol="arrow_back"
+        text="record.back-button"
+      />
     </div>
   {:else}
     <LiveRecording
@@ -215,10 +221,11 @@
 
   {#if isModelOn}
     <div>
-      <button on:click={stopCameraAndRecording}>
-        <span class="material-symbols-outlined"> camera </span>
-        <p>{$t('record.stop-record')}</p>
-      </button>
+      <Button
+        on:click={stopCameraAndRecording}
+        symbol="camera"
+        text="record.stop-button"
+      />
     </div>
     <LiveRecordingSettings
       bind:enableLiveAvatar
@@ -260,14 +267,6 @@
     display: grid;
     grid-template-columns: auto auto auto;
   }
-  button {
-    width: 100px;
-    height: 80px;
-    margin: 10px;
-  }
-  button span {
-    font-size: 42px;
-  }
 
   div.title {
     margin: auto;
@@ -279,13 +278,5 @@
     text-align: center;
     font-size: 23px;
     overflow: hidden auto;
-  }
-
-  @media (max-width: 360px) {
-    /* Three buttons must fit next to each other, including margin */
-    button {
-      width: 75px;
-      height: fit-content;
-    }
   }
 </style>

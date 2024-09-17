@@ -1,6 +1,7 @@
 <script>
   import { t } from '$lib/i18n';
   import { bpm, setBeatStart, setBpm } from '$lib/stores/Beat';
+  import Button from '../ui/Button.svelte';
   import Header from '../ui/Header.svelte';
   import BeatVisualizer from './BeatVisualizer.svelte';
 
@@ -69,9 +70,13 @@
     <div>
       {$t('record.estimated-bpm-label')}
     </div>
-    <button class="reset" on:click={reset}>
-      <span class="material-symbols-outlined button"> cancel </span>
-    </button>
+    <Button
+      class="reset wide"
+      on:click={reset}
+      symbolClass="thin"
+      symbolSize={28}
+      symbol="cancel"
+    ></Button>
   </div>
 
   <div class="fixed-bpm">
@@ -101,18 +106,6 @@
   }
   .bpm {
     font-size: 90px;
-  }
-  .reset {
-    width: 80px;
-    height: 30px;
-    background-color: var(--theme-accent-light);
-    color: var(--theme-neutral-dark);
-    text-align: center;
-    padding: 0;
-  }
-  span {
-    line-height: 30px;
-    font-size: 28px;
   }
   .visualizer {
     padding-top: 20px;

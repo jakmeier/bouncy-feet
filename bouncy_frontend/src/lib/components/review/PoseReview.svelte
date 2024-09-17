@@ -7,6 +7,7 @@
   import { getContext } from 'svelte';
   import InstructorAvatar from '../avatar/InstructorAvatar.svelte';
   import { LEFT_RIGHT_COLORING_LIGHT } from '$lib/constants';
+  import Symbol from '../ui/Symbol.svelte';
 
   /** @type {PoseApproximation} */
   export let pose;
@@ -29,9 +30,9 @@
 
 <div class="pose" class:failed-pose={pose.error > threshold}>
   {#if pose.error <= threshold}
-    <span class="material-symbols-outlined passed"> verified </span>
+    <Symbol class="white">verified</Symbol>
   {:else}
-    <span class="material-symbols-outlined failed"> release_alert </span>
+    <Symbol class="white">release_alert</Symbol>
   {/if}
 
   <div class="skeleton">
@@ -111,11 +112,5 @@
 
   span {
     font-size: 50px;
-  }
-  span.failed {
-    color: var(--theme-neutral-white);
-  }
-  span.passed {
-    color: var(--theme-neutral-white);
   }
 </style>

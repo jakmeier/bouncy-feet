@@ -1,4 +1,6 @@
 <script>
+  import Symbol from './Symbol.svelte';
+
   /** @type {string} */
   export let path;
   let videoExists = false;
@@ -35,11 +37,11 @@
 
 {#if videoLoading}
   <div class="video-unavailable">
-    <span class="material-symbols-outlined rotating"> refresh </span>
+    <Symbol size={100} class="rotating">refresh</Symbol>
   </div>
 {:else if !videoExists}
   <div class="video-unavailable">
-    <span class="material-symbols-outlined"> disabled_by_default </span>
+    <Symbol>disabled_by_default</Symbol>
   </div>
 {/if}
 
@@ -53,9 +55,6 @@
     text-align: center;
     line-height: 370px;
     border-radius: 25px;
-  }
-  .video-unavailable span {
-    font-size: 100px;
   }
 
   .video-container {
@@ -76,14 +75,5 @@
 
   .hide {
     display: none;
-  }
-
-  .rotating {
-    animation: rotate 1.5s linear infinite;
-  }
-  @keyframes rotate {
-    to {
-      transform: rotate(360deg);
-    }
   }
 </style>

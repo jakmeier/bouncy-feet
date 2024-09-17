@@ -4,6 +4,7 @@
   import Area from '$lib/components/ui/Area.svelte';
   import SelectStep from './SelectStep.svelte';
   import DanceStepDetails from './DanceStepDetails.svelte';
+  import Symbol from '$lib/components/ui/Symbol.svelte';
 
   /** @type {import("$lib/instructor/bouncy_instructor").StepInfo[]} */
   export let availableSteps;
@@ -281,7 +282,7 @@
         </div>
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div class="delete-button" on:click={(event) => handleRemove(event, i)}>
-          <span class="material-symbols-outlined">close</span>
+          <Symbol>close</Symbol>
         </div>
         <p
           class="handle draggable"
@@ -290,8 +291,10 @@
           on:touchend={handleDrop}
           on:touchmove={handleTouchMove}
         >
-          <span class="material-symbols-outlined" style="pointer-events: none;"
-            >open_with</span
+          <span
+            class="material-symbols-outlined"
+            style="pointer-events: none;"
+            translate="no">open_with</span
           >
         </p>
         <p class="label" style="width: {stepSize}px">{step.name}</p>
@@ -305,6 +308,7 @@
         <span
           class="material-symbols-outlined add-button"
           style="font-size: {stepSize / 2}px"
+          translate="no"
         >
           add_circle
         </span>

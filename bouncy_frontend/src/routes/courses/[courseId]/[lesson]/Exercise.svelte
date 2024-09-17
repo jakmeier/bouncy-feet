@@ -6,6 +6,7 @@
   import { counter } from '$lib/timer';
   import { writable } from 'svelte/store';
   import Step from '../../../collection/Step.svelte';
+  import Symbol from '$lib/components/ui/Symbol.svelte';
 
   /** @type {import("$lib/instructor/bouncy_instructor").LessonPart} */
   export let lessonPart;
@@ -87,9 +88,9 @@
     <div class="audio-selector">
       <Toggle bind:isOn={audioOn} border></Toggle>
       {#if audioOn}
-        <span class="material-symbols-outlined"> volume_up </span>
+        <Symbol class="blue margin15" size={40}>volume_up</Symbol>
       {:else}
-        <span class="material-symbols-outlined"> volume_off </span>
+        <Symbol class="blue margin15" size={40}>volume_off</Symbol>
       {/if}
     </div>
   </div>
@@ -159,11 +160,5 @@
 
   .bpm-option:not(.selected):hover {
     transform: scale(1.2);
-  }
-
-  .audio-selector span {
-    color: var(--theme-main);
-    font-size: 40px;
-    margin: 15px;
   }
 </style>

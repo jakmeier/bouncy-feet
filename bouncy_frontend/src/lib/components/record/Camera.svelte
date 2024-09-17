@@ -2,6 +2,7 @@
 <script>
   import { onDestroy } from 'svelte';
   import { waitForVideoMetaLoaded } from '$lib/promise_util';
+  import Symbol from '../ui/Symbol.svelte';
 
   /** @type HTMLVideoElement|null */
   export let videoElement = null;
@@ -114,11 +115,5 @@
   style="opacity: {opacity}"
 ></video>
 {#if !cameraOn}
-  <span class="material-symbols-outlined"> videocam </span>
+  <Symbol size={100}>videocam</Symbol>
 {/if}
-
-<style>
-  span {
-    font-size: 100px;
-  }
-</style>

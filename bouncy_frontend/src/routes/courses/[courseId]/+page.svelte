@@ -2,10 +2,11 @@
   import { page } from '$app/stores';
   import { t } from '$lib/i18n.js';
   import Header from '$lib/components/ui/Header.svelte';
-  import { getContext, onDestroy, onMount } from 'svelte';
+  import { getContext } from 'svelte';
   import Step from '../../collection/Step.svelte';
   import { counter } from '$lib/timer';
   import { dev } from '$lib/stores/FeatureSelection.js';
+  import Symbol from '$lib/components/ui/Symbol.svelte';
 
   const { getCourse } = getContext('courses');
   const user = getContext('user').store;
@@ -46,11 +47,11 @@
         <div class="rank">
           {#if courseProgress && courseProgress.lessons}
             {#if courseProgress.lessons[index] > 0}
-              <span class="material-symbols-outlined done"> verified </span>
+              <Symbol size={50} class="blue">verified</Symbol>
             {/if}
 
             {#each Array(Math.max(0, courseProgress.lessons[index] - 1 || 0)) as _}
-              <span class="material-symbols-outlined"> star </span>
+              <Symbol size={50}>star</Symbol>
             {/each}
           {/if}
         </div>
@@ -104,12 +105,6 @@
     display: flex;
     justify-content: center;
     margin-top: -5px;
-  }
-  .done {
-    color: var(--theme-main);
-  }
-  span {
-    font-size: 50px;
   }
   button {
     margin: 10px;

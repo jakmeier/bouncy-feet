@@ -10,9 +10,11 @@
   import VideoReview from '$lib/components/review/VideoReview.svelte';
   import Audio from '$lib/components/Audio.svelte';
   import { registerTracker, setHalfSpeed } from '$lib/stores/Beat';
+  import Button from '$lib/components/ui/Button.svelte';
 
   const { getCourse } = getContext('courses');
-  const { recordFinishedLesson } = getContext('user');
+  const { recordFinishedLesson, computeDanceStats, addDanceToStats } =
+    getContext('user');
 
   /** @type {string} */
   let id;
@@ -137,6 +139,10 @@
     if (passed) {
       recordFinishedLesson(id, lessonIndex, 1);
     }
+    const sessionResult = computeDanceStats(detected.steps());
+    if (sessionResult) {
+      addDanceToStats(sessionResult);
+    }
   }
   $: if ($trackingState === DetectionState.TrackingDone) trackingDone();
 
@@ -154,13 +160,12 @@
       bind:bpmSelected={beatDetected}
       bind:useFixedBpm
     ></BeatSelector>
-    <button
-      class={beatDetected ? 'light' : 'locked'}
+    <Button
+      class={beatDetected ? 'light wide' : 'locked wide'}
       on:click={beatDetected ? start : () => showHint.set(true)}
-    >
-      <span class="material-symbols-outlined button"> play_arrow </span>
-      <p>{$t('courses.lesson.start-button')}</p>
-    </button>
+      symbol="play_arrow"
+      text="courses.lesson.start-button"
+    ></Button>
   {:else if $trackingState === DetectionState.TrackingDone}
     <LessonEnd {hitRate} {passed}></LessonEnd>
 
@@ -176,12 +181,18 @@
     {/if}
 
     <div class="buttons">
-      <button class="light" on:click={restart}
-        >{$t('courses.end.again-button')}</button
-      >
-      <button class="light" on:click={goBack}
-        >{$t('courses.end.back-button')}</button
-      >
+      <Button
+        class="light wide"
+        on:click={restart}
+        symbol=""
+        text="courses.end.again-button"
+      ></Button>
+      <Button
+        class="light wide"
+        on:click={goBack}
+        symbol=""
+        text="courses.end.back-button"
+      ></Button>
     </div>
   {:else}
     <LiveRecording
@@ -197,10 +208,12 @@
       forceBeat
     ></LiveRecording>
 
-    <button class="light" on:click={stop}>
-      <span class="material-symbols-outlined"> camera </span>
-      <p>{$t('courses.lesson.stop-button')}</p>
-    </button>
+    <Button
+      class="light wide"
+      on:click={stop}
+      symbol="camera"
+      text="courses.lesson.stop-button"
+    ></Button>
   {/if}
 </div>
 
@@ -219,19 +232,5 @@
     display: flex;
     flex-direction: column;
     margin-top: 10px;
-  }
-  button {
-    height: 80px;
-    margin: 5px auto;
-    width: 90%;
-  }
-  button span {
-    font-size: 42px;
-  }
-  .locked {
-    background-color: var(--theme-neutral-gray);
-    color: var(--theme-neutral-dark);
-    opacity: 0.5;
-    cursor: not-allowed;
   }
 </style>

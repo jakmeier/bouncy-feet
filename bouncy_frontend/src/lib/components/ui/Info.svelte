@@ -24,6 +24,7 @@
 <div class="info">
   <span
     class="material-symbols-outlined"
+    translate="no"
     on:click={toggleOpen}
     on:keydown={toggleOpen}
     role="button"

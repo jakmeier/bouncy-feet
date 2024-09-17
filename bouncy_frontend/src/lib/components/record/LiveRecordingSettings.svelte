@@ -1,5 +1,6 @@
 <script>
   import { t } from '$lib/i18n';
+  import Symbol from '../ui/Symbol.svelte';
   import Toggle from '../ui/Toggle.svelte';
 
   export let enableLiveAvatar = false;
@@ -11,12 +12,12 @@
 <div id="control-panel">
   <div class="toggle-items">
     <div class="toggle-item">
-      <span class="material-symbols-outlined tracking">directions_walk</span>
+      <Symbol size={70}>directions_walk</Symbol>
       <div>{$t('record.settings.enable-tracking')}</div>
       <Toggle bind:isOn={enableLiveAvatar} />
     </div>
     <div class="toggle-item">
-      <span class="material-symbols-outlined instructor">directions_walk</span>
+      <Symbol size={70}>directions_walk</Symbol>
       <div>{$t('record.settings.enable-instructor')}</div>
       <Toggle bind:isOn={enableInstructorAvatar} />
     </div>
@@ -54,16 +55,5 @@
     display: grid;
     grid-template-columns: 1fr;
     justify-items: center;
-  }
-
-  .toggle-item span {
-    font-size: 70px;
-  }
-
-  .tracking {
-    color: var(--theme-neutral-dark);
-  }
-  .instructor {
-    color: var(--theme-main);
   }
 </style>

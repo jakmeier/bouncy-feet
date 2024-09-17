@@ -1,7 +1,8 @@
 <script>
   import Header from '$lib/components/ui/Header.svelte';
+  import Symbol from '$lib/components/ui/Symbol.svelte';
   import Toggle from '$lib/components/ui/Toggle.svelte';
-  import { t } from '$lib/i18n';
+  import { locale, t } from '$lib/i18n';
   import { getContext } from 'svelte';
 
   const user = getContext('user').store;
@@ -11,15 +12,22 @@
 
 <div id="control-panel">
   <div class="toggle-item">
-    <span class="material-symbols-outlined">sports_score</span>
+    <Symbol size={45}>sports_score</Symbol>
     <Toggle bind:isOn={$user.consentSendingStats} />
     <div>{$t('profile.settings.consent-title')}</div>
   </div>
   <div class="toggle-item">
-    <span class="material-symbols-outlined">science</span>
+    <Symbol size={45}>science</Symbol>
     <Toggle bind:isOn={$user.experimentalFeatures} />
     <div>{$t('profile.settings.experimental-title')}</div>
   </div>
+  {#if $user.experimentalFeatures}
+    <div class="toggle-item">
+      <Symbol size={45}>translate</Symbol>
+      <div></div>
+      <div>{$locale}</div>
+    </div>
+  {/if}
 </div>
 
 <style>
@@ -35,9 +43,5 @@
     grid-template-columns: 1fr 1fr 4fr;
     gap: 0.5rem;
     align-items: center;
-  }
-
-  .toggle-item span {
-    font-size: 45px;
   }
 </style>

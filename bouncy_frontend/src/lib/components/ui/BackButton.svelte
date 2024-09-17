@@ -5,7 +5,7 @@
 </script>
 
 <button on:click={goBack}>
-  <span class="material-symbols-outlined"> chevron_left </span>
+  <span class="material-symbols-outlined" translate="no"> chevron_left </span>
 </button>
 
 <style>

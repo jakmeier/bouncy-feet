@@ -7,6 +7,7 @@
   import Step from '../../../../collection/Step.svelte';
   import Video from '$lib/components/ui/Video.svelte';
   import { base } from '$app/paths';
+  import Button from '$lib/components/ui/Button.svelte';
 
   const { getCourse } = getContext('courses');
 
@@ -68,10 +69,11 @@
 
 <div class="controls">
   <a href="./record">
-    <button class="light">
-      <span class="material-symbols-outlined button"> start </span>
-      <p>{$t('courses.lesson.start-button')}</p>
-    </button>
+    <Button
+      class="light big"
+      symbol="start"
+      text="courses.lesson.start-button"
+    />
   </a>
 </div>
 
@@ -91,14 +93,6 @@
 
   .controls {
     text-align: center;
-  }
-  button {
-    width: 152px;
-    height: 80px;
-    margin: 10px;
-  }
-  button span {
-    font-size: 42px;
   }
 
   .background-strip {

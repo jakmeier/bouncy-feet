@@ -1,6 +1,7 @@
 <script>
   import { getContext } from 'svelte';
   import PoseError from './PoseError.svelte';
+  import Symbol from '../ui/Symbol.svelte';
 
   /** @type {HTMLVideoElement} */
   export let reviewVideoElement;
@@ -28,7 +29,7 @@
 <div class="dev-area">
   <h2>Dev Area</h2>
   <button on:click={computePoseErrors}>
-    <span class="material-symbols-outlined"> unfold_more_double </span>
+    <Symbol>unfold_more_double</Symbol>
     <p>Print Frame Details</p>
   </button>
 

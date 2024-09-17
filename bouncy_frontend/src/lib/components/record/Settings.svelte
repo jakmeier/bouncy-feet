@@ -25,6 +25,7 @@
   {bpm}
   {$t('record.settings.bpm-unit')}
   <span
+    translate="no"
     class="material-symbols-outlined"
     role="button"
     tabindex="0"

@@ -9,6 +9,8 @@
   import { browser } from '$app/environment';
   import Info from '$lib/components/ui/Info.svelte';
   import { getContext } from 'svelte';
+  import Symbol from '$lib/components/ui/Symbol.svelte';
+  import Button from '$lib/components/ui/Button.svelte';
 
   /** @type {import('./$types').PageData} */
   export let data;
@@ -99,23 +101,18 @@
 
 {#if !$features.enableStepRecording(name)}
   <div class="note">
-    <span class="material-symbols-outlined"> info </span>
+    <Symbol>info</Symbol>
     {$t('step.wip-tracking')}
   </div>
 {/if}
 {#if $features.enableStepRecording(name) || $user.experimentalFeatures || !browser}
   <div class="label buttons">
     <a href="./learn">
-      <button class="light">
-        <span class="material-symbols-outlined"> school </span>
-        <p>{$t('record.learn-button')}</p>
-      </button>
+      <Button class="light" symbol="school" text="record.learn-button"></Button>
     </a>
     <a href="./train">
-      <button class="light">
-        <span class="material-symbols-outlined"> exercise </span>
-        <p>{$t('record.train-button')}</p>
-      </button>
+      <Button class="light" symbol="exercise" text="record.train-button"
+      ></Button>
     </a>
     <Info title="record.learn-button" text="record.info.learn" />
     <Info title="record.train-button" text="record.info.train" />
@@ -136,9 +133,6 @@
   .buttons {
     grid-template-columns: auto auto;
     row-gap: 10px;
-  }
-  button {
-    width: 120px;
   }
   .note {
     display: grid;

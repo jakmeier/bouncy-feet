@@ -39,7 +39,9 @@
   </div>
   {#if button !== null}
     <button on:click>
-      <span class="material-symbols-outlined button"> {button} </span>
+      <span class="material-symbols-outlined button" translate="no">
+        {button}
+      </span>
     </button>
   {/if}
 </header>

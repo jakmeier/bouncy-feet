@@ -30,7 +30,7 @@
 
 <div class="title">
   <img class="logo" src="{base}/icons/logo.svg" alt="Bouncy Feet Logo" />
-  <h1>
+  <h1 translate="no">
     {$t('home.title')}
   </h1>
 </div>

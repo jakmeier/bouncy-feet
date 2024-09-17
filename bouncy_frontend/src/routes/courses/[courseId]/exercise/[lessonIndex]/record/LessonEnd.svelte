@@ -60,13 +60,15 @@
   >
     <div class="score" style="width: {scoreWidth}%;"></div>
     {#if passed}
-      <span class="material-symbols-outlined above-bar"> verified </span>
+      <span class="material-symbols-outlined above-bar" translate="no">
+        verified
+      </span>
     {:else}
-      <span class="material-symbols-outlined above-bar">
+      <span class="material-symbols-outlined above-bar" translate="no">
         sentiment_dissatisfied
       </span>
     {/if}
-    <!-- <span class="material-symbols-outlined above-bar"> star_half </span> -->
+    <!-- <span class="material-symbols-outlined above-bar" translate="no"> star_half </span> -->
     <div class="above-bar">
       {(hitRate * 100).toFixed(0)}%
     </div>

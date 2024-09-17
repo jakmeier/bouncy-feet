@@ -1,4 +1,5 @@
 <script>
+  import Symbol from '$lib/components/ui/Symbol.svelte';
   import UiBox from '$lib/components/ui/UiBox.svelte';
   import { stepById } from '$lib/instructor/bouncy_instructor';
   import Step from '../Step.svelte';
@@ -50,7 +51,7 @@
           </div>
         </div>
         <p class="direction">
-          <span class="material-symbols-outlined"> arrow_back </span>
+          <Symbol>arrow_back</Symbol>
         </p>
       </div>
       <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -67,7 +68,7 @@
           </div>
         </div>
         <p class="direction">
-          <span class="material-symbols-outlined"> arrow_forward </span>
+          <Symbol>arrow_forward</Symbol>
         </p>
       </div>
     </div>

@@ -10,6 +10,7 @@
   import { goto } from '$app/navigation';
   import Toggle from '$lib/components/ui/Toggle.svelte';
   import { dev, displayedVersion } from '$lib/stores/FeatureSelection';
+  import Symbol from '$lib/components/ui/Symbol.svelte';
 
   const user = getContext('user').store;
   let scoreboardData = [];
@@ -66,9 +67,7 @@
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div class="profile-pic" on:click={clickProfile}>
-  <span class="material-symbols-outlined" style="font-size:100px">
-    person
-  </span>
+  <Symbol size={100}>person</Symbol>
   {$user.publicName}
 </div>
 <h2 class="box">{$t('profile.stats-title')}</h2>

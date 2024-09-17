@@ -9,6 +9,7 @@
   import AllPoseErrors from '$lib/components/dev/AllPoseErrors.svelte';
   import { dev } from '$lib/stores/FeatureSelection.js';
   import { registerTracker } from '$lib/stores/Beat';
+  import Button from '$lib/components/ui/Button.svelte';
 
   const userCtx = getContext('user');
 
@@ -121,39 +122,35 @@
 
   <div>
     {#if !showCamera}
-      <button on:click={startRecording}>
-        <span class="material-symbols-outlined"> videocam </span>
-        <p>{$t('record.start-button')}</p>
-      </button>
+      <Button
+        on:click={startRecording}
+        symbol="videocam"
+        text="record.start-button"
+      />
     {/if}
 
     {#if showCamera}
       {#if !recordingStarted}
-        <button on:click={startRecording}>
-          <span class="material-symbols-outlined">
-            radio_button_unchecked
-          </span>
-          <p>{$t('record.record-button')}</p>
-        </button>
+        <Button
+          on:click={startRecording}
+          symbol="radio_button_unchecked"
+          text="record.record-button"
+        />
       {:else if isModelOn}
-        <button on:click={stopCameraAndRecording}>
-          <span class="material-symbols-outlined"> camera </span>
-          <p>{$t('record.stop-record')}</p>
-        </button>
+        <Button
+          on:click={stopCameraAndRecording}
+          symbol="camera"
+          text="record.stop-record"
+        />
       {:else}
         <DanceStats
           numSteps={reviewStatsNumSteps}
           seconds={reviewStatsSeconds}
         />
-        <button on:click={reset}>
-          <span class="material-symbols-outlined"> done </span>
-          <p>{$t('record.done-button')}</p>
-        </button>
+        <Button on:click={reset} symbol="done" text="record.done-button" />
+
         <a href={reviewVideoSrc} download>
-          <button>
-            <span class="material-symbols-outlined"> download </span>
-            <p>{$t('record.download')}</p>
-          </button>
+          <Button symbol="download" text="record.download" />
         </a>
       {/if}
     {/if}
@@ -170,21 +167,5 @@
     margin: auto;
     display: grid;
     justify-items: center;
-  }
-
-  button {
-    width: 152px;
-    height: 80px;
-    margin: 10px;
-  }
-  button span {
-    font-size: 42px;
-  }
-
-  @media (max-width: 360px) {
-    /* Two buttons must fit next to each other, including margin */
-    button {
-      width: 120px;
-    }
   }
 </style>

@@ -52,7 +52,7 @@
         href={route}
         title={label}
       >
-        <span class="material-symbols-outlined">{icon}</span>
+        <span class="material-symbols-outlined" translate="no">{icon}</span>
       </a>
     {/each}
   </nav>
