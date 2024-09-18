@@ -11,6 +11,7 @@
   import Audio from '$lib/components/Audio.svelte';
   import { registerTracker, setHalfSpeed } from '$lib/stores/Beat';
   import Button from '$lib/components/ui/Button.svelte';
+  import { writable } from 'svelte/store';
 
   const { getCourse } = getContext('courses');
   const { recordFinishedLesson, computeDanceStats, addDanceToStats } =
@@ -59,10 +60,21 @@
   $: trackingState = tracker ? tracker.detectionState : null;
 
   let live = false;
-  let showReview = false;
   let useFixedBpm = false;
+  /** @type {import('svelte/store').Writable<boolean>} */
+  let beatHintPopUpIsOpen = writable(true);
+  /** @type {import('svelte/store').Writable<boolean>} */
+  let startExercisePopUpIsOpen = writable(false);
+
+  let showHintBeforeStart = true;
 
   async function start() {
+    if (showHintBeforeStart) {
+      // only show the hint once per sessions
+      showHintBeforeStart = false;
+      $startExercisePopUpIsOpen = true;
+      return;
+    }
     live = true;
     await tick();
     await startCamera();
@@ -91,23 +103,23 @@
     tracker?.clear();
     bpmDetectionCounter = -1;
     beatStart = 0;
-    showReview = false;
     live = false;
     recordingStart = undefined;
     recordingEnd = undefined;
   }
 
-  function openReview() {
-    showReview = true;
-  }
-
-  function closeReview() {
-    showReview = false;
-  }
-
   function goBack() {
     window.history.back();
     window.history.back();
+  }
+
+  function closeBeatPopUp() {
+    $beatHintPopUpIsOpen = false;
+  }
+
+  function closeStartExercisePopUp() {
+    $startExercisePopUpIsOpen = false;
+    start();
   }
 
   function loadCourse() {
@@ -222,6 +234,37 @@
 
 <Popup bind:isOpen={showHint} showOkButton title={'common.hint-popup-title'}>
   {$t('record.estimate-bpm-hint')}
+</Popup>
+
+<Popup
+  isOpen={beatHintPopUpIsOpen}
+  title={'courses.lesson.exercise-popup-title'}
+>
+  <div>
+    {$t('courses.lesson.exercise-beat-description')}
+  </div>
+  <button class="light wide" on:click={closeBeatPopUp}
+    >{$t('courses.lesson.own-music-button')}</button
+  >
+  <button
+    class="light wide"
+    on:click={() => {
+      useFixedBpm = true;
+      closeBeatPopUp();
+    }}>{$t('courses.lesson.play-beat-button')}</button
+  >
+  <slot />
+</Popup>
+
+<Popup
+  isOpen={startExercisePopUpIsOpen}
+  title={'courses.lesson.exercise-popup-title'}
+>
+  <div>
+    {$t('courses.lesson.exercise-start-description')}
+  </div>
+  <button class="light wide" on:click={closeStartExercisePopUp}>OK</button>
+  <slot />
 </Popup>
 
 <style>

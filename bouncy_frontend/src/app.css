@@ -87,15 +87,58 @@ button.light:active {
     box-shadow: 0 0px 0px #00000082;
 }
 
+button {
+    height: 80px;
+    width: 120px;
+}
+
+@media (max-width: 360px) {
+    /* Three buttons must fit next to each other, including margin */
+    button {
+        width: 75px;
+        height: fit-content;
+    }
+}
+
+button.big {
+    width: 152px;
+    height: 80px;
+    margin: 10px;
+}
+
+button.wide {
+    margin: 5px auto;
+    width: 90%;
+    max-width: 450px;
+}
+
+button.locked {
+    background-color: var(--theme-neutral-gray);
+    color: var(--theme-neutral-dark);
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+button.reset {
+    width: 80px;
+    height: 30px;
+    background-color: var(--theme-accent-light);
+    color: var(--theme-neutral-dark);
+    text-align: center;
+    padding: 0;
+}
+
+button.blue {
+    color: var(--theme-main);
+}
+
+button.margin15 {
+    margin: 15px;
+}
+
 button.danger {
     font-weight: 800;
     border: var(--theme-neutral-dark) solid 3px;
-}
-
-button p {
-    padding: 0;
-    margin: 0;
-    font-size: 12px;
 }
 
 /* for permanently hidden objects or the occasional instances where it's easier

@@ -15,6 +15,7 @@
       : hitRate > 0.44
         ? 'courses.end.failed'
         : 'courses.end.failed-hard';
+  $: displayedPercent = (Number(hitRate || 0) * 100).toFixed(0);
   let borderColor = 'var(--theme-neutral-gray)';
   let borderWidth = '3px';
 
@@ -70,7 +71,7 @@
     {/if}
     <!-- <span class="material-symbols-outlined above-bar" translate="no"> star_half </span> -->
     <div class="above-bar">
-      {(hitRate * 100).toFixed(0)}%
+      {displayedPercent}%
     </div>
   </div>
 </div>

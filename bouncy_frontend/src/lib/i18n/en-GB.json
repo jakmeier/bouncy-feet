@@ -46,7 +46,8 @@
             "audio-label": "Play beat",
             "bpm-label": "Speed",
             "exercise-popup-title": "Start exercise",
-            "exercise-start-description": "Please stand in an empty are to can dance along with the exercise. I recommend playing your own music for maximum fun.",
+            "exercise-beat-description": "You can either dance along a simple beat or play your own music outside Bouncy Feet and match the beat.",
+            "exercise-start-description": "Place your phone on the floor and stand where the camera can see you. Your entire body from head to toes must be visible.",
             "play-beat-button": "Play a beat",
             "own-music-button": "I have my own music"
         }
@@ -116,10 +117,12 @@
         "no-upload-hint": "Hint: The recording is evaluated on your device and never uploaded or shared with the developers.",
         "download": "save",
         "bpm-tap-button": "Tap along with your music to match the beat",
+        "bpm-fixed-button": "Pick the tempo below.",
         "estimated-bpm-label": "bpm",
         "estimate-bpm-hint": "You have to tap the button to detect the beat before starting the exercise.",
         "metronome-subtitle": "No music? Play a simple beat:",
         "prepare-title": "Prepare dance tracking",
+        "bpm-source-toggle-label": "Play beat",
         "settings": {
             "title": "Settings",
             "enable-tracking": "Tracking",

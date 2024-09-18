@@ -4,10 +4,12 @@
   import BackgroundTask from '../BackgroundTask.svelte';
 
   export let size = 50;
+  export let accentColor = true;
   $: innerSize = size * 0.9;
   $: bigInnerSize = size * 0.95;
   $: padding = (bigInnerSize - innerSize) * 2 + 10;
   $: slotSize = size - 2 * padding;
+  $: innerColor = accentColor ? '--theme-accent-light' : '--theme-neutral-gray';
 
   /** @type {{tracker: Tracker}} */
   const { tracker } = getContext('tracker');
@@ -70,7 +72,7 @@
     <div
       bind:this={disk}
       class="inner circle"
-      style="--inner-size: {innerSize}px; --big-inner-size: {bigInnerSize}px;"
+      style="--inner-size: {innerSize}px; --big-inner-size: {bigInnerSize}px; --inner-color: var({innerColor})"
     ></div>
     <div
       class="slot"
@@ -100,7 +102,7 @@
   .inner {
     width: var(--inner-size);
     height: var(--inner-size);
-    background-color: var(--theme-accent-light);
+    background-color: var(--inner-color);
   }
   .circle {
     border-radius: 50%;

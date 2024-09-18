@@ -5,59 +5,25 @@
   export let text = '';
   export let symbolClass = '';
   export let symbolSize = 42;
+
+  $: hasSymbol = symbol != '';
 </script>
 
 <button class={$$props.class} on:click>
-  <Symbol size={symbolSize} class={symbolClass || ''}>{symbol}</Symbol>
-  <p>{$t(text)}</p>
+  {#if hasSymbol}
+    <Symbol size={symbolSize} class={symbolClass || ''}>{symbol}</Symbol>
+  {/if}
+  <p class:smallText={hasSymbol}>
+    {#if text !== ''}
+      {$t(text)}
+    {/if}
+  </p>
 </button>
 
 <style>
-  button {
-    height: 80px;
-    width: 120px;
-  }
-
-  button.big {
-    width: 152px;
-    height: 80px;
-    margin: 10px;
-  }
-
-  button.wide {
-    margin: 5px auto;
-    width: 90%;
-  }
-
-  button.locked {
-    background-color: var(--theme-neutral-gray);
-    color: var(--theme-neutral-dark);
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  button.reset {
-    width: 80px;
-    height: 30px;
-    background-color: var(--theme-accent-light);
-    color: var(--theme-neutral-dark);
-    text-align: center;
+  button p.smallText {
     padding: 0;
-  }
-
-  button.blue {
-    color: var(--theme-main);
-  }
-
-  button.margin15 {
-    margin: 15px;
-  }
-
-  @media (max-width: 360px) {
-    /* Three buttons must fit next to each other, including margin */
-    button {
-      width: 75px;
-      height: fit-content;
-    }
+    margin: 0;
+    font-size: 12px;
   }
 </style>

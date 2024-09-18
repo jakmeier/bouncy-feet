@@ -3,6 +3,7 @@
   import { bpm, setBeatStart, setBpm } from '$lib/stores/Beat';
   import Button from '../ui/Button.svelte';
   import Header from '../ui/Header.svelte';
+  import Toggle from '../ui/Toggle.svelte';
   import BeatVisualizer from './BeatVisualizer.svelte';
 
   export let counter = -1;
@@ -58,8 +59,10 @@
 
 <div class="outer">
   <div class="visualizer" on:pointerdown={tap}>
-    <BeatVisualizer size={200}>
-      {$t('record.bpm-tap-button')}
+    <BeatVisualizer size={200} accentColor={!useFixedBpm}>
+      {useFixedBpm
+        ? $t('record.bpm-fixed-button')
+        : $t('record.bpm-tap-button')}
     </BeatVisualizer>
   </div>
 
@@ -70,13 +73,15 @@
     <div>
       {$t('record.estimated-bpm-label')}
     </div>
-    <Button
-      class="reset wide"
-      on:click={reset}
-      symbolClass="thin"
-      symbolSize={28}
-      symbol="cancel"
-    ></Button>
+    {#if !useFixedBpm}
+      <Button
+        class="reset"
+        on:click={reset}
+        symbolClass="thin"
+        symbolSize={28}
+        symbol="cancel"
+      ></Button>
+    {/if}
   </div>
 
   <div class="fixed-bpm">
@@ -90,6 +95,11 @@
         </div>
       {/each}
     </div>
+  </div>
+
+  <div class="bpm-source">
+    <div>{$t('record.bpm-source-toggle-label')}</div>
+    <Toggle bind:isOn={useFixedBpm}></Toggle>
   </div>
 </div>
 
@@ -122,5 +132,12 @@
     background-color: var(--theme-main);
     color: var(--theme-neutral-white);
     border-radius: 4px;
+  }
+  .bpm-source {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    gap: 20px;
   }
 </style>
