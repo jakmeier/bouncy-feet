@@ -12,8 +12,11 @@
   import { dev, displayedVersion } from '$lib/stores/FeatureSelection';
   import Symbol from '$lib/components/ui/Symbol.svelte';
 
+  /** @type {import('./$types').PageData} */
+  export let data;
+
   const user = getContext('user').store;
-  let scoreboardData = [];
+  let scoreboardData = data.leaderboard;
   let showStatsSharingPopup = writable(!$user.consentSendingStats);
 
   async function submit() {
@@ -34,7 +37,6 @@
       scoreboardData = result;
     }
   }
-  refreshLeaderboard();
 
   function openSettings() {
     goto('./settings');

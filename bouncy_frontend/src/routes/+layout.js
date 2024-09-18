@@ -9,13 +9,14 @@ import {
     StepInfo,
 } from '$lib/instructor/bouncy_instructor';
 
-export const prerender = true;
+// This is the root layout, hence it defines prerendering for the entire app default.
+export const prerender = false;
 export const trailingSlash = 'always';
 
 let loadedOnce = false;
 
 /** @type {import('@sveltejs/kit').Load} */
-export const load = async ({ data }) => {
+export const load = async ({ fetch, data }) => {
     const { i18n, translations } = data;
     const { locale, route } = i18n;
 
@@ -24,9 +25,45 @@ export const load = async ({ data }) => {
     await setRoute(route);
     await setLocale(locale);
 
+    const poseFile = fetch('/pose.ron').then(checkStatus).catch((e) => console.error(e));
+    const danceFile = fetch('/dance.ron').then(checkStatus).catch((e) => console.error(e));
+
+
+    const stepFiles = [
+        'basic.ron',
+        'footwork.ron',
+        'idle_steps.ron',
+        'misc.ron',
+        'rm_variations.ron',
+        'shapes.ron'
+    ].map(filename => fetch(`/steps/${filename}`).then(checkStatus).catch((e) => console.error(e)));
+
+    const [
+        poseFileResponse,
+        danceFileResponse,
+        ...stepFileResponses
+    ] = await Promise.all([poseFile, danceFile, ...stepFiles]);
+
+    const stepFileStrings = await Promise.all(stepFileResponses.map(response => response.text()));
+
+    const poseFileString = await poseFileResponse.text();
+    const danceFileString = await danceFileResponse.text();
+
+    let collectionData = {
+        poseFileString,
+        danceFileString,
+        stepFileStrings: {
+            basic: stepFileStrings[0],
+            footwork: stepFileStrings[1],
+            idle_steps: stepFileStrings[2],
+            misc: stepFileStrings[3],
+            rm_variations: stepFileStrings[4],
+            shapes: stepFileStrings[5]
+        }
+    };
+
     if (!loadedOnce) {
-        loadedOnce = true;
-        loadOnce(data);
+        loadOnce(collectionData);
     }
 
     const stepData = {
@@ -101,12 +138,22 @@ export const load = async ({ data }) => {
 };
 
 function loadOnce(data) {
-    loadPoseString(data.poseFileString);
-    loadStepString(data.stepFileStrings.basic, 'basic');
-    loadStepString(data.stepFileStrings.footwork, 'footwork');
-    loadStepString(data.stepFileStrings.idle_steps, 'idle_steps');
-    loadStepString(data.stepFileStrings.misc, 'misc');
-    loadStepString(data.stepFileStrings.rm_variations, 'rm_variations');
-    loadStepString(data.stepFileStrings.shapes, 'shapes');
-    loadDanceString(data.danceFileString);
+    if (data.poseFileString && data.poseFileString.length > 0) {
+        loadedOnce = true;
+        loadPoseString(data.poseFileString);
+        loadStepString(data.stepFileStrings.basic, 'basic');
+        loadStepString(data.stepFileStrings.footwork, 'footwork');
+        loadStepString(data.stepFileStrings.idle_steps, 'idle_steps');
+        loadStepString(data.stepFileStrings.misc, 'misc');
+        loadStepString(data.stepFileStrings.rm_variations, 'rm_variations');
+        loadStepString(data.stepFileStrings.shapes, 'shapes');
+        loadDanceString(data.danceFileString);
+    }
+}
+
+async function checkStatus(response) {
+    if (!response.ok) {
+        throw new Error(`Response status: ${response.status}`);
+    }
+    return response;
 }

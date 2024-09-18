@@ -54,6 +54,7 @@ export async function fetchLeaderboard() {
         }
     } catch (error) {
         console.error('Error while reading scoreboard:', error);
+        return [];
     }
 }
 
