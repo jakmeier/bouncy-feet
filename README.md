@@ -76,6 +76,10 @@ core business logic (dance detection).
 
 ## Progress Status
 
+- 18 Sep 2024: Release version v0.5.1
+    - Fix language selection based on locale configured on the client device.
+    - Fix: Preserve icons in automated translation.
+    - Server infrastructure changes. (Scoreboard is now hosted on stats.bouncy-feet.ch)
 -  9 Sep 2024: Release version v0.5.0
     - Introduce courses, with a running man course as a first example.
       - Note: This is a poorly made example course for demonstration purposes. Actual courses will have better quality videos and better tracking.
