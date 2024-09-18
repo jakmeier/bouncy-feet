@@ -1,7 +1,6 @@
 import { dev } from "$app/environment";
 
-// TODO: This is a temporary place to host the stats service
-let STATS_API_BASE = "https://demo.paddlers.ch:3000";
+let STATS_API_BASE = "https://stats.bouncy-feet.ch";
 
 if (dev) {
     STATS_API_BASE = "http://localhost:3000";
