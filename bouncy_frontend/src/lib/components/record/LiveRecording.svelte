@@ -29,6 +29,11 @@
   import ProgressBar from './ProgressBar.svelte';
   import { locale } from '$lib/i18n';
   import { timeBetweenMoves } from '$lib/stores/Beat';
+  import {
+    recordDetectionDelay,
+    recordTrackSyncDelay,
+    recordMediaPipeDelay,
+  } from '$lib/stores/System';
 
   /** @type {boolean} */
   export let cameraOn = false;
@@ -124,6 +129,7 @@
       dataListener.trackFrame(cameraVideoElement);
       const t = performance.now() - start;
       if (t > 50) console.debug(`trackFrame took ${t}ms`);
+      recordTrackSyncDelay(t);
 
       const before = tracker.numDetectedPoses();
       let detectionResult = tracker.runDetection();
@@ -153,6 +159,7 @@
       if (t2 - t > 30) {
         console.debug(`detectDance took ${t2 - t}ms`);
       }
+      recordDetectionDelay(t2 - t);
     }
     for (
       let audio = tracker.nextAudioEffect();
@@ -171,6 +178,7 @@
     if (recordingStart === undefined) {
       recordingStart = timestamp;
     }
+    recordMediaPipeDelay(performance.now() - timestamp);
     if (result.landmarks && result.landmarks.length >= 1) {
       landmarks = result.landmarks[0];
       const kp = landmarksToKeypoints(result.landmarks[0]);

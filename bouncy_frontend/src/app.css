@@ -136,6 +136,10 @@ button.margin15 {
     margin: 15px;
 }
 
+button.width60 {
+    width: 60px;
+}
+
 button.danger {
     font-weight: 800;
     border: var(--theme-neutral-dark) solid 3px;

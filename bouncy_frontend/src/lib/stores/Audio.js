@@ -1,7 +1,9 @@
 
-import { writable, get } from 'svelte/store';
+import { writable } from 'svelte/store';
 import { base } from '$app/paths';
 import { browser } from '$app/environment';
+import { audioDelay } from '$lib/stores/System';
+
 
 /** @type {AudioContext} */
 export let audioContext;
@@ -17,6 +19,7 @@ async function initAudioContext() {
     return;
   }
   audioContext = new AudioContext();
+  audioDelay.set(audioContext.outputLatency);
   // @ts-ignore
   channels.default = new GainNode(audioContext, { gain: 1.0 });
   // @ts-ignore
