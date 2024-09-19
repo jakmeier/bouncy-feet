@@ -82,7 +82,7 @@
 <h2 class="box">{$t('profile.leaderboard-title')}</h2>
 <Leaderboard users={scoreboardData} />
 <form class="inputs">
-  <button on:click={submit} class="light">{$t('profile.submit-stats')}</button>
+  <button on:click={submit} class="light wide">{$t('profile.submit-stats')}</button>
 </form>
 <form class="inputs">
   <label for="publicName">{$t('profile.public-name')}</label>

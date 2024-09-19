@@ -6,12 +6,13 @@
   import { DetectionState, Tracker } from '$lib/instructor/bouncy_instructor';
   import BeatSelector from '$lib/components/record/BeatSelector.svelte';
   import Popup from '$lib/components/ui/Popup.svelte';
-  import LessonEnd from './LessonEnd.svelte';
+  import LessonEndResults from './LessonEndResults.svelte';
   import VideoReview from '$lib/components/review/VideoReview.svelte';
   import Audio from '$lib/components/Audio.svelte';
   import { registerTracker, setHalfSpeed } from '$lib/stores/Beat';
   import Button from '$lib/components/ui/Button.svelte';
   import { writable } from 'svelte/store';
+  import LessonEnd from './LessonEnd.svelte';
 
   const { getCourse } = getContext('courses');
   const { recordFinishedLesson, computeDanceStats, addDanceToStats } =
@@ -67,6 +68,8 @@
   let startExercisePopUpIsOpen = writable(false);
 
   let showHintBeforeStart = true;
+  // wait for a user input before showing stats
+  let showResults = false;
 
   async function start() {
     if (showHintBeforeStart) {
@@ -106,6 +109,7 @@
     live = false;
     recordingStart = undefined;
     recordingEnd = undefined;
+    showResults = false;
   }
 
   function goBack() {
@@ -179,33 +183,37 @@
       text="courses.lesson.start-button"
     ></Button>
   {:else if $trackingState === DetectionState.TrackingDone}
-    <LessonEnd {hitRate} {passed}></LessonEnd>
-
-    {#if recordingStart !== undefined && recordingEnd !== undefined}
-      <VideoReview
-        reviewVideoSrc={videoUrl}
-        {detectedSteps}
-        {recordingStart}
-        {recordingEnd}
-      ></VideoReview>
+    {#if !showResults}
+      <LessonEnd bind:showResults></LessonEnd>
     {:else}
-      Failed to load review
-    {/if}
+      <LessonEndResults {hitRate} {passed}></LessonEndResults>
 
-    <div class="buttons">
-      <Button
-        class="light wide"
-        on:click={restart}
-        symbol=""
-        text="courses.end.again-button"
-      ></Button>
-      <Button
-        class="light wide"
-        on:click={goBack}
-        symbol=""
-        text="courses.end.back-button"
-      ></Button>
-    </div>
+      {#if recordingStart !== undefined && recordingEnd !== undefined}
+        <VideoReview
+          reviewVideoSrc={videoUrl}
+          {detectedSteps}
+          {recordingStart}
+          {recordingEnd}
+        ></VideoReview>
+      {:else}
+        Failed to load review
+      {/if}
+
+      <div class="buttons">
+        <Button
+          class="light wide"
+          on:click={restart}
+          symbol=""
+          text="courses.end.again-button"
+        ></Button>
+        <Button
+          class="light wide"
+          on:click={goBack}
+          symbol=""
+          text="courses.end.back-button"
+        ></Button>
+      </div>
+    {/if}
   {:else}
     <LiveRecording
       bind:startCamera

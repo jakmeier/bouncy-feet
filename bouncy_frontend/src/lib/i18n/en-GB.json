@@ -105,6 +105,7 @@
         "train-button": "Train",
         "reset-button": "Record again",
         "review-button": "Review Video",
+        "results-button": "Show results",
         "stop-camera": "stop camera",
         "stop-record": "stop video",
         "learn-dance-prefix": "Learn",

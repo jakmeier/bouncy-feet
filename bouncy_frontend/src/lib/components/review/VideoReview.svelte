@@ -17,8 +17,11 @@
   /** @type {import("$lib/instructor/bouncy_instructor").DetectedStep[]} */
   export let detectedSteps = [];
 
-  $: firstPoseTime = detectedSteps[0].start;
-  $: lastPoseTime = detectedSteps[detectedSteps.length - 1].end;
+  $: firstPoseTime = detectedSteps.length > 0 ? detectedSteps[0].start : 0;
+  $: lastPoseTime =
+    detectedSteps.length > 0
+      ? detectedSteps[detectedSteps.length - 1].end
+      : 100;
 
   let tracker = getContext('tracker').tracker;
   const avatarSize = 140;
