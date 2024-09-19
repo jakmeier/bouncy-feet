@@ -14,14 +14,15 @@
   let swapBackgroundColor = 'var(--theme-neutral-white)';
   onMount(() => {
     swapBackgroundColor = $backgroundColor;
-    $backgroundColor = 'var(--theme-main)';
+    $backgroundColor =
+      'linear-gradient(180deg, var(--theme-main) 0%, var(--theme-neutral-dark) 90%)';
   });
   onDestroy(() => {
     $backgroundColor = swapBackgroundColor;
   });
 </script>
 
-<Header title={$t('courses.title')} />
+<Header title={$t('courses.title')} backButton={false} />
 
 {#each $courses as course}
   <a class="course" href={course.id}>
@@ -57,11 +58,11 @@
     grid-template-columns: 1fr 1fr;
     justify-items: center;
     align-items: center;
-    background-color: var(--theme-accent);
+    background-color: var(--theme-accent-light);
     width: 90%;
     margin: 25px auto 5px;
     padding: 15px;
-    box-shadow: var(--theme-neutral-white) 0px 0px 5px;
+    box-shadow: var(--theme-neutral-dark) 0px 0px 5px;
     line-height: 72px;
   }
   .course-symbol {
@@ -83,9 +84,8 @@
     box-shadow: var(--theme-neutral-dark) 0px 0px 5px;
   }
   .start-here {
-    background-color: var(--theme-accent-light);
+    background-color: var(--theme-main);
     color: var(--theme-neutral-white);
-    text-shadow: var(--theme-neutral-dark) 0px 0px 11px;
     font-size: 28px;
     line-height: 28px;
     text-align: center;

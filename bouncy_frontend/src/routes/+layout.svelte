@@ -22,7 +22,7 @@
 
 <div
   class="background"
-  style="background-color: {$backgroundColor}; padding: {outerPadding}px;"
+  style="background: {$backgroundColor}; padding: {outerPadding}px;"
 >
   <main
     style="margin:{mainMargin}px; height: calc(100vh - {navBarHeight}px); max-width: calc(min(730px, 100vw) - {2 *
