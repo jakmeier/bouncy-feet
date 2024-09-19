@@ -3,7 +3,7 @@
   import { onDestroy, onMount } from 'svelte';
   import DanceAnimation from './DanceAnimation.svelte';
   import { backgroundColor } from '$lib/stores/UiState';
-  import { BOLD_MAIN_THEME_COLORING } from '$lib/constants';
+  import { BOLD_MAIN_THEME_COLORING, WHITE_COLORING } from '$lib/constants';
   import { base } from '$app/paths';
   import { versionString } from '$lib/stores/FeatureSelection';
 
@@ -38,11 +38,7 @@
 <div class="dark-stripe">
   <div class="dancers" style="grid-template-columns: repeat({7}, 1fr);">
     {#each { length: 4 } as _}
-      <DanceAnimation
-        dance={dance(0)}
-        style={BOLD_MAIN_THEME_COLORING}
-        showOverflow
-      />
+      <DanceAnimation dance={dance(0)} style={WHITE_COLORING} showOverflow />
       <div></div>
     {/each}
   </div>
@@ -102,11 +98,7 @@
     style="grid-template-columns: repeat({9}, 1fr); margin-left: -50px;"
   >
     {#each { length: 9 } as _}
-      <DanceAnimation
-        dance={dance(3)}
-        style={BOLD_MAIN_THEME_COLORING}
-        showOverflow
-      />
+      <DanceAnimation dance={dance(3)} style={WHITE_COLORING} showOverflow />
     {/each}
   </div>
 </div>
@@ -161,7 +153,6 @@
   }
   .slogan {
     box-shadow: none;
-    /* box-shadow: var(--theme-neutral-white) 0px 0px 5px; */
     max-width: 400px;
     margin: auto;
     text-align: center;
