@@ -79,13 +79,16 @@ impl Default for DanceDetector {
             tracked_beats: None,
             beat_alignment: None,
             force_beat: false,
-            beat_tolerance: 100.0,
+            // TODO: should this depend on bpm and system info?
+            beat_tolerance: 250.0,
             // This is what I measured on my desktop with my webcam by looking
             // at the timestamps of claps timed on the audio output. Basically,
             // I measured the remaining error in timing after I have considered
-            // audio output latency and computational overhead.
-            // TODO: have some kind of estimate run on the device
-            camera_input_delay: 150.0,
+            // audio output latency and computational overhead. TODO: have some
+            // kind of estimate run on the device Note: Set to a small value for
+            // now, it seems more stable to underestimate and then just use a
+            // large tolerance.
+            camera_input_delay: 50.0,
             detection_state: DetectionState::Init,
             detection_state_store: Readable::new(DetectionState::Init),
             detection_state_start: 0.0,
@@ -146,8 +149,12 @@ impl DanceDetector {
                 }
             }
             DetectionState::CountDown => {
-                if now > self.detection_state_start + (self.time_between_poses() * 9.0).floor() {
-                    self.transition_to_state(DetectionState::LiveTracking, now);
+                let time_between_poses = self.time_between_poses();
+                if now > self.detection_state_start + (time_between_poses * 8.0).floor() {
+                    // the change to the next state must happen BEFORE it
+                    // actually starts, to give time to the animation
+                    let actual_start = self.next_pose_time(now + time_between_poses);
+                    self.transition_to_state(DetectionState::LiveTracking, actual_start);
                 }
             }
             DetectionState::LiveTracking => {
@@ -207,11 +214,9 @@ impl DanceDetector {
         let num_detected_poses = self.num_detected_poses();
         let time_delta = self.time_between_poses();
         let first_beat = self.next_pose_time(self.detection_state_start + (time_delta / 2.0));
-        let expected_next_pose = first_beat + (num_detected_poses as f64 * time_delta).round();
-        if self.force_beat
-            && f64::abs(pose_timestamp - expected_next_pose - self.camera_input_delay)
-                < self.beat_tolerance
-        {
+        let expected_next_pose =
+            first_beat + (num_detected_poses as f64 * time_delta).round() + self.camera_input_delay;
+        if self.force_beat && pose_timestamp < expected_next_pose - self.beat_tolerance {
             return self
                 .detected
                 .clone()
@@ -270,9 +275,7 @@ impl DanceDetector {
             // smallest error in the tolerated range.
             if self.force_beat {
                 self.on_beat_candidates.push(pose_approximation.clone());
-                if pose_timestamp - self.camera_input_delay
-                    > expected_next_pose + self.beat_tolerance
-                {
+                if pose_timestamp > expected_next_pose + self.beat_tolerance {
                     let closest_fit = self
                         .on_beat_candidates
                         .drain(..)
@@ -354,7 +357,7 @@ impl DanceDetector {
         }
     }
 
-    pub(crate) fn time_to_beat(&self, t: Timestamp) -> u32 {
+    pub(crate) fn timestamp_to_beat(&self, t: Timestamp) -> u32 {
         let t0 = self.next_pose_time(self.beat_alignment.unwrap_or(0.0));
         let pose_duration = self.time_between_poses();
         ((t - t0) / pose_duration).floor() as u32
@@ -363,7 +366,7 @@ impl DanceDetector {
     pub(crate) fn next_pose_time(&self, not_before: Timestamp) -> Timestamp {
         let t0 = self.beat_alignment.unwrap_or(0.0);
         let pose_duration = self.time_between_poses();
-        let poses = ((not_before - t0) / pose_duration).floor();
+        let poses = ((not_before - t0) / pose_duration).ceil();
         t0 + poses * pose_duration
     }
 

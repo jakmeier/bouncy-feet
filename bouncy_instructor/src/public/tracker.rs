@@ -246,18 +246,25 @@ impl Tracker {
     #[wasm_bindgen(js_name = expectedPoseSkeleton)]
     pub fn expected_pose_skeleton(&self) -> Skeleton {
         let beat = self.detector.num_detected_poses();
-        self.pose_skeleton_at_beat(beat)
+        self.pose_skeleton_at_beat(beat as i32)
     }
 
     #[wasm_bindgen(js_name = beat)]
-    pub fn beat(&self, t: f64) -> u32 {
-        self.detector.time_to_beat(t)
+    pub fn beat(&self, t: f64) -> i32 {
+        self.detector.timestamp_to_beat(t) as i32
+            - self
+                .detector
+                .timestamp_to_beat(self.detector.detection_state_start) as i32
     }
 
     #[wasm_bindgen(js_name = poseSkeletonAtBeat)]
-    pub fn pose_skeleton_at_beat(&self, beat: usize) -> Skeleton {
+    pub fn pose_skeleton_at_beat(&self, beat: i32) -> Skeleton {
         let step_info = self.detector.tracked_step();
-        step_info.skeleton(beat)
+
+        match usize::try_from(beat) {
+            Ok(beat) => step_info.skeleton(beat),
+            _else => step_info.skeleton(0).resting_pose(),
+        }
     }
 
     #[wasm_bindgen(js_name = expectedPoseBodyShift)]
