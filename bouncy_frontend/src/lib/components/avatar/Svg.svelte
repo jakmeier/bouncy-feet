@@ -45,6 +45,15 @@
 
   /**
    * @param {string} id
+   */
+  function removeLine(id) {
+    let index = lines.findIndex((x) => x.id === id);
+    lines.splice(index, 1);
+    lines = lines;
+  }
+
+  /**
+   * @param {string} id
    * @param {Polygon} polygon
    */
   function setPolygon(id, polygon) {
@@ -98,6 +107,7 @@
 
   setContext('svg', {
     setLine,
+    removeLine,
     setPolygon,
     removePolygon,
     setCircle,
