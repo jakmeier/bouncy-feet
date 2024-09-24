@@ -56,12 +56,22 @@
       }
     }
   }
+
+  function restartAnimation() {
+    const n = $beat - firstDancedBeat;
+    if (n > dancedBeats) {
+      firstDancedBeat = $beat + 2;
+    }
+  }
+
   onMount(() => {
     firstDancedBeat = $beat + 2;
   });
 </script>
 
-<div class="explanation" style="width: {width}px">
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+<div class="explanation" style="width: {width}px" on:click={restartAnimation}>
   <SpeechBubble
     {text}
     position="bottom"
