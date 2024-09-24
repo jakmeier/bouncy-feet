@@ -1,11 +1,7 @@
 <script>
-  import SvgAvatarSide from './SvgAvatarSide.svelte';
-  import SvgPolygon from './SvgPolygon.svelte';
-  import SvgStyle from './SvgStyle.svelte';
-  import SvgCircle from './SvgCircle.svelte';
   import { Cartesian2d, LimbError } from '$lib/instructor/bouncy_instructor';
   import { MAIN_THEME_COLORING } from '$lib/constants';
-  import SvgLine from './SvgLine.svelte';
+  import SvgAvatar2 from './SvgAvatar2.svelte';
 
   /** @type import('$lib/instructor/bouncy_instructor').Skeleton */
   export let skeleton;
@@ -19,9 +15,6 @@
 
   /** @type {AvatarColoring} */
   export let style = MAIN_THEME_COLORING;
-
-  const markerColor = '#ff111188';
-  const markerLineWidth = 20;
 
   /**
    * @param {number} s
@@ -47,55 +40,18 @@
     new Cartesian2d(hip.x, hip.y),
     avatarSizePixels
   );
-  /** @type {Cartesian2d} */
-  $: leftHip = renderedSkeleton.hip.start;
-  /** @type {Cartesian2d} */
-  $: leftShoulder = renderedSkeleton.shoulder.start;
-  /** @type {Cartesian2d} */
-  $: rightHip = renderedSkeleton.hip.end;
-  /** @type {Cartesian2d} */
-  $: rightShoulder = renderedSkeleton.shoulder.end;
-  /** @type {number} */
-  $: cx = (leftShoulder.x + rightShoulder.x) / 2;
-  /** @type {number} */
-  $: cy = leftShoulder.y - avatarSizePixels * 0.1;
   let dummyUpdate = 0;
-  $: renderedSkeleton, dummyUpdate += 1;
+  $: renderedSkeleton, (dummyUpdate += 1);
   $: markedSegments = markedLimbs.map((limb) => limb.render(renderedSkeleton));
 
   $: headRadius = 0.075 * avatarSizePixels;
 </script>
 
-<SvgPolygon
-  id="torso"
-  points={[leftHip, rightHip, rightShoulder, leftShoulder]}
-  style={{
-    color: style.headColor,
-    fill: style.bodyColor,
-    linecap: 'round',
-    lineWidth: lineWidth * 0.9,
-  }}
+<SvgAvatar2
+  {avatarSizePixels}
+  skeleton={renderedSkeleton}
+  {lineWidth}
+  {markedSegments}
+  {headRadius}
+  {style}
 />
-<SvgCircle id="head" {cx} {cy} r={headRadius} fill={style.headColor} {dummyUpdate} />
-<SvgStyle color={style.leftColor} linecap="round" {lineWidth}>
-  <SvgAvatarSide side={renderedSkeleton.left} sideId={'left'}></SvgAvatarSide>
-</SvgStyle>
-<SvgStyle color={style.rightColor} linecap="round" {lineWidth}>
-  <SvgAvatarSide side={renderedSkeleton.right} sideId={'right'}></SvgAvatarSide>
-</SvgStyle>
-{#each markedSegments as segment, i}
-  <SvgLine
-    id="{`marker${i}`},"
-    line={{
-      id: `marker${i}`,
-      start: segment.start,
-      end: segment.end,
-      z: segment.z,
-      style: {
-        color: markerColor,
-        linecap: 'butt',
-        lineWidth: markerLineWidth,
-      },
-    }}
-  ></SvgLine>
-{/each}
