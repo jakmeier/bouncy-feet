@@ -12,17 +12,29 @@
 
   /** @type import('$lib/instructor/bouncy_instructor').SkeletonV2 */
   export let skeleton;
+  /** @type {AvatarColoring} */
+  export let style = MAIN_THEME_COLORING;
   export let lineWidth = 10;
   export let avatarSizePixels = 100;
   export let headRadius = 0.075 * avatarSizePixels;
   /** @type {RenderableSegment[]} */
   export let markedSegments = [];
+  $: markedSegmentsLines = markedSegments.map((segment, i) => {
+    return {
+      id: `marker${i}`,
+      start: segment.start,
+      end: segment.end,
+      z: segment.z - 1,
+      style: {
+        color: markerColor,
+        linecap: 'round',
+        lineWidth: markerLineWidth,
+      },
+    };
+  });
 
-  /** @type {AvatarColoring} */
-  export let style = MAIN_THEME_COLORING;
-
-  const markerColor = '#ff111188';
-  const markerLineWidth = 20;
+  const markerColor = '#ff111166';
+  const markerLineWidth = 16;
 
   /** @type {Cartesian2d} */
   $: leftHip = skeleton.hip.start;
@@ -64,19 +76,6 @@
 <SvgStyle color={style.rightColor} linecap="round" {lineWidth}>
   <SvgAvatarSide side={skeleton.right} sideId={'right'}></SvgAvatarSide>
 </SvgStyle>
-{#each markedSegments as segment, i}
-  <SvgLine
-    id="{`marker${i}`},"
-    line={{
-      id: `marker${i}`,
-      start: segment.start,
-      end: segment.end,
-      z: segment.z,
-      style: {
-        color: markerColor,
-        linecap: 'butt',
-        lineWidth: markerLineWidth,
-      },
-    }}
-  ></SvgLine>
+{#each markedSegmentsLines as line}
+  <SvgLine id={line.id} {line}></SvgLine>
 {/each}

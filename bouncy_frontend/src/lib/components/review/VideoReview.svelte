@@ -7,14 +7,16 @@
   import BackgroundTask from '$lib/components/BackgroundTask.svelte';
   import PoseReview from './PoseReview.svelte';
   import {
-    LEFT_RIGHT_COLORING,
     LEFT_RIGHT_COLORING_LIGHT,
+    MAIN_THEME_COLORING,
   } from '$lib/constants';
   import {
     LimbError,
     PoseApproximation,
   } from '$lib/instructor/bouncy_instructor';
   import SvgAvatar2 from '../avatar/SvgAvatar2.svelte';
+  import Toggle from '../ui/Toggle.svelte';
+  import { t } from '$lib/i18n';
 
   /** @type {string} URL (usually local) to the video for review  */
   export let reviewVideoSrc;
@@ -28,6 +30,7 @@
   let videoSrcWidth = 0;
   let videoSrcHeight = 0;
   let videoLoaded = false;
+  let displayVideoOverlay = true;
 
   $: firstPoseTime = detectedSteps.length > 0 ? detectedSteps[0].start : 0;
   $: lastPoseTime =
@@ -36,7 +39,6 @@
       : 100;
 
   let tracker = getContext('tracker').tracker;
-  const rightAvatarSize = 140;
   const rightAvatarLineWidth = 5;
 
   /** @type {HTMLVideoElement} */
@@ -51,7 +53,12 @@
   let selectedBeat = -1;
   $: beatsPerStep =
     detectedSteps.length > 0 ? detectedSteps[0].poses.length : 4;
-  $: leftAvatarSizePixels = videoSrcHeight;
+  $: avatarSizePixels = videoSrcHeight;
+  $: headRadius = 0.075 * videoSrcHeight;
+  let markedSegments = [];
+  $: if (keypointSkeleton) {
+    markedSegments = limbErrors.map((limb) => limb.render(keypointSkeleton));
+  }
 
   let prevTime = 0;
   function onFrame() {
@@ -139,8 +146,12 @@
     // TODO: deduplicate threshold definition
     const threshold = 0.05;
     if (pose.error >= threshold) {
-      // limbErrors = pose.worstLimbs(3).filter((pose) => pose.error > threshold);
-      limbErrors = pose.worstLimbs(1);
+      limbErrors = pose
+        .worstLimbs(6)
+        .filter(
+          (pose) =>
+            pose.error * pose.weight > threshold && pose.name.length < 30
+        );
     } else {
       limbErrors = [];
     }
@@ -178,6 +189,7 @@
   function togglePlay() {
     if (reviewVideoElement.paused) {
       reviewVideoElement.play();
+      limbErrors = [];
     } else {
       reviewVideoElement.pause();
     }
@@ -234,7 +246,9 @@ once per 250ms. -->
 </div>
 
 <div class="background-strip">
-  {formatBeatLabel(selectedBeat, selectedStep, beatsPerStep)}
+  <div class="beat-label">
+    {formatBeatLabel(selectedBeat, selectedStep, beatsPerStep)}
+  </div>
   <div class="upper">
     <div class="video-wrapper">
       <!-- svelte-ignore a11y-media-has-caption -->
@@ -251,42 +265,49 @@ once per 250ms. -->
         playsinline
         style="max-width: 100%"
       ></video>
-      {#if keypointSkeleton}
+      {#if keypointSkeleton && displayVideoOverlay}
         <div class="video-overlay" style="pointer-events: none;">
           <Svg
             width={videoSrcWidth}
             height={videoSrcHeight}
-            orderByZ={false}
+            orderByZ
             showOverflow
           >
             <SvgAvatar2
               skeleton={keypointSkeleton}
-              avatarSizePixels={leftAvatarSizePixels}
+              {avatarSizePixels}
               lineWidth={3}
               style={LEFT_RIGHT_COLORING_LIGHT}
+              {headRadius}
+              {markedSegments}
             />
-            <!-- 
-                     markedSegments={limbErrors.map((limb) =>
-                limb.render(keypointSkeleton)
-              )}
-             -->
           </Svg>
         </div>
       {/if}
     </div>
 
-    <div>
-      <Svg height={rightAvatarSize} width={rightAvatarSize} orderByZ>
-        {#if skeleton}
-          <SvgAvatar
-            width={rightAvatarSize}
-            height={rightAvatarSize}
+    {#if keypointSkeleton}
+      <div>
+        <Svg
+          height={videoSrcHeight}
+          width={videoSrcWidth}
+          orderByZ
+          showOverflow
+        >
+          <SvgAvatar2
             lineWidth={rightAvatarLineWidth}
-            {skeleton}
-            style={LEFT_RIGHT_COLORING}
+            skeleton={keypointSkeleton}
+            {avatarSizePixels}
+            style={MAIN_THEME_COLORING}
+            {headRadius}
+            {markedSegments}
           />
-        {/if}
-      </Svg>
+        </Svg>
+      </div>
+    {/if}
+    <div class="toggle-item">
+      <div>{$t('record.settings.enable-tracking')}</div>
+      <Toggle bind:isOn={displayVideoOverlay} />
     </div>
   </div>
   {#if $dev}
@@ -331,7 +352,7 @@ once per 250ms. -->
 
   .upper {
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 1fr 1fr;
     align-items: center;
   }
 
@@ -345,5 +366,15 @@ once per 250ms. -->
     padding: 10px 30px;
     border-radius: 10px;
     box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.55);
+  }
+
+  .beat-label {
+    margin-bottom: 10px;
+  }
+
+  .toggle-item {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
   }
 </style>
