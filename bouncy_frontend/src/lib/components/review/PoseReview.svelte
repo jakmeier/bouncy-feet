@@ -11,6 +11,7 @@
 
   /** @type {PoseApproximation} */
   export let pose;
+  export let beatLabel = '0';
   /** @type {number} */
   export let threshold = 0.05;
   $: max = 3 * threshold;
@@ -59,6 +60,9 @@
       <div class="bad" style="width: {badWidth}px;"></div>
     </div>
   </div>
+  <div class="beat-label">
+    {beatLabel}
+  </div>
 </div>
 
 <style>
@@ -71,11 +75,14 @@
     margin: 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.55);
   }
+  .pose:hover {
+    box-shadow: 0 4px 8px #33a86d;
+  }
   .failed-pose {
     border: solid 2px #eb3b3b;
   }
-  .pose:hover {
-    box-shadow: 0 8px 16px var(--theme-neutral-light);
+  .failed-pose:hover {
+    box-shadow: 0 4px 8px #eb3b3b;
   }
   .pose:active {
     box-shadow: none;
@@ -110,7 +117,10 @@
     background-color: var(--theme-main);
   }
 
-  span {
-    font-size: 50px;
+  .beat-label {
+    margin-top: 10px;
+    padding: 5px;
+    font-size: 14px;
+    color: var(--theme-neutral-dark);
   }
 </style>

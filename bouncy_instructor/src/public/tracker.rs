@@ -7,6 +7,7 @@ pub use detection_output::{DetectionFailureReason, DetectionResult, PoseHint};
 pub use pose_output::PoseApproximation;
 pub use step_output::DetectedStep;
 
+use super::renderable::RenderableSkeleton;
 use crate::intern::dance_collection::{DanceCollection, ForeignCollectionError};
 use crate::intern::dance_detector::{DanceDetector, DetectionState};
 use crate::intern::skeleton_3d::{Direction, Skeleton3d};
@@ -335,6 +336,20 @@ impl Tracker {
         self.skeletons
             .get(i)
             .map(|skeleton_info| skeleton_info.to_skeleton(0.0))
+    }
+
+    /// The original keypoints rendered as skeleton, at the given time frame.
+    #[wasm_bindgen(js_name = renderedKeypointsAt)]
+    pub fn rendered_keypoints_at(
+        &self,
+        timestamp: Timestamp,
+        width: f32,
+        height: f32,
+    ) -> Option<RenderableSkeleton> {
+        let i = self.timestamps.partition_point(|t| *t < timestamp);
+        self.skeletons
+            .get(i)
+            .map(|skeleton_info| skeleton_info.keypoints_skeleton(width, height))
     }
 
     #[wasm_bindgen(getter, js_name = halfSpeed)]

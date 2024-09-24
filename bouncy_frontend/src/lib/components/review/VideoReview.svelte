@@ -6,7 +6,15 @@
   import { getContext, onMount } from 'svelte';
   import BackgroundTask from '$lib/components/BackgroundTask.svelte';
   import PoseReview from './PoseReview.svelte';
-  import { LEFT_RIGHT_COLORING } from '$lib/constants';
+  import {
+    LEFT_RIGHT_COLORING,
+    LEFT_RIGHT_COLORING_LIGHT,
+  } from '$lib/constants';
+  import {
+    LimbError,
+    PoseApproximation,
+  } from '$lib/instructor/bouncy_instructor';
+  import SvgAvatar2 from '../avatar/SvgAvatar2.svelte';
 
   /** @type {string} URL (usually local) to the video for review  */
   export let reviewVideoSrc;
@@ -17,6 +25,10 @@
   /** @type {import("$lib/instructor/bouncy_instructor").DetectedStep[]} */
   export let detectedSteps = [];
 
+  let videoSrcWidth = 0;
+  let videoSrcHeight = 0;
+  let videoLoaded = false;
+
   $: firstPoseTime = detectedSteps.length > 0 ? detectedSteps[0].start : 0;
   $: lastPoseTime =
     detectedSteps.length > 0
@@ -24,13 +36,22 @@
       : 100;
 
   let tracker = getContext('tracker').tracker;
-  const avatarSize = 140;
-  const avatarLineWidth = 5;
+  const rightAvatarSize = 140;
+  const rightAvatarLineWidth = 5;
 
   /** @type {HTMLVideoElement} */
   let reviewVideoElement;
   /** @type {import("$lib/instructor/bouncy_instructor").Skeleton} */
   let skeleton;
+  /** @type {import("$lib/instructor/bouncy_instructor").SkeletonV2} */
+  let keypointSkeleton;
+  /** @type {LimbError[]} */
+  let limbErrors = [];
+  let selectedStep = -1;
+  let selectedBeat = -1;
+  $: beatsPerStep =
+    detectedSteps.length > 0 ? detectedSteps[0].poses.length : 4;
+  $: leftAvatarSizePixels = videoSrcHeight;
 
   let prevTime = 0;
   function onFrame() {
@@ -44,6 +65,13 @@
     const ms = reviewVideoElement.currentTime * 1000;
     const reviewTimestamp = ms + recordingStart;
     skeleton = tracker.skeletonAt(reviewTimestamp);
+    if (videoLoaded) {
+      keypointSkeleton = tracker.renderedKeypointsAt(
+        reviewTimestamp,
+        videoSrcWidth,
+        videoSrcHeight
+      );
+    }
     const cursor = ms / (recordingEnd - recordingStart);
     if (setCursor) {
       setCursor(cursor);
@@ -78,6 +106,75 @@
     reviewVideoElement.currentTime = videoTime;
   }
 
+  /** @returns {null | PoseApproximation}*/
+  function selectedPose() {
+    if (selectedBeat < 0) {
+      return null;
+    }
+    if (
+      detectedSteps &&
+      detectedSteps.length > selectedStep &&
+      detectedSteps[selectedStep].poses.length > selectedBeat
+    ) {
+      return detectedSteps[selectedStep].poses[selectedBeat];
+    } else {
+      console.error('beat out of range', selectedStep, selectedBeat);
+      return null;
+    }
+  }
+
+  // Load the specified beat to the review cursor.
+  /**
+   * @param {number} step
+   * @param {number} beat
+   * */
+  function selectBeat(step, beat) {
+    selectedStep = step;
+    selectedBeat = beat;
+    const pose = selectedPose();
+    if (!pose) {
+      return;
+    }
+    selectTimestamp(pose.timestamp);
+    // TODO: deduplicate threshold definition
+    const threshold = 0.05;
+    if (pose.error >= threshold) {
+      // limbErrors = pose.worstLimbs(3).filter((pose) => pose.error > threshold);
+      limbErrors = pose.worstLimbs(1);
+    } else {
+      limbErrors = [];
+    }
+  }
+
+  // select a pose if the video time is right
+  /** @param {number} t */
+  function checkTimeOnBeat(t) {
+    // find the last step that didn't end before t
+    selectedStep = 0;
+    while (
+      detectedSteps &&
+      detectedSteps.length > selectedStep &&
+      t > detectedSteps[selectedStep].end
+    ) {
+      selectedStep++;
+    }
+    // find the last pose that was before t - maxDt
+    const maxDt = 50;
+    selectedBeat = 0;
+    while (
+      detectedSteps[selectedStep] &&
+      detectedSteps[selectedStep].poses.length > selectedBeat &&
+      t - maxDt > detectedSteps[selectedStep].poses[selectedBeat].timestamp
+    ) {
+      selectedBeat++;
+    }
+    const pose = selectedPose();
+    if (!pose || Math.abs(pose.timestamp - t) > maxDt) {
+      selectedBeat = -1;
+      limbErrors = [];
+    }
+  }
+
   function togglePlay() {
     if (reviewVideoElement.paused) {
       reviewVideoElement.play();
@@ -93,10 +190,24 @@
       poseCards.scrollLeft / (poseCards.scrollWidth - poseCards.clientWidth);
     const t = firstPoseTime + (lastPoseTime - firstPoseTime) * r;
     selectTimestamp(t);
+    checkTimeOnBeat(t);
+  }
+
+  /**
+   * @param {number} beat
+   * @param {number} step
+   * @param {number} stepLen
+   */
+  function formatBeatLabel(beat, step, stepLen) {
+    if (beat < 0) {
+      return '?';
+    }
+    const i = step * stepLen + beat;
+    return `${i + 1}`;
   }
 
   onMount(() => {
-    selectTimestamp(firstPoseTime);
+    selectBeat(0, 0);
   });
 </script>
 
@@ -107,37 +218,70 @@ once per 250ms. -->
 <BackgroundTask {onFrame}></BackgroundTask>
 
 <div class="poses-details" bind:this={poseCards} on:scroll={onScrollPoseCards}>
-  {#each detectedSteps as step}
-    {#each step.poses as pose}
+  {#each detectedSteps as step, iStep}
+    {#each step.poses as pose, iBeat}
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->
-      <div on:click={() => selectTimestamp(pose.timestamp)}>
-        <PoseReview {pose}></PoseReview>
+      <!-- TODO(performance): step.poses.length allocates a vector and an array every time it is read -->
+      <div on:click={() => selectBeat(iStep, iBeat)}>
+        <PoseReview
+          {pose}
+          beatLabel={formatBeatLabel(iBeat, iStep, step.poses.length)}
+        ></PoseReview>
       </div>
     {/each}
   {/each}
 </div>
 
 <div class="background-strip">
+  {formatBeatLabel(selectedBeat, selectedStep, beatsPerStep)}
   <div class="upper">
-    <div>
+    <div class="video-wrapper">
       <!-- svelte-ignore a11y-media-has-caption -->
       <video
-        bind:this={reviewVideoElement}
         on:click={togglePlay}
+        on:loadeddata={() => {
+          videoLoaded = true;
+          onSeek();
+        }}
+        bind:this={reviewVideoElement}
+        bind:videoWidth={videoSrcWidth}
+        bind:videoHeight={videoSrcHeight}
         src={reviewVideoSrc}
         playsinline
-        style="margin-top: 10px; max-width: 100%"
+        style="max-width: 100%"
       ></video>
+      {#if keypointSkeleton}
+        <div class="video-overlay" style="pointer-events: none;">
+          <Svg
+            width={videoSrcWidth}
+            height={videoSrcHeight}
+            orderByZ={false}
+            showOverflow
+          >
+            <SvgAvatar2
+              skeleton={keypointSkeleton}
+              avatarSizePixels={leftAvatarSizePixels}
+              lineWidth={3}
+              style={LEFT_RIGHT_COLORING_LIGHT}
+            />
+            <!-- 
+                     markedSegments={limbErrors.map((limb) =>
+                limb.render(keypointSkeleton)
+              )}
+             -->
+          </Svg>
+        </div>
+      {/if}
     </div>
 
     <div>
-      <Svg height={avatarSize} width={avatarSize} orderByZ>
+      <Svg height={rightAvatarSize} width={rightAvatarSize} orderByZ>
         {#if skeleton}
           <SvgAvatar
-            width={avatarSize}
-            height={avatarSize}
-            lineWidth={avatarLineWidth}
+            width={rightAvatarSize}
+            height={rightAvatarSize}
+            lineWidth={rightAvatarLineWidth}
             {skeleton}
             style={LEFT_RIGHT_COLORING}
           />
@@ -145,6 +289,13 @@ once per 250ms. -->
       </Svg>
     </div>
   </div>
+  {#if $dev}
+    {#each limbErrors as limb}
+      <div>
+        {limb.name.split(' ')[0]}
+      </div>
+    {/each}
+  {/if}
 </div>
 
 <!-- <Banner
@@ -165,6 +316,19 @@ once per 250ms. -->
     overflow: hidden;
   }
 
+  .video-wrapper {
+    position: relative;
+    margin: auto;
+  }
+
+  .video-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+  }
+
   .upper {
     display: grid;
     grid-template-columns: 2fr 1fr;
@@ -177,9 +341,9 @@ once per 250ms. -->
   }
 
   .background-strip {
-    margin: 0 -25px;
+    margin: 10px -25px;
     padding: 10px 30px;
-    background-color: var(--theme-neutral-light);
     border-radius: 10px;
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.55);
   }
 </style>

@@ -2,6 +2,7 @@ use super::dance_collection::{DanceCollection, LimbIndex};
 use super::geom::{Angle3d, SignedAngle};
 use super::pose::{BodyPoint, Limb};
 use crate::keypoints::Cartesian3d;
+use crate::renderable::RenderableSkeleton;
 use crate::skeleton::{Segment, Side, Skeleton};
 use crate::Keypoints;
 use std::collections::HashMap;
@@ -219,6 +220,16 @@ impl Skeleton3d {
             sideway,
             backwards,
         }
+    }
+
+    /// Take the original keypoints as recorded and render it.
+    ///
+    /// Unlike `to_skeleton`, this doesn't display the model used to compute
+    /// scores, which transforms the input to angles per limbs. This gives the
+    /// points exactly as they were initially detected on the video. This is
+    /// typically used for drawing overlays on videos.
+    pub(crate) fn keypoints_skeleton(&self, width: f32, height: f32) -> RenderableSkeleton {
+        RenderableSkeleton::from_coordinates(&self.coordinates, width, height)
     }
 }
 

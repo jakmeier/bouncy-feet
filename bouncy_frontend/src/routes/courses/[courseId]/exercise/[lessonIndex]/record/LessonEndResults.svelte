@@ -16,7 +16,7 @@
         ? 'courses.end.failed'
         : 'courses.end.failed-hard';
   $: displayedPercent = (Number(hitRate || 0) * 100).toFixed(0);
-  let borderColor = 'var(--theme-neutral-gray)';
+  let scoreColor = 'var(--theme-neutral-gray)';
   let borderWidth = '3px';
 
   let outerWidth;
@@ -38,15 +38,19 @@
   function setResult() {
     scoreWidth = hitRate * 100;
     if (passed) {
-      borderColor = '#33a86d';
-      borderWidth = '5px';
+      scoreColor = '#33a86d';
+      // borderWidth = '5px';
     } else {
-      borderColor = '#eb3b3b';
+      scoreColor = '#eb3b3b';
     }
   }
 </script>
 
-<div class="outer" bind:clientWidth={outerWidth}>
+<div
+  class="outer"
+  bind:clientWidth={outerWidth}
+  style="--score-color: {scoreColor}"
+>
   <div class="explanation">
     <Explanation
       text={$t(text)}
@@ -57,7 +61,7 @@
 
   <div
     class="result"
-    style="border-color: {borderColor}; border-width: {borderWidth}"
+    style="border-color: {scoreColor}; border-width: {borderWidth}"
   >
     <div class="score" style="width: {scoreWidth}%;"></div>
     {#if passed}
@@ -93,7 +97,7 @@
     color: var(--theme-neutral-white);
     /* width and color overwritten by inline style */
     border: solid 3px var(--theme-neutral-gray);
-    border-radius: 38px;
+    /* border-radius: 38px; */
     overflow: hidden;
     transition:
       border-color 0s step-start 1s,
@@ -105,12 +109,14 @@
   }
   .score {
     position: absolute;
-    background-color: var(--theme-main);
+    background-color: var(--score-color);
     height: 100%;
     top: 0;
     left: 0;
     width: 0;
-    transition: width 1s;
+    transition:
+      width 1s,
+      background-color 0s step-start 1s;
   }
   span {
     font-size: 36px;

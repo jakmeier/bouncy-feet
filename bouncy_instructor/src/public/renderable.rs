@@ -1,4 +1,7 @@
+use super::keypoints::Cartesian3d;
+use crate::intern::pose::{BodyPart, BodyPoint, BodySide};
 use crate::skeleton::{Cartesian2d, Segment, Side, Skeleton};
+use std::collections::HashMap;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 /// A self-sufficient description of a body position snapshot for 2.5d
@@ -49,6 +52,17 @@ impl RenderableSegment {
     pub(crate) fn new(start: Cartesian2d, end: Cartesian2d, z: i16) -> Self {
         Self { start, end, z }
     }
+
+    pub(crate) fn from_3d(start: Cartesian3d, end: Cartesian3d, width: f32, height: f32) -> Self {
+        Self::new(
+            Cartesian2d::new(width * start.x, height * start.y),
+            Cartesian2d::new(width * end.x, height * end.y),
+            ((start.z + end.z) / 2.0)
+                .round()
+                .max(i16::MIN as f32)
+                .min(i16::MAX as f32) as i16,
+        )
+    }
 }
 
 impl RenderableSkeleton {
@@ -60,6 +74,42 @@ impl RenderableSkeleton {
     pub(crate) const FOOT_LEN: f32 = 0.075;
     pub(crate) const SHOULDER_LEN: f32 = 0.1;
     pub(crate) const HIP_LEN: f32 = 0.075;
+
+    /// Take already computed coordinates and create a RenderableSkeleton.
+    pub(crate) fn from_coordinates(
+        c: &HashMap<BodyPoint, Cartesian3d>,
+        width: f32,
+        height: f32,
+    ) -> Self {
+        let left_hip = c[&BodyPoint {
+            side: BodySide::Left,
+            part: BodyPart::Hip,
+        }];
+        let right_hip = c[&BodyPoint {
+            side: BodySide::Right,
+            part: BodyPart::Hip,
+        }];
+        let left_shoulder = c[&BodyPoint {
+            side: BodySide::Left,
+            part: BodyPart::Shoulder,
+        }];
+        let right_shoulder = c[&BodyPoint {
+            side: BodySide::Right,
+            part: BodyPart::Shoulder,
+        }];
+        let hip = RenderableSegment::from_3d(left_hip, right_hip, width, height);
+        let shoulder = RenderableSegment::from_3d(left_shoulder, right_shoulder, width, height);
+
+        RenderableSkeleton {
+            left: RenderableSide::from_coordinates(BodySide::Left, c, width, height),
+            right: RenderableSide::from_coordinates(BodySide::Right, c, width, height),
+            hip,
+            shoulder,
+            // TODO: can I find sensible values for these two boolean flags?
+            sideway: false,
+            backwards: false,
+        }
+    }
 }
 
 #[wasm_bindgen]
@@ -122,6 +172,56 @@ impl Side {
             arm,
             forearm,
             foot,
+        }
+    }
+}
+
+impl RenderableSide {
+    pub(crate) fn from_coordinates(
+        side: BodySide,
+        c: &HashMap<BodyPoint, Cartesian3d>,
+        width: f32,
+        height: f32,
+    ) -> Self {
+        let heel = c[&BodyPoint {
+            side,
+            part: BodyPart::Heel,
+        }];
+        let toes = c[&BodyPoint {
+            side,
+            part: BodyPart::Toes,
+        }];
+        let ankle = c[&BodyPoint {
+            side,
+            part: BodyPart::Ankle,
+        }];
+        let knee = c[&BodyPoint {
+            side,
+            part: BodyPart::Knee,
+        }];
+        let hip = c[&BodyPoint {
+            side,
+            part: BodyPart::Hip,
+        }];
+        let shoulder = c[&BodyPoint {
+            side,
+            part: BodyPart::Shoulder,
+        }];
+        let elbow = c[&BodyPoint {
+            side,
+            part: BodyPart::Elbow,
+        }];
+        let wrist = c[&BodyPoint {
+            side,
+            part: BodyPart::Wrist,
+        }];
+
+        Self {
+            thigh: RenderableSegment::from_3d(hip, knee, width, height),
+            shin: RenderableSegment::from_3d(knee, ankle, width, height),
+            arm: RenderableSegment::from_3d(shoulder, elbow, width, height),
+            forearm: RenderableSegment::from_3d(elbow, wrist, width, height),
+            foot: RenderableSegment::from_3d(heel, toes, width, height),
         }
     }
 }

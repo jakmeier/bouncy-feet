@@ -115,6 +115,7 @@ export function tracker_poseBodyShiftAtBeat(a: number, b: number): number;
 export function tracker_poseHint(a: number): number;
 export function tracker_poseSkeleton(a: number, b: number, c: number): number;
 export function tracker_poseSkeletonAtBeat(a: number, b: number): number;
+export function tracker_renderedKeypointsAt(a: number, b: number, c: number, d: number): number;
 export function tracker_runDetection(a: number): number;
 export function tracker_setBpm(a: number, b: number): void;
 export function tracker_setErrorThreshold(a: number, b: number): void;

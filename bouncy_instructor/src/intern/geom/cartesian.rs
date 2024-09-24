@@ -93,6 +93,12 @@ impl Cartesian3d {
     }
 }
 
+impl From<Cartesian3d> for Cartesian2d {
+    fn from(p: Cartesian3d) -> Self {
+        Self { x: p.x, y: p.y }
+    }
+}
+
 impl From<Cartesian3d> for Angle3d {
     fn from(p: Cartesian3d) -> Self {
         Self::new(
