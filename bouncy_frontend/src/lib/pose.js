@@ -135,7 +135,8 @@ async function initMediaPipeBackend() {
     // offending at all.
     // In conclusion, there is no good reason at the moment to do something else.
     const wasmSet = await FilesetResolver.forVisionTasks(
-        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
+        // with 0.10.16 I get "TypeError: GLctx is undefined"
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.15/wasm"
     );
 
     return await PoseLandmarker.createFromOptions(
