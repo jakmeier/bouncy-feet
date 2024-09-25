@@ -76,6 +76,14 @@ core business logic (dance detection).
 
 ## Progress Status
 
+- 25 Sep 2024: Release version v0.5.2
+    - The course lesson review page now shows which body parts are wrong for missed poses.
+    - Add several prompt and in-between screen to make it easier to follow what is happening in the app.
+    - Use a smaller model for the detection of the dance in the video.
+      This should make tracking smoother, especially on less powerful devices, such as old phones.
+      On the flip side, it will make detection less accurate in some circumstances.
+    - Enabling experimental features now also shows systems statistics that can be useful to debug performance issues.
+    - Various UI styling fixes and changes.
 - 18 Sep 2024: Release version v0.5.1
     - Fix language selection based on locale configured on the client device.
     - Fix: Preserve icons in automated translation.
