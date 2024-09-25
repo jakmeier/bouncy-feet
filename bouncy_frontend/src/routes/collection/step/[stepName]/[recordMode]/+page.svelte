@@ -24,7 +24,8 @@
   const tracker = Tracker.UniqueStepTracker(instructorStep.id);
   registerTracker(tracker);
   setBpm(120);
-  setHalfSpeed(isLearnMode);
+  // setHalfSpeed(isLearnMode);
+  setHalfSpeed(true);
 
   const userCtx = getContext('user');
 
@@ -132,7 +133,7 @@
     if (isLearnMode) {
       showLearnModeHint.set(true);
       showLearnModeHint.subscribe((hintShown) => {
-        if (!$showLearnModeHint && isLearnMode && !isModelOn) {
+        if (!$showLearnModeHint && !hintShown && !isModelOn) {
           turnOnRecording();
         }
       });
@@ -141,7 +142,7 @@
     if (isTrainMode) {
       showTrainModeHint.set(true);
       showTrainModeHint.subscribe((hintShown) => {
-        if (!$showTrainModeHint && isTrainMode && !isModelOn) {
+        if (!$showTrainModeHint && !hintShown && !isModelOn) {
           turnOnRecording();
         }
       });
@@ -169,10 +170,10 @@
       ></VideoReview>
       <div>
         <a href={reviewVideoSrc} download>
-          <Button class="light" symbol="download" text="record.download" />
+          <Button class="light wide" symbol="download" text="record.download" />
         </a>
         <Button
-          class="light"
+          class="light wide"
           on:click={closeReview}
           symbol="arrow_back"
           text="record.back-button"
@@ -187,19 +188,19 @@
     </div>
     <div class="buttons">
       <Button
-        class="light"
+        class="light wide"
         on:click={openReview}
         symbol="tv"
         text="record.review-button"
       />
       <Button
-        class="light"
+        class="light wide"
         on:click={reset}
         symbol="videocam"
         text="record.reset-button"
       />
       <Button
-        class="light"
+        class="light wide"
         on:click={goBackToStep}
         symbol="arrow_back"
         text="record.back-button"
@@ -223,8 +224,9 @@
     <div>
       <Button
         on:click={stopCameraAndRecording}
+        class="light wide"
         symbol="camera"
-        text="record.stop-button"
+        text="record.stop-record"
       />
     </div>
     <LiveRecordingSettings
@@ -265,7 +267,7 @@
 
   .buttons {
     display: grid;
-    grid-template-columns: auto auto auto;
+    grid-template-columns: auto;
   }
 
   div.title {

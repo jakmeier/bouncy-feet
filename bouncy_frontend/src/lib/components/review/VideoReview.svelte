@@ -54,7 +54,7 @@
   $: beatsPerStep =
     detectedSteps.length > 0 ? detectedSteps[0].poses.length : 4;
   $: avatarSizePixels = videoSrcHeight;
-  $: headRadius = 0.075 * videoSrcHeight;
+  $: headRadius = 0.075 * Math.min(videoSrcHeight, videoSrcWidth);
   let markedSegments = [];
   $: if (keypointSkeleton) {
     markedSegments = limbErrors.map((limb) => limb.render(keypointSkeleton));
@@ -359,6 +359,7 @@ once per 250ms. -->
   .poses-details {
     display: flex;
     overflow-x: auto;
+    max-width: 100%;
   }
 
   .background-strip {
@@ -366,6 +367,7 @@ once per 250ms. -->
     padding: 10px 30px;
     border-radius: 10px;
     box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.55);
+    text-align: center;
   }
 
   .beat-label {

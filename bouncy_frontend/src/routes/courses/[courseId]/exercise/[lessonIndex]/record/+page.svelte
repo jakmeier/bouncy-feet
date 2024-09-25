@@ -151,7 +151,7 @@
     const detected = tracker.lastDetection;
     hitRate =
       detected.poseMatches / (detected.poseMisses + detected.poseMatches);
-    passed = hitRate > 0.6;
+    passed = hitRate >= 0.6;
     if (passed) {
       recordFinishedLesson(id, lessonIndex, 1);
     }
