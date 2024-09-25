@@ -29,7 +29,8 @@
 
   let size = 100;
   let bpm = 132;
-  $: stepTime = 30_000 / bpm;
+  // use half speed
+  $: stepTime = 60_000 / bpm;
   $: animationTime = Math.min(stepTime * 0.7, 300);
   $: i = counter(-1, 1, stepTime);
 
