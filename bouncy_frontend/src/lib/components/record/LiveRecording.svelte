@@ -72,6 +72,7 @@
   $: $wideView = cameraOn;
   let progress = 0.0;
   let currentBeat = -1;
+  let firstPoseIsShown = false;
 
   let lastAudioHint = performance.now() - 2000;
   let audioHintDelay = 5000;
@@ -136,21 +137,25 @@
       if (tracker.numDetectedPoses() > before) {
         onStepDetection(detectionResult);
         if (!forceBeat) {
-          instructorSkeleton = tracker.expectedPoseSkeleton();
-          instructorSkeletonBodyShift = tracker.expectedPoseBodyShift();
+          updateInstructor();
         }
         console.assert(
           instructorSkeleton,
           'tracker returned no next expected pose'
         );
       }
-      if (forceBeat && $detectionState === DetectionState.LiveTracking) {
-        const future = performance.now() + animationTime;
-        let newBeat = tracker.beat(future);
-        if (newBeat !== currentBeat) {
-          instructorSkeleton = tracker.poseSkeletonAtBeat(newBeat);
-          instructorSkeletonBodyShift = tracker.poseBodyShiftAtBeat(newBeat);
-          currentBeat = newBeat;
+      if ($detectionState === DetectionState.LiveTracking) {
+        if (forceBeat) {
+          const future = performance.now() + animationTime;
+          let newBeat = tracker.beat(future);
+          if (newBeat !== currentBeat) {
+            instructorSkeleton = tracker.poseSkeletonAtBeat(newBeat);
+            instructorSkeletonBodyShift = tracker.poseBodyShiftAtBeat(newBeat);
+            currentBeat = newBeat;
+          }
+        } else if (before === 0 && !firstPoseIsShown) {
+          updateInstructor();
+          firstPoseIsShown = true;
         }
       }
       displayPoseHint();
@@ -168,6 +173,11 @@
     ) {
       scheduleAudio(audio.soundId, Number(audio.timestamp));
     }
+  }
+
+  function updateInstructor() {
+    instructorSkeleton = tracker.expectedPoseSkeleton();
+    instructorSkeletonBodyShift = tracker.expectedPoseBodyShift();
   }
 
   // this is called anytime media pipe has a frame with landmarks

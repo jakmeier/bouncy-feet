@@ -9,7 +9,7 @@
 
   /** @type{import("$lib/instructor/bouncy_instructor").DanceInfo[]} */
   export let featuredDances;
-  
+
   let swapBackgroundColor = 'var(--theme-neutral-white)';
   onMount(() => {
     swapBackgroundColor = $backgroundColor;
@@ -38,11 +38,7 @@
 <div class="dark-stripe">
   <div class="dancers" style="grid-template-columns: repeat({7}, 1fr);">
     {#each { length: 4 } as _}
-      <DanceAnimation
-        dance={dance(0)}
-        style={WHITE_COLORING}
-        showOverflow
-      />
+      <DanceAnimation dance={dance(0)} style={WHITE_COLORING} showOverflow />
       <div></div>
     {/each}
   </div>
@@ -68,10 +64,10 @@
   </div>
   <div class="centered">
     <a href="./collection">
-      <button class="light"> {$t('home.collection-button')} </button>
+      <button class="light wide"> {$t('home.collection-button')} </button>
     </a>
     <a href="./courses">
-      <button class="light"> {$t('home.courses-button')} </button>
+      <button class="light wide"> {$t('home.courses-button')} </button>
     </a>
   </div>
   <p>
@@ -102,11 +98,7 @@
     style="grid-template-columns: repeat({9}, 1fr); margin-left: -50px;"
   >
     {#each { length: 9 } as _}
-      <DanceAnimation
-        dance={dance(3)}
-        style={WHITE_COLORING}
-        showOverflow
-      />
+      <DanceAnimation dance={dance(3)} style={WHITE_COLORING} showOverflow />
     {/each}
   </div>
 </div>
@@ -125,7 +117,7 @@
     display: flex;
     justify-content: center;
     margin: -10px -10px;
-    padding:  0 5px 5px;
+    padding: 0 5px 5px;
     background-color: var(--theme-neutral-light);
     box-shadow: var(--theme-neutral-dark) 0px 0px 11px;
   }

@@ -64,10 +64,10 @@
   </div>
   <div class="centered">
     <a href="./collection">
-      <button class="light"> {$t('home.collection-button')} </button>
+      <button class="light wide"> {$t('home.collection-button')} </button>
     </a>
     <a href="./courses">
-      <button class="light"> {$t('home.courses-button')} </button>
+      <button class="light wide"> {$t('home.courses-button')} </button>
     </a>
   </div>
   <p>
