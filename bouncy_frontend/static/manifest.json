@@ -65,6 +65,12 @@
             "sizes": "1080x2400",
             "type": "image/jpg",
             "platform": "narrow"
+        },
+        {
+            "src": "screenshots/04_lesson_review.jpg",
+            "sizes": "1080x2400",
+            "type": "image/jpg",
+            "platform": "narrow"
         }
     ]
 }
