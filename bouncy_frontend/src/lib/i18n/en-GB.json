@@ -124,6 +124,7 @@
         "metronome-subtitle": "No music? Play a simple beat:",
         "prepare-title": "Prepare dance tracking",
         "bpm-source-toggle-label": "Play beat",
+        "no-video-for-review": "Nothing recorded, nothing to review. Make sure to enable the camera and the sound and follow the instructions. The recording will not start until the camera can detect your full body.",
         "settings": {
             "title": "Settings",
             "enable-tracking": "Tracking",

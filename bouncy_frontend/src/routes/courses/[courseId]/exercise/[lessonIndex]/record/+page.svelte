@@ -196,7 +196,7 @@
           {recordingEnd}
         ></VideoReview>
       {:else}
-        Failed to load review
+        {$t('record.no-video-for-review')}
       {/if}
 
       <div class="buttons">

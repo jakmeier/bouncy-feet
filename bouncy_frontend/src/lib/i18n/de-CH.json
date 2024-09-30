@@ -124,6 +124,7 @@
         "metronome-subtitle": "Keine Musik? Spiel einen Takt:",
         "prepare-title": "Vorbereitung fürs Tracken",
         "bpm-source-toggle-label": "Metronom",
+        "no-video-for-review": "Kein Video wurde aufgezeichnet. Versichere dich, dass die Kamera und der Ton aktiviert sind, dann folge den Instruktionen während der Aufzeichnung. Erst wenn der gesamte Körper von der Kamera erfasst wurde, begint die Aufzeichnung.",
         "settings": {
             "title": "Einstellungen",
             "enable-tracking": "Tracking",

@@ -180,7 +180,13 @@
         />
       </div>
     {:else}
-      Could not show review, something failed.
+      {$t('record.no-video-for-review')}
+      <Button
+        class="light wide"
+        on:click={closeReview}
+        symbol="arrow_back"
+        text="record.back-button"
+      />
     {/if}
   {:else if showSummary}
     <div>
@@ -221,7 +227,7 @@
   {/if}
 
   {#if isModelOn}
-    <div>
+    <div style="width: 50%;">
       <Button
         on:click={stopCameraAndRecording}
         class="light wide"
@@ -268,6 +274,7 @@
   .buttons {
     display: grid;
     grid-template-columns: auto;
+    width: 90%;
   }
 
   div.title {
