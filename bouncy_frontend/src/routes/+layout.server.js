@@ -23,7 +23,7 @@ export const load = async ({ url, cookies, request }) => {
     // Use default locale if current locale is not supported
     if (!supportedLocales.includes(locale)) {
         locale = defaultLocale;
-        console.log("Found a matching locale: ", locale);
+        console.log("Using default locale:", locale);
     }
 
     await loadTranslations(locale, pathname); // keep this just before the `return`

@@ -1,4 +1,4 @@
-import { addTranslations, setLocale, setRoute } from '$lib/i18n.js';
+import { addTranslations, loadTranslations, setLocale, setRoute } from '$lib/i18n.js';
 import {
     loadDanceString,
     loadPoseString,
@@ -16,7 +16,7 @@ export const trailingSlash = 'always';
 let loadedOnce = false;
 
 /** @type {import('@sveltejs/kit').Load} */
-export const load = async ({ fetch, data }) => {
+export const load = async ({ data }) => {
     const { i18n, translations } = data;
     const { locale, route } = i18n;
 
@@ -25,18 +25,30 @@ export const load = async ({ fetch, data }) => {
     await setRoute(route);
     await setLocale(locale);
 
-    const poseFile = fetch('/pose.ron').then(checkStatus).catch((e) => console.error(e));
-    const danceFile = fetch('/dance.ron').then(checkStatus).catch((e) => console.error(e));
+    const lookupSteps = await loadCollectionAssets();
+    const officialDances = dances();
 
+    return {
+        i18n,
+        translations,
+        officialDances,
+        lookupSteps,
+    };
+};
+
+
+async function loadCollectionAssets() {
+    const poseFile = loadRon("pose");
+    const danceFile = loadRon("dance");
 
     const stepFiles = [
-        'basic.ron',
-        'footwork.ron',
-        'idle_steps.ron',
-        'misc.ron',
-        'rm_variations.ron',
-        'shapes.ron'
-    ].map(filename => fetch(`/steps/${filename}`).then(checkStatus).catch((e) => console.error(e)));
+        import('$lib/assets/steps/basic.ron?raw'),
+        import('$lib/assets/steps/footwork.ron?raw'),
+        import('$lib/assets/steps/idle_steps.ron?raw'),
+        import('$lib/assets/steps/misc.ron?raw'),
+        import('$lib/assets/steps/rm_variations.ron?raw'),
+        import('$lib/assets/steps/shapes.ron?raw')
+    ].map((promise) => promise.catch((e) => console.error(e)));
 
     const [
         poseFileResponse,
@@ -44,10 +56,10 @@ export const load = async ({ fetch, data }) => {
         ...stepFileResponses
     ] = await Promise.all([poseFile, danceFile, ...stepFiles]);
 
-    const stepFileStrings = await Promise.all(stepFileResponses.map(response => response.text()));
+    const stepFileStrings = await Promise.all(stepFileResponses.map((data) => data.default)).catch((e) => console.error(e));
 
-    const poseFileString = await poseFileResponse.text();
-    const danceFileString = await danceFileResponse.text();
+    const poseFileString = poseFileResponse;
+    const danceFileString = danceFileResponse;
 
     let collectionData = {
         poseFileString,
@@ -78,7 +90,6 @@ export const load = async ({ fetch, data }) => {
         }
     }
 
-    const officialDances = dances();
 
     /** 
      * Exported function to lookup a filtered list of steps.
@@ -125,17 +136,19 @@ export const load = async ({ fetch, data }) => {
                 out.push(step);
             }
         }
-
         return out;
     };
 
-    return {
-        i18n,
-        translations,
-        officialDances,
-        lookupSteps,
-    };
-};
+    return lookupSteps;
+}
+
+/**
+ * @param {string} name
+ * @returns {Promise<string>}
+ */
+function loadRon(name) {
+    return import(`$lib/assets/${name}.ron?raw`).then((data) => data.default).catch((e) => console.error(e));
+}
 
 function loadOnce(data) {
     if (data.poseFileString && data.poseFileString.length > 0) {
@@ -149,11 +162,4 @@ function loadOnce(data) {
         loadStepString(data.stepFileStrings.shapes, 'shapes');
         loadDanceString(data.danceFileString);
     }
-}
-
-async function checkStatus(response) {
-    if (!response.ok) {
-        throw new Error(`Response status: ${response.status}`);
-    }
-    return response;
 }
