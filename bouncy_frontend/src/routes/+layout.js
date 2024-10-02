@@ -10,7 +10,9 @@ import {
 } from '$lib/instructor/bouncy_instructor';
 
 // This is the root layout, hence it defines prerendering for the entire app default.
+// Translations act weird with prerender on, so I'm disabling it.
 export const prerender = false;
+export const ssr = true;
 export const trailingSlash = 'always';
 
 let loadedOnce = false;
