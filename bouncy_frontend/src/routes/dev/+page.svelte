@@ -6,13 +6,24 @@
   import PoseError from '$lib/components/dev/PoseError.svelte';
   import VideoReview from '$lib/components/review/VideoReview.svelte';
   import { registerTracker } from '$lib/stores/Beat';
+  import Svg from '$lib/components/avatar/Svg.svelte';
+  import SvgAvatar2 from '$lib/components/avatar/SvgAvatar2.svelte';
+  import { LEFT_RIGHT_COLORING_LIGHT } from '$lib/constants';
+  import PoseInputForm from '$lib/components/editor/PoseInputForm.svelte';
 
   /** @type {HTMLInputElement}  */
   let upload;
   /** @type {HTMLVideoElement}  */
   let video;
+  let prevTime = -1;
+  let videoSrcWidth = 0;
+  let videoSrcHeight = 0;
+  /** @type {import("$lib/instructor/bouncy_instructor").SkeletonV2|undefined} */
+  let liveSkeleton;
 
   let dataListener;
+  /** @type {(skeleton: import("$lib/instructor/bouncy_instructor").Skeleton)=>void} */
+  let loadSkeleton;
   let tracker = new Tracker();
   registerTracker(tracker);
   const poseCtx = getContext('pose');
@@ -42,8 +53,10 @@
   }
 
   function loop() {
-    if (dataListener) {
-      dataListener.trackFrame(video, video.currentTime * 1000);
+    if (dataListener && prevTime !== video.currentTime) {
+      prevTime = video.currentTime;
+      dataListener.trackFrame(video);
+      // dataListener.trackFrame(video, video.currentTime * 1000);
     }
     requestAnimationFrame(loop);
   }
@@ -57,6 +70,15 @@
         const kp = landmarksToKeypoints(result.landmarks[0]);
         tracker.addKeypoints(kp, timestamp);
         recordingEnd = timestamp;
+        liveSkeleton = tracker.renderedKeypointsAt(
+          timestamp,
+          videoSrcWidth,
+          videoSrcHeight
+        );
+        let skeleton = tracker.skeletonAt(timestamp);
+        if (skeleton) {
+          loadSkeleton(skeleton);
+        }
       }
     });
   });
@@ -102,7 +124,29 @@
 <h1>Dev</h1>
 
 <!-- svelte-ignore a11y-media-has-caption -->
-<video bind:this={video} playsinline controls></video>
+<div class="side-by-side">
+  <video
+    bind:this={video}
+    bind:videoWidth={videoSrcWidth}
+    bind:videoHeight={videoSrcHeight}
+    playsinline
+    controls
+  ></video>
+  <div>
+    {#if liveSkeleton}
+      <Svg width={videoSrcWidth} height={videoSrcHeight} orderByZ showOverflow>
+        <SvgAvatar2
+          skeleton={liveSkeleton}
+          lineWidth={3}
+          style={LEFT_RIGHT_COLORING_LIGHT}
+        />
+      </Svg>
+    {/if}
+  </div>
+</div>
+
+<PoseInputForm bind:loadSkeleton></PoseInputForm>
+
 <p>
   <input
     bind:this={upload}
@@ -132,5 +176,10 @@
 <style>
   video {
     max-width: 100%;
+  }
+
+  .side-by-side {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
   }
 </style>
