@@ -42,8 +42,9 @@
    */
   let detectedSteps = [];
 
+  /** @param { Event } event */
   async function loadVideo(event) {
-    if (event.target.files && event.target.files[0]) {
+    if (event.target && event.target.files && event.target.files[0]) {
       video.src = await fileToUrl(event.target.files[0]);
       await waitForVideoMetaLoaded(video);
       tracker.clear();
@@ -62,25 +63,30 @@
   }
 
   onMount(async () => {
-    dataListener = await poseCtx.newPoseDetection((result, timestamp) => {
-      if (recordingStart === undefined) {
-        recordingStart = timestamp;
-      }
-      if (result.landmarks && result.landmarks.length >= 1) {
-        const kp = landmarksToKeypoints(result.landmarks[0]);
-        tracker.addKeypoints(kp, timestamp);
-        recordingEnd = timestamp;
-        liveSkeleton = tracker.renderedKeypointsAt(
-          timestamp,
-          videoSrcWidth,
-          videoSrcHeight
-        );
-        let skeleton = tracker.skeletonAt(timestamp);
-        if (skeleton) {
-          loadSkeleton(skeleton);
+    dataListener = await poseCtx.newPoseDetection(
+      (
+        /** @type {{ landmarks: string | any[]; }} */ result,
+        /** @type {number | undefined} */ timestamp
+      ) => {
+        if (recordingStart === undefined) {
+          recordingStart = timestamp;
+        }
+        if (result.landmarks && result.landmarks.length >= 1) {
+          const kp = landmarksToKeypoints(result.landmarks[0]);
+          tracker.addKeypoints(kp, timestamp);
+          recordingEnd = timestamp;
+          liveSkeleton = tracker.renderedKeypointsAt(
+            timestamp,
+            videoSrcWidth,
+            videoSrcHeight
+          );
+          let skeleton = tracker.skeletonAt(timestamp);
+          if (skeleton) {
+            loadSkeleton(skeleton);
+          }
         }
       }
-    });
+    );
   });
 
   /**

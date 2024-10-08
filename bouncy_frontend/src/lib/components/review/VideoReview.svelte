@@ -2,7 +2,6 @@
   import { dev } from '$lib/stores/FeatureSelection.js';
   import AllPoseErrors from '$lib/components/dev/AllPoseErrors.svelte';
   import Svg from '$lib/components/avatar/Svg.svelte';
-  import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
   import { getContext, onMount } from 'svelte';
   import BackgroundTask from '$lib/components/BackgroundTask.svelte';
   import PoseReview from './PoseReview.svelte';
@@ -55,6 +54,7 @@
     detectedSteps.length > 0 ? detectedSteps[0].poses.length : 4;
   $: avatarSizePixels = videoSrcHeight;
   $: headRadius = 0.075 * Math.min(videoSrcHeight, videoSrcWidth);
+  /** @type {import("$lib/instructor/bouncy_instructor").RenderableSegment[]} */
   let markedSegments = [];
   $: if (keypointSkeleton) {
     markedSegments = limbErrors.map((limb) => limb.render(keypointSkeleton));
