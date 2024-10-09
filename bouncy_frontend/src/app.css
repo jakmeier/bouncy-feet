@@ -112,6 +112,15 @@ button.wide {
     max-width: 450px;
 }
 
+button.full-width {
+    margin: 5px auto;
+    width: 100%;
+}
+
+button.short {
+    height: 50px;
+}
+
 button.locked {
     background-color: var(--theme-neutral-gray);
     color: var(--theme-neutral-dark);

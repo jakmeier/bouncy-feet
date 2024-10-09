@@ -26,6 +26,14 @@ use wasm_bindgen::prelude::wasm_bindgen;
 #[wasm_bindgen(js_name = "Skeleton")]
 #[derive(Clone, Copy, Debug)]
 pub struct Skeleton {
+    // TODO: pub fields with wasm_bindgen are error-prone, as something like
+    // `skeleton.left.arm.angle = 5` on the JS side allocates a new side, and a
+    // new segment, before changing the angle on the segment, leaving the angle
+    // on the original skeleton untouched.
+    // I think I should ensure the JS side only does reads. But even that is not
+    // ideal, thinking of the performance hit of allocations on every read.
+    // I need a deep think about this to decide what's the best way out of this
+    // situation.
     pub left: Side,
     pub right: Side,
     pub hip: Segment,
@@ -71,6 +79,21 @@ pub struct Cartesian2d {
 }
 
 #[wasm_bindgen]
+#[derive(Clone, Copy, PartialEq)]
+pub enum SkeletonField {
+    LeftThigh,
+    LeftShin,
+    LeftArm,
+    LeftForearm,
+    LeftFoot,
+    RightThigh,
+    RightShin,
+    RightArm,
+    RightForearm,
+    RightFoot,
+}
+
+#[wasm_bindgen]
 impl Skeleton {
     pub fn resting(sideway: bool) -> Self {
         let mut left = Side::default();
@@ -106,6 +129,22 @@ impl Skeleton {
     #[wasm_bindgen(js_name = "debugString")]
     pub fn debug_string(&self) -> String {
         format!("{self:?}")
+    }
+
+    #[wasm_bindgen(js_name = "setAngle")]
+    pub fn set_angle(&mut self, field: SkeletonField, value: f32) {
+        match field {
+            SkeletonField::LeftThigh => self.left.thigh.angle = value,
+            SkeletonField::LeftShin => self.left.shin.angle = value,
+            SkeletonField::LeftArm => self.left.arm.angle = value,
+            SkeletonField::LeftForearm => self.left.forearm.angle = value,
+            SkeletonField::LeftFoot => self.left.foot.angle = value,
+            SkeletonField::RightThigh => self.right.thigh.angle = value,
+            SkeletonField::RightShin => self.right.shin.angle = value,
+            SkeletonField::RightArm => self.right.arm.angle = value,
+            SkeletonField::RightForearm => self.right.forearm.angle = value,
+            SkeletonField::RightFoot => self.right.foot.angle = value,
+        }
     }
 }
 

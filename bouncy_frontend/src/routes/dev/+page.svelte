@@ -16,10 +16,13 @@
   /** @type {HTMLVideoElement}  */
   let video;
   let prevTime = -1;
+  let selectedTimestamp = 0;
   let videoSrcWidth = 0;
   let videoSrcHeight = 0;
-  /** @type {import("$lib/instructor/bouncy_instructor").SkeletonV2|undefined} */
+  /** @type {import("$lib/instructor/bouncy_instructor").SkeletonV2 | undefined} */
   let liveSkeleton;
+  /** @type {import("$lib/instructor/bouncy_instructor").Skeleton | undefined} */
+  let poseSkeleton;
 
   let dataListener;
   /** @type {(skeleton: import("$lib/instructor/bouncy_instructor").Skeleton)=>void} */
@@ -74,16 +77,13 @@
         if (result.landmarks && result.landmarks.length >= 1) {
           const kp = landmarksToKeypoints(result.landmarks[0]);
           tracker.addKeypoints(kp, timestamp);
-          recordingEnd = timestamp;
+          recordingEnd = Math.max(timestamp, recordingEnd);
+          selectedTimestamp = timestamp;
           liveSkeleton = tracker.renderedKeypointsAt(
             timestamp,
             videoSrcWidth,
             videoSrcHeight
           );
-          let skeleton = tracker.skeletonAt(timestamp);
-          if (skeleton) {
-            loadSkeleton(skeleton);
-          }
         }
       }
     );
@@ -125,9 +125,29 @@
       console.log(step.name, step.start, step.end);
     });
   }
+
+  function copySkeleton() {
+    poseSkeleton = tracker.skeletonAt(selectedTimestamp);
+    if (poseSkeleton) {
+      loadSkeleton(poseSkeleton);
+    }
+  }
+
+  function copyPose() {
+    // TOOD
+  }
 </script>
 
 <h1>Dev</h1>
+
+<p>
+  <input
+    bind:this={upload}
+    type="file"
+    accept="video/*"
+    on:change={loadVideo}
+  />
+</p>
 
 <!-- svelte-ignore a11y-media-has-caption -->
 <div class="side-by-side">
@@ -151,16 +171,12 @@
   </div>
 </div>
 
+<button class="light full-width short" on:click={copySkeleton}> ↓ </button>
+
 <PoseInputForm bind:loadSkeleton></PoseInputForm>
 
-<p>
-  <input
-    bind:this={upload}
-    type="file"
-    accept="video/*"
-    on:change={loadVideo}
-  />
-</p>
+<button class="light full-width short" on:click={copyPose}> ↓ </button>
+
 <button on:click={downloadFrame}> Download Keypoints of Frame </button>
 <button on:click={downloadKeypoints}> Download Keypoints of Video </button>
 <h2>Dance Evaluation</h2>

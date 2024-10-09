@@ -76,6 +76,7 @@ export function skeleton_debugString(a: number, b: number): void;
 export function skeleton_render(a: number, b: number, c: number): number;
 export function skeleton_resting(a: number): number;
 export function skeleton_restingPose(a: number): number;
+export function skeleton_setAngle(a: number, b: number, c: number): void;
 export function stepById(a: number, b: number, c: number): number;
 export function stepinfo_beats(a: number): number;
 export function stepinfo_bodyShift(a: number, b: number): number;
