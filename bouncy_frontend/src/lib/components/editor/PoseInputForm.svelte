@@ -18,7 +18,7 @@
     { name: 'Right Foot', angle: 0, isKey: false, weight: null },
   ];
   /** @type{Skeleton | undefined} */
-  let skeleton;
+  let skeleton = Skeleton.resting(false);
 
   /** @param {Skeleton} newSkeleton */
   export function loadSkeleton(newSkeleton) {
@@ -81,40 +81,47 @@
 </script>
 
 <div class="container">
-  {#each bodyParts as part, index}
-    <div
-      class="body-part"
-      class:left={index % 2 === 0}
-      class:right={index % 2 === 1}
-    >
-      <label>{part.name}</label>
-      <input
-        type="number"
-        class="angle-input"
-        bind:value={part.angle}
-        on:change={updateAvatar}
-        placeholder="Angle"
-      />
-      <!-- <button class="key-button" on:click={() => toggleKeyPart(index)}>
-        {part.isKey ? 'Unset Key' : 'Set as Key'}
-      </button> -->
-
-      {#if part.isKey}
-        <div class="weight-popup">
-          <label>Weight</label>
-          <input type="number" bind:value={part.weight} placeholder="Weight" />
+  <div class="left input-group">
+    {#each bodyParts as part, index}
+      {#if index % 2 === 0}
+        <div class="body-part">
+          <label>{part.name}</label>
+          <input
+            type="number"
+            class="angle-input"
+            bind:value={part.angle}
+            on:change={updateAvatar}
+            placeholder="Angle"
+          />
         </div>
       {/if}
-    </div>
-  {/each}
+    {/each}
+  </div>
+
+  <div class="right input-group">
+    {#each bodyParts as part, index}
+      {#if index % 2 === 1}
+        <div class="body-part">
+          <label>{part.name}</label>
+          <input
+            type="number"
+            class="angle-input"
+            bind:value={part.angle}
+            on:change={updateAvatar}
+            placeholder="Angle"
+          />
+        </div>
+      {/if}
+    {/each}
+  </div>
 
   <div class="avatar">
-    <Svg width={200} height={300} orderByZ>
+    <Svg width={200} height={200} orderByZ>
       {#if skeleton}
         <SvgAvatar
           {skeleton}
           width={200}
-          height={300}
+          height={200}
           style={LEFT_RIGHT_COLORING}
         ></SvgAvatar>
       {/if}
@@ -126,49 +133,45 @@
   .container {
     display: grid;
     grid-template-areas:
-      'left-values avatar right-values'
-      'left-values avatar right-values'
-      'left-values avatar right-values'
-      'left-values avatar right-values'
-      'left-values avatar right-values';
+      'right-values avatar left-values'
+      'right-values avatar left-values'
+      'right-values avatar left-values'
+      'right-values avatar left-values'
+      'right-values avatar left-values';
     gap: 8px;
     justify-items: center;
   }
-  /* .left {
+  .left {
     grid-area: left-values;
+    background-color: var(--theme-accent-light);
   }
   .right {
     grid-area: right-values;
-  } */
+    background-color: var(--theme-neutral-light);
+  }
   .avatar {
-    grid-column: 1 / 5;
     grid-area: avatar;
+  }
+  .input-group {
+    padding: 5px;
   }
   .body-part {
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 90%;
+    margin: auto;
   }
   .angle-input {
     width: 100%;
     text-align: center;
   }
-  .key-button {
-    background: #e0e0e0;
-    border: none;
-    padding: 4px;
-    margin-top: 4px;
-    cursor: pointer;
-  }
-  .weight-popup {
-    position: absolute;
-    background-color: #f9f9f9;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    z-index: 10;
-    width: 80px;
-    top: 35px;
+
+  @media (max-width: 600px) {
+    .container {
+      grid-template-areas:
+        'avatar avatar'
+        'right-values left-values';
+    }
   }
 </style>
