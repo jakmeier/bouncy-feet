@@ -90,6 +90,13 @@
             "pick-name-prompt": "Pick a name",
             "name-label": "Name",
             "save-button-label": "Save"
+        },
+        "body": {
+            "arm": "Arm",
+            "forearm": "Forearm",
+            "thigh": "Thigh",
+            "shin": "Shin",
+            "foot": "Foot"
         }
     },
     "record": {

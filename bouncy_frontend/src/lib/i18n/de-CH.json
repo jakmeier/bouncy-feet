@@ -90,6 +90,13 @@
             "pick-name-prompt": "Wähle einen Namen",
             "name-label": "Name",
             "save-button-label": "Speichern"
+        },
+        "body": {
+            "arm": "Oberarm",
+            "forearm": "Unterarm",
+            "thigh": "Oberschenkel",
+            "shin": "Unterschenkel",
+            "foot": "Fuss"
         }
     },
     "record": {

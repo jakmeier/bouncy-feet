@@ -1,21 +1,22 @@
 <script>
   import { LEFT_RIGHT_COLORING } from '$lib/constants';
+  import { t } from '$lib/i18n';
   import { Skeleton } from '$lib/instructor/bouncy_instructor';
   import { SkeletonField } from '$lib/instructor/bouncy_instructor_bg';
   import Svg from '../avatar/Svg.svelte';
   import SvgAvatar from '../avatar/SvgAvatar.svelte';
 
   let bodyParts = [
-    { name: 'Left Arm', angle: 0, isKey: false, weight: null },
-    { name: 'Right Arm', angle: 0, isKey: false, weight: null },
-    { name: 'Left Forearm', angle: 0, isKey: false, weight: null },
-    { name: 'Right Forearm', angle: 0, isKey: false, weight: null },
-    { name: 'Left Thigh', angle: 0, isKey: false, weight: null },
-    { name: 'Right Thigh', angle: 0, isKey: false, weight: null },
-    { name: 'Left Shin', angle: 0, isKey: false, weight: null },
-    { name: 'Right Shin', angle: 0, isKey: false, weight: null },
-    { name: 'Left Foot', angle: 0, isKey: false, weight: null },
-    { name: 'Right Foot', angle: 0, isKey: false, weight: null },
+    { name: 'editor.body.arm', angle: 0, isKey: false, weight: null },
+    { name: 'editor.body.arm', angle: 0, isKey: false, weight: null },
+    { name: 'editor.body.forearm', angle: 0, isKey: false, weight: null },
+    { name: 'editor.body.forearm', angle: 0, isKey: false, weight: null },
+    { name: 'editor.body.thigh', angle: 0, isKey: false, weight: null },
+    { name: 'editor.body.thigh', angle: 0, isKey: false, weight: null },
+    { name: 'editor.body.shin', angle: 0, isKey: false, weight: null },
+    { name: 'editor.body.shin', angle: 0, isKey: false, weight: null },
+    { name: 'editor.body.foot', angle: 0, isKey: false, weight: null },
+    { name: 'editor.body.foot', angle: 0, isKey: false, weight: null },
   ];
   /** @type{Skeleton | undefined} */
   let skeleton = Skeleton.resting(false);
@@ -71,13 +72,6 @@
       skeleton = skeleton;
     }
   }
-
-  //   function toggleKeyPart(index) {
-  //     bodyParts[index].isKey = !bodyParts[index].isKey;
-  //     if (!bodyParts[index].isKey) {
-  //       bodyParts[index].weight = null;
-  //     }
-  //   }
 </script>
 
 <div class="container">
@@ -85,8 +79,9 @@
     {#each bodyParts as part, index}
       {#if index % 2 === 0}
         <div class="body-part">
-          <label>{part.name}</label>
+          <label for="left-{index}">{$t(part.name)}</label>
           <input
+            name="left-{index}"
             type="number"
             class="angle-input"
             bind:value={part.angle}
@@ -102,8 +97,9 @@
     {#each bodyParts as part, index}
       {#if index % 2 === 1}
         <div class="body-part">
-          <label>{part.name}</label>
+          <label for="right-{index}">{$t(part.name)}</label>
           <input
+            name="right-{index}"
             type="number"
             class="angle-input"
             bind:value={part.angle}
