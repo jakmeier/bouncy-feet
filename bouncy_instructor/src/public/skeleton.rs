@@ -130,22 +130,6 @@ impl Skeleton {
     pub fn debug_string(&self) -> String {
         format!("{self:?}")
     }
-
-    #[wasm_bindgen(js_name = "setAngle")]
-    pub fn set_angle(&mut self, field: SkeletonField, value: f32) {
-        match field {
-            SkeletonField::LeftThigh => self.left.thigh.angle = value,
-            SkeletonField::LeftShin => self.left.shin.angle = value,
-            SkeletonField::LeftArm => self.left.arm.angle = value,
-            SkeletonField::LeftForearm => self.left.forearm.angle = value,
-            SkeletonField::LeftFoot => self.left.foot.angle = value,
-            SkeletonField::RightThigh => self.right.thigh.angle = value,
-            SkeletonField::RightShin => self.right.shin.angle = value,
-            SkeletonField::RightArm => self.right.arm.angle = value,
-            SkeletonField::RightForearm => self.right.forearm.angle = value,
-            SkeletonField::RightFoot => self.right.foot.angle = value,
-        }
-    }
 }
 
 impl Skeleton {

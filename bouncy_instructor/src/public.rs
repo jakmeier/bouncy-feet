@@ -10,6 +10,7 @@ pub(crate) mod skeleton;
 pub(crate) mod step_info;
 pub(crate) mod tracker;
 pub(crate) mod ui_event;
+pub(crate) mod wrapper;
 
 pub use crate::public::course::Course;
 pub use dance_info::DanceInfo;

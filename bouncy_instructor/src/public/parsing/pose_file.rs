@@ -146,7 +146,7 @@ pub(crate) enum BodyPart {
     Toes,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone, Copy)]
 pub enum PoseDirection {
     /// Dancer faces the camera.
     Front,

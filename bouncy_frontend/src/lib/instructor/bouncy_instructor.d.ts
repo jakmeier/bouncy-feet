@@ -66,29 +66,6 @@ export function dances(): (DanceInfo)[];
 export function danceBuilderFromDance(dance_id: string): DanceBuilder;
 /**
 */
-export enum SkeletonField {
-  LeftThigh = 0,
-  LeftShin = 1,
-  LeftArm = 2,
-  LeftForearm = 3,
-  LeftFoot = 4,
-  RightThigh = 5,
-  RightShin = 6,
-  RightArm = 7,
-  RightForearm = 8,
-  RightFoot = 9,
-}
-/**
-* Best guess for what the dancer needs to change to fit the pose.
-*/
-export enum PoseHint {
-  DontKnow = 0,
-  LeftRight = 1,
-  ZOrder = 2,
-  WrongDirection = 3,
-}
-/**
-*/
 export enum DetectionFailureReason {
 /**
 * The last match was too recent to have another match.
@@ -116,6 +93,15 @@ export enum DetectionFailureReason {
   NoNewData = 6,
 }
 /**
+* Best guess for what the dancer needs to change to fit the pose.
+*/
+export enum PoseHint {
+  DontKnow = 0,
+  LeftRight = 1,
+  ZOrder = 2,
+  WrongDirection = 3,
+}
+/**
 */
 export enum DetectionState {
 /**
@@ -139,6 +125,20 @@ export enum DetectionState {
 * available.
 */
   TrackingDone = 5,
+}
+/**
+*/
+export enum SkeletonField {
+  LeftThigh = 0,
+  LeftShin = 1,
+  LeftArm = 2,
+  LeftForearm = 3,
+  LeftFoot = 4,
+  RightThigh = 5,
+  RightShin = 6,
+  RightArm = 7,
+  RightForearm = 8,
+  RightFoot = 9,
 }
 
 import type { Readable } from "svelte/store";
@@ -594,6 +594,26 @@ export class PoseApproximation {
   timestamp: number;
 }
 /**
+*/
+export class PoseWrapper {
+  free(): void;
+/**
+* @returns {Skeleton}
+*/
+  skeleton(): Skeleton;
+/**
+* @param {SkeletonField} field
+* @param {number} degree
+*/
+  setAngle(field: SkeletonField, degree: number): void;
+/**
+* Angle in degree
+* @param {SkeletonField} field
+* @returns {number}
+*/
+  getAngle(field: SkeletonField): number;
+}
+/**
 * Projected line segment with two coordinates and a Z index.
 *
 * This format is perfect for 2D drawing.
@@ -656,17 +676,6 @@ export class Segment {
 export class Skeleton {
   free(): void;
 /**
-* Compute 2d coordinates for the skeleton for rendering.
-*
-* The skeleton will be rendered assuming hard-coded values for body part
-* proportional lengths, multiplied with the size parameter. The hip
-* segment will have its center at the given position.
-* @param {Cartesian2d} hip_center
-* @param {number} size
-* @returns {SkeletonV2}
-*/
-  render(hip_center: Cartesian2d, size: number): SkeletonV2;
-/**
 * @param {boolean} sideway
 * @returns {Skeleton}
 */
@@ -680,10 +689,16 @@ export class Skeleton {
 */
   debugString(): string;
 /**
-* @param {SkeletonField} field
-* @param {number} value
+* Compute 2d coordinates for the skeleton for rendering.
+*
+* The skeleton will be rendered assuming hard-coded values for body part
+* proportional lengths, multiplied with the size parameter. The hip
+* segment will have its center at the given position.
+* @param {Cartesian2d} hip_center
+* @param {number} size
+* @returns {SkeletonV2}
 */
-  setAngle(field: SkeletonField, value: number): void;
+  render(hip_center: Cartesian2d, size: number): SkeletonV2;
 /**
 * Does the dancer face away more than they face the camera?
 */
@@ -776,6 +791,23 @@ export class SkeletonV2 {
 * Does the dancer look more to the side han they face the camera?
 */
   sideway: boolean;
+}
+/**
+*/
+export class SkeletonWrapper {
+  free(): void;
+/**
+* @returns {PoseWrapper}
+*/
+  pose(): PoseWrapper;
+/**
+* @returns {Skeleton}
+*/
+  skeleton(): Skeleton;
+/**
+* @returns {Skeleton}
+*/
+  set(): Skeleton;
 }
 /**
 */
@@ -993,6 +1025,11 @@ export class Tracker {
 * @returns {Skeleton | undefined}
 */
   skeletonAt(timestamp: number): Skeleton | undefined;
+/**
+* @param {number} timestamp
+* @returns {SkeletonWrapper | undefined}
+*/
+  skeletonWrapperAt(timestamp: number): SkeletonWrapper | undefined;
 /**
 * The original keypoints rendered as skeleton, at the given time frame.
 * @param {number} timestamp

@@ -21,12 +21,14 @@
   let videoSrcHeight = 0;
   /** @type {import("$lib/instructor/bouncy_instructor").SkeletonV2 | undefined} */
   let liveSkeleton;
-  /** @type {import("$lib/instructor/bouncy_instructor").Skeleton | undefined} */
+  /** @type {import("$lib/instructor/bouncy_instructor").SkeletonWrapper | undefined} */
   let poseSkeleton;
 
   let dataListener;
-  /** @type {(skeleton: import("$lib/instructor/bouncy_instructor").Skeleton)=>void} */
+  /** @type {(skeleton: import("$lib/instructor/bouncy_instructor").SkeletonWrapper)=>void} */
   let loadSkeleton;
+  /** @type {()=>import("$lib/instructor/bouncy_instructor").PoseWrapper} */
+  let poseFromForm;
   let tracker = new Tracker();
   registerTracker(tracker);
   const poseCtx = getContext('pose');
@@ -127,14 +129,18 @@
   }
 
   function copySkeleton() {
-    poseSkeleton = tracker.skeletonAt(selectedTimestamp);
+    poseSkeleton = tracker.skeletonWrapperAt(selectedTimestamp);
     if (poseSkeleton) {
       loadSkeleton(poseSkeleton);
     }
   }
 
   function copyPose() {
-    // TOOD
+    let pose = poseFromForm();
+    if(pose) {
+      // TODO: display this
+      console.log(pose);
+    }
   }
 </script>
 
@@ -173,7 +179,7 @@
 
 <button class="light full-width short" on:click={copySkeleton}> ↓ </button>
 
-<PoseInputForm bind:loadSkeleton></PoseInputForm>
+<PoseInputForm bind:loadSkeleton bind:readPose={poseFromForm}></PoseInputForm>
 
 <button class="light full-width short" on:click={copyPose}> ↓ </button>
 

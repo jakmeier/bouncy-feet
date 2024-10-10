@@ -7,7 +7,6 @@ use wasm_bindgen::JsValue;
 use super::dance_builder::DanceBuilder;
 
 #[wasm_bindgen]
-
 pub struct DanceFileBuilder {
     version: u16,
     dances: Vec<intern::dance::Dance>,

@@ -8,6 +8,7 @@ pub use pose_output::PoseApproximation;
 pub use step_output::DetectedStep;
 
 use super::renderable::RenderableSkeleton;
+use super::wrapper::skeleton_wrapper::SkeletonWrapper;
 use crate::intern::dance_collection::{DanceCollection, ForeignCollectionError};
 use crate::intern::dance_detector::{DanceDetector, DetectionState};
 use crate::intern::skeleton_3d::{Direction, Skeleton3d};
@@ -336,6 +337,15 @@ impl Tracker {
         self.skeletons
             .get(i)
             .map(|skeleton_info| skeleton_info.to_skeleton(0.0))
+    }
+
+    // Note: this probably will eventually replace all uses of `skeleton_at`
+    #[wasm_bindgen(js_name = skeletonWrapperAt)]
+    pub fn skeleton_wrapper_at(&self, timestamp: Timestamp) -> Option<SkeletonWrapper> {
+        let i = self.timestamps.partition_point(|t| *t < timestamp);
+        self.keypoints
+            .get(i)
+            .map(|kp| SkeletonWrapper::new(*kp, self.db.clone()))
     }
 
     /// The original keypoints rendered as skeleton, at the given time frame.
