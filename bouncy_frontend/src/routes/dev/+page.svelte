@@ -24,14 +24,14 @@
   let liveSkeleton;
   /** @type {import("$lib/instructor/bouncy_instructor").SkeletonWrapper | undefined} */
   let poseSkeleton;
-  /** @type {import("$lib/instructor/bouncy_instructor").PoseWrapper | undefined} */
-  let editorPose;
 
   let dataListener;
   /** @type {(skeleton: import("$lib/instructor/bouncy_instructor").SkeletonWrapper)=>void} */
   let loadSkeleton;
   /** @type {()=>import("$lib/instructor/bouncy_instructor").PoseWrapper} */
   let poseFromForm;
+  /** @type {(skeleton: import("$lib/instructor/bouncy_instructor").PoseWrapper)=>void} */
+  let loadPose;
   let tracker = new Tracker();
   registerTracker(tracker);
   const poseCtx = getContext('pose');
@@ -139,7 +139,10 @@
   }
 
   function copyPose() {
-    editorPose = poseFromForm();
+    let pose = poseFromForm();
+    if (pose) {
+      loadPose(pose);
+    }
   }
 </script>
 
@@ -182,9 +185,7 @@
 
 <button class="light full-width short" on:click={copyPose}> ↓ </button>
 
-{#if editorPose}
-  <PoseEditForm pose={editorPose}></PoseEditForm>
-{/if}
+<PoseEditForm bind:loadPose></PoseEditForm>
 
 <button on:click={downloadFrame}> Download Keypoints of Frame </button>
 <button on:click={downloadKeypoints}> Download Keypoints of Video </button>
