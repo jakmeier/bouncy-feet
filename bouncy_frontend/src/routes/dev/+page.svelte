@@ -10,6 +10,7 @@
   import SvgAvatar2 from '$lib/components/avatar/SvgAvatar2.svelte';
   import { LEFT_RIGHT_COLORING_LIGHT } from '$lib/constants';
   import PoseInputForm from '$lib/components/editor/PoseInputForm.svelte';
+  import PoseEditForm from '$lib/components/editor/PoseEditForm.svelte';
 
   /** @type {HTMLInputElement}  */
   let upload;
@@ -23,6 +24,8 @@
   let liveSkeleton;
   /** @type {import("$lib/instructor/bouncy_instructor").SkeletonWrapper | undefined} */
   let poseSkeleton;
+  /** @type {import("$lib/instructor/bouncy_instructor").PoseWrapper | undefined} */
+  let editorPose;
 
   let dataListener;
   /** @type {(skeleton: import("$lib/instructor/bouncy_instructor").SkeletonWrapper)=>void} */
@@ -136,11 +139,7 @@
   }
 
   function copyPose() {
-    let pose = poseFromForm();
-    if(pose) {
-      // TODO: display this
-      console.log(pose);
-    }
+    editorPose = poseFromForm();
   }
 </script>
 
@@ -182,6 +181,10 @@
 <PoseInputForm bind:loadSkeleton bind:readPose={poseFromForm}></PoseInputForm>
 
 <button class="light full-width short" on:click={copyPose}> ↓ </button>
+
+{#if editorPose}
+  <PoseEditForm pose={editorPose}></PoseEditForm>
+{/if}
 
 <button on:click={downloadFrame}> Download Keypoints of Frame </button>
 <button on:click={downloadKeypoints}> Download Keypoints of Video </button>

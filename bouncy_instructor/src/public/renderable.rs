@@ -1,4 +1,5 @@
 use super::keypoints::Cartesian3d;
+use super::skeleton::SkeletonField;
 use crate::intern::pose::{BodyPart, BodyPoint, BodySide};
 use crate::skeleton::{Cartesian2d, Segment, Side, Skeleton};
 use std::collections::HashMap;
@@ -62,6 +63,25 @@ impl RenderableSegment {
                 .max(i16::MIN as f32)
                 .min(i16::MAX as f32) as i16,
         )
+    }
+}
+
+#[wasm_bindgen]
+impl RenderableSkeleton {
+    #[wasm_bindgen(js_name = segment)]
+    pub fn segment(&self, field: SkeletonField) -> RenderableSegment {
+        match field {
+            SkeletonField::LeftThigh => self.left.thigh,
+            SkeletonField::LeftShin => self.left.shin,
+            SkeletonField::LeftArm => self.left.arm,
+            SkeletonField::LeftForearm => self.left.forearm,
+            SkeletonField::LeftFoot => self.left.foot,
+            SkeletonField::RightThigh => self.right.thigh,
+            SkeletonField::RightShin => self.right.shin,
+            SkeletonField::RightArm => self.right.arm,
+            SkeletonField::RightForearm => self.right.forearm,
+            SkeletonField::RightFoot => self.right.foot,
+        }
     }
 }
 

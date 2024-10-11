@@ -5,6 +5,13 @@ export const BLACK_COLORING = {
     bodyColor: '#00000010',
 };
 
+export const GRAY_COLORING = {
+    leftColor: '#00000040',
+    rightColor: '#00000040',
+    headColor: '#00000040',
+    bodyColor: '#00000040',
+};
+
 export const BOLD_MAIN_THEME_COLORING = {
 
     leftColor: 'var(--theme-main)',

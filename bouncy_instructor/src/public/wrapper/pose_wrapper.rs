@@ -89,6 +89,37 @@ impl PoseWrapper {
             z_order,
         )
     }
+
+    fn find_limb_position(&self, limb: pose_file::Limb) -> Option<&pose_file::LimbPosition> {
+        self.pose_definition
+            .limbs
+            .iter()
+            .find(|def| def.limb == limb)
+    }
+
+    fn find_or_insert_limb_position(
+        &mut self,
+        limb: pose_file::Limb,
+    ) -> &mut pose_file::LimbPosition {
+        let i = match self
+            .pose_definition
+            .limbs
+            .iter()
+            .position(|def| def.limb == limb)
+        {
+            Some(i) => i,
+            None => {
+                self.pose_definition.limbs.push(pose_file::LimbPosition {
+                    limb,
+                    weight: 1.0,
+                    angle: 0,
+                    tolerance: 10,
+                });
+                self.pose_definition.limbs.len() - 1
+            }
+        };
+        &mut self.pose_definition.limbs[i]
+    }
 }
 
 #[wasm_bindgen]
@@ -106,33 +137,9 @@ impl PoseWrapper {
 
     #[wasm_bindgen(js_name = "setAngle")]
     pub fn set_angle(&mut self, field: SkeletonField, degree: i16) {
-        let limb = match field {
-            SkeletonField::LeftThigh => pose_file::Limb::LeftThigh,
-            SkeletonField::LeftShin => pose_file::Limb::LeftShin,
-            SkeletonField::LeftArm => pose_file::Limb::LeftArm,
-            SkeletonField::LeftForearm => pose_file::Limb::LeftForearm,
-            SkeletonField::LeftFoot => pose_file::Limb::LeftFoot,
-            SkeletonField::RightThigh => pose_file::Limb::RightThigh,
-            SkeletonField::RightShin => pose_file::Limb::RightShin,
-            SkeletonField::RightArm => pose_file::Limb::RightArm,
-            SkeletonField::RightForearm => pose_file::Limb::RightForearm,
-            SkeletonField::RightFoot => pose_file::Limb::RightFoot,
-        };
-        match self
-            .pose_definition
-            .limbs
-            .iter()
-            .position(|def| def.limb == limb)
-        {
-            Some(i) => self.pose_definition.limbs[i].angle = degree,
-            None => self.pose_definition.limbs.push(pose_file::LimbPosition {
-                limb,
-                weight: 1.0,
-                angle: degree,
-                tolerance: 10,
-            }),
-        }
-        // self.pose_definition.limbs[limb_index].angle = value;
+        let limb: pose_file::Limb = field.into();
+        let limb_position = self.find_or_insert_limb_position(limb);
+        limb_position.angle = degree;
         self.invalidate_cache();
     }
 
@@ -153,5 +160,38 @@ impl PoseWrapper {
         }
         .to_degrees()
         .round()
+    }
+
+    #[wasm_bindgen(js_name = "setWeight")]
+    pub fn set_weight(&mut self, field: SkeletonField, weight: f32) {
+        let limb: pose_file::Limb = field.into();
+        let limb_position = self.find_or_insert_limb_position(limb);
+        limb_position.weight = weight;
+        self.invalidate_cache();
+    }
+
+    /// Weight of limb in pose detection
+    #[wasm_bindgen(js_name = "getWeight")]
+    pub fn weight(&self, field: SkeletonField) -> f32 {
+        let limb: pose_file::Limb = field.into();
+        let limb_position = self.find_limb_position(limb);
+        limb_position.map(|p| p.weight).unwrap_or(0.0)
+    }
+}
+
+impl From<SkeletonField> for pose_file::Limb {
+    fn from(field: SkeletonField) -> Self {
+        match field {
+            SkeletonField::LeftThigh => pose_file::Limb::LeftThigh,
+            SkeletonField::LeftShin => pose_file::Limb::LeftShin,
+            SkeletonField::LeftArm => pose_file::Limb::LeftArm,
+            SkeletonField::LeftForearm => pose_file::Limb::LeftForearm,
+            SkeletonField::LeftFoot => pose_file::Limb::LeftFoot,
+            SkeletonField::RightThigh => pose_file::Limb::RightThigh,
+            SkeletonField::RightShin => pose_file::Limb::RightShin,
+            SkeletonField::RightArm => pose_file::Limb::RightArm,
+            SkeletonField::RightForearm => pose_file::Limb::RightForearm,
+            SkeletonField::RightFoot => pose_file::Limb::RightFoot,
+        }
     }
 }

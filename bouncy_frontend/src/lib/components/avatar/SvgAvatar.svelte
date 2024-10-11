@@ -12,6 +12,8 @@
   export let avatarSize = 1.0;
   /** @type LimbError[] */
   export let markedLimbs = [];
+  /** @type number[] */
+  export let markedLimbIndices = [];
 
   /** @type {AvatarColoring} */
   export let style = MAIN_THEME_COLORING;
@@ -42,7 +44,9 @@
   );
   let dummyUpdate = 0;
   $: renderedSkeleton, (dummyUpdate += 1);
-  $: markedSegments = markedLimbs.map((limb) => limb.render(renderedSkeleton));
+  $: markedSegments = markedLimbs
+    .map((limb) => limb.render(renderedSkeleton))
+    .concat(markedLimbIndices.map((i) => renderedSkeleton.segment(i)));
 
   $: headRadius = 0.075 * avatarSizePixels;
 </script>

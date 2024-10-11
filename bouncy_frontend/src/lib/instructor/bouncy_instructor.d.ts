@@ -93,13 +93,18 @@ export enum DetectionFailureReason {
   NoNewData = 6,
 }
 /**
-* Best guess for what the dancer needs to change to fit the pose.
 */
-export enum PoseHint {
-  DontKnow = 0,
-  LeftRight = 1,
-  ZOrder = 2,
-  WrongDirection = 3,
+export enum SkeletonField {
+  LeftThigh = 0,
+  LeftShin = 1,
+  LeftArm = 2,
+  LeftForearm = 3,
+  LeftFoot = 4,
+  RightThigh = 5,
+  RightShin = 6,
+  RightArm = 7,
+  RightForearm = 8,
+  RightFoot = 9,
 }
 /**
 */
@@ -127,18 +132,13 @@ export enum DetectionState {
   TrackingDone = 5,
 }
 /**
+* Best guess for what the dancer needs to change to fit the pose.
 */
-export enum SkeletonField {
-  LeftThigh = 0,
-  LeftShin = 1,
-  LeftArm = 2,
-  LeftForearm = 3,
-  LeftFoot = 4,
-  RightThigh = 5,
-  RightShin = 6,
-  RightArm = 7,
-  RightForearm = 8,
-  RightFoot = 9,
+export enum PoseHint {
+  DontKnow = 0,
+  LeftRight = 1,
+  ZOrder = 2,
+  WrongDirection = 3,
 }
 
 import type { Readable } from "svelte/store";
@@ -612,6 +612,17 @@ export class PoseWrapper {
 * @returns {number}
 */
   getAngle(field: SkeletonField): number;
+/**
+* @param {SkeletonField} field
+* @param {number} weight
+*/
+  setWeight(field: SkeletonField, weight: number): void;
+/**
+* Weight of limb in pose detection
+* @param {SkeletonField} field
+* @returns {number}
+*/
+  getWeight(field: SkeletonField): number;
 }
 /**
 * Projected line segment with two coordinates and a Z index.
@@ -771,6 +782,10 @@ export class SkeletonSideV2 {
 */
 export class SkeletonV2 {
   free(): void;
+
+/** FIXME: Added manually due to bug in wasm_bindgen */
+  segment(i: number): RenderableSegment;
+
 /**
 * Does the dancer face away more than they face the camera?
 */

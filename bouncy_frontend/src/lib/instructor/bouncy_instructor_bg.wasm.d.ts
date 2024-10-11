@@ -73,8 +73,11 @@ export function poseapproximation_worstLimbs(a: number, b: number, c: number): v
 export function poseapproximation_zErrors(a: number, b: number): void;
 export function poseapproximation_zOrderErrors(a: number, b: number): void;
 export function posewrapper_getAngle(a: number, b: number): number;
+export function posewrapper_getWeight(a: number, b: number): number;
 export function posewrapper_setAngle(a: number, b: number, c: number): void;
+export function posewrapper_setWeight(a: number, b: number, c: number): void;
 export function posewrapper_skeleton(a: number): number;
+export function renderableskeleton_segment(a: number, b: number): number;
 export function skeleton_debugString(a: number, b: number): void;
 export function skeleton_render(a: number, b: number, c: number): number;
 export function skeleton_resting(a: number): number;

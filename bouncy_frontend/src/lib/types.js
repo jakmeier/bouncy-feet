@@ -70,4 +70,9 @@
  * @property {LessonProgress[]} lessons
  * 
  * @typedef {number} LessonProgress
+ * 
+ * @typedef {Object} WeightedPoseLimb
+ * @property {string} name
+ * @property {number} index
+ * @property {number} weight
  */
