@@ -66,34 +66,6 @@ export function dances(): (DanceInfo)[];
 export function danceBuilderFromDance(dance_id: string): DanceBuilder;
 /**
 */
-export enum DetectionFailureReason {
-/**
-* The last match was too recent to have another match.
-*/
-  TooEarly = 1,
-/**
-* The timing is off.
-*/
-  NotOnBeat = 2,
-/**
-* Detection did not match an expected pose.
-*/
-  WrongPose = 3,
-/**
-* No data to run detection against.
-*/
-  NoData = 4,
-/**
-* Currently in a state that does not detect.
-*/
-  DetectionDisabled = 5,
-/**
-* No *new* data to run detection against.
-*/
-  NoNewData = 6,
-}
-/**
-*/
 export enum SkeletonField {
   LeftThigh = 0,
   LeftShin = 1,
@@ -105,6 +77,15 @@ export enum SkeletonField {
   RightArm = 7,
   RightForearm = 8,
   RightFoot = 9,
+}
+/**
+* Best guess for what the dancer needs to change to fit the pose.
+*/
+export enum PoseHint {
+  DontKnow = 0,
+  LeftRight = 1,
+  ZOrder = 2,
+  WrongDirection = 3,
 }
 /**
 */
@@ -132,13 +113,32 @@ export enum DetectionState {
   TrackingDone = 5,
 }
 /**
-* Best guess for what the dancer needs to change to fit the pose.
 */
-export enum PoseHint {
-  DontKnow = 0,
-  LeftRight = 1,
-  ZOrder = 2,
-  WrongDirection = 3,
+export enum DetectionFailureReason {
+/**
+* The last match was too recent to have another match.
+*/
+  TooEarly = 1,
+/**
+* The timing is off.
+*/
+  NotOnBeat = 2,
+/**
+* Detection did not match an expected pose.
+*/
+  WrongPose = 3,
+/**
+* No data to run detection against.
+*/
+  NoData = 4,
+/**
+* Currently in a state that does not detect.
+*/
+  DetectionDisabled = 5,
+/**
+* No *new* data to run detection against.
+*/
+  NoNewData = 6,
 }
 
 import type { Readable } from "svelte/store";
@@ -782,10 +782,11 @@ export class SkeletonSideV2 {
 */
 export class SkeletonV2 {
   free(): void;
-
-/** FIXME: Added manually due to bug in wasm_bindgen */
-  segment(i: number): RenderableSegment;
-
+/**
+* @param {SkeletonField} field
+* @returns {RenderableSegment}
+*/
+  segment(field: SkeletonField): RenderableSegment;
 /**
 * Does the dancer face away more than they face the camera?
 */

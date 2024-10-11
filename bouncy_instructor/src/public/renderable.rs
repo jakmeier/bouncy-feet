@@ -66,9 +66,8 @@ impl RenderableSegment {
     }
 }
 
-#[wasm_bindgen]
+#[wasm_bindgen(js_class = SkeletonV2)]
 impl RenderableSkeleton {
-    #[wasm_bindgen(js_name = segment)]
     pub fn segment(&self, field: SkeletonField) -> RenderableSegment {
         match field {
             SkeletonField::LeftThigh => self.left.thigh,
