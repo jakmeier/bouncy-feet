@@ -30,20 +30,20 @@
     weightedLimbs = extractWeightedLimbs(newPose);
   }
 
-  $: markedLimbIndices = weightedLimbs.map((limb) => limb.index);
+  $: markedLimbIndices = weightedLimbs
+    .filter((limb) => limb.weight > 0.0)
+    .map((limb) => limb.index);
 
   /**
    * @param {PoseWrapper} pose
    * @returns {WeightedPoseLimb[]}
    */
   function extractWeightedLimbs(pose) {
-    return allSkeletonFields()
-      .map((limb) => ({
-        name: SkeletonField[limb],
-        index: limb,
-        weight: pose.getWeight(limb),
-      }))
-      .filter((limb) => limb.weight > 0.0);
+    return allSkeletonFields().map((limb) => ({
+      name: SkeletonField[limb],
+      index: limb,
+      weight: pose.getWeight(limb),
+    }));
   }
 
   /** @param {number} weightedLimbIndex */
