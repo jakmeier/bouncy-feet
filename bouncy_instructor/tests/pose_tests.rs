@@ -53,7 +53,7 @@ fn check_pose_not_in_keypoints(keypoints: &str, unexpected_pose: &str) {
     let pose = tracker
         .all_pose_errors(timestamp)
         .into_iter()
-        .find(|approximation| approximation.name() == unexpected_pose)
+        .find(|approximation| approximation.id() == unexpected_pose)
         .expect("missing approximation for pose");
 
     for limb in pose.limb_errors() {
