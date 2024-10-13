@@ -12,6 +12,7 @@ pub(crate) mod tracker;
 pub(crate) mod ui_event;
 pub(crate) mod wrapper;
 
+use crate::intern::lfsr;
 pub use crate::public::course::Course;
 pub use dance_info::DanceInfo;
 pub use keypoints::{Keypoints, Side as KeypointsSide};
@@ -32,6 +33,15 @@ use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::{JsCast, JsValue};
 use wasm_bindgen_futures::JsFuture;
 use web_sys::Request;
+
+#[wasm_bindgen(js_name = init)]
+pub fn init(random_seed: u32) -> Result<(), JsValue> {
+    if random_seed == 0 {
+        return Err("random seed must not be 0".into());
+    }
+    lfsr::init(random_seed);
+    Ok(())
+}
 
 #[wasm_bindgen(js_name = loadPoseFile)]
 pub async fn load_pose_file(url: &str) -> Result<(), JsValue> {

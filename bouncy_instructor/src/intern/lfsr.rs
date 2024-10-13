@@ -8,7 +8,6 @@ use std::sync::atomic::{AtomicU32, Ordering};
 static SEED: AtomicU32 = AtomicU32::new(0);
 
 pub(crate) fn next() -> u32 {
-    init();
     // Polynomial for 32-bit with maximal LFSR feedback length, as listed among
     // many others on http://users.ece.cmu.edu/~koopman/lfsr/
     // const POLYNOMIAL: u32 = 0x8200_4040;
@@ -21,13 +20,8 @@ pub(crate) fn next() -> u32 {
     next
 }
 
-fn init() {
-    if SEED.load(Ordering::SeqCst) == 0 {
-        // unwrap impossible: system clock drift cannot produce time < UNIX_EPOCH
-        let t = std::time::UNIX_EPOCH.elapsed().unwrap();
-        let seed = (t.as_micros() & u32::MAX as u128) as u32;
-        _ = SEED.compare_exchange(0, seed, Ordering::SeqCst, Ordering::SeqCst);
-    }
+pub(crate) fn init(init_seed: u32) {
+    _ = SEED.compare_exchange(0, init_seed, Ordering::SeqCst, Ordering::SeqCst);
 }
 
 /// Weak random id

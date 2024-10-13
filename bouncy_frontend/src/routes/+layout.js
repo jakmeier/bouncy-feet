@@ -7,6 +7,7 @@ import {
     steps,
     stepsBySource,
     StepInfo,
+    init,
 } from '$lib/instructor/bouncy_instructor';
 
 // This is the root layout, hence it defines prerendering for the entire app default.
@@ -155,6 +156,7 @@ function loadRon(name) {
 function loadOnce(data) {
     if (data.poseFileString && data.poseFileString.length > 0) {
         loadedOnce = true;
+        init(Math.random() * 4_294_967_295);
         loadPoseString(data.poseFileString);
         loadStepString(data.stepFileStrings.basic, 'basic');
         loadStepString(data.stepFileStrings.footwork, 'footwork');

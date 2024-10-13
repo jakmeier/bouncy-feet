@@ -7,7 +7,7 @@ pub(crate) mod dance_collection;
 pub(crate) mod dance_detector;
 pub(crate) mod geom;
 pub(crate) mod keypoints_iter;
-pub(crate) mod lsfr;
+pub(crate) mod lfsr;
 pub(crate) mod pose;
 pub(crate) mod pose_score;
 pub(crate) mod skeleton_3d;
