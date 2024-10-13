@@ -30,8 +30,10 @@ use crate::{dance_file, pose_file, AddDanceError, AddStepError};
 pub(crate) struct DanceCollection {
     /// Pose definitions
     poses: Vec<Pose>,
-    /// Pose names, shares the index with `.poses`
-    names: Vec<String>,
+    /// Pose ids, shares the index with `.poses`
+    pose_ids: Vec<String>,
+    /// Translated pose names, shares the index with `.poses`
+    pose_names: Vec<String>,
 
     /// list of limbs to track, referenced by `LimbPosition.limb`.
     ///
@@ -42,6 +44,11 @@ pub(crate) struct DanceCollection {
 
     steps: Vec<Step>,
     dances: Vec<Dance>,
+
+    /// Language for displayed strings, all names in this collection are in this
+    /// language, if available. To change the language, create a new collection
+    /// and load everything again from the definitions.
+    lang: String,
 }
 
 /// For accessing LimbPositionDatabase::limbs
@@ -57,11 +64,13 @@ impl Default for DanceCollection {
     fn default() -> Self {
         Self {
             poses: vec![],
-            names: vec![],
+            pose_ids: vec![],
+            pose_names: vec![],
             limbs: Limb::base_limbs(),
             limb_names: Limb::base_limb_names(),
             steps: Default::default(),
             dances: Default::default(),
+            lang: "en".to_owned(),
         }
     }
 }
@@ -89,7 +98,12 @@ impl DanceCollection {
                 )
             };
             self.poses.push(new_pose);
-            self.names.push(pose.name);
+            self.pose_names.push(
+                pose.names
+                    .and_then(|translations| translations.take(&self.lang))
+                    .unwrap_or_else(|| pose.id.clone()),
+            );
+            self.pose_ids.push(pose.id);
         }
         Ok(())
     }
@@ -128,7 +142,9 @@ impl DanceCollection {
 
         let new_index = self.poses.len();
         self.poses.push(new_pose);
-        self.names
+        self.pose_ids
+            .push(other.pose_id(foreign_pose_index).to_owned());
+        self.pose_names
             .push(other.pose_name(foreign_pose_index).to_owned());
         new_index
     }
@@ -229,11 +245,15 @@ impl DanceCollection {
     }
 
     pub(crate) fn pose_by_id(&self, id: &str) -> Option<usize> {
-        self.names.iter().position(|name| name == id)
+        self.pose_ids.iter().position(|name| name == id)
+    }
+
+    pub(crate) fn pose_id(&self, i: usize) -> &str {
+        &self.pose_ids[i]
     }
 
     pub(crate) fn pose_name(&self, i: usize) -> &str {
-        &self.names[i]
+        &self.pose_names[i]
     }
 
     pub(crate) fn limbs(&self) -> impl Iterator<Item = (LimbIndex, &Limb)> {
@@ -347,7 +367,7 @@ impl DanceCollection {
             .poses
             .iter()
             .map(|&foreign_pose_index| {
-                let pose_id = other.pose_name(foreign_pose_index);
+                let pose_id = other.pose_id(foreign_pose_index);
                 self.pose_by_id(pose_id)
                     .unwrap_or_else(|| self.add_foreign_pose(other, foreign_pose_index))
             })
@@ -411,7 +431,8 @@ impl DanceCollection {
 
         Self {
             poses,
-            names: vec!["test_pose".into()],
+            pose_ids: vec!["test_pose".into()],
+            pose_names: vec!["Test Pose".into()],
             limbs: vec![pose_file::Limb::LeftThigh.into()],
             limb_names: vec!["test_limb".into()],
             ..Default::default()
@@ -424,7 +445,7 @@ impl DanceCollection {
             self.limbs.len(),
             self.limb_names,
             self.poses.len(),
-            self.names,
+            self.pose_ids,
             self.steps.len(),
             self.steps()
                 .iter()

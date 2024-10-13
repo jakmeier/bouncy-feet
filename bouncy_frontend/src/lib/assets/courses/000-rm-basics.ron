@@ -197,7 +197,7 @@
   ],
   poses: [
     (
-      name: "in-place-right-up",
+      id: "in-place-right-up",
       direction: Front,
       limbs: [
         (limb: LeftThigh, weight: 1.0, angle: -1, tolerance: 0),
@@ -219,7 +219,7 @@
       ),
     ),
     (
-      name: "in-place-left-up",
+      id: "in-place-left-up",
       direction: Front,
       limbs: [
         (limb: LeftThigh, weight: 1.0, angle: 2, tolerance: 0),
@@ -241,7 +241,7 @@
       ),
     ),
     (
-      name: "kick-right-unbalanced",
+      id: "kick-right-unbalanced",
       direction: Right,
       limbs: [
         (limb: LeftThigh, angle: 0, tolerance: 5, weight: 0.5),
@@ -258,12 +258,12 @@
       ],
     ),
     (
-      name: "kick-left-unbalanced",
+      id: "kick-left-unbalanced",
       mirror_of: "kick-right-unbalanced",
       direction: Right,
     ),
     (
-      name: "kick-right",
+      id: "kick-right",
       direction: Right,
       limbs: [
         (limb: LeftThigh, angle: -10, tolerance: 5, weight: 0.25),
@@ -280,9 +280,9 @@
         (limb: RightForearm, angle: -20, tolerance: 0, weight: 0.0),
       ],
     ),
-    (name: "kick-left", mirror_of: "kick-right", direction: Right),
+    (id: "kick-left", mirror_of: "kick-right", direction: Right),
     (
-      name: "centered-sideway",
+      id: "centered-sideway",
       direction: Right,
       limbs: [
         (limb: LeftShin, angle: 0, tolerance: 2, weight: 0.0),
@@ -300,7 +300,7 @@
       ],
     ),
     (
-      name: "right-forward",
+      id: "right-forward",
       direction: Right,
       y_shift: -0.0275,
       limbs: [
@@ -318,9 +318,9 @@
         (limb: RightForearm, angle: -20, tolerance: 0, weight: 0.0),
       ],
     ),
-    (name: "left-forward", mirror_of: "right-forward", direction: Right),
+    (id: "left-forward", mirror_of: "right-forward", direction: Right),
     (
-      name: "right-up",
+      id: "right-up",
       direction: Right,
       turn_shoulder: 30,
       turn_hip: 20,
@@ -337,9 +337,9 @@
         (limb: RightForearm, angle: 6, tolerance: 0, weight: 0.0),
       ],
     ),
-    (name: "left-up", mirror_of: "right-up", direction: Right),
+    (id: "left-up", mirror_of: "right-up", direction: Right),
     (
-      name: "right-slightly-up",
+      id: "right-slightly-up",
       direction: Right,
       limbs: [
         (limb: LeftShin, angle: 0, tolerance: 5, weight: 1.0),
@@ -354,11 +354,11 @@
         (limb: LeftForearm, angle: 6, tolerance: 0, weight: 0.0),
       ]
     ),
-    (name: "left-slightly-up", mirror_of: "right-slightly-up", direction: Right),
+    (id: "left-slightly-up", mirror_of: "right-slightly-up", direction: Right),
     // TODO: Resting poses should either be added by default or not be required
-    // to exist with exactly these names
+    // to exist with exactly these ids
     (
-      name: "standing-straight-front",
+      id: "standing-straight-front",
       direction: Front,
       limbs: [
         (limb: LeftShin, angle: 0, tolerance: 5, weight: 1.0),
@@ -374,7 +374,7 @@
       ]
     ),
     (
-      name: "standing-straight-side",
+      id: "standing-straight-side",
       direction: Right,
       limbs: [
         (limb: LeftShin, angle: 0, tolerance: 5, weight: 1.0),

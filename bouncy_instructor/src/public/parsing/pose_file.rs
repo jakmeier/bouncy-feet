@@ -5,13 +5,15 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-use super::ParseFileError;
+use super::course_file::TranslatedString;
+use super::{ParseFileError, VersionCheck};
 
-const CURRENT_VERSION: u16 = 0;
+const CURRENT_VERSION: u16 = 1;
 
 /// Format for pose definition files.
 #[derive(Deserialize)]
 pub(crate) struct PoseFile {
+    #[allow(dead_code)]
     pub version: u16,
     pub poses: Vec<Pose>,
 }
@@ -23,7 +25,9 @@ pub(crate) struct PoseFile {
 /// It is converted to a [`crate::pose::Pose`] for computations.
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub(crate) struct Pose {
-    pub name: String,
+    pub id: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub names: Option<TranslatedString>,
     pub direction: PoseDirection,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub limbs: Vec<LimbPosition>,
@@ -156,13 +160,20 @@ pub enum PoseDirection {
 
 impl PoseFile {
     pub(crate) fn from_str(text: &str) -> Result<Self, ParseFileError> {
-        let parsed: PoseFile = ron::from_str(text)?;
-        if parsed.version != CURRENT_VERSION {
+        let check: VersionCheck = ron::from_str(text)?;
+
+        if check.version == 0 {
+            let parsed: v0::PoseFile = ron::from_str(text)?;
+            return Ok(parsed.into());
+        }
+
+        if check.version != CURRENT_VERSION {
             return Err(ParseFileError::VersionMismatch {
                 expected: CURRENT_VERSION,
-                found: parsed.version,
+                found: check.version,
             });
         }
+        let parsed: PoseFile = ron::from_str(text)?;
         Ok(parsed)
     }
 }
@@ -192,4 +203,63 @@ fn is_zero(f: &f32) -> bool {
 
 fn zero(i: &i16) -> bool {
     *i == 0
+}
+
+mod v0 {
+    use serde::{Deserialize, Serialize};
+
+    use super::{LimbPosition, PoseDirection, PoseZ, CURRENT_VERSION};
+
+    /// Format for dance definition files.
+    #[derive(Deserialize)]
+    pub(crate) struct PoseFile {
+        #[allow(dead_code)]
+        pub version: u16,
+        pub poses: Vec<Pose>,
+    }
+
+    /// V0 Pose
+    #[derive(Serialize, Deserialize, Debug)]
+    pub(crate) struct Pose {
+        pub name: String,
+        pub direction: PoseDirection,
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        pub limbs: Vec<LimbPosition>,
+        #[serde(default, skip_serializing_if = "super::is_zero")]
+        pub x_shift: f32,
+        #[serde(default, skip_serializing_if = "super::is_zero")]
+        pub y_shift: f32,
+        #[serde(default, skip_serializing_if = "super::zero")]
+        pub turn_shoulder: i16,
+        #[serde(default, skip_serializing_if = "super::zero")]
+        pub turn_hip: i16,
+        #[serde(default, skip_serializing_if = "PoseZ::is_empty")]
+        pub z: PoseZ,
+        #[serde(default, skip_serializing_if = "String::is_empty")]
+        pub mirror_of: String,
+    }
+
+    impl From<PoseFile> for super::PoseFile {
+        fn from(v0: PoseFile) -> Self {
+            super::PoseFile {
+                version: CURRENT_VERSION,
+                poses: v0
+                    .poses
+                    .into_iter()
+                    .map(|pose_v0| super::Pose {
+                        id: pose_v0.name,
+                        names: Default::default(),
+                        direction: pose_v0.direction,
+                        limbs: pose_v0.limbs,
+                        x_shift: pose_v0.x_shift,
+                        y_shift: pose_v0.y_shift,
+                        turn_shoulder: pose_v0.turn_shoulder,
+                        turn_hip: pose_v0.turn_hip,
+                        z: pose_v0.z,
+                        mirror_of: pose_v0.mirror_of,
+                    })
+                    .collect(),
+            }
+        }
+    }
 }

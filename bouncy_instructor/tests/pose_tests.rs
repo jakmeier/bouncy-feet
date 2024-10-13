@@ -18,7 +18,7 @@ fn check_pose_in_keypoints(keypoints: &str, expected_pose: &str) {
         .expect("no match found");
 
     for pose in tracker.all_pose_errors(timestamp) {
-        println!("{}: {}", pose.name(), pose.error);
+        println!("{}: {}", pose.id(), pose.error);
         for limb in pose.limb_errors() {
             println!(
                 "    {:?}: {:?} x {:?}",
@@ -31,7 +31,7 @@ fn check_pose_in_keypoints(keypoints: &str, expected_pose: &str) {
     }
     assert_eq!(
         expected_pose,
-        approximation.name(),
+        approximation.id(),
         "wrong pose detected {:?}",
         approximation
     );

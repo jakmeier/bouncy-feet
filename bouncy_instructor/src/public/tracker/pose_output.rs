@@ -11,6 +11,8 @@ use wasm_bindgen::prelude::wasm_bindgen;
 #[wasm_bindgen]
 pub struct PoseApproximation {
     /// ID defined in pose file
+    pub(crate) id: String,
+    /// Translated name if available, id otherwise
     pub(crate) name: String,
     /// Total error between 0.0 and 1.0.
     pub error: f32,
@@ -44,6 +46,11 @@ pub struct ZWrongOrderError {
 
 #[wasm_bindgen]
 impl PoseApproximation {
+    #[wasm_bindgen(getter)]
+    pub fn id(&self) -> String {
+        self.id.clone()
+    }
+
     #[wasm_bindgen(getter)]
     pub fn name(&self) -> String {
         self.name.clone()

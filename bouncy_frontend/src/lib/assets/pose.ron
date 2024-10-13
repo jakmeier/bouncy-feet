@@ -1,9 +1,10 @@
 #![enable(implicit_some)]
 (
-  version: 0,
+  version: 1,
   poses: [
     (
-      name: "standing-straight-front",
+      id: "standing-straight-front",
+      names: {"de": "Ruhend", "en": "Resting"},
       direction: Front,
       limbs: [
         (limb: LeftShin, angle: 0, tolerance: 5, weight: 1.0),
@@ -19,7 +20,8 @@
       ]
     ),
     (
-      name: "standing-straight-side",
+      id: "standing-straight-side",
+      names: {"de": "Seitlich ruhend", "en": "Resting sideways"},
       direction: Right,
       limbs: [
         (limb: LeftShin, angle: 0, tolerance: 5, weight: 1.0),
@@ -33,7 +35,8 @@
       ]
     ),
     (
-      name: "right-up",
+      id: "right-up",
+      names: {"de": "Rechts auf", "en": "Right up"},
       direction: Right,
       turn_shoulder: 30,
       turn_hip: 20,
@@ -53,9 +56,10 @@
         (limb: RightForearm, angle: 6, tolerance: 0, weight: 0.0),
       ]
     ),
-    ( name: "left-up", mirror_of: "right-up", direction: Right ),
+    ( id: "left-up", names: {"de": "Links aud", "en": "Left up"}, mirror_of: "right-up", direction: Right ),
     (
-      name: "right-forward",
+      id: "right-forward",
+      names: {"de": "Rechts vor", "en": "Right forward"},
       direction: Right,
       y_shift: -0.0275,
       limbs: [
@@ -72,9 +76,10 @@
         (limb: RightForearm, angle: -20, tolerance: 0, weight: 0.0),
       ]
     ),
-    ( name: "left-forward", mirror_of: "right-forward", direction: Right ),
+    ( id: "left-forward", names: {"de": "Links vor", "en": "Left forward"}, mirror_of: "right-forward", direction: Right ),
     (
-      name: "right-kick",
+      id: "right-kick",
+      names: {"de": "TODO", "en": "TODO"},
       direction: Right,
       y_shift: -0.0275,
       limbs: [
@@ -91,9 +96,10 @@
         (limb: RightForearm, angle: -20, tolerance: 0, weight: 0.0),
       ]
     ),
-    ( name: "left-kick", mirror_of: "right-kick", direction: Right ),
+    ( id: "left-kick", names: {"de": "TODO", "en": "TODO"}, mirror_of: "right-kick", direction: Right ),
     (
-      name: "right-forward-heel",
+      id: "right-forward-heel",
+      names: {"de": "TODO", "en": "TODO"},
       direction: Right,
       y_shift: -0.0275,
       limbs: [
@@ -110,9 +116,10 @@
         (limb: RightForearm, angle: -20, tolerance: 0, weight: 0.0),
       ]
     ),
-    ( name: "left-forward-heel", mirror_of: "right-forward-heel", direction: Right ),
+    ( id: "left-forward-heel", names: {"de": "TODO", "en": "TODO"}, mirror_of: "right-forward-heel", direction: Right ),
     (
-      name: "v-open-right",
+      id: "v-open-right",
+      names: {"de": "TODO", "en": "TODO"},
       direction: Front,
       limbs: [
         (limb: LeftThigh, weight: 1.0, angle: -10, tolerance: 5),
@@ -127,9 +134,10 @@
         (limb: LeftForearm, angle: -90, tolerance: 0, weight: 0.0),
       ],
     ),
-    ( name: "v-open-left", mirror_of: "v-open-right", direction: Front ),
+    ( id: "v-open-left", names: {"de": "TODO", "en": "TODO"}, mirror_of: "v-open-right", direction: Front ),
     (
-      name: "v-closed",
+      id: "v-closed",
+      names: {"de": "TODO", "en": "TODO"},
       direction: Front,
       limbs: [
         (limb: LeftThigh, angle: 0, tolerance: 5, weight: 0.25),
@@ -145,16 +153,18 @@
       ]
     ),
     (
-      name: "pendulum-right",
+      id: "pendulum-right",
+      names: {"de": "TODO", "en": "TODO"},
       direction: Front,
       limbs: [
         (limb: RightShin, angle: 55, tolerance: 5, weight: 1.0),
         (limb: RightThigh, angle: 45, tolerance: 5, weight: 1.0),
       ]
     ),
-    ( name: "pendulum-left", mirror_of: "pendulum-right", direction: Front ),
+    ( id: "pendulum-left", names: {"de": "TODO", "en": "TODO"}, mirror_of: "pendulum-right", direction: Front ),
     (
-      name: "t-open-right",
+      id: "t-open-right",
+      names: {"de": "TODO", "en": "TODO"},
       direction: Front,
       limbs: [
         (limb: LeftThigh, weight: 0.1, angle: -5, tolerance: 5),
@@ -171,9 +181,10 @@
         (limb: RightForearm, weight: 0.0, angle: -13, tolerance: 0),
       ],
     ),
-    ( name: "t-open-left", mirror_of: "t-open-right", direction: Front ),
+    ( id: "t-open-left", names: {"de": "TODO", "en": "TODO"}, mirror_of: "t-open-right", direction: Front ),
     (
-      name: "t-closed-right",
+      id: "t-closed-right",
+      names: {"de": "TODO", "en": "TODO"},
       direction: Front,
       // also: in t-step, sometimes it's not classified as Front
       limbs: [
@@ -203,9 +214,10 @@
         ]
       )
     ),
-    ( name: "t-closed-left", mirror_of: "t-closed-right", direction: Front ),
+    ( id: "t-closed-left", names: {"de": "TODO", "en": "TODO"}, mirror_of: "t-closed-right", direction: Front ),
     (
-      name: "polly-right",
+      id: "polly-right",
+      names: {"de": "TODO", "en": "TODO"},
       direction: Front,
       y_shift: -0.03125,
       turn_hip: 60,
@@ -241,9 +253,10 @@
         ]
       )
     ),
-    ( name: "polly-left", mirror_of: "polly-right", direction: Front ),
+    ( id: "polly-left", names: {"de": "TODO", "en": "TODO"}, mirror_of: "polly-right", direction: Front ),
     (
-      name: "staggered-stance-right",
+      id: "staggered-stance-right",
+      names: {"de": "TODO", "en": "TODO"},
       direction: Front,
       limbs: [
         ( limb: LeftThigh, weight: 0.5, angle: 10, tolerance: 2),
@@ -266,9 +279,10 @@
         ]
       )
     ),
-    ( name: "staggered-stance-left", mirror_of: "staggered-stance-right", direction: Front ),
+    ( id: "staggered-stance-left", names: {"de": "TODO", "en": "TODO"}, mirror_of: "staggered-stance-right", direction: Front ),
     (
-      name: "light-outward-stance",
+      id: "light-outward-stance",
+      names: {"de": "TODO", "en": "TODO"},
       y_shift: 0.0125,
       direction: Front,
       limbs: [
@@ -293,7 +307,8 @@
       )
     ),
     (
-      name: "left-heel-front",
+      id: "left-heel-front",
+      names: {"de": "TODO", "en": "TODO"},
       direction: Front,
       y_shift: -0.125,
       limbs: [
@@ -319,9 +334,10 @@
         },
       ),
     ),
-    ( name: "right-heel-front", mirror_of: "left-heel-front", direction: Front ),
+    ( id: "right-heel-front", names: {"de": "TODO", "en": "TODO"}, mirror_of: "left-heel-front", direction: Front ),
     (
-      name: "open-rm-left",
+      id: "open-rm-left",
+      names: {"de": "TODO", "en": "TODO"},
       direction: Front,
       y_shift: -0.025,
       turn_shoulder: 35,
@@ -351,9 +367,10 @@
         },
       ),
     ),
-    ( name: "open-rm-right", mirror_of: "open-rm-left", direction: Front ),
+    ( id: "open-rm-right", names: {"de": "TODO", "en": "TODO"}, mirror_of: "open-rm-left", direction: Front ),
     (
-      name: "open-heel-rm-left",
+      id: "open-heel-rm-left",
+      names: {"de": "TODO", "en": "TODO"},
       direction: Front,
       y_shift: -0.04,
       turn_shoulder: 35,
@@ -384,9 +401,10 @@
         },
       ),
     ),
-    ( name: "open-heel-rm-right", mirror_of: "open-heel-rm-left", direction: Front ),
+    ( id: "open-heel-rm-right", names: {"de": "TODO", "en": "TODO"}, mirror_of: "open-heel-rm-left", direction: Front ),
     (
-      name: "happy-right",
+      id: "happy-right",
+      names: {"de": "TODO", "en": "TODO"},
       direction: Front,
       y_shift: -0.0125,
       turn_shoulder: 0,
@@ -404,9 +422,10 @@
         ( limb: RightForearm, weight: 0.0, angle: 15, tolerance: 0),
       ],
     ),
-    ( name: "happy-left", mirror_of: "happy-right", direction: Front ),
+    ( id: "happy-left", names: {"de": "TODO", "en": "TODO"}, mirror_of: "happy-right", direction: Front ),
     (
-      name: "closed-x",
+      id: "closed-x",
+      names: {"de": "TODO", "en": "TODO"},
       direction: Front,
       limbs: [
         ( limb: LeftThigh, weight: 1.0, angle: 0, tolerance: 5),
@@ -422,7 +441,8 @@
       ],
     ),
     (
-      name: "gangsta-right-up",
+      id: "gangsta-right-up",
+      names: {"de": "TODO", "en": "TODO"},
       direction: Right,
       turn_shoulder: 30,
       turn_hip: 20,
@@ -443,9 +463,10 @@
         (limb: LeftFoot, angle: 90, tolerance: 0, weight: 0.0),
       ]
     ),
-    ( name: "gangsta-left-up", mirror_of: "gangsta-right-up", direction: Front ),
+    ( id: "gangsta-left-up", names: {"de": "TODO", "en": "TODO"}, mirror_of: "gangsta-right-up", direction: Front ),
     (
-      name: "gangsta-right-up-front",
+      id: "gangsta-right-up-front",
+      names: {"de": "TODO", "en": "TODO"},
       direction: Front,
       turn_shoulder: 0,
       turn_hip: 0,
@@ -471,9 +492,10 @@
         ]
       ),
     ),
-    ( name: "gangsta-left-up-front", mirror_of: "gangsta-right-up-front", direction: Front ),
+    ( id: "gangsta-left-up-front", names: {"de": "TODO", "en": "TODO"}, mirror_of: "gangsta-right-up-front", direction: Front ),
     (
-      name: "gangsta-hop-left",
+      id: "gangsta-hop-left",
+      names: {"de": "TODO", "en": "TODO"},
       direction: Front,
       y_shift: -0.04,
       turn_shoulder: -20,
@@ -500,9 +522,10 @@
         },
       ),
     ),
-    ( name: "gangsta-hop-right", mirror_of: "gangsta-hop-left", direction: Front ),
+    ( id: "gangsta-hop-right", names: {"de": "TODO", "en": "TODO"}, mirror_of: "gangsta-hop-left", direction: Front ),
     (
-      name: "hands-up",
+      id: "hands-up",
+      names: {"de": "TODO", "en": "TODO"},
       direction: Front,
       y_shift: 0.08,
       limbs: [

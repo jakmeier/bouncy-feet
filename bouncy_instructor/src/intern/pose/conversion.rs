@@ -14,6 +14,7 @@
 use super::{BodyPartOrdering, Pose, PoseDirection};
 use crate::intern::dance_collection::DanceCollection;
 use crate::intern::geom::{Angle3d, SignedAngle};
+use crate::intern::lsfr;
 use crate::intern::pose::{BodyPart, BodyPoint, BodySide, Limb};
 use crate::intern::skeleton_3d::{Direction, Skeleton3d};
 use crate::keypoints::Cartesian3d;
@@ -297,7 +298,8 @@ impl pose_file::Pose {
         Self {
             direction: skeleton.direction().into(),
             limbs,
-            name: "Generated Pose".to_owned(),
+            id: format!("generated-pose-{}", lsfr::random_id()),
+            names: None,
             mirror_of: String::new(),
             z: Default::default(),
             x_shift: 0.0,
@@ -561,7 +563,7 @@ mod tests {
         };
         format!(
             r#"(
-            name: "Generated Pose",
+            id: "Generated Pose",
             direction: {direction},
             limbs: [
               (limb: LeftThigh, angle: {angle}, tolerance: 0, weight: 1.0),

@@ -243,6 +243,7 @@ impl DanceDetector {
         let error = error_details.error_score();
         let has_z_error = !error_details.z_order_errors.is_empty();
         let pose_approximation = PoseApproximation {
+            id: db.pose_id(pose_idx).to_owned(),
             name: db.pose_name(pose_idx).to_owned(),
             error,
             timestamp: pose_timestamp,

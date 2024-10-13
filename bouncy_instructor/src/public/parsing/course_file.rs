@@ -41,7 +41,7 @@ pub(crate) struct Part {
     pub(crate) explanations: Option<TranslatedString>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Default)]
+#[derive(Debug, Serialize, Deserialize, Default, PartialEq)]
 #[serde(transparent)]
 pub(crate) struct TranslatedString {
     inner: HashMap<String, String>,

@@ -3,7 +3,6 @@
 //! This is done in-house to have a minimal footprint on code size, and keep
 /// platform independence.
 use std::sync::atomic::{AtomicU32, Ordering};
-use std::u32;
 
 // global seed
 static SEED: AtomicU32 = AtomicU32::new(0);
@@ -19,14 +18,14 @@ pub(crate) fn next() -> u32 {
     let next = (prev >> 1) | high_bit;
     SEED.store(next, Ordering::SeqCst);
 
-    return next;
+    next
 }
 
 fn init() {
     if SEED.load(Ordering::SeqCst) == 0 {
         // unwrap impossible: system clock drift cannot produce time < UNIX_EPOCH
         let t = std::time::UNIX_EPOCH.elapsed().unwrap();
-        let seed = (t.as_micros() & u32::MAX as u128) as u32 & 0x4000_000;
+        let seed = (t.as_micros() & u32::MAX as u128) as u32;
         _ = SEED.compare_exchange(0, seed, Ordering::SeqCst, Ordering::SeqCst);
     }
 }

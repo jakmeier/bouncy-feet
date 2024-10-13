@@ -129,7 +129,7 @@ mod tests {
       ],
       poses: [
         (
-          name: "in-place-right-up",
+          id: "in-place-right-up",
           direction: Front,
           limbs: [
             (limb: LeftThigh, weight: 1.0, angle: -1, tolerance: 0),
@@ -141,7 +141,7 @@ mod tests {
           ),
         ),
         (
-          name: "in-place-left-up",
+          id: "in-place-left-up",
           direction: Front,
           limbs: [
             (limb: RightThigh, weight: 1.0, angle: 0, tolerance: 0),

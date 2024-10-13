@@ -67,6 +67,7 @@ export function loadStepFile(a: number, b: number, c: number, d: number): number
 export function loadStepString(a: number, b: number, c: number, d: number, e: number): void;
 export function parseCourseString(a: number, b: number, c: number, d: number, e: number): void;
 export function poseapproximation_debugString(a: number, b: number): void;
+export function poseapproximation_id(a: number, b: number): void;
 export function poseapproximation_limbErrors(a: number, b: number): void;
 export function poseapproximation_name(a: number, b: number): void;
 export function poseapproximation_worstLimbs(a: number, b: number, c: number): void;

@@ -30,6 +30,7 @@ impl Tracker {
             }
         }
         Some(PoseApproximation {
+            id: self.db.pose_id(pose_index).to_owned(),
             name: self.db.pose_name(pose_index).to_owned(),
             error,
             timestamp: self.timestamps[history_index],
@@ -78,6 +79,7 @@ impl Tracker {
             None
         } else {
             Some(PoseApproximation {
+                id: db.pose_id(pose_index).to_owned(),
                 name: db.pose_name(pose_index).to_owned(),
                 error: best_error,
                 timestamp: self.timestamps[history_index],
@@ -113,6 +115,7 @@ impl Tracker {
             .map(|(pose_index, pose)| {
                 let details = pose.skeleton_error(skeleton);
                 PoseApproximation {
+                    id: self.db.pose_id(pose_index).to_owned(),
                     name: self.db.pose_name(pose_index).to_owned(),
                     error: details.error_score(),
                     timestamp,
