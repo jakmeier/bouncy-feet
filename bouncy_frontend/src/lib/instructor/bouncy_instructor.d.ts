@@ -2,8 +2,9 @@
 /* eslint-disable */
 /**
 * @param {number} random_seed
+* @param {string} lang
 */
-export function init(random_seed: number): void;
+export function init(random_seed: number, lang: string): void;
 /**
 * @param {string} url
 * @returns {Promise<void>}
@@ -69,20 +70,6 @@ export function dances(): (DanceInfo)[];
 */
 export function danceBuilderFromDance(dance_id: string): DanceBuilder;
 /**
-*/
-export enum SkeletonField {
-  LeftThigh = 0,
-  LeftShin = 1,
-  LeftArm = 2,
-  LeftForearm = 3,
-  LeftFoot = 4,
-  RightThigh = 5,
-  RightShin = 6,
-  RightArm = 7,
-  RightForearm = 8,
-  RightFoot = 9,
-}
-/**
 * Best guess for what the dancer needs to change to fit the pose.
 */
 export enum PoseHint {
@@ -90,31 +77,6 @@ export enum PoseHint {
   LeftRight = 1,
   ZOrder = 2,
   WrongDirection = 3,
-}
-/**
-*/
-export enum DetectionState {
-/**
-* Neutral state, not detecting anything.
-*/
-  Init = 1,
-/**
-* Dance is positioning themselves, detecting the idle position.
-*/
-  Positioning = 2,
-/**
-* About to go over to live tracking, playing a countdown audio.
-*/
-  CountDown = 3,
-/**
-* Tracking current movements.
-*/
-  LiveTracking = 4,
-/**
-* No longer tracking but the results of the previous tracking are
-* available.
-*/
-  TrackingDone = 5,
 }
 /**
 */
@@ -143,6 +105,45 @@ export enum DetectionFailureReason {
 * No *new* data to run detection against.
 */
   NoNewData = 6,
+}
+/**
+*/
+export enum DetectionState {
+/**
+* Neutral state, not detecting anything.
+*/
+  Init = 1,
+/**
+* Dance is positioning themselves, detecting the idle position.
+*/
+  Positioning = 2,
+/**
+* About to go over to live tracking, playing a countdown audio.
+*/
+  CountDown = 3,
+/**
+* Tracking current movements.
+*/
+  LiveTracking = 4,
+/**
+* No longer tracking but the results of the previous tracking are
+* available.
+*/
+  TrackingDone = 5,
+}
+/**
+*/
+export enum SkeletonField {
+  LeftThigh = 0,
+  LeftShin = 1,
+  LeftArm = 2,
+  LeftForearm = 3,
+  LeftFoot = 4,
+  RightThigh = 5,
+  RightShin = 6,
+  RightArm = 7,
+  RightForearm = 8,
+  RightFoot = 9,
 }
 
 import type { Readable } from "svelte/store";

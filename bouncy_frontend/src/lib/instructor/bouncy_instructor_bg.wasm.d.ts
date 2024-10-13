@@ -46,7 +46,7 @@ export function detectionresult_poseHint(a: number): number;
 export function detectionresult_steps(a: number, b: number): void;
 export function exportedframe_keypoints(a: number, b: number): void;
 export function exportedframe_pose(a: number, b: number): void;
-export function init(a: number, b: number): void;
+export function init(a: number, b: number, c: number, d: number): void;
 export function keypoints_new(a: number, b: number, c: number): number;
 export function keypointsside_new(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number): number;
 export function lesson_explanation(a: number, b: number): void;

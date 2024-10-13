@@ -76,6 +76,13 @@ impl Default for DanceCollection {
 }
 
 impl DanceCollection {
+    pub(crate) fn new(lang: String) -> Self {
+        Self {
+            lang,
+            ..Default::default()
+        }
+    }
+
     pub(crate) fn add_poses(
         &mut self,
         poses: Vec<crate::pose_file::Pose>,

@@ -29,6 +29,11 @@ thread_local! {
 }
 
 impl State {
+    fn reset(&mut self, lang: String) {
+        let db = DanceCollection::new(lang);
+        self.db = Rc::new(db);
+    }
+
     fn add_poses(
         &mut self,
         poses: Vec<pose_file::Pose>,

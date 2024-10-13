@@ -56,7 +56,7 @@
         (limb: RightForearm, angle: 6, tolerance: 0, weight: 0.0),
       ]
     ),
-    ( id: "left-up", names: {"de": "Links aud", "en": "Left up"}, mirror_of: "right-up", direction: Right ),
+    ( id: "left-up", names: {"de": "Links auf", "en": "Left up"}, mirror_of: "right-up", direction: Right ),
     (
       id: "right-forward",
       names: {"de": "Rechts vor", "en": "Right forward"},

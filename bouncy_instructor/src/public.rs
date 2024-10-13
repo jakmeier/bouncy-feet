@@ -35,11 +35,12 @@ use wasm_bindgen_futures::JsFuture;
 use web_sys::Request;
 
 #[wasm_bindgen(js_name = init)]
-pub fn init(random_seed: u32) -> Result<(), JsValue> {
+pub fn init(random_seed: u32, lang: String) -> Result<(), JsValue> {
     if random_seed == 0 {
         return Err("random seed must not be 0".into());
     }
     lfsr::init(random_seed);
+    STATE.with(|state| state.borrow_mut().reset(lang));
     Ok(())
 }
 

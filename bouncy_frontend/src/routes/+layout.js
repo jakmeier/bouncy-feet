@@ -1,4 +1,4 @@
-import { addTranslations, loadTranslations, setLocale, setRoute } from '$lib/i18n.js';
+import { addTranslations, loadTranslations, locale, setLocale, setRoute } from '$lib/i18n.js';
 import {
     loadDanceString,
     loadPoseString,
@@ -78,7 +78,7 @@ async function loadCollectionAssets() {
     };
 
     if (!loadedOnce) {
-        loadOnce(collectionData);
+        loadOnce(collectionData, locale.get());
     }
 
     const stepData = {
@@ -153,10 +153,14 @@ function loadRon(name) {
     return import(`$lib/assets/${name}.ron?raw`).then((data) => data.default).catch((e) => console.error(e));
 }
 
-function loadOnce(data) {
+/**
+ * @param {{ poseFileString: any; danceFileString: any; stepFileStrings: any; }} data
+ * @param {string} lang
+ */
+function loadOnce(data, lang) {
     if (data.poseFileString && data.poseFileString.length > 0) {
         loadedOnce = true;
-        init(Math.random() * 4_294_967_295);
+        init(Math.random() * 4_294_967_295, lang);
         loadPoseString(data.poseFileString);
         loadStepString(data.stepFileStrings.basic, 'basic');
         loadStepString(data.stepFileStrings.footwork, 'footwork');
