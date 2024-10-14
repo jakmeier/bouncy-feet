@@ -6,6 +6,7 @@
  * @property {(step: string)=>boolean} enableStepRecording
  * @property {boolean} enableDanceCollection
  * @property {boolean} enableDanceCreator
+ * @property {boolean} enableEditorPage
  * @property {boolean} enableCourses
  * @property {boolean} enableDevView
  *

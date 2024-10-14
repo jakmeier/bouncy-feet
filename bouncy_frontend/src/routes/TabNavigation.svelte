@@ -31,6 +31,13 @@
       icon: 'book_5',
       route: `${base}/collection`,
     });
+    if (features.enableEditorPage) {
+      tabs.push({
+        label: $t('editor.nav'),
+        icon: 'experiment',
+        route: `${base}/editor`,
+      });
+    }
     tabs.push({
       label: $t('profile.nav'),
       icon: 'account_circle',

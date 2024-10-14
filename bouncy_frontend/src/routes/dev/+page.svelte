@@ -9,8 +9,6 @@
   import Svg from '$lib/components/avatar/Svg.svelte';
   import SvgAvatar2 from '$lib/components/avatar/SvgAvatar2.svelte';
   import { LEFT_RIGHT_COLORING_LIGHT } from '$lib/constants';
-  import PoseInputForm from '$lib/components/editor/PoseInputForm.svelte';
-  import PoseEditForm from '$lib/components/editor/PoseEditForm.svelte';
 
   /** @type {HTMLInputElement}  */
   let upload;
@@ -22,8 +20,6 @@
   let videoSrcHeight = 0;
   /** @type {import("$lib/instructor/bouncy_instructor").SkeletonV2 | undefined} */
   let liveSkeleton;
-  /** @type {import("$lib/instructor/bouncy_instructor").SkeletonWrapper | undefined} */
-  let poseSkeleton;
 
   let dataListener;
   /** @type {(skeleton: import("$lib/instructor/bouncy_instructor").SkeletonWrapper)=>void} */
@@ -130,20 +126,6 @@
       console.log(step.name, step.start, step.end);
     });
   }
-
-  function copySkeleton() {
-    poseSkeleton = tracker.skeletonWrapperAt(selectedTimestamp);
-    if (poseSkeleton) {
-      loadSkeleton(poseSkeleton);
-    }
-  }
-
-  function copyPose() {
-    let pose = poseFromForm();
-    if (pose) {
-      loadPose(pose);
-    }
-  }
 </script>
 
 <h1>Dev</h1>
@@ -178,14 +160,6 @@
     {/if}
   </div>
 </div>
-
-<button class="light full-width short" on:click={copySkeleton}> ↓ </button>
-
-<PoseInputForm bind:loadSkeleton bind:readPose={poseFromForm}></PoseInputForm>
-
-<button class="light full-width short" on:click={copyPose}> ↓ </button>
-
-<PoseEditForm bind:loadPose></PoseEditForm>
 
 <button on:click={downloadFrame}> Download Keypoints of Frame </button>
 <button on:click={downloadKeypoints}> Download Keypoints of Video </button>

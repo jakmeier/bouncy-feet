@@ -73,6 +73,8 @@
         }
     },
     "editor": {
+        "title": "Labor",
+        "nav": "Labor",
         "edit-dance-context-menu": "Bearbeiten",
         "dance-copy-postfix": "Kopie",
         "delete-dance-button": "Tanz löschen",

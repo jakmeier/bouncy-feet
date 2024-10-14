@@ -7,6 +7,7 @@
   import { generateRandomUsername } from '$lib/username';
   import { setContext } from 'svelte';
   import { writable } from 'svelte/store';
+  import { showExperimentalFeatures } from '$lib/stores/FeatureSelection.js';
 
   function fromLocalStorage() {
     try {
@@ -49,6 +50,9 @@
   );
   if (browser) {
     user.subscribe((value) => (localStorage.user = JSON.stringify(value)));
+    user.subscribe((value) => {
+      showExperimentalFeatures(value.experimentalFeatures);
+    });
   }
 
   /**

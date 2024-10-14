@@ -91,7 +91,7 @@ export class PoseDetection {
     /**
      * 
      * @param {import('@mediapipe/tasks-vision').ImageSource} videoElement
-     * @param {number} timestamp
+     * @param {number | undefined} timestamp
     */
     trackFrame(videoElement, timestamp) {
         if (timestamp === undefined || timestamp === null) {

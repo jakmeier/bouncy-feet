@@ -3,6 +3,7 @@
 import { derived, readable, writable } from "svelte/store";
 import { dev as envDev, browser } from '$app/environment';
 
+let experimental = writable(false);
 let privDev = envDev;
 export const dev = readable(privDev, (set) => {
     if (browser) {
@@ -23,7 +24,7 @@ function versionNumberToString(v) {
 }
 
 /** @type {import("svelte/motion").Readable<Features>} */
-export const features = derived([version, dev], ([$v, $dev]) => {
+export const features = derived([version, dev, experimental], ([$v, $dev, $experimental]) => {
     return {
         /* Fully enabled features for now but might be disabled again*/
         enableDanceCollection: $v >= 0.003,
@@ -32,6 +33,7 @@ export const features = derived([version, dev], ([$v, $dev]) => {
 
         /* Partially enabled features */
         enableStepRecording: (stepName) => STABLE_TRACKING_STEPS.includes(stepName),
+        enableEditorPage: $experimental,
 
         /* Features that are not ready to be released */
         enableAvatarRotation: $v >= 0.999,
@@ -42,6 +44,11 @@ export const features = derived([version, dev], ([$v, $dev]) => {
     }
 }
 );
+
+/** @param {boolean} yes */
+export function showExperimentalFeatures(yes) {
+    experimental.set(yes);
+}
 
 /** Steps that should be possible to track, with passing tests. */
 export const STABLE_TRACKING_STEPS = [

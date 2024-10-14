@@ -73,6 +73,8 @@
         }
     },
     "editor": {
+        "title": "Laboratory",
+        "nav": "Laboratory",
         "edit-dance-context-menu": "Edit",
         "dance-copy-postfix": "copy",
         "delete-dance-button": "Delete dance",
