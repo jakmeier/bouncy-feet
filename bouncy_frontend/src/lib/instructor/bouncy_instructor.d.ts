@@ -112,15 +112,6 @@ export enum DetectionFailureReason {
   NoNewData = 6,
 }
 /**
-* Best guess for what the dancer needs to change to fit the pose.
-*/
-export enum PoseHint {
-  DontKnow = 0,
-  LeftRight = 1,
-  ZOrder = 2,
-  WrongDirection = 3,
-}
-/**
 */
 export enum DetectionState {
 /**
@@ -144,6 +135,15 @@ export enum DetectionState {
 * available.
 */
   TrackingDone = 5,
+}
+/**
+* Best guess for what the dancer needs to change to fit the pose.
+*/
+export enum PoseHint {
+  DontKnow = 0,
+  LeftRight = 1,
+  ZOrder = 2,
+  WrongDirection = 3,
 }
 
 import type { Readable } from "svelte/store";
@@ -709,6 +709,17 @@ export class Segment {
 export class Skeleton {
   free(): void;
 /**
+* Compute 2d coordinates for the skeleton for rendering.
+*
+* The skeleton will be rendered assuming hard-coded values for body part
+* proportional lengths, multiplied with the size parameter. The hip
+* segment will have its center at the given position.
+* @param {Cartesian2d} hip_center
+* @param {number} size
+* @returns {SkeletonV2}
+*/
+  render(hip_center: Cartesian2d, size: number): SkeletonV2;
+/**
 * @param {boolean} sideway
 * @returns {Skeleton}
 */
@@ -721,17 +732,6 @@ export class Skeleton {
 * @returns {string}
 */
   debugString(): string;
-/**
-* Compute 2d coordinates for the skeleton for rendering.
-*
-* The skeleton will be rendered assuming hard-coded values for body part
-* proportional lengths, multiplied with the size parameter. The hip
-* segment will have its center at the given position.
-* @param {Cartesian2d} hip_center
-* @param {number} size
-* @returns {SkeletonV2}
-*/
-  render(hip_center: Cartesian2d, size: number): SkeletonV2;
 /**
 * Does the dancer face away more than they face the camera?
 */
@@ -914,19 +914,15 @@ export class StepInfo {
   readonly variation: string;
 }
 /**
+*/
+export class StepWrapper {
+  free(): void;
+}
+/**
 * A Tracker gathers skeletons over time and passes it on to a DanceDetector.
 */
 export class Tracker {
   free(): void;
-/**
-* @param {number} timestamp
-* @returns {ExportedFrame}
-*/
-  exportFrame(timestamp: number): ExportedFrame;
-/**
-* @returns {string}
-*/
-  exportKeypoints(): string;
 /**
 * Create a tracker for all known steps.
 */
@@ -1085,6 +1081,15 @@ export class Tracker {
 * @returns {SkeletonV2 | undefined}
 */
   renderedKeypointsAt(timestamp: number, width: number, height: number): SkeletonV2 | undefined;
+/**
+* @param {number} timestamp
+* @returns {ExportedFrame}
+*/
+  exportFrame(timestamp: number): ExportedFrame;
+/**
+* @returns {string}
+*/
+  exportKeypoints(): string;
 /**
 */
   readonly detectionState: ReadableDetectionState;

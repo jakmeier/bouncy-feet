@@ -72,8 +72,8 @@ impl From<&Dance> for DanceInfo {
                 if flipped {
                     step = step.flipped();
                 }
-                let step_info = StepInfo::from_step(step.clone(), &state.db);
-                body_shift.add_step(&step, &step_info.skeletons, &state.db);
+                let step_info = StepInfo::from_step(step.clone(), &state.global_db.tracker_view);
+                body_shift.add_step(&step, &step_info.skeletons, &state.global_db.tracker_view);
                 steps.push(step_info);
             }
         });

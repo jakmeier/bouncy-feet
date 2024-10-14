@@ -12,11 +12,11 @@
 //! 3) Skeleton3d -> pose_file::Pose
 
 use super::{BodyPartOrdering, Pose, PoseDirection};
-use crate::intern::tracker_dance_collection::TrackerDanceCollection;
 use crate::intern::geom::{Angle3d, SignedAngle};
 use crate::intern::lfsr;
 use crate::intern::pose::{BodyPart, BodyPoint, BodySide, Limb};
 use crate::intern::skeleton_3d::{Direction, Skeleton3d};
+use crate::intern::tracker_dance_collection::TrackerDanceCollection;
 use crate::keypoints::Cartesian3d;
 use crate::pose_file;
 
@@ -343,7 +343,11 @@ impl From<Limb> for pose_file::Limb {
 impl Skeleton3d {
     /// Creates a skeleton with all limbs set to perfectly match the pose.
     /// Angles which are not defined in the pose are set to 0.
-    pub(crate) fn from_with_db(pose: &Pose, db: &TrackerDanceCollection, direction: Direction) -> Self {
+    pub(crate) fn from_with_db(
+        pose: &Pose,
+        db: &TrackerDanceCollection,
+        direction: Direction,
+    ) -> Self {
         let num_limbs = db.limbs().count();
         let mut limb_angles = vec![Angle3d::ZERO; num_limbs];
         let mut limbs_z = vec![0.0; num_limbs];
@@ -482,7 +486,7 @@ mod tests {
 
         let mut db = TrackerDanceCollection::default();
         let input_pose: pose_file::Pose = ron::from_str(&input).unwrap();
-        db.add_poses(vec![input_pose]).unwrap();
+        db.add_poses([input_pose].iter()).unwrap();
 
         assert_eq!(db.poses().len(), 1, "test expects only 1 pose");
         let pose = db.poses().first().unwrap();
@@ -523,7 +527,7 @@ mod tests {
 
         let mut db = TrackerDanceCollection::default();
         let input_pose: pose_file::Pose = ron::from_str(&input).unwrap();
-        db.add_poses(vec![input_pose]).unwrap();
+        db.add_poses([input_pose].iter()).unwrap();
         let input_pose: pose_file::Pose = ron::from_str(&input).unwrap();
 
         let mut poses = db

@@ -1,9 +1,9 @@
 use super::renderable::RenderableSkeleton;
 use crate::intern::body_shift::BodyShift;
-use crate::intern::tracker_dance_collection::TrackerDanceCollection;
 use crate::intern::pose::{BodyPart, BodyPoint};
 use crate::intern::skeleton_3d::Skeleton3d;
 use crate::intern::step::Step;
+use crate::intern::tracker_dance_collection::TrackerDanceCollection;
 use crate::skeleton::{Cartesian2d, Side, Skeleton};
 use crate::STATE;
 use wasm_bindgen::prelude::wasm_bindgen;
@@ -55,8 +55,9 @@ impl StepInfo {
             let step = state.step(&self.id).expect("missing step");
             let pose_index = step.poses[beat % step.poses.len()];
             let direction = step.directions[beat % step.poses.len()];
-            let pose = &state.db.poses()[pose_index];
-            Skeleton3d::from_with_db(pose, &state.db, direction).to_skeleton(rotation)
+            let pose = &state.global_db.tracker_view.poses()[pose_index];
+            Skeleton3d::from_with_db(pose, &state.global_db.tracker_view, direction)
+                .to_skeleton(rotation)
         })
     }
 

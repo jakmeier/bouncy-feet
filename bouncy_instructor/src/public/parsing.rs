@@ -181,7 +181,7 @@ mod tests {
     fn test_valid_pose_reference() {
         load_pose_str(POSE_STR).unwrap();
         load_step_str(STEP_STR, "test".to_owned()).unwrap();
-        let num_poses = STATE.with_borrow(|state| state.db.poses().len());
+        let num_poses = STATE.with_borrow(|state| state.global_db.tracker_view.poses().len());
         assert_eq!(num_poses, 2);
     }
 

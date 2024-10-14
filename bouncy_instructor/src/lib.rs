@@ -7,50 +7,50 @@ mod test_utils;
 
 pub use public::*;
 
-use intern::tracker_dance_collection::TrackerDanceCollection;
-use intern::step::Step;
+use intern::global_collection::GlobalCollection;
+use intern::step::{Step, StepSource};
 use public::parsing::ParseFileError;
 use std::cell::RefCell;
-use std::rc::Rc;
 
 /// Singleton internal state, shared between `Tracker` instances that run in the
 /// same JS worker thread.
 struct State {
-    /// The global collection of poses/steps/dances. Trackers will keep a
-    /// reference on this or on subsets of it. When this global instance is
-    /// mutated, clone-on-write is used using `Rc::make_mut`.
-    db: Rc<TrackerDanceCollection>,
+    /// The global collection of poses/steps/dances/courses.
+    global_db: GlobalCollection,
 }
 thread_local! {
     static STATE: RefCell<State> =
         State {
-            db: Default::default(),
+            global_db: Default::default(),
         }.into();
 }
 
 impl State {
-    fn reset(&mut self, lang: String) {
-        let db = TrackerDanceCollection::new(lang);
-        self.db = Rc::new(db);
+    fn reset_language(&mut self, lang: String) {
+        self.global_db.set_language(lang);
     }
 
     fn add_poses(
         &mut self,
         poses: Vec<pose_file::Pose>,
     ) -> Result<(), intern::tracker_dance_collection::AddPoseError> {
-        Rc::make_mut(&mut self.db).add_poses(poses)
+        self.global_db.add_poses(poses)
     }
 
-    fn add_steps(&mut self, steps: &[step_file::Step], source: String) -> Result<(), AddStepError> {
-        Rc::make_mut(&mut self.db).add_steps(steps, source)
+    fn add_steps(
+        &mut self,
+        steps: Vec<step_file::Step>,
+        source: String,
+    ) -> Result<(), AddStepError> {
+        self.global_db.add_steps(steps, StepSource::new(source))
     }
 
     fn add_dances(&mut self, dances: Vec<dance_file::Dance>) -> Result<(), AddDanceError> {
-        Rc::make_mut(&mut self.db).add_dances(dances)
+        self.global_db.add_dances(dances)
     }
 
     fn step(&self, id: &str) -> Option<&Step> {
-        self.db.step(id)
+        self.global_db.tracker_view.step(id)
     }
 }
 

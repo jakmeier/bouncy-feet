@@ -9,9 +9,9 @@ pub use step_output::DetectedStep;
 
 use super::renderable::RenderableSkeleton;
 use super::wrapper::skeleton_wrapper::SkeletonWrapper;
-use crate::intern::tracker_dance_collection::{TrackerDanceCollection, ForeignCollectionError};
 use crate::intern::dance_detector::{DanceDetector, DetectionState};
 use crate::intern::skeleton_3d::{Direction, Skeleton3d};
+use crate::intern::tracker_dance_collection::{ForeignCollectionError, TrackerDanceCollection};
 use crate::keypoints::{Cartesian3d, Keypoints};
 use crate::skeleton::{Cartesian2d, Skeleton};
 use crate::{AudioEffect, StepInfo};
@@ -71,7 +71,7 @@ impl Tracker {
     /// Create a tracker for all known steps.
     #[wasm_bindgen(constructor)]
     pub fn new_from_global_collection() -> Self {
-        let db = crate::STATE.with_borrow(|state| Rc::clone(&state.db));
+        let db = crate::STATE.with_borrow(|state| Rc::clone(&state.global_db.tracker_view));
         Tracker::new(db, None, None)
     }
 
@@ -80,12 +80,12 @@ impl Tracker {
     pub fn new_step_tracker(step_name: String) -> Result<Tracker, ForeignCollectionError> {
         let mut db = TrackerDanceCollection::default();
         crate::STATE.with_borrow(|state| {
-            for step in state.db.steps_by_name(&step_name) {
-                db.add_foreign_step(&state.db, &step.id)?;
+            for step in state.global_db.tracker_view.steps_by_name(&step_name) {
+                db.add_foreign_step(&state.global_db.tracker_view, &step.id)?;
             }
             // also add idle steps, those should always be included in a tracker
-            for step in state.db.idle_steps() {
-                db.add_foreign_step(&state.db, &step.id)?;
+            for step in state.global_db.tracker_view.idle_steps() {
+                db.add_foreign_step(&state.global_db.tracker_view, &step.id)?;
             }
             Ok(())
         })?;
@@ -100,9 +100,9 @@ impl Tracker {
     pub fn new_unique_step_tracker(step_id: String) -> Result<Tracker, ForeignCollectionError> {
         let mut db = TrackerDanceCollection::default();
         crate::STATE.with_borrow(|state| {
-            db.add_foreign_pose_by_id(&state.db, "standing-straight-side");
-            db.add_foreign_pose_by_id(&state.db, "standing-straight-front");
-            db.add_foreign_step(&state.db, &step_id)?;
+            db.add_foreign_pose_by_id(&state.global_db.tracker_view, "standing-straight-side");
+            db.add_foreign_pose_by_id(&state.global_db.tracker_view, "standing-straight-front");
+            db.add_foreign_step(&state.global_db.tracker_view, &step_id)?;
             Ok(())
         })?;
         let step = db.step(&step_id).cloned().expect("just added the step");
@@ -343,9 +343,7 @@ impl Tracker {
     #[wasm_bindgen(js_name = skeletonWrapperAt)]
     pub fn skeleton_wrapper_at(&self, timestamp: Timestamp) -> Option<SkeletonWrapper> {
         let i = self.timestamps.partition_point(|t| *t < timestamp);
-        self.keypoints
-            .get(i)
-            .map(|kp| SkeletonWrapper::new(*kp, self.db.clone()))
+        self.keypoints.get(i).map(|kp| SkeletonWrapper::new(*kp))
     }
 
     /// The original keypoints rendered as skeleton, at the given time frame.

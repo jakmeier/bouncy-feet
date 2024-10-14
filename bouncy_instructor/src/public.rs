@@ -40,7 +40,7 @@ pub fn init(random_seed: u32, lang: String) -> Result<(), JsValue> {
         return Err("random seed must not be 0".into());
     }
     lfsr::init(random_seed);
-    STATE.with(|state| state.borrow_mut().reset(lang));
+    STATE.with(|state| state.borrow_mut().reset_language(lang));
     Ok(())
 }
 
@@ -93,11 +93,12 @@ pub fn parse_course_string(data: &str, lang: &str) -> Result<Course, JsValue> {
 pub fn steps() -> Vec<StepInfo> {
     STATE.with_borrow(|state| {
         state
-            .db
+            .global_db
+            .tracker_view
             .steps()
             .iter()
             .cloned()
-            .map(|step| StepInfo::from_step(step, &state.db))
+            .map(|step| StepInfo::from_step(step, &state.global_db.tracker_view))
             .collect::<Vec<_>>()
     })
 }
@@ -106,12 +107,13 @@ pub fn steps() -> Vec<StepInfo> {
 pub fn steps_by_source(source: &str) -> Vec<StepInfo> {
     STATE.with_borrow(|state| {
         state
-            .db
+            .global_db
+            .tracker_view
             .steps()
             .iter()
             .filter(|step| &*step.source == source)
             .cloned()
-            .map(|step| StepInfo::from_step(step, &state.db))
+            .map(|step| StepInfo::from_step(step, &state.global_db.tracker_view))
             .collect::<Vec<_>>()
     })
 }
@@ -119,12 +121,12 @@ pub fn steps_by_source(source: &str) -> Vec<StepInfo> {
 #[wasm_bindgen(js_name = "stepById")]
 pub fn step_by_id(id: String, flipped: bool) -> Option<StepInfo> {
     STATE.with_borrow(|state| {
-        let mut step = state.db.step(&id).cloned()?;
+        let mut step = state.global_db.tracker_view.step(&id).cloned()?;
 
         if flipped {
             step = step.flipped();
         }
-        Some(StepInfo::from_step(step, &state.db))
+        Some(StepInfo::from_step(step, &state.global_db.tracker_view))
     })
 }
 
@@ -132,10 +134,11 @@ pub fn step_by_id(id: String, flipped: bool) -> Option<StepInfo> {
 pub fn steps_by_name(step_name: String) -> Vec<StepInfo> {
     STATE.with_borrow(|state| {
         state
-            .db
+            .global_db
+            .tracker_view
             .steps_by_name(&step_name)
             .cloned()
-            .map(|step| StepInfo::from_step(step, &state.db))
+            .map(|step| StepInfo::from_step(step, &state.global_db.tracker_view))
             .collect()
     })
 }
@@ -144,7 +147,8 @@ pub fn steps_by_name(step_name: String) -> Vec<StepInfo> {
 pub fn dances() -> Vec<DanceInfo> {
     STATE.with_borrow(|state| {
         state
-            .db
+            .global_db
+            .tracker_view
             .dances()
             .iter()
             .map(DanceInfo::from)
@@ -156,7 +160,8 @@ pub fn dances() -> Vec<DanceInfo> {
 pub fn dance_builder_from_dance(dance_id: String) -> Result<DanceBuilder, String> {
     STATE.with_borrow(|state| {
         state
-            .db
+            .global_db
+            .tracker_view
             .dances()
             .iter()
             .find(|dance| dance.id == dance_id)
@@ -175,7 +180,7 @@ pub fn load_pose_str(text: &str) -> Result<(), ParseFileError> {
 
 pub fn load_step_str(text: &str, source: String) -> Result<(), ParseFileError> {
     let parsed = StepFile::from_str(text)?;
-    STATE.with(|state| state.borrow_mut().add_steps(&parsed.steps, source))?;
+    STATE.with(|state| state.borrow_mut().add_steps(parsed.steps, source))?;
     Ok(())
 }
 

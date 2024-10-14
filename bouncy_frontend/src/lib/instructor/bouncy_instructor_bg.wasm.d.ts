@@ -284,6 +284,7 @@ export function __wbg_skeletonsidev2_free(a: number, b: number): void;
 export function __wbg_skeletonv2_free(a: number, b: number): void;
 export function __wbg_skeletonwrapper_free(a: number, b: number): void;
 export function __wbg_stepinfo_free(a: number, b: number): void;
+export function __wbg_stepwrapper_free(a: number, b: number): void;
 export function __wbg_tracker_free(a: number, b: number): void;
 export function __wbg_zerror_free(a: number, b: number): void;
 export function __wbg_zwrongordererror_free(a: number, b: number): void;

@@ -15,14 +15,14 @@ pub(crate) struct DanceFile {
 }
 
 /// Description of a dance.
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub(crate) struct Dance {
     pub id: String,
     pub steps: Vec<DanceStep>,
 }
 
 /// Description of step inside a dance.
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub(crate) struct DanceStep {
     pub id: String,
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]

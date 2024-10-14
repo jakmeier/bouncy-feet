@@ -1,7 +1,7 @@
 use super::Timestamp;
-use crate::intern::tracker_dance_collection::LimbIndex;
 use crate::intern::pose::{BodyPoint, Limb};
 use crate::intern::pose_score::ErrorDetails;
+use crate::intern::tracker_dance_collection::LimbIndex;
 use crate::renderable::{RenderableSegment, RenderableSkeleton};
 use crate::STATE;
 use wasm_bindgen::prelude::wasm_bindgen;
@@ -112,8 +112,12 @@ impl PoseApproximation {
             .map(|i| {
                 let limb_index = self.error_details.limbs[i];
                 STATE.with_borrow(|state| LimbError {
-                    name: state.db.limb_name(limb_index).to_owned(),
-                    limb: *state.db.limb(limb_index),
+                    name: state
+                        .global_db
+                        .tracker_view
+                        .limb_name(limb_index)
+                        .to_owned(),
+                    limb: *state.global_db.tracker_view.limb(limb_index),
                     limb_index,
                     error: self.error_details.errors[i],
                     weight: self.error_details.weights[i],

@@ -83,9 +83,9 @@ impl TrackerDanceCollection {
         }
     }
 
-    pub(crate) fn add_poses(
+    pub(crate) fn add_poses<'a>(
         &mut self,
-        poses: Vec<crate::pose_file::Pose>,
+        poses: impl Iterator<Item = &'a crate::pose_file::Pose>,
     ) -> Result<(), AddPoseError> {
         for pose in poses {
             let new_pose = if !pose.mirror_of.is_empty() {
@@ -97,20 +97,21 @@ impl TrackerDanceCollection {
             } else {
                 self.new_pose(
                     pose.direction,
-                    pose.limbs,
+                    pose.limbs.clone(),
                     Cartesian2d::new(-pose.x_shift, -pose.y_shift),
                     SignedAngle::degree(pose.turn_shoulder as f32),
                     SignedAngle::degree(pose.turn_hip as f32),
-                    pose.z,
+                    pose.z.clone(),
                 )
             };
             self.poses.push(new_pose);
             self.pose_names.push(
                 pose.names
-                    .and_then(|translations| translations.take(&self.lang))
+                    .as_ref()
+                    .and_then(|translations| translations.get(&self.lang))
                     .unwrap_or_else(|| pose.id.clone()),
             );
-            self.pose_ids.push(pose.id);
+            self.pose_ids.push(pose.id.clone());
         }
         Ok(())
     }
@@ -306,12 +307,11 @@ impl TrackerDanceCollection {
         pose
     }
 
-    pub(crate) fn add_steps(
+    pub(crate) fn add_steps<'a>(
         &mut self,
-        steps: &[step_file::Step],
-        source: String,
+        steps: impl IntoIterator<Item = &'a step_file::Step>,
+        source: StepSource,
     ) -> Result<(), AddStepError> {
-        let source = StepSource::new(source);
         for def in steps {
             let poses = def
                 .keyframes
@@ -393,15 +393,15 @@ impl TrackerDanceCollection {
         Ok(())
     }
 
-    pub(crate) fn add_dances(
+    pub(crate) fn add_dances<'a>(
         &mut self,
-        dances: Vec<dance_file::Dance>,
+        dances: impl Iterator<Item = &'a dance_file::Dance>,
     ) -> Result<(), AddDanceError> {
         for def in dances {
             if let Some(missing) = def.steps.iter().find(|step| self.step(&step.id).is_none()) {
                 return Err(AddDanceError::MissingStep(missing.id.clone()));
             }
-            self.dances.push(def.into());
+            self.dances.push(def.clone().into());
         }
         Ok(())
     }

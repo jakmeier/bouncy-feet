@@ -1,3 +1,4 @@
+use crate::intern::step::StepSource;
 use crate::intern::tracker_dance_collection::TrackerDanceCollection;
 use crate::public::Course;
 use serde::{Deserialize, Serialize};
@@ -64,8 +65,8 @@ impl CourseFile {
     pub(crate) fn into_course(self, lang: &str) -> Result<Course, ParseFileError> {
         // The course object uses its own collection of poses and steps.
         let mut collection = TrackerDanceCollection::default();
-        collection.add_poses(self.poses)?;
-        collection.add_steps(&self.steps, "course".to_owned())?;
+        collection.add_poses(self.poses.iter())?;
+        collection.add_steps(self.steps.iter(), StepSource::new("course".to_owned()))?;
 
         let name = self
             .names
