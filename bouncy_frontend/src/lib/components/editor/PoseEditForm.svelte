@@ -15,12 +15,20 @@
   let skeleton;
   /** @type {WeightedPoseLimb[]} */
   let weightedLimbs = [];
+  let poseName = '';
 
   /** @param {PoseWrapper} newPose */
   export function loadPose(newPose) {
     // using an indirect setting, rather than a property, to better control when
     // the updates happen
     pose = newPose;
+    // TODO: support translated editing
+    let maybeName = pose.name('en');
+    if (maybeName) {
+      poseName = maybeName;
+    } else {
+      poseName = pose.id();
+    }
     onPoseUpdated(pose);
   }
 
@@ -57,6 +65,13 @@
     }
   }
 
+  function updateName() {
+    if (pose) {
+      // TODO: support translated editing
+      pose.setName(poseName, 'en');
+    }
+  }
+
   function allSkeletonFields() {
     // using reduce as a map + filter to avoid the extra array
     return Object.keys(SkeletonField).reduce(
@@ -76,6 +91,16 @@
 </script>
 
 <div class="container">
+  <div class="name">
+    <input
+      name="pose-name"
+      class="name-input"
+      bind:value={poseName}
+      on:input={() => updateName()}
+      placeholder="Name"
+    />
+  </div>
+
   <div class="avatar">
     <Svg width={300} height={300} orderByZ>
       {#if skeleton}
@@ -99,8 +124,9 @@
           type="number"
           class="weight-input"
           bind:value={limb.weight}
-          on:input={() => updateAvatar(index)}
+          on:change={() => updateAvatar(index)}
           placeholder="Weight"
+          min="0.0"
         />
       </div>
     {/each}
@@ -110,7 +136,22 @@
 <style>
   .container {
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-areas:
+      'avatar weights'
+      'name weights';
+  }
+  .name {
+    grid-area: name;
+  }
+  .avatar {
+    grid-area: avatar;
+    border: solid 1px var(--theme-neutral-gray);
+    border-radius: 100px;
+  }
+  .weights {
+    grid-area: weights;
+    display: flex;
+    flex-direction: column;
   }
   .body-part {
     display: flex;
@@ -122,5 +163,12 @@
   .weight-input {
     width: 100%;
     text-align: center;
+    font-size: 20px;
+  }
+  .name-input {
+    border: none;
+    width: 100%;
+    text-align: center;
+    font-size: 32px;
   }
 </style>

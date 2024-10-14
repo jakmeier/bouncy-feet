@@ -142,4 +142,22 @@ impl TranslatedString {
         #[allow(clippy::let_and_return)]
         result
     }
+
+    pub fn get(&self, lang: &str) -> Option<String> {
+        let key = if lang.len() > 2 { &lang[0..2] } else { lang };
+        let result = self
+            .inner
+            .get(key)
+            .or_else(|| self.inner.get("en"))
+            .or_else(|| self.inner.values().next());
+        #[cfg(target_arch = "wasm32")]
+        result.as_ref().inspect(|s| {
+            wasm_bindgen::intern(s);
+        });
+        result.cloned()
+    }
+
+    pub fn set(&mut self, lang: String, name: String) {
+        self.inner.insert(lang, name);
+    }
 }

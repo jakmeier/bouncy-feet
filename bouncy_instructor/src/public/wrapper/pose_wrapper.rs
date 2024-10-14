@@ -135,6 +135,28 @@ impl PoseWrapper {
         self.skeleton_cache.unwrap()
     }
 
+    pub fn id(&self) -> String {
+        self.pose_definition.id.clone()
+    }
+
+    pub fn name(&self, lang: String) -> Option<String> {
+        if let Some(translated) = &self.pose_definition.names {
+            translated.get(&lang)
+        } else {
+            None
+        }
+    }
+
+    #[wasm_bindgen(js_name = "setName")]
+    pub fn set_name(&mut self, name: String, lang: String) {
+        let translated = self
+            .pose_definition
+            .names
+            .get_or_insert_with(Default::default);
+
+        translated.set(lang, name)
+    }
+
     #[wasm_bindgen(js_name = "setAngle")]
     pub fn set_angle(&mut self, field: SkeletonField, degree: i16) {
         let limb: pose_file::Limb = field.into();
