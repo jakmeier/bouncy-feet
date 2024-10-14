@@ -2,7 +2,7 @@ use std::borrow::Borrow;
 use std::rc::Rc;
 
 use super::skeleton_wrapper::SkeletonWrapper;
-use crate::intern::dance_collection::DanceCollection;
+use crate::intern::tracker_dance_collection::TrackerDanceCollection;
 use crate::intern::geom::SignedAngle;
 use crate::intern::pose::{Limb, LimbPosition, Pose};
 use crate::pose_file;
@@ -24,7 +24,7 @@ pub struct PoseWrapper {
     // display_name_cache: Option<String>,
 
     // TODO: The full DB here is a bit awkward
-    pub(crate) db: Rc<DanceCollection>,
+    pub(crate) db: Rc<TrackerDanceCollection>,
 }
 
 impl PoseWrapper {
@@ -53,7 +53,7 @@ impl PoseWrapper {
             .iter()
             .map(|def| {
                 let limb = Limb::from(def.limb.clone());
-                let db: &DanceCollection = self.db.borrow();
+                let db: &TrackerDanceCollection = self.db.borrow();
                 let index = db
                     .limbs()
                     .find(|(_index, l)| **l == limb)

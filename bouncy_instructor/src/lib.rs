@@ -7,7 +7,7 @@ mod test_utils;
 
 pub use public::*;
 
-use intern::dance_collection::DanceCollection;
+use intern::tracker_dance_collection::TrackerDanceCollection;
 use intern::step::Step;
 use public::parsing::ParseFileError;
 use std::cell::RefCell;
@@ -19,7 +19,7 @@ struct State {
     /// The global collection of poses/steps/dances. Trackers will keep a
     /// reference on this or on subsets of it. When this global instance is
     /// mutated, clone-on-write is used using `Rc::make_mut`.
-    db: Rc<DanceCollection>,
+    db: Rc<TrackerDanceCollection>,
 }
 thread_local! {
     static STATE: RefCell<State> =
@@ -30,14 +30,14 @@ thread_local! {
 
 impl State {
     fn reset(&mut self, lang: String) {
-        let db = DanceCollection::new(lang);
+        let db = TrackerDanceCollection::new(lang);
         self.db = Rc::new(db);
     }
 
     fn add_poses(
         &mut self,
         poses: Vec<pose_file::Pose>,
-    ) -> Result<(), intern::dance_collection::AddPoseError> {
+    ) -> Result<(), intern::tracker_dance_collection::AddPoseError> {
         Rc::make_mut(&mut self.db).add_poses(poses)
     }
 

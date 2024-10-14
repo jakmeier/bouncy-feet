@@ -1,6 +1,6 @@
 use crate::skeleton::{Cartesian2d, Skeleton};
 
-use super::dance_collection::DanceCollection;
+use super::tracker_dance_collection::TrackerDanceCollection;
 use super::step::Step;
 
 /// Component for calculating how much the body shifts after N transitions.
@@ -20,7 +20,7 @@ impl BodyShift {
         }
     }
 
-    pub(crate) fn add_step(&mut self, step: &Step, skeletons: &[Skeleton], db: &DanceCollection) {
+    pub(crate) fn add_step(&mut self, step: &Step, skeletons: &[Skeleton], db: &TrackerDanceCollection) {
         for &pose in &step.poses {
             self.pose_body_shift.push(db.poses()[pose].shift);
         }

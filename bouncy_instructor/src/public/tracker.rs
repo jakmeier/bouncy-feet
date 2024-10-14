@@ -9,7 +9,7 @@ pub use step_output::DetectedStep;
 
 use super::renderable::RenderableSkeleton;
 use super::wrapper::skeleton_wrapper::SkeletonWrapper;
-use crate::intern::dance_collection::{DanceCollection, ForeignCollectionError};
+use crate::intern::tracker_dance_collection::{TrackerDanceCollection, ForeignCollectionError};
 use crate::intern::dance_detector::{DanceDetector, DetectionState};
 use crate::intern::skeleton_3d::{Direction, Skeleton3d};
 use crate::keypoints::{Cartesian3d, Keypoints};
@@ -23,7 +23,7 @@ type Timestamp = f64;
 /// A Tracker gathers skeletons over time and passes it on to a DanceDetector.
 #[wasm_bindgen]
 pub struct Tracker {
-    pub(crate) db: Rc<DanceCollection>,
+    pub(crate) db: Rc<TrackerDanceCollection>,
 
     /// invariant: ordered by timestamp
     pub(crate) timestamps: Vec<Timestamp>,
@@ -42,7 +42,7 @@ pub struct Skeletons {
 }
 impl Default for Tracker {
     fn default() -> Self {
-        let db = DanceCollection::default();
+        let db = TrackerDanceCollection::default();
         Tracker {
             db: Rc::new(db),
             // order by timestamp satisfied for empty list
@@ -57,7 +57,7 @@ impl Default for Tracker {
 #[wasm_bindgen]
 impl Tracker {
     pub(crate) fn new(
-        db: impl Into<Rc<DanceCollection>>,
+        db: impl Into<Rc<TrackerDanceCollection>>,
         target_step: Option<StepInfo>,
         tracked_beats: Option<u32>,
     ) -> Self {
@@ -78,7 +78,7 @@ impl Tracker {
     /// Track one specific step, by name, including its variations (with the same name).
     #[wasm_bindgen(js_name = "StepTracker")]
     pub fn new_step_tracker(step_name: String) -> Result<Tracker, ForeignCollectionError> {
-        let mut db = DanceCollection::default();
+        let mut db = TrackerDanceCollection::default();
         crate::STATE.with_borrow(|state| {
             for step in state.db.steps_by_name(&step_name) {
                 db.add_foreign_step(&state.db, &step.id)?;
@@ -98,7 +98,7 @@ impl Tracker {
     /// specific training session without much regard for timing etc.
     #[wasm_bindgen(js_name = "UniqueStepTracker")]
     pub fn new_unique_step_tracker(step_id: String) -> Result<Tracker, ForeignCollectionError> {
-        let mut db = DanceCollection::default();
+        let mut db = TrackerDanceCollection::default();
         crate::STATE.with_borrow(|state| {
             db.add_foreign_pose_by_id(&state.db, "standing-straight-side");
             db.add_foreign_pose_by_id(&state.db, "standing-straight-front");

@@ -1,7 +1,7 @@
 use std::cell::{Ref, RefCell};
 use std::rc::Rc;
 
-use crate::intern::dance_collection::DanceCollection;
+use crate::intern::tracker_dance_collection::TrackerDanceCollection;
 use crate::intern::skeleton_3d::Skeleton3d;
 use crate::skeleton::Skeleton;
 use crate::Keypoints;
@@ -17,7 +17,7 @@ pub struct SkeletonWrapper {
     keypoints: Keypoints,
 
     // TODO: The full DB here is a bit awkward
-    pub(crate) db: Rc<DanceCollection>,
+    pub(crate) db: Rc<TrackerDanceCollection>,
 
     // cached values
     skeleton: Rc<RefCell<Option<Skeleton3d>>>,
@@ -40,7 +40,7 @@ impl SkeletonWrapper {
 }
 
 impl SkeletonWrapper {
-    pub(crate) fn new(keypoints: Keypoints, db: Rc<DanceCollection>) -> Self {
+    pub(crate) fn new(keypoints: Keypoints, db: Rc<TrackerDanceCollection>) -> Self {
         Self {
             keypoints,
             db,

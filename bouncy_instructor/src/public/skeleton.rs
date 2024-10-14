@@ -1,4 +1,4 @@
-use crate::intern::dance_collection::DanceCollection;
+use crate::intern::tracker_dance_collection::TrackerDanceCollection;
 use crate::intern::geom::Angle3d;
 use crate::intern::pose::Pose;
 use crate::intern::skeleton_3d::{Direction, Skeleton3d};
@@ -133,7 +133,7 @@ impl Skeleton {
 }
 
 impl Skeleton {
-    pub(crate) fn from_pose(pose: &Pose, db: &DanceCollection, direction: Direction) -> Self {
+    pub(crate) fn from_pose(pose: &Pose, db: &TrackerDanceCollection, direction: Direction) -> Self {
         let rotation = 0.0;
         Skeleton3d::from_with_db(pose, db, direction).to_skeleton(rotation)
     }

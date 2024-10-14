@@ -1,4 +1,4 @@
-use super::dance_collection::{DanceCollection, LimbIndex};
+use super::tracker_dance_collection::{TrackerDanceCollection, LimbIndex};
 use super::geom::{Angle3d, SignedAngle};
 use super::pose::{BodyPoint, Limb};
 use crate::keypoints::Cartesian3d;
@@ -85,7 +85,7 @@ impl Skeleton3d {
         }
     }
 
-    pub(crate) fn from_keypoints(kp: &Keypoints, db: &DanceCollection) -> Self {
+    pub(crate) fn from_keypoints(kp: &Keypoints, db: &TrackerDanceCollection) -> Self {
         let limb_angles_3d = db
             .limbs()
             .map(|(_index, limb)| limb.to_angle(kp))

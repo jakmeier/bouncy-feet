@@ -1,4 +1,4 @@
-use crate::intern::dance_collection::DanceCollection;
+use crate::intern::tracker_dance_collection::TrackerDanceCollection;
 use crate::intern::pose_score::{best_fit_pose, ErrorDetails};
 use crate::public::Tracker;
 use crate::tracker::PoseApproximation;
@@ -44,7 +44,7 @@ impl Tracker {
         pose_index: usize,
         start: Timestamp,
         end: Timestamp,
-        db: &DanceCollection,
+        db: &TrackerDanceCollection,
     ) -> Option<PoseApproximation> {
         let first = self.timestamps.partition_point(|t| *t < start);
         let last = self.timestamps.partition_point(|t| *t <= end);

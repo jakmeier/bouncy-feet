@@ -1,4 +1,4 @@
-use crate::intern::dance_collection::DanceCollection;
+use crate::intern::tracker_dance_collection::TrackerDanceCollection;
 use crate::public::tracker::{DetectionResult, PoseApproximation};
 use crate::tracker::DetectedStep;
 use crate::{StepInfo, Tracker};
@@ -128,7 +128,7 @@ impl Tracker {
         start: usize,
         min_dt: f64,
         max_dt: f64,
-        db: &DanceCollection,
+        db: &TrackerDanceCollection,
     ) -> Option<DetectedStep> {
         let mut best_error = f32::INFINITY;
         let mut result = None;

@@ -1,4 +1,4 @@
-use crate::intern::dance_collection::DanceCollection;
+use crate::intern::tracker_dance_collection::TrackerDanceCollection;
 use crate::public::Course;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -63,7 +63,7 @@ impl CourseFile {
 
     pub(crate) fn into_course(self, lang: &str) -> Result<Course, ParseFileError> {
         // The course object uses its own collection of poses and steps.
-        let mut collection = DanceCollection::default();
+        let mut collection = TrackerDanceCollection::default();
         collection.add_poses(self.poses)?;
         collection.add_steps(&self.steps, "course".to_owned())?;
 

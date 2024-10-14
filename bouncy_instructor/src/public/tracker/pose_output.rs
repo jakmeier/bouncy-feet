@@ -1,5 +1,5 @@
 use super::Timestamp;
-use crate::intern::dance_collection::LimbIndex;
+use crate::intern::tracker_dance_collection::LimbIndex;
 use crate::intern::pose::{BodyPoint, Limb};
 use crate::intern::pose_score::ErrorDetails;
 use crate::renderable::{RenderableSegment, RenderableSkeleton};

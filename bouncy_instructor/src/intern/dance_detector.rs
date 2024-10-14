@@ -5,7 +5,7 @@ use crate::tracker::PoseApproximation;
 use crate::ui_event::UiEvents;
 use crate::{DetectionFailureReason, DetectionResult, PoseHint, StepInfo};
 
-use super::dance_collection::DanceCollection;
+use super::tracker_dance_collection::TrackerDanceCollection;
 use super::pose::PoseDirection;
 use super::skeleton_3d::Skeleton3d;
 
@@ -122,7 +122,7 @@ impl DanceDetector {
     pub(crate) fn tick(
         &mut self,
         now: Timestamp,
-        db: &DanceCollection,
+        db: &TrackerDanceCollection,
         skeletons: &[Skeleton3d],
     ) -> DetectionResult {
         match self.detection_state {
@@ -190,7 +190,7 @@ impl DanceDetector {
     /// Take a previous detection and try adding one more pose to it.
     pub fn detect_next_pose(
         &mut self,
-        db: &DanceCollection,
+        db: &TrackerDanceCollection,
         skeleton: &Skeleton3d,
         pose_timestamp: Timestamp,
     ) -> DetectionResult {

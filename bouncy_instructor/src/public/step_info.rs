@@ -1,6 +1,6 @@
 use super::renderable::RenderableSkeleton;
 use crate::intern::body_shift::BodyShift;
-use crate::intern::dance_collection::DanceCollection;
+use crate::intern::tracker_dance_collection::TrackerDanceCollection;
 use crate::intern::pose::{BodyPart, BodyPoint};
 use crate::intern::skeleton_3d::Skeleton3d;
 use crate::intern::step::Step;
@@ -94,7 +94,7 @@ impl StepInfo {
 }
 
 impl StepInfo {
-    pub(crate) fn from_step(step: Step, db: &DanceCollection) -> Self {
+    pub(crate) fn from_step(step: Step, db: &TrackerDanceCollection) -> Self {
         let mut skeletons = vec![];
         let mut body_shift = BodyShift::new();
 

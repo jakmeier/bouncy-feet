@@ -7,7 +7,7 @@
 mod approximation;
 mod conversion;
 
-use super::dance_collection::{DanceCollection, LimbIndex};
+use super::tracker_dance_collection::{TrackerDanceCollection, LimbIndex};
 use super::geom::SignedAngle;
 use super::pose_score::AngleTarget;
 use super::skeleton_3d::Direction;
@@ -123,7 +123,7 @@ impl BodyPoint {
 
     pub(crate) fn attached_limbs<'a>(
         &'a self,
-        db: &'a DanceCollection,
+        db: &'a TrackerDanceCollection,
     ) -> impl Iterator<Item = (LimbIndex, &'a Limb)> {
         db.limbs()
             .filter(|(_index, limb)| limb.start == *self || limb.end == *self)

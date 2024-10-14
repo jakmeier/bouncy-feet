@@ -27,7 +27,7 @@ use crate::{dance_file, pose_file, AddDanceError, AddStepError};
 /// data they are stored in the most convenient way, which will see many
 /// refactorings over time.
 #[derive(Clone, Debug)]
-pub(crate) struct DanceCollection {
+pub(crate) struct TrackerDanceCollection {
     /// Pose definitions
     poses: Vec<Pose>,
     /// Pose ids, shares the index with `.poses`
@@ -60,7 +60,7 @@ pub(crate) enum AddPoseError {
     MissingMirror(String),
 }
 
-impl Default for DanceCollection {
+impl Default for TrackerDanceCollection {
     fn default() -> Self {
         Self {
             poses: vec![],
@@ -75,7 +75,7 @@ impl Default for DanceCollection {
     }
 }
 
-impl DanceCollection {
+impl TrackerDanceCollection {
     pub(crate) fn new(lang: String) -> Self {
         Self {
             lang,

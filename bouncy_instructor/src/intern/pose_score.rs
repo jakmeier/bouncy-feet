@@ -1,6 +1,6 @@
 //! Computing the error score between a pose and a skeleton.
 
-use super::dance_collection::LimbIndex;
+use super::tracker_dance_collection::LimbIndex;
 use super::geom::SignedAngle;
 use super::pose::{BodyPartOrdering, BodyPoint, Pose};
 use super::skeleton_3d::Skeleton3d;

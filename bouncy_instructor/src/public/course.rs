@@ -1,6 +1,6 @@
 use super::parsing::ParseFileError;
 use super::{parsing, StepInfo};
-use crate::intern::dance_collection::DanceCollection;
+use crate::intern::tracker_dance_collection::TrackerDanceCollection;
 use crate::Tracker;
 use std::rc::Rc;
 use wasm_bindgen::prelude::wasm_bindgen;
@@ -12,7 +12,7 @@ pub struct Course {
     pub(crate) explanation: Option<String>,
     pub(crate) featured_step_id: String,
     pub(crate) lessons: Vec<Lesson>,
-    pub(crate) collection: DanceCollection,
+    pub(crate) collection: TrackerDanceCollection,
 }
 
 #[derive(Debug, Clone)]
@@ -102,7 +102,7 @@ impl Lesson {
 }
 
 impl Lesson {
-    pub(crate) fn tracker(&self, db: impl Into<Rc<DanceCollection>>) -> crate::Tracker {
+    pub(crate) fn tracker(&self, db: impl Into<Rc<TrackerDanceCollection>>) -> crate::Tracker {
         let first_step = self
             .parts
             .first()
@@ -178,7 +178,7 @@ impl LessonPart {
         step_name: String,
         explanation: Option<String>,
         bpms: Vec<u16>,
-        state: &DanceCollection,
+        state: &TrackerDanceCollection,
     ) -> Result<Self, CourseError> {
         let step = state
             .step(&step_name)
