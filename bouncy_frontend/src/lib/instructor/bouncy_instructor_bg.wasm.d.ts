@@ -78,6 +78,7 @@ export function posefilewrapper_addPose(a: number, b: number, c: number): void;
 export function posefilewrapper_buildRon(a: number, b: number): void;
 export function posefilewrapper_fromRon(a: number, b: number, c: number): void;
 export function posefilewrapper_new_empty(): number;
+export function posefilewrapper_overwritePose(a: number, b: number, c: number): void;
 export function posefilewrapper_poses(a: number, b: number): void;
 export function posefilewrapper_removePose(a: number, b: number, c: number, d: number): void;
 export function poses(a: number): void;

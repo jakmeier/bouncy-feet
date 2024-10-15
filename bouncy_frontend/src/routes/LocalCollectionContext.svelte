@@ -80,7 +80,11 @@
    * @param {PoseWrapper} pose
    */
   function addPose(pose) {
-    $poseBuilderStore.addPose(pose);
+    try {
+      $poseBuilderStore.overwritePose(pose);
+    } catch {
+      $poseBuilderStore.addPose(pose);
+    }
     // trigger update (can I do better?)
     $poseBuilderStore = $poseBuilderStore;
   }

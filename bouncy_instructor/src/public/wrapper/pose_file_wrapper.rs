@@ -48,9 +48,22 @@ impl PoseFileWrapper {
         Ok(())
     }
 
-    // #[wasm_bindgen(js_name = "overwritePose")]
-    // pub fn overwrite_pose(&mut self, pose: &PoseWrapper) -> Result<(), String> {
-    // }
+    #[wasm_bindgen(js_name = "overwritePose")]
+    pub fn overwrite_pose(&mut self, new_pose: &PoseWrapper) -> Result<(), String> {
+        let file = self.pose_file.as_ref().borrow();
+
+        if let Some(index) = file
+            .poses
+            .iter()
+            .position(|pose| pose.id == new_pose.definition().id)
+        {
+            drop(file);
+            self.set_pose(index, new_pose.clone());
+            Ok(())
+        } else {
+            Err("Pose ID does not exists".to_owned())
+        }
+    }
 
     #[wasm_bindgen(js_name = "removePose")]
     pub fn remove_pose(&mut self, id: String) -> Result<(), String> {
@@ -92,5 +105,10 @@ impl PoseFileWrapper {
     fn remove_pose_internal(&self, index: usize) {
         self.poses_cache.borrow_mut().remove(index);
         self.pose_file.borrow_mut().poses.remove(index);
+    }
+
+    fn set_pose(&self, index: usize, pose: PoseWrapper) {
+        self.pose_file.borrow_mut().poses[index] = pose.definition().clone();
+        self.poses_cache.borrow_mut()[index] = pose;
     }
 }
