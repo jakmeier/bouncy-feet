@@ -6,6 +6,7 @@
 //! architecture makes sense.
 
 pub(crate) mod dance_wrapper;
+pub(crate) mod pose_file_wrapper;
 pub(crate) mod pose_wrapper;
 pub(crate) mod skeleton_wrapper;
 pub(crate) mod step_wrapper;

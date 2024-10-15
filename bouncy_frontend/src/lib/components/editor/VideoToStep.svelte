@@ -10,8 +10,10 @@
   import PoseEditForm from '$lib/components/editor/PoseEditForm.svelte';
   import { fileToUrl, waitForVideoMetaLoaded } from '$lib/promise_util';
   import { PoseDetection } from '$lib/pose';
+  import Button from '../ui/Button.svelte';
 
   const poseCtx = getContext('pose');
+  const localCollectionCtx = getContext('localCollection');
   let tracker = new Tracker();
   registerTracker(tracker);
 
@@ -23,6 +25,8 @@
   let poseFromForm;
   /** @type {(skeleton: import("$lib/instructor/bouncy_instructor").PoseWrapper)=>void} */
   let loadPose;
+  /** @type {()=>import("$lib/instructor/bouncy_instructor").PoseWrapper} */
+  let getPose;
 
   /** @type {import("$lib/instructor/bouncy_instructor").SkeletonV2 | undefined} */
   let liveSkeleton;
@@ -99,6 +103,11 @@
       loadPose(pose);
     }
   }
+
+  function savePose() {
+    let pose = getPose();
+    localCollectionCtx.addPose(pose);
+  }
 </script>
 
 <p>
@@ -138,4 +147,11 @@
 
 <button class="light full-width short" on:click={copyPose}> ↓ </button>
 
-<PoseEditForm bind:loadPose></PoseEditForm>
+<PoseEditForm bind:loadPose bind:getPose></PoseEditForm>
+
+<Button
+  symbol="save"
+  symbolSize={29}
+  class="light full-width short"
+  on:click={savePose}
+></Button>

@@ -32,6 +32,11 @@
     onPoseUpdated(pose);
   }
 
+  /** @returns {PoseWrapper} newPose */
+  export function getPose() {
+    return pose;
+  }
+
   /** @param {PoseWrapper} newPose */
   function onPoseUpdated(newPose) {
     skeleton = newPose.skeleton();

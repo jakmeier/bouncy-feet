@@ -6,28 +6,44 @@
   import {
     DanceFileBuilder,
     DanceBuilder,
+    PoseFileWrapper,
+    PoseWrapper,
   } from '$lib/instructor/bouncy_instructor';
   import { setContext } from 'svelte';
   import { derived, writable } from 'svelte/store';
 
-  const ron = browser ? localStorage.dances : null;
-  const fileBuilder = ron
-    ? DanceFileBuilder.fromRon(ron)
+  const danceRon = browser ? localStorage.dances : null;
+  const danceFileBuilder = danceRon
+    ? DanceFileBuilder.fromRon(danceRon)
     : new DanceFileBuilder();
+  const danceBuilderStore = writable(danceFileBuilder);
 
-  const builderStore = writable(fileBuilder);
+  const poseRon = browser ? localStorage.poses : null;
+  const poseFileBuilder = poseRon
+    ? PoseFileWrapper.fromRon(poseRon)
+    : new PoseFileWrapper();
+  const poseBuilderStore = writable(poseFileBuilder);
+
   const ctx = {
-    builder: builderStore,
-    dances: derived(builderStore, ($b) => $b.dances()),
+    danceBuilder: danceBuilderStore,
+    dances: derived(danceBuilderStore, ($b) => $b.dances()),
+    poseBuilder: poseBuilderStore,
+    poses: derived(poseBuilderStore, ($b) => $b.poses()),
     addDanceBuilder,
     overwriteDanceBuilder,
     removeDance,
+    addPose,
+    removePose,
   };
 
   if (browser) {
-    ctx.builder.subscribe(
+    ctx.danceBuilder.subscribe(
       (/** @type {DanceFileBuilder} */ builder) =>
         (localStorage.dances = builder.buildRon())
+    );
+    ctx.poseBuilder.subscribe(
+      (/** @type {PoseFileWrapper} */ builder) =>
+        (localStorage.poses = builder.buildRon())
     );
   }
 
@@ -37,27 +53,45 @@
    * @param {DanceBuilder} danceBuilder
    */
   function addDanceBuilder(danceBuilder) {
-    $builderStore.addDance(danceBuilder);
+    $danceBuilderStore.addDance(danceBuilder);
     // trigger update (can I do better?)
-    $builderStore = $builderStore;
+    $danceBuilderStore = $danceBuilderStore;
   }
 
   /**
    * @param {DanceBuilder} danceBuilder
    */
   function overwriteDanceBuilder(danceBuilder) {
-    $builderStore.overwriteDance(danceBuilder);
+    $danceBuilderStore.overwriteDance(danceBuilder);
     // trigger update (can I do better?)
-    $builderStore = $builderStore;
+    $danceBuilderStore = $danceBuilderStore;
   }
 
   /**
    * @param {String} id
    */
   function removeDance(id) {
-    $builderStore.removeDance(id);
+    $danceBuilderStore.removeDance(id);
     // trigger update (can I do better?)
-    $builderStore = $builderStore;
+    $danceBuilderStore = $danceBuilderStore;
+  }
+
+  /**
+   * @param {PoseWrapper} pose
+   */
+  function addPose(pose) {
+    $poseBuilderStore.addPose(pose);
+    // trigger update (can I do better?)
+    $poseBuilderStore = $poseBuilderStore;
+  }
+
+  /**
+   * @param {String} id
+   */
+  function removePose(id) {
+    $poseBuilderStore.removePose(id);
+    // trigger update (can I do better?)
+    $poseBuilderStore = $poseBuilderStore;
   }
 </script>
 

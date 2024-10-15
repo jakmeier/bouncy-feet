@@ -11,7 +11,7 @@ use super::{ParseFileError, VersionCheck};
 const CURRENT_VERSION: u16 = 1;
 
 /// Format for pose definition files.
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub(crate) struct PoseFile {
     #[allow(dead_code)]
     pub version: u16,
@@ -159,6 +159,13 @@ pub enum PoseDirection {
 }
 
 impl PoseFile {
+    pub(crate) fn new() -> Self {
+        Self {
+            version: CURRENT_VERSION,
+            poses: vec![],
+        }
+    }
+
     pub(crate) fn from_str(text: &str) -> Result<Self, ParseFileError> {
         let check: VersionCheck = ron::from_str(text)?;
 
