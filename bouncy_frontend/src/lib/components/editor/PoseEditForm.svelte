@@ -94,6 +94,26 @@
       []
     );
   }
+
+  function limbTranslationKey(enumName) {
+    if (isLeftBodyPart(enumName)) {
+      return `editor.body.${enumName.substring(4)}`.toLowerCase();
+    } else if (isRightBodyPart(enumName)) {
+      return `editor.body.${enumName.substring(5)}`.toLowerCase();
+    } else {
+      return `editor.body.${enumName}`.toLowerCase();
+    }
+  }
+
+  /** @param {string} enumName */
+  function isLeftBodyPart(enumName) {
+    return enumName.startsWith('Left');
+  }
+
+  /** @param {string} enumName */
+  function isRightBodyPart(enumName) {
+    return enumName.startsWith('Right');
+  }
 </script>
 
 <div class="container">
@@ -121,20 +141,60 @@
     </Svg>
   </div>
 
-  <div class="weights">
+  <div class="right weights">
     {#each weightedLimbs as limb, index}
-      <div class="body-part">
-        <label for={limb.name}>{$t(limb.name)}</label>
-        <input
-          name={limb.name}
-          type="number"
-          class="weight-input"
-          bind:value={limb.weight}
-          on:change={() => updateAvatar(index)}
-          placeholder="Weight"
-          min="0.0"
-        />
-      </div>
+      {#if isRightBodyPart(limb.name)}
+        <div class="body-part">
+          <label for={limb.name}>{$t(limbTranslationKey(limb.name))}</label>
+          <input
+            name={limb.name}
+            type="number"
+            class="weight-input"
+            bind:value={limb.weight}
+            on:change={() => updateAvatar(index)}
+            placeholder="Weight"
+            min="0.0"
+          />
+        </div>
+      {/if}
+    {/each}
+  </div>
+
+  <div class="left weights">
+    {#each weightedLimbs as limb, index}
+      {#if isLeftBodyPart(limb.name)}
+        <div class="body-part">
+          <label for={limb.name}>{$t(limbTranslationKey(limb.name))}</label>
+          <input
+            name={limb.name}
+            type="number"
+            class="weight-input"
+            bind:value={limb.weight}
+            on:change={() => updateAvatar(index)}
+            placeholder="Weight"
+            min="0.0"
+          />
+        </div>
+      {/if}
+    {/each}
+  </div>
+
+  <div class="center weights">
+    {#each weightedLimbs as limb, index}
+      {#if !isLeftBodyPart(limb.name) && !isRightBodyPart(limb.name)}
+        <div class="body-part">
+          <label for={limb.name}>{$t(limbTranslationKey(limb.name))}</label>
+          <input
+            name={limb.name}
+            type="number"
+            class="weight-input"
+            bind:value={limb.weight}
+            on:change={() => updateAvatar(index)}
+            placeholder="Weight"
+            min="0.0"
+          />
+        </div>
+      {/if}
     {/each}
   </div>
 </div>
@@ -143,19 +203,28 @@
   .container {
     display: grid;
     grid-template-areas:
-      'avatar weights'
-      'name weights';
+      'right avatar left'
+      'right name left'
+      'right center left';
   }
   .name {
     grid-area: name;
   }
+  .left {
+    grid-area: left;
+  }
+  .right {
+    grid-area: right;
+  }
+  .center {
+    grid-area: center;
+  }
   .avatar {
     grid-area: avatar;
     border: solid 1px var(--theme-neutral-gray);
-    border-radius: 100px;
+    border-radius: 50%;
   }
   .weights {
-    grid-area: weights;
     display: flex;
     flex-direction: column;
   }
@@ -176,5 +245,16 @@
     width: 100%;
     text-align: center;
     font-size: 32px;
+  }
+
+  @media (max-width: 600px) {
+    .container {
+      grid-template-areas:
+        'avatar avatar'
+        'name name'
+        'right left'
+        'center center'
+        ;
+    }
   }
 </style>
