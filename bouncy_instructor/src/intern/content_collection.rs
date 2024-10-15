@@ -43,6 +43,10 @@ pub(crate) struct ContentCollection {
 }
 
 impl ContentCollection {
+    pub(crate) fn poses(&self) -> &[PoseWrapper] {
+        &self.poses
+    }
+
     pub(crate) fn step(&self, id: &str) -> Option<&StepWrapper> {
         self.steps.iter().find(|step| step.definition().id == id)
     }

@@ -75,31 +75,6 @@ export function dances(): (DanceWrapper)[];
 export function danceBuilderFromDance(dance_id: string): DanceBuilder;
 /**
 */
-export enum DetectionState {
-/**
-* Neutral state, not detecting anything.
-*/
-  Init = 1,
-/**
-* Dance is positioning themselves, detecting the idle position.
-*/
-  Positioning = 2,
-/**
-* About to go over to live tracking, playing a countdown audio.
-*/
-  CountDown = 3,
-/**
-* Tracking current movements.
-*/
-  LiveTracking = 4,
-/**
-* No longer tracking but the results of the previous tracking are
-* available.
-*/
-  TrackingDone = 5,
-}
-/**
-*/
 export enum DetectionFailureReason {
 /**
 * The last match was too recent to have another match.
@@ -125,6 +100,31 @@ export enum DetectionFailureReason {
 * No *new* data to run detection against.
 */
   NoNewData = 6,
+}
+/**
+*/
+export enum DetectionState {
+/**
+* Neutral state, not detecting anything.
+*/
+  Init = 1,
+/**
+* Dance is positioning themselves, detecting the idle position.
+*/
+  Positioning = 2,
+/**
+* About to go over to live tracking, playing a countdown audio.
+*/
+  CountDown = 3,
+/**
+* Tracking current movements.
+*/
+  LiveTracking = 4,
+/**
+* No longer tracking but the results of the previous tracking are
+* available.
+*/
+  TrackingDone = 5,
 }
 /**
 */

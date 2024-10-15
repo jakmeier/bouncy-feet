@@ -20,6 +20,7 @@ pub use tracker::{DetectionFailureReason, DetectionResult, PoseHint, Tracker};
 pub use ui_event::AudioEffect;
 
 pub(crate) use parsing::{dance_file, pose_file, step_file};
+use wrapper::pose_wrapper::PoseWrapper;
 
 use super::STATE;
 use crate::intern::lfsr;
@@ -90,6 +91,11 @@ pub fn load_step_string(data: &str, source: String) -> Result<(), JsValue> {
 pub fn parse_course_string(data: &str, lang: &str) -> Result<Course, JsValue> {
     let course = parse_course_str(data, lang)?;
     Ok(course)
+}
+
+#[wasm_bindgen]
+pub fn poses() -> Vec<PoseWrapper> {
+    STATE.with_borrow(|state| state.global_db.poses().to_vec())
 }
 
 #[wasm_bindgen]

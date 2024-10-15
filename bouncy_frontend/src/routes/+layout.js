@@ -9,6 +9,7 @@ import {
     StepWrapper,
     init,
     PoseWrapper,
+    poses,
 } from '$lib/instructor/bouncy_instructor';
 
 // This is the root layout, hence it defines prerendering for the entire app default.
@@ -152,8 +153,8 @@ async function loadCollectionAssets() {
      * @returns {PoseWrapper[]}
     */
     function lookupPoses(filter) {
-        poses
-        return [];
+        // TODO: filtering
+        return poses();
     }
 
 
