@@ -84,6 +84,34 @@ export enum PoseHint {
 }
 /**
 */
+export enum DetectionFailureReason {
+/**
+* The last match was too recent to have another match.
+*/
+  TooEarly = 1,
+/**
+* The timing is off.
+*/
+  NotOnBeat = 2,
+/**
+* Detection did not match an expected pose.
+*/
+  WrongPose = 3,
+/**
+* No data to run detection against.
+*/
+  NoData = 4,
+/**
+* Currently in a state that does not detect.
+*/
+  DetectionDisabled = 5,
+/**
+* No *new* data to run detection against.
+*/
+  NoNewData = 6,
+}
+/**
+*/
 export enum SkeletonField {
   LeftThigh = 0,
   LeftShin = 1,
@@ -120,34 +148,6 @@ export enum DetectionState {
 * available.
 */
   TrackingDone = 5,
-}
-/**
-*/
-export enum DetectionFailureReason {
-/**
-* The last match was too recent to have another match.
-*/
-  TooEarly = 1,
-/**
-* The timing is off.
-*/
-  NotOnBeat = 2,
-/**
-* Detection did not match an expected pose.
-*/
-  WrongPose = 3,
-/**
-* No data to run detection against.
-*/
-  NoData = 4,
-/**
-* Currently in a state that does not detect.
-*/
-  DetectionDisabled = 5,
-/**
-* No *new* data to run detection against.
-*/
-  NoNewData = 6,
 }
 
 import type { Readable } from "svelte/store";
@@ -741,17 +741,6 @@ export class Segment {
 export class Skeleton {
   free(): void;
 /**
-* Compute 2d coordinates for the skeleton for rendering.
-*
-* The skeleton will be rendered assuming hard-coded values for body part
-* proportional lengths, multiplied with the size parameter. The hip
-* segment will have its center at the given position.
-* @param {Cartesian2d} hip_center
-* @param {number} size
-* @returns {SkeletonV2}
-*/
-  render(hip_center: Cartesian2d, size: number): SkeletonV2;
-/**
 * @param {boolean} sideway
 * @returns {Skeleton}
 */
@@ -764,6 +753,17 @@ export class Skeleton {
 * @returns {string}
 */
   debugString(): string;
+/**
+* Compute 2d coordinates for the skeleton for rendering.
+*
+* The skeleton will be rendered assuming hard-coded values for body part
+* proportional lengths, multiplied with the size parameter. The hip
+* segment will have its center at the given position.
+* @param {Cartesian2d} hip_center
+* @param {number} size
+* @returns {SkeletonV2}
+*/
+  render(hip_center: Cartesian2d, size: number): SkeletonV2;
 /**
 * Does the dancer face away more than they face the camera?
 */
@@ -946,15 +946,6 @@ export class StepWrapper {
 export class Tracker {
   free(): void;
 /**
-* @param {number} timestamp
-* @returns {ExportedFrame}
-*/
-  exportFrame(timestamp: number): ExportedFrame;
-/**
-* @returns {string}
-*/
-  exportKeypoints(): string;
-/**
 * Create a tracker for all known steps.
 */
   constructor();
@@ -1112,6 +1103,15 @@ export class Tracker {
 * @returns {SkeletonV2 | undefined}
 */
   renderedKeypointsAt(timestamp: number, width: number, height: number): SkeletonV2 | undefined;
+/**
+* @param {number} timestamp
+* @returns {ExportedFrame}
+*/
+  exportFrame(timestamp: number): ExportedFrame;
+/**
+* @returns {string}
+*/
+  exportKeypoints(): string;
 /**
 */
   readonly detectionState: ReadableDetectionState;

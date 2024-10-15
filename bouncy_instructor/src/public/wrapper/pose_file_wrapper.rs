@@ -34,7 +34,7 @@ impl PoseFileWrapper {
     }
 
     #[wasm_bindgen(js_name = "addPose")]
-    pub fn add_pose(&mut self, new_pose: PoseWrapper) -> Result<(), String> {
+    pub fn add_pose(&mut self, new_pose: &PoseWrapper) -> Result<(), String> {
         let file = self.pose_file.as_ref().borrow();
         if file
             .poses
@@ -44,7 +44,7 @@ impl PoseFileWrapper {
             return Err("Pose ID already exists".to_owned());
         }
         drop(file);
-        self.push_pose_internal(new_pose);
+        self.push_pose_internal(new_pose.clone());
         Ok(())
     }
 
