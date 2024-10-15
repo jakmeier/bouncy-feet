@@ -28,6 +28,7 @@
       poseName = maybeName;
     } else {
       poseName = pose.id();
+      updateName();
     }
     onPoseUpdated(pose);
   }

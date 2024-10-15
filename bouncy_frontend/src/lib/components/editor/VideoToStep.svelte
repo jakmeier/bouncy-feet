@@ -155,3 +155,14 @@
   class="light full-width short"
   on:click={savePose}
 ></Button>
+
+<style>
+  video {
+    max-width: 100%;
+  }
+
+  .side-by-side {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+</style>

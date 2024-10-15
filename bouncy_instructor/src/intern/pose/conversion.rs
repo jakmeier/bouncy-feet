@@ -298,7 +298,7 @@ impl pose_file::Pose {
         Self {
             direction: skeleton.direction().into(),
             limbs,
-            id: format!("generated-pose-{}", lfsr::random_id()),
+            id: format!("pose-{}", lfsr::random_id()),
             names: None,
             mirror_of: String::new(),
             z: Default::default(),
