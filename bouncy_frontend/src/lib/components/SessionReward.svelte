@@ -7,7 +7,7 @@
 
   /** @type {DanceSessionResult?} */
   export let data;
-  /** @type {import('$lib/instructor/bouncy_instructor').StepInfo} */
+  /** @type {import('$lib/instructor/bouncy_instructor').StepWrapper} */
   export let step;
 
   const user = getContext('user').store;

@@ -41,29 +41,33 @@ export function loadStepString(data: string, source: string): void;
 */
 export function parseCourseString(data: string, lang: string): Course;
 /**
-* @returns {(StepInfo)[]}
+* @returns {(PoseWrapper)[]}
 */
-export function steps(): (StepInfo)[];
+export function poses(): (PoseWrapper)[];
+/**
+* @returns {(StepWrapper)[]}
+*/
+export function steps(): (StepWrapper)[];
 /**
 * @param {string} source
-* @returns {(StepInfo)[]}
+* @returns {(StepWrapper)[]}
 */
-export function stepsBySource(source: string): (StepInfo)[];
+export function stepsBySource(source: string): (StepWrapper)[];
 /**
 * @param {string} id
 * @param {boolean} flipped
-* @returns {StepInfo | undefined}
+* @returns {StepWrapper | undefined}
 */
-export function stepById(id: string, flipped: boolean): StepInfo | undefined;
+export function stepById(id: string, flipped: boolean): StepWrapper | undefined;
 /**
 * @param {string} step_name
-* @returns {(StepInfo)[]}
+* @returns {(StepWrapper)[]}
 */
-export function stepsByName(step_name: string): (StepInfo)[];
+export function stepsByName(step_name: string): (StepWrapper)[];
 /**
-* @returns {(DanceInfo)[]}
+* @returns {(DanceWrapper)[]}
 */
-export function dances(): (DanceInfo)[];
+export function dances(): (DanceWrapper)[];
 /**
 * @param {string} dance_id
 * @returns {DanceBuilder}
@@ -71,17 +75,28 @@ export function dances(): (DanceInfo)[];
 export function danceBuilderFromDance(dance_id: string): DanceBuilder;
 /**
 */
-export enum SkeletonField {
-  LeftThigh = 0,
-  LeftShin = 1,
-  LeftArm = 2,
-  LeftForearm = 3,
-  LeftFoot = 4,
-  RightThigh = 5,
-  RightShin = 6,
-  RightArm = 7,
-  RightForearm = 8,
-  RightFoot = 9,
+export enum DetectionState {
+/**
+* Neutral state, not detecting anything.
+*/
+  Init = 1,
+/**
+* Dance is positioning themselves, detecting the idle position.
+*/
+  Positioning = 2,
+/**
+* About to go over to live tracking, playing a countdown audio.
+*/
+  CountDown = 3,
+/**
+* Tracking current movements.
+*/
+  LiveTracking = 4,
+/**
+* No longer tracking but the results of the previous tracking are
+* available.
+*/
+  TrackingDone = 5,
 }
 /**
 */
@@ -113,28 +128,17 @@ export enum DetectionFailureReason {
 }
 /**
 */
-export enum DetectionState {
-/**
-* Neutral state, not detecting anything.
-*/
-  Init = 1,
-/**
-* Dance is positioning themselves, detecting the idle position.
-*/
-  Positioning = 2,
-/**
-* About to go over to live tracking, playing a countdown audio.
-*/
-  CountDown = 3,
-/**
-* Tracking current movements.
-*/
-  LiveTracking = 4,
-/**
-* No longer tracking but the results of the previous tracking are
-* available.
-*/
-  TrackingDone = 5,
+export enum SkeletonField {
+  LeftThigh = 0,
+  LeftShin = 1,
+  LeftArm = 2,
+  LeftForearm = 3,
+  LeftFoot = 4,
+  RightThigh = 5,
+  RightShin = 6,
+  RightArm = 7,
+  RightForearm = 8,
+  RightFoot = 9,
 }
 /**
 * Best guess for what the dancer needs to change to fit the pose.
@@ -219,9 +223,9 @@ export class Cartesian3d {
 export class Course {
   free(): void;
 /**
-* @returns {StepInfo | undefined}
+* @returns {StepWrapper | undefined}
 */
-  featuredStep(): StepInfo | undefined;
+  featuredStep(): StepWrapper | undefined;
 /**
 * @param {number} lesson_index
 * @returns {Tracker | undefined}
@@ -284,9 +288,9 @@ export class DanceBuilder {
 */
   clear(): void;
 /**
-* @returns {DanceInfo}
+* @returns {DanceWrapper}
 */
-  danceInfo(): DanceInfo;
+  danceInfo(): DanceWrapper;
 }
 /**
 * Contains all information about a dance to be detected and has an interface
@@ -324,9 +328,9 @@ export class DanceFileBuilder {
 */
   buildRon(): string;
 /**
-* @returns {(DanceInfo)[]}
+* @returns {(DanceWrapper)[]}
 */
-  dances(): (DanceInfo)[];
+  dances(): (DanceWrapper)[];
 /**
 * @param {string} dance_id
 * @returns {DanceBuilder}
@@ -334,18 +338,17 @@ export class DanceFileBuilder {
   danceBuilder(dance_id: string): DanceBuilder;
 }
 /**
-* Information about a dance for display in the frontend.
 */
-export class DanceInfo {
+export class DanceWrapper {
   free(): void;
 /**
 * @returns {number}
 */
   length(): number;
 /**
-* @returns {(StepInfo)[]}
+* @returns {(StepWrapper)[]}
 */
-  steps(): (StepInfo)[];
+  steps(): (StepWrapper)[];
 /**
 * @param {number} beat
 * @returns {Skeleton | undefined}
@@ -533,7 +536,7 @@ export class LessonPart {
   readonly explanation: string;
 /**
 */
-  readonly step: StepInfo;
+  readonly step: StepWrapper;
 /**
 */
   readonly stepName: string;
@@ -709,17 +712,6 @@ export class Segment {
 export class Skeleton {
   free(): void;
 /**
-* Compute 2d coordinates for the skeleton for rendering.
-*
-* The skeleton will be rendered assuming hard-coded values for body part
-* proportional lengths, multiplied with the size parameter. The hip
-* segment will have its center at the given position.
-* @param {Cartesian2d} hip_center
-* @param {number} size
-* @returns {SkeletonV2}
-*/
-  render(hip_center: Cartesian2d, size: number): SkeletonV2;
-/**
 * @param {boolean} sideway
 * @returns {Skeleton}
 */
@@ -732,6 +724,17 @@ export class Skeleton {
 * @returns {string}
 */
   debugString(): string;
+/**
+* Compute 2d coordinates for the skeleton for rendering.
+*
+* The skeleton will be rendered assuming hard-coded values for body part
+* proportional lengths, multiplied with the size parameter. The hip
+* segment will have its center at the given position.
+* @param {Cartesian2d} hip_center
+* @param {number} size
+* @returns {SkeletonV2}
+*/
+  render(hip_center: Cartesian2d, size: number): SkeletonV2;
 /**
 * Does the dancer face away more than they face the camera?
 */
@@ -859,9 +862,8 @@ export class Skeletons {
   side: Skeleton;
 }
 /**
-* Information about a step for display in the frontend.
 */
-export class StepInfo {
+export class StepWrapper {
   free(): void;
 /**
 * @param {number} beat
@@ -887,10 +889,6 @@ export class StepInfo {
 */
   jumpHeight(beat: number): number | undefined;
 /**
-* @returns {StepInfo}
-*/
-  rustClone(): StepInfo;
-/**
 * The number of beats the step takes for one repetition.
 */
   readonly beats: number;
@@ -912,11 +910,6 @@ export class StepInfo {
 * with the left foot first. The app shows a translated text like "Left Leg First".
 */
   readonly variation: string;
-}
-/**
-*/
-export class StepWrapper {
-  free(): void;
 }
 /**
 * A Tracker gathers skeletons over time and passes it on to a DanceDetector.

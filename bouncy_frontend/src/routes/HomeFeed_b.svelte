@@ -7,7 +7,7 @@
   import { base } from '$app/paths';
   import { versionString } from '$lib/stores/FeatureSelection';
 
-  /** @type{import("$lib/instructor/bouncy_instructor").DanceInfo[]} */
+  /** @type{import("$lib/instructor/bouncy_instructor").DanceWrapper[]} */
   export let featuredDances;
 
   let swapBackgroundColor = 'var(--theme-neutral-white)';
@@ -21,7 +21,7 @@
 
   /**
    * @param {number} i
-   * @returns {import("$lib/instructor/bouncy_instructor").DanceInfo}
+   * @returns {import("$lib/instructor/bouncy_instructor").DanceWrapper}
    */
   function dance(i) {
     return featuredDances[i % featuredDances.length];

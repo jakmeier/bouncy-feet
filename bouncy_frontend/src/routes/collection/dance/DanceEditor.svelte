@@ -8,7 +8,7 @@
   import { goto } from '$app/navigation';
   import { dynamicCounter } from '$lib/timer';
 
-  /** @type {import("$lib/instructor/bouncy_instructor").StepInfo[]} */
+  /** @type {import("$lib/instructor/bouncy_instructor").StepWrapper[]} */
   export let availableSteps;
   /** @type {import('$lib/instructor/bouncy_instructor').DanceBuilder} */
   export let danceBuilder;
@@ -27,7 +27,7 @@
 
   const localCollection = getContext('localCollection');
 
-  /** @type {import('svelte/store').Readable<import('$lib/instructor/bouncy_instructor').DanceInfo[]>} */
+  /** @type {import('svelte/store').Readable<import('$lib/instructor/bouncy_instructor').DanceWrapper[]>} */
   const localDances = localCollection.dances;
 
   $: dancePreview = danceBuilder.danceInfo();

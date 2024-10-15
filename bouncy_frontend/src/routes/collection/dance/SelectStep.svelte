@@ -2,7 +2,7 @@
   import Step from '../Step.svelte';
   import UiBox from '$lib/components/ui/UiBox.svelte';
 
-  /** @type {import('$lib/instructor/bouncy_instructor').StepInfo[]} */
+  /** @type {import('$lib/instructor/bouncy_instructor').StepWrapper[]} */
   export let steps;
   export let show = false;
 
@@ -12,12 +12,12 @@
   export let animationTime = 500;
 
   /**
-   * @type {(step: import('$lib/instructor/bouncy_instructor').StepInfo) => boolean}
+   * @type {(step: import('$lib/instructor/bouncy_instructor').StepWrapper) => boolean}
    */
   export let selectedCallback;
 
   /**
-   * @param {import("$lib/instructor/bouncy_instructor").StepInfo} step
+   * @param {import("$lib/instructor/bouncy_instructor").StepWrapper} step
    */
   function select(step) {
     const close = selectedCallback(step);

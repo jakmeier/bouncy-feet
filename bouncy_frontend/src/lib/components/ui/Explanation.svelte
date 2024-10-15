@@ -6,14 +6,14 @@
   import {
     Cartesian2d,
     Skeleton,
-    DanceInfo,
+    DanceWrapper,
   } from '$lib/instructor/bouncy_instructor';
   import { onMount } from 'svelte';
   import { counter } from '$lib/timer';
 
   export let text;
   export let width = 250;
-  /** @type { null | DanceInfo } */
+  /** @type { null | DanceWrapper } */
   export let entryDance = null;
   export let entryDanceRepetitions = 1;
   /** @type { undefined | Skeleton } */

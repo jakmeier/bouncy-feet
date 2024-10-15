@@ -4,11 +4,11 @@
   import { stepById } from '$lib/instructor/bouncy_instructor';
   import Step from '../Step.svelte';
 
-  /** @type {import("$lib/instructor/bouncy_instructor").StepInfo[]} */
+  /** @type {import("$lib/instructor/bouncy_instructor").StepWrapper[]} */
   export let allSteps;
-  /** @type {import("$lib/instructor/bouncy_instructor").StepInfo} */
+  /** @type {import("$lib/instructor/bouncy_instructor").StepWrapper} */
   export let selectedStep;
-  /** @type {import("$lib/instructor/bouncy_instructor").StepInfo[]} */
+  /** @type {import("$lib/instructor/bouncy_instructor").StepWrapper[]} */
   $: variations = allSteps.filter((step) => step.name == selectedStep.name);
   /** @type {number} */
   export let poseIndex;
@@ -16,7 +16,7 @@
   export let animationTime;
   const stepSize = 100;
   /**
-   * @type {(step: import('$lib/instructor/bouncy_instructor').StepInfo) => void }
+   * @type {(step: import('$lib/instructor/bouncy_instructor').StepWrapper) => void }
    */
   export let selectedVariationCallback;
   /**

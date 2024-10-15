@@ -6,7 +6,7 @@
   import { Skeleton } from '$lib/instructor/bouncy_instructor';
   import { LEFT_RIGHT_COLORING } from '$lib/constants';
 
-  /** @type {import('$lib/instructor/bouncy_instructor').StepInfo} */
+  /** @type {import('$lib/instructor/bouncy_instructor').StepWrapper} */
   export let step;
   export let rotation = 0.0;
   export let size = 100;
@@ -36,7 +36,7 @@
     size * (maybeJumpHeight === undefined ? 0.025 : maybeJumpHeight);
 
   /**
-   * @param {import("$lib/instructor/bouncy_instructor").StepInfo} step
+   * @param {import("$lib/instructor/bouncy_instructor").StepWrapper} step
    * @param {number} poseIndex
    */
   function stepBodyShift(step, poseIndex) {

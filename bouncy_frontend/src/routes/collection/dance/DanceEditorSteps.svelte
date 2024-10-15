@@ -6,9 +6,9 @@
   import DanceStepDetails from './DanceStepDetails.svelte';
   import Symbol from '$lib/components/ui/Symbol.svelte';
 
-  /** @type {import("$lib/instructor/bouncy_instructor").StepInfo[]} */
+  /** @type {import("$lib/instructor/bouncy_instructor").StepWrapper[]} */
   export let availableSteps;
-  /** @type {import("$lib/instructor/bouncy_instructor").StepInfo[]} */
+  /** @type {import("$lib/instructor/bouncy_instructor").StepWrapper[]} */
   $: uniqueSteps = availableSteps.filter(
     (step, index, self) => index === self.findIndex((t) => t.name === step.name)
   );
@@ -24,33 +24,33 @@
   export let beatCounter = counter(-1, 1, stepTime);
 
   /**
-   * @type {import('$lib/instructor/bouncy_instructor').StepInfo[]}
+   * @type {import('$lib/instructor/bouncy_instructor').StepWrapper[]}
    */
   let steps = danceBuilder.danceInfo().steps();
   let selectedStepIndex = -1;
 
   let stepSelectionActive = false;
-  /** @param {import('$lib/instructor/bouncy_instructor').StepInfo} stepInfo */
-  function selectedCallback(stepInfo) {
-    if (!stepInfo) {
+  /** @param {import('$lib/instructor/bouncy_instructor').StepWrapper} stepWrapper */
+  function selectedCallback(stepWrapper) {
+    if (!stepWrapper) {
       return false;
     }
 
     selectedStepIndex = steps.length;
-    steps.push(stepInfo);
-    danceBuilder.addStep(stepInfo.id);
+    steps.push(stepWrapper);
+    danceBuilder.addStep(stepWrapper.id);
     // trigger reload in ui (can I do better?)
     danceBuilder = danceBuilder;
 
     return true;
   }
 
-  /** @param {import('$lib/instructor/bouncy_instructor').StepInfo} stepInfo */
-  function selectedVariationCallback(stepInfo) {
+  /** @param {import('$lib/instructor/bouncy_instructor').StepWrapper} stepWrapper */
+  function selectedVariationCallback(stepWrapper) {
     if (selectedStepIndex !== -1) {
-      steps[selectedStepIndex] = stepInfo;
+      steps[selectedStepIndex] = stepWrapper;
       danceBuilder.removeStep(selectedStepIndex);
-      danceBuilder.insertStep(selectedStepIndex, stepInfo.id);
+      danceBuilder.insertStep(selectedStepIndex, stepWrapper.id);
     }
   }
 

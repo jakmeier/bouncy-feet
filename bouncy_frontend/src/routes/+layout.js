@@ -6,8 +6,9 @@ import {
     dances,
     steps,
     stepsBySource,
-    StepInfo,
+    StepWrapper,
     init,
+    PoseWrapper,
 } from '$lib/instructor/bouncy_instructor';
 
 // This is the root layout, hence it defines prerendering for the entire app default.
@@ -28,7 +29,7 @@ export const load = async ({ data }) => {
     await setRoute(route);
     await setLocale(locale);
 
-    const lookupSteps = await loadCollectionAssets();
+    const { lookupSteps, lookupPoses } = await loadCollectionAssets();
     const officialDances = dances();
 
     return {
@@ -36,6 +37,7 @@ export const load = async ({ data }) => {
         translations,
         officialDances,
         lookupSteps,
+        lookupPoses,
     };
 };
 
@@ -99,7 +101,7 @@ async function loadCollectionAssets() {
      *
      * (Note: I might want to move this to Rust code.)
      * @param {StepFilter} filter 
-     * @returns {StepInfo[]}
+     * @returns {StepWrapper[]}
     */
     function lookupSteps(filter) {
         // collect all steps to include from sources
@@ -142,7 +144,20 @@ async function loadCollectionAssets() {
         return out;
     };
 
-    return lookupSteps;
+    /** 
+     * Exported function to lookup a filtered list of poses.
+     *
+     * (Note: I might want to move this to Rust code.)
+     * @param {StepFilter} filter 
+     * @returns {PoseWrapper[]}
+    */
+    function lookupPoses(filter) {
+        poses
+        return [];
+    }
+
+
+    return { lookupSteps, lookupPoses };
 }
 
 /**

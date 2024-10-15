@@ -6,7 +6,7 @@
   import { Skeleton } from '$lib/instructor/bouncy_instructor';
   import { counter } from '$lib/timer';
 
-  /** @type{import("$lib/instructor/bouncy_instructor").DanceInfo} */
+  /** @type{import("$lib/instructor/bouncy_instructor").DanceWrapper} */
   export let dance;
   const bpm = 260;
   const stepTime = 60_000 / bpm;
@@ -27,7 +27,7 @@
   $: bodyShift = $beat >= 0 ? danceBodyShift(dance, $beat) : { x: 0, y: 0 };
 
   /**
-   * @param {import("$lib/instructor/bouncy_instructor").DanceInfo} dance
+   * @param {import("$lib/instructor/bouncy_instructor").DanceWrapper} dance
    * @param {number} poseIndex
    */
   function danceBodyShift(dance, poseIndex) {
