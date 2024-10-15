@@ -12,11 +12,9 @@ pub(crate) mod tracker;
 pub(crate) mod ui_event;
 pub(crate) mod wrapper;
 
-use crate::intern::lfsr;
 pub use crate::public::course::Course;
 pub use dance_info::DanceInfo;
 pub use keypoints::{Keypoints, Side as KeypointsSide};
-use parsing::course_file::CourseFile;
 pub use step_info::StepInfo;
 pub use tracker::{DetectionFailureReason, DetectionResult, PoseHint, Tracker};
 pub use ui_event::AudioEffect;
@@ -24,15 +22,20 @@ pub use ui_event::AudioEffect;
 pub(crate) use parsing::{dance_file, pose_file, step_file};
 
 use super::STATE;
+use crate::intern::lfsr;
 use editor::dance_builder::DanceBuilder;
+use parsing::course_file::CourseFile;
 use parsing::dance_file::DanceFile;
 use parsing::pose_file::PoseFile;
 use parsing::step_file::StepFile;
 use parsing::ParseFileError;
+use std::ops::Deref;
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::{JsCast, JsValue};
 use wasm_bindgen_futures::JsFuture;
 use web_sys::Request;
+use wrapper::dance_wrapper::DanceWrapper;
+use wrapper::step_wrapper::StepWrapper;
 
 #[wasm_bindgen(js_name = init)]
 pub fn init(random_seed: u32, lang: String) -> Result<(), JsValue> {
@@ -90,70 +93,41 @@ pub fn parse_course_string(data: &str, lang: &str) -> Result<Course, JsValue> {
 }
 
 #[wasm_bindgen]
-pub fn steps() -> Vec<StepInfo> {
-    STATE.with_borrow(|state| {
-        state
-            .global_db
-            .tracker_view
-            .steps()
-            .iter()
-            .cloned()
-            .map(|step| StepInfo::from_step(step, &state.global_db.tracker_view))
-            .collect::<Vec<_>>()
-    })
+pub fn steps() -> Vec<StepWrapper> {
+    STATE.with_borrow(|state| state.global_db.steps().cloned().collect())
 }
 
 #[wasm_bindgen(js_name = "stepsBySource")]
-pub fn steps_by_source(source: &str) -> Vec<StepInfo> {
+pub fn steps_by_source(source: &str) -> Vec<StepWrapper> {
     STATE.with_borrow(|state| {
         state
             .global_db
-            .tracker_view
             .steps()
-            .iter()
-            .filter(|step| &*step.source == source)
+            .filter(|step| step.source().deref() == source)
             .cloned()
-            .map(|step| StepInfo::from_step(step, &state.global_db.tracker_view))
             .collect::<Vec<_>>()
     })
 }
 
 #[wasm_bindgen(js_name = "stepById")]
-pub fn step_by_id(id: String, flipped: bool) -> Option<StepInfo> {
+pub fn step_by_id(id: String, flipped: bool) -> Option<StepWrapper> {
     STATE.with_borrow(|state| {
-        let mut step = state.global_db.tracker_view.step(&id).cloned()?;
-
+        let mut step = state.global_db.step(&id).cloned()?;
         if flipped {
-            step = step.flipped();
+            step = step.flipped(&state.global_db.tracker_view);
         }
-        Some(StepInfo::from_step(step, &state.global_db.tracker_view))
+        Some(step)
     })
 }
 
 #[wasm_bindgen(js_name = "stepsByName")]
-pub fn steps_by_name(step_name: String) -> Vec<StepInfo> {
-    STATE.with_borrow(|state| {
-        state
-            .global_db
-            .tracker_view
-            .steps_by_name(&step_name)
-            .cloned()
-            .map(|step| StepInfo::from_step(step, &state.global_db.tracker_view))
-            .collect()
-    })
+pub fn steps_by_name(step_name: String) -> Vec<StepWrapper> {
+    STATE.with_borrow(|state| state.global_db.steps_by_name(&step_name).cloned().collect())
 }
 
 #[wasm_bindgen]
-pub fn dances() -> Vec<DanceInfo> {
-    STATE.with_borrow(|state| {
-        state
-            .global_db
-            .tracker_view
-            .dances()
-            .iter()
-            .map(DanceInfo::from)
-            .collect::<Vec<_>>()
-    })
+pub fn dances() -> Vec<DanceWrapper> {
+    STATE.with_borrow(|state| state.global_db.dances().cloned().collect::<Vec<_>>())
 }
 
 #[wasm_bindgen(js_name = "danceBuilderFromDance")]

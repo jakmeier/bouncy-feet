@@ -5,6 +5,7 @@
 //! At least that is kind of the idea. I'm still experimenting with what
 //! architecture makes sense.
 
+pub(crate) mod dance_wrapper;
 pub(crate) mod pose_wrapper;
 pub(crate) mod skeleton_wrapper;
 pub(crate) mod step_wrapper;

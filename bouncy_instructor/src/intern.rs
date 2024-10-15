@@ -5,7 +5,7 @@ pub(crate) mod body_shift;
 pub(crate) mod dance;
 pub(crate) mod dance_detector;
 pub(crate) mod geom;
-pub(crate) mod global_collection;
+pub(crate) mod content_collection;
 pub(crate) mod keypoints_iter;
 pub(crate) mod lfsr;
 pub(crate) mod pose;

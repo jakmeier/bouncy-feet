@@ -7,7 +7,7 @@ mod test_utils;
 
 pub use public::*;
 
-use intern::global_collection::GlobalCollection;
+use intern::content_collection::ContentCollection;
 use intern::step::{Step, StepSource};
 use public::parsing::ParseFileError;
 use std::cell::RefCell;
@@ -16,7 +16,7 @@ use std::cell::RefCell;
 /// same JS worker thread.
 struct State {
     /// The global collection of poses/steps/dances/courses.
-    global_db: GlobalCollection,
+    global_db: ContentCollection,
 }
 thread_local! {
     static STATE: RefCell<State> =

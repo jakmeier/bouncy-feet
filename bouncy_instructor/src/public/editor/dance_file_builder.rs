@@ -1,6 +1,8 @@
-use crate::dance_file::{DanceFile, DanceStep};
+use crate::dance_file::DanceFile;
 use crate::editor::ExportError;
-use crate::{dance_file, intern, DanceInfo};
+use crate::wrapper::dance_wrapper::DanceWrapper;
+use crate::{dance_file, STATE};
+use std::rc::Rc;
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::JsValue;
 
@@ -9,7 +11,7 @@ use super::dance_builder::DanceBuilder;
 #[wasm_bindgen]
 pub struct DanceFileBuilder {
     version: u16,
-    dances: Vec<intern::dance::Dance>,
+    dances: Vec<DanceWrapper>,
 }
 
 #[wasm_bindgen]
@@ -30,10 +32,17 @@ impl DanceFileBuilder {
 
     #[wasm_bindgen(js_name = "addDance")]
     pub fn add_dance(&mut self, dance_builder: &DanceBuilder) -> Result<(), String> {
-        if self.dances.iter().any(|dance| dance.id == dance_builder.id) {
+        if self
+            .dances
+            .iter()
+            .any(|dance| dance.definition().id == dance_builder.id)
+        {
             return Err("Dance ID already exists".to_owned());
         }
-        self.dances.push(dance_builder.build());
+        self.dances.push(DanceWrapper::new(
+            dance_builder.build(),
+            dance_builder.global_collection.clone(),
+        ));
         Ok(())
     }
 
@@ -42,17 +51,24 @@ impl DanceFileBuilder {
         let Some(index) = self
             .dances
             .iter()
-            .position(|dance| dance.id == dance_builder.id)
+            .position(|dance| dance.definition().id == dance_builder.id)
         else {
             return Err("Dance ID does not exist".to_owned());
         };
-        self.dances[index] = dance_builder.build();
+        self.dances[index] = DanceWrapper::new(
+            dance_builder.build(),
+            dance_builder.global_collection.clone(),
+        );
         Ok(())
     }
 
     #[wasm_bindgen(js_name = "removeDance")]
     pub fn remove_dance(&mut self, id: String) -> Result<(), String> {
-        if let Some(index) = self.dances.iter().position(|dance| dance.id == id) {
+        if let Some(index) = self
+            .dances
+            .iter()
+            .position(|dance| dance.definition().id == id)
+        {
             self.dances.remove(index);
             Ok(())
         } else {
@@ -67,33 +83,23 @@ impl DanceFileBuilder {
             dances: self
                 .dances
                 .iter()
-                .map(|dance| dance_file::Dance {
-                    id: dance.id.clone(),
-                    steps: dance
-                        .step_ids
-                        .iter()
-                        .zip(dance.flip_orientation.iter())
-                        .map(|(id, &flip_orientation)| DanceStep {
-                            id: id.clone(),
-                            flip_orientation,
-                        })
-                        .collect(),
-                })
+                .map(DanceWrapper::definition)
+                .cloned()
                 .collect(),
         };
         let string = ron::ser::to_string(&file_data)?;
         Ok(string)
     }
 
-    pub fn dances(&self) -> Vec<DanceInfo> {
-        self.dances.iter().map(DanceInfo::from).collect()
+    pub fn dances(&self) -> Vec<DanceWrapper> {
+        self.dances.clone()
     }
 
     #[wasm_bindgen(js_name = "danceBuilder")]
     pub fn dance_builder(&self, dance_id: String) -> Result<DanceBuilder, String> {
         self.dances
             .iter()
-            .find(|dance| dance.id == dance_id)
+            .find(|dance| dance.id() == dance_id)
             .map(|dance| DanceBuilder::from(dance.clone()))
             .ok_or_else(|| format!("missing dance {dance_id} in dance file builder"))
     }
@@ -101,12 +107,16 @@ impl DanceFileBuilder {
 
 impl From<DanceFile> for DanceFileBuilder {
     fn from(other: DanceFile) -> Self {
+        let global_collection = STATE.with_borrow(|state| {
+            // FIXME: This clone is inefficient and fragile to modifications.
+            Rc::new(state.global_db.clone())
+        });
         Self {
             version: other.version,
             dances: other
                 .dances
                 .into_iter()
-                .map(intern::dance::Dance::from)
+                .map(|d| DanceWrapper::new(d, global_collection.clone()))
                 .collect(),
         }
     }

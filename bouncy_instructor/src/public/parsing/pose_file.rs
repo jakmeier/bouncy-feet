@@ -23,7 +23,7 @@ pub(crate) struct PoseFile {
 /// This includes the exact desired position range and a name.
 /// This is the format for external files and loaded in at runtime.
 /// It is converted to a [`crate::pose::Pose`] for computations.
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub(crate) struct Pose {
     pub id: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]

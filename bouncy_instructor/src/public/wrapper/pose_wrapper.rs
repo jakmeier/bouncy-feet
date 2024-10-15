@@ -6,7 +6,7 @@ use crate::skeleton::{Cartesian2d, Skeleton, SkeletonField};
 use crate::{pose_file, STATE};
 use wasm_bindgen::prelude::wasm_bindgen;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 #[wasm_bindgen]
 pub struct PoseWrapper {
     /// The source of truth. Modification must only go here first and then

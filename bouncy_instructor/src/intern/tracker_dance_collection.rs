@@ -313,52 +313,62 @@ impl TrackerDanceCollection {
         source: StepSource,
     ) -> Result<(), AddStepError> {
         for def in steps {
-            let poses = def
-                .keyframes
-                .iter()
-                .map(|frame| {
-                    self.pose_by_id(&frame.pose)
-                        .ok_or_else(|| AddStepError::MissingPose(frame.pose.clone()))
-                })
-                .collect::<Result<_, _>>()?;
-
-            let directions = def
-                .keyframes
-                .iter()
-                .map(|frame| match frame.orientation {
-                    Orientation::ToCamera => Direction::North,
-                    Orientation::Right => Direction::East,
-                    Orientation::Away => Direction::South,
-                    Orientation::Left => Direction::West,
-                    Orientation::Any => Direction::Unknown,
-                })
-                .collect();
-
-            let pivots = def
-                .keyframes
-                .iter()
-                .map(|frame| BodyPoint::from(frame.pivot.clone()))
-                .collect();
-
-            let jump_heights = def
-                .keyframes
-                .iter()
-                .map(|frame| frame.jump_height)
-                .collect();
-
-            let new_step = Step {
-                id: def.id.clone(),
-                name: def.name.clone(),
-                variation: def.variation.clone(),
-                poses,
-                directions,
-                pivots,
-                jump_heights,
-                source: source.clone(),
-            };
+            let new_step = self.load_step(def, &source)?;
             self.steps.push(new_step);
         }
         Ok(())
+    }
+
+    /// Given a step definition, load it with correspondence to how poses and
+    /// limbs are stored in this collection.
+    ///
+    /// TODO: Can I rely less on this kind of step? The dependence on a specific
+    /// collection breaks much of the architecture.
+    pub(crate) fn load_step(
+        &mut self,
+        def: &step_file::Step,
+        source: &StepSource,
+    ) -> Result<Step, AddStepError> {
+        let poses = def
+            .keyframes
+            .iter()
+            .map(|frame| {
+                self.pose_by_id(&frame.pose)
+                    .ok_or_else(|| AddStepError::MissingPose(frame.pose.clone()))
+            })
+            .collect::<Result<_, _>>()?;
+        let directions = def
+            .keyframes
+            .iter()
+            .map(|frame| match frame.orientation {
+                Orientation::ToCamera => Direction::North,
+                Orientation::Right => Direction::East,
+                Orientation::Away => Direction::South,
+                Orientation::Left => Direction::West,
+                Orientation::Any => Direction::Unknown,
+            })
+            .collect();
+        let pivots = def
+            .keyframes
+            .iter()
+            .map(|frame| BodyPoint::from(frame.pivot.clone()))
+            .collect();
+        let jump_heights = def
+            .keyframes
+            .iter()
+            .map(|frame| frame.jump_height)
+            .collect();
+        let new_step = Step {
+            id: def.id.clone(),
+            name: def.name.clone(),
+            variation: def.variation.clone(),
+            poses,
+            directions,
+            pivots,
+            jump_heights,
+            source: source.clone(),
+        };
+        Ok(new_step)
     }
 
     /// Copies a step from a different dance collection, including poses.

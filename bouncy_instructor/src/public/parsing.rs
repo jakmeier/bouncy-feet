@@ -284,6 +284,7 @@ mod tests {
             Course {
                 id: "running-man-basics",
                 name: "Running Man beginner's course",
+                explanation: None,
                 featured_step_id: "rm-0",
                 lessons: [
                     Lesson {
@@ -311,7 +312,12 @@ mod tests {
                         ],
                     },
                 ],
-                collection: "DanceCollection { limbs: (10): [\"LeftThigh\", \"LeftShin\", \"LeftFoot\", \"LeftArm\", \"LeftForearm\", \"RightThigh\", \"RightShin\", \"RightFoot\", \"RightArm\", \"RightForearm\"], poses(2): [\"in-place-right-up\", \"in-place-left-up\"], steps(2): [\"Run in place\", \"Another step for testing\"], dances(0): []}",
+                collection: ContentCollection {
+                    poses(len): 2,
+                    steps(len): 2,
+                    dances(len): 0,
+                    tracker_view: "DanceCollection { limbs: (10): [\"LeftThigh\", \"LeftShin\", \"LeftFoot\", \"LeftArm\", \"LeftForearm\", \"RightThigh\", \"RightShin\", \"RightFoot\", \"RightArm\", \"RightForearm\"], poses(2): [\"in-place-right-up\", \"in-place-left-up\"], steps(2): [\"Run in place\", \"Another step for testing\"], dances(0): []}",
+                },
             }
         "#]]
         .assert_debug_eq(&en_course);

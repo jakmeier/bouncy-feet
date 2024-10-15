@@ -1,5 +1,5 @@
+use crate::intern::content_collection::ContentCollection;
 use crate::intern::step::StepSource;
-use crate::intern::tracker_dance_collection::TrackerDanceCollection;
 use crate::public::Course;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -42,7 +42,7 @@ pub(crate) struct Part {
     pub(crate) explanations: Option<TranslatedString>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Default, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, Default, Clone, PartialEq)]
 #[serde(transparent)]
 pub(crate) struct TranslatedString {
     inner: HashMap<String, String>,
@@ -64,9 +64,9 @@ impl CourseFile {
 
     pub(crate) fn into_course(self, lang: &str) -> Result<Course, ParseFileError> {
         // The course object uses its own collection of poses and steps.
-        let mut collection = TrackerDanceCollection::default();
-        collection.add_poses(self.poses.iter())?;
-        collection.add_steps(self.steps.iter(), StepSource::new("course".to_owned()))?;
+        let mut collection = ContentCollection::default();
+        collection.add_poses(self.poses)?;
+        collection.add_steps(self.steps, StepSource::new("course".to_owned()))?;
 
         let name = self
             .names

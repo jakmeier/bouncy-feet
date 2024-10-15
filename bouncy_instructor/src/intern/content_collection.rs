@@ -1,18 +1,19 @@
 use std::rc::Rc;
 
+use super::step::StepSource;
+use super::tracker_dance_collection::{AddPoseError, TrackerDanceCollection};
+use crate::wrapper::dance_wrapper::DanceWrapper;
 use crate::wrapper::pose_wrapper::PoseWrapper;
 use crate::wrapper::step_wrapper::StepWrapper;
 use crate::{dance_file, step_file, AddDanceError, AddStepError};
 
-use super::step::StepSource;
-use super::tracker_dance_collection::{AddPoseError, TrackerDanceCollection};
-
 /// List of all registered data, in their source-of-truth form with handles for
 /// cheap WASM-to-JS transitions.
 ///
-/// There is a singleton GlobalCollection per WASM module instance (or process,
-/// if running outside the web). Loading poses, steps, dances and courses into
-/// the instructor always happens through this global data store.
+/// There is a singleton ContentCollection per WASM module instance (or process,
+/// if running outside the web) as well as one per course. Loading poses, steps,
+/// dances and courses into the instructor always happens through one of these
+/// data stores.
 ///
 /// Accessing data from this collection is good for anything that is not super
 /// performance critical. For tracking, there is the more optimized
@@ -20,12 +21,11 @@ use super::tracker_dance_collection::{AddPoseError, TrackerDanceCollection};
 /// view, which usually contains a subset of what is in the global instance.
 ///
 /// On translations, this structure keeps strings for all available languages.
-#[derive(Debug, Default)]
-pub(crate) struct GlobalCollection {
+#[derive(Default, Clone)]
+pub(crate) struct ContentCollection {
     poses: Vec<PoseWrapper>,
     steps: Vec<StepWrapper>,
-    // TODO: should use wrapper
-    dances: Vec<dance_file::Dance>,
+    dances: Vec<DanceWrapper>,
     // TODO: should use wrapper
     // courses: Vec<course_file::CourseFile>,
     //
@@ -42,7 +42,24 @@ pub(crate) struct GlobalCollection {
     pub(crate) tracker_view: Rc<TrackerDanceCollection>,
 }
 
-impl GlobalCollection {
+impl ContentCollection {
+    pub(crate) fn step(&self, id: &str) -> Option<&StepWrapper> {
+        self.steps.iter().find(|step| step.definition().id == id)
+    }
+
+    pub(crate) fn steps(&self) -> impl Iterator<Item = &StepWrapper> {
+        self.steps.iter()
+    }
+
+    pub(crate) fn steps_by_name<'a>(
+        &'a self,
+        name: &'a str,
+    ) -> impl Iterator<Item = &'a StepWrapper> {
+        self.steps
+            .iter()
+            .filter(move |step| step.definition().name == name)
+    }
+
     pub(crate) fn add_poses(
         &mut self,
         poses: Vec<crate::pose_file::Pose>,
@@ -50,6 +67,10 @@ impl GlobalCollection {
         Rc::make_mut(&mut self.tracker_view).add_poses(poses.iter())?;
         self.poses.extend(poses.into_iter().map(PoseWrapper::new));
         Ok(())
+    }
+
+    pub(crate) fn dances(&self) -> impl Iterator<Item = &DanceWrapper> {
+        self.dances.iter()
     }
 
     pub(crate) fn add_steps(
@@ -61,17 +82,23 @@ impl GlobalCollection {
         self.steps.extend(
             steps
                 .into_iter()
-                .map(|def| StepWrapper::new(def, source.clone())),
+                .map(|def| StepWrapper::new(def, source.clone()).warm_up(&self.tracker_view)),
         );
         Ok(())
     }
 
     pub(crate) fn add_dances(
         &mut self,
-        mut dances: Vec<dance_file::Dance>,
+        dances: Vec<dance_file::Dance>,
     ) -> Result<(), AddDanceError> {
         Rc::make_mut(&mut self.tracker_view).add_dances(dances.iter())?;
-        self.dances.append(&mut dances);
+        // FIXME: This copy is inefficient and fragile to modifications.
+        let db = Rc::new(self.clone());
+        self.dances.extend(
+            dances
+                .into_iter()
+                .map(|def| DanceWrapper::new(def, db.clone())),
+        );
         Ok(())
     }
 
@@ -86,8 +113,20 @@ impl GlobalCollection {
             db.add_steps(std::iter::once(step.definition()), step.source().clone())
                 .expect(EXPECT);
         }
-        db.add_dances(self.dances.iter()).expect(EXPECT);
+        db.add_dances(self.dances.iter().map(DanceWrapper::definition))
+            .expect(EXPECT);
 
         self.tracker_view = Rc::new(db);
+    }
+}
+
+impl std::fmt::Debug for ContentCollection {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ContentCollection")
+            .field("poses(len)", &self.poses.len())
+            .field("steps(len)", &self.steps.len())
+            .field("dances(len)", &self.dances.len())
+            .field("tracker_view", &self.tracker_view.short_debug_string())
+            .finish()
     }
 }

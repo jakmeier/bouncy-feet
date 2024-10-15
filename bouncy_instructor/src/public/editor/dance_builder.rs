@@ -1,22 +1,33 @@
-use crate::{intern, DanceInfo};
+use crate::dance_file::DanceStep;
+use crate::intern::content_collection::ContentCollection;
+use crate::wrapper::dance_wrapper::DanceWrapper;
+use crate::{dance_file, intern, STATE};
+use std::rc::Rc;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 #[wasm_bindgen]
-
 pub struct DanceBuilder {
     pub(crate) id: String,
     step_ids: Vec<String>,
     flip_orientation: Vec<bool>,
+    // hack to keep a copy around for easier creation of step wrappers, which
+    // unfortunately contain a collection rc
+    pub(crate) global_collection: Rc<ContentCollection>,
 }
 
 #[wasm_bindgen]
 impl DanceBuilder {
     #[wasm_bindgen(constructor)]
     pub fn new(id: String) -> Self {
+        let global_collection = STATE.with_borrow(|state| {
+            // FIXME: This clone is inefficient and fragile to modifications.
+            Rc::new(state.global_db.clone())
+        });
         Self {
             id,
             step_ids: vec![],
             flip_orientation: vec![],
+            global_collection,
         }
     }
 
@@ -78,26 +89,66 @@ impl DanceBuilder {
     }
 
     #[wasm_bindgen(js_name = "danceInfo")]
-    pub fn dance_info(&self) -> DanceInfo {
-        (&self.build()).into()
+    pub fn as_dance(&self) -> DanceWrapper {
+        // Dance builder currently are only supported on the global collection.
+        DanceWrapper::new_on_global_collection(self.build())
     }
 }
 impl DanceBuilder {
-    pub(crate) fn build(&self) -> intern::dance::Dance {
-        intern::dance::Dance {
+    pub(crate) fn build(&self) -> dance_file::Dance {
+        let steps = self
+            .step_ids
+            .iter()
+            .zip(&self.flip_orientation)
+            .map(|(id, &flip_orientation)| DanceStep {
+                id: id.clone(),
+                flip_orientation,
+            })
+            .collect();
+        dance_file::Dance {
             id: self.id.clone(),
-            step_ids: self.step_ids.clone(),
-            flip_orientation: self.flip_orientation.clone(),
+            steps,
         }
     }
 }
 
 impl From<intern::dance::Dance> for DanceBuilder {
     fn from(dance: intern::dance::Dance) -> Self {
+        let global_collection = STATE.with_borrow(|state| {
+            // FIXME: This clone is inefficient and fragile to modifications.
+            Rc::new(state.global_db.clone())
+        });
         Self {
             id: dance.id,
             step_ids: dance.step_ids,
             flip_orientation: dance.flip_orientation,
+            global_collection,
         }
+    }
+}
+
+impl From<dance_file::Dance> for DanceBuilder {
+    fn from(definition: dance_file::Dance) -> Self {
+        let (step_ids, flip_orientation) = definition
+            .steps
+            .into_iter()
+            .map(|s| (s.id, s.flip_orientation))
+            .unzip();
+        let global_collection = STATE.with_borrow(|state| {
+            // FIXME: This clone is inefficient and fragile to modifications.
+            Rc::new(state.global_db.clone())
+        });
+        Self {
+            id: definition.id,
+            step_ids,
+            flip_orientation,
+            global_collection,
+        }
+    }
+}
+
+impl From<DanceWrapper> for DanceBuilder {
+    fn from(wrapper: DanceWrapper) -> Self {
+        wrapper.definition().clone().into()
     }
 }

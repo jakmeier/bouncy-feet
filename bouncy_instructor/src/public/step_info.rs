@@ -6,11 +6,11 @@ use crate::intern::step::Step;
 use crate::intern::tracker_dance_collection::TrackerDanceCollection;
 use crate::skeleton::{Cartesian2d, Side, Skeleton};
 use crate::STATE;
-use wasm_bindgen::prelude::wasm_bindgen;
 
 /// Information about a step for display in the frontend.
+///
+/// This type is no longer exposed to JS, use StepWrapper instead.
 #[derive(Debug, Clone)]
-#[wasm_bindgen]
 pub struct StepInfo {
     // TODO: stronger typing
     id: String,
@@ -21,17 +21,14 @@ pub struct StepInfo {
     body_shift: BodyShift,
 }
 
-#[wasm_bindgen]
 impl StepInfo {
     /// The unique identifier for the step.
-    #[wasm_bindgen(getter)]
     pub fn id(&self) -> String {
         self.id.clone()
     }
 
     /// The descriptive name for the step. The same name is used for variations
     /// of the same step.
-    #[wasm_bindgen(getter)]
     pub fn name(&self) -> String {
         self.name.clone()
     }
@@ -42,13 +39,11 @@ impl StepInfo {
     }
 
     /// How much the body position deviates from the origin.
-    #[wasm_bindgen(js_name = "bodyShift")]
     pub fn body_shift(&self, beat: usize) -> Cartesian2d {
         self.body_shift.at_beat(beat)
     }
 
     /// Applies a rotation (in degree) and returns the resulting skelton.
-    #[wasm_bindgen(js_name = "rotatedSkeleton")]
     pub fn rotated_skeleton(&self, beat: usize, rotation: f32) -> Skeleton {
         debug_assert!(!self.skeletons.is_empty());
         STATE.with_borrow(|state| {
@@ -61,7 +56,6 @@ impl StepInfo {
         })
     }
 
-    #[wasm_bindgen(js_name = "jumpHeight")]
     pub fn jump_height(&self, beat: usize) -> Option<f32> {
         if self.jump_heights.is_empty() {
             return None;
@@ -75,22 +69,13 @@ impl StepInfo {
     /// For example: "left-first" can be used for all steps which are the same
     /// as the original but instead of starting with the right foot, it starts
     /// with the left foot first. The app shows a translated text like "Left Leg First".
-    #[wasm_bindgen(getter)]
     pub fn variation(&self) -> Option<String> {
         self.step_variation.clone()
     }
 
     /// The number of beats the step takes for one repetition.
-    #[wasm_bindgen(getter)]
     pub fn beats(&self) -> usize {
         self.skeletons.len()
-    }
-
-    // Cursed: Sometimes I need to initiate a Rust clone from within JS to avoid
-    // use-after-free.
-    #[wasm_bindgen(js_name = "rustClone")]
-    pub fn rust_clone(&self) -> Self {
-        self.clone()
     }
 }
 

@@ -18,8 +18,8 @@ pub(crate) struct StepFile {
 ///
 /// A step is a sequence of poses with timing and orientation information.
 /// This is the format for external files and loaded in at runtime.
-/// It is converted to a [`crate::step::Step`] for step detection.
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+/// It is converted to a [`crate::intern::step::Step`] for step detection.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub(crate) struct Step {
     /// The unique identifier for the step.
     pub id: String,
@@ -39,7 +39,7 @@ pub(crate) struct Step {
     pub keyframes: Vec<StepPosition>,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub(crate) struct StepPosition {
     /// Reference to the name of a pose
     pub pose: String,

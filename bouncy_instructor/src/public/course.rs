@@ -1,10 +1,13 @@
+use super::parsing;
 use super::parsing::ParseFileError;
-use super::{parsing, StepInfo};
+use crate::intern::content_collection::ContentCollection;
 use crate::intern::tracker_dance_collection::TrackerDanceCollection;
+use crate::wrapper::step_wrapper::StepWrapper;
 use crate::Tracker;
 use std::rc::Rc;
 use wasm_bindgen::prelude::wasm_bindgen;
 
+#[derive(Debug)]
 #[wasm_bindgen]
 pub struct Course {
     pub(crate) id: String,
@@ -12,7 +15,7 @@ pub struct Course {
     pub(crate) explanation: Option<String>,
     pub(crate) featured_step_id: String,
     pub(crate) lessons: Vec<Lesson>,
-    pub(crate) collection: TrackerDanceCollection,
+    pub(crate) collection: ContentCollection,
 }
 
 #[derive(Debug, Clone)]
@@ -30,7 +33,7 @@ pub struct Lesson {
 pub struct LessonPart {
     pub(crate) explanation: Option<String>,
     pub(crate) step_name: String,
-    pub(crate) step_info: StepInfo,
+    pub(crate) step_wrapper: StepWrapper,
     pub(crate) bpms: Vec<u16>,
 }
 
@@ -62,14 +65,14 @@ impl Course {
     }
 
     #[wasm_bindgen(js_name = "featuredStep")]
-    pub fn featured_step(&self) -> Option<crate::StepInfo> {
+    pub fn featured_step(&self) -> Option<StepWrapper> {
         crate::step_by_id(self.featured_step_id.clone(), false)
     }
 
     pub fn tracker(&self, lesson_index: usize) -> Option<Tracker> {
         self.lessons
             .get(lesson_index)
-            .map(|lesson| lesson.tracker(self.collection.clone()))
+            .map(|lesson| lesson.tracker(self.collection.tracker_view.clone()))
     }
 }
 
@@ -103,14 +106,16 @@ impl Lesson {
 
 impl Lesson {
     pub(crate) fn tracker(&self, db: impl Into<Rc<TrackerDanceCollection>>) -> crate::Tracker {
+        let db = db.into();
         let first_step = self
             .parts
             .first()
             .expect("no step in lesson to track")
-            .step_info
+            .step_wrapper
             .clone();
         // TODO: make this number configurable
-        let mut tracker = Tracker::new(db, Some(first_step), Some(20));
+        let target_step = Some(first_step.info(&db).clone());
+        let mut tracker = Tracker::new(db, target_step, Some(20));
         // TODO: make half speed property configurable
         tracker.detector.half_speed = true;
         tracker
@@ -131,8 +136,8 @@ impl LessonPart {
     }
 
     #[wasm_bindgen(getter)]
-    pub fn step(&self) -> StepInfo {
-        self.step_info.clone()
+    pub fn step(&self) -> StepWrapper {
+        self.step_wrapper.clone()
     }
     #[wasm_bindgen(getter)]
     pub fn bpms(&self) -> Vec<u16> {
@@ -178,16 +183,17 @@ impl LessonPart {
         step_name: String,
         explanation: Option<String>,
         bpms: Vec<u16>,
-        state: &TrackerDanceCollection,
+        state: &ContentCollection,
     ) -> Result<Self, CourseError> {
-        let step = state
+        let step_wrapper = state
             .step(&step_name)
+            .cloned()
             .ok_or_else(|| CourseError::MissingStep(step_name.clone()))?;
-        let step_info = StepInfo::from_step(step.clone(), state);
+
         Ok(LessonPart {
             explanation,
             step_name,
-            step_info,
+            step_wrapper,
             bpms,
         })
     }
@@ -198,18 +204,6 @@ impl From<CourseError> for ParseFileError {
         match err {
             CourseError::MissingStep(s) => ParseFileError::UnknownStepName(s),
         }
-    }
-}
-
-impl std::fmt::Debug for Course {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("Course")
-            .field("id", &self.id)
-            .field("name", &self.name)
-            .field("featured_step_id", &self.featured_step_id)
-            .field("lessons", &self.lessons)
-            .field("collection", &self.collection.short_debug_string())
-            .finish()
     }
 }
 
