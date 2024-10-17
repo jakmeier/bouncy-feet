@@ -75,6 +75,9 @@
     "editor": {
         "title": "Labor",
         "nav": "Labor",
+        "description0": "Im Labor kannst du eigene Schritte aus eigenen Körperpositionen komplett frei erfinden.",
+        "description1": "Kreiere deine eigenen Schritte und teile sie mit deinen Freunden.",
+        "description2": "Diese Funktionen für Fortgeschrittene Nutzer sind in der Testphase gratis für alle zugänglich.",
         "edit-dance-context-menu": "Bearbeiten",
         "dance-copy-postfix": "Kopie",
         "delete-dance-button": "Tanz löschen",
@@ -87,6 +90,16 @@
         "overwrite-existing-button": "Überschreiben",
         "direction": "Richtung",
         "speed": "Tempo",
+        "pose": {
+            "title": "Labor: Posen",
+            "list": "Meine Posen",
+            "new": "Neue Pose erstellen"
+        },
+        "step": {
+            "title": "Labor: Schritte",
+            "list": "Meine Schritte",
+            "new": "Neuen Schritt erstellen"
+        },
         "new-dance": {
             "default-dance-name": "Mein Tanz",
             "pick-name-prompt": "Wähle einen Namen",

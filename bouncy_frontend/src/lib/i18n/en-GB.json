@@ -75,6 +75,9 @@
     "editor": {
         "title": "Laboratory",
         "nav": "Laboratory",
+        "description0": "The laboratory allows you to invent your own moves freely, using custom body positions.",
+        "description1": "Create your own dance moves and share them with your friends.",
+        "description2": "During the test phase, these features for advanced users are available for free to everyone.",
         "edit-dance-context-menu": "Edit",
         "dance-copy-postfix": "copy",
         "delete-dance-button": "Delete dance",
@@ -87,6 +90,16 @@
         "overwrite-existing-button": "Overwrite",
         "direction": "Direction",
         "speed": "Speed",
+        "pose": {
+            "title": "Lab: Poses",
+            "list": "My poses",
+            "new": "Create new pose"
+        },
+        "step": {
+            "title": "Lab: Steps",
+            "list": "My steps",
+            "new": "Create new step"
+        },
         "new-dance": {
             "default-dance-name": "My Dance",
             "pick-name-prompt": "Pick a name",

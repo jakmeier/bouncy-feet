@@ -1,43 +1,36 @@
 <script>
-  import Svg from '$lib/components/avatar/Svg.svelte';
-  import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
-  import VideoToStep from '$lib/components/editor/VideoToStep.svelte';
-  import { LEFT_RIGHT_COLORING_LIGHT } from '$lib/constants';
-  import { getContext } from 'svelte';
-
-  /** @type {import('./$types').PageData} */
-  export let data;
-  // const poses = data.lookupPoses();
-  const localCollectionCtx = getContext('localCollection');
-  const poses = localCollectionCtx.poses;
+  import Header from '$lib/components/ui/Header.svelte';
+  import { t } from '$lib/i18n';
 </script>
 
-<div class="poses">
-  {#each $poses as pose}
-    <div class="pose">
-      <p>{pose.name('en')}</p>
-      <div class="avatar">
-        <Svg width={200} height={200} orderByZ>
-          <SvgAvatar
-            skeleton={pose.skeleton()}
-            width={200}
-            height={200}
-            style={LEFT_RIGHT_COLORING_LIGHT}
-          ></SvgAvatar>
-        </Svg>
-      </div>
-    </div>
-  {/each}
+<Header title={$t('editor.title')}></Header>
+
+<div class="centered">
+  <p>
+    {$t('editor.description0')}
+    {$t('editor.description1')}
+  </p>
+  <i>
+    {$t('editor.description2')}
+  </i>
+
+  <div class="buttons">
+    <a href="./pose">
+      <button class="light wide"> {$t('editor.pose.list')} </button>
+    </a>
+    <a href="./step">
+      <button class="light wide"> {$t('editor.step.list')} </button>
+    </a>
+  </div>
 </div>
 
-<VideoToStep></VideoToStep>
-
 <style>
-  .poses {
-    display: flex;
-    flex-wrap: wrap;
+  .centered {
+    max-width: 80%;
+    margin: auto;
+    text-align: center;
   }
-  .pose {
-    max-width: 200px;
+  .buttons {
+    margin-top: 20px;
   }
 </style>
