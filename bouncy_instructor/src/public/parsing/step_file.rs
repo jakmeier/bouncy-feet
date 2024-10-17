@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 const CURRENT_VERSION: u16 = 0;
 
 /// Format for pose definition files.
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub(crate) struct StepFile {
     pub version: u16,
     pub steps: Vec<Step>,
@@ -73,6 +73,13 @@ pub(crate) enum Orientation {
 }
 
 impl StepFile {
+    pub(crate) fn new() -> Self {
+        Self {
+            version: CURRENT_VERSION,
+            steps: vec![],
+        }
+    }
+
     pub(crate) fn from_str(text: &str) -> Result<Self, ParseFileError> {
         let parsed: StepFile = ron::from_str(text)?;
         if parsed.version != CURRENT_VERSION {
