@@ -1,5 +1,9 @@
 <script>
-  import VideoToStep from '$lib/components/editor/VideoToStep.svelte';
+  import VideoToPose from '$lib/components/editor/VideoToPose.svelte';
+  import Header from '$lib/components/ui/Header.svelte';
+  import { t } from '$lib/i18n';
 </script>
 
-<VideoToStep></VideoToStep>
+<Header title={$t('editor.pose.new')}></Header>
+
+<VideoToPose></VideoToPose>
