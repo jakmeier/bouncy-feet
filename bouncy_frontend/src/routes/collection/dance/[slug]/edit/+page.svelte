@@ -13,7 +13,7 @@
 
   const localCollection = getContext('localCollection');
   const localDances = localCollection.dances;
-  const fileBuilder = localCollection.builder;
+  const fileBuilder = localCollection.danceBuilder;
 
   const id = $page.params.slug;
 
