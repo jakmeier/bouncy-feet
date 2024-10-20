@@ -9,6 +9,7 @@
   import { SkeletonField } from '$lib/instructor/bouncy_instructor_bg';
   import Svg from '../avatar/Svg.svelte';
   import SvgAvatar from '../avatar/SvgAvatar.svelte';
+  import Button from '../ui/Button.svelte';
 
   let bodyParts = [
     { name: 'editor.body.arm', angle: 0, isKey: false, weight: null },
@@ -32,16 +33,16 @@
     pose = newSkeleton.pose();
     skeleton = pose.skeleton();
 
-    bodyParts[0].angle = pose.getAngle(SkeletonField.LeftArm);
-    bodyParts[1].angle = pose.getAngle(SkeletonField.RightArm);
-    bodyParts[2].angle = pose.getAngle(SkeletonField.LeftForearm);
-    bodyParts[3].angle = pose.getAngle(SkeletonField.RightForearm);
-    bodyParts[4].angle = pose.getAngle(SkeletonField.LeftThigh);
-    bodyParts[5].angle = pose.getAngle(SkeletonField.RightThigh);
-    bodyParts[6].angle = pose.getAngle(SkeletonField.LeftShin);
-    bodyParts[7].angle = pose.getAngle(SkeletonField.RightShin);
-    bodyParts[8].angle = pose.getAngle(SkeletonField.LeftFoot);
-    bodyParts[9].angle = pose.getAngle(SkeletonField.RightFoot);
+    bodyParts[0].angle = pose.getAngle(SkeletonField.LeftArm) - 90.0;
+    bodyParts[1].angle = pose.getAngle(SkeletonField.RightArm) - 90.0;
+    bodyParts[2].angle = pose.getAngle(SkeletonField.LeftForearm) - 90.0;
+    bodyParts[3].angle = pose.getAngle(SkeletonField.RightForearm) - 90.0;
+    bodyParts[4].angle = pose.getAngle(SkeletonField.LeftThigh) - 90.0;
+    bodyParts[5].angle = pose.getAngle(SkeletonField.RightThigh) - 90.0;
+    bodyParts[6].angle = pose.getAngle(SkeletonField.LeftShin) - 90.0;
+    bodyParts[7].angle = pose.getAngle(SkeletonField.RightShin) - 90.0;
+    bodyParts[8].angle = pose.getAngle(SkeletonField.LeftFoot) - 90.0;
+    bodyParts[9].angle = pose.getAngle(SkeletonField.RightFoot) - 90.0;
   }
 
   /** @returns {PoseWrapper | undefined} */
@@ -64,6 +65,12 @@
       pose.setAngle(SkeletonField.LeftFoot, bodyParts[8].angle);
       pose.setAngle(SkeletonField.RightFoot, bodyParts[9].angle);
 
+      updateSkeleton();
+    }
+  }
+
+  function updateSkeleton() {
+    if (pose) {
       skeleton = pose.skeleton();
     }
   }
@@ -118,17 +125,62 @@
       {/if}
     </Svg>
   </div>
+
+  {#if pose}
+    <div class="direction">
+      <!-- {PoseDirection[pose?.direction]} -->
+      <Button
+        class="light short"
+        symbolSize={29}
+        symbol="sync"
+        on:click={() => {
+          pose.setDirection((pose.direction + 1) % 2);
+          updateSkeleton();
+        }}
+      ></Button>
+    </div>
+
+    <div class="body-turn">
+      <div class="turn">
+        <label for="turn-shoulder">{$t('editor.body.shoulder')}</label>
+        <input
+          name="turn-shoulder"
+          type="number"
+          class="turn-input angle-input"
+          bind:value={pose.turnShoulder}
+          on:change={updateSkeleton}
+          placeholder={$t('editor.body.shoulder')}
+          min={-45}
+          max={45}
+        />
+      </div>
+
+      <div class="turn">
+        <label for="turn-hip">{$t('editor.body.hip')}</label>
+        <input
+          name="turn-hip"
+          type="number"
+          class="turn-input angle-input"
+          bind:value={pose.turnHip}
+          on:change={updateSkeleton}
+          placeholder={$t('editor.body.hip')}
+          min={-45}
+          max={45}
+        />
+      </div>
+    </div>
+  {/if}
 </div>
 
 <style>
   .container {
     display: grid;
     grid-template-areas:
+      'right-values direction left-values'
       'right-values avatar left-values'
       'right-values avatar left-values'
       'right-values avatar left-values'
-      'right-values avatar left-values'
-      'right-values avatar left-values';
+      'right-values body-turn left-values';
     gap: 8px;
     justify-items: center;
   }
@@ -142,6 +194,12 @@
   }
   .avatar {
     grid-area: avatar;
+  }
+  .direction {
+    grid-area: direction;
+  }
+  .body-turn {
+    grid-area: body-turn;
   }
   .input-group {
     padding: 5px;
@@ -157,10 +215,21 @@
     width: 100%;
     text-align: center;
   }
+  .turn-input {
+    font-size: 20px;
+  }
+  .body-turn {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 10px;
+  }
 
   @media (max-width: 600px) {
     .container {
       grid-template-areas:
+        'direction direction'
+        'body-turn body-turn'
         'avatar avatar'
         'right-values left-values';
     }

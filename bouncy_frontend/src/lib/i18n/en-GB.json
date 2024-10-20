@@ -113,7 +113,9 @@
             "forearm": "Forearm",
             "thigh": "Thigh",
             "shin": "Shin",
-            "foot": "Foot"
+            "foot": "Foot",
+            "shoulder": "Shoulder",
+            "hip": "Hip"
         }
     },
     "record": {

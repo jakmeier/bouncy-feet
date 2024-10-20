@@ -2,6 +2,7 @@ use super::skeleton_wrapper::SkeletonWrapper;
 use crate::intern::geom::SignedAngle;
 use crate::intern::pose::{Limb, LimbPosition, Pose};
 use crate::intern::tracker_dance_collection::TrackerDanceCollection;
+use crate::pose_file::PoseDirection;
 use crate::skeleton::{Cartesian2d, Skeleton, SkeletonField};
 use crate::{pose_file, STATE};
 use wasm_bindgen::prelude::wasm_bindgen;
@@ -138,12 +139,12 @@ impl PoseWrapper {
 impl PoseWrapper {
     pub fn skeleton(&mut self) -> Skeleton {
         if self.skeleton_cache.is_none() {
-            // let skeleton_3d = Skeleton3d::from_with_db(&self.pose(), &self.db, direction);
-            // TODO: select direction
             STATE.with_borrow(|state| {
                 let db: &TrackerDanceCollection = &state.global_db.tracker_view;
-                let direction = crate::intern::skeleton_3d::Direction::East;
-                let skeleton = Skeleton::from_pose(&self.pose(), db, direction);
+                let pose = self.pose();
+                // TODO: the direction here should be set by the parent step position
+                let direction = pose.direction.into();
+                let skeleton = Skeleton::from_pose(&pose, db, direction);
                 self.skeleton_cache = Some(skeleton);
             })
         }
@@ -213,6 +214,61 @@ impl PoseWrapper {
         let limb: pose_file::Limb = field.into();
         let limb_position = self.find_limb_position(limb);
         limb_position.map(|p| p.weight).unwrap_or(0.0)
+    }
+
+    #[wasm_bindgen(getter, js_name = direction)]
+    pub fn direction(&self) -> PoseDirection {
+        self.pose_definition.direction
+    }
+
+    #[wasm_bindgen(js_name = setDirection)]
+    pub fn set_direction(&mut self, direction: PoseDirection) {
+        self.pose_definition.direction = direction;
+        self.invalidate_cache();
+    }
+
+    #[wasm_bindgen(getter, js_name = xShift)]
+    pub fn x_shift(&self) -> f32 {
+        self.pose_definition.x_shift
+    }
+
+    #[wasm_bindgen(setter, js_name = xShift)]
+    pub fn set_x_shift(&mut self, x_shift: f32) {
+        self.pose_definition.x_shift = x_shift;
+        self.invalidate_cache();
+    }
+
+    #[wasm_bindgen(getter, js_name = yShift)]
+    pub fn get_y_shift(&self) -> f32 {
+        self.pose_definition.y_shift
+    }
+
+    #[wasm_bindgen(setter, js_name = yShift)]
+    pub fn y_shift(&mut self, y_shift: f32) {
+        self.pose_definition.y_shift = y_shift;
+        self.invalidate_cache();
+    }
+
+    #[wasm_bindgen(getter, js_name = turnShoulder)]
+    pub fn get_turn_shoulder(&self) -> i16 {
+        self.pose_definition.turn_shoulder
+    }
+
+    #[wasm_bindgen(setter, js_name = turnShoulder)]
+    pub fn set_turn_shoulder(&mut self, turn_shoulder: i16) {
+        self.pose_definition.turn_shoulder = turn_shoulder;
+        self.invalidate_cache();
+    }
+
+    #[wasm_bindgen(getter, js_name = turnHip)]
+    pub fn turn_hip(&self) -> i16 {
+        self.pose_definition.turn_hip
+    }
+
+    #[wasm_bindgen(setter, js_name = turnHip)]
+    pub fn set_turn_hip(&mut self, turn_hip: i16) {
+        self.pose_definition.turn_hip = turn_hip;
+        self.invalidate_cache();
     }
 }
 

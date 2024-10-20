@@ -33,7 +33,7 @@
     onPoseUpdated(pose);
   }
 
-  /** @returns {PoseWrapper} newPose */
+  /** @returns {PoseWrapper|undefined} newPose */
   export function getPose() {
     return pose;
   }
@@ -253,8 +253,7 @@
         'avatar avatar'
         'name name'
         'right left'
-        'center center'
-        ;
+        'center center';
     }
   }
 </style>

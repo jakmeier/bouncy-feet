@@ -1,9 +1,9 @@
 //! Defines the external format for defining poses, which are still positions of
 //! a body.
 
-use std::collections::HashMap;
-
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use wasm_bindgen::prelude::wasm_bindgen;
 
 use super::course_file::TranslatedString;
 use super::{ParseFileError, VersionCheck};
@@ -150,6 +150,7 @@ pub(crate) enum BodyPart {
     Toes,
 }
 
+#[wasm_bindgen]
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone, Copy)]
 pub enum PoseDirection {
     /// Dancer faces the camera.

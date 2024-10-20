@@ -83,6 +83,40 @@ export function addLocalPoses(poses: (PoseWrapper)[]): void;
 export function loadLocalSteps(steps: (StepWrapper)[]): void;
 /**
 */
+export enum DetectionState {
+/**
+* Neutral state, not detecting anything.
+*/
+  Init = 1,
+/**
+* Dance is positioning themselves, detecting the idle position.
+*/
+  Positioning = 2,
+/**
+* About to go over to live tracking, playing a countdown audio.
+*/
+  CountDown = 3,
+/**
+* Tracking current movements.
+*/
+  LiveTracking = 4,
+/**
+* No longer tracking but the results of the previous tracking are
+* available.
+*/
+  TrackingDone = 5,
+}
+/**
+* Best guess for what the dancer needs to change to fit the pose.
+*/
+export enum PoseHint {
+  DontKnow = 0,
+  LeftRight = 1,
+  ZOrder = 2,
+  WrongDirection = 3,
+}
+/**
+*/
 export enum DetectionFailureReason {
 /**
 * The last match was too recent to have another match.
@@ -111,6 +145,18 @@ export enum DetectionFailureReason {
 }
 /**
 */
+export enum PoseDirection {
+/**
+* Dancer faces the camera.
+*/
+  Front = 0,
+/**
+* Dancer faces to their right. (Left in non-mirrored video.)
+*/
+  Right = 1,
+}
+/**
+*/
 export enum SkeletonField {
   LeftThigh = 0,
   LeftShin = 1,
@@ -122,40 +168,6 @@ export enum SkeletonField {
   RightArm = 7,
   RightForearm = 8,
   RightFoot = 9,
-}
-/**
-* Best guess for what the dancer needs to change to fit the pose.
-*/
-export enum PoseHint {
-  DontKnow = 0,
-  LeftRight = 1,
-  ZOrder = 2,
-  WrongDirection = 3,
-}
-/**
-*/
-export enum DetectionState {
-/**
-* Neutral state, not detecting anything.
-*/
-  Init = 1,
-/**
-* Dance is positioning themselves, detecting the idle position.
-*/
-  Positioning = 2,
-/**
-* About to go over to live tracking, playing a countdown audio.
-*/
-  CountDown = 3,
-/**
-* Tracking current movements.
-*/
-  LiveTracking = 4,
-/**
-* No longer tracking but the results of the previous tracking are
-* available.
-*/
-  TrackingDone = 5,
 }
 
 import type { Readable } from "svelte/store";
@@ -689,6 +701,25 @@ export class PoseWrapper {
 * @returns {number}
 */
   getWeight(field: SkeletonField): number;
+/**
+* @param {PoseDirection} direction
+*/
+  setDirection(direction: PoseDirection): void;
+/**
+*/
+  readonly direction: PoseDirection;
+/**
+*/
+  turnHip: number;
+/**
+*/
+  turnShoulder: number;
+/**
+*/
+  xShift: number;
+/**
+*/
+  yShift: number;
 }
 /**
 * Projected line segment with two coordinates and a Z index.
@@ -956,6 +987,16 @@ export class StepPositionBuilder {
 * @param {number} height
 */
   setJumpHeight(height: number): void;
+/**
+* @param {string} orientation
+*/
+  setOrientation(orientation: string): void;
+/**
+*/
+  readonly jumpHeight: number | undefined;
+/**
+*/
+  readonly orientation: string;
 }
 /**
 */

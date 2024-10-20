@@ -113,7 +113,9 @@
             "forearm": "Unterarm",
             "thigh": "Oberschenkel",
             "shin": "Unterschenkel",
-            "foot": "Fuss"
+            "foot": "Fuss",
+            "shoulder": "Schulter",
+            "hip": "Hüfte"
         }
     },
     "record": {
