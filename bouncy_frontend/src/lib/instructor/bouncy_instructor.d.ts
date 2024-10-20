@@ -82,39 +82,17 @@ export function addLocalPoses(poses: (PoseWrapper)[]): void;
 */
 export function loadLocalSteps(steps: (StepWrapper)[]): void;
 /**
+* Define in which direction a pose should be oriented.
 */
-export enum SkeletonField {
-  LeftThigh = 0,
-  LeftShin = 1,
-  LeftArm = 2,
-  LeftForearm = 3,
-  LeftFoot = 4,
-  RightThigh = 5,
-  RightShin = 6,
-  RightArm = 7,
-  RightForearm = 8,
-  RightFoot = 9,
-}
-/**
-*/
-export enum PoseDirection {
-/**
-* Dancer faces the camera.
-*/
-  Front = 0,
-/**
-* Dancer faces to their right. (Left in non-mirrored video.)
-*/
+export enum Orientation {
+  ToCamera = 0,
   Right = 1,
-}
+  Away = 2,
+  Left = 3,
 /**
-* Best guess for what the dancer needs to change to fit the pose.
+* It doesn't matter in which direction the pose is done.
 */
-export enum PoseHint {
-  DontKnow = 0,
-  LeftRight = 1,
-  ZOrder = 2,
-  WrongDirection = 3,
+  Any = 4,
 }
 /**
 */
@@ -168,6 +146,41 @@ export enum DetectionFailureReason {
 * No *new* data to run detection against.
 */
   NoNewData = 6,
+}
+/**
+* Best guess for what the dancer needs to change to fit the pose.
+*/
+export enum PoseHint {
+  DontKnow = 0,
+  LeftRight = 1,
+  ZOrder = 2,
+  WrongDirection = 3,
+}
+/**
+*/
+export enum PoseDirection {
+/**
+* Dancer faces the camera.
+*/
+  Front = 0,
+/**
+* Dancer faces to their right. (Left in non-mirrored video.)
+*/
+  Right = 1,
+}
+/**
+*/
+export enum SkeletonField {
+  LeftThigh = 0,
+  LeftShin = 1,
+  LeftArm = 2,
+  LeftForearm = 3,
+  LeftFoot = 4,
+  RightThigh = 5,
+  RightShin = 6,
+  RightArm = 7,
+  RightForearm = 8,
+  RightFoot = 9,
 }
 
 import type { Readable } from "svelte/store";
@@ -784,17 +797,6 @@ export class Segment {
 export class Skeleton {
   free(): void;
 /**
-* Compute 2d coordinates for the skeleton for rendering.
-*
-* The skeleton will be rendered assuming hard-coded values for body part
-* proportional lengths, multiplied with the size parameter. The hip
-* segment will have its center at the given position.
-* @param {Cartesian2d} hip_center
-* @param {number} size
-* @returns {SkeletonV2}
-*/
-  render(hip_center: Cartesian2d, size: number): SkeletonV2;
-/**
 * @param {boolean} sideway
 * @returns {Skeleton}
 */
@@ -807,6 +809,17 @@ export class Skeleton {
 * @returns {string}
 */
   debugString(): string;
+/**
+* Compute 2d coordinates for the skeleton for rendering.
+*
+* The skeleton will be rendered assuming hard-coded values for body part
+* proportional lengths, multiplied with the size parameter. The hip
+* segment will have its center at the given position.
+* @param {Cartesian2d} hip_center
+* @param {number} size
+* @returns {SkeletonV2}
+*/
+  render(hip_center: Cartesian2d, size: number): SkeletonV2;
 /**
 * Does the dancer face away more than they face the camera?
 */
@@ -941,10 +954,6 @@ export class StepFileWrapper {
 */
   constructor();
 /**
-* FIXME: This adds steps as lab steps and then calls a warm up. This is to
-* avoid the problem where a step wrapper can only be created for steps
-* that are already registered in global state. A proper refactoring should
-* solve this.
 * @param {string} text
 * @returns {StepFileWrapper}
 */
@@ -988,15 +997,15 @@ export class StepPositionBuilder {
 */
   setJumpHeight(height: number): void;
 /**
-* @param {string} orientation
+* @param {Orientation} orientation
 */
-  setOrientation(orientation: string): void;
+  setOrientation(orientation: Orientation): void;
 /**
 */
   readonly jumpHeight: number | undefined;
 /**
 */
-  readonly orientation: string;
+  readonly orientation: Orientation;
 }
 /**
 */

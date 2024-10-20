@@ -4,6 +4,7 @@
 use crate::parsing::ParseFileError;
 use crate::pose_file::BodyPoint;
 use serde::{Deserialize, Serialize};
+use wasm_bindgen::prelude::wasm_bindgen;
 
 const CURRENT_VERSION: u16 = 0;
 
@@ -63,7 +64,8 @@ pub(crate) struct StepPosition {
 
 /// Define in which direction a pose should be oriented.
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone, Copy)]
-pub(crate) enum Orientation {
+#[wasm_bindgen]
+pub enum Orientation {
     ToCamera,
     Right,
     Away,

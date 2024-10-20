@@ -120,10 +120,10 @@ export function stepfilewrapper_removeStep(a: number, b: number, c: number, d: n
 export function stepfilewrapper_steps(a: number, b: number): void;
 export function steppositionbuilder_jumpHeight(a: number, b: number): void;
 export function steppositionbuilder_new(a: number): number;
-export function steppositionbuilder_orientation(a: number, b: number): void;
+export function steppositionbuilder_orientation(a: number): number;
 export function steppositionbuilder_pose(a: number): number;
 export function steppositionbuilder_setJumpHeight(a: number, b: number): void;
-export function steppositionbuilder_setOrientation(a: number, b: number, c: number): void;
+export function steppositionbuilder_setOrientation(a: number, b: number): void;
 export function steps(a: number): void;
 export function stepsByName(a: number, b: number, c: number): void;
 export function stepsBySource(a: number, b: number, c: number): void;

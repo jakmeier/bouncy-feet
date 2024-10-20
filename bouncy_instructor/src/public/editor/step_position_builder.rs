@@ -40,14 +40,27 @@ impl StepPositionBuilder {
     }
 
     // TODO
-    // #[wasm_bindgen(js_name="setOrientation")]
-    // pub fn set_orientation(&mut self, ){}
     // #[wasm_bindgen(js_name="setPivot")]
     // pub fn set_pivot(&mut self, ){}
+
+    #[wasm_bindgen(getter, js_name = "jumpHeight")]
+    pub fn jump_height(&self) -> Option<f32> {
+        self.jump_height
+    }
 
     #[wasm_bindgen(js_name = "setJumpHeight")]
     pub fn set_jump_height(&mut self, height: f32) {
         self.jump_height = Some(height);
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn orientation(&self) -> Orientation {
+        self.orientation
+    }
+
+    #[wasm_bindgen(js_name = "setOrientation")]
+    pub fn set_orientation(&mut self, orientation: Orientation) {
+        self.orientation = orientation
     }
 }
 
