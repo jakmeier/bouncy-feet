@@ -26,18 +26,11 @@ impl StepFileWrapper {
     }
 
     #[wasm_bindgen(js_name = "fromRon")]
-    /// FIXME: This adds steps as lab steps and then calls a warm up. This is to
-    /// avoid the problem where a step wrapper can only be created for steps
-    /// that are already registered in global state. A proper refactoring should
-    /// solve this.
     pub fn from_ron(text: &str) -> Result<StepFileWrapper, JsValue> {
         let file = StepFile::from_str(text)?;
         let file_wrapper = Self::new_cold_lab_step_file(file);
 
         STATE.with_borrow_mut(|state| {
-            state
-                .global_db
-                .replace_steps(StepSource::new("lab".to_owned()), file_wrapper.steps());
             file_wrapper.warm_up(&state.global_db.tracker_view);
         });
         Ok(file_wrapper)

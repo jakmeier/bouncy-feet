@@ -45,10 +45,8 @@ impl StepWrapper {
     }
 
     pub(crate) fn warm_up(&mut self, db: &TrackerDanceCollection) {
-        let step = db
-            .step(&self.definition().id)
-            .cloned()
-            .unwrap_or_else(|| panic!("missing step {:?}", self.definition().id));
+        let step = db.load_step(self.definition(), &self.source).unwrap();
+
         *self.cached_intern.borrow_mut() = Some(step.clone());
         *self.cached_info.borrow_mut() = Some(StepInfo::from_step(step, db));
     }
@@ -230,6 +228,7 @@ impl StepWrapper {
         Rc::make_mut(&mut self.step_definition)
             .keyframes
             .push(position.into());
+        // FIXME: this essentially deletes changes and reads them again from the global db lol
         self.recompute_caches();
     }
 

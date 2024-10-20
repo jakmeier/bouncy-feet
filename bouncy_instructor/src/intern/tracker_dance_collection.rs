@@ -325,7 +325,7 @@ impl TrackerDanceCollection {
     /// TODO: Can I rely less on this kind of step? The dependence on a specific
     /// collection breaks much of the architecture.
     pub(crate) fn load_step(
-        &mut self,
+        &self,
         def: &step_file::Step,
         source: &StepSource,
     ) -> Result<Step, AddStepError> {
