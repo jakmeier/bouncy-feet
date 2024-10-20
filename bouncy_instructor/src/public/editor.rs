@@ -3,6 +3,7 @@ use wasm_bindgen::JsValue;
 
 pub(crate) mod dance_builder;
 pub(crate) mod dance_file_builder;
+pub(crate) mod step_position_builder;
 
 #[derive(Error, Debug)]
 pub enum ExportError {

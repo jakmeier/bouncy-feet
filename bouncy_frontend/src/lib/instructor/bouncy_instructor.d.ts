@@ -74,30 +74,13 @@ export function dances(): (DanceWrapper)[];
 */
 export function danceBuilderFromDance(dance_id: string): DanceBuilder;
 /**
+* @param {(PoseWrapper)[]} poses
 */
-export enum DetectionState {
+export function addLocalPoses(poses: (PoseWrapper)[]): void;
 /**
-* Neutral state, not detecting anything.
+* @param {(StepWrapper)[]} steps
 */
-  Init = 1,
-/**
-* Dance is positioning themselves, detecting the idle position.
-*/
-  Positioning = 2,
-/**
-* About to go over to live tracking, playing a countdown audio.
-*/
-  CountDown = 3,
-/**
-* Tracking current movements.
-*/
-  LiveTracking = 4,
-/**
-* No longer tracking but the results of the previous tracking are
-* available.
-*/
-  TrackingDone = 5,
-}
+export function loadLocalSteps(steps: (StepWrapper)[]): void;
 /**
 */
 export enum DetectionFailureReason {
@@ -148,6 +131,31 @@ export enum PoseHint {
   LeftRight = 1,
   ZOrder = 2,
   WrongDirection = 3,
+}
+/**
+*/
+export enum DetectionState {
+/**
+* Neutral state, not detecting anything.
+*/
+  Init = 1,
+/**
+* Dance is positioning themselves, detecting the idle position.
+*/
+  Positioning = 2,
+/**
+* About to go over to live tracking, playing a countdown audio.
+*/
+  CountDown = 3,
+/**
+* Tracking current movements.
+*/
+  LiveTracking = 4,
+/**
+* No longer tracking but the results of the previous tracking are
+* available.
+*/
+  TrackingDone = 5,
 }
 
 import type { Readable } from "svelte/store";
@@ -745,6 +753,17 @@ export class Segment {
 export class Skeleton {
   free(): void;
 /**
+* Compute 2d coordinates for the skeleton for rendering.
+*
+* The skeleton will be rendered assuming hard-coded values for body part
+* proportional lengths, multiplied with the size parameter. The hip
+* segment will have its center at the given position.
+* @param {Cartesian2d} hip_center
+* @param {number} size
+* @returns {SkeletonV2}
+*/
+  render(hip_center: Cartesian2d, size: number): SkeletonV2;
+/**
 * @param {boolean} sideway
 * @returns {Skeleton}
 */
@@ -757,17 +776,6 @@ export class Skeleton {
 * @returns {string}
 */
   debugString(): string;
-/**
-* Compute 2d coordinates for the skeleton for rendering.
-*
-* The skeleton will be rendered assuming hard-coded values for body part
-* proportional lengths, multiplied with the size parameter. The hip
-* segment will have its center at the given position.
-* @param {Cartesian2d} hip_center
-* @param {number} size
-* @returns {SkeletonV2}
-*/
-  render(hip_center: Cartesian2d, size: number): SkeletonV2;
 /**
 * Does the dancer face away more than they face the camera?
 */
@@ -902,6 +910,10 @@ export class StepFileWrapper {
 */
   constructor();
 /**
+* FIXME: This adds steps as lab steps and then calls a warm up. This is to
+* avoid the problem where a step wrapper can only be created for steps
+* that are already registered in global state. A proper refactoring should
+* solve this.
 * @param {string} text
 * @returns {StepFileWrapper}
 */
@@ -928,9 +940,33 @@ export class StepFileWrapper {
   buildRon(): string;
 }
 /**
+* Used in the editor to add and edit poses of a step.
+*/
+export class StepPositionBuilder {
+  free(): void;
+/**
+* @param {PoseWrapper} pose
+*/
+  constructor(pose: PoseWrapper);
+/**
+* @returns {PoseWrapper}
+*/
+  pose(): PoseWrapper;
+/**
+* @param {number} height
+*/
+  setJumpHeight(height: number): void;
+}
+/**
 */
 export class StepWrapper {
   free(): void;
+/**
+* @param {string} id
+* @param {string} name
+* @param {string} source
+*/
+  constructor(id: string, name: string, source: string);
 /**
 * @param {number} beat
 * @returns {Skeleton}
@@ -954,6 +990,33 @@ export class StepWrapper {
 * @returns {number | undefined}
 */
   jumpHeight(beat: number): number | undefined;
+/**
+* Look up poses from the global collection, do not use for courses that
+* require a custom collection.
+* @returns {(PoseWrapper)[]}
+*/
+  poses(): (PoseWrapper)[];
+/**
+* Positions with poses from the global collection, do not use for courses
+* that require a custom collection.
+* @returns {(StepPositionBuilder)[]}
+*/
+  positions(): (StepPositionBuilder)[];
+/**
+* Add poses from the global collection, do not use for courses that
+* require a custom collection.
+* @param {StepPositionBuilder} position
+*/
+  addPosition(position: StepPositionBuilder): void;
+/**
+* @param {number} index
+*/
+  removePosition(index: number): void;
+/**
+* @param {number} index
+* @param {StepPositionBuilder} position
+*/
+  insertPosition(index: number, position: StepPositionBuilder): void;
 /**
 * The number of beats the step takes for one repetition.
 */
@@ -982,15 +1045,6 @@ export class StepWrapper {
 */
 export class Tracker {
   free(): void;
-/**
-* @param {number} timestamp
-* @returns {ExportedFrame}
-*/
-  exportFrame(timestamp: number): ExportedFrame;
-/**
-* @returns {string}
-*/
-  exportKeypoints(): string;
 /**
 * Create a tracker for all known steps.
 */
@@ -1149,6 +1203,15 @@ export class Tracker {
 * @returns {SkeletonV2 | undefined}
 */
   renderedKeypointsAt(timestamp: number, width: number, height: number): SkeletonV2 | undefined;
+/**
+* @param {number} timestamp
+* @returns {ExportedFrame}
+*/
+  exportFrame(timestamp: number): ExportedFrame;
+/**
+* @returns {string}
+*/
+  exportKeypoints(): string;
 /**
 */
   readonly detectionState: ReadableDetectionState;

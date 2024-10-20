@@ -314,7 +314,9 @@ mod tests {
                 ],
                 collection: ContentCollection {
                     poses(len): 2,
-                    steps(len): 2,
+                    steps(len/source): [
+                        "course: 2",
+                    ],
                     dances(len): 0,
                     tracker_view: "DanceCollection { limbs: (10): [\"LeftThigh\", \"LeftShin\", \"LeftFoot\", \"LeftArm\", \"LeftForearm\", \"RightThigh\", \"RightShin\", \"RightFoot\", \"RightArm\", \"RightForearm\"], poses(2): [\"in-place-right-up\", \"in-place-left-up\"], steps(2): [\"Run in place\", \"Another step for testing\"], dances(0): []}",
                 },

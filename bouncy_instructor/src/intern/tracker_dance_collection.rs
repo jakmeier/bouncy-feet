@@ -428,6 +428,14 @@ impl TrackerDanceCollection {
         self.steps.iter().filter(|step| step.id.contains("idle"))
     }
 
+    pub(crate) fn remove_step(&mut self, id: &str) -> Option<Step> {
+        if let Some(index) = self.steps.iter().position(|step| step.id == id) {
+            Some(self.steps.remove(index))
+        } else {
+            None
+        }
+    }
+
     /// A DB without default poses for testing where only one pose is needed.
     #[cfg(test)]
     pub(crate) fn test(target: super::geom::Angle3d) -> Self {

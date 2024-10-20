@@ -1,3 +1,4 @@
+use std::collections::{BTreeMap, HashSet};
 use std::rc::Rc;
 
 use super::step::StepSource;
@@ -24,7 +25,7 @@ use crate::{dance_file, step_file, AddDanceError, AddStepError};
 #[derive(Default, Clone)]
 pub(crate) struct ContentCollection {
     poses: Vec<PoseWrapper>,
-    steps: Vec<StepWrapper>,
+    steps: BTreeMap<StepSource, Vec<StepWrapper>>,
     dances: Vec<DanceWrapper>,
     // TODO: should use wrapper
     // courses: Vec<course_file::CourseFile>,
@@ -48,19 +49,24 @@ impl ContentCollection {
     }
 
     pub(crate) fn step(&self, id: &str) -> Option<&StepWrapper> {
-        self.steps.iter().find(|step| step.definition().id == id)
+        for steps in self.steps.values() {
+            let Some(step) = steps.iter().find(|step| step.definition().id == id) else {
+                continue;
+            };
+            return Some(step);
+        }
+        None
     }
 
     pub(crate) fn steps(&self) -> impl Iterator<Item = &StepWrapper> {
-        self.steps.iter()
+        self.steps.values().flatten()
     }
 
     pub(crate) fn steps_by_name<'a>(
         &'a self,
         name: &'a str,
     ) -> impl Iterator<Item = &'a StepWrapper> {
-        self.steps
-            .iter()
+        self.steps()
             .filter(move |step| step.definition().name == name)
     }
 
@@ -73,6 +79,25 @@ impl ContentCollection {
         Ok(())
     }
 
+    /// Add missing poses.
+    pub(crate) fn complement_poses(&mut self, poses: Vec<PoseWrapper>) {
+        // find out which poses need to be added
+        let mut existing: HashSet<&String> = self
+            .poses
+            .iter()
+            .map(|pose| &pose.definition().id)
+            .collect();
+
+        let mut to_add = vec![];
+        for pose in poses {
+            let existed = existing.remove(&pose.definition().id);
+            if !existed {
+                to_add.push(pose.definition().clone());
+            }
+        }
+        self.add_poses(to_add).unwrap();
+    }
+
     pub(crate) fn dances(&self) -> impl Iterator<Item = &DanceWrapper> {
         self.dances.iter()
     }
@@ -83,12 +108,25 @@ impl ContentCollection {
         source: StepSource,
     ) -> Result<(), AddStepError> {
         Rc::make_mut(&mut self.tracker_view).add_steps(steps.as_ref().iter(), source.clone())?;
-        self.steps.extend(
-            steps
-                .into_iter()
-                .map(|def| StepWrapper::new(def, source.clone()).warm_up(&self.tracker_view)),
+        self.steps.entry(source.clone()).or_default().extend(
+            steps.into_iter().map(|def| {
+                StepWrapper::new_cold(def, source.clone()).warmed_up(&self.tracker_view)
+            }),
         );
         Ok(())
+    }
+
+    pub(crate) fn replace_steps(&mut self, source: StepSource, steps: Vec<StepWrapper>) {
+        let removed = self.steps.insert(source.clone(), steps.clone());
+        if let Some(removed) = removed {
+            let tracker_view = Rc::make_mut(&mut self.tracker_view);
+            for step in removed {
+                tracker_view.remove_step(&step.definition().id);
+            }
+        }
+        Rc::make_mut(&mut self.tracker_view)
+            .add_steps(steps.iter().map(|s| s.definition()), source)
+            .unwrap();
     }
 
     pub(crate) fn add_dances(
@@ -113,7 +151,7 @@ impl ContentCollection {
 
         db.add_poses(self.poses.iter().map(|p| p.definition()))
             .expect(EXPECT);
-        for step in &self.steps {
+        for step in self.steps() {
             db.add_steps(std::iter::once(step.definition()), step.source().clone())
                 .expect(EXPECT);
         }
@@ -122,13 +160,23 @@ impl ContentCollection {
 
         self.tracker_view = Rc::new(db);
     }
+
+    pub(crate) fn pose_by_id(&self, pose_id: &str) -> Option<&PoseWrapper> {
+        self.poses.iter().find(|p| p.definition().id == pose_id)
+    }
 }
 
 impl std::fmt::Debug for ContentCollection {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let steps_len: Vec<String> = self
+            .steps
+            .iter()
+            .map(|(source, steps)| format!("{}: {}", &**source, steps.len()))
+            .collect();
+
         f.debug_struct("ContentCollection")
             .field("poses(len)", &self.poses.len())
-            .field("steps(len)", &self.steps.len())
+            .field("steps(len/source)", &steps_len)
             .field("dances(len)", &self.dances.len())
             .field("tracker_view", &self.tracker_view.short_debug_string())
             .finish()

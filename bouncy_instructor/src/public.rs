@@ -12,6 +12,7 @@ pub(crate) mod tracker;
 pub(crate) mod ui_event;
 pub(crate) mod wrapper;
 
+use crate::intern::step::StepSource;
 pub use crate::public::course::Course;
 pub use dance_info::DanceInfo;
 pub use keypoints::{Keypoints, Side as KeypointsSide};
@@ -184,4 +185,19 @@ async fn load_text_file(url: &str) -> Result<String, JsValue> {
     let js_value = JsFuture::from(resp.text()?).await?;
     let text = js_value.as_string().ok_or("Not a string")?;
     Ok(text)
+}
+
+#[wasm_bindgen(js_name = "addLocalPoses")]
+pub fn add_local_poses(poses: Vec<PoseWrapper>) {
+    STATE.with(|state| state.borrow_mut().global_db.complement_poses(poses));
+}
+
+#[wasm_bindgen(js_name = "loadLocalSteps")]
+pub fn load_local_steps(steps: Vec<StepWrapper>) {
+    STATE.with(|state| {
+        state
+            .borrow_mut()
+            .global_db
+            .replace_steps(StepSource::new("lab".to_owned()), steps)
+    });
 }

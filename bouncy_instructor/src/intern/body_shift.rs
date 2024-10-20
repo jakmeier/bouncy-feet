@@ -1,7 +1,7 @@
 use crate::skeleton::{Cartesian2d, Skeleton};
 
-use super::tracker_dance_collection::TrackerDanceCollection;
 use super::step::Step;
+use super::tracker_dance_collection::TrackerDanceCollection;
 
 /// Component for calculating how much the body shifts after N transitions.
 #[derive(Debug, Clone)]
@@ -20,7 +20,16 @@ impl BodyShift {
         }
     }
 
-    pub(crate) fn add_step(&mut self, step: &Step, skeletons: &[Skeleton], db: &TrackerDanceCollection) {
+    pub(crate) fn add_step(
+        &mut self,
+        step: &Step,
+        skeletons: &[Skeleton],
+        db: &TrackerDanceCollection,
+    ) {
+        if step.poses.is_empty() {
+            // nothing to add
+            return;
+        }
         for &pose in &step.poses {
             self.pose_body_shift.push(db.poses()[pose].shift);
         }
@@ -50,7 +59,9 @@ impl BodyShift {
 
     /// How much the body position deviates from the origin after N beats.
     pub(crate) fn at_beat(&self, beat: usize) -> Cartesian2d {
-        debug_assert!(!self.accumulated_body_shift.is_empty());
+        if self.accumulated_body_shift.is_empty() {
+            return Cartesian2d::default();
+        }
         let len = self.pose_body_shift.len();
         if len == 0 {
             return Cartesian2d::default();

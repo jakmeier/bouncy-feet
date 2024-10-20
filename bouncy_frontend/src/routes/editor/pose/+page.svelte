@@ -5,6 +5,7 @@
   import { getContext } from 'svelte';
   import Header from '$lib/components/ui/Header.svelte';
   import { t } from '$lib/i18n';
+  import Pose from '$lib/components/Pose.svelte';
 
   /** @type {import('./$types').PageData} */
   export let data;
@@ -26,17 +27,7 @@
 <div class="poses">
   {#each $poses as pose}
     <div class="pose">
-      <p>{pose.name('en')}</p>
-      <div class="avatar">
-        <Svg width={200} height={200} orderByZ>
-          <SvgAvatar
-            skeleton={pose.skeleton()}
-            width={200}
-            height={200}
-            style={LEFT_RIGHT_COLORING_LIGHT}
-          ></SvgAvatar>
-        </Svg>
-      </div>
+      <Pose {pose}></Pose>
     </div>
   {/each}
 </div>

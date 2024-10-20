@@ -92,6 +92,17 @@ impl StepFile {
     }
 }
 
+impl Step {
+    pub fn new_empty(id: String, name: String) -> Self {
+        Self {
+            id,
+            name,
+            variation: None,
+            keyframes: vec![],
+        }
+    }
+}
+
 impl Orientation {
     fn any(&self) -> bool {
         matches!(self, Orientation::Any)

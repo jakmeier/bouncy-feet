@@ -5,8 +5,10 @@ use wasm_bindgen::JsValue;
 
 use crate::editor::ExportError;
 use crate::intern::step::StepSource;
+use crate::intern::tracker_dance_collection::TrackerDanceCollection;
 use crate::step_file::StepFile;
 use crate::wrapper::step_wrapper::StepWrapper;
+use crate::STATE;
 
 #[derive(Debug, Clone)]
 #[wasm_bindgen]
@@ -20,14 +22,25 @@ pub struct StepFileWrapper {
 impl StepFileWrapper {
     #[wasm_bindgen(constructor)]
     pub fn new_empty() -> Self {
-        Self::new(StepFile::new())
+        Self::new_cold_lab_step_file(StepFile::new())
     }
 
     #[wasm_bindgen(js_name = "fromRon")]
+    /// FIXME: This adds steps as lab steps and then calls a warm up. This is to
+    /// avoid the problem where a step wrapper can only be created for steps
+    /// that are already registered in global state. A proper refactoring should
+    /// solve this.
     pub fn from_ron(text: &str) -> Result<StepFileWrapper, JsValue> {
         let file = StepFile::from_str(text)?;
+        let file_wrapper = Self::new_cold_lab_step_file(file);
 
-        Ok(Self::new(file))
+        STATE.with_borrow_mut(|state| {
+            state
+                .global_db
+                .replace_steps(StepSource::new("lab".to_owned()), file_wrapper.steps());
+            file_wrapper.warm_up(&state.global_db.tracker_view);
+        });
+        Ok(file_wrapper)
     }
 
     pub fn steps(&self) -> Vec<StepWrapper> {
@@ -87,17 +100,25 @@ impl StepFileWrapper {
 }
 
 impl StepFileWrapper {
-    fn new(file: StepFile) -> Self {
+    /// Creates a step file for the lab, with steps that need to be warmed up
+    /// before using them.
+    fn new_cold_lab_step_file(file: StepFile) -> Self {
         let source = StepSource::new("lab".to_owned());
         let steps = file
             .steps
             .iter()
             .cloned()
-            .map(|def| StepWrapper::new(def, source.clone()))
+            .map(|def| StepWrapper::new_cold(def, source.clone()))
             .collect();
         Self {
             step_file: Rc::new(RefCell::new(file)),
             steps_cache: Rc::new(RefCell::new(steps)),
+        }
+    }
+
+    fn warm_up(&self, db: &TrackerDanceCollection) {
+        for step in self.steps_cache.borrow_mut().iter_mut() {
+            step.warm_up(db);
         }
     }
 

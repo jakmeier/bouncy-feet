@@ -34,8 +34,11 @@ impl StepInfo {
     }
 
     pub fn skeleton(&self, beat: usize) -> Skeleton {
-        debug_assert!(!self.skeletons.is_empty());
-        self.skeletons[beat % self.skeletons.len()]
+        if self.skeletons.is_empty() {
+            Skeleton::resting(false)
+        } else {
+            self.skeletons[beat % self.skeletons.len()]
+        }
     }
 
     /// How much the body position deviates from the origin.

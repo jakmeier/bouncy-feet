@@ -24,7 +24,7 @@ pub(crate) struct Step {
 /// WASM-to-JS expensive string conversions.
 ///
 /// Derefs into a &str.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct StepSource {
     name: Rc<String>,
 }
@@ -66,6 +66,10 @@ impl Deref for StepSource {
     type Target = str;
 
     fn deref(&self) -> &str {
-        wasm_bindgen::intern(self.name.as_ref())
+        if cfg!(target_arch = "wasm32") {
+            wasm_bindgen::intern(self.name.as_ref())
+        } else {
+            self.name.as_ref()
+        }
     }
 }

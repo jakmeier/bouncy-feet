@@ -10,15 +10,17 @@
     PoseWrapper,
     StepWrapper,
     StepFileWrapper,
+    loadLocalSteps,
+    addLocalPoses,
   } from '$lib/instructor/bouncy_instructor';
   import { setContext } from 'svelte';
   import { derived, writable } from 'svelte/store';
 
-  const danceRon = browser ? localStorage.dances : null;
-  const danceFileBuilder = danceRon
-    ? DanceFileBuilder.fromRon(danceRon)
-    : new DanceFileBuilder();
-  const danceBuilderStore = writable(danceFileBuilder);
+  const poseRon = browser ? localStorage.poses : null;
+  const poseFileBuilder = poseRon
+    ? PoseFileWrapper.fromRon(poseRon)
+    : new PoseFileWrapper();
+  const poseBuilderStore = writable(poseFileBuilder);
 
   const stepRon = browser ? localStorage.steps : null;
   const stepFileBuilder = stepRon
@@ -26,11 +28,11 @@
     : new StepFileWrapper();
   const stepBuilderStore = writable(stepFileBuilder);
 
-  const poseRon = browser ? localStorage.poses : null;
-  const poseFileBuilder = poseRon
-    ? PoseFileWrapper.fromRon(poseRon)
-    : new PoseFileWrapper();
-  const poseBuilderStore = writable(poseFileBuilder);
+  const danceRon = browser ? localStorage.dances : null;
+  const danceFileBuilder = danceRon
+    ? DanceFileBuilder.fromRon(danceRon)
+    : new DanceFileBuilder();
+  const danceBuilderStore = writable(danceFileBuilder);
 
   const ctx = {
     danceBuilder: danceBuilderStore,
@@ -42,6 +44,8 @@
     addDanceBuilder,
     overwriteDanceBuilder,
     removeDance,
+    addStep,
+    removeStep,
     addPose,
     removePose,
   };
@@ -51,14 +55,17 @@
       (/** @type {DanceFileBuilder} */ builder) =>
         (localStorage.dances = builder.buildRon())
     );
-    ctx.stepBuilder.subscribe(
-      (/** @type {StepFileWrapper} */ builder) =>
-        (localStorage.steps = builder.buildRon())
-    );
-    ctx.poseBuilder.subscribe(
-      (/** @type {PoseFileWrapper} */ builder) =>
-        (localStorage.poses = builder.buildRon())
-    );
+    ctx.stepBuilder.subscribe((/** @type {StepFileWrapper} */ builder) => {
+      localStorage.steps = builder.buildRon();
+      loadLocalSteps(builder.steps());
+    });
+    ctx.poseBuilder.subscribe((/** @type {PoseFileWrapper} */ builder) => {
+      localStorage.poses = builder.buildRon();
+      // TODO: allow deleting poses
+      addLocalPoses(builder.poses());
+    });
+    addLocalPoses(poseFileBuilder.poses());
+    loadLocalSteps(stepFileBuilder.steps());
   }
 
   setContext('localCollection', ctx);
@@ -95,9 +102,9 @@
    */
   function addStep(step) {
     try {
-      $stepBuilderStore.overwritePose(step);
+      $stepBuilderStore.overwriteStep(step);
     } catch {
-      $stepBuilderStore.addPose(step);
+      $stepBuilderStore.addStep(step);
     }
     // trigger update (can I do better?)
     $stepBuilderStore = $stepBuilderStore;

@@ -30,11 +30,11 @@
 {#if show}
   <UiBox title="editor.pick-step-prompt">
     <div>
-      {#each steps as step, i}
+      {#each steps as step}
         <div
           on:click={() => select(step)}
           role="button"
-          tabindex={i}
+          tabindex={0}
           on:keydown={(event) => {
             if (event.key === 'Enter' || event.key === ' ') {
               select(step);
