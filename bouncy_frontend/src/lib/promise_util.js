@@ -2,17 +2,7 @@
  * @param {Blob} file
  */
 export function fileToUrl(file) {
-    var reader = new FileReader();
-
-    const promise = new Promise((resolve) => {
-        reader.onload = function (e) {
-            resolve(e.target.result);
-        };
-    });
-
-    reader.readAsDataURL(file);
-
-    return promise;
+    return URL.createObjectURL(file);
 }
 
 /**
