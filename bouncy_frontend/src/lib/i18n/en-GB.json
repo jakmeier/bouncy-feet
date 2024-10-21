@@ -92,15 +92,22 @@
         "direction": "Direction",
         "speed": "Speed",
         "name-input-placeholder": "Name",
+        "delete-confirmation-title": "Delete?",
+        "cancel-delete-button": "Cancel",
+        "confirm-delete-button": "Delete",
         "pose": {
             "title": "Lab: Poses",
             "list": "My poses",
-            "new": "Create new pose"
+            "new": "New pose",
+            "edit": "Edit pose"
         },
         "step": {
             "title": "Lab: Steps",
             "list": "My steps",
-            "new": "Create new step"
+            "delete-confirmation0": "Step",
+            "delete-confirmation1": "will be deleted.",
+            "new": "New step",
+            "edit": "Edit step"
         },
         "new-dance": {
             "default-dance-name": "My Dance",

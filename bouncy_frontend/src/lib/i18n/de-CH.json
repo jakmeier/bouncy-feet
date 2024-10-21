@@ -92,15 +92,22 @@
         "direction": "Richtung",
         "speed": "Tempo",
         "name-input-placeholder": "Name",
+        "delete-confirmation-title": "Wirklich löschen?",
+        "cancel-delete-button": "Abbrechen",
+        "confirm-delete-button": "Löschen",
         "pose": {
             "title": "Labor: Posen",
             "list": "Meine Posen",
-            "new": "Neue Pose erstellen"
+            "new": "Pose erstellen",
+            "edit": "Pose bearbeiten"
         },
         "step": {
             "title": "Labor: Schritte",
             "list": "Meine Schritte",
-            "new": "Neuen Schritt erstellen"
+            "delete-confirmation0": "Schritt",
+            "delete-confirmation1": "wird gelöscht.",
+            "new": "Schritt erstellen",
+            "edit": "Schritt bearbeiten"
         },
         "new-dance": {
             "default-dance-name": "Mein Tanz",
