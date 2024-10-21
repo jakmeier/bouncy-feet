@@ -14,7 +14,7 @@ jobs:
   bouncy_instructor:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Run Clippy
       working-directory: ./bouncy_instructor
       run: cargo clippy --all-targets --all-features
@@ -28,7 +28,7 @@ jobs:
   bouncy_stats:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Run Clippy
       working-directory: ./bouncy_stats
       run: cargo clippy --all-targets --all-features
