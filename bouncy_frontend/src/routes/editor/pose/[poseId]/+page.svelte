@@ -5,7 +5,6 @@
   import Button from '$lib/components/ui/Button.svelte';
   import { PoseWrapper } from '$lib/instructor/bouncy_instructor';
   import { getContext, onMount } from 'svelte';
-  import { Readable } from 'svelte/store';
 
   const poseId = $page.params.poseId;
 
