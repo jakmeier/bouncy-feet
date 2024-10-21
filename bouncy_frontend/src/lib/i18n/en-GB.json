@@ -95,6 +95,7 @@
         "delete-confirmation-title": "Delete?",
         "cancel-delete-button": "Cancel",
         "confirm-delete-button": "Delete",
+        "confirm-leave": "You have unsaved changes that will be lost if you leave. Leave anyway?",
         "pose": {
             "title": "Lab: Poses",
             "list": "My poses",

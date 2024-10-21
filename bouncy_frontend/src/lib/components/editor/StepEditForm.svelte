@@ -11,6 +11,7 @@
   import Pose from '../Pose.svelte';
   import StepPositionDetails from './StepPositionDetails.svelte';
   import AnimatedStep from '../AnimatedStep.svelte';
+  import { beforeNavigate } from '$app/navigation';
 
   const localCollectionCtx = getContext('localCollection');
   const availablePoses = localCollectionCtx.poses;
@@ -23,6 +24,7 @@
 
   export function save() {
     localCollectionCtx.addStep(step);
+    isDirty = false;
   }
 
   /** @type {StepWrapper} */
@@ -32,25 +34,27 @@
 
   let showAddNewItem = false;
   let selectedIndex = -1;
+  let isDirty = false;
 
   function newStep() {
     const idNum = Math.random().toFixed(6).substring(2);
     const id = `step-${idNum}`;
     const name = `Step ${idNum}`;
     const step = new StepWrapper(id, name, 'lab');
-    localCollectionCtx.addStep(step);
     return step;
   }
 
   /** @param {PoseWrapper} pose */
   function addPose(pose) {
     step.addPosition(new StepPositionBuilder(pose));
+    isDirty = true;
     step = step;
   }
 
   /** @type {(item: any, index: number) => void} */
   function onRemove(_item, index) {
     step.removePosition(index);
+    isDirty = true;
     step = step;
   }
 
@@ -71,10 +75,19 @@
       step.removePosition(draggedIndex);
       step.insertPosition(swappedIndex, draggedItem);
     }
+    isDirty = true;
     step = step;
-    console.log(step.poses().map((pose) => pose.name('en')));
+    // console.log(step.poses().map((pose) => pose.name('en')));
     return swappedIndex;
   }
+
+  beforeNavigate(({ cancel }) => {
+    if (isDirty) {
+      if (!confirm($t('editor.confirm-leave'))) {
+        cancel();
+      }
+    }
+  });
 </script>
 
 <AnimatedStep {step} size={200}></AnimatedStep>

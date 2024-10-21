@@ -95,6 +95,7 @@
         "delete-confirmation-title": "Wirklich löschen?",
         "cancel-delete-button": "Abbrechen",
         "confirm-delete-button": "Löschen",
+        "confirm-leave": "Die Seite hat ungespeicherte Änderungen die verloren gehen. Seite trotzdem verlassen?",
         "pose": {
             "title": "Labor: Posen",
             "list": "Meine Posen",
