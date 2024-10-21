@@ -21,12 +21,14 @@
     ? PoseFileWrapper.fromRon(poseRon)
     : new PoseFileWrapper();
   const poseBuilderStore = writable(poseFileBuilder);
+  addLocalPoses(poseFileBuilder.poses());
 
   const stepRon = browser ? localStorage.steps : null;
   const stepFileBuilder = stepRon
     ? StepFileWrapper.fromRon(stepRon)
     : new StepFileWrapper();
   const stepBuilderStore = writable(stepFileBuilder);
+  loadLocalSteps(stepFileBuilder.steps());
 
   const danceRon = browser ? localStorage.dances : null;
   const danceFileBuilder = danceRon
@@ -51,21 +53,19 @@
   };
 
   if (browser) {
-    ctx.danceBuilder.subscribe(
-      (/** @type {DanceFileBuilder} */ builder) =>
-        (localStorage.dances = builder.buildRon())
-    );
-    ctx.stepBuilder.subscribe((/** @type {StepFileWrapper} */ builder) => {
-      localStorage.steps = builder.buildRon();
-      loadLocalSteps(builder.steps());
-    });
     ctx.poseBuilder.subscribe((/** @type {PoseFileWrapper} */ builder) => {
       localStorage.poses = builder.buildRon();
       // TODO: allow deleting poses
       addLocalPoses(builder.poses());
     });
-    addLocalPoses(poseFileBuilder.poses());
-    loadLocalSteps(stepFileBuilder.steps());
+    ctx.stepBuilder.subscribe((/** @type {StepFileWrapper} */ builder) => {
+      localStorage.steps = builder.buildRon();
+      loadLocalSteps(builder.steps());
+    });
+    ctx.danceBuilder.subscribe(
+      (/** @type {DanceFileBuilder} */ builder) =>
+        (localStorage.dances = builder.buildRon())
+    );
   }
 
   setContext('localCollection', ctx);
