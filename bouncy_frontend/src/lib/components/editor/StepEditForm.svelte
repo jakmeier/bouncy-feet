@@ -36,7 +36,7 @@
   function newStep() {
     const idNum = Math.random().toFixed(6).substring(2);
     const id = `step-${idNum}`;
-    const name = `Step ${idNum} Name`;
+    const name = `Step ${idNum}`;
     const step = new StepWrapper(id, name, 'lab');
     localCollectionCtx.addStep(step);
     return step;
@@ -72,14 +72,19 @@
       step.insertPosition(swappedIndex, draggedItem);
     }
     step = step;
-    console.log(step.poses().map((pose) => pose.name("en")));
+    console.log(step.poses().map((pose) => pose.name('en')));
     return swappedIndex;
   }
 </script>
 
-<input id="name" name="name" bind:value={stepName} />
-
 <AnimatedStep {step} size={200}></AnimatedStep>
+
+<input
+  id="name"
+  name="name"
+  bind:value={stepName}
+  on:change={() => (step.name = stepName)}
+/>
 
 <DraggableList
   items={stepPositionBuilders}
@@ -102,7 +107,7 @@
 
 {#if showAddNewItem}
   <UiBox title="editor.pick-pose-prompt">
-    <div>
+    <div class="available-poses">
       {#each $availablePoses as pose}
         <div
           on:click={() => addPose(pose)}
@@ -115,7 +120,7 @@
           }}
         >
           <div class="pose">
-            <p>{pose.name('en')}</p>
+            <div>{pose.name('en')}</div>
             <Pose {pose}></Pose>
           </div>
         </div>
@@ -123,3 +128,29 @@
     </div>
   </UiBox>
 {/if}
+
+<style>
+  input#name {
+    display: block;
+    margin: auto;
+    width: 95%;
+    text-align: center;
+  }
+
+  .available-poses {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: end;
+    gap: 10px;
+  }
+  .available-poses div {
+    /* ensure equal size per grid column */
+    min-width: 0;
+  }
+
+  @media (min-width: 730px) {
+    .available-poses {
+      grid-template-columns: repeat(5, 1fr);
+    }
+  }
+</style>

@@ -28,6 +28,7 @@
 <div class="steps">
   {#each $steps as step}
     <div class="step">
+      <div>{step.name}</div>
       <Step {step} poseIndex={$i} {animationTime} />
     </div>
   {/each}
@@ -37,6 +38,7 @@
   .steps {
     display: flex;
     flex-wrap: wrap;
+    justify-content: space-between;
   }
   .step {
     max-width: 200px;

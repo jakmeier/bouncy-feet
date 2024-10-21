@@ -887,7 +887,7 @@ export class StepWrapper {
  * The descriptive name for the step. The same name is used for variations
  * of the same step.
  */
-  readonly name: string;
+  name: string;
 /**
  * Description identifier for the translated text which describes how the
  * variation is different from the original.

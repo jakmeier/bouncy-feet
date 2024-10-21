@@ -159,6 +159,12 @@ impl StepWrapper {
         self.definition().name.clone()
     }
 
+    #[wasm_bindgen(setter)]
+    pub fn set_name(&mut self, name: String) {
+        Rc::make_mut(&mut self.step_definition).name = name;
+        self.recompute_caches();
+    }
+
     pub fn skeleton(&self, beat: usize) -> Skeleton {
         self.info_unchecked().skeleton(beat)
     }

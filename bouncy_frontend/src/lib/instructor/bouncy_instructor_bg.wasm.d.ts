@@ -139,6 +139,7 @@ export function stepwrapper_poses(a: number, b: number): void;
 export function stepwrapper_positions(a: number, b: number): void;
 export function stepwrapper_removePosition(a: number, b: number, c: number): void;
 export function stepwrapper_rotatedSkeleton(a: number, b: number, c: number): number;
+export function stepwrapper_set_name(a: number, b: number, c: number): void;
 export function stepwrapper_skeleton(a: number, b: number): number;
 export function stepwrapper_variation(a: number, b: number): void;
 export function tracker_addKeypoints(a: number, b: number, c: number): number;
