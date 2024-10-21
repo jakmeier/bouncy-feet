@@ -5,17 +5,26 @@
   import { getContext } from 'svelte';
   import Step from '../../collection/Step.svelte';
   import { goto } from '$app/navigation';
-  import { StepWrapper } from '$lib/instructor/bouncy_instructor';
+  import {
+    StepFileWrapper,
+    StepWrapper,
+  } from '$lib/instructor/bouncy_instructor';
   import EditOrDeleteList from '$lib/components/ui/EditOrDeleteList.svelte';
+  import Popup from '$lib/components/ui/Popup.svelte';
+  import { writable } from 'svelte/store';
+  import Button from '$lib/components/ui/Button.svelte';
+  import { downloadTextFile } from '$lib/text_utils';
 
   const localCollectionCtx = getContext('localCollection');
 
   /** @type {import("svelte/store").Readable<StepWrapper[]>} */
   const steps = localCollectionCtx.steps;
+  const builder = localCollectionCtx.stepBuilder;
 
   const stepTime = 300;
   const animationTime = stepTime * 0.7;
   const i = counter(-1, 1, stepTime);
+  let showSettings = writable(false);
 
   /** @param {number} index */
   function editStep(index) {
@@ -28,9 +37,42 @@
     const stepId = $steps[index].id;
     localCollectionCtx.removeStep(stepId);
   }
+
+  function openSettings() {
+    $showSettings = true;
+  }
+
+  function handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const ronString = e.target.result;
+        importFile(ronString);
+      };
+      reader.readAsText(file);
+    }
+  }
+
+  /** @param {string} ronString */
+  function importFile(ronString) {
+    try {
+      const file = StepFileWrapper.fromRon(ronString);
+      for (let step of file.steps()) {
+        localCollectionCtx.addStep(step);
+      }
+    } catch (e) {
+      alert(e);
+    }
+  }
+
+  function exportFile() {
+    const string = $builder.buildPrettyRon();
+    downloadTextFile('my_steps.steps.ron', string);
+  }
 </script>
 
-<Header title={$t('editor.step.title')}></Header>
+<Header title={$t('editor.step.title')} button="menu" on:click={openSettings} />
 
 <div class="centered">
   <a href="./new">
@@ -59,6 +101,30 @@
   </div>
 </EditOrDeleteList>
 
+<Popup title={'editor.settings'} bind:isOpen={showSettings} showOkButton>
+  <Button
+    class="light wide"
+    symbol="upgrade"
+    text={'editor.step.export-all'}
+    on:click={exportFile}
+  />
+  <Button
+    class="light wide"
+    symbol="system_update_alt"
+    text={'editor.step.import'}
+    on:click={() => document.querySelector('input#ron-upload')?.click()}
+  ></Button>
+</Popup>
+
+<div class="hidden">
+  <input
+    id="ron-upload"
+    type="file"
+    accept=".ron"
+    on:change={handleFileUpload}
+  />
+</div>
+
 <style>
   .centered {
     margin: 30px auto;
@@ -68,5 +134,9 @@
   .bold {
     font-weight: 800;
     text-shadow: gray 0px 1px 2px;
+  }
+
+  .hidden {
+    display: None;
   }
 </style>

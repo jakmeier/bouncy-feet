@@ -78,6 +78,7 @@
         "description0": "Im Labor kannst du eigene Schritte aus eigenen Körperpositionen komplett frei erfinden.",
         "description1": "Kreiere deine eigenen Schritte und teile sie mit deinen Freunden.",
         "description2": "Diese Funktionen für Fortgeschrittene Nutzer sind in der Testphase gratis für alle zugänglich.",
+        "settings": "Einstellungen",
         "edit-dance-context-menu": "Bearbeiten",
         "dance-copy-postfix": "Kopie",
         "delete-dance-button": "Tanz löschen",
@@ -96,11 +97,15 @@
         "cancel-delete-button": "Abbrechen",
         "confirm-delete-button": "Löschen",
         "confirm-leave": "Die Seite hat ungespeicherte Änderungen die verloren gehen. Seite trotzdem verlassen?",
+        "export-dances": "Alle Tänze exportieren",
+        "import-dances": "Tänze importieren",
         "pose": {
             "title": "Labor: Posen",
             "list": "Meine Posen",
             "new": "Pose erstellen",
-            "edit": "Pose bearbeiten"
+            "edit": "Pose bearbeiten",
+            "export-all": "Alle Posen exportieren",
+            "import": "Posen importieren"
         },
         "step": {
             "title": "Labor: Schritte",
@@ -108,7 +113,9 @@
             "delete-confirmation0": "Schritt",
             "delete-confirmation1": "wird gelöscht.",
             "new": "Schritt erstellen",
-            "edit": "Schritt bearbeiten"
+            "edit": "Schritt bearbeiten",
+            "export-all": "Alle Schritte exportieren",
+            "import": "Schritte importieren"
         },
         "new-dance": {
             "default-dance-name": "Mein Tanz",

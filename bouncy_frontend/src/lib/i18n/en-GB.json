@@ -78,6 +78,7 @@
         "description0": "The laboratory allows you to invent your own moves freely, using custom body positions.",
         "description1": "Create your own dance moves and share them with your friends.",
         "description2": "During the test phase, these features for advanced users are available for free to everyone.",
+        "settings": "Settings",
         "edit-dance-context-menu": "Edit",
         "dance-copy-postfix": "copy",
         "delete-dance-button": "Delete dance",
@@ -96,11 +97,15 @@
         "cancel-delete-button": "Cancel",
         "confirm-delete-button": "Delete",
         "confirm-leave": "You have unsaved changes that will be lost if you leave. Leave anyway?",
+        "export-dances": "Export all my dances",
+        "import-dances": "Import dances",
         "pose": {
             "title": "Lab: Poses",
             "list": "My poses",
             "new": "New pose",
-            "edit": "Edit pose"
+            "edit": "Edit pose",
+            "export-all": "Export all my poses",
+            "import": "Import poses"
         },
         "step": {
             "title": "Lab: Steps",
@@ -108,7 +113,9 @@
             "delete-confirmation0": "Step",
             "delete-confirmation1": "will be deleted.",
             "new": "New step",
-            "edit": "Edit step"
+            "edit": "Edit step",
+            "export-all": "Export all my steps",
+            "import": "Import steps"
         },
         "new-dance": {
             "default-dance-name": "My Dance",

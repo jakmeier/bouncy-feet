@@ -4,13 +4,19 @@
   import { t } from '$lib/i18n';
   import Pose from '$lib/components/Pose.svelte';
   import EditOrDeleteList from '$lib/components/ui/EditOrDeleteList.svelte';
-  import { goto } from '$app/navigation';
+  import Popup from '$lib/components/ui/Popup.svelte';
+  import Button from '$lib/components/ui/Button.svelte';
+  import { writable } from 'svelte/store';
+  import { PoseFileWrapper } from '$lib/instructor/bouncy_instructor';
+  import { downloadTextFile } from '$lib/text_utils';
 
   /** @type {import('./$types').PageData} */
   export let data;
   // const poses = data.lookupPoses();
   const localCollectionCtx = getContext('localCollection');
   const poses = localCollectionCtx.poses;
+  const builder = localCollectionCtx.poseBuilder;
+  let showSettings = writable(false);
 
   /** @param {number} index */
   function editPose(index) {
@@ -31,9 +37,42 @@
     console.warn('deleting not implemented');
     alert('deleting poses not implemented :(');
   }
+
+  function openSettings() {
+    $showSettings = true;
+  }
+
+  function handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const ronString = e.target.result;
+        importFile(ronString);
+      };
+      reader.readAsText(file);
+    }
+  }
+
+  /** @param {string} ronString */
+  function importFile(ronString) {
+    try {
+      const file = PoseFileWrapper.fromRon(ronString);
+      for (let pose of file.poses()) {
+        localCollectionCtx.addPose(pose);
+      }
+    } catch (e) {
+      alert(e);
+    }
+  }
+
+  function exportFile() {
+    const string = $builder.buildPrettyRon();
+    downloadTextFile('my_poses.poses.ron', string);
+  }
 </script>
 
-<Header title={$t('editor.pose.title')}></Header>
+<Header title={$t('editor.pose.title')} button="menu" on:click={openSettings} />
 
 <div class="centered">
   <a href="./new">
@@ -59,6 +98,30 @@
   </div>
 </EditOrDeleteList>
 
+<Popup title={'editor.settings'} bind:isOpen={showSettings} showOkButton>
+  <Button
+    class="light wide"
+    symbol="upgrade"
+    text={'editor.pose.export-all'}
+    on:click={exportFile}
+  />
+  <Button
+    class="light wide"
+    symbol="system_update_alt"
+    text={'editor.pose.import'}
+    on:click={() => document.querySelector('input#ron-upload')?.click()}
+  ></Button>
+</Popup>
+
+<div class="hidden">
+  <input
+    id="ron-upload"
+    type="file"
+    accept=".ron"
+    on:change={handleFileUpload}
+  />
+</div>
+
 <style>
   .pose {
     max-width: 200px;
@@ -66,5 +129,8 @@
   .centered {
     margin: 30px auto;
     text-align: center;
+  }
+  .hidden {
+    display: None;
   }
 </style>

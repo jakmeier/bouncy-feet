@@ -83,6 +83,13 @@ impl PoseFileWrapper {
         let string = ron::ser::to_string(&*file_data)?;
         Ok(string)
     }
+
+    #[wasm_bindgen(js_name = "buildPrettyRon")]
+    pub fn build_pretty_ron(&self) -> Result<String, ExportError> {
+        let file_data = self.pose_file.as_ref().borrow();
+        let string = ron::ser::to_string_pretty(&*file_data, ron::ser::PrettyConfig::default())?;
+        Ok(string)
+    }
 }
 
 impl PoseFileWrapper {

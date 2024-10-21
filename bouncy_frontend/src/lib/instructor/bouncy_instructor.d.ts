@@ -325,6 +325,10 @@ export class DanceFileBuilder {
    */
   buildRon(): string;
   /**
+   * @returns {string}
+   */
+  buildPrettyRon(): string;
+  /**
    * @returns {(DanceWrapper)[]}
    */
   dances(): (DanceWrapper)[];
@@ -547,6 +551,10 @@ export class PoseFileWrapper {
    * @returns {string}
    */
   buildRon(): string;
+  /**
+   * @returns {string}
+   */
+  buildPrettyRon(): string;
 }
 export class PoseWrapper {
   free(): void;
@@ -792,6 +800,10 @@ export class StepFileWrapper {
    * @returns {string}
    */
   buildRon(): string;
+  /**
+   * @returns {string}
+   */
+  buildPrettyRon(): string;
 }
 /**
  * Used in the editor to add and edit poses of a step.
@@ -903,15 +915,6 @@ export class StepWrapper {
  */
 export class Tracker {
   free(): void;
-  /**
-   * @param {number} timestamp
-   * @returns {ExportedFrame}
-   */
-  exportFrame(timestamp: number): ExportedFrame;
-  /**
-   * @returns {string}
-   */
-  exportKeypoints(): string;
   /**
    * Create a tracker for all known steps.
    */
@@ -1066,6 +1069,15 @@ export class Tracker {
    * @returns {SkeletonV2 | undefined}
    */
   renderedKeypointsAt(timestamp: number, width: number, height: number): SkeletonV2 | undefined;
+  /**
+   * @param {number} timestamp
+   * @returns {ExportedFrame}
+   */
+  exportFrame(timestamp: number): ExportedFrame;
+  /**
+   * @returns {string}
+   */
+  exportKeypoints(): string;
   readonly detectionState: ReadableDetectionState;
   readonly halfSpeed: boolean;
   readonly lastDetection: DetectionResult;

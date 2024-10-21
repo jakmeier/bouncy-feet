@@ -9,6 +9,7 @@
   import Svg from '$lib/components/avatar/Svg.svelte';
   import SvgAvatar2 from '$lib/components/avatar/SvgAvatar2.svelte';
   import { LEFT_RIGHT_COLORING_LIGHT } from '$lib/constants';
+  import { downloadTextFile } from '$lib/text_utils';
 
   /** @type {HTMLInputElement}  */
   let upload;
@@ -89,21 +90,6 @@
       }
     );
   });
-
-  /**
-   * @param {string} filename
-   * @param {string} text
-   */
-  function downloadTextFile(filename, text) {
-    // Create a temporary <a> to trigger the download
-    const a = document.createElement('a');
-    a.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(text);
-    a.download = filename;
-
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  }
 
   function downloadFrame() {
     const exported = tracker.exportFrame(video.currentTime * 1000);

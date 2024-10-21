@@ -91,6 +91,21 @@ impl DanceFileBuilder {
         Ok(string)
     }
 
+    #[wasm_bindgen(js_name = "buildPrettyRon")]
+    pub fn build_pretty_ron(&self) -> Result<String, ExportError> {
+        let file_data = DanceFile {
+            version: self.version,
+            dances: self
+                .dances
+                .iter()
+                .map(DanceWrapper::definition)
+                .cloned()
+                .collect(),
+        };
+        let string = ron::ser::to_string_pretty(&file_data, ron::ser::PrettyConfig::default())?;
+        Ok(string)
+    }
+
     pub fn dances(&self) -> Vec<DanceWrapper> {
         self.dances.clone()
     }

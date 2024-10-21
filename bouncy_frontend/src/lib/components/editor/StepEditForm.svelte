@@ -5,13 +5,15 @@
     StepPositionBuilder,
     StepWrapper,
   } from '$lib/instructor/bouncy_instructor';
-  import { getContext } from 'svelte';
+  import { getContext, onMount } from 'svelte';
   import DraggableList from '../ui/DraggableList.svelte';
   import UiBox from '../ui/UiBox.svelte';
   import Pose from '../Pose.svelte';
   import StepPositionDetails from './StepPositionDetails.svelte';
   import AnimatedStep from '../AnimatedStep.svelte';
   import { beforeNavigate } from '$app/navigation';
+  import { beatCounter, bpm, setHalfSpeed } from '$lib/stores/Beat';
+  import Button from '../ui/Button.svelte';
 
   const localCollectionCtx = getContext('localCollection');
   const availablePoses = localCollectionCtx.poses;
@@ -35,6 +37,7 @@
   let showAddNewItem = false;
   let selectedIndex = -1;
   let isDirty = false;
+  let stepBpm = $bpm;
 
   function newStep() {
     const idNum = Math.random().toFixed(6).substring(2);
@@ -88,16 +91,42 @@
       }
     }
   });
+
+  onMount(() => {
+    setHalfSpeed(true);
+  });
 </script>
 
 <AnimatedStep {step} size={200}></AnimatedStep>
 
-<input
-  id="name"
-  name="name"
-  bind:value={stepName}
-  on:change={() => (step.name = stepName)}
-/>
+<div class="step-settings">
+  <Button
+    class="light small"
+    symbolSize={28}
+    symbol="first_page"
+    on:click={() => beatCounter.reset()}
+  ></Button>
+  <label>
+    {$t('courses.lesson.bpm-label')}
+    <input
+      type="range"
+      bind:value={stepBpm}
+      on:change={() => {
+        $bpm = stepBpm;
+      }}
+      min="30"
+      max="240"
+      class="range"
+    />
+  </label>
+
+  <input
+    id="name"
+    name="name"
+    bind:value={stepName}
+    on:change={() => (step.name = stepName)}
+  />
+</div>
 
 <DraggableList
   items={stepPositionBuilders}
@@ -115,7 +144,7 @@
 </DraggableList>
 
 {#if selectedIndex !== -1}
-  <StepPositionDetails position={stepPositionBuilders[selectedIndex]} />
+  <StepPositionDetails bind:isDirty position={stepPositionBuilders[selectedIndex]} />
 {/if}
 
 {#if showAddNewItem}
@@ -143,10 +172,21 @@
 {/if}
 
 <style>
-  input#name {
-    display: block;
+  .step-settings {
     margin: auto;
     width: 95%;
+    text-align: center;
+    width: max(200px, 67%);
+  }
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  input#name {
+    width: 100%;
     text-align: center;
   }
 
