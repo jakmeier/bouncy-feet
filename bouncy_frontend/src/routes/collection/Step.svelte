@@ -33,7 +33,7 @@
     poseIndex >= 0 ? stepBodyShift(step, poseIndex) : { x: 0, y: 0 };
   $: maybeJumpHeight = step.jumpHeight(poseIndex);
   $: jumpHeight =
-    size * (maybeJumpHeight === undefined ? 0.025 : maybeJumpHeight);
+    size * (maybeJumpHeight === undefined ? 1.0 : maybeJumpHeight);
 
   /**
    * @param {import("$lib/instructor/bouncy_instructor").StepWrapper} step

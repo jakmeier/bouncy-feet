@@ -7,7 +7,10 @@
   export let animationTime = 0;
   export let delay = 0;
   export let easing = quadIn;
-  export let jumpHeight = 10;
+  export let jumpHeight = 1;
+
+  // this factor is chosen to have a jump height of 1.0 to be a reasonable default
+  const jumpHeightFactor = 0.025;
 
   const animationTimeStore = writable(animationTime);
   $: animationTimeStore.set(animationTime);
@@ -48,7 +51,7 @@
           $animationTimeStore;
         // Parabolic jump with a peak at t = 0.5.
         // This might not be ideal for all moves but it's a good start.
-        const jumpOffset = -4 * jumpHeight * t * (t - 1);
+        const jumpOffset = -4 * jumpHeight * jumpHeightFactor * t * (t - 1);
         set($y.value - jumpOffset);
       });
 
