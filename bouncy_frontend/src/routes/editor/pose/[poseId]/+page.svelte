@@ -1,10 +1,11 @@
 <script>
   import { page } from '$app/stores';
-  import PoseEditForm from '$lib/components/editor/PoseEditForm.svelte';
-  import PoseInputForm from '$lib/components/editor/PoseInputForm.svelte';
-  import Button from '$lib/components/ui/Button.svelte';
+  import PoseWeightsForm from '$lib/components/editor/PoseWeightsForm.svelte';
+  import PoseAnglesForm from '$lib/components/editor/PoseAnglesForm.svelte';
   import { PoseWrapper } from '$lib/instructor/bouncy_instructor';
   import { getContext, onMount } from 'svelte';
+  import Header from '$lib/components/ui/Header.svelte';
+  import { t } from '$lib/i18n';
 
   const poseId = $page.params.poseId;
 
@@ -14,19 +15,19 @@
   /** @type {Readable<PoseWrapper[]>} */
   const poses = localCollectionCtx.poses;
 
-  /** @type {(skeleton: import("$lib/instructor/bouncy_instructor").SkeletonWrapper)=>void} */
-  let loadSkeleton;
   /** @type {()=>import("$lib/instructor/bouncy_instructor").PoseWrapper} */
   let poseFromForm;
   /** @type {(skeleton: import("$lib/instructor/bouncy_instructor").PoseWrapper)=>void} */
-  let loadPose;
+  let loadPoseToAngles;
+  /** @type {(skeleton: import("$lib/instructor/bouncy_instructor").PoseWrapper)=>void} */
+  let loadPoseToWeights;
   /** @type {()=>import("$lib/instructor/bouncy_instructor").PoseWrapper} */
   let getPose;
 
   function copyPose() {
     let pose = poseFromForm();
     if (pose) {
-      loadPose(pose);
+      loadPoseToWeights(pose);
     }
   }
 
@@ -38,23 +39,24 @@
   onMount(() => {
     let pose = $poses.find((p) => p.id() === poseId);
     if (pose) {
-      // TODO: need a way to load a skeleton wrapper! (it currently requires
-      // keypoints, which is a bit annoying to get for a pose)
-      // loadSkeleton(pose.skeleton());
+      loadPoseToAngles(pose);
+      loadPoseToWeights(pose);
     }
-    // loadSkeleton()
   });
 </script>
 
-<PoseInputForm bind:loadSkeleton bind:readPose={poseFromForm}></PoseInputForm>
+<Header title={$t('editor.pose.edit')} button="save" on:click={savePose}
+></Header>
 
-<button class="light full-width short" on:click={copyPose}> ↓ </button>
+<h2 class="box">{$t('editor.pose.angles-subtitle')}</h2>
 
-<PoseEditForm bind:loadPose bind:getPose></PoseEditForm>
+<PoseAnglesForm
+bind:loadPose={loadPoseToAngles}
+bind:readPose={poseFromForm}
+onChange={copyPose}
+/>
 
-<Button
-  symbol="save"
-  symbolSize={29}
-  class="light full-width short"
-  on:click={savePose}
-></Button>
+<h2 class="box">{$t('editor.pose.weights-subtitle')}</h2>
+
+<PoseWeightsForm bind:loadPose={loadPoseToWeights} bind:getPose
+></PoseWeightsForm>

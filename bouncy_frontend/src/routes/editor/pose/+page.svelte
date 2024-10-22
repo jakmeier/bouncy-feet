@@ -9,6 +9,7 @@
   import { writable } from 'svelte/store';
   import { PoseFileWrapper } from '$lib/instructor/bouncy_instructor';
   import { downloadTextFile } from '$lib/text_utils';
+  import { goto } from '$app/navigation';
 
   /** @type {import('./$types').PageData} */
   export let data;
@@ -20,12 +21,8 @@
 
   /** @param {number} index */
   function editPose(index) {
-    // const poseId = $poses[index].id();
-    // goto(`./${poseId}`);
-
-    // loading of the pose isn't properly implemented
-    console.warn('editing poses not implemented');
-    alert('editing poses not implemented :(');
+    const poseId = $poses[index].id();
+    goto(`./${poseId}`);
   }
 
   /** @param {number} index */

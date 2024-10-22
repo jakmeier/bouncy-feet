@@ -102,6 +102,8 @@
         "pose": {
             "title": "Lab: Poses",
             "list": "My poses",
+            "angles-subtitle": "Body part angles",
+            "weights-subtitle": "Weight for tracking score",
             "new": "New pose",
             "edit": "Edit pose",
             "export-all": "Export all my poses",

@@ -102,6 +102,8 @@
         "pose": {
             "title": "Labor: Posen",
             "list": "Meine Posen",
+            "angles-subtitle": "Winkel von Körperteilen",
+            "weights-subtitle": "Gewichtung für die Tracking-Punktzahl",
             "new": "Pose erstellen",
             "edit": "Pose bearbeiten",
             "export-all": "Alle Posen exportieren",

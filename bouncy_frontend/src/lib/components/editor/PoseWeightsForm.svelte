@@ -79,20 +79,37 @@
   }
 
   function allSkeletonFields() {
+    // simple, fast, and full control over order:
+    // (requires manually updating when enum changes)
+    return [
+      SkeletonField.LeftArm,
+      SkeletonField.LeftForearm,
+      SkeletonField.LeftThigh,
+      SkeletonField.LeftShin,
+      SkeletonField.LeftFoot,
+      SkeletonField.RightArm,
+      SkeletonField.RightForearm,
+      SkeletonField.RightThigh,
+      SkeletonField.RightShin,
+      SkeletonField.RightFoot,
+    ];
+
+    // generic approach(bad):
     // using reduce as a map + filter to avoid the extra array
-    return Object.keys(SkeletonField).reduce(
-      /** @type {(acc: number[], field: string) => number[]} */
-      (acc, field) => {
-        // enum has static values for indices and names, we want to filter only the numbers
-        let limb = SkeletonField[field];
-        if (typeof limb === 'number') {
-          acc.push(limb);
-        }
-        return acc;
-      },
-      /** @type {number[]}*/
-      []
-    );
+    // return Object.keys(SkeletonField).reduce(
+    //   /** @type {(acc: number[], field: string) => number[]} */
+    //   (acc, field) => {
+    //     // enum has static values for indices and names, we want to filter only the numbers
+    //     let limb = SkeletonField[field];
+    //     if (typeof limb === 'number') {
+    //       acc.push(limb);
+    //     }
+    //     return acc;
+    //   },
+    //   /** @type {number[]}*/
+    //   []
+    // );
+
   }
 
   function limbTranslationKey(enumName) {

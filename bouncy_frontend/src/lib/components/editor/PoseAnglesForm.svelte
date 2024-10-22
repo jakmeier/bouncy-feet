@@ -28,9 +28,26 @@
   /** @type{PoseWrapper | undefined} */
   let pose;
 
-  /** @param {SkeletonWrapper} newSkeleton */
-  export function loadSkeleton(newSkeleton) {
-    pose = newSkeleton.pose();
+  /** @param {PoseWrapper} pose */
+  export let onChange = (pose) => {};
+
+  /** @param {SkeletonWrapper} inputSkeleton */
+  export function loadSkeleton(inputSkeleton) {
+    loadPose(inputSkeleton.pose());
+  }
+
+  /** @param {PoseWrapper} inputPose */
+  export function loadPose(inputPose) {
+    pose = inputPose;
+    updateAnglesFromPose(pose);
+  }
+
+  /** @returns {PoseWrapper | undefined} */
+  export function readPose() {
+    return pose;
+  }
+
+  function updateAnglesFromPose(pose) {
     skeleton = pose.skeleton();
 
     bodyParts[0].angle = pose.getAngle(SkeletonField.LeftArm) - 90.0;
@@ -43,11 +60,6 @@
     bodyParts[7].angle = pose.getAngle(SkeletonField.RightShin) - 90.0;
     bodyParts[8].angle = pose.getAngle(SkeletonField.LeftFoot) - 90.0;
     bodyParts[9].angle = pose.getAngle(SkeletonField.RightFoot) - 90.0;
-  }
-
-  /** @returns {PoseWrapper | undefined} */
-  export function readPose() {
-    return pose;
   }
 
   function updateAvatar() {
@@ -72,6 +84,7 @@
   function updateSkeleton() {
     if (pose) {
       skeleton = pose.skeleton();
+      onChange(pose);
     }
   }
 </script>
@@ -89,6 +102,8 @@
             bind:value={part.angle}
             on:change={updateAvatar}
             placeholder="Angle"
+            min={-360}
+            max={360}
           />
         </div>
       {/if}
@@ -107,6 +122,8 @@
             bind:value={part.angle}
             on:change={updateAvatar}
             placeholder="Angle"
+            min={-360}
+            max={360}
           />
         </div>
       {/if}

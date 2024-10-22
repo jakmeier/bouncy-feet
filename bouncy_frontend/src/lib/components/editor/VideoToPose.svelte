@@ -6,8 +6,8 @@
   import Svg from '$lib/components/avatar/Svg.svelte';
   import SvgAvatar2 from '$lib/components/avatar/SvgAvatar2.svelte';
   import { LEFT_RIGHT_COLORING_LIGHT } from '$lib/constants';
-  import PoseInputForm from '$lib/components/editor/PoseInputForm.svelte';
-  import PoseEditForm from '$lib/components/editor/PoseEditForm.svelte';
+  import PoseAnglesForm from '$lib/components/editor/PoseAnglesForm.svelte';
+  import PoseWeightsForm from '$lib/components/editor/PoseWeightsForm.svelte';
   import { fileToUrl, waitForVideoMetaLoaded } from '$lib/promise_util';
   import { PoseDetection } from '$lib/pose';
   import Button from '../ui/Button.svelte';
@@ -143,11 +143,11 @@
 
 <button class="light full-width short" on:click={copySkeleton}> ↓ </button>
 
-<PoseInputForm bind:loadSkeleton bind:readPose={poseFromForm}></PoseInputForm>
+<PoseAnglesForm bind:loadSkeleton bind:readPose={poseFromForm}></PoseAnglesForm>
 
 <button class="light full-width short" on:click={copyPose}> ↓ </button>
 
-<PoseEditForm bind:loadPose bind:getPose></PoseEditForm>
+<PoseWeightsForm bind:loadPose bind:getPose></PoseWeightsForm>
 
 <Button
   symbol="save"
