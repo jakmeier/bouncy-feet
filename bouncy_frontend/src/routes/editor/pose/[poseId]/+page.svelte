@@ -6,6 +6,7 @@
   import { getContext, onMount } from 'svelte';
   import Header from '$lib/components/ui/Header.svelte';
   import { t } from '$lib/i18n';
+  import { beforeNavigate } from '$app/navigation';
 
   const poseId = $page.params.poseId;
 
@@ -24,17 +25,29 @@
   /** @type {()=>import("$lib/instructor/bouncy_instructor").PoseWrapper} */
   let getPose;
 
+  let isDirty = false;
+
   function copyPose() {
     let pose = poseFromForm();
     if (pose) {
       loadPoseToWeights(pose);
+      isDirty = true;
     }
   }
 
   function savePose() {
     let pose = getPose();
     localCollectionCtx.addPose(pose);
+    isDirty = false;
   }
+
+  beforeNavigate(({ cancel }) => {
+    if (isDirty) {
+      if (!confirm($t('editor.confirm-leave'))) {
+        cancel();
+      }
+    }
+  });
 
   onMount(() => {
     let pose = $poses.find((p) => p.id() === poseId);
@@ -51,12 +64,15 @@
 <h2 class="box">{$t('editor.pose.angles-subtitle')}</h2>
 
 <PoseAnglesForm
-bind:loadPose={loadPoseToAngles}
-bind:readPose={poseFromForm}
-onChange={copyPose}
+  bind:loadPose={loadPoseToAngles}
+  bind:readPose={poseFromForm}
+  onChange={copyPose}
 />
 
 <h2 class="box">{$t('editor.pose.weights-subtitle')}</h2>
 
-<PoseWeightsForm bind:loadPose={loadPoseToWeights} bind:getPose
-></PoseWeightsForm>
+<PoseWeightsForm
+  bind:loadPose={loadPoseToWeights}
+  bind:getPose
+  onChange={() => (isDirty = true)}
+/>

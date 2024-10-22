@@ -17,6 +17,8 @@
   let weightedLimbs = [];
   let poseName = '';
 
+  export let onChange = () => {};
+
   /** @param {PoseWrapper} newPose */
   export function loadPose(newPose) {
     // using an indirect setting, rather than a property, to better control when
@@ -66,6 +68,7 @@
     if (pose && limb) {
       pose.setWeight(limb.index, limb.weight);
       onPoseUpdated(pose);
+      onChange();
     } else {
       console.log('Pose or limb not available');
     }
@@ -109,7 +112,6 @@
     //   /** @type {number[]}*/
     //   []
     // );
-
   }
 
   function limbTranslationKey(enumName) {
