@@ -16,24 +16,62 @@
   import { setContext } from 'svelte';
   import { derived, writable } from 'svelte/store';
 
+  // handle corrupt local storage etc without the app crashing
+  let corruptDances = false;
+  /**
+   * @param {string} ron
+   * @param {{ fromRon: ((ron: string) => any) }} wrapperConstructor
+   */
+  function safeFromRon(ron, wrapperConstructor) {
+    try {
+      return wrapperConstructor.fromRon(ron);
+    } catch (e) {
+      alert(`Error loading data: ${e}`);
+      return null;
+    }
+  }
+
+  let lockLocalStorage = false;
+
   const poseRon = browser ? localStorage.poses : null;
-  const poseFileBuilder = poseRon
-    ? PoseFileWrapper.fromRon(poseRon)
+  let poseFileBuilder = poseRon
+    ? safeFromRon(poseRon, PoseFileWrapper)
     : new PoseFileWrapper();
+  if (poseFileBuilder === null) {
+    // local storage could not be parsed
+    // overwriting it might lost user data, let's avoid that
+    lockLocalStorage = true;
+    // but let's keep the app functional
+    poseFileBuilder = new PoseFileWrapper();
+  }
   const poseBuilderStore = writable(poseFileBuilder);
   addLocalPoses(poseFileBuilder.poses());
 
   const stepRon = browser ? localStorage.steps : null;
-  const stepFileBuilder = stepRon
-    ? StepFileWrapper.fromRon(stepRon)
+  let stepFileBuilder = stepRon
+    ? safeFromRon(stepRon, StepFileWrapper)
     : new StepFileWrapper();
+  if (stepFileBuilder === null) {
+    // local storage could not be parsed
+    // overwriting it might lost user data, let's avoid that
+    lockLocalStorage = true;
+    // but let's keep the app functional
+    stepFileBuilder = new StepFileWrapper();
+  }
   const stepBuilderStore = writable(stepFileBuilder);
   loadLocalSteps(stepFileBuilder.steps());
 
   const danceRon = browser ? localStorage.dances : null;
-  const danceFileBuilder = danceRon
-    ? DanceFileBuilder.fromRon(danceRon)
+  let danceFileBuilder = danceRon
+    ? safeFromRon(danceRon, DanceFileBuilder)
     : new DanceFileBuilder();
+  if (danceFileBuilder === null) {
+    // local storage could not be parsed
+    // overwriting it might lost user data, let's avoid that
+    lockLocalStorage = true;
+    // but let's keep the app functional
+    danceFileBuilder = new DanceFileBuilder();
+  }
   const danceBuilderStore = writable(danceFileBuilder);
 
   const ctx = {
@@ -54,18 +92,23 @@
 
   if (browser) {
     ctx.poseBuilder.subscribe((/** @type {PoseFileWrapper} */ builder) => {
-      localStorage.poses = builder.buildRon();
+      if (!lockLocalStorage) {
+        localStorage.poses = builder.buildRon();
+      }
       // TODO: allow deleting poses
       addLocalPoses(builder.poses());
     });
     ctx.stepBuilder.subscribe((/** @type {StepFileWrapper} */ builder) => {
-      localStorage.steps = builder.buildRon();
+      if (!lockLocalStorage) {
+        localStorage.steps = builder.buildRon();
+      }
       loadLocalSteps(builder.steps());
     });
-    ctx.danceBuilder.subscribe(
-      (/** @type {DanceFileBuilder} */ builder) =>
-        (localStorage.dances = builder.buildRon())
-    );
+    ctx.danceBuilder.subscribe((/** @type {DanceFileBuilder} */ builder) => {
+      if (!lockLocalStorage) {
+        localStorage.dances = builder.buildRon();
+      }
+    });
   }
 
   setContext('localCollection', ctx);
