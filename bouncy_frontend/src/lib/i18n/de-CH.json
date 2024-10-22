@@ -114,6 +114,11 @@
             "delete-confirmation1": "wird gelöscht.",
             "new": "Schritt erstellen",
             "edit": "Schritt bearbeiten",
+            "edit-position": "Schrittposition bearbeiten",
+            "jump-height": "Sprunghöhe",
+            "jump-height-info": "Definiert die Höhe des Sprungs beim Übergang in diese Pose. 1.0 ist der Standardwert. Bei 0.0 gibt es keinen Sprung.",
+            "direction": "Richtung aus Kamerasicht",
+            "direction-info": "Erlaubt das Drehen der gesamten Körperpose. Beispielsweise kann die Running-Man Pose mit dem rechten Bein vorne, aus Kamerasicht entweder nach links oder nach rechts ausgeführt werden.",
             "export-all": "Alle Schritte exportieren",
             "import": "Schritte importieren"
         },

@@ -1,4 +1,5 @@
 import { Tracker } from '$lib/instructor/bouncy_instructor';
+import { dynamicCounter } from '$lib/timer';
 import { setContext } from 'svelte';
 import { derived, writable } from 'svelte/store';
 
@@ -10,6 +11,9 @@ export const halfSpeed = writable(false);
 export const timeBetweenMoves = derived([bpm, halfSpeed], ([$bpm, $halfSpeed]) => {
     return ($halfSpeed ? 60_000 : 30_000) / $bpm;
 })
+
+export let beatCounter = dynamicCounter(-1, 1, 100);
+timeBetweenMoves.subscribe((value) => beatCounter.setDelay(value));
 
 /** @param {number} value */
 export function setBpm(value) {

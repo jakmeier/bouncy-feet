@@ -39,6 +39,20 @@
   let isDirty = false;
   let stepBpm = $bpm;
 
+  /** @type {(position: StepPositionBuilder|undefined)=>void} */
+  let loadPosition;
+  $: selectPosition(selectedIndex);
+
+  /** @param {number} index */
+  function selectPosition(index) {
+    if (!loadPosition) return;
+    if (index === -1) {
+      loadPosition(undefined);
+    } else {
+      loadPosition(stepPositionBuilders[index]);
+    }
+  }
+
   function newStep() {
     const idNum = Math.random().toFixed(6).substring(2);
     const id = `step-${idNum}`;
@@ -82,6 +96,18 @@
     step = step;
     // console.log(step.poses().map((pose) => pose.name('en')));
     return swappedIndex;
+  }
+
+  /** @param {StepPositionBuilder} position */
+  function onPositionDetailsChanged(position) {
+    if (selectedIndex) {
+      step.removePosition(selectedIndex);
+      step.insertPosition(selectedIndex, position);
+      isDirty = true;
+      step = step;
+    } else {
+      console.warn("no index selected, can't update step position");
+    }
   }
 
   beforeNavigate(({ cancel }) => {
@@ -135,17 +161,22 @@
   {onDragMove}
   {onRemove}
 >
-  <slot slot="main" let:item={position}>
-    <div class="pose">
+  <div slot="main" let:item={position} let:index>
+    <div class="pose" class:selected={index === selectedIndex}>
       <Pose pose={position.pose()}></Pose>
     </div>
-  </slot>
-  <slot slot="name" let:item={position}>{position.pose().name('en')}</slot>
+  </div>
+  <div
+    slot="name"
+    let:item={position}
+    let:index
+    class:selected={index === selectedIndex}
+  >
+    {position.pose().name('en')}
+  </div>
 </DraggableList>
 
-{#if selectedIndex !== -1}
-  <StepPositionDetails bind:isDirty position={stepPositionBuilders[selectedIndex]} />
-{/if}
+<StepPositionDetails bind:loadPosition onChange={onPositionDetailsChanged} />
 
 {#if showAddNewItem}
   <UiBox title="editor.pick-pose-prompt">
@@ -199,6 +230,18 @@
   .available-poses div {
     /* ensure equal size per grid column */
     min-width: 0;
+  }
+
+  .pose {
+    width: 100px;
+    padding: 2px;
+  }
+  .selected {
+    font-weight: 800;
+  }
+  .pose.selected {
+    background-color: var(--theme-neutral-light);
+    border-radius: 20px;
   }
 
   @media (min-width: 730px) {

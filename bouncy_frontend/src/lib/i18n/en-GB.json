@@ -114,6 +114,11 @@
             "delete-confirmation1": "will be deleted.",
             "new": "New step",
             "edit": "Edit step",
+            "edit-position": "Edit step position",
+            "jump-height": "Jump height",
+            "jump-height-info": "When transitioning into this position, define how high to jump. The default value is 1.0. Set it to 0.0 to have no jump.",
+            "direction": "Direction from camera",
+            "direction-info": "Allows turning the entire body of a pose. For example, the running man pose with the right leg forward could be done toward the left or right side, as seen from the camera.",
             "export-all": "Export all my steps",
             "import": "Import steps"
         },
