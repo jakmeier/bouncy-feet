@@ -9,6 +9,7 @@
   import { SkeletonField } from '$lib/instructor/bouncy_instructor_bg';
   import Svg from '../avatar/Svg.svelte';
   import SvgAvatar from '../avatar/SvgAvatar.svelte';
+  import AngleInput from '../ui/AngleInput.svelte';
   import Button from '../ui/Button.svelte';
 
   let bodyParts = [
@@ -95,16 +96,11 @@
       {#if index % 2 === 0}
         <div class="body-part">
           <label for="left-{index}">{$t(part.name)}</label>
-          <input
+          <AngleInput
             name="left-{index}"
-            type="number"
-            class="angle-input"
             bind:value={part.angle}
-            on:change={updateAvatar}
-            placeholder="Angle"
-            min={-360}
-            max={360}
-          />
+            onChange={updateAvatar}
+          ></AngleInput>
         </div>
       {/if}
     {/each}
@@ -115,16 +111,11 @@
       {#if index % 2 === 1}
         <div class="body-part">
           <label for="right-{index}">{$t(part.name)}</label>
-          <input
+          <AngleInput
             name="right-{index}"
-            type="number"
-            class="angle-input"
             bind:value={part.angle}
-            on:change={updateAvatar}
-            placeholder="Angle"
-            min={-360}
-            max={360}
-          />
+            onChange={updateAvatar}
+          ></AngleInput>
         </div>
       {/if}
     {/each}
@@ -203,11 +194,9 @@
   }
   .left {
     grid-area: left-values;
-    background-color: var(--theme-accent-light);
   }
   .right {
     grid-area: right-values;
-    background-color: var(--theme-neutral-light);
   }
   .avatar {
     grid-area: avatar;
@@ -220,13 +209,21 @@
   }
   .input-group {
     padding: 5px;
+    width: 90%;
   }
   .body-part {
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 90%;
-    margin: auto;
+    margin: 5px auto;
+    padding: 10px 5px;
+  }
+  .left .body-part {
+    background-color: var(--theme-accent-light);
+  }
+  .right .body-part {
+    background-color: var(--theme-neutral-light);
   }
   .angle-input {
     width: 100%;
