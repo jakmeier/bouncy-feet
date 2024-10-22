@@ -262,6 +262,7 @@ impl StepWrapper {
         Rc::make_mut(&mut self.step_definition)
             .keyframes
             .insert(index, position.into());
+        self.recompute_caches();
         Ok(())
     }
 }

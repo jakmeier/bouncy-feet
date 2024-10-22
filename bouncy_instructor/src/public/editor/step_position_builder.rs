@@ -1,7 +1,7 @@
 use wasm_bindgen::prelude::wasm_bindgen;
 
 use crate::intern::content_collection::ContentCollection;
-use crate::pose_file::BodyPoint;
+use crate::pose_file::{BodyPoint, PoseDirection};
 use crate::step_file::{Orientation, StepPosition};
 use crate::wrapper::pose_wrapper::PoseWrapper;
 
@@ -29,7 +29,10 @@ impl StepPositionBuilder {
     pub fn new(pose: &PoseWrapper) -> Self {
         Self {
             pose: pose.clone(),
-            orientation: Orientation::Right,
+            orientation: match pose.direction() {
+                PoseDirection::Front => Orientation::ToCamera,
+                PoseDirection::Right => Orientation::Right,
+            },
             pivot: BodyPoint::default_pivot(),
             jump_height: None,
         }

@@ -916,6 +916,15 @@ export class StepWrapper {
 export class Tracker {
   free(): void;
   /**
+   * @param {number} timestamp
+   * @returns {ExportedFrame}
+   */
+  exportFrame(timestamp: number): ExportedFrame;
+  /**
+   * @returns {string}
+   */
+  exportKeypoints(): string;
+  /**
    * Create a tracker for all known steps.
    */
   constructor();
@@ -1069,15 +1078,6 @@ export class Tracker {
    * @returns {SkeletonV2 | undefined}
    */
   renderedKeypointsAt(timestamp: number, width: number, height: number): SkeletonV2 | undefined;
-  /**
-   * @param {number} timestamp
-   * @returns {ExportedFrame}
-   */
-  exportFrame(timestamp: number): ExportedFrame;
-  /**
-   * @returns {string}
-   */
-  exportKeypoints(): string;
   readonly detectionState: ReadableDetectionState;
   readonly halfSpeed: boolean;
   readonly lastDetection: DetectionResult;
