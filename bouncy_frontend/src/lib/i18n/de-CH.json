@@ -230,6 +230,9 @@
             "left-out": "Links nach aussen"
         }
     },
+    "dance": {
+        "counts": "Zur Musik gezählt"
+    },
     "common": {
         "hint-popup-title": "Hinweis"
     }

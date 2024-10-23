@@ -230,6 +230,9 @@
             "left-out": "Left leg outwards"
         }
     },
+    "dance": {
+        "counts": "Music counts"
+    },
     "common": {
         "hint-popup-title": "Hint"
     }
