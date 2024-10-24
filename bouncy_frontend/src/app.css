@@ -93,6 +93,7 @@ button {
 }
 
 @media (max-width: 360px) {
+
     /* Three buttons must fit next to each other, including margin */
     button {
         width: 75px;
@@ -163,4 +164,11 @@ button.danger {
 to hide an element instead of conditional rendering */
 .hidden {
     display: none;
+}
+
+li,
+ul,
+ol {
+    list-style: none;
+    padding: 0;
 }

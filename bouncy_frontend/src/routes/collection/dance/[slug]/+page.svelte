@@ -9,6 +9,7 @@
   import Popup from '$lib/components/ui/Popup.svelte';
   import { goto } from '$app/navigation';
   import { derived } from 'svelte/store';
+  import DanceCounts from '$lib/components/DanceCounts.svelte';
 
   /** @type {import('./$types').PageData} */
   export let data;
@@ -34,6 +35,7 @@
 
   /** @type {import('svelte/store').Writable<boolean>} */
   let optionsPopupActive;
+  let highlightedStep = -1;
 
   function edit() {
     $optionsPopupActive = false;
@@ -46,6 +48,14 @@
       $optionsPopupActive = false;
       window.history.back();
     }
+  }
+
+  function highlight(index) {
+    highlightedStep = index;
+  }
+
+  function resetHighlight() {
+    highlightedStep = -1;
   }
 </script>
 
@@ -66,10 +76,17 @@
     {/if}
   </div>
 
-  <div class="steps-container">
-    {#each steps as step}
-      <div class="step">
-        <a href={`../../step/${step.name}`}>
+  <ol class="steps-container">
+    {#each steps as step, index}
+      <li class="step" class:highlighted={highlightedStep === index}>
+        <a
+          href={`../../step/${step.name}`}
+          on:mouseover={() => highlight(index)}
+          on:focus={() => highlight(index)}
+          on:mouseout={resetHighlight}
+          on:blur={resetHighlight}
+          tabindex={0}
+        >
           <Step
             {step}
             poseIndex={$beatCounter}
@@ -78,9 +95,12 @@
           />
           <p style="width: {stepSize}px">{step.name}</p>
         </a>
-      </div>
+      </li>
     {/each}
-  </div>
+  </ol>
+
+  <h2 class="box">{$t('dance.counts')}</h2>
+  <DanceCounts {dance} bind:highlightedStep />
 </div>
 
 <Popup bind:isOpen={optionsPopupActive} title="editor.edit-dance-context-menu">
@@ -108,6 +128,7 @@
   }
   .step {
     margin: 2px;
+    padding: 5px;
   }
   .step p {
     background-color: var(--theme-neutral-light);
@@ -118,5 +139,10 @@
   }
   .step a {
     font-weight: 400;
+  }
+  .step.highlighted {
+    font-weight: 800;
+    border-radius: 5px;
+    background-color: var(--theme-accent-light);
   }
 </style>
