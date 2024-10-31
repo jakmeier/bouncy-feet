@@ -1,7 +1,7 @@
-use crate::intern::tracker_dance_collection::TrackerDanceCollection;
 use crate::intern::geom::Angle3d;
 use crate::intern::pose::Pose;
 use crate::intern::skeleton_3d::{Direction, Skeleton3d};
+use crate::intern::tracker_dance_collection::TrackerDanceCollection;
 use std::f32::consts::TAU;
 use std::fmt::Debug;
 use wasm_bindgen::prelude::wasm_bindgen;
@@ -80,7 +80,7 @@ pub struct Cartesian2d {
 
 #[wasm_bindgen]
 #[derive(Clone, Copy, PartialEq)]
-pub enum SkeletonField {
+pub enum SkeletonLimb {
     LeftThigh,
     LeftShin,
     LeftArm,
@@ -91,6 +91,27 @@ pub enum SkeletonField {
     RightArm,
     RightForearm,
     RightFoot,
+}
+
+#[wasm_bindgen]
+#[derive(Clone, Copy, PartialEq)]
+pub enum SkeletonPoint {
+    LeftShoulder,
+    LeftElbow,
+    LeftWrist,
+    LeftHip,
+    LeftKnee,
+    LeftAnkle,
+    LeftHeel,
+    LeftToes,
+    RightShoulder,
+    RightElbow,
+    RightWrist,
+    RightHip,
+    RightKnee,
+    RightAnkle,
+    RightHeel,
+    RightToes,
 }
 
 #[wasm_bindgen]
@@ -133,7 +154,11 @@ impl Skeleton {
 }
 
 impl Skeleton {
-    pub(crate) fn from_pose(pose: &Pose, db: &TrackerDanceCollection, direction: Direction) -> Self {
+    pub(crate) fn from_pose(
+        pose: &Pose,
+        db: &TrackerDanceCollection,
+        direction: Direction,
+    ) -> Self {
         let rotation = 0.0;
         Skeleton3d::from_with_db(pose, db, direction).to_skeleton(rotation)
     }

@@ -1,9 +1,10 @@
 use super::skeleton_wrapper::SkeletonWrapper;
 use crate::intern::geom::SignedAngle;
 use crate::intern::pose::{Limb, LimbPosition, Pose};
+use crate::intern::skeleton_3d::{Direction, Skeleton3d};
 use crate::intern::tracker_dance_collection::TrackerDanceCollection;
-use crate::pose_file::PoseDirection;
-use crate::skeleton::{Cartesian2d, Skeleton, SkeletonField};
+use crate::pose_file::{BodyPoint, PoseDirection};
+use crate::skeleton::{Cartesian2d, Skeleton, SkeletonLimb, SkeletonPoint};
 use crate::{pose_file, STATE};
 use wasm_bindgen::prelude::wasm_bindgen;
 
@@ -18,6 +19,7 @@ pub struct PoseWrapper {
     // id: Option<String>,
     // name: Option<TranslatedString>,
     skeleton_cache: Option<Skeleton>,
+    side_skeleton_cache: Option<Skeleton>,
     // TODO: use as cache
     // pose: Option<intern::pose::Pose>,
     // display_name_cache: Option<String>,
@@ -28,6 +30,7 @@ impl PoseWrapper {
         Self {
             pose_definition,
             skeleton_cache: None,
+            side_skeleton_cache: None,
         }
     }
 
@@ -42,11 +45,13 @@ impl PoseWrapper {
             // pose: None,
             // display_name_cache: None,
             skeleton_cache: None,
+            side_skeleton_cache: None,
         })
     }
 
     fn invalidate_cache(&mut self) {
         self.skeleton_cache = None;
+        self.side_skeleton_cache = None;
     }
 
     pub(crate) fn definition(&self) -> &pose_file::Pose {
@@ -151,6 +156,22 @@ impl PoseWrapper {
         self.skeleton_cache.unwrap()
     }
 
+    #[wasm_bindgen(js_name = "sideSkeleton")]
+    pub fn side_skeleton(&mut self) -> Skeleton {
+        if self.side_skeleton_cache.is_none() {
+            STATE.with_borrow(|state| {
+                let db: &TrackerDanceCollection = &state.global_db.tracker_view;
+                let pose = self.pose();
+                // TODO: the direction here should be set by the parent step position
+                let direction = Direction::from(pose.direction).rotate_one();
+                let rotation = 90.0;
+                let skeleton = Skeleton3d::from_with_db(&pose, db, direction).to_skeleton(rotation);
+                self.side_skeleton_cache = Some(skeleton);
+            })
+        }
+        self.side_skeleton_cache.unwrap()
+    }
+
     pub fn id(&self) -> String {
         self.pose_definition.id.clone()
     }
@@ -174,7 +195,7 @@ impl PoseWrapper {
     }
 
     #[wasm_bindgen(js_name = "setAngle")]
-    pub fn set_angle(&mut self, field: SkeletonField, degree: i16) {
+    pub fn set_angle(&mut self, field: SkeletonLimb, degree: i16) {
         let limb: pose_file::Limb = field.into();
         let limb_position = self.find_or_insert_limb_position(limb);
         limb_position.angle = degree;
@@ -183,25 +204,46 @@ impl PoseWrapper {
 
     /// Angle in degree
     #[wasm_bindgen(js_name = "getAngle")]
-    pub fn angle(&mut self, field: SkeletonField) -> f32 {
+    pub fn angle(&mut self, field: SkeletonLimb) -> f32 {
         match field {
-            SkeletonField::LeftThigh => self.skeleton().left.thigh.angle,
-            SkeletonField::LeftShin => self.skeleton().left.shin.angle,
-            SkeletonField::LeftArm => self.skeleton().left.arm.angle,
-            SkeletonField::LeftForearm => self.skeleton().left.forearm.angle,
-            SkeletonField::LeftFoot => self.skeleton().left.foot.angle,
-            SkeletonField::RightThigh => self.skeleton().right.thigh.angle,
-            SkeletonField::RightShin => self.skeleton().right.shin.angle,
-            SkeletonField::RightArm => self.skeleton().right.arm.angle,
-            SkeletonField::RightForearm => self.skeleton().right.forearm.angle,
-            SkeletonField::RightFoot => self.skeleton().right.foot.angle,
+            SkeletonLimb::LeftThigh => self.skeleton().left.thigh.angle,
+            SkeletonLimb::LeftShin => self.skeleton().left.shin.angle,
+            SkeletonLimb::LeftArm => self.skeleton().left.arm.angle,
+            SkeletonLimb::LeftForearm => self.skeleton().left.forearm.angle,
+            SkeletonLimb::LeftFoot => self.skeleton().left.foot.angle,
+            SkeletonLimb::RightThigh => self.skeleton().right.thigh.angle,
+            SkeletonLimb::RightShin => self.skeleton().right.shin.angle,
+            SkeletonLimb::RightArm => self.skeleton().right.arm.angle,
+            SkeletonLimb::RightForearm => self.skeleton().right.forearm.angle,
+            SkeletonLimb::RightFoot => self.skeleton().right.foot.angle,
         }
         .to_degrees()
         .round()
     }
 
+    #[wasm_bindgen(js_name = "setZ")]
+    pub fn set_z(&mut self, field: SkeletonPoint, z: f32) {
+        let point: pose_file::BodyPoint = field.into();
+        self.pose_definition.z.absolute.insert(point, z);
+        self.invalidate_cache();
+    }
+
+    #[wasm_bindgen(js_name = "getZ")]
+    pub fn get_z(&self, field: SkeletonPoint) -> f32 {
+        let point: pose_file::BodyPoint = field.into();
+        self.pose_definition
+            .z
+            .absolute
+            .get(&point)
+            .copied()
+            .unwrap_or(0.0)
+    }
+
+    // TODO: set relative Z for limbs
+    // TODO: Z should be estimated from input video
+
     #[wasm_bindgen(js_name = "setWeight")]
-    pub fn set_weight(&mut self, field: SkeletonField, weight: f32) {
+    pub fn set_weight(&mut self, field: SkeletonLimb, weight: f32) {
         let limb: pose_file::Limb = field.into();
         let limb_position = self.find_or_insert_limb_position(limb);
         limb_position.weight = weight;
@@ -210,7 +252,7 @@ impl PoseWrapper {
 
     /// Weight of limb in pose detection
     #[wasm_bindgen(js_name = "getWeight")]
-    pub fn weight(&self, field: SkeletonField) -> f32 {
+    pub fn weight(&self, field: SkeletonLimb) -> f32 {
         let limb: pose_file::Limb = field.into();
         let limb_position = self.find_limb_position(limb);
         limb_position.map(|p| p.weight).unwrap_or(0.0)
@@ -272,19 +314,90 @@ impl PoseWrapper {
     }
 }
 
-impl From<SkeletonField> for pose_file::Limb {
-    fn from(field: SkeletonField) -> Self {
+impl From<SkeletonLimb> for pose_file::Limb {
+    fn from(field: SkeletonLimb) -> Self {
         match field {
-            SkeletonField::LeftThigh => pose_file::Limb::LeftThigh,
-            SkeletonField::LeftShin => pose_file::Limb::LeftShin,
-            SkeletonField::LeftArm => pose_file::Limb::LeftArm,
-            SkeletonField::LeftForearm => pose_file::Limb::LeftForearm,
-            SkeletonField::LeftFoot => pose_file::Limb::LeftFoot,
-            SkeletonField::RightThigh => pose_file::Limb::RightThigh,
-            SkeletonField::RightShin => pose_file::Limb::RightShin,
-            SkeletonField::RightArm => pose_file::Limb::RightArm,
-            SkeletonField::RightForearm => pose_file::Limb::RightForearm,
-            SkeletonField::RightFoot => pose_file::Limb::RightFoot,
+            SkeletonLimb::LeftThigh => pose_file::Limb::LeftThigh,
+            SkeletonLimb::LeftShin => pose_file::Limb::LeftShin,
+            SkeletonLimb::LeftArm => pose_file::Limb::LeftArm,
+            SkeletonLimb::LeftForearm => pose_file::Limb::LeftForearm,
+            SkeletonLimb::LeftFoot => pose_file::Limb::LeftFoot,
+            SkeletonLimb::RightThigh => pose_file::Limb::RightThigh,
+            SkeletonLimb::RightShin => pose_file::Limb::RightShin,
+            SkeletonLimb::RightArm => pose_file::Limb::RightArm,
+            SkeletonLimb::RightForearm => pose_file::Limb::RightForearm,
+            SkeletonLimb::RightFoot => pose_file::Limb::RightFoot,
+        }
+    }
+}
+
+impl From<SkeletonPoint> for pose_file::BodyPoint {
+    fn from(field: SkeletonPoint) -> Self {
+        match field {
+            SkeletonPoint::LeftShoulder => BodyPoint {
+                side: pose_file::BodySide::Left,
+                part: pose_file::BodyPart::Shoulder,
+            },
+            SkeletonPoint::LeftElbow => BodyPoint {
+                side: pose_file::BodySide::Left,
+                part: pose_file::BodyPart::Elbow,
+            },
+            SkeletonPoint::LeftWrist => BodyPoint {
+                side: pose_file::BodySide::Left,
+                part: pose_file::BodyPart::Wrist,
+            },
+            SkeletonPoint::LeftHip => BodyPoint {
+                side: pose_file::BodySide::Left,
+                part: pose_file::BodyPart::Hip,
+            },
+            SkeletonPoint::LeftKnee => BodyPoint {
+                side: pose_file::BodySide::Left,
+                part: pose_file::BodyPart::Knee,
+            },
+            SkeletonPoint::LeftAnkle => BodyPoint {
+                side: pose_file::BodySide::Left,
+                part: pose_file::BodyPart::Ankle,
+            },
+            SkeletonPoint::LeftHeel => BodyPoint {
+                side: pose_file::BodySide::Left,
+                part: pose_file::BodyPart::Heel,
+            },
+            SkeletonPoint::LeftToes => BodyPoint {
+                side: pose_file::BodySide::Left,
+                part: pose_file::BodyPart::Toes,
+            },
+            SkeletonPoint::RightShoulder => BodyPoint {
+                side: pose_file::BodySide::Right,
+                part: pose_file::BodyPart::Shoulder,
+            },
+            SkeletonPoint::RightElbow => BodyPoint {
+                side: pose_file::BodySide::Right,
+                part: pose_file::BodyPart::Elbow,
+            },
+            SkeletonPoint::RightWrist => BodyPoint {
+                side: pose_file::BodySide::Right,
+                part: pose_file::BodyPart::Wrist,
+            },
+            SkeletonPoint::RightHip => BodyPoint {
+                side: pose_file::BodySide::Right,
+                part: pose_file::BodyPart::Hip,
+            },
+            SkeletonPoint::RightKnee => BodyPoint {
+                side: pose_file::BodySide::Right,
+                part: pose_file::BodyPart::Knee,
+            },
+            SkeletonPoint::RightAnkle => BodyPoint {
+                side: pose_file::BodySide::Right,
+                part: pose_file::BodyPart::Ankle,
+            },
+            SkeletonPoint::RightHeel => BodyPoint {
+                side: pose_file::BodySide::Right,
+                part: pose_file::BodyPart::Heel,
+            },
+            SkeletonPoint::RightToes => BodyPoint {
+                side: pose_file::BodySide::Right,
+                part: pose_file::BodyPart::Toes,
+            },
         }
     }
 }

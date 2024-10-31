@@ -1,5 +1,5 @@
 use super::keypoints::Cartesian3d;
-use super::skeleton::SkeletonField;
+use super::skeleton::SkeletonLimb;
 use crate::intern::pose::{BodyPart, BodyPoint, BodySide};
 use crate::skeleton::{Cartesian2d, Segment, Side, Skeleton};
 use std::collections::HashMap;
@@ -68,18 +68,18 @@ impl RenderableSegment {
 
 #[wasm_bindgen(js_class = SkeletonV2)]
 impl RenderableSkeleton {
-    pub fn segment(&self, field: SkeletonField) -> RenderableSegment {
+    pub fn segment(&self, field: SkeletonLimb) -> RenderableSegment {
         match field {
-            SkeletonField::LeftThigh => self.left.thigh,
-            SkeletonField::LeftShin => self.left.shin,
-            SkeletonField::LeftArm => self.left.arm,
-            SkeletonField::LeftForearm => self.left.forearm,
-            SkeletonField::LeftFoot => self.left.foot,
-            SkeletonField::RightThigh => self.right.thigh,
-            SkeletonField::RightShin => self.right.shin,
-            SkeletonField::RightArm => self.right.arm,
-            SkeletonField::RightForearm => self.right.forearm,
-            SkeletonField::RightFoot => self.right.foot,
+            SkeletonLimb::LeftThigh => self.left.thigh,
+            SkeletonLimb::LeftShin => self.left.shin,
+            SkeletonLimb::LeftArm => self.left.arm,
+            SkeletonLimb::LeftForearm => self.left.forearm,
+            SkeletonLimb::LeftFoot => self.left.foot,
+            SkeletonLimb::RightThigh => self.right.thigh,
+            SkeletonLimb::RightShin => self.right.shin,
+            SkeletonLimb::RightArm => self.right.arm,
+            SkeletonLimb::RightForearm => self.right.forearm,
+            SkeletonLimb::RightFoot => self.right.foot,
         }
     }
 }

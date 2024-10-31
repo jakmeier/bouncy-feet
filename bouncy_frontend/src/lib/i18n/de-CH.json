@@ -137,7 +137,13 @@
             "shin": "Unterschenkel",
             "foot": "Fuss",
             "shoulder": "Schulter",
-            "hip": "Hüfte"
+            "hip": "Hüfte",
+            "elbow": "Ellbogen",
+            "wrist": "Hand",
+            "knee": "Knie",
+            "ankle": "Knöchel",
+            "heel": "Ferse",
+            "toes": "Zehen"
         }
     },
     "record": {

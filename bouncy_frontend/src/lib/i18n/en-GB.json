@@ -137,7 +137,13 @@
             "shin": "Shin",
             "foot": "Foot",
             "shoulder": "Shoulder",
-            "hip": "Hip"
+            "hip": "Hip",
+            "elbow": "Elbow",
+            "wrist": "Hand",
+            "knee": "Knee",
+            "ankle": "Ankle",
+            "heel": "Heel",
+            "toes": "Toes"
         }
     },
     "record": {

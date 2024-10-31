@@ -1,6 +1,6 @@
-use super::tracker_dance_collection::{TrackerDanceCollection, LimbIndex};
 use super::geom::{Angle3d, SignedAngle};
 use super::pose::{BodyPoint, Limb};
+use super::tracker_dance_collection::{LimbIndex, TrackerDanceCollection};
 use crate::keypoints::Cartesian3d;
 use crate::renderable::RenderableSkeleton;
 use crate::skeleton::{Segment, Side, Skeleton};
@@ -164,6 +164,11 @@ impl Skeleton3d {
         self.direction
     }
 
+    /// Project 3D skeleton to a 2D plane to be drawn on a screen.
+    ///
+    /// # Arguments
+    ///
+    /// * `rotation` - degrees of rotation to apply before the projection
     pub(crate) fn to_skeleton(&self, rotation: f32) -> Skeleton {
         let direction = self.direction().rotate(SignedAngle::degree(rotation));
         let sideway = match direction {
@@ -254,7 +259,7 @@ impl Direction {
         out
     }
 
-    fn rotate_one(&self) -> Direction {
+    pub(crate) fn rotate_one(&self) -> Direction {
         match self {
             Direction::North => Direction::East,
             Direction::East => Direction::South,

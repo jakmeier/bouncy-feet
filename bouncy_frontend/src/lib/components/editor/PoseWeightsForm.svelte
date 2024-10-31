@@ -4,7 +4,7 @@
   import {
     PoseWrapper,
     Skeleton,
-    SkeletonField,
+    SkeletonLimb,
   } from '$lib/instructor/bouncy_instructor';
   import Svg from '../avatar/Svg.svelte';
   import SvgAvatar from '../avatar/SvgAvatar.svelte';
@@ -55,8 +55,8 @@
    * @returns {WeightedPoseLimb[]}
    */
   function extractWeightedLimbs(pose) {
-    return allSkeletonFields().map((limb) => ({
-      name: SkeletonField[limb],
+    return allSkeletonLimbs().map((limb) => ({
+      name: SkeletonLimb[limb],
       index: limb,
       weight: pose.getWeight(limb),
     }));
@@ -81,29 +81,29 @@
     }
   }
 
-  function allSkeletonFields() {
+  function allSkeletonLimbs() {
     // simple, fast, and full control over order:
     // (requires manually updating when enum changes)
     return [
-      SkeletonField.LeftArm,
-      SkeletonField.LeftForearm,
-      SkeletonField.LeftThigh,
-      SkeletonField.LeftShin,
-      SkeletonField.LeftFoot,
-      SkeletonField.RightArm,
-      SkeletonField.RightForearm,
-      SkeletonField.RightThigh,
-      SkeletonField.RightShin,
-      SkeletonField.RightFoot,
+      SkeletonLimb.LeftArm,
+      SkeletonLimb.LeftForearm,
+      SkeletonLimb.LeftThigh,
+      SkeletonLimb.LeftShin,
+      SkeletonLimb.LeftFoot,
+      SkeletonLimb.RightArm,
+      SkeletonLimb.RightForearm,
+      SkeletonLimb.RightThigh,
+      SkeletonLimb.RightShin,
+      SkeletonLimb.RightFoot,
     ];
 
     // generic approach(bad):
     // using reduce as a map + filter to avoid the extra array
-    // return Object.keys(SkeletonField).reduce(
+    // return Object.keys(SkeletonLimb).reduce(
     //   /** @type {(acc: number[], field: string) => number[]} */
     //   (acc, field) => {
     //     // enum has static values for indices and names, we want to filter only the numbers
-    //     let limb = SkeletonField[field];
+    //     let limb = SkeletonLimb[field];
     //     if (typeof limb === 'number') {
     //       acc.push(limb);
     //     }

@@ -162,7 +162,7 @@ export enum PoseHint {
   ZOrder = 2,
   WrongDirection = 3,
 }
-export enum SkeletonField {
+export enum SkeletonLimb {
   LeftThigh = 0,
   LeftShin = 1,
   LeftArm = 2,
@@ -173,6 +173,24 @@ export enum SkeletonField {
   RightArm = 7,
   RightForearm = 8,
   RightFoot = 9,
+}
+export enum SkeletonPoint {
+  LeftShoulder = 0,
+  LeftElbow = 1,
+  LeftWrist = 2,
+  LeftHip = 3,
+  LeftKnee = 4,
+  LeftAnkle = 5,
+  LeftHeel = 6,
+  LeftToes = 7,
+  RightShoulder = 8,
+  RightElbow = 9,
+  RightWrist = 10,
+  RightHip = 11,
+  RightKnee = 12,
+  RightAnkle = 13,
+  RightHeel = 14,
+  RightToes = 15,
 }
 
 import type { Readable } from "svelte/store";
@@ -563,6 +581,10 @@ export class PoseWrapper {
    */
   skeleton(): Skeleton;
   /**
+   * @returns {Skeleton}
+   */
+  sideSkeleton(): Skeleton;
+  /**
    * @returns {string}
    */
   id(): string;
@@ -577,27 +599,37 @@ export class PoseWrapper {
    */
   setName(name: string, lang: string): void;
   /**
-   * @param {SkeletonField} field
+   * @param {SkeletonLimb} field
    * @param {number} degree
    */
-  setAngle(field: SkeletonField, degree: number): void;
+  setAngle(field: SkeletonLimb, degree: number): void;
   /**
    * Angle in degree
-   * @param {SkeletonField} field
+   * @param {SkeletonLimb} field
    * @returns {number}
    */
-  getAngle(field: SkeletonField): number;
+  getAngle(field: SkeletonLimb): number;
   /**
-   * @param {SkeletonField} field
+   * @param {SkeletonPoint} field
+   * @param {number} z
+   */
+  setZ(field: SkeletonPoint, z: number): void;
+  /**
+   * @param {SkeletonPoint} field
+   * @returns {number}
+   */
+  getZ(field: SkeletonPoint): number;
+  /**
+   * @param {SkeletonLimb} field
    * @param {number} weight
    */
-  setWeight(field: SkeletonField, weight: number): void;
+  setWeight(field: SkeletonLimb, weight: number): void;
   /**
    * Weight of limb in pose detection
-   * @param {SkeletonField} field
+   * @param {SkeletonLimb} field
    * @returns {number}
    */
-  getWeight(field: SkeletonField): number;
+  getWeight(field: SkeletonLimb): number;
   /**
    * @param {PoseDirection} direction
    */
@@ -671,6 +703,17 @@ export class Segment {
 export class Skeleton {
   free(): void;
   /**
+   * Compute 2d coordinates for the skeleton for rendering.
+   *
+   * The skeleton will be rendered assuming hard-coded values for body part
+   * proportional lengths, multiplied with the size parameter. The hip
+   * segment will have its center at the given position.
+   * @param {Cartesian2d} hip_center
+   * @param {number} size
+   * @returns {SkeletonV2}
+   */
+  render(hip_center: Cartesian2d, size: number): SkeletonV2;
+  /**
    * @param {boolean} sideway
    * @returns {Skeleton}
    */
@@ -683,17 +726,6 @@ export class Skeleton {
    * @returns {string}
    */
   debugString(): string;
-  /**
-   * Compute 2d coordinates for the skeleton for rendering.
-   *
-   * The skeleton will be rendered assuming hard-coded values for body part
-   * proportional lengths, multiplied with the size parameter. The hip
-   * segment will have its center at the given position.
-   * @param {Cartesian2d} hip_center
-   * @param {number} size
-   * @returns {SkeletonV2}
-   */
-  render(hip_center: Cartesian2d, size: number): SkeletonV2;
 /**
  * Does the dancer face away more than they face the camera?
  */
@@ -735,10 +767,10 @@ export class SkeletonSideV2 {
 export class SkeletonV2 {
   free(): void;
   /**
-   * @param {SkeletonField} field
+   * @param {SkeletonLimb} field
    * @returns {RenderableSegment}
    */
-  segment(field: SkeletonField): RenderableSegment;
+  segment(field: SkeletonLimb): RenderableSegment;
 /**
  * Does the dancer face away more than they face the camera?
  */
