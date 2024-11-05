@@ -23,7 +23,7 @@
 
   /** @type {{tracker: Tracker}} */
   let { tracker } = getContext('tracker');
-  let instructorSkeleton = tracker.poseSkeleton(pose.name);
+  let instructorSkeleton = tracker.poseSkeleton(pose.id);
 
   $: badWidth = (1.0 - threshold / max) * width;
   $: scoreWidth = ((max - pose.error) / max) * width;
