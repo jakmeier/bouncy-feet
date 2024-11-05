@@ -11,7 +11,7 @@ export const dev = readable(privDev, (set) => {
         window.toggleDev = () => { privDev = !privDev; set(privDev); };
     }
 });
-export const displayedVersion = writable(0.005002);
+export const displayedVersion = writable(0.006000);
 export const version = derived([dev, displayedVersion], ([$dev, $version]) => $dev ? 0.999 : $version);
 export const versionString = derived([dev, displayedVersion], ([$dev, $version]) => ($dev ? "DEV " : "") + versionNumberToString($version));
 

@@ -76,6 +76,16 @@ core business logic (dance detection).
 
 ## Progress Status
 
+- 5 Nov 2024: Release version  v0.6.0
+    - Step & pose editor (experimental feature): It is now possible to create
+      completely custom poses from a video or camera input. Then decide which
+      body parts are how important to get right for live-tracking, combine the
+      poses to steps, and lastly combine the steps to a dance / choreography.
+      Custom steps and dances can be used for everything the pre-bundled steps
+      are used for, including leveling up steps with live-tracking.
+    - Importing and exporting steps and poses to share them with friends.
+    - More details on a choreography: Show all poses with corresponding count
+      and visually link poses with the corresponding step.
 - 25 Sep 2024: Release version v0.5.2
     - The course lesson review page now shows which body parts are wrong for missed poses.
     - Add several prompt and in-between screen to make it easier to follow what is happening in the app.
