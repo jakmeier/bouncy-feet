@@ -90,7 +90,7 @@ export class PoseDetection {
 
     /**
      * 
-     * @param {import('@mediapipe/tasks-vision').ImageSource} videoElement
+     * @param {TexImageSource} videoElement
      * @param {number | undefined} timestamp
     */
     trackFrame(videoElement, timestamp) {
@@ -135,8 +135,7 @@ async function initMediaPipeBackend() {
     // offending at all.
     // In conclusion, there is no good reason at the moment to do something else.
     const wasmSet = await FilesetResolver.forVisionTasks(
-        // with 0.10.16 I get "TypeError: GLctx is undefined"
-        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.15/wasm"
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.18/wasm"
     );
 
     return await PoseLandmarker.createFromOptions(
