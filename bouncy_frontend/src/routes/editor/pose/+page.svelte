@@ -27,12 +27,13 @@
 
   /** @param {number} index */
   function deleteConfirmed(index) {
-    // const poseId = $poses[index].id();
-    // localCollectionCtx.removePose(poseId);
-
-    // before deleting, it should be checked that no step uses the pose!
-    console.warn('deleting not implemented');
-    alert('deleting poses not implemented :(');
+    const poseId = $poses[index].id();
+    try {
+      localCollectionCtx.removePose(poseId);
+    } catch (error) {
+      console.warn('deleting pose failed', poseId, error);
+      alert($t('editor.pose.delete-failed'));
+    }
   }
 
   function openSettings() {

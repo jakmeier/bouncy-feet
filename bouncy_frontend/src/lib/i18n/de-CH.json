@@ -106,6 +106,9 @@
             "weights-subtitle": "Gewichtung für die Tracking-Punktzahl",
             "new": "Pose erstellen",
             "edit": "Pose bearbeiten",
+            "delete-confirmation0": "Pose",
+            "delete-confirmation1": "wird gelöscht.",
+            "delete-failed": "Pose konnte nicht gelöscht werden. Lösche zuerst alle Schritte, welche die Pose verwenden.",
             "export-all": "Alle Posen exportieren",
             "import": "Posen importieren"
         },
@@ -114,6 +117,7 @@
             "list": "Meine Schritte",
             "delete-confirmation0": "Schritt",
             "delete-confirmation1": "wird gelöscht.",
+            "delete-failed": "Schritt konnte nicht gelöscht werden. Lösche zuerst alle Tänze, welche den Schritt verwenden.",
             "new": "Schritt erstellen",
             "edit": "Schritt bearbeiten",
             "edit-position": "Schrittposition bearbeiten",

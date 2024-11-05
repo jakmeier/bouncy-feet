@@ -12,6 +12,7 @@
     StepFileWrapper,
     loadLocalSteps,
     addLocalPoses,
+    DanceWrapper,
   } from '$lib/instructor/bouncy_instructor';
   import { setContext } from 'svelte';
   import { derived, writable } from 'svelte/store';
@@ -157,6 +158,18 @@
    * @param {String} id
    */
   function removeStep(id) {
+    // before deleting, we must check that no dance uses the step!
+    /** @type {DanceWrapper[]} */
+    const dances = $danceBuilderStore.dances();
+    for (let dance of dances) {
+      const steps = dance.steps();
+      for (let step of steps) {
+        if (step.id === id) {
+          throw new Error('Step in use');
+        }
+      }
+    }
+
     $stepBuilderStore.removeStep(id);
     // trigger update (can I do better?)
     $stepBuilderStore = $stepBuilderStore;
@@ -179,6 +192,18 @@
    * @param {String} id
    */
   function removePose(id) {
+    // before deleting, we must check that no step uses the pose!
+    /** @type {StepWrapper[]} */
+    const steps = $stepBuilderStore.steps();
+    for (let step of steps) {
+      const poses = step.poses();
+      for (let pose of poses) {
+        if (pose.id() === id) {
+          throw new Error('Pose in use');
+        }
+      }
+    }
+
     $poseBuilderStore.removePose(id);
     // trigger update (can I do better?)
     $poseBuilderStore = $poseBuilderStore;

@@ -84,11 +84,11 @@
     item={items[selectedIndex]}
   />
 
-  <button class="light wide" on:click={cancelDelete}
-    >{$t('editor.cancel-delete-button')}</button
-  >
-  <button class="light wide" on:click={deleteConfirmed}
+  <button class="danger wide" on:click={deleteConfirmed}
     >{$t('editor.confirm-delete-button')}</button
+  >
+  <button class="cancel wide" on:click={cancelDelete}
+    >{$t('editor.cancel-delete-button')}</button
   >
 </Popup>
 

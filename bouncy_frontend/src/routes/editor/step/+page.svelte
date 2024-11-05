@@ -35,7 +35,13 @@
   /** @param {number} index */
   function deleteConfirmed(index) {
     const stepId = $steps[index].id;
-    localCollectionCtx.removeStep(stepId);
+
+    try {
+      localCollectionCtx.removeStep(stepId);
+    } catch (error) {
+      console.warn('deleting step failed', stepId, error);
+      alert($t('editor.step.delete-failed'));
+    }
   }
 
   function openSettings() {

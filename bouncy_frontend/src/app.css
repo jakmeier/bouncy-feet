@@ -79,7 +79,7 @@ button.light {
     box-shadow: 0 2px 4px #00000082;
 }
 
-button.light:hover {
+button:hover {
     box-shadow: 0 2px 8px #00000082;
 }
 
@@ -132,6 +132,11 @@ button.locked {
     color: var(--theme-neutral-dark);
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+button.cancel {
+    background-color: var(--theme-neutral-gray);
+    color: var(--theme-neutral-dark);
 }
 
 button.reset {

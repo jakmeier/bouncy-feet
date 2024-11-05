@@ -106,6 +106,9 @@
             "weights-subtitle": "Weight for tracking score",
             "new": "New pose",
             "edit": "Edit pose",
+            "delete-confirmation0": "Pose",
+            "delete-confirmation1": "will be deleted.",
+            "delete-failed": "Deleting pose failed. Please first delete all steps that use the pose.",
             "export-all": "Export all my poses",
             "import": "Import poses"
         },
@@ -114,6 +117,7 @@
             "list": "My steps",
             "delete-confirmation0": "Step",
             "delete-confirmation1": "will be deleted.",
+            "delete-failed": "Deleting step failed. Please first delete all dances that use the step.",
             "new": "New step",
             "edit": "Edit step",
             "edit-position": "Edit step position",
