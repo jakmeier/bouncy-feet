@@ -10,6 +10,7 @@
   import { derived } from 'svelte/store';
   import DanceCounts from '$lib/components/DanceCounts.svelte';
   import { bpm, setBpm, beatCounter, timeBetweenMoves } from '$lib/stores/Beat';
+  import Collapse from '$lib/components/ui/Collapse.svelte';
 
   /** @type {import('./$types').PageData} */
   export let data;
@@ -80,40 +81,42 @@
     {/if}
   </div>
 
-  <ol class="steps-container">
-    {#each steps as step, index}
-      <li class="step" class:highlighted={highlightedStep === index}>
-        <a
-          href={`../../step/${step.name}`}
-          on:mouseover={() => highlight(index)}
-          on:focus={() => highlight(index)}
-          on:mouseout={resetHighlight}
-          on:blur={resetHighlight}
-          tabindex={0}
-        >
-          <Step
-            {step}
-            poseIndex={$beatCounter}
-            {animationTime}
-            size={stepSize}
-          />
-          <p style="width: {stepSize}px">{step.name}</p>
-        </a>
-      </li>
-    {/each}
-  </ol>
+  <Collapse>
+    <ol class="steps-container">
+      {#each steps as step, index}
+        <li class="step" class:highlighted={highlightedStep === index}>
+          <a
+            href={`../../step/${step.name}`}
+            on:mouseover={() => highlight(index)}
+            on:focus={() => highlight(index)}
+            on:mouseout={resetHighlight}
+            on:blur={resetHighlight}
+            tabindex={0}
+          >
+            <Step
+              {step}
+              poseIndex={$beatCounter}
+              {animationTime}
+              size={stepSize}
+            />
+            <p style="width: {stepSize}px">{step.name}</p>
+          </a>
+        </li>
+      {/each}
+    </ol>
 
-  <label class="config">
-    <div>{$t('editor.speed')} {inputBpm} / {$beatCounter}</div>
-    <input
-      type="range"
-      bind:value={inputBpm}
-      min="15"
-      max="150"
-      class="range"
-      on:change={() => setBpm(inputBpm)}
-    />
-  </label>
+    <label class="config">
+      <div>{$t('editor.speed')} {inputBpm}</div>
+      <input
+        type="range"
+        bind:value={inputBpm}
+        min="15"
+        max="150"
+        class="range"
+        on:change={() => setBpm(inputBpm)}
+      />
+    </label>
+  </Collapse>
 
   <h2 class="box">{$t('dance.counts')}</h2>
   <DanceCounts
