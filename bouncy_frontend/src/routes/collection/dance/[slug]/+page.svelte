@@ -122,7 +122,7 @@
   <DanceCounts
     {dance}
     bind:highlightedStep
-    markedPoseIndex={$beatCounter + 1}
+    markedPoseIndex={$beatCounter}
   />
 </div>
 

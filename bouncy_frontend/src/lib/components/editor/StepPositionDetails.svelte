@@ -20,7 +20,6 @@
     position = newPosition;
     jumpHeight = position?.jumpHeight || 1.0;
     selectedOrientation = Orientation[position?.orientation || Orientation.Any];
-    console.log('loaded selectedOrientation', selectedOrientation);
     pose = position?.pose();
   }
 
@@ -45,9 +44,7 @@
     if (!position) {
       return;
     }
-    console.log('setting jump height to', jumpHeight);
     position.setJumpHeight(jumpHeight);
-    console.log('jump height is', position.jumpHeight);
     onChange(position);
   }
 </script>
