@@ -7,6 +7,7 @@
   /** @type {DanceWrapper} */
   export let dance;
   export let highlightedStep = -1;
+  export let markedPoseIndex = -1;
 
   let innerWidth = 300;
 
@@ -51,7 +52,7 @@
         }
       }}
     >
-      <div class="count">
+      <div class="count" class:marked={beat === markedPoseIndex % beats}>
         {count(beat)}
       </div>
       {#if stepTransitions.includes(beat)}
@@ -88,6 +89,11 @@
     position: relative;
     z-index: 4;
     text-align: center;
+  }
+  .marked {
+    font-weight: 800;
+    color: white;
+    background-color: var(--theme-neutral-light);
   }
   .step-transition {
     position: absolute;

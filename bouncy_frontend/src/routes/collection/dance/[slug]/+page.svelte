@@ -100,7 +100,7 @@
   </ol>
 
   <h2 class="box">{$t('dance.counts')}</h2>
-  <DanceCounts {dance} bind:highlightedStep />
+  <DanceCounts {dance} bind:highlightedStep markedPoseIndex={$beatCounter} />
 </div>
 
 <Popup bind:isOpen={optionsPopupActive} title="editor.edit-dance-context-menu">
