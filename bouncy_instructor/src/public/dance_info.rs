@@ -32,7 +32,7 @@ impl DanceInfo {
         let mut offset = beat % self.total_beats;
 
         for step in &self.steps {
-            if step.beats() < offset {
+            if step.beats() <= offset {
                 offset -= step.beats();
             } else {
                 return Some(step.skeleton(offset));
