@@ -4,19 +4,18 @@
   import Header from '$lib/components/ui/Header.svelte';
   import DanceAnimation from '../../../DanceAnimation.svelte';
   import Step from '../../Step.svelte';
-  import { counter } from '$lib/timer';
-  import { getContext } from 'svelte';
+  import { getContext, onMount } from 'svelte';
   import Popup from '$lib/components/ui/Popup.svelte';
   import { goto } from '$app/navigation';
   import { derived } from 'svelte/store';
   import DanceCounts from '$lib/components/DanceCounts.svelte';
+  import { bpm, setBpm, beatCounter, timeBetweenMoves } from '$lib/stores/Beat';
 
   /** @type {import('./$types').PageData} */
   export let data;
 
-  const bpm = 240;
-  const stepTime = 60_000 / bpm;
-  const animationTime = stepTime * 0.85;
+  let inputBpm = $bpm;
+
   const danceSize = 250;
   const stepSize = 100;
 
@@ -31,7 +30,7 @@
     data.officialDances.find(isSelected) || $localDances.find(isSelected);
   $: steps = dance?.steps() || [];
   $: isStatic = data.officialDances.find(isSelected) !== undefined;
-  const beatCounter = counter(-1, 1, stepTime);
+  $: animationTime = $timeBetweenMoves * 0.85;
 
   /** @type {import('svelte/store').Writable<boolean>} */
   let optionsPopupActive;
@@ -57,6 +56,11 @@
   function resetHighlight() {
     highlightedStep = -1;
   }
+
+  onMount(() => {
+    setBpm(40);
+    inputBpm = $bpm;
+  });
 </script>
 
 <!-- TODO: translate -->
@@ -72,7 +76,7 @@
     style="max-width: {danceSize}px; max-height: {danceSize}px"
   >
     {#if dance}
-      <DanceAnimation {dance} />
+      <DanceAnimation {dance} beat={beatCounter} {animationTime} />
     {/if}
   </div>
 
@@ -99,8 +103,24 @@
     {/each}
   </ol>
 
+  <label class="config">
+    <div>{$t('editor.speed')} {inputBpm} / {$beatCounter}</div>
+    <input
+      type="range"
+      bind:value={inputBpm}
+      min="15"
+      max="150"
+      class="range"
+      on:change={() => setBpm(inputBpm)}
+    />
+  </label>
+
   <h2 class="box">{$t('dance.counts')}</h2>
-  <DanceCounts {dance} bind:highlightedStep markedPoseIndex={$beatCounter} />
+  <DanceCounts
+    {dance}
+    bind:highlightedStep
+    markedPoseIndex={$beatCounter + 1}
+  />
 </div>
 
 <Popup bind:isOpen={optionsPopupActive} title="editor.edit-dance-context-menu">
