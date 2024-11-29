@@ -1,22 +1,70 @@
-use axum::http::StatusCode;
+use axum::error_handling::HandleErrorLayer;
+use axum::http::{HeaderValue, StatusCode, Uri};
+use axum::response::IntoResponse;
 use axum::routing::{get, post};
 use axum::{extract, Json, Router};
+use axum_oidc::error::MiddlewareError;
+use axum_oidc::{EmptyAdditionalClaims, OidcAuthLayer, OidcClaims, OidcLoginLayer};
 use serde::{Deserialize, Serialize};
 use sqlx::migrate::MigrateDatabase;
 use sqlx::sqlite::SqliteRow;
 use sqlx::{Executor, Sqlite, SqlitePool};
 use tokio::net::TcpListener;
+use tower::ServiceBuilder;
+use tower_http::cors::AllowOrigin;
+use tower_sessions::cookie::{time::Duration, SameSite};
+use tower_sessions::{Expiry, MemoryStore, SessionManagerLayer};
 
 const DB_PATH: &str = "sqlite:data/db.sqlite";
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     let create_db_pool = create_db_pool().await?;
+
+    let app_url = require_env("CLIENT_URL");
+    let issuer = require_env("OIDC_ISSUER");
+    let client_id = require_env("OIDC_CLIENT_ID");
+    let client_secret = require_env("OIDC_CLIENT_SECRET");
+
+    let session_store = MemoryStore::default();
+    let session_layer = SessionManagerLayer::new(session_store)
+        .with_secure(true)
+        .with_same_site(SameSite::Strict)
+        .with_expiry(Expiry::OnInactivity(Duration::seconds(3600)));
+
+    let oidc_login_service = ServiceBuilder::new()
+        .layer(HandleErrorLayer::new(|e: MiddlewareError| async {
+            e.into_response()
+        }))
+        .layer(OidcLoginLayer::<EmptyAdditionalClaims>::new());
+
+    let origin = HeaderValue::from_str(&app_url).expect("url should be valid origin");
+    let parsed_app_url = Uri::from_maybe_shared(app_url).expect("valid url");
+    let oidc_auth_service = ServiceBuilder::new()
+        .layer(HandleErrorLayer::new(|e: MiddlewareError| async {
+            e.into_response()
+        }))
+        .layer(
+            OidcAuthLayer::<EmptyAdditionalClaims>::discover_client(
+                parsed_app_url,
+                issuer,
+                client_id,
+                Some(client_secret),
+                vec![],
+            )
+            .await
+            .unwrap(),
+        );
+
     let app = Router::new()
+        .route("/testauth", get(authenticated))
+        .layer(oidc_login_service)
+        .layer(oidc_auth_service)
+        .layer(session_layer)
         .route("/", get(root))
         .route("/scoreboard", get(get_scores))
         .route("/user/stats", post(post_stats))
-        .layer(tower_http::cors::CorsLayer::permissive())
+        .layer(tower_http::cors::CorsLayer::permissive().allow_origin(AllowOrigin::exact(origin)))
         .with_state(create_db_pool);
 
     let listener = TcpListener::bind("0.0.0.0:3000").await.unwrap();
@@ -155,6 +203,10 @@ async fn insert_or_update_user(
     Ok(())
 }
 
+async fn authenticated(claims: OidcClaims<EmptyAdditionalClaims>) -> impl IntoResponse {
+    format!("Hello {}", claims.subject().as_str())
+}
+
 /// Utility function for mapping any error into a `500 Internal Server Error`
 /// response.
 fn internal_error<E>(err: E) -> (StatusCode, String)
@@ -162,4 +214,9 @@ where
     E: std::error::Error,
 {
     (StatusCode::INTERNAL_SERVER_ERROR, err.to_string())
+}
+
+fn require_env(var_name: &str) -> String {
+    std::env::var(var_name)
+        .unwrap_or_else(|err| panic!("missing {var_name} environment variable, err {err}"))
 }
