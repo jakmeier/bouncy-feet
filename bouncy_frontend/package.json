@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "vite dev",
     "dev-host": "vite dev --host 0.0.0.0",
-    "build": "vite build",
+    "build": "vite build --mode staging",
+    "build-prod": "vite build --mode production",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json --watch",

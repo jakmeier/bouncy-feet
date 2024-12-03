@@ -1,0 +1,16 @@
+version: "3.6"
+services:
+  bouncy_stats:
+    image: jakmeier/bouncy-feet:dev-api
+    environment:
+      CLIENT_URL: https://dev.bouncy-feet.ch
+      OIDC_ISSUER: https://auth.bouncy-feet.ch/realms/bouncyfeet-dev
+      OIDC_CLIENT_SECRET: XXXX
+      OIDC_CLIENT_ID: bouncy-dev-backend
+    volumes:
+      - dev-data:/app/db.sqlite
+    ports:
+      - 3003:3000
+volumes:
+    data:
+        external: false

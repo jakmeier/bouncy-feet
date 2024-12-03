@@ -1,10 +1,15 @@
 import { dev } from "$app/environment";
+import { PUBLIC_API_BASE, PUBLIC_OIDC_CLIENT } from '$env/static/public';
 
-let STATS_API_BASE = "https://stats.bouncy-feet.ch";
+let STATS_API_BASE = PUBLIC_API_BASE;
 
 if (dev) {
     STATS_API_BASE = "http://localhost:3000";
 }
+
+const redirectUri = STATS_API_BASE + "/auth";
+const clientId = PUBLIC_OIDC_CLIENT;
+const idpUrl = `https://auth.bouncy-feet.ch/realms/bouncyfeet/protocol/openid-connect/auth?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}`;
 
 /**
  * @param {UserData} user
@@ -56,6 +61,28 @@ export async function fetchLeaderboard() {
         console.error('Error while reading scoreboard:', error);
         return [];
     }
+}
+
+/**
+ * @param {string} endpoint
+ * @returns {Promise<Response>}
+ */
+export async function apiRequest(endpoint, options = {}) {
+    const response = await fetch(`${STATS_API_BASE}${endpoint}`, {
+        ...options,
+        credentials: 'include', // Include cookies in the request
+    });
+
+    if (response.status === 401 || response.headers.get('WWW-Authenticate')) {
+        // If unauthorized, redirect to the login endpoint
+        window.location.href = idpUrl;
+    }
+
+    if (!response.ok) {
+        throw new Error(`API request failed with status ${response.status}`);
+    }
+
+    return response;
 }
 
 // This code is not UI or in any way browser API related, so it shouldn't really
