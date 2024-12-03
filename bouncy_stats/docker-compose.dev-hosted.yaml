@@ -1,6 +1,6 @@
 version: "3.6"
 services:
-  bouncy_stats:
+  bouncy_stats_dev:
     image: jakmeier/bouncy-feet:dev-api
     environment:
       CLIENT_URL: https://dev.bouncy-feet.ch
@@ -12,5 +12,5 @@ services:
     ports:
       - 3003:3000
 volumes:
-    data:
+    dev-data:
         external: false
