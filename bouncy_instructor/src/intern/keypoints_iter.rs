@@ -93,7 +93,7 @@ pub(crate) struct BodyPointsIter<'a> {
     bp: Box<dyn Iterator<Item = BodyPoint>>,
 }
 
-impl<'a> Iterator for BodyPointsIter<'a> {
+impl Iterator for BodyPointsIter<'_> {
     type Item = (BodyPoint, Cartesian3d);
 
     fn next(&mut self) -> Option<Self::Item> {
