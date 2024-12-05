@@ -1,6 +1,6 @@
 use auth::AdditionalClaims;
 use axum::error_handling::HandleErrorLayer;
-use axum::http::{HeaderValue, StatusCode, Uri};
+use axum::http::{HeaderValue, Method, StatusCode, Uri};
 use axum::response::IntoResponse;
 use axum::routing::{get, post};
 use axum::Router;
@@ -66,23 +66,33 @@ async fn main() -> anyhow::Result<()> {
                 oidc_issuer,
                 oidc_client_id,
                 Some(oidc_client_secret),
-                vec![],
+                vec![
+                    "openid".to_string(),
+                    "email".to_string(),
+                    "profile".to_string(),
+                ],
             )
             .await
             .unwrap(),
         );
+
     let origin = HeaderValue::from_str(&state.app_url).expect("url should be valid origin");
+    let cors_layer = tower_http::cors::CorsLayer::new()
+        .allow_origin(AllowOrigin::exact(origin))
+        .allow_methods([Method::GET, Method::POST])
+        .allow_credentials(true);
 
     let app = Router::new()
+        // /auth is the endpoint for OICD code exchange
         .route("/auth", get(auth::oauth_callback))
+        .layer(oidc_login_service) // enforces logging in
         .route("/testauth", get(authenticated))
-        .layer(oidc_login_service)
-        .layer(oidc_auth_service)
+        .layer(oidc_auth_service) // provides (optional) oidc claims
         .layer(session_layer)
         .route("/", get(root))
         .route("/scoreboard", get(get_scores))
         .route("/user/stats", post(post_stats))
-        .layer(tower_http::cors::CorsLayer::permissive().allow_origin(AllowOrigin::exact(origin)))
+        .layer(cors_layer)
         .with_state(state);
 
     let listener = TcpListener::bind("0.0.0.0:3000").await.unwrap();

@@ -1,11 +1,11 @@
 //! Authentication flow:
 //!
 //! Bouncy Feet uses OIDC with the Authentication Code flow. The PWA (client)
-//! redirects to Keycloak for the login, which then redirects to the
-//! oauth_callback in this file.
+//! establishes a session with the API backend and may call the `oauth_callback`
+//! endpoint to authenticate the session.
 //!
 //! The oauth_callback will establish a session with the user, without revealing
-//! the the access token to the user itself. Then it redirects back to the PWA's
+//! the access token to the user itself. Then it redirects back to the PWA's
 //! domain, where authenticated API requests are now possible.
 
 use crate::AppState;
@@ -24,7 +24,8 @@ struct TokenResponse {
     token_type: String,
 }
 
-/// The IdP redirect here for establishing a session.
+/// Calling this will redirect to Keyloak, have the user log in and then
+/// redirect back to the PWA domain.
 pub async fn oauth_callback(
     claims: OidcClaims<AdditionalClaims>,
     State(state): State<AppState>,
@@ -37,6 +38,5 @@ pub async fn oauth_callback(
 
     // Redirect to the PWA frontend if login was successful
     // TODO: redirect to the exact same page the user was on before
-    // (dev or app origin, with exact fully qualified url)
     Redirect::to(&state.app_url).into_response()
 }
