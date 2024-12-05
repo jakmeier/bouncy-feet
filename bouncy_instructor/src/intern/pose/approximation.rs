@@ -1,5 +1,5 @@
-use crate::intern::tracker_dance_collection::TrackerDanceCollection;
 use crate::intern::pose_score::{best_fit_pose, ErrorDetails};
+use crate::intern::tracker_dance_collection::TrackerDanceCollection;
 use crate::public::Tracker;
 use crate::tracker::PoseApproximation;
 

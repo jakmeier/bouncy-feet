@@ -5,9 +5,9 @@ use crate::tracker::PoseApproximation;
 use crate::ui_event::UiEvents;
 use crate::{DetectionFailureReason, DetectionResult, PoseHint, StepInfo};
 
-use super::tracker_dance_collection::TrackerDanceCollection;
 use super::pose::PoseDirection;
 use super::skeleton_3d::Skeleton3d;
+use super::tracker_dance_collection::TrackerDanceCollection;
 
 type Timestamp = f64;
 

@@ -7,10 +7,10 @@
 mod approximation;
 mod conversion;
 
-use super::tracker_dance_collection::{TrackerDanceCollection, LimbIndex};
 use super::geom::SignedAngle;
 use super::pose_score::AngleTarget;
 use super::skeleton_3d::Direction;
+use super::tracker_dance_collection::{LimbIndex, TrackerDanceCollection};
 use crate::intern::geom::Angle3d;
 use crate::public::keypoints::Cartesian3d;
 use crate::skeleton::Cartesian2d;
