@@ -420,7 +420,7 @@ impl TrackerDanceCollection {
         self.steps.iter().find(|step| step.id == id)
     }
 
-    pub(crate) fn steps_by_name<'a>(&'a self, name: &'a str) -> impl Iterator<Item = &Step> {
+    pub(crate) fn steps_by_name<'a>(&'a self, name: &'a str) -> impl Iterator<Item = &'a Step> {
         self.steps.iter().filter(move |step| step.name == name)
     }
 
