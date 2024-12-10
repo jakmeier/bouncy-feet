@@ -8,6 +8,7 @@ services:
       OIDC_ISSUER: https://auth.bouncy-feet.ch/realms/bouncyfeet-dev
       OIDC_CLIENT_SECRET: XXXX
       OIDC_CLIENT_ID: bouncy-dev-backend
+      DATABASE_URL: "postgres://api_user:local_password@postgres/bouncyfeet"
     build:
       context: ./
       dockerfile: Dockerfile
@@ -16,6 +17,25 @@ services:
       - data:/app/db.sqlite
     ports:
       - 3000:3000
+    networks:
+      - local_network
+  postgres:
+    image: postgres:17.2
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: bouncyfeet
+      POSTGRES_USER: api_user
+      POSTGRES_PASSWORD: local_password
+    ports:
+      - 65432:5432
+    networks:
+      - local_network
+    restart: always
 volumes:
-    data:
-        external: false
+  data:
+    external: false
+  pgdata:
+networks:
+  local_network:
+    driver: bridge

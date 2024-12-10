@@ -32,7 +32,7 @@ pub(crate) struct UserScore {
 pub(crate) async fn get_scores(
     extract::State(state): extract::State<AppState>,
 ) -> Result<Json<Vec<UserScore>>, (StatusCode, String)> {
-    let db_pool = &state.db_pool;
+    let db_pool = &state.sqlite_db_pool;
     let users: Vec<User> =
         sqlx::query_as::<_, User>("SELECT * FROM users ORDER BY steps DESC LIMIT 100")
             .fetch_all(db_pool)
@@ -52,7 +52,7 @@ pub(crate) async fn post_stats(
     extract::State(state): extract::State<AppState>,
     extract::Json(user): extract::Json<NewUserStats>,
 ) -> Result<(), (StatusCode, String)> {
-    let db_pool = &state.db_pool;
+    let db_pool = &state.sqlite_db_pool;
     let mut tx = db_pool.begin().await.map_err(internal_error)?;
 
     let db_formatted_user = User {

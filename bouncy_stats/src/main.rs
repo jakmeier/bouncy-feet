@@ -3,11 +3,11 @@ use axum::error_handling::HandleErrorLayer;
 use axum::http::{HeaderValue, Method, StatusCode, Uri};
 use axum::response::IntoResponse;
 use axum::routing::{get, post};
-use axum::Router;
+use axum::{extract, Router};
 use axum_oidc::error::MiddlewareError;
 use axum_oidc::{OidcAuthLayer, OidcClaims, OidcLoginLayer};
 use sqlx::migrate::MigrateDatabase;
-use sqlx::{Executor, Sqlite, SqlitePool};
+use sqlx::{Executor, PgPool, Sqlite, SqlitePool};
 use tokio::net::TcpListener;
 use tower::ServiceBuilder;
 use tower_http::cors::AllowOrigin;
@@ -23,21 +23,37 @@ const DB_PATH: &str = "sqlite:data/db.sqlite";
 #[derive(Clone)]
 struct AppState {
     app_url: String,
-    db_pool: SqlitePool,
+    sqlite_db_pool: SqlitePool,
+    pg_db_pool: PgPool,
 }
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    let db_pool = create_db_pool().await?;
-
-    let state = AppState {
-        app_url: require_env("CLIENT_URL"),
-        db_pool,
-    };
     let api_url = require_env("API_URL");
+    let app_url = require_env("CLIENT_URL");
     let oidc_issuer = require_env("OIDC_ISSUER");
     let oidc_client_id = require_env("OIDC_CLIENT_ID");
     let oidc_client_secret = require_env("OIDC_CLIENT_SECRET");
+    let db_url = require_env("DATABASE_URL");
+
+    let sqlite_db_pool = create_db_pool().await?;
+    let pg_db_pool = PgPool::connect(&db_url).await?;
+
+    // TODO: better DB setup
+    {
+        println!("Starting DB migrations...");
+        sqlx::migrate!("./db_migrations/")
+            .run(&pg_db_pool)
+            .await
+            .unwrap();
+        println!("...DB migrations done");
+    }
+
+    let state = AppState {
+        app_url,
+        sqlite_db_pool,
+        pg_db_pool,
+    };
 
     let session_store = MemoryStore::default();
     let session_layer = SessionManagerLayer::new(session_store)
@@ -127,8 +143,17 @@ async fn create_db_pool() -> anyhow::Result<SqlitePool> {
     Ok(db_pool)
 }
 
-async fn authenticated(claims: OidcClaims<AdditionalClaims>) -> impl IntoResponse {
-    format!("Hello {}", claims.subject().as_str())
+async fn authenticated(
+    extract::State(state): extract::State<AppState>,
+    claims: OidcClaims<AdditionalClaims>,
+) -> impl IntoResponse {
+    let subject = claims.subject().as_str();
+    let rec = sqlx::query!("SELECT id FROM users WHERE oidc_subject = $1", subject)
+        .fetch_one(&state.pg_db_pool)
+        .await
+        .unwrap();
+
+    format!("Hello {}, you are user number {}", subject, rec.id)
 }
 
 /// Utility function for mapping any error into a `500 Internal Server Error`
