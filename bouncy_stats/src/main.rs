@@ -8,7 +8,6 @@ use axum_oidc::error::MiddlewareError;
 use axum_oidc::{OidcAuthLayer, OidcClaims, OidcLoginLayer};
 use sqlx::migrate::MigrateDatabase;
 use sqlx::{Executor, Sqlite, SqlitePool};
-use std::str::FromStr;
 use tokio::net::TcpListener;
 use tower::ServiceBuilder;
 use tower_http::cors::AllowOrigin;
@@ -35,6 +34,7 @@ async fn main() -> anyhow::Result<()> {
         app_url: require_env("CLIENT_URL"),
         db_pool,
     };
+    let api_url = require_env("API_URL");
     let oidc_issuer = require_env("OIDC_ISSUER");
     let oidc_client_id = require_env("OIDC_CLIENT_ID");
     let oidc_client_secret = require_env("OIDC_CLIENT_SECRET");
@@ -55,14 +55,14 @@ async fn main() -> anyhow::Result<()> {
         }))
         .layer(OidcLoginLayer::<AdditionalClaims>::new());
 
-    let parsed_app_url = Uri::from_str(&state.app_url).expect("valid url");
+    let parsed_api_url = Uri::from_maybe_shared(api_url).expect("valid api url");
     let oidc_auth_service = ServiceBuilder::new()
         .layer(HandleErrorLayer::new(|e: MiddlewareError| async {
             e.into_response()
         }))
         .layer(
             OidcAuthLayer::<AdditionalClaims>::discover_client(
-                parsed_app_url,
+                parsed_api_url,
                 oidc_issuer,
                 oidc_client_id,
                 Some(oidc_client_secret),
@@ -76,9 +76,9 @@ async fn main() -> anyhow::Result<()> {
             .unwrap(),
         );
 
-    let origin = HeaderValue::from_str(&state.app_url).expect("url should be valid origin");
+    let client_origin = HeaderValue::from_str(&state.app_url).expect("url should be valid origin");
     let cors_layer = tower_http::cors::CorsLayer::new()
-        .allow_origin(AllowOrigin::exact(origin))
+        .allow_origin(AllowOrigin::exact(client_origin))
         .allow_methods([Method::GET, Method::POST])
         .allow_credentials(true);
 

@@ -2,6 +2,12 @@ version: "3.6"
 services:
   bouncy_stats:
     image: bouncy_stats
+    environment:
+      CLIENT_URL: http://localhost:5173
+      API_URL: http://localhost:3000
+      OIDC_ISSUER: https://auth.bouncy-feet.ch/realms/bouncyfeet-dev
+      OIDC_CLIENT_SECRET: XXXX
+      OIDC_CLIENT_ID: bouncy-dev-backend
     build:
       context: ./
       dockerfile: Dockerfile
