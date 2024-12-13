@@ -4,6 +4,7 @@
   import PhysicalSvgPolygon from './PhysicalSvgPolygon.svelte';
   import PhysicalSvgCircle from './PhysicalSvgCircle.svelte';
   import SvgStyle from './SvgStyle.svelte';
+  import PhysicalSvgPath from './PhysicalSvgPath.svelte';
 
   /** @type {number} */
   export let width;
@@ -24,6 +25,10 @@
   let lines = [];
   /**  @type {Line[]}  */
   let displayedLines = [];
+  /**  @type {Path[]}  */
+  let paths = [];
+  /**  @type {Path[]}  */
+  let displayedPaths = [];
   /**  @type {Polygon[]}  */
   let polygons = [];
   /**  @type {Circle[]}  */
@@ -50,6 +55,29 @@
     let index = lines.findIndex((x) => x.id === id);
     lines.splice(index, 1);
     lines = lines;
+  }
+
+  /**
+   * @param {string} id
+   * @param {Path} path
+   */
+  function setPath(id, path) {
+    const namedPath = { ...path, id };
+    let index = paths.findIndex((x) => x.id === id);
+    if (index !== -1) {
+      paths[index] = namedPath;
+    } else {
+      paths.push(namedPath);
+    }
+  }
+
+  /**
+   * @param {string} id
+   */
+  function removePath(id) {
+    let index = paths.findIndex((x) => x.id === id);
+    paths.splice(index, 1);
+    paths = paths;
   }
 
   /**
@@ -100,14 +128,18 @@
 
   async function update() {
     displayedLines = lines;
+    displayedPaths = paths;
     if (orderByZ) {
       displayedLines = displayedLines.sort((a, b) => a.z - b.z);
+      displayedPaths = displayedPaths.sort((a, b) => a.z - b.z);
     }
   }
 
   setContext('svg', {
     setLine,
     removeLine,
+    setPath,
+    removePath,
     setPolygon,
     removePolygon,
     setCircle,
@@ -135,6 +167,13 @@
 
   {#each displayedLines as line (line.id)}
     <PhysicalSvgLine start={line.start} end={line.end} style={line.style} />
+  {/each}
+
+  {#each displayedPaths as path (path.id)}
+    <PhysicalSvgPath
+      points={path.points}
+      style={path.style}
+    />
   {/each}
 </svg>
 

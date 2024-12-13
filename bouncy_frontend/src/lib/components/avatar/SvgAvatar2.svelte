@@ -51,7 +51,7 @@
   let dummyUpdate = 0;
   $: skeleton, (dummyUpdate += 1);
 </script>
-
+<!-- 
 <SvgPolygon
   id="torso"
   points={[leftHip, rightHip, rightShoulder, leftShoulder]}
@@ -61,7 +61,7 @@
     linecap: 'round',
     lineWidth: lineWidth * 0.9,
   }}
-/>
+/> -->
 <SvgCircle
   id="head"
   {cx}

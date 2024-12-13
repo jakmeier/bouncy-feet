@@ -20,6 +20,12 @@
  * @property {Point} end
  * @property {number} z
  * @property {any} style
+ *
+ * @typedef {Object} Path
+ * @property {String} id
+ * @property {Point[]} points
+ * @property {number} z
+ * @property {any} style
  * 
  * @typedef {Object} Polygon
  * @property {String} id
@@ -77,3 +83,6 @@
  * @property {number} index
  * @property {number} weight
  */
+import { Cartesian2d } from "./instructor/bouncy_instructor";
+
+
