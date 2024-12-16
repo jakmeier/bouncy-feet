@@ -48,7 +48,7 @@
     .map((limb) => limb.render(renderedSkeleton))
     .concat(markedLimbIndices.map((i) => renderedSkeleton.segment(i)));
 
-  $: headRadius = 0.075 * avatarSizePixels;
+  $: headRadius = 0.055 * avatarSizePixels;
 </script>
 
 <SvgAvatar2

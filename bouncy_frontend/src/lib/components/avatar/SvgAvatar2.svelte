@@ -16,7 +16,7 @@
   export let style = MAIN_THEME_COLORING;
   export let lineWidth = 10;
   export let avatarSizePixels = 100;
-  export let headRadius = 0.075 * avatarSizePixels;
+  export let headRadius = 0.055 * avatarSizePixels;
   /** @type {RenderableSegment[]} */
   export let markedSegments = [];
   $: markedSegmentsLines = markedSegments.map((segment, i) => {
