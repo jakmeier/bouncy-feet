@@ -17,6 +17,9 @@
   export let lineWidth = 4;
   export let style = LEFT_RIGHT_COLORING;
 
+  export let headRadius = undefined;
+  export let headHeight = undefined;
+
   // When the pose index is negative, it should show a resting position
   // according to the orientation of the first pose.
   const restingStep = Skeleton.resting(step.skeleton(0).sideway);
@@ -60,6 +63,8 @@
         {bodyShift}
         {lineWidth}
         {style}
+        {headRadius}
+        {headHeight}
       />
     </Svg>
   </Animation>

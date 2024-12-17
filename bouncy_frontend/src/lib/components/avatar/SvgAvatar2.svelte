@@ -17,6 +17,7 @@
   export let lineWidth = 10;
   export let avatarSizePixels = 100;
   export let headRadius = 0.055 * avatarSizePixels;
+  export let headHeight = 1;
   /** @type {RenderableSegment[]} */
   export let markedSegments = [];
   $: markedSegmentsLines = markedSegments.map((segment, i) => {
@@ -47,7 +48,7 @@
   /** @type {number} */
   $: cx = (leftShoulder.x + rightShoulder.x) / 2;
   /** @type {number} */
-  $: cy = leftShoulder.y - avatarSizePixels * 0.1;
+  $: cy = leftShoulder.y - avatarSizePixels * headHeight / 10;
   let dummyUpdate = 0;
   $: skeleton, (dummyUpdate += 1);
 </script>

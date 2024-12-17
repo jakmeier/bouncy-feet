@@ -17,6 +17,8 @@
 
   /** @type {AvatarColoring} */
   export let style = MAIN_THEME_COLORING;
+  export let headRadius = Math.min(height, width) * avatarSize * 0.055;
+  export let headHeight = 1.0;
 
   /**
    * @param {number} s
@@ -48,7 +50,7 @@
     .map((limb) => limb.render(renderedSkeleton))
     .concat(markedLimbIndices.map((i) => renderedSkeleton.segment(i)));
 
-  $: headRadius = 0.055 * avatarSizePixels;
+  // $: headRadius = 0.055 * avatarSizePixels;
 </script>
 
 <SvgAvatar2
@@ -57,5 +59,6 @@
   {lineWidth}
   {markedSegments}
   {headRadius}
+  {headHeight}
   {style}
 />
