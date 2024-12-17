@@ -2,7 +2,11 @@
   import { getContext } from 'svelte';
   import DanceStats from './DanceStats.svelte';
   import { t } from '$lib/i18n';
-  import { submitStats, fetchLeaderboard } from '$lib/stats';
+  import {
+    submitStats,
+    fetchLeaderboard,
+    submitUserMetadata,
+  } from '$lib/stats';
   import Leaderboard from './Leaderboard.svelte';
   import Popup from '$lib/components/ui/Popup.svelte';
   import { writable } from 'svelte/store';
@@ -20,6 +24,7 @@
   let showStatsSharingPopup = writable(!$user.consentSendingStats);
 
   async function submit() {
+    submitUserMetadata('publicName', $user.publicName);
     await submitStats($user);
     refreshLeaderboard();
   }
@@ -82,7 +87,9 @@
 <h2 class="box">{$t('profile.leaderboard-title')}</h2>
 <Leaderboard users={scoreboardData} />
 <form class="inputs">
-  <button on:click={submit} class="light wide">{$t('profile.submit-stats')}</button>
+  <button on:click={submit} class="light wide"
+    >{$t('profile.submit-stats')}</button
+  >
 </form>
 <form class="inputs">
   <label for="publicName">{$t('profile.public-name')}</label>

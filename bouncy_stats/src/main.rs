@@ -1,5 +1,6 @@
 use auth::AdditionalClaims;
 use axum::error_handling::HandleErrorLayer;
+use axum::http::header::CONTENT_TYPE;
 use axum::http::{HeaderValue, Method, StatusCode, Uri};
 use axum::response::IntoResponse;
 use axum::routing::{get, post};
@@ -99,6 +100,7 @@ async fn main() -> anyhow::Result<()> {
     let cors_layer = tower_http::cors::CorsLayer::new()
         .allow_origin(AllowOrigin::exact(client_origin))
         .allow_methods([Method::GET, Method::POST])
+        .allow_headers([CONTENT_TYPE])
         .allow_credentials(true);
 
     let user_layer = middleware::from_fn_with_state(state.clone(), user2::user_lookup);

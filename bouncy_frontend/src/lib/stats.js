@@ -10,6 +10,29 @@ if (dev) {
 const loginUrl = STATS_API_BASE + "/auth";
 
 /**
+ * @param {string} key
+ * @param {string} value
+ */
+export async function submitUserMetadata(key, value) {
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            key_name: key,
+            key_value: value,
+            // chrono can parse the time including the timezone from this
+            last_modified: new Date().toISOString(),
+            // the only existing version for now
+            version: 0,
+        })
+    };
+
+    return await apiRequest('/user/meta/update', options);
+}
+
+/**
  * @param {UserData} user
  */
 export async function submitStats(user) {
@@ -63,6 +86,7 @@ export async function fetchLeaderboard() {
 
 /**
  * @param {string} endpoint
+ * @param {object} options
  * @returns {Promise<Response>}
  */
 export async function apiRequest(endpoint, options = {}) {
