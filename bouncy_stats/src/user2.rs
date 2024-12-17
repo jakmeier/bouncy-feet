@@ -62,3 +62,9 @@ pub async fn user_info(
     })
     .to_string()
 }
+
+impl UserId {
+    pub fn num(&self) -> i64 {
+        self.0
+    }
+}

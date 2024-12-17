@@ -1,0 +1,40 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT key_name, key_value, last_modified, version_nr\n        FROM user_meta\n        WHERE user_id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "key_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "key_value",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "last_modified",
+        "type_info": "Timestamp"
+      },
+      {
+        "ordinal": 3,
+        "name": "version_nr",
+        "type_info": "Int2"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "57ce7512a765e9f53a27b2c1e1cfb8e149578e734e303d145f99ec560e997411"
+}

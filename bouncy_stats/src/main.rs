@@ -18,6 +18,7 @@ use user::{get_scores, post_stats};
 mod auth;
 mod user;
 mod user2;
+mod user_meta;
 
 const DB_PATH: &str = "sqlite:data/db.sqlite";
 
@@ -103,6 +104,8 @@ async fn main() -> anyhow::Result<()> {
     let user_layer = middleware::from_fn_with_state(state.clone(), user2::user_lookup);
 
     let app = Router::new()
+        .route("/user/meta", get(user_meta::metadata))
+        .route("/user/meta/update", post(user_meta::update_user_metadata))
         .route("/user", get(user2::user_info))
         .layer(user_layer)
         // /auth is the endpoint for OICD code exchange
@@ -168,6 +171,7 @@ fn internal_error<E>(err: E) -> (StatusCode, String)
 where
     E: std::error::Error,
 {
+    eprintln!("Internal error: {:?}", err);
     (StatusCode::INTERNAL_SERVER_ERROR, err.to_string())
 }
 
