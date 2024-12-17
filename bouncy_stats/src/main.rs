@@ -3,7 +3,7 @@ use axum::error_handling::HandleErrorLayer;
 use axum::http::{HeaderValue, Method, StatusCode, Uri};
 use axum::response::IntoResponse;
 use axum::routing::{get, post};
-use axum::{extract, Router};
+use axum::{extract, middleware, Router};
 use axum_oidc::error::MiddlewareError;
 use axum_oidc::{OidcAuthLayer, OidcClaims, OidcLoginLayer};
 use sqlx::migrate::MigrateDatabase;
@@ -17,9 +17,11 @@ use user::{get_scores, post_stats};
 
 mod auth;
 mod user;
+mod user2;
 
 const DB_PATH: &str = "sqlite:data/db.sqlite";
 
+/// Immutable shared state, should be cheap to clone.
 #[derive(Clone)]
 struct AppState {
     app_url: String,
@@ -98,7 +100,11 @@ async fn main() -> anyhow::Result<()> {
         .allow_methods([Method::GET, Method::POST])
         .allow_credentials(true);
 
+    let user_layer = middleware::from_fn_with_state(state.clone(), user2::user_lookup);
+
     let app = Router::new()
+        .route("/user", get(user2::user_info))
+        .layer(user_layer)
         // /auth is the endpoint for OICD code exchange
         .route("/auth", get(auth::oauth_callback))
         .layer(oidc_login_service) // enforces logging in
