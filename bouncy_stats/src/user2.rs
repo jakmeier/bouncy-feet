@@ -33,12 +33,11 @@ pub async fn user_lookup(
         None => {
             sqlx::query!(
                 r#"
-                INSERT INTO users (oidc_subject, test_counter) 
-                VALUES ($1, $2)
+                INSERT INTO users (oidc_subject) 
+                VALUES ($1)
                 RETURNING id
                 "#,
-                subject,
-                0
+                subject
             )
             .fetch_one(&state.pg_db_pool)
             .await
