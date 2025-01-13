@@ -39,9 +39,9 @@
   let thickness = 4;
   let headRadiusParam = 1;
   let headHeightParam = 1;
-  let rightColor = '#382eeb';
-  let leftColor = '#e97516';
-  let headColor = '#121124';
+  let rightColor = '#9beb66';
+  let leftColor = '#4c6633';
+  let headColor = '#4c6633';
 </script>
 
 <Header title={name} />

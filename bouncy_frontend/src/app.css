@@ -3,13 +3,19 @@
 * The theme is static for now.
 */
 :root {
-    --theme-main: #382eeb;
-    --theme-neutral-dark: #121124;
-    --theme-neutral-gray: #aeaeb1;
-    --theme-neutral-light: #c2bfff;
+    --theme-main: #9beb66;
+    --theme-main-dark: #4c6633;
+    --theme-main-medium: #cbf3a3;
+    --theme-main-light: #ddf7c2;
+    --theme-neutral-dark: #2c2e35;
+    --theme-neutral-gray: #e6f2ef;
+    --theme-neutral-light: #ddf7c2;
+    /* --theme-neutral-white: #f0f7f5; */
     --theme-neutral-white: #ffffff;
-    --theme-accent: #e97516;
-    --theme-accent-light: #ffad69;
+    --theme-accent: #ff7301;
+    --theme-accent-dark: #7a340c;
+    --theme-accent-medium: #ffab67;
+    --theme-accent-light: #ffc79a;
 }
 
 /*
@@ -40,7 +46,7 @@ h1.colored {
 
 h2.box {
     margin: 5px 0;
-    background-color: var(--theme-neutral-light);
+    background-color: var(--theme-accent-light);
     border-radius: 5px;
     padding: 5px;
     text-align: center;
@@ -73,7 +79,7 @@ button {
 }
 
 button.light {
-    background-color: var(--theme-accent-light);
+    background-color: var(--theme-accent-medium);
     color: var(--theme-neutral-dark);
     border: var(--theme-neutral-dark) solid 1px;
     border-radius: 2px;

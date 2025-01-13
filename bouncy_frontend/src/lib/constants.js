@@ -28,17 +28,17 @@ export const CORRECT_COLORING = {
 };
 
 export const LEFT_RIGHT_COLORING = {
-    leftColor: 'var(--theme-accent)',
-    rightColor: 'var(--theme-main)',
-    headColor: 'var(--theme-neutral-dark)',
-    bodyColor: 'var(--theme-neutral-light)',
+    leftColor: 'var(--theme-main)',
+    rightColor: 'var(--theme-main-dark)',
+    headColor: 'var(--theme-main-dark)',
+    bodyColor: 'var(--theme-main-dark)',
 };
 
 export const LEFT_RIGHT_COLORING_LIGHT = {
-    leftColor: '#e97516D0',
-    rightColor: '#382eebD0',
-    headColor: '#00000040',
-    bodyColor: '#00000040',
+    leftColor: '#4c6633D0',
+    rightColor: '#9beb66D0',
+    headColor: '#4c663340',
+    bodyColor: '#4c663340',
 };
 
 export const MAIN_THEME_COLORING = {

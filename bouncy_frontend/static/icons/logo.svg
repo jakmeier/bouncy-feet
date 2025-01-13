@@ -1,170 +1,39 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #1d1d1b;
+      }
 
-<svg
-   width="100mm"
-   height="100mm"
-   viewBox="0 0 100 100"
-   version="1.1"
-   id="svg5"
-   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
-   sodipodi:docname="logo.svg"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg">
-  <sodipodi:namedview
-     id="namedview7"
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1.0"
-     inkscape:pageshadow="2"
-     inkscape:pageopacity="0.0"
-     inkscape:pagecheckerboard="0"
-     inkscape:document-units="mm"
-     showgrid="false"
-     inkscape:zoom="0.93583155"
-     inkscape:cx="214.24796"
-     inkscape:cy="200.35657"
-     inkscape:window-width="1850"
-     inkscape:window-height="1016"
-     inkscape:window-x="70"
-     inkscape:window-y="27"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="g866" />
-  <defs
-     id="defs2" />
-  <g
-     inkscape:label="Layer 1"
-     inkscape:groupmode="layer"
-     id="layer1">
-    <g
-       id="g866"
-       transform="matrix(0.48011193,0,0,0.48011193,4.028132,0.36857147)">
-      <ellipse
-         cx="95.752396"
-         cy="103.3747"
-         fill="#121124"
-         id="circle826-3"
-         style="stroke-width:4.6563;stroke-miterlimit:4;stroke-dasharray:none"
-         rx="52.07119"
-         ry="93.728142" />
-      <polygon
-         points="100,55.5 100,105.5 "
-         stroke-width="3.6px"
-         stroke="#121124"
-         fill="#c2bfff"
-         stroke-linecap="round"
-         id="polygon824"
-         style="fill:#d3d3d3;stroke:#d3d3d3;stroke-width:14.5799;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;fill-opacity:1"
-         transform="translate(-3.6442206,2.1324395)" />
-      <circle
-         cx="96.355782"
-         cy="37.632439"
-         r="18.01545"
-         fill="#121124"
-         id="circle826"
-         style="fill:#d3d3d3;fill-opacity:1;stroke-width:1.20075;stroke-miterlimit:4;stroke-dasharray:none" />
-      <line
-         x1="96.355782"
-         y1="107.63244"
-         x2="70.644279"
-         y2="138.27422"
-         stroke-width="4px"
-         stroke="#e97516"
-         stroke-linecap="round"
-         id="line828"
-         style="stroke-width:16.66278111;stroke-miterlimit:4;stroke-dasharray:none" />
-      <line
-         x1="70.644279"
-         y1="138.27422"
-         x2="70.644272"
-         y2="178.27422"
-         stroke-width="4px"
-         stroke="#e97516"
-         stroke-linecap="round"
-         id="line830"
-         style="stroke-width:16.66278111;stroke-miterlimit:4;stroke-dasharray:none" />
-      <line
-         x1="96.355782"
-         y1="57.632439"
-         x2="89.921577"
-         y2="76.569214"
-         stroke-width="4px"
-         stroke="#e97516"
-         stroke-linecap="round"
-         id="line832"
-         style="stroke-width:14.5799;stroke-miterlimit:4;stroke-dasharray:none" />
-      <line
-         x1="89.921577"
-         y1="76.569214"
-         x2="61.598934"
-         y2="86.46003"
-         stroke-width="4px"
-         stroke="#e97516"
-         stroke-linecap="round"
-         id="line834"
-         style="stroke-width:14.5799;stroke-miterlimit:4;stroke-dasharray:none" />
-      <line
-         x1="70.644272"
-         y1="178.27422"
-         x2="55.644268"
-         y2="178.27422"
-         stroke-width="4px"
-         stroke="#e97516"
-         stroke-linecap="round"
-         id="line836"
-         style="stroke-width:14.5799;stroke-miterlimit:4;stroke-dasharray:none" />
-      <line
-         x1="96.355782"
-         y1="107.63244"
-         x2="110.03658"
-         y2="145.22015"
-         stroke-width="4px"
-         stroke="#382eeb"
-         stroke-linecap="round"
-         id="line838"
-         style="stroke-width:16.66278111;stroke-miterlimit:4;stroke-dasharray:none" />
-      <line
-         x1="110.03658"
-         y1="145.22015"
-         x2="126.9413"
-         y2="181.47246"
-         stroke-width="4px"
-         stroke="#382eeb"
-         stroke-linecap="round"
-         id="line840"
-         style="stroke-width:16.66278111;stroke-miterlimit:4;stroke-dasharray:none" />
-      <line
-         x1="96.355782"
-         y1="57.632439"
-         x2="104.80815"
-         y2="75.758591"
-         stroke-width="4px"
-         stroke="#382eeb"
-         stroke-linecap="round"
-         id="line842"
-         style="stroke-width:14.5799;stroke-miterlimit:4;stroke-dasharray:none" />
-      <line
-         x1="104.80815"
-         y1="75.758591"
-         x2="115.06876"
-         y2="103.94937"
-         stroke-width="4px"
-         stroke="#382eeb"
-         stroke-linecap="round"
-         id="line844"
-         style="stroke-width:14.5799;stroke-miterlimit:4;stroke-dasharray:none" />
-      <line
-         x1="126.9413"
-         y1="181.47246"
-         x2="111.94131"
-         y2="181.47246"
-         stroke-width="4px"
-         stroke="#382eeb"
-         stroke-linecap="round"
-         id="line846"
-         style="stroke-width:14.5799;stroke-miterlimit:4;stroke-dasharray:none" />
+      .cls-2 {
+        fill: #fff;
+      }
+
+      .cls-3 {
+        fill: url(#Neues_Verlaufsfeld_1);
+      }
+    </style>
+    <linearGradient id="Neues_Verlaufsfeld_1" data-name="Neues Verlaufsfeld 1" x1="0" y1="256" x2="512" y2="256" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#a9eb66"/>
+      <stop offset="1" stop-color="#ff7301"/>
+    </linearGradient>
+  </defs>
+  <g id="HG_verlauf" data-name="HG verlauf">
+    <rect class="cls-3" width="512" height="512" rx="110" ry="110"/>
+  </g>
+  <g id="schablone">
+    <g>
+      <path class="cls-2" d="M402,0H110C49.25,0,0,49.25,0,110v292c0,60.75,49.25,110,110,110h292c60.75,0,110-49.25,110-110V110c0-60.75-49.25-110-110-110ZM229.18,74.64c7.94-17.02,28.17-24.38,45.18-16.45,17.02,7.94,24.38,28.17,16.45,45.18-7.94,17.02-28.17,24.38-45.18,16.45-17.02-7.94-24.38-28.17-16.45-45.18ZM400.66,354.13c-11.57-49.29-24.36-73.03-33.05-84.26-6.02-7.78-10.6-10.25-12.39-10.72-7.4,2.14-20.23,9-34.67,17.43,17.6,16.01,34.23,35.02,44.2,57.11,4.05,8.97,6.89,24.15.29,74.04-3.34,25.23-7.59,47.92-7.77,48.88l-49.14-9.23c.04-.2,3.8-20.34,6.89-42.86,5.03-36.72,4.01-48.79,3.64-51.4-7.57-16-21.69-30.95-36.77-43.98,3.51,44.37-.65,71.29-13.37,86.99-15.79,19.5-52.8,30.88-83.28,38.62-29.46,7.48-55.99,11.75-57.11,11.92l-7.88-49.37s0,0,0,0c.47-.08,25.16-4.07,51.93-10.82,44.98-11.35,55.77-20.19,57.33-21.68.68-1.4,4.19-9.99,3.4-36.06-30.05,16.28-52.35,24.23-69.8,19.89-9.26-2.3-16.95-7.97-21.65-15.95-32.79-55.62-74.23-71.54-75.98-72.19l.2.07,16.64-47.15c1.64.58,16.62,6.08,36.42,20.38,23.05,16.65,43.78,38.9,60.41,64.76,4.8-1.51,13.06-4.79,26.52-11.91,5.58-2.95,11.45-6.23,17.48-9.72-8.13-18.73-21.58-59.3-12.13-106.98-12.76-5.71-26.34-11.66-38.74-16.31-6.88-2.58-12.25-4.34-16.41-5.52,2.57,14.3,8.93,36.42,16.45,55.93l-46.65,18c-.31-.81-7.72-20.06-13.58-41.49-10.48-38.29-9.86-59.46,2.15-73.09,8.1-9.2,20.1-13.06,35.68-11.47,8.14.83,17.85,3.17,29.67,7.15,19.5,6.57,41.41,16.44,60.74,25.15,3.87,1.74,7.6,3.42,11.12,4.99,20.82,9.26,61.63,15.11,80.64,15.26.16-12.5-3.54-36.26-9.2-56.93l48.21-13.25c.23.83,5.62,20.54,8.72,41.98,3.82,26.4,5.3,58.46-17.29,72.07-4.87,2.93-16.28,9.8-63.43,3.53-7.77-1.03-15.43-2.31-22.78-3.77-2.22,20.29,1.89,37.86,5.77,49.1,23.31-14.08,43.48-25.42,58.56-29.96,9.2-3.23,23.61-3.77,38.69,3.85,30.58,15.45,53.48,57.16,70.01,127.53l-48.68,11.43Z"/>
+      <path class="cls-2" d="M253.53,102.88c9.67,4.51,20.46,3.56,28.93-1.56,1.04-.63,1.59-1.82,1.41-3.02-1.52-9.77-7.73-18.65-17.4-23.16-9.67-4.51-20.46-3.56-28.93,1.56-1.04.63-1.59,1.82-1.41,3.02,1.52,9.77,7.73,18.65,17.4,23.16ZM249.73,84.22c2.65-5.67,9.39-8.13,15.06-5.48s8.13,9.39,5.48,15.06c-2.65,5.67-9.39,8.13-15.06,5.48-5.67-2.65-8.13-9.39-5.48-15.06Z"/>
+    </g>
+  </g>
+  <g id="logo_pfad" data-name="logo pfad">
+    <rect class="cls-3" width="512" height="512"/>
+    <path class="cls-1" d="M367.61,269.87c8.69,11.24,21.47,34.98,33.05,84.26l48.68-11.43c-16.53-70.37-39.42-112.08-70.01-127.53-15.08-7.62-29.49-7.08-38.69-3.85-15.08,4.54-35.24,15.88-58.56,29.96-3.88-11.24-7.99-28.81-5.77-49.1,7.36,1.46,15.01,2.74,22.78,3.77,47.15,6.27,58.56-.6,63.43-3.53,22.59-13.61,21.11-45.66,17.29-72.07-3.1-21.44-8.49-41.15-8.72-41.98l-48.21,13.25c5.66,20.67,9.36,44.43,9.2,56.93-19.02-.15-59.82-6-80.64-15.26-3.53-1.57-7.25-3.25-11.12-4.99-19.33-8.71-41.25-18.58-60.74-25.15-11.82-3.98-21.52-6.32-29.67-7.15-15.58-1.58-27.58,2.27-35.68,11.47-12.01,13.63-12.63,34.8-2.15,73.09,5.86,21.42,13.27,40.68,13.58,41.49l46.65-18c-7.52-19.52-13.88-41.63-16.45-55.93,4.16,1.19,9.53,2.94,16.41,5.52,12.4,4.66,25.98,10.6,38.74,16.31-9.45,47.68,4,88.25,12.13,106.98-6.04,3.49-11.9,6.77-17.48,9.72-13.45,7.11-21.72,10.4-26.52,11.91-16.63-25.86-37.37-48.11-60.41-64.76-19.8-14.3-34.78-19.8-36.42-20.38l-16.64,47.15-.2-.07c1.75.65,43.19,16.57,75.98,72.19,4.7,7.98,12.39,13.64,21.65,15.95,17.46,4.35,39.76-3.61,69.8-19.89.79,26.07-2.72,34.66-3.4,36.06-1.56,1.49-12.35,10.33-57.33,21.68-26.77,6.75-51.46,10.74-51.93,10.82,0,0,0,0,0,0l7.88,49.37c1.11-.18,27.64-4.44,57.11-11.92,30.48-7.74,67.49-19.12,83.28-38.62,12.72-15.7,16.88-42.63,13.37-86.99,15.08,13.03,29.21,27.98,36.77,43.98.37,2.61,1.39,14.68-3.64,51.4-3.08,22.52-6.85,42.66-6.89,42.86l49.14,9.23c.18-.95,4.43-23.65,7.77-48.88,6.61-49.89,3.77-65.07-.29-74.04-9.98-22.09-26.6-41.1-44.2-57.11,14.44-8.44,27.26-15.29,34.67-17.43,1.8.46,6.37,2.94,12.39,10.72Z"/>
+    <g>
+      <path class="cls-1" d="M274.37,58.19c-17.02-7.94-37.25-.57-45.18,16.45-7.94,17.02-.57,37.25,16.45,45.18,17.02,7.94,37.25.57,45.18-16.45,7.94-17.02.57-37.25-16.45-45.18ZM253.53,102.88c-9.67-4.51-15.88-13.39-17.4-23.16-.19-1.2.37-2.39,1.41-3.02,8.47-5.11,19.26-6.07,28.93-1.56,9.67,4.51,15.88,13.39,17.4,23.16.19,1.2-.37,2.39-1.41,3.02-8.47,5.11-19.26,6.07-28.93,1.56Z"/>
+      <circle class="cls-1" cx="260" cy="89.01" r="11.33"/>
     </g>
   </g>
 </svg>

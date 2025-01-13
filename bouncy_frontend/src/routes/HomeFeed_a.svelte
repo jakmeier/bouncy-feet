@@ -29,7 +29,7 @@
 </script>
 
 <div class="title">
-  <img class="logo" src="{base}/icons/logo.svg" alt="Bouncy Feet Logo" />
+  <img class="logo" src="{base}/icons/new-logo-black.svg" alt="Bouncy Feet Logo" />
   <h1 translate="no">
     {$t('home.title')}
   </h1>

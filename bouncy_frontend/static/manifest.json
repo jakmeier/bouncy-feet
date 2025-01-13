@@ -5,26 +5,26 @@
     "start_url": "/",
     "icons": [
         {
-            "src": "icons/512x512_round.png",
+            "src": "icons/512x512.png",
             "type": "image/png",
             "sizes": "512x512"
         },
         {
-            "src": "icons/192x192_round.png",
+            "src": "icons/192x192.png",
             "type": "image/png",
             "sizes": "192x192"
         },
         {
-            "src": "icons/48x48_round.png",
+            "src": "icons/48x48.png",
             "type": "image/png",
             "sizes": "48x48"
         },
         {
-            "src": "icons/logo_round.svg",
+            "src": "icons/logo.svg",
             "sizes": "any"
         }
     ],
-    "background_color": "#121124",
+    "background_color": "#9beb66",
     "display": "fullscreen",
     "scope": "/",
     "theme_color": "#382eeb",

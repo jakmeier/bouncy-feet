@@ -48,14 +48,14 @@
       <circle
          cx="95.564224"
          cy="103.3747"
-         fill="#121124"
+         fill="#FFFFFF"
          id="circle826-3"
          style="stroke-width:6.24708;stroke-miterlimit:4;stroke-dasharray:none"
          r="93.728142" />
       <polygon
          points="100,55.5 100,105.5 "
          stroke-width="3.6px"
-         stroke="#121124"
+         stroke="#FFFFFF"
          fill="#c2bfff"
          stroke-linecap="round"
          id="polygon824"
@@ -65,7 +65,7 @@
          cx="96.355782"
          cy="37.632439"
          r="18.01545"
-         fill="#121124"
+         fill="#FFFFFF"
          id="circle826"
          style="fill:#d3d3d3;fill-opacity:1;stroke-width:1.20075;stroke-miterlimit:4;stroke-dasharray:none" />
       <line
@@ -124,7 +124,7 @@
          x2="110.03658"
          y2="145.22015"
          stroke-width="4px"
-         stroke="#382eeb"
+         stroke="#9beb66"
          stroke-linecap="round"
          id="line838"
          style="stroke-width:16.6628;stroke-miterlimit:4;stroke-dasharray:none" />
@@ -134,7 +134,7 @@
          x2="126.9413"
          y2="181.47246"
          stroke-width="4px"
-         stroke="#382eeb"
+         stroke="#9beb66"
          stroke-linecap="round"
          id="line840"
          style="stroke-width:16.6628;stroke-miterlimit:4;stroke-dasharray:none" />
@@ -144,7 +144,7 @@
          x2="104.80815"
          y2="75.758591"
          stroke-width="4px"
-         stroke="#382eeb"
+         stroke="#9beb66"
          stroke-linecap="round"
          id="line842"
          style="stroke-width:14.5799;stroke-miterlimit:4;stroke-dasharray:none" />
@@ -154,7 +154,7 @@
          x2="115.06876"
          y2="103.94937"
          stroke-width="4px"
-         stroke="#382eeb"
+         stroke="#9beb66"
          stroke-linecap="round"
          id="line844"
          style="stroke-width:14.5799;stroke-miterlimit:4;stroke-dasharray:none" />
@@ -164,7 +164,7 @@
          x2="111.94131"
          y2="181.47246"
          stroke-width="4px"
-         stroke="#382eeb"
+         stroke="#9beb66"
          stroke-linecap="round"
          id="line846"
          style="stroke-width:14.5799;stroke-miterlimit:4;stroke-dasharray:none" />
