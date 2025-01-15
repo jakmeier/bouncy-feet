@@ -29,7 +29,8 @@
 body {
     margin: 0;
     background-color: var(--theme-neutral-white);
-    color: var(--theme-neutral-dark);
+    color: black;
+    /* color: var(--theme-neutral-dark); */
 }
 
 body,
@@ -83,8 +84,8 @@ button {
 button.light {
     background-color: var(--theme-accent-medium);
     color: var(--theme-neutral-dark);
-    border: var(--theme-neutral-dark) solid 1px;
-    border-radius: 2px;
+    /* border: var(--theme-neutral-dark) solid 1px; */
+    border-radius: 50px;
     font-size: 20px;
     padding: 10px;
     box-shadow: 0 2px 4px #00000082;
