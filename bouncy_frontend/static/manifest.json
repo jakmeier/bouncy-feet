@@ -24,7 +24,7 @@
             "sizes": "any"
         }
     ],
-    "background_color": "#9beb66",
+    "background_color": "#a9eb66",
     "display": "fullscreen",
     "scope": "/",
     "theme_color": "#382eeb",
