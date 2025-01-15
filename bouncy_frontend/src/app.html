@@ -3,12 +3,18 @@
 
 <head>
     <meta charset="utf-8" />
-    <link rel="icon" type="image/png" sizes="48x48" href="%sveltekit.assets%/icons/48x48.png" >
-    <link rel="icon" type="image/png" sizes="32x32" href="%sveltekit.assets%/icons/32x32.png" >
-    <link rel="icon" type="image/png" sizes="16x16" href="%sveltekit.assets%/icons/16x16.png" >
+    <link rel="icon" type="image/png" sizes="48x48" href="%sveltekit.assets%/icons/48x48.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="%sveltekit.assets%/icons/32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="%sveltekit.assets%/icons/16x16.png">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="manifest" href="%sveltekit.assets%/manifest.json" />
+
+    <!-- temporary font replacement for sofia -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@700&display=swap" rel="stylesheet">
+
     %sveltekit.head%
 </head>
 
@@ -18,63 +24,10 @@
 
 <style>
     @font-face {
-        font-family: 'Walkway';
+        font-family: 'Pleasure Medium';
         src:
-            url('%sveltekit.assets%/fonts/WalkwaySemiBold.woff2') format('woff2'),
-            url('%sveltekit.assets%/fonts/WalkwaySemiBold.woff') format('woff');
-        font-weight: 400;
-        font-style: normal;
-        font-display: swap;
-    }
-
-    @font-face {
-        font-family: 'Walkway';
-        src:
-            url('%sveltekit.assets%/fonts/WalkwayBold.woff2') format('woff2'),
-            url('%sveltekit.assets%/fonts/WalkwayBold.woff') format('woff');
-        font-weight: 700;
-        font-style: normal;
-        font-display: swap;
-    }
-
-    @font-face {
-        font-family: 'Walkway';
-        src:
-            url('%sveltekit.assets%/fonts/WalkwayBlack.woff2') format('woff2'),
-            url('%sveltekit.assets%/fonts/WalkwayBlack.woff') format('woff');
-        font-weight: 900;
-        font-style: normal;
-        font-display: swap;
-    }
-
-    @font-face {
-        font-family: 'Walkway';
-        src:
-            url('%sveltekit.assets%/fonts/Walkway.woff2') format('woff2'),
-            url('%sveltekit.assets%/fonts/Walkway.woff') format('woff');
-        font-weight: 300;
-        font-style: normal;
-        font-display: swap;
-    }
-
-    @font-face {
-        font-family: 'Walkway Oblique';
-        src:
-            url('%sveltekit.assets%/fonts/WalkwayObliqueSemiBold.woff2') format('woff2'),
-            url('%sveltekit.assets%/fonts/WalkwayObliqueSemiBold.woff') format('woff');
-        font-weight: 400;
-        font-style: normal;
-        font-display: swap;
-    }
-
-    @font-face {
-        font-family: 'Walkway Oblique';
-        src:
-            url('%sveltekit.assets%/fonts/WalkwayOblique.woff2') format('woff2'),
-            url('%sveltekit.assets%/fonts/WalkwayOblique.woff') format('woff');
-        font-weight: 300;
-        font-style: normal;
-        font-display: swap;
+            url('https://app.bouncy-feet.ch/fonts/PleasureInktrap.woff2') format('woff2');
+        font-weight: 500;
     }
 </style>
 
