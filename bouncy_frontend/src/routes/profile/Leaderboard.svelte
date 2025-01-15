@@ -21,7 +21,7 @@
     grid-template-columns: 1fr 6fr 3fr;
   }
   .header {
-    font-family: 'Walkway Oblique';
+    font-family: 'Pleasure Medium';
     font-size: smaller;
     opacity: 0.5;
   }
