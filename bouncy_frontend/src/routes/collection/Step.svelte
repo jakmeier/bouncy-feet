@@ -11,11 +11,12 @@
   export let rotation = 0.0;
   export let size = 100;
   export let poseIndex = 0;
-  export let borderWidth = 2;
+  export let borderWidth = 0;
   /** @type{number} animationTime in ms */
   export let animationTime = 500;
-  export let lineWidth = 4;
+  export let lineWidth = size * 0.05;
   export let style = LEFT_RIGHT_COLORING;
+  export let backgroundColor = 'var(--theme-neutral-gray)';
 
   export let headRadius = undefined;
   export let headHeight = undefined;
@@ -53,6 +54,7 @@
   height="{size}px"
   borderRadius="20px"
   borderWidth="{borderWidth}px"
+  {backgroundColor}
 >
   <Animation {animationTime} {jumpHeight}>
     <Svg width={size} height={size} orderByZ>

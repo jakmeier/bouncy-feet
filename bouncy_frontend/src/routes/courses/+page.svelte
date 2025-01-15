@@ -15,7 +15,7 @@
   onMount(() => {
     swapBackgroundColor = $backgroundColor;
     $backgroundColor =
-      'linear-gradient(180deg, var(--theme-main) 0%, var(--theme-neutral-dark) 90%)';
+      'linear-gradient(180deg, var(--theme-main) 0%, var(--theme-accent) 90%)';
   });
   onDestroy(() => {
     $backgroundColor = swapBackgroundColor;
@@ -33,6 +33,7 @@
         animationTime={$timeBetweenMoves * 0.6}
         style={WHITE_COLORING}
         borderWidth={0}
+        backgroundColor="none"
       />
       <div class="start-here">start here</div>
     </div>
@@ -58,7 +59,7 @@
     grid-template-columns: 1fr 1fr;
     justify-items: center;
     align-items: center;
-    background-color: var(--theme-accent-light);
+    background-color: var(--theme-accent-medium);
     width: 90%;
     margin: 25px auto 5px;
     padding: 15px;
@@ -84,7 +85,7 @@
     box-shadow: var(--theme-neutral-dark) 0px 0px 5px;
   }
   .start-here {
-    background-color: var(--theme-main);
+    background-color: var(--theme-accent-dark);
     color: var(--theme-neutral-white);
     font-size: 28px;
     line-height: 28px;

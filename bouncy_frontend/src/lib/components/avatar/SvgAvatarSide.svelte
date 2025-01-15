@@ -30,7 +30,7 @@
    * @param {string} id
    * @param {Point[]} points
    * @param {number} z
-   * @param {any} style
+   * @param {Style} style
    * @returns {Path}
    */
   function svgPath(id, points, z, style) {

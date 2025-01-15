@@ -28,15 +28,15 @@ export const CORRECT_COLORING = {
 };
 
 export const LEFT_RIGHT_COLORING = {
-    leftColor: 'var(--theme-main)',
-    rightColor: 'var(--theme-main-dark)',
-    headColor: 'var(--theme-main-dark)',
+    leftColor: 'var(--avatar-left)',
+    rightColor: 'var(--avatar-right)',
+    headColor: 'var(--avatar-head)',
     bodyColor: 'var(--theme-main-dark)',
 };
 
 export const LEFT_RIGHT_COLORING_LIGHT = {
     leftColor: '#4c6633D0',
-    rightColor: '#9beb66D0',
+    rightColor: '#a9eb66D0',
     headColor: '#4c663340',
     bodyColor: '#4c663340',
 };

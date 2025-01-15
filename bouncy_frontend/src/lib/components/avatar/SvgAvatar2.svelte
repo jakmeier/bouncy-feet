@@ -48,21 +48,11 @@
   /** @type {number} */
   $: cx = (leftShoulder.x + rightShoulder.x) / 2;
   /** @type {number} */
-  $: cy = leftShoulder.y - avatarSizePixels * headHeight / 10;
+  $: cy = leftShoulder.y - (avatarSizePixels * headHeight) / 10;
   let dummyUpdate = 0;
   $: skeleton, (dummyUpdate += 1);
 </script>
-<!-- 
-<SvgPolygon
-  id="torso"
-  points={[leftHip, rightHip, rightShoulder, leftShoulder]}
-  style={{
-    color: style.headColor,
-    fill: style.bodyColor,
-    linecap: 'round',
-    lineWidth: lineWidth * 0.9,
-  }}
-/> -->
+
 <SvgCircle
   id="head"
   {cx}

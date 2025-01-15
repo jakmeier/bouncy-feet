@@ -6,6 +6,7 @@
   /** @type {StepWrapper} */
   export let step;
   export let size = 100;
+  $: lineWidth = size * 0.05;
 
   const beat = beatCounter;
   $: step,
@@ -17,4 +18,10 @@
     );
 </script>
 
-<Step {size} {step} poseIndex={$beat} animationTime={$timeBetweenMoves * 0.7} />
+<Step
+  {size}
+  {lineWidth}
+  {step}
+  poseIndex={$beat}
+  animationTime={$timeBetweenMoves * 0.7}
+/>

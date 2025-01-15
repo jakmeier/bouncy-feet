@@ -13,7 +13,7 @@
   let swapBackgroundColor = 'var(--theme-neutral-white)';
   onMount(() => {
     swapBackgroundColor = $backgroundColor;
-    $backgroundColor = 'var(--theme-main)';
+    $backgroundColor = 'var(--theme-neutral-white)';
   });
   onDestroy(() => {
     $backgroundColor = swapBackgroundColor;

@@ -7,7 +7,7 @@
   export let skeleton;
   export let width = 100;
   export let height = 100;
-  export let lineWidth = 10;
+  export let lineWidth = Math.max(width, height) * 0.05;
   export let bodyShift = { x: 0, y: 0 };
   export let avatarSize = 1.0;
   /** @type LimbError[] */

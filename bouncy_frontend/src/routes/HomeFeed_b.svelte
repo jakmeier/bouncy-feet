@@ -13,7 +13,7 @@
   let swapBackgroundColor = 'var(--theme-neutral-white)';
   onMount(() => {
     swapBackgroundColor = $backgroundColor;
-    $backgroundColor = 'var(--theme-main)';
+    $backgroundColor = 'var(--theme-neutral-white)';
   });
   onDestroy(() => {
     $backgroundColor = swapBackgroundColor;
@@ -29,10 +29,12 @@
 </script>
 
 <div class="title">
-  <img class="logo" src="{base}/icons/new-logo-black.svg" alt="Bouncy Feet Logo" />
-  <h1 translate="no">
-    {$t('home.title')}
-  </h1>
+  <img
+    class="logo"
+    src="{base}/icons/new-logo-black.svg"
+    alt="Bouncy Feet Logo"
+  />
+  <h1 class="logo-font" translate="no">BouncyFeet</h1>
 </div>
 
 <div class="dark-stripe">
@@ -170,5 +172,13 @@
   }
   button {
     margin: 5px;
+  }
+
+  .logo-font {
+    font-family: 'Quicksand', serif;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    font-style: normal;
+    letter-spacing: -2px;
   }
 </style>
