@@ -29,7 +29,9 @@
 <h1 class="colored">{$t('collection.title')}</h1>
 
 <h2 class="box"><b>{$t('collection.steps-subtitle')}</b></h2>
-<h2 class="box">{$t('collection.basic-steps-subtitle')}</h2>
+<h2 class="box">
+  <div class="gradient-text">{$t('collection.basic-steps-subtitle')}</div>
+</h2>
 <div class="step-table">
   {#each data.lookupSteps({ uniqueNames: true, sources: ['basic'] }) as step}
     <div class="step">
@@ -47,7 +49,12 @@
   {/each}
 </div>
 
-<h2 class="box">{$t('collection.shapes-steps-subtitle')}</h2>
+<h2 class="box">
+  <div class="gradient-text">
+    {$t('collection.shapes-steps-subtitle')}
+    <div></div>
+  </div>
+</h2>
 <div class="step-table">
   {#each data.lookupSteps({ uniqueNames: true, sources: ['shapes'] }) as step}
     <div class="step">
@@ -65,7 +72,7 @@
   {/each}
 </div>
 
-<h2 class="box">{$t('collection.footwork-steps-subtitle')}</h2>
+<h2 class="box"><div class="gradient-text">{$t('collection.footwork-steps-subtitle')}</div></h2>
 
 <div class="step-table">
   {#each data.lookupSteps({ uniqueNames: true, sources: ['footwork'] }) as step}
@@ -84,7 +91,7 @@
   {/each}
 </div>
 
-<h2 class="box">{$t('collection.rm-steps-subtitle')}</h2>
+<h2 class="box"><div class="gradient-text">{$t('collection.rm-steps-subtitle')}</div></h2>
 <div class="step-table">
   {#each data.lookupSteps( { uniqueNames: true, sources: ['rm_variations'] } ) as step}
     <div class="step">
@@ -103,7 +110,7 @@
 </div>
 
 {#if dev}
-  <h2 class="box">DEV STEPS</h2>
+  <h2 class="box"><div class="gradient-text">DEV STEPS</div></h2>
   <div class="step-table">
     {#each data.lookupSteps({ uniqueNames: true, sources: ['misc'] }) as step}
       <div class="step">
@@ -122,7 +129,7 @@
 {/if}
 
 {#if !browser || $features.enableDanceCollection}
-  <h2 class="box"><b>{$t('collection.dances-subtitle')}</b></h2>
+  <h2 class="box"><div><b>{$t('collection.dances-subtitle')}</b></div></h2>
   <div class="dance-table">
     {#each [...data.officialDances, ...$localDances] as dance}
       <div>

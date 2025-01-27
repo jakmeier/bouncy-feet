@@ -10,6 +10,7 @@
   import PoseDetectionContext from './PoseDetectionContext.svelte';
   import UserContext from './UserContext.svelte';
   import LocalCollectionContext from './LocalCollectionContext.svelte';
+  import MovingBackground from '$lib/components/ui/MovingBackground.svelte';
 
   $: navBarHeight = $hideNavigation ? 0 : 90;
   $: outerPadding = $wideView ? 0 : 5;
@@ -24,19 +25,21 @@
   class="background"
   style="background: {$backgroundColor}; padding: {outerPadding}px;"
 >
-  <main
-    style="margin:{mainMargin}px; height: calc(100vh - {navBarHeight}px); max-width: calc(min(730px, 100vw) - {2 *
-      mainMargin}px);"
-  >
-    <UserContext>
-      <LocalCollectionContext>
-        <PoseDetectionContext>
-          <slot />
-        </PoseDetectionContext>
-      </LocalCollectionContext>
-    </UserContext>
-    <div class="scroll-buffer"></div>
-  </main>
+  <MovingBackground>
+    <main
+      style="margin:{mainMargin}px; height: calc(100vh - {navBarHeight}px); max-width: calc(min(730px, 100vw) - {2 *
+        mainMargin}px);"
+    >
+      <UserContext>
+        <LocalCollectionContext>
+          <PoseDetectionContext>
+            <slot />
+          </PoseDetectionContext>
+        </LocalCollectionContext>
+      </UserContext>
+      <div class="scroll-buffer"></div>
+    </main>
+  </MovingBackground>
 </div>
 
 {#if !$hideNavigation}
@@ -49,7 +52,10 @@
   }
 
   .background {
+    position: fixed;
+    z-index: -2;
     overflow: hidden auto;
+    width: 100%;
   }
 
   @media (min-width: 730px) {

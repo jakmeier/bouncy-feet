@@ -9,13 +9,6 @@
   $: lineWidth = size * 0.05;
 
   const beat = beatCounter;
-  $: step,
-    console.log(
-      'step updated',
-      step.jumpHeight(0),
-      step.jumpHeight(1),
-      step.jumpHeight(2)
-    );
 </script>
 
 <Step

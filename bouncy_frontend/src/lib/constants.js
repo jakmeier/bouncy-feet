@@ -48,6 +48,13 @@ export const MAIN_THEME_COLORING = {
     bodyColor: 'var(--theme-neutral-light)',
 };
 
+export const DARK_THEME_COLORING = {
+    leftColor: 'var(--theme-main-dark)',
+    rightColor: 'var(--theme-main-dark)',
+    headColor: 'var(--theme-main-dark)',
+    bodyColor: 'var(--theme-main-dark)',
+};
+
 export const WHITE_COLORING = {
     leftColor: 'var(--theme-neutral-white)',
     rightColor: 'var(--theme-neutral-white)',

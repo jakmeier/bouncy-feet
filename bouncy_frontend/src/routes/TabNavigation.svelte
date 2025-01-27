@@ -68,7 +68,7 @@
 <style>
   .nav-background {
     overflow: hidden;
-    background-color: var(--theme-neutral-dark);
+    background-color: var(--theme-main);
     position: fixed;
     bottom: 0;
     width: 100%;
@@ -90,7 +90,7 @@
     cursor: pointer;
     transition: background-color 0.3s ease;
     border-radius: 5px;
-    color: var(--theme-neutral-light);
+    color: var(--theme-neutral-dark);
     text-decoration: none;
   }
 
@@ -100,7 +100,7 @@
   }
 
   .tab:hover {
-    color: var(--theme-accent);
+    color: var(--theme-main-alt);
   }
 
   a.active-tab {

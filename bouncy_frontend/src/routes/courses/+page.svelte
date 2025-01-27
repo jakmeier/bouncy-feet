@@ -15,7 +15,7 @@
   onMount(() => {
     swapBackgroundColor = $backgroundColor;
     $backgroundColor =
-      'linear-gradient(180deg, var(--theme-main) 0%, var(--theme-accent) 90%)';
+      'linear-gradient(0deg, #ff7301 15%, #ffe72e 50%, #7fdb61 80%)';
   });
   onDestroy(() => {
     $backgroundColor = swapBackgroundColor;
