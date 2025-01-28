@@ -49,6 +49,8 @@
     { name: 'editor.body.toes', i: SkeletonPoint.RightToes, z: 0.0 },
   ];
 
+  let bodyShift = { x: 0, y: 0 };
+
   /** @type{Skeleton | undefined} */
   let skeleton = Skeleton.resting(false);
   /** @type{Skeleton} */
@@ -68,6 +70,8 @@
   export function loadPose(inputPose) {
     pose = inputPose;
     updateAnglesFromPose(pose);
+    bodyShift.x = pose.xShift;
+    bodyShift.y = pose.yShift;
   }
 
   /** @returns {PoseWrapper | undefined} */
@@ -118,6 +122,14 @@
         pose.setZ(point.i, point.z);
       }
 
+      updateSkeleton();
+    }
+  }
+
+  function updateBodyShift() {
+    if (pose) {
+      pose.xShift = bodyShift.x;
+      pose.yShift = bodyShift.y;
       updateSkeleton();
     }
   }
@@ -218,6 +230,36 @@
         />
       </div>
     </div>
+
+    <div class="shift">
+      <div class="turn">
+        <label for="xshift">X</label>
+        <input
+          name="xshift"
+          type="number"
+          class="turn-input angle-input"
+          bind:value={bodyShift.x}
+          on:change={updateBodyShift}
+          min={-4}
+          max={4}
+          step={0.0125}
+        />
+      </div>
+
+      <div class="turn">
+        <label for="yshift">Y</label>
+        <input
+          name="yshift"
+          type="number"
+          class="turn-input angle-input"
+          bind:value={bodyShift.y}
+          on:change={updateBodyShift}
+          min={-4}
+          max={4}
+          step={0.0125}
+        />
+      </div>
+    </div>
   {/if}
 </div>
 
@@ -235,7 +277,7 @@
             min={-5.0}
             max={5.0}
             decimals={1}
-            ></NumberSlider>
+          ></NumberSlider>
         </div>
       {/if}
     {/each}
@@ -279,7 +321,8 @@
       'right-values avatar left-values'
       'right-values avatar left-values'
       'right-values avatar left-values'
-      'right-values body-turn left-values';
+      'right-values body-turn left-values'
+      'right-values shift left-values';
     gap: 8px;
     justify-items: center;
   }
@@ -297,6 +340,9 @@
   }
   .body-turn {
     grid-area: body-turn;
+  }
+  .shift {
+    grid-area: shift;
   }
   .input-group {
     padding: 5px;
@@ -323,7 +369,8 @@
   .turn-input {
     font-size: 20px;
   }
-  .body-turn {
+  .body-turn,
+  .shift {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
