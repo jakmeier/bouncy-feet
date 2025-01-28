@@ -89,7 +89,7 @@
 <h2 class="box">{$t('editor.step.list')}</h2>
 
 <EditOrDeleteList items={$steps} onDelete={deleteConfirmed} onEdit={editStep}>
-  <div slot="item" let:item let:index let:selected>
+  <div class="list-item" slot="item" let:item let:index let:selected>
     <div class:bold={selected}>{item.name}</div>
     <Step
       step={item}
@@ -144,5 +144,12 @@
 
   .hidden {
     display: None;
+  }
+
+  .list-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
   }
 </style>

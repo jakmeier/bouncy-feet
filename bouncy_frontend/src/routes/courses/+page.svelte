@@ -59,7 +59,7 @@
     grid-template-columns: 1fr 1fr;
     justify-items: center;
     align-items: center;
-    background-color: var(--theme-accent-medium);
+    background-color: var(--theme-accent-dark);
     width: 90%;
     margin: 25px auto 5px;
     padding: 15px;
@@ -85,7 +85,7 @@
     box-shadow: var(--theme-neutral-dark) 0px 0px 5px;
   }
   .start-here {
-    background-color: var(--theme-accent-dark);
+    background-color: var(--theme-accent);
     color: var(--theme-neutral-white);
     font-size: 28px;
     line-height: 28px;

@@ -103,6 +103,7 @@
   }
   .inner-item {
     max-width: 200px;
+    height: 100%;
     position: relative;
   }
 
@@ -113,8 +114,8 @@
     width: 100%;
     height: 100%;
 
-    background-color: #c2bfff80;
-    border-radius: 20px;
+    background-color: var(--theme-main-60);
+    border-radius: 5px;
 
     display: flex;
     align-items: center;

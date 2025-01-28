@@ -14,6 +14,7 @@
     height: 50px;
     padding: auto;
     background-color: var(--theme-neutral-light);
+    color: var(--theme-neutral-dark);
   }
   button span {
     font-size: 30px;
