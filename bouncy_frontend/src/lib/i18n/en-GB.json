@@ -14,6 +14,7 @@
         "go-to-github": "Report issues or contribute to the development.",
         "version-label": "version",
         "go-button": "Let's Go",
+        "progress-title": "Your Progress",
         "collection-button": "Browse moves",
         "courses-button": "Learn Shuffle",
         "nav": "Home"
@@ -243,6 +244,9 @@
     },
     "dance": {
         "counts": "Music counts"
+    },
+    "pathway": {
+        "skill": "Skill"
     },
     "common": {
         "hint-popup-title": "Hint"

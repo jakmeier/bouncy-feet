@@ -5,6 +5,13 @@ export const BLACK_COLORING = {
     bodyColor: '#00000010',
 };
 
+export const ZEBRA_COLORING = {
+    leftColor: 'var(--theme-neutral-dark)',
+    rightColor: '#a0a0a0',
+    headColor: 'var(--theme-neutral-dark)',
+    bodyColor: 'var(--theme-neutral-dark)',
+};
+
 export const GRAY_COLORING = {
     leftColor: '#00000040',
     rightColor: '#00000040',
@@ -46,6 +53,13 @@ export const MAIN_THEME_COLORING = {
     rightColor: 'var(--theme-main)',
     headColor: 'var(--theme-main)',
     bodyColor: 'var(--theme-neutral-light)',
+};
+
+export const ORANGE_COLORING = {
+    leftColor: 'var(--theme-accent-dark)',
+    rightColor: 'var(--theme-accent)',
+    headColor: 'var(--theme-accent)',
+    bodyColor: 'var(--theme-accent-dark)',
 };
 
 export const DARK_THEME_COLORING = {

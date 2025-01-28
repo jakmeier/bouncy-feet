@@ -55,5 +55,19 @@
         (id:"jump-hands-up"),
       ]
     ),
+    (
+      id:"Home Animation (dev)",
+      steps:[
+        (id:"step-096391"),
+        (id:"step-223437"),
+        (id:"step-064996"),
+        (id:"step-064996"),
+        (id:"idle-0"),
+        (id:"idle-0"),
+        (id:"idle-0"),
+        (id:"step-657582"),
+        (id:"step-064996"),
+      ]
+    )
   ]
 )

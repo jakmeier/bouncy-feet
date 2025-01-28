@@ -62,7 +62,8 @@
 <style>
   .container {
     position: relative;
-    width: 100%;
+    /* 5px padding */
+    width: calc(100% - 10px);
     min-height: 100vh;
     /* overflow: hidden; */
   }

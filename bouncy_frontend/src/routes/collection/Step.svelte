@@ -16,7 +16,7 @@
   export let animationTime = 500;
   export let lineWidth = size * 0.05;
   export let style = LEFT_RIGHT_COLORING;
-  export let backgroundColor = 'var(--theme-neutral-gray)';
+  export let backgroundColor = 'var(--theme-neutral-light)';
 
   export let headRadius = undefined;
   export let headHeight = undefined;

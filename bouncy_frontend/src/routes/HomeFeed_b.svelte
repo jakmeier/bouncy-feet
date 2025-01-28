@@ -1,15 +1,19 @@
 <script>
   import { t } from '$lib/i18n.js';
-  import { getContext, onDestroy, onMount } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
   import DanceAnimation from './DanceAnimation.svelte';
   import { backgroundColor } from '$lib/stores/UiState';
-  import { WHITE_COLORING } from '$lib/constants';
+  import {
+    LEFT_RIGHT_COLORING,
+    ORANGE_COLORING,
+    WHITE_COLORING,
+  } from '$lib/constants';
   import { base } from '$app/paths';
   import { versionString } from '$lib/stores/FeatureSelection';
   import { beatCounter, timeBetweenMoves } from '$lib/stores/Beat';
-  import AnimatedStep from '$lib/components/AnimatedStep.svelte';
-  import Area from '$lib/components/ui/Area.svelte';
-  import Pose from '$lib/components/Pose.svelte';
+  import HomeEntry from './HomeEntry.svelte';
+  import PathwayProgress from './PathwayProgress.svelte';
+  import SpeechBubble from '$lib/components/ui/SpeechBubble.svelte';
 
   /** @type{import("$lib/instructor/bouncy_instructor").DanceWrapper[]} */
   export let featuredDances;
@@ -18,9 +22,9 @@
   /** @type{import("$lib/instructor/bouncy_instructor").StepWrapper} */
   export let idleStep;
 
-  const localCollectionCtx = getContext('localCollection');
-  /** @type {Readable<PoseWrapper[]>} */
-  const poses = localCollectionCtx.poses;
+  const entryDance = featuredDances.find(
+    (dance) => dance.id === 'Home Animation (dev)'
+  );
 
   let swapBackgroundColor = 'var(--theme-neutral-white)';
   onMount(() => {
@@ -46,95 +50,74 @@
       animationDelay = 0;
     }
   });
-
-  /**
-   * @type {number | undefined}
-   */
-  let selectedStep = undefined;
-  $: bigAvatarStep =
-    selectedStep !== undefined ? featuredSteps[selectedStep] : undefined;
-  let trainingsWidth = 300;
-  $: trainingWidth = (trainingsWidth - 60) / 3;
 </script>
 
 <div class="title">
   <img
     class="logo"
-    src="{base}/icons/gradient-icon.svg"
+    src="{base}/icons/new-logo-black.svg"
     alt="Bouncy Feet Logo"
   />
 </div>
 
-<div class="light-box focus-card">
-  <div>
-    {$t('home.test0')}
-  </div>
-
-  <div class="space">
-    {#if bigAvatarStep}
-      <AnimatedStep size={300} step={bigAvatarStep} />
-    {:else if $poses[0]}
-      <Area
-        width="300px"
-        height="300px"
-        borderRadius="20px"
-        borderWidth="0px"
-        backgroundColor="var(--theme-neutral-gray)"
-      >
-        <Pose size={300} pose={idleStep.poses()[0]} />
-      </Area>
-    {/if}
-
-    <div class="trainings" bind:clientWidth={trainingsWidth}>
-      {#each featuredSteps as step, i}
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <!-- svelte-ignore a11y-no-static-element-interactions -->
-        <div
-          class="training"
-          class:marked={selectedStep === i}
-          on:click={() => (selectedStep = i)}
-        >
-          <AnimatedStep size={trainingWidth} {step} />
-        </div>
-      {/each}
+<div class="focus-card">
+  <div class="light-box lime">
+    <div class="speech-bubble">
+      <SpeechBubble text={$t('home.test0')} position="bottom" width={'100%'} />
     </div>
 
-    <!-- Mock up -->
-    <button class="light wide"> {$t('home.go-button')} </button>
+    <div>
+      <HomeEntry {featuredSteps} dance={entryDance}></HomeEntry>
+    </div>
   </div>
 </div>
 
-<div class="light-box space">
-  <div>
-    {$t('home.description3')}
-  </div>
-  <div class="centered">
-    <a href="./collection">
-      <button class="light wide"> {$t('home.collection-button')} </button>
-    </a>
-    <a href="./courses">
-      <button class="light wide"> {$t('home.courses-button')} </button>
-    </a>
-  </div>
-  <p>
-    <i>
-      {$t('home.alpha-disclaimer')}
-    </i>
-  </p>
-</div>
-
-<div class="light-box space">
-  <div>
-    {$t('home.go-to-github')}
-  </div>
-  <div class="centered">
-    <a href="https://github.com/jakmeier/bouncy-feet/issues">
-      <button class="light"> GitHub </button>
-    </a>
+<div class="space">
+  <div class="light-box transparent">
+    <h3>
+      {$t('home.progress-title')}
+    </h3>
   </div>
 </div>
 
-<div class="light-box rotated">
+<div class="light-box">
+  <PathwayProgress
+    teacherName="V-Step Master"
+    step={featuredSteps[1]}
+    style={LEFT_RIGHT_COLORING}
+    experience={700}
+    skill={7}
+    maxSkill={10}
+    totalSteps={1703}
+  />
+</div>
+
+<div class="light-box">
+  <PathwayProgress
+    teacherName="Running Man Coach"
+    step={featuredSteps[0]}
+    style={ORANGE_COLORING}
+    experience={0}
+    skill={0}
+    maxSkill={10}
+    totalSteps={0}
+  />
+</div>
+
+<div class="space">
+  <div class="light-box transparent">
+    <div>
+      {$t('home.go-to-github')}
+    </div>
+    <div class="centered">
+      <a href="https://github.com/jakmeier/bouncy-feet/issues">
+        <button class="light"> GitHub </button>
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="rotated-outer">
   <img
     class="logo rotated"
     src="{base}/icons/bouncyfeet.png"
@@ -142,7 +125,7 @@
   />
 </div>
 
-<div class="light-box">
+<div class="light-box transparent">
   <div>
     <i>
       {$t('home.version-label')}:
@@ -217,25 +200,34 @@
 
   .light-box {
     padding: 20px;
-    /* background-color: var(--theme-neutral-light); */
+    background-color: var(--theme-neutral-white);
+    background-blend-mode: saturation;
+
     border-radius: 10px;
-    margin: 5px 0;
+    margin: 15px 5px;
     z-index: 1;
     position: relative;
-    /* box-shadow: var(--theme-neutral-dark) 0px 0px 11px; */
+    box-shadow: var(--theme-neutral-dark) 0px 0px 11px;
     text-align: center;
+  }
+  .lime {
+    background-color: var(--theme-main);
+  }
+  .transparent {
+    background-color: #e6f2efa0;
+    box-shadow: none;
+    margin: 32px;
   }
   .centered {
     margin-top: 15px;
     text-align: center;
   }
-  .light-box.rotated {
+  .rotated-outer {
     height: 0px;
     overflow: visible;
     rotate: 90deg;
-    display: flex;
   }
-  .rotated img {
+  .rotated-outer img {
     max-height: min(10vw, 100px);
     max-width: unset;
     align-self: start;
@@ -256,6 +248,8 @@
   }
   button {
     margin: 5px;
+    width: fit-content;
+    height: fit-content;
   }
 
   .space {
@@ -267,19 +261,8 @@
       var(--animation-delay);
   }
 
-  .trainings {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-  }
-
-  .training {
-    margin: 5px;
-    padding: 5px;
-  }
-
-  .marked {
-    background-color: var(--theme-main-dark);
-    border-radius: 5px;
+  .speech-bubble {
+    margin-bottom: 20px;
   }
 
   @keyframes bounce {

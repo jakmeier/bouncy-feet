@@ -5,8 +5,6 @@
 
   /** @type {import('./$types').PageData} */
   export let data;
-  let featuredDance =
-    data.officialDances.length > 0 ? data.officialDances[0] : null;
 
   // (mockup) learn today step
   const featuredSteps = data

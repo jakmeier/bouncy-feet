@@ -8,9 +8,13 @@
 
   /** @type{import("$lib/instructor/bouncy_instructor").DanceWrapper} */
   export let dance;
+  /** How long it takes before the dance animation begins */
+  export let beatDelay = 5;
+  /** How many beats the avatar should be hidden at the start */
+  export let hiddenBeats = 0;
   const bpm = 260;
   const stepTime = 60_000 / bpm;
-  export let beat = counter(-5, 1, stepTime);
+  export let beat = counter(-beatDelay, 1, stepTime);
   export let animationTime = stepTime * 0.85;
   export let size = 100;
   /** @type {boolean} */
@@ -38,15 +42,8 @@
 
 <Animation {animationTime} jumpHeight={size * 0.025}>
   <Svg height={size} width={size} orderByZ {showOverflow}>
-    {#if skeleton}
-      <SvgAvatar
-        width={size}
-        height={size}
-        {skeleton}
-        {bodyShift}
-        lineWidth={4}
-        {style}
-      />
+    {#if skeleton && $beat >= hiddenBeats - beatDelay}
+      <SvgAvatar width={size} height={size} {skeleton} {bodyShift} {style} />
     {/if}
   </Svg>
 </Animation>

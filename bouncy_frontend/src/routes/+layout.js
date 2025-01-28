@@ -45,6 +45,7 @@ export const load = async ({ data }) => {
 
 async function loadCollectionAssets() {
     const poseFile = loadRon("pose");
+    const animationPoseFile = loadRon("animation_poses");
     const danceFile = loadRon("dance");
 
     const stepFiles = [
@@ -53,22 +54,26 @@ async function loadCollectionAssets() {
         import('$lib/assets/steps/idle_steps.ron?raw'),
         import('$lib/assets/steps/misc.ron?raw'),
         import('$lib/assets/steps/rm_variations.ron?raw'),
-        import('$lib/assets/steps/shapes.ron?raw')
+        import('$lib/assets/steps/shapes.ron?raw'),
+        import('$lib/assets/steps/animation.ron?raw')
     ].map((promise) => promise.catch((e) => console.error(e)));
 
     const [
         poseFileResponse,
+        animationPoseFileResponse,
         danceFileResponse,
         ...stepFileResponses
-    ] = await Promise.all([poseFile, danceFile, ...stepFiles]);
+    ] = await Promise.all([poseFile, animationPoseFile, danceFile, ...stepFiles]);
 
     const stepFileStrings = await Promise.all(stepFileResponses.map((data) => data.default)).catch((e) => console.error(e));
 
     const poseFileString = poseFileResponse;
+    const animationPoseFileString = animationPoseFileResponse;
     const danceFileString = danceFileResponse;
 
     let collectionData = {
         poseFileString,
+        animationPoseFileString,
         danceFileString,
         stepFileStrings: {
             basic: stepFileStrings[0],
@@ -76,7 +81,8 @@ async function loadCollectionAssets() {
             idle_steps: stepFileStrings[2],
             misc: stepFileStrings[3],
             rm_variations: stepFileStrings[4],
-            shapes: stepFileStrings[5]
+            shapes: stepFileStrings[5],
+            animation: stepFileStrings[6]
         }
     };
 
@@ -93,6 +99,7 @@ async function loadCollectionAssets() {
             misc: stepsBySource('misc'),
             rm_variations: stepsBySource('rm_variations'),
             shapes: stepsBySource('shapes'),
+            animation: stepsBySource('animation'),
         }
     }
 
@@ -170,7 +177,7 @@ function loadRon(name) {
 }
 
 /**
- * @param {{ poseFileString: any; danceFileString: any; stepFileStrings: any; }} data
+ * @param {{ poseFileString: any; animationPoseFileString: string; danceFileString: any; stepFileStrings: any; }} data
  * @param {string} lang
  */
 function loadOnce(data, lang) {
@@ -184,6 +191,10 @@ function loadOnce(data, lang) {
         loadStepString(data.stepFileStrings.misc, 'misc');
         loadStepString(data.stepFileStrings.rm_variations, 'rm_variations');
         loadStepString(data.stepFileStrings.shapes, 'shapes');
+        if (data.animationPoseFileString) {
+            loadPoseString(data.animationPoseFileString);
+            loadStepString(data.stepFileStrings.animation, 'animation');
+        }
         loadDanceString(data.danceFileString);
     }
 }
