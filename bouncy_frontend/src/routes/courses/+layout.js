@@ -7,7 +7,8 @@ export async function load({ fetch, parent }) {
     const { i18n } = await parent();
     const lang = i18n.locale;
     const coursePromises = [
-        import('$lib/assets/courses/000-rm-basics.ron?raw')
+        import('$lib/assets/courses/000-rm-basics.ron?raw'),
+        import('$lib/assets/courses/002-v-step-basics.ron?raw')
     ].map(promise => promise
         .then(
             (data) => data.default

@@ -35,6 +35,7 @@
       </div>
       <div class="step">
         {#if lesson.parts.length > 0}
+        <!-- TODO: show all parts, not just the last! -->
           <Step
             step={lesson.parts[lesson.parts.length - 1].step}
             poseIndex={$i}

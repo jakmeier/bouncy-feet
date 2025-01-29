@@ -1,0 +1,218 @@
+#![enable(implicit_some)]
+(
+  version: 0,
+  id: "v-step-basics",
+  names: {"de": "V-Step Anfängerkurs", "en": "V-Step beginner's course"},
+  featured_step: "happy-feet-0",
+  explanations: {
+    "de": "Lerne die Basis für seitliche Bewegungen mit dem V-Step.",
+    "en": "Learn the base of sideway movements in shuffle with the V-Step.",
+  },
+  lessons: [
+    (
+      names: {"de": "V rechts öffnen", "en": "Open V to the right"},
+      icon: "todo.svg",
+      // video: "/video/todo.mp4",
+      parts: [
+        (step: "open-v-right", bpms: [60, 90]),
+      ],
+    ),
+    (
+      names: {"de": "V links öffnen", "en": "Open V to the left"},
+      icon: "todo.svg",
+      // video: "/video/todo.mp4",
+      parts: [
+        (step: "open-v-left", bpms: [60, 90]),
+      ],
+    ),
+    (
+      names: {"de": "V beidseitig", "en": "V both ways"},
+      icon: "todo.svg",
+      // video: "/video/todo.mp4",
+      parts: [
+        (step: "open-v-left", bpms: [60, 90]),
+        (step: "open-v-right", bpms: [60, 90]),
+      ],
+    ),
+    (
+      names: {"de": "V-Step", "en": "V-Step"},
+      icon: "todo.svg",
+      // video: "/video/todo.mp4",
+      parts: [
+        (step: "v-0", bpms: [60, 90]),
+        (step: "v-0", bpms: [60, 90]),
+        (step: "v-1", bpms: [60, 90]),
+        (step: "v-1", bpms: [60, 90]),
+      ],
+    ),
+  ],
+  steps: [
+    (
+      name: "Happy Feet",
+      id: "happy-feet-0",
+      variation: "right-first",
+      keyframes: [
+        (pose: "closed-x", orientation: ToCamera),
+        (pose: "happy-right", orientation: ToCamera),
+        (pose: "closed-x", orientation: ToCamera),
+        (pose: "happy-left", orientation: ToCamera),
+      ]
+    ),
+    (
+      name: "Open V-Step",
+      id: "open-v-right",
+      variation: "right-out",
+      keyframes: [
+        (pose: "v-closed", orientation: ToCamera, pivot: (side: Right, part: Heel)),
+        (pose: "v-closed", orientation: ToCamera, pivot: (side: Right, part: Heel)),
+        (pose: "v-closed", orientation: ToCamera, pivot: (side: Right, part: Heel)),
+        (pose: "v-closed", orientation: ToCamera, pivot: (side: Right, part: Heel)),
+        (pose: "v-open-right", orientation: ToCamera, pivot: (side: Right, part: Heel)),
+        (pose: "v-open-right", orientation: ToCamera, pivot: (side: Right, part: Heel)),
+        (pose: "v-open-right", orientation: ToCamera, pivot: (side: Right, part: Heel)),
+        (pose: "v-open-right", orientation: ToCamera, pivot: (side: Right, part: Heel)),
+      ]
+    ),
+    (
+      name: "Open V-Step",
+      id: "open-v-left",
+      variation: "left-out",
+      keyframes: [
+        (pose: "v-closed", orientation: ToCamera, pivot: (side: Left, part: Heel)),
+        (pose: "v-closed", orientation: ToCamera, pivot: (side: Left, part: Heel)),
+        (pose: "v-closed", orientation: ToCamera, pivot: (side: Left, part: Heel)),
+        (pose: "v-closed", orientation: ToCamera, pivot: (side: Left, part: Heel)),
+        (pose: "v-open-left", orientation: ToCamera, pivot: (side: Left, part: Heel)),
+        (pose: "v-open-left", orientation: ToCamera, pivot: (side: Left, part: Heel)),
+        (pose: "v-open-left", orientation: ToCamera, pivot: (side: Left, part: Heel)),
+        (pose: "v-open-left", orientation: ToCamera, pivot: (side: Left, part: Heel)),
+      ]
+    ),
+    (
+      name: "V-Step",
+      id: "v-0",
+      variation: "right-out",
+      keyframes: [
+        (pose: "v-open-right", orientation: ToCamera, pivot: (side: Right, part: Toes)),
+        (pose: "v-closed", orientation: ToCamera, pivot: (side: Right, part: Heel)),
+      ]
+    ),
+    (
+      name: "V-Step",
+      id: "v-1",
+      variation: "left-out",
+      keyframes: [
+        (pose: "v-open-left", orientation: ToCamera, pivot: (side: Left, part: Toes)),
+        (pose: "v-closed", orientation: ToCamera, pivot: (side: Left, part: Heel)),
+      ]
+    )
+  ],
+  poses: [
+    (
+      id: "v-open-right",
+      names: {"de": "TODO", "en": "TODO"},
+      direction: Front,
+      limbs: [
+        (limb: LeftThigh, weight: 1.0, angle: -10, tolerance: 5),
+        (limb: LeftShin, weight: 1.0, angle: 20, tolerance: 5),
+        (limb: LeftFoot, weight: 1.0, angle: -60, tolerance: 5),
+        (limb: RightThigh, weight: 1.0, angle: 20, tolerance: 3),
+        (limb: RightShin, weight: 1.0, angle: -10, tolerance: 3),
+        (limb: RightFoot, weight: 1.0, angle: 60, tolerance: 5),
+        (limb: RightArm, angle: 90, tolerance: 0, weight: 0.0),
+        (limb: RightForearm, angle: 90, tolerance: 0, weight: 0.0),
+        (limb: LeftArm, angle: -90, tolerance: 0, weight: 0.0),
+        (limb: LeftForearm, angle: -90, tolerance: 0, weight: 0.0),
+      ],
+    ),
+    ( id: "v-open-left", names: {"de": "TODO", "en": "TODO"}, mirror_of: "v-open-right", direction: Front ),
+    (
+      id: "v-closed",
+      names: {"de": "TODO", "en": "TODO"},
+      direction: Front,
+      limbs: [
+        (limb: LeftThigh, angle: 0, tolerance: 5, weight: 0.25),
+        (limb: LeftShin, angle: -10, tolerance: 5, weight: 0.25),
+        (limb: LeftFoot, angle: 60, tolerance: 15, weight: 1.0),
+        (limb: RightThigh, angle: 0, tolerance: 5, weight: 0.25),
+        (limb: RightShin, angle: 10, tolerance: 5, weight: 0.25),
+        (limb: RightFoot, angle: -60, tolerance: 15, weight: 1.0),
+        (limb: RightArm, angle: 80, tolerance: 0, weight: 0.0),
+        (limb: RightForearm, angle: 100, tolerance: 0, weight: 0.0),
+        (limb: LeftArm, angle: -80, tolerance: 0, weight: 0.0),
+        (limb: LeftForearm, angle: -100, tolerance: 0, weight: 0.0),
+      ]
+    ),
+
+    // TODO: Resting poses should either be added by default or not be required
+    // to exist with exactly these ids
+    (
+      id: "standing-straight-front",
+      direction: Front,
+      limbs: [
+        (limb: LeftShin, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: LeftThigh, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: RightShin, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: LeftFoot, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: RightThigh, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: RightFoot, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: RightArm, angle: 10, tolerance: 0, weight: 0.0),
+        (limb: RightForearm, angle: -5, tolerance: 0, weight: 0.0),
+        (limb: LeftArm, angle: -10, tolerance: 0, weight: 0.0),
+        (limb: LeftForearm, angle: 5, tolerance: 0, weight: 0.0),
+      ]
+    ),
+        (
+      id: "happy-right",
+      names: {"de": "TODO", "en": "TODO"},
+      direction: Front,
+      y_shift: -0.0125,
+      turn_shoulder: 0,
+      turn_hip: 40,
+      limbs: [
+        ( limb: LeftThigh, weight: 1.0, angle: -10, tolerance: 5),
+        ( limb: LeftShin, weight: 1.0, angle: 20, tolerance: 5),
+        ( limb: LeftFoot, weight: 1.0, angle: -60, tolerance: 5),
+        ( limb: RightThigh, weight: 1.0, angle: 20, tolerance: 3),
+        ( limb: RightShin, weight: 1.0, angle: -10, tolerance: 3),
+        ( limb: RightFoot, weight: 1.0, angle: 65, tolerance: 5),
+        ( limb: LeftArm, weight: 0.0, angle: -5, tolerance: 0),
+        ( limb: LeftForearm, weight: 0.0, angle: -10, tolerance: 0),
+        ( limb: RightArm, weight: 0.0, angle: 12, tolerance: 0),
+        ( limb: RightForearm, weight: 0.0, angle: 15, tolerance: 0),
+      ],
+    ),
+    ( id: "happy-left", names: {"de": "TODO", "en": "TODO"}, mirror_of: "happy-right", direction: Front ),
+    (
+      id: "closed-x",
+      names: {"de": "TODO", "en": "TODO"},
+      direction: Front,
+      limbs: [
+        ( limb: LeftThigh, weight: 1.0, angle: 0, tolerance: 5),
+        ( limb: LeftShin, weight: 1.0, angle: -5, tolerance: 5),
+        ( limb: LeftFoot, weight: 1.0, angle: 60, tolerance: 5),
+        ( limb: RightThigh, weight: 1.0, angle: 0, tolerance: 5),
+        ( limb: RightShin, weight: 1.0, angle: 5, tolerance: 5),
+        ( limb: RightFoot, weight: 1.0, angle: -60, tolerance: 5),
+        ( limb: LeftArm, weight: 0.0, angle: -10, tolerance: 0),
+        ( limb: LeftForearm, weight: 0.0, angle: -7, tolerance: 0),
+        ( limb: RightArm, weight: 0.0, angle: 10, tolerance: 0),
+        ( limb: RightForearm, weight: 0.0, angle: -7, tolerance: 0),
+      ],
+    ),
+    (
+      id: "standing-straight-side",
+      direction: Right,
+      limbs: [
+        (limb: LeftShin, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: LeftThigh, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: RightShin, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: RightThigh, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: RightArm, angle: 6, tolerance: 0, weight: 0.0),
+        (limb: RightForearm, angle: 18, tolerance: 0, weight: 0.0),
+        (limb: LeftArm, angle: -12, tolerance: 0, weight: 0.0),
+        (limb: LeftForearm, angle: 6, tolerance: 0, weight: 0.0),
+      ]
+    ),
+  ],
+)
