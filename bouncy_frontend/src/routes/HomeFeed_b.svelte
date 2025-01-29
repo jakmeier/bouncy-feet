@@ -19,8 +19,6 @@
   export let featuredDances;
   /** @type{import("$lib/instructor/bouncy_instructor").StepWrapper[]} */
   export let featuredSteps;
-  /** @type{import("$lib/instructor/bouncy_instructor").StepWrapper} */
-  export let idleStep;
 
   const entryDance = featuredDances.find(
     (dance) => dance.id === 'Home Animation (dev)'

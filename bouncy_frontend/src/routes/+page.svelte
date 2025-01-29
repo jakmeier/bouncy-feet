@@ -14,15 +14,11 @@
     })
     .filter((_, i) => (i & 1) == 0)
     .slice(0, 3);
-  const idleStep = data.lookupSteps({
-    uniqueNames: true,
-    sources: ['idle_steps'],
-  })[0];
 </script>
 
 <!-- Switch between stable and unstable HomeFeed -->
 {#if $version <= 0.005}
   <HomeFeedA featuredDances={data.officialDances} />
 {:else}
-  <HomeFeedB featuredDances={data.officialDances} {featuredSteps} {idleStep} />
+  <HomeFeedB featuredDances={data.officialDances} {featuredSteps} />
 {/if}
