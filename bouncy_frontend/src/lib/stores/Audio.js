@@ -77,6 +77,11 @@ export async function loadBeatSounds() {
   return Promise.all(kickAudioFiles.map((name) => loadAudio(name, `${base}/audio/${name}.mp3`)));
 }
 
+/** @param {string} name */
+export async function loadTrack(name) {
+  return loadAudio(name, `https://app.bouncy-feet.ch/media/tracks/${name}.mp3`);
+}
+
 /** @param {string} id */
 export function playAudio(id) {
   scheduleAudio(id, performance.now());

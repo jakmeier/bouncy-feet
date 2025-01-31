@@ -1,5 +1,5 @@
 <script>
-  import Audio from '$lib/components/Audio.svelte';
+  import Audio from '$lib/components/BeatAudio.svelte';
   import Popup from '$lib/components/ui/Popup.svelte';
   import Toggle from '$lib/components/ui/Toggle.svelte';
   import { t } from '$lib/i18n';

@@ -8,7 +8,7 @@
   import Popup from '$lib/components/ui/Popup.svelte';
   import LessonEndResults from './LessonEndResults.svelte';
   import VideoReview from '$lib/components/review/VideoReview.svelte';
-  import Audio from '$lib/components/Audio.svelte';
+  import Audio from '$lib/components/BeatAudio.svelte';
   import { registerTracker, setHalfSpeed } from '$lib/stores/Beat';
   import Button from '$lib/components/ui/Button.svelte';
   import { writable } from 'svelte/store';

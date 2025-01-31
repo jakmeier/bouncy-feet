@@ -3,10 +3,11 @@
   import AnimatedStep from '$lib/components/AnimatedStep.svelte';
   import Header from '$lib/components/ui/Header.svelte';
   import { LEFT_RIGHT_COLORING, ORANGE_COLORING } from '$lib/constants';
-  import { halfSpeed } from '$lib/stores/Beat';
+  import { bpm, halfSpeed } from '$lib/stores/Beat';
   import { getContext } from 'svelte';
   import { t } from '$lib/i18n';
   import { dev } from '$lib/stores/FeatureSelection';
+  import Audio from '$lib/components/TrackAudio.svelte';
 
   const coach = $page.params.coach;
   const { getCourse } = getContext('courses');
@@ -15,7 +16,11 @@
   const course = getCourse(coachCourseId(coach), true);
   const step = course.featuredStep();
 
+  $bpm = 120;
   $halfSpeed = true;
+
+  // TODO: let user turn it off
+  let audioOn = true;
 
   function coachStyle(coach) {
     switch (coach) {
@@ -39,6 +44,8 @@
     }
   }
 </script>
+
+<Audio bind:isOn={audioOn} track="120bpm_tech_house"></Audio>
 
 <Header title={coach} />
 
