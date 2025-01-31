@@ -7,7 +7,7 @@ export const BLACK_COLORING = {
 
 export const ZEBRA_COLORING = {
     leftColor: 'var(--theme-neutral-dark)',
-    rightColor: '#a0a0a0',
+    rightColor: 'var(--theme-neutral-white)',
     headColor: 'var(--theme-neutral-dark)',
     bodyColor: 'var(--theme-neutral-dark)',
 };
