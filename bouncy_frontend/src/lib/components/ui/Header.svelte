@@ -68,6 +68,7 @@
 
   span {
     display: inline-block;
+    text-transform: capitalize;
   }
 
   button {
