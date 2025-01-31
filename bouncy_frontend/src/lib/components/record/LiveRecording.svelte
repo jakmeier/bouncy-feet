@@ -3,8 +3,8 @@
   import Camera from '$lib/components/record/Camera.svelte';
   import Canvas from '$lib/components/Canvas.svelte';
   import Avatar from '$lib/components/avatar/Avatar.svelte';
-  import { hideNavigation, wideView } from '$lib/stores/UiState';
-  import { getContext, onDestroy, onMount } from 'svelte';
+  import { wideView } from '$lib/stores/UiState';
+  import { getContext, onMount } from 'svelte';
   import { I, landmarksToKeypoints, PoseDetection } from '$lib/pose';
   import BackgroundTask from '../BackgroundTask.svelte';
   import { writable } from 'svelte/store';
@@ -68,7 +68,7 @@
   let detectionState = tracker.detectionState;
   tracker.enforceBeat(forceBeat);
   $: animationTime = Math.min($timeBetweenMoves / 3, 300);
-  $: $hideNavigation = cameraOn;
+  // $: $hideNavigation = cameraOn;
   $: $wideView = cameraOn;
   let progress = 0.0;
   let currentBeat = -1;
@@ -276,9 +276,9 @@
     setChannelGain('audio-guide', 2.0);
   });
 
-  onDestroy(() => {
-    $hideNavigation = false;
-  });
+  // onDestroy(() => {
+  //   $hideNavigation = false;
+  // });
 </script>
 
 <div bind:clientWidth={outerWidth} style="width: 100%; transform: scaleX(-1);">

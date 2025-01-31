@@ -99,7 +99,9 @@
   }
 
   .move {
-    animation: move 9s linear 0s infinite alternate;
+    /* animation: move 9s linear 0s infinite alternate; */
+    /* instead of moving, just fix it? to the start? */
+    transform: translateY(-50vh) rotate(var(--start-rotation, 0deg));
   }
   .reverse {
     animation-direction: alternate-reverse;

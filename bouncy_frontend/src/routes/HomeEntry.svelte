@@ -41,7 +41,7 @@
   {/if}
 
   <div class="training">
-    <div class="shine"></div>
+    <div class=""></div>
 
     <div>{$t('record.train-dance-prefix')}</div>
     <AnimatedStep
@@ -57,7 +57,7 @@
   </div>
 
   <div class="new-skill">
-    <div class="shine"></div>
+    <div class=""></div>
     <div>{$t('record.learn-dance-prefix')}</div>
     <AnimatedStep size={trainingWidth} step={featuredSteps[1]} />
     <div class="bubbles">

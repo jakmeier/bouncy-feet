@@ -11,7 +11,9 @@
   import UserContext from './UserContext.svelte';
   import LocalCollectionContext from './LocalCollectionContext.svelte';
   import MovingBackground from '$lib/components/ui/MovingBackground.svelte';
+  import { dev } from '$lib/stores/FeatureSelection';
 
+  $: hideNavigation.set(!$dev);
   $: navBarHeight = $hideNavigation ? 0 : 90;
   $: outerPadding = $wideView ? 0 : 5;
   $: mainMargin = $wideView ? 2 : 5;
