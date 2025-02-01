@@ -1,6 +1,5 @@
 <script>
   import { onMount } from 'svelte';
-  import BackgroundTask from '../BackgroundTask.svelte';
 
   export let size = 50;
   export let accentColor = true;
@@ -14,7 +13,7 @@
   $: slotSize = size - 2 * padding;
   $: innerColor = accentColor ? '--theme-accent-light' : '--theme-neutral-gray';
 
-  $: duration = timeBetweenBeats;
+  $: timeBetweenBeats, start, replaceAnimation(timeBetweenBeats);
   /** @type {Element} */
   let disk;
 
@@ -54,15 +53,8 @@
     animation.play();
   }
 
-  function onFrame() {
-    if (duration !== timeBetweenBeats) {
-      duration = timeBetweenBeats;
-      replaceAnimation(duration);
-    }
-  }
-
   onMount(() => {
-    replaceAnimation(duration);
+    replaceAnimation(timeBetweenBeats);
   });
 </script>
 
@@ -81,8 +73,6 @@
     </div>
   </div>
 </div>
-
-<BackgroundTask {onFrame} />
 
 <style>
   .container {
