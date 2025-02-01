@@ -1,19 +1,20 @@
 <script>
-  import { Tracker } from '$lib/instructor/bouncy_instructor';
-  import { getContext, onMount } from 'svelte';
+  import { onMount } from 'svelte';
   import BackgroundTask from '../BackgroundTask.svelte';
 
   export let size = 50;
   export let accentColor = true;
+  /** @type {number} */
+  export let start;
+  /** @type {number} */
+  export let timeBetweenBeats;
   $: innerSize = size * 0.9;
   $: bigInnerSize = size * 0.95;
   $: padding = (bigInnerSize - innerSize) * 2 + 10;
   $: slotSize = size - 2 * padding;
   $: innerColor = accentColor ? '--theme-accent-light' : '--theme-neutral-gray';
 
-  /** @type {{tracker: Tracker}} */
-  const { tracker } = getContext('tracker');
-  let duration = tracker.timeBetweenPoses;
+  $: duration = timeBetweenBeats;
   /** @type {Element} */
   let disk;
 
@@ -48,16 +49,14 @@
       easing: 'cubic-bezier(0.65, 0.05, 0.36, 1)',
       iterations: Infinity,
     });
-    const now = performance.now();
     animation = new Animation(effect);
-    const start = tracker.nextHalfBeat(now);
     animation.startTime = Number(start);
     animation.play();
   }
 
   function onFrame() {
-    if (duration !== tracker.timeBetweenPoses) {
-      duration = tracker.timeBetweenPoses;
+    if (duration !== timeBetweenBeats) {
+      duration = timeBetweenBeats;
       replaceAnimation(duration);
     }
   }

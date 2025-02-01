@@ -1,6 +1,12 @@
 <script>
   import { t } from '$lib/i18n';
-  import { bpm, setBeatStart, setBpm } from '$lib/stores/Beat';
+  import {
+    bpm,
+    setBeatStart,
+    setBpm,
+    beatStart,
+    timeBetweenMoves,
+  } from '$lib/stores/Beat';
   import Button from '../ui/Button.svelte';
   import Header from '../ui/Header.svelte';
   import Toggle from '../ui/Toggle.svelte';
@@ -59,7 +65,12 @@
 
 <div class="outer">
   <div class="visualizer" on:pointerdown={tap}>
-    <BeatVisualizer size={200} accentColor={!useFixedBpm}>
+    <BeatVisualizer
+      size={200}
+      accentColor={!useFixedBpm}
+      start={$beatStart}
+      timeBetweenBeats={$timeBetweenMoves}
+    >
       {useFixedBpm
         ? $t('record.bpm-fixed-button')
         : $t('record.bpm-tap-button')}
