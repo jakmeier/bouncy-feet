@@ -12,4 +12,5 @@ pub(crate) mod pose;
 pub(crate) mod pose_score;
 pub(crate) mod skeleton_3d;
 pub(crate) mod step;
+pub(crate) mod teacher;
 pub(crate) mod tracker_dance_collection;

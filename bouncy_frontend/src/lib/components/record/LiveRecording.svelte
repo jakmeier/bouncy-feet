@@ -225,7 +225,7 @@
     const hip = tracker.hipPosition(recordingEnd || 0);
     lastSuccessSkeletonOrigin = new Cartesian2d(hip.x - 0.5, hip.y - 0.5);
 
-    const target = tracker.trackedBeats * 2;
+    const target = tracker.trackedBeats;
     progress = Math.min(tracker.numDetectedPoses() / target, 1.0);
   }
 

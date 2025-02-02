@@ -7,6 +7,7 @@ use crate::{DetectionFailureReason, DetectionResult, PoseHint, StepInfo};
 
 use super::pose::PoseDirection;
 use super::skeleton_3d::Skeleton3d;
+use super::teacher::Teacher;
 use super::tracker_dance_collection::TrackerDanceCollection;
 
 type Timestamp = f64;
@@ -29,10 +30,9 @@ pub(crate) struct DanceDetector {
     /// How long it takes from a movement of the person on camera to be visible
     /// in an image.
     pub(crate) camera_input_delay: f64,
-    /// The expected step for unique step tracking
-    pub(crate) target_step: Option<StepInfo>,
-    /// How many beats to track for, counting only in LiveTracking state.
-    pub(crate) tracked_beats: Option<u32>,
+
+    /// picks steps, switches between views, etc
+    pub(crate) teacher: Teacher,
 
     // state
     /// Data about detection so far.
@@ -75,8 +75,6 @@ impl Default for DanceDetector {
             half_speed: false,
             error_threshold: 0.05,
             detected: DetectionResult::default(),
-            target_step: None,
-            tracked_beats: None,
             beat_alignment: None,
             force_beat: false,
             // TODO: should this depend on bpm and system info?
@@ -95,15 +93,25 @@ impl Default for DanceDetector {
             last_evaluation: -0.1,
             ui_events: UiEvents::default(),
             on_beat_candidates: vec![],
+            teacher: Default::default(),
         }
     }
 }
 
 impl DanceDetector {
     pub(crate) fn new(target_step: Option<StepInfo>, tracked_beats: Option<u32>) -> Self {
+        let mut teacher = Teacher::default();
+
+        if let Some(step) = target_step {
+            let beats = tracked_beats.unwrap_or_else(|| step.beats() as u32);
+            teacher.add_step(step, beats);
+        } else {
+            let beats = tracked_beats.unwrap_or(64);
+            teacher.add_freestyle(beats);
+        }
+
         Self {
-            target_step,
-            tracked_beats,
+            teacher,
             ..Default::default()
         }
     }
@@ -130,9 +138,9 @@ impl DanceDetector {
                 self.transition_to_state(DetectionState::Positioning, now);
             }
             DetectionState::Positioning => {
-                if let Some(target) = &self.target_step {
+                if let Some((target, _)) = self.teacher.step_at_beat(0) {
                     if let Some(skeleton) = skeletons.last() {
-                        let resting_pose_idx = if target.skeletons[0].sideway {
+                        let resting_pose_idx = if target.skeleton(0).sideway {
                             db.pose_by_id("standing-straight-side")
                                 .expect("missing resting pose")
                         } else {
@@ -165,10 +173,8 @@ impl DanceDetector {
                         .with_failure_reason(DetectionFailureReason::NoNewData);
                 }
                 self.last_evaluation = now;
-                if let Some(num_beats) = self.tracked_beats {
-                    if self.num_detected_poses() as u32 >= num_beats * self.poses_per_beat() {
-                        self.transition_to_state(DetectionState::TrackingDone, now);
-                    }
+                if self.num_detected_poses() as u32 >= self.teacher.tracked_beats() {
+                    self.transition_to_state(DetectionState::TrackingDone, now);
                 }
 
                 if let Some(skeleton) = skeletons.last() {
@@ -223,10 +229,20 @@ impl DanceDetector {
                 .with_failure_reason(DetectionFailureReason::NotOnBeat);
         }
 
-        let step_info = self.tracked_step();
-        let step = db.step(&step_info.id()).expect("tracked step must exist");
+        let beat = num_detected_poses as u32;
+        let (step_id, beat_remainder) = match self.tracked_step_with_beat_count(beat) {
+            Some((step, beat_remainder)) => (step.id(), beat_remainder),
+            None => {
+                // TODO: To support freestyle, this should match against any step
+                return self
+                    .detected
+                    .clone()
+                    .with_failure_reason(DetectionFailureReason::NoTrackingTarget);
+            }
+        };
+        let step = db.step(&step_id).expect("tracked step must exist");
 
-        let pose_idx = step.poses[num_detected_poses % step.poses.len()];
+        let pose_idx = step.poses[beat_remainder as usize % step.poses.len()];
         let pose = &db.poses()[pose_idx];
 
         // If we detected a different direction than the expected one, it
@@ -303,15 +319,12 @@ impl DanceDetector {
 
     /// Return how many poses have been detected so far.
     pub(crate) fn num_detected_poses(&self) -> usize {
-        let full = if let Some(target_step) = &self.target_step {
-            self.detected.steps.len() * target_step.beats()
-        } else {
-            self.detected
-                .steps
-                .iter()
-                .map(|step| step.poses.len())
-                .sum()
-        };
+        let full: usize = self
+            .detected
+            .steps
+            .iter()
+            .map(|step| step.poses.len())
+            .sum();
         let partial = if let Some(partial_step) = &self.detected.partial {
             partial_step.poses.len()
         } else {
@@ -320,17 +333,21 @@ impl DanceDetector {
         full + partial
     }
 
-    /// Returns the single tracked step.
-    ///
-    /// (experimenting with live instructor, I probably want to change this when cleaning up the impl)
-    pub(crate) fn tracked_step(&self) -> StepInfo {
-        self.target_step.clone().expect("requires target_step")
+    /// Returns the tracked step for a given beat after tracking started.
+    pub(crate) fn tracked_step(&self, beat: u32) -> Option<&StepInfo> {
+        self.teacher.step_at_beat(beat).map(|inner| inner.0)
+    }
+
+    /// Returns the tracked step and beat for a given beat after tracking started.
+    pub(crate) fn tracked_step_with_beat_count(&self, beat: u32) -> Option<(&StepInfo, u32)> {
+        self.teacher.step_at_beat(beat)
     }
 
     pub(crate) fn add_pose(&mut self, pose: PoseApproximation) {
         self.detected.add_pose(pose);
         self.on_beat_candidates.clear();
-        if let Some(target_step) = &self.target_step {
+        let beat = self.num_detected_poses() as u32;
+        if let Some((target_step, _beat)) = &self.teacher.step_at_beat(beat) {
             self.detected.match_step(target_step);
         }
     }
@@ -346,15 +363,6 @@ impl DanceDetector {
             2.0 * 30_000.0 / self.bpm as f64
         } else {
             30_000.0 / self.bpm as f64
-        }
-    }
-
-    #[inline]
-    pub(crate) fn poses_per_beat(&self) -> u32 {
-        if self.half_speed {
-            1
-        } else {
-            2
         }
     }
 

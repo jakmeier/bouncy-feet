@@ -41,6 +41,8 @@ pub enum DetectionFailureReason {
     DetectionDisabled = 5,
     /// No *new* data to run detection against.
     NoNewData = 6,
+    /// Nothing to track, hence nothing to detect.
+    NoTrackingTarget = 7,
 }
 
 /// Best guess for what the dancer needs to change to fit the pose.

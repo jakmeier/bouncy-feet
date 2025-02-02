@@ -210,8 +210,8 @@ impl Tracker {
     }
 
     #[wasm_bindgen(getter, js_name = trackedBeats)]
-    pub fn tracked_beats(&self) -> Option<u32> {
-        self.detector.tracked_beats
+    pub fn tracked_beats(&self) -> u32 {
+        self.detector.teacher.tracked_beats()
     }
 
     #[wasm_bindgen(js_name = nextHalfBeat)]
@@ -261,11 +261,24 @@ impl Tracker {
 
     #[wasm_bindgen(js_name = poseSkeletonAtBeat)]
     pub fn pose_skeleton_at_beat(&self, beat: i32) -> Skeleton {
-        let step_info = self.detector.tracked_step();
-
-        match usize::try_from(beat) {
-            Ok(beat) => step_info.skeleton(beat),
-            _else => step_info.skeleton(0).resting_pose(),
+        let resting_pose = || {
+            self.detector
+                .tracked_step(0)
+                .expect("must have at least one step")
+                .skeleton(0)
+                .resting_pose()
+        };
+        match u32::try_from(beat) {
+            Ok(beat) => {
+                if let Some((step, beat_remainder)) =
+                    self.detector.tracked_step_with_beat_count(beat)
+                {
+                    step.skeleton(beat_remainder as usize)
+                } else {
+                    resting_pose()
+                }
+            }
+            _else => resting_pose(),
         }
     }
 
@@ -277,8 +290,7 @@ impl Tracker {
 
     #[wasm_bindgen(js_name = poseBodyShiftAtBeat)]
     pub fn pose_body_shift_at_beat(&self, beat: usize) -> Cartesian2d {
-        let step_info = self.detector.tracked_step();
-        step_info.body_shift(beat)
+        self.detector.teacher.pose_body_shift_at_beat(beat as u32)
     }
 
     #[wasm_bindgen(getter, js_name = lastDetection)]

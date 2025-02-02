@@ -13,6 +13,7 @@
   import SessionReward from '$lib/components/SessionReward.svelte';
   import { registerTracker, setBpm, setHalfSpeed } from '$lib/stores/Beat';
   import Button from '$lib/components/ui/Button.svelte';
+  import { DetectionState } from '$lib/instructor/bouncy_instructor_bg';
 
   const stepName = $page.params.stepName;
   const instructorStep = stepsByName(stepName)[0];
@@ -59,6 +60,10 @@
   let stopCamera;
   /** @type {() => any}*/
   let endRecording;
+
+  $: trackingState = tracker ? tracker.detectionState : null;
+  $: if ($trackingState === DetectionState.TrackingDone)
+    stopCameraAndRecording();
 
   async function turnOnRecording() {
     await startCamera();
