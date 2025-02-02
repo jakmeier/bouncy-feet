@@ -4,13 +4,13 @@
   import Header from '$lib/components/ui/Header.svelte';
   import { LEFT_RIGHT_COLORING, ORANGE_COLORING } from '$lib/constants';
   import { bpm, halfSpeed } from '$lib/stores/Beat';
-  import { getContext } from 'svelte';
+  import { getContext, onMount } from 'svelte';
   import { t } from '$lib/i18n';
   import { dev } from '$lib/stores/FeatureSelection';
-  import Audio from '$lib/components/TrackAudio.svelte';
 
   const coach = $page.params.coach;
   const { getCourse } = getContext('courses');
+  const { setTrack } = getContext('music');
 
   const style = coachStyle(coach);
   const course = getCourse(coachCourseId(coach), true);
@@ -43,9 +43,11 @@
         return '';
     }
   }
-</script>
 
-<Audio bind:isOn={audioOn} track="120bpm_tech_house"></Audio>
+  onMount(() => {
+    setTrack('120bpm_tech_house');
+  });
+</script>
 
 <Header title={coach} />
 

@@ -27,8 +27,7 @@
   let connectedNodes = [];
 
   onMount(async () => {
-    await loadTrack(track);
-    if (isOn) startAudio();
+    await loadAndPlayTrack();
     initialized = true;
   });
 
@@ -36,6 +35,14 @@
     stopAudio();
     resetAudio();
   });
+
+  $: track, loadAndPlayTrack();
+  async function loadAndPlayTrack() {
+    if (track !== '') {
+      await loadTrack(track);
+      startAudio();
+    }
+  }
 
   /**
    * @param {number} time

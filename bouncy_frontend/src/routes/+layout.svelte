@@ -12,6 +12,7 @@
   import LocalCollectionContext from './LocalCollectionContext.svelte';
   import MovingBackground from '$lib/components/ui/MovingBackground.svelte';
   import { dev } from '$lib/stores/FeatureSelection';
+  import MusicContext from './MusicContext.svelte';
 
   $: hideNavigation.set(!$dev);
   $: navBarHeight = $hideNavigation ? 0 : 90;
@@ -35,7 +36,9 @@
       <UserContext>
         <LocalCollectionContext>
           <PoseDetectionContext>
-            <slot />
+            <MusicContext>
+              <slot />
+            </MusicContext>
           </PoseDetectionContext>
         </LocalCollectionContext>
       </UserContext>
