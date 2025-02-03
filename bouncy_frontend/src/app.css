@@ -61,9 +61,10 @@ h2.box {
 }
 
 h2.box .gradient-text {
-    background: linear-gradient(0deg, #ff7301 15%, #ffe72e 50%, #7fdb61 80%);
-    background-clip: text;
-    color: transparent;
+    /* background: linear-gradient(0deg, #ff7301 15%, #ffe72e 50%, #7fdb61 80%);
+    background-clip: text; */
+    /* color: transparent; */
+    color: #7fdb61;
 }
 
 input {
