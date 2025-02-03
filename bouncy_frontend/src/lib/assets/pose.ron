@@ -541,5 +541,627 @@
         (limb: LeftForearm, angle: -150, tolerance: 0, weight: 1.0),
       ],
     ),
+    (
+      id: "pose-26b8821b",
+      names: Some({
+          "en": "step-back-left",
+      }),
+      direction: Front,
+      limbs: [
+          (
+              limb: LeftThigh,
+              weight: 1.0,
+              angle: 12,
+              tolerance: 0,
+          ),
+          (
+              limb: LeftShin,
+              weight: 1.0,
+              angle: 7,
+              tolerance: 0,
+          ),
+          (
+              limb: LeftFoot,
+              weight: 1.0,
+              angle: 41,
+              tolerance: 0,
+          ),
+          (
+              limb: LeftArm,
+              weight: 0.0,
+              angle: -25,
+              tolerance: 0,
+          ),
+          (
+              limb: LeftForearm,
+              weight: 0.0,
+              angle: -40,
+              tolerance: 0,
+          ),
+          (
+              limb: RightThigh,
+              weight: 1.0,
+              angle: 8,
+              tolerance: 0,
+          ),
+          (
+              limb: RightShin,
+              weight: 1.0,
+              angle: -12,
+              tolerance: 0,
+          ),
+          (
+              limb: RightFoot,
+              weight: 1.0,
+              angle: 63,
+              tolerance: 0,
+          ),
+          (
+              limb: RightArm,
+              weight: 0.0,
+              angle: 31,
+              tolerance: 0,
+          ),
+          (
+              limb: RightForearm,
+              weight: 0.0,
+              angle: 45,
+              tolerance: 0,
+          ),
+          (
+              limb: LeftLeg,
+              weight: 1.0,
+              angle: 10,
+              tolerance: 0,
+          ),
+          (
+              limb: RightLeg,
+              weight: 1.0,
+              angle: -2,
+              tolerance: 0,
+          ),
+      ],
+      x_shift: 0.05,
+      y_shift: -0.05,
+      turn_hip: 10,
+      z: (
+          absolute: {
+              (
+                  side: Right,
+                  part: Ankle,
+              ): 0.0,
+              (
+                  side: Right,
+                  part: Elbow,
+              ): 0.0,
+              (
+                  side: Left,
+                  part: Ankle,
+              ): -1.0,
+              (
+                  side: Right,
+                  part: Knee,
+              ): 0.5,
+              (
+                  side: Left,
+                  part: Toes,
+              ): -0.5,
+              (
+                  side: Right,
+                  part: Heel,
+              ): 0.0,
+              (
+                  side: Right,
+                  part: Wrist,
+              ): 0.0,
+              (
+                  side: Left,
+                  part: Elbow,
+              ): 0.0,
+              (
+                  side: Left,
+                  part: Knee,
+              ): 0.0,
+              (
+                  side: Left,
+                  part: Heel,
+              ): -2.0,
+              (
+                  side: Left,
+                  part: Wrist,
+              ): 0.0,
+              (
+                  side: Right,
+                  part: Toes,
+              ): 2.0,
+          },
+      ),
+  ),
+  (
+      id: "pose-935c410d",
+      names: Some({
+          "en": "step-back-right",
+      }),
+      direction: Front,
+      limbs: [
+          (
+              limb: LeftThigh,
+              weight: 1.0,
+              angle: -1,
+              tolerance: 0,
+          ),
+          (
+              limb: LeftShin,
+              weight: 1.0,
+              angle: 8,
+              tolerance: 0,
+          ),
+          (
+              limb: LeftFoot,
+              weight: 1.0,
+              angle: -57,
+              tolerance: 0,
+          ),
+          (
+              limb: LeftArm,
+              weight: 0.0,
+              angle: -10,
+              tolerance: 0,
+          ),
+          (
+              limb: LeftForearm,
+              weight: 0.0,
+              angle: -40,
+              tolerance: 0,
+          ),
+          (
+              limb: RightThigh,
+              weight: 1.0,
+              angle: -7,
+              tolerance: 0,
+          ),
+          (
+              limb: RightShin,
+              weight: 1.0,
+              angle: -1,
+              tolerance: 0,
+          ),
+          (
+              limb: RightFoot,
+              weight: 1.0,
+              angle: -28,
+              tolerance: 0,
+          ),
+          (
+              limb: RightArm,
+              weight: 0.0,
+              angle: 20,
+              tolerance: 0,
+          ),
+          (
+              limb: RightForearm,
+              weight: 0.0,
+              angle: 33,
+              tolerance: 0,
+          ),
+          (
+              limb: LeftLeg,
+              weight: 1.0,
+              angle: 3,
+              tolerance: 0,
+          ),
+          (
+              limb: RightLeg,
+              weight: 1.0,
+              angle: -5,
+              tolerance: 0,
+          ),
+      ],
+      x_shift: -0.05,
+      y_shift: -0.05,
+      turn_hip: -19,
+      z: (
+          absolute: {
+              (
+                  side: Right,
+                  part: Heel,
+              ): -2.0,
+              (
+                  side: Left,
+                  part: Heel,
+              ): 0.0,
+              (
+                  side: Right,
+                  part: Wrist,
+              ): 0.0,
+              (
+                  side: Right,
+                  part: Ankle,
+              ): -1.0,
+              (
+                  side: Right,
+                  part: Elbow,
+              ): 0.0,
+              (
+                  side: Left,
+                  part: Knee,
+              ): 0.5,
+              (
+                  side: Left,
+                  part: Ankle,
+              ): 0.0,
+              (
+                  side: Right,
+                  part: Knee,
+              ): 0.0,
+              (
+                  side: Left,
+                  part: Toes,
+              ): 2.0,
+              (
+                  side: Left,
+                  part: Elbow,
+              ): 0.0,
+              (
+                  side: Left,
+                  part: Wrist,
+              ): 0.0,
+              (
+                  side: Right,
+                  part: Toes,
+              ): -0.5,
+          },
+      ),
+  ),
+  (
+      id: "pose-30831c4d",
+      names: Some({
+          "en": "open-V",
+      }),
+      direction: Front,
+      limbs: [
+          (
+              limb: LeftThigh,
+              weight: 1.0,
+              angle: -5,
+              tolerance: 0,
+          ),
+          (
+              limb: LeftShin,
+              weight: 1.0,
+              angle: 1,
+              tolerance: 0,
+          ),
+          (
+              limb: LeftFoot,
+              weight: 2.0,
+              angle: -60,
+              tolerance: 0,
+          ),
+          (
+              limb: LeftArm,
+              weight: 0.0,
+              angle: -9,
+              tolerance: 0,
+          ),
+          (
+              limb: LeftForearm,
+              weight: 0.0,
+              angle: -9,
+              tolerance: 0,
+          ),
+          (
+              limb: RightThigh,
+              weight: 1.0,
+              angle: 2,
+              tolerance: 0,
+          ),
+          (
+              limb: RightShin,
+              weight: 1.0,
+              angle: 3,
+              tolerance: 0,
+          ),
+          (
+              limb: RightFoot,
+              weight: 2.0,
+              angle: 41,
+              tolerance: 0,
+          ),
+          (
+              limb: RightArm,
+              weight: 0.0,
+              angle: 5,
+              tolerance: 0,
+          ),
+          (
+              limb: RightForearm,
+              weight: 0.0,
+              angle: 8,
+              tolerance: 0,
+          ),
+          (
+              limb: LeftLeg,
+              weight: 1.0,
+              angle: -2,
+              tolerance: 0,
+          ),
+          (
+              limb: RightLeg,
+              weight: 1.0,
+              angle: 2,
+              tolerance: 0,
+          ),
+      ],
+      turn_hip: 4,
+  ),
+  (
+      id: "pose-98418e26",
+      names: Some({
+          "en": "t-up-right",
+      }),
+      direction: Front,
+      limbs: [
+          (
+              limb: LeftThigh,
+              weight: 1.0,
+              angle: -18,
+              tolerance: 0,
+          ),
+          (
+              limb: LeftShin,
+              weight: 1.0,
+              angle: 45,
+              tolerance: 0,
+          ),
+          (
+              limb: LeftFoot,
+              weight: 1.0,
+              angle: -24,
+              tolerance: 0,
+          ),
+          (
+              limb: LeftArm,
+              weight: 0.0,
+              angle: -21,
+              tolerance: 0,
+          ),
+          (
+              limb: LeftForearm,
+              weight: 0.0,
+              angle: -29,
+              tolerance: 0,
+          ),
+          (
+              limb: RightThigh,
+              weight: 1.0,
+              angle: -4,
+              tolerance: 0,
+          ),
+          (
+              limb: RightShin,
+              weight: 1.0,
+              angle: 2,
+              tolerance: 0,
+          ),
+          (
+              limb: RightFoot,
+              weight: 1.0,
+              angle: -59,
+              tolerance: 0,
+          ),
+          (
+              limb: RightArm,
+              weight: 0.0,
+              angle: 8,
+              tolerance: 0,
+          ),
+          (
+              limb: RightForearm,
+              weight: 0.0,
+              angle: -78,
+              tolerance: 0,
+          ),
+          (
+              limb: LeftLeg,
+              weight: 1.0,
+              angle: 3,
+              tolerance: 0,
+          ),
+          (
+              limb: RightLeg,
+              weight: 1.0,
+              angle: -1,
+              tolerance: 0,
+          ),
+      ],
+      turn_hip: -18,
+      z: (
+          absolute: {
+              (
+                  side: Right,
+                  part: Heel,
+              ): 0.0,
+              (
+                  side: Right,
+                  part: Ankle,
+              ): 0.0,
+              (
+                  side: Left,
+                  part: Toes,
+              ): -0.5,
+              (
+                  side: Left,
+                  part: Knee,
+              ): 1.0,
+              (
+                  side: Left,
+                  part: Wrist,
+              ): 0.0,
+              (
+                  side: Left,
+                  part: Elbow,
+              ): 0.0,
+              (
+                  side: Right,
+                  part: Elbow,
+              ): 0.0,
+              (
+                  side: Right,
+                  part: Toes,
+              ): 0.0,
+              (
+                  side: Right,
+                  part: Wrist,
+              ): 0.0,
+              (
+                  side: Right,
+                  part: Knee,
+              ): 0.0,
+              (
+                  side: Left,
+                  part: Ankle,
+              ): -1.0,
+              (
+                  side: Left,
+                  part: Heel,
+              ): -1.0,
+          },
+      ),
+  ),
+  (
+      id: "pose-cc20c713",
+      names: Some({
+          "en": "t-up-left",
+      }),
+      direction: Front,
+      limbs: [
+          (
+            limb: LeftThigh,
+            weight: 1.0,
+            angle: 1,
+            tolerance: 0,
+          ),
+          (
+            limb: LeftShin,
+            weight: 1.0,
+            angle: -11,
+            tolerance: 0,
+          ),
+          (
+            limb: LeftFoot,
+            weight: 1.0,
+            angle: 48,
+            tolerance: 0,
+          ),
+          (
+            limb: LeftArm,
+            weight: 0.0,
+            angle: -25,
+            tolerance: 0,
+          ),
+          (
+            limb: LeftForearm,
+            weight: 0.0,
+            angle: -53,
+            tolerance: 0,
+          ),
+          (
+            limb: RightThigh,
+            weight: 1.0,
+            angle: 23,
+            tolerance: 0,
+          ),
+          (
+            limb: RightShin,
+            weight: 1.0,
+            angle: -7,
+            tolerance: 0,
+          ),
+          (
+            limb: RightFoot,
+            weight: 1.0,
+            angle: 37,
+            tolerance: 0,
+          ),
+          (
+            limb: RightArm,
+            weight: 0.0,
+            angle: 13,
+            tolerance: 0,
+          ),
+          (
+            limb: RightForearm,
+            weight: 0.0,
+            angle: 106,
+            tolerance: 0,
+          ),
+          (
+            limb: LeftLeg,
+            weight: 1.0,
+            angle: -5,
+            tolerance: 0,
+          ),
+          (
+            limb: RightLeg,
+            weight: 1.0,
+            angle: 8,
+            tolerance: 0,
+          ),
+      ],
+      turn_hip: 17,
+      z: (
+      absolute: {
+          (
+              side: Right,
+              part: Ankle,
+          ): -1.0,
+          (
+              side: Right,
+              part: Wrist,
+          ): 0.0,
+          (
+              side: Left,
+              part: Heel,
+          ): 0.0,
+          (
+              side: Right,
+              part: Toes,
+          ): -0.5,
+          (
+              side: Right,
+              part: Elbow,
+          ): 0.0,
+          (
+              side: Left,
+              part: Ankle,
+          ): 0.0,
+          (
+              side: Left,
+              part: Knee,
+          ): 0.0,
+          (
+              side: Right,
+              part: Knee,
+          ): 1.0,
+          (
+              side: Right,
+              part: Heel,
+          ): -1.0,
+          (
+              side: Left,
+              part: Toes,
+          ): 0.0,
+          (
+              side: Left,
+              part: Wrist,
+          ): 0.0,
+          (
+              side: Left,
+              part: Elbow,
+          ): 0.0,
+        },
+      ),
+    ),
   ]
 )

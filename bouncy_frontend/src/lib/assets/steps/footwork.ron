@@ -53,5 +53,54 @@
         (pose: "gangsta-right-up-front", orientation: ToCamera),
       ]
     ),
+    (
+    id: "step-469617",
+    name: "step-back",
+    keyframes: [
+        (
+          pose: "pose-26b8821b",
+          orientation: ToCamera,
+          pivot: (side: Right, part: Heel),
+        ),
+        (
+          pose: "pose-98418e26",
+          orientation: ToCamera,
+          pivot: (side: Right, part: Heel),
+        ),
+        (
+          // open V
+          pose: "pose-30831c4d",
+          orientation: ToCamera,
+          pivot: (side: Right, part: Toes),
+        ),
+        (
+          pose: "pose-cc20c713",
+          orientation: ToCamera,
+          pivot: (side: Left, part: Toes),
+        ),
+        (
+          // step back right
+          pose: "pose-935c410d",
+          orientation: ToCamera,
+          pivot: (side: Left, part: Heel),
+        ),
+        (
+          pose: "pose-cc20c713",
+          orientation: ToCamera,
+          pivot: (side: Left, part: Heel),
+        ),
+        (
+          // open V
+          pose: "pose-30831c4d",
+          orientation: ToCamera,
+          pivot: (side: Left, part: Toes),
+        ),
+        (
+          pose: "pose-98418e26",
+          orientation: ToCamera,
+          pivot: (side: Right, part: Toes),
+        ),
+      ],
+    ),
   ]
 )
