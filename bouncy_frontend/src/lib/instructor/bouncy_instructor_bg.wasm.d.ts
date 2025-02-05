@@ -10,6 +10,7 @@ export const course_id: (a: number, b: number) => void;
 export const course_lessons: (a: number, b: number) => void;
 export const course_name: (a: number, b: number) => void;
 export const course_tracker: (a: number, b: number) => number;
+export const course_trainingTracker: (a: number) => number;
 export const dancebuilder_addStep: (a: number, b: number, c: number) => void;
 export const dancebuilder_clear: (a: number) => void;
 export const dancebuilder_danceInfo: (a: number) => number;

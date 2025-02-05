@@ -184,6 +184,11 @@ export class Course {
   free(): void;
   featuredStep(): StepWrapper | undefined;
   tracker(lesson_index: number): Tracker | undefined;
+  /**
+   * WIP: Create a training session for the given course. At the moment, it
+   * is hard coded to give something for testing.
+   */
+  trainingTracker(): Tracker;
   readonly id: string;
   readonly name: string;
   readonly explanation: string;

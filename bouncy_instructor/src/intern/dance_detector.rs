@@ -110,6 +110,10 @@ impl DanceDetector {
             teacher.add_freestyle(beats);
         }
 
+        Self::new_from_teacher(teacher)
+    }
+
+    pub(crate) fn new_from_teacher(teacher: Teacher) -> Self {
         Self {
             teacher,
             ..Default::default()

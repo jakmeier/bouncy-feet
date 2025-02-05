@@ -1,6 +1,7 @@
 use super::parsing;
 use super::parsing::ParseFileError;
 use crate::intern::content_collection::ContentCollection;
+use crate::intern::teacher::Teacher;
 use crate::intern::tracker_dance_collection::TrackerDanceCollection;
 use crate::wrapper::step_wrapper::StepWrapper;
 use crate::Tracker;
@@ -73,6 +74,32 @@ impl Course {
         self.lessons
             .get(lesson_index)
             .map(|lesson| lesson.tracker(self.collection.tracker_view.clone()))
+    }
+
+    /// WIP: Create a training session for the given course. At the moment, it
+    /// is hard coded to give something for testing.
+    #[wasm_bindgen(js_name = "trainingTracker")]
+    pub fn training_tracker(&self) -> Tracker {
+        let db = self.collection.tracker_view.clone();
+
+        // WIP: for now, take the last lesson and create a tracker for those parts
+        let steps = self
+            .lessons
+            .last()
+            .expect("must have lesson")
+            .parts
+            .iter()
+            .map(|part| &part.step_wrapper);
+
+        let mut teacher = Teacher::default();
+        for step in steps {
+            // WIP: 16 beats per step, why not
+            teacher.add_step(step.info(&db), 16);
+        }
+
+        let mut tracker = Tracker::new_from_teacher(db, teacher);
+        tracker.detector.half_speed = false;
+        tracker
     }
 }
 

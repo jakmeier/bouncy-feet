@@ -13,7 +13,6 @@
 
   const id = $page.params.courseId;
   const course = getCourse(id);
-  const step = course.featuredStep();
 
   const stepTime = 300;
   const animationTime = stepTime * 0.7;
@@ -27,6 +26,19 @@
 <p>{course.explanation}</p>
 
 <div class="ol">
+  <!-- WIP -->
+  <div class="course">
+    Train
+
+    <div class="link">
+      <a href="./exercise/-1/record">
+        <button class="light">
+          {$t('courses.course-overview.start-lesson')}
+        </button>
+      </a>
+    </div>
+  </div>
+
   {#each course.lessons as lesson, index}
     <div class="course">
       <div>
@@ -35,7 +47,6 @@
       </div>
       <div class="step">
         {#if lesson.parts.length > 0}
-        <!-- TODO: show all parts, not just the last! -->
           <Step
             step={lesson.parts[lesson.parts.length - 1].step}
             poseIndex={$i}

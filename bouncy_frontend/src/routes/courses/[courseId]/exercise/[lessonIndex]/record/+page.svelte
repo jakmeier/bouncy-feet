@@ -133,7 +133,11 @@
     lesson = course.lessons[lessonIndex];
     partIndex = undefined;
 
-    tracker = course.tracker(lessonIndex);
+    if (lessonIndex >= 0) {
+      tracker = course.tracker(lessonIndex);
+    } else {
+      tracker = course.trainingTracker();
+    }
     if (tracker) {
       setHalfSpeed(tracker.halfSpeed);
       registerTracker(tracker);
@@ -171,6 +175,7 @@
 
 <div class="outer">
   {#if !live}
+    <!-- TODO: beat selector should be a layer above, optionally, by default it should be music from the app -->
     <BeatSelector
       bind:counter={bpmDetectionCounter}
       bind:bpmSelected={beatDetected}

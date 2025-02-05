@@ -100,5 +100,6 @@
     position: absolute;
     display: grid;
     align-self: center;
+    text-align: center;
   }
 </style>

@@ -50,13 +50,8 @@
       icon: "todo.svg",
       // video: "/video/todo.mp4",
       parts: [
-        (step: "v-0", bpms: [110, 120, 130]),
-        (step: "v-0", bpms: [110, 120, 130]),
-        (step: "v-1", bpms: [110, 120, 130]),
-        (step: "v-1", bpms: [110, 120, 130]),
-        (step: "step-back", bpms: [110, 120, 130]),
-        (step: "step-back", bpms: [110, 120, 130]),
-        (step: "step-back", bpms: [110, 120, 130]),
+        (step: "happy-feet-0", bpms: [110, 120, 130]),
+        (step: "v-step-back", bpms: [110, 120, 130]),
         (step: "step-back", bpms: [110, 120, 130]),
       ],
     ),
@@ -121,7 +116,7 @@
         (pose: "v-closed", orientation: ToCamera, pivot: (side: Left, part: Heel)),
       ]
     ),
-        (
+    (
     id: "step-back",
     name: "step-back",
     keyframes: [
@@ -170,6 +165,25 @@
         ),
       ],
     ),
+    (
+    id: "v-step-back",
+    name: "v-step-back",
+    keyframes: [
+        (pose: "v-closed-2", orientation: ToCamera, pivot: (side: Left, part: Heel)),
+        (
+          pose: "pose-26b8821b",
+          orientation: ToCamera,
+          pivot: (side: Right, part: Heel),
+        ),
+        (pose: "v-closed-2", orientation: ToCamera, pivot: (side: Right, part: Heel)),
+        (
+          // step back right
+          pose: "pose-935c410d",
+          orientation: ToCamera,
+          pivot: (side: Left, part: Heel),
+        ),
+      ],
+    ),
   ],
   poses: [
     (
@@ -206,6 +220,32 @@
         (limb: LeftArm, angle: -80, tolerance: 0, weight: 0.0),
         (limb: LeftForearm, angle: -100, tolerance: 0, weight: 0.0),
       ]
+    ),
+    (
+      // like v-closed but legs further apart and arms lower
+      id: "v-closed-2",
+      names: {"de": "TODO", "en": "TODO"},
+      direction: Front,
+      limbs: [
+        (limb: LeftThigh, angle: -10, tolerance: 5, weight: 0.25),
+        (limb: LeftShin, angle: -10, tolerance: 5, weight: 0.25),
+        (limb: LeftFoot, angle: 60, tolerance: 15, weight: 1.0),
+        (limb: RightThigh, angle: 10, tolerance: 5, weight: 0.25),
+        (limb: RightShin, angle: 10, tolerance: 5, weight: 0.25),
+        (limb: RightFoot, angle: -60, tolerance: 15, weight: 1.0),
+        (limb: RightArm, angle: 35, tolerance: 0, weight: 0.0),
+        (limb: RightForearm, angle: 17, tolerance: 0, weight: 0.0),
+        (limb: LeftArm, angle: -36, tolerance: 0, weight: 0.0),
+        (limb: LeftForearm, angle: -21, tolerance: 0, weight: 0.0),
+      ],
+      z: (
+        absolute: {
+          (side: Right, part: Elbow): -0.25,
+          (side: Right, part: Wrist): 0.5,
+          (side: Left, part: Elbow): -0.25,
+          (side: Left, part: Wrist): 0.5,
+        },
+      ),
     ),
 
     // TODO: Resting poses should either be added by default or not be required
@@ -300,7 +340,7 @@
           (
               limb: LeftFoot,
               weight: 1.0,
-              angle: 41,
+              angle: -41,
               tolerance: 0,
           ),
           (
@@ -358,7 +398,7 @@
               tolerance: 0,
           ),
       ],
-      x_shift: 0.05,
+      // x_shift: 0.05,
       y_shift: -0.05,
       turn_hip: 10,
       z: (
@@ -366,15 +406,15 @@
               (
                   side: Right,
                   part: Ankle,
-              ): 0.0,
+              ): 1.0,
               (
                   side: Right,
                   part: Elbow,
-              ): 0.0,
+              ): -0.25,
               (
                   side: Left,
                   part: Ankle,
-              ): -1.0,
+              ): -1.5,
               (
                   side: Right,
                   part: Knee,
@@ -386,15 +426,15 @@
               (
                   side: Right,
                   part: Heel,
-              ): 0.0,
+              ): 1.0,
               (
                   side: Right,
                   part: Wrist,
-              ): 0.0,
+              ): 0.5,
               (
                   side: Left,
                   part: Elbow,
-              ): 0.0,
+              ): -0.25,
               (
                   side: Left,
                   part: Knee,
@@ -402,11 +442,11 @@
               (
                   side: Left,
                   part: Heel,
-              ): -2.0,
+              ): -1.5,
               (
                   side: Left,
                   part: Wrist,
-              ): 0.0,
+              ): 0.5,
               (
                   side: Right,
                   part: Toes,
@@ -435,7 +475,7 @@
           ),
           (
               limb: LeftFoot,
-              weight: 1.0,
+              weight: 10.0,
               angle: -57,
               tolerance: 0,
           ),
@@ -465,8 +505,8 @@
           ),
           (
               limb: RightFoot,
-              weight: 1.0,
-              angle: -28,
+              weight: 10.0,
+              angle: 35,
               tolerance: 0,
           ),
           (
@@ -494,7 +534,7 @@
               tolerance: 0,
           ),
       ],
-      x_shift: -0.05,
+      // x_shift: -0.05,
       y_shift: -0.05,
       turn_hip: -19,
       z: (
@@ -502,23 +542,23 @@
               (
                   side: Right,
                   part: Heel,
-              ): -2.0,
+              ): -1.5,
               (
                   side: Left,
                   part: Heel,
-              ): 0.0,
+              ): 1.0,
               (
                   side: Right,
                   part: Wrist,
-              ): 0.0,
+              ): 0.5,
               (
                   side: Right,
                   part: Ankle,
-              ): -1.0,
+              ): -1.5,
               (
                   side: Right,
                   part: Elbow,
-              ): 0.0,
+              ): -0.25,
               (
                   side: Left,
                   part: Knee,
@@ -526,7 +566,7 @@
               (
                   side: Left,
                   part: Ankle,
-              ): 0.0,
+              ): 1.0,
               (
                   side: Right,
                   part: Knee,
@@ -538,11 +578,11 @@
               (
                   side: Left,
                   part: Elbow,
-              ): 0.0,
+              ): -0.25,
               (
                   side: Left,
                   part: Wrist,
-              ): 0.0,
+              ): 0.5,
               (
                   side: Right,
                   part: Toes,

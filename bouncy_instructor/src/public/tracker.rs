@@ -11,6 +11,7 @@ use super::renderable::RenderableSkeleton;
 use super::wrapper::skeleton_wrapper::SkeletonWrapper;
 use crate::intern::dance_detector::{DanceDetector, DetectionState};
 use crate::intern::skeleton_3d::{Direction, Skeleton3d};
+use crate::intern::teacher::Teacher;
 use crate::intern::tracker_dance_collection::{ForeignCollectionError, TrackerDanceCollection};
 use crate::keypoints::{Cartesian3d, Keypoints};
 use crate::skeleton::{Cartesian2d, Skeleton};
@@ -64,6 +65,17 @@ impl Tracker {
         Tracker {
             db: db.into(),
             detector: DanceDetector::new(target_step, tracked_beats),
+            ..Default::default()
+        }
+    }
+
+    pub(crate) fn new_from_teacher(
+        db: impl Into<Rc<TrackerDanceCollection>>,
+        teacher: Teacher,
+    ) -> Self {
+        Tracker {
+            db: db.into(),
+            detector: DanceDetector::new_from_teacher(teacher),
             ..Default::default()
         }
     }
