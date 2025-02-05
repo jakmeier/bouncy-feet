@@ -153,6 +153,32 @@
       ]
     ),
     (
+      // like v-closed but legs further apart and arms lower
+      id: "v-closed-2",
+      names: {"de": "TODO", "en": "TODO"},
+      direction: Front,
+      limbs: [
+        (limb: LeftThigh, angle: -10, tolerance: 5, weight: 0.25),
+        (limb: LeftShin, angle: -10, tolerance: 5, weight: 0.25),
+        (limb: LeftFoot, angle: 60, tolerance: 15, weight: 1.0),
+        (limb: RightThigh, angle: 10, tolerance: 5, weight: 0.25),
+        (limb: RightShin, angle: 10, tolerance: 5, weight: 0.25),
+        (limb: RightFoot, angle: -60, tolerance: 15, weight: 1.0),
+        (limb: RightArm, angle: 35, tolerance: 0, weight: 0.0),
+        (limb: RightForearm, angle: 17, tolerance: 0, weight: 0.0),
+        (limb: LeftArm, angle: -36, tolerance: 0, weight: 0.0),
+        (limb: LeftForearm, angle: -21, tolerance: 0, weight: 0.0),
+      ],
+      z: (
+        absolute: {
+          (side: Right, part: Elbow): -0.25,
+          (side: Right, part: Wrist): 0.5,
+          (side: Left, part: Elbow): -0.25,
+          (side: Left, part: Wrist): 0.5,
+        },
+      ),
+    ),
+    (
       id: "pendulum-right",
       names: {"de": "TODO", "en": "TODO"},
       direction: Front,
@@ -563,7 +589,7 @@
           (
               limb: LeftFoot,
               weight: 1.0,
-              angle: 41,
+              angle: -41,
               tolerance: 0,
           ),
           (
@@ -621,7 +647,7 @@
               tolerance: 0,
           ),
       ],
-      x_shift: 0.05,
+      // x_shift: 0.05,
       y_shift: -0.05,
       turn_hip: 10,
       z: (
@@ -629,15 +655,15 @@
               (
                   side: Right,
                   part: Ankle,
-              ): 0.0,
+              ): 1.0,
               (
                   side: Right,
                   part: Elbow,
-              ): 0.0,
+              ): -0.25,
               (
                   side: Left,
                   part: Ankle,
-              ): -1.0,
+              ): -1.5,
               (
                   side: Right,
                   part: Knee,
@@ -649,15 +675,15 @@
               (
                   side: Right,
                   part: Heel,
-              ): 0.0,
+              ): 1.0,
               (
                   side: Right,
                   part: Wrist,
-              ): 0.0,
+              ): 0.5,
               (
                   side: Left,
                   part: Elbow,
-              ): 0.0,
+              ): -0.25,
               (
                   side: Left,
                   part: Knee,
@@ -665,11 +691,11 @@
               (
                   side: Left,
                   part: Heel,
-              ): -2.0,
+              ): -1.5,
               (
                   side: Left,
                   part: Wrist,
-              ): 0.0,
+              ): 0.5,
               (
                   side: Right,
                   part: Toes,
@@ -729,7 +755,7 @@
           (
               limb: RightFoot,
               weight: 1.0,
-              angle: -28,
+              angle: 35,
               tolerance: 0,
           ),
           (
@@ -757,7 +783,7 @@
               tolerance: 0,
           ),
       ],
-      x_shift: -0.05,
+      // x_shift: -0.05,
       y_shift: -0.05,
       turn_hip: -19,
       z: (
@@ -765,23 +791,23 @@
               (
                   side: Right,
                   part: Heel,
-              ): -2.0,
+              ): -1.5,
               (
                   side: Left,
                   part: Heel,
-              ): 0.0,
+              ): 1.0,
               (
                   side: Right,
                   part: Wrist,
-              ): 0.0,
+              ): 0.5,
               (
                   side: Right,
                   part: Ankle,
-              ): -1.0,
+              ): -1.5,
               (
                   side: Right,
                   part: Elbow,
-              ): 0.0,
+              ): -0.25,
               (
                   side: Left,
                   part: Knee,
@@ -789,7 +815,7 @@
               (
                   side: Left,
                   part: Ankle,
-              ): 0.0,
+              ): 1.0,
               (
                   side: Right,
                   part: Knee,
@@ -801,11 +827,11 @@
               (
                   side: Left,
                   part: Elbow,
-              ): 0.0,
+              ): -0.25,
               (
                   side: Left,
                   part: Wrist,
-              ): 0.0,
+              ): 0.5,
               (
                   side: Right,
                   part: Toes,

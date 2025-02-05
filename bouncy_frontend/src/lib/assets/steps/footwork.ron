@@ -102,5 +102,24 @@
         ),
       ],
     ),
+    (
+    id: "step-469617-2",
+    name: "v-step-back",
+    keyframes: [
+        (pose: "v-closed-2", orientation: ToCamera, pivot: (side: Left, part: Heel)),
+        (
+          pose: "pose-26b8821b",
+          orientation: ToCamera,
+          pivot: (side: Right, part: Heel),
+        ),
+        (pose: "v-closed-2", orientation: ToCamera, pivot: (side: Right, part: Heel)),
+        (
+          // step back right
+          pose: "pose-935c410d",
+          orientation: ToCamera,
+          pivot: (side: Left, part: Heel),
+        ),
+      ],
+    ),
   ]
 )
