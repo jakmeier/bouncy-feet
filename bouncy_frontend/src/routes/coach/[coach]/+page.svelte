@@ -84,6 +84,19 @@
   {/each}
 </div>
 
+<!-- WIP -->
+<div class="train">
+  Train
+
+  <div class="link">
+    <a href="../../courses/{course.id}/exercise/-1/record">
+      <button class="light">
+        {$t('courses.course-overview.start-lesson')}
+      </button>
+    </a>
+  </div>
+</div>
+
 <style>
   .ol {
     display: flex;
@@ -107,8 +120,18 @@
     padding: 10px;
     text-align: center;
   }
+  .train {
+    box-shadow: 0 0 4px 2px var(--theme-main);
+    background-color: var(--theme-neutral-light);
+    padding: 5px 10px;
+    max-width: 400px;
+    font-size: 30px;
+    margin: 30px auto;
+    text-align: center;
+  }
   button {
     margin: 10px;
     height: min-content;
+    min-width: 160px;
   }
 </style>
