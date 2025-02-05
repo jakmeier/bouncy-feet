@@ -5,7 +5,7 @@
     setBeatStart,
     setBpm,
     beatStart,
-    timeBetweenMoves,
+    beatDuration,
   } from '$lib/stores/Beat';
   import Button from '../ui/Button.svelte';
   import Header from '../ui/Header.svelte';
@@ -69,7 +69,7 @@
       size={200}
       accentColor={!useFixedBpm}
       start={$beatStart}
-      timeBetweenBeats={$timeBetweenMoves}
+      timeBetweenBeats={$beatDuration}
     >
       {useFixedBpm
         ? $t('record.bpm-fixed-button')

@@ -12,6 +12,10 @@ export const timeBetweenMoves = derived([bpm, halfSpeed], ([$bpm, $halfSpeed]) =
     return ($halfSpeed ? 60_000 : 30_000) / $bpm;
 })
 
+export const beatDuration = derived([bpm], ([$bpm]) => {
+    return 60_000 / $bpm;
+})
+
 export let beatCounter = dynamicCounter(-1, 1, 100);
 
 let once = false;
