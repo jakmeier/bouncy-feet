@@ -724,7 +724,7 @@
           ),
           (
               limb: LeftFoot,
-              weight: 1.0,
+              weight: 10.0,
               angle: -57,
               tolerance: 0,
           ),
@@ -754,7 +754,7 @@
           ),
           (
               limb: RightFoot,
-              weight: 1.0,
+              weight: 10.0,
               angle: 35,
               tolerance: 0,
           ),
