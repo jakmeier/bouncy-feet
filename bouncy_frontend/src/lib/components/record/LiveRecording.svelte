@@ -103,7 +103,8 @@
   /** @type {import('svelte/store').Writable<number>} */
   let videoSrcHeight = writable(150);
 
-  let lastSuccessSkeletonSize = 1.0;
+  let lastDetectedSkeletonSize = 1.0;
+  $: instructorSkeletonSize = Math.min(lastDetectedSkeletonSize, 2.0);
   let lastSuccessSkeletonOrigin = new Cartesian2d(0.0, 0.0);
   /** @type {LimbError[]} */
   let worstLimbs = [];
@@ -192,9 +193,15 @@
     if (result.landmarks && result.landmarks.length >= 1) {
       landmarks = result.landmarks[0];
       const kp = landmarksToKeypoints(result.landmarks[0]);
-      if (kp.fullyVisible || $detectionState !== DetectionState.Positioning) {
+      const fullyVisible = kp.fullyVisible;
+      if (fullyVisible || $detectionState !== DetectionState.Positioning) {
         tracker.addKeypoints(kp, timestamp);
         recordingEnd = timestamp;
+
+        if (fullyVisible) {
+          lastDetectedSkeletonSize =
+            distance2d(landmarks[I.LEFT_SHOULDER], landmarks[I.LEFT_HIP]) * 6;
+        }
       } else if (lastAudioHint + audioHintDelay < performance.now()) {
         lastAudioHint = performance.now();
         scheduleAudioOnChannel('take-position', lastAudioHint, 'audio-guide');
@@ -220,8 +227,6 @@
       // scheduleAudioOnChannel('mistake', soundTimestamp, 'live-feedback');
       lastPoseWasCorrect = false;
     }
-    lastSuccessSkeletonSize =
-      distance2d(landmarks[I.LEFT_SHOULDER], landmarks[I.LEFT_HIP]) * 6;
     const hip = tracker.hipPosition(recordingEnd || 0);
     lastSuccessSkeletonOrigin = new Cartesian2d(hip.x - 0.5, hip.y - 0.5);
 
@@ -304,7 +309,7 @@
         <InstructorAvatar
           width={$videoSrcWidth}
           height={$videoSrcHeight}
-          avatarSize={lastSuccessSkeletonSize}
+          avatarSize={instructorSkeletonSize}
           skeleton={instructorSkeleton}
           bodyShift={instructorSkeletonBodyShift}
           origin={lastSuccessSkeletonOrigin}
