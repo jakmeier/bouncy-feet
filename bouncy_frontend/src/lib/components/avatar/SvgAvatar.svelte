@@ -7,7 +7,7 @@
   export let skeleton;
   export let width = 100;
   export let height = 100;
-  export let lineWidth = Math.max(width, height) * 0.05;
+  export let lineWidth = 0;
   export let bodyShift = { x: 0, y: 0 };
   export let avatarSize = 1.0;
   /** @type LimbError[] */
@@ -17,8 +17,16 @@
 
   /** @type {AvatarColoring} */
   export let style = MAIN_THEME_COLORING;
-  export let headRadius = Math.min(height, width) * avatarSize * 0.055;
+  export let headRadius = 0;
   export let headHeight = 1.0;
+
+  $: displayedLineWidth = lineWidth
+    ? lineWidth
+    : Math.max(width, height) * 0.05;
+
+  $: displayedHeadRadius = headRadius
+    ? headRadius
+    : Math.min(height, width) * avatarSize * 0.055;
 
   /**
    * @param {number} s
@@ -56,9 +64,9 @@
 <SvgAvatar2
   {avatarSizePixels}
   skeleton={renderedSkeleton}
-  {lineWidth}
+  lineWidth={displayedLineWidth}
   {markedSegments}
-  {headRadius}
+  headRadius={displayedHeadRadius}
   {headHeight}
   {style}
 />

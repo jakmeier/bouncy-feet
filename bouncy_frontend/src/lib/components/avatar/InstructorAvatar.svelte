@@ -43,9 +43,6 @@
   // let animationDelay = $timeBetweenMoves - animationTime;
   let animationDelay = 0;
 
-  $: avatarLineWidth = 6 * avatarSize;
-  $: correctAvatarLineWidth = 10 * avatarSize;
-
   /** @type {import("$lib/instructor/bouncy_instructor").Skeleton | null} */
   let prevSkeleton = null;
   /** @type {import('$lib/instructor/bouncy_instructor').Cartesian2d | null} */
@@ -57,7 +54,6 @@
   let correctBodyShift = null;
 
   let displayedStyle = instructorStyle;
-  let displayedLineWidth = avatarLineWidth;
   let displayedSkeleton = skeleton;
   let displayedBodyShift = bodyShift;
 
@@ -79,13 +75,11 @@
 
   function displayCorrectPosition() {
     displayedStyle = CORRECT_COLORING;
-    displayedLineWidth = correctAvatarLineWidth;
     displayedBodyShift = correctBodyShift || bodyShift;
     setTimeout(() => {
       // TODO: handle reentrance
       animationDelay = $timeBetweenMoves - animationTime - showCorrectTime;
       displayedStyle = instructorStyle;
-      displayedLineWidth = avatarLineWidth;
       displayedBodyShift = bodyShift;
       displayedSkeleton = skeleton;
     }, showCorrectTime);
@@ -106,7 +100,6 @@
         {height}
         {avatarSize}
         style={displayedStyle}
-        lineWidth={avatarLineWidth}
         bodyShift={displayedBodyShift.add(origin)}
       ></SvgAvatar>
     </Svg>

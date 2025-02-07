@@ -5,10 +5,7 @@
   import { getContext, onMount } from 'svelte';
   import BackgroundTask from '$lib/components/BackgroundTask.svelte';
   import PoseReview from './PoseReview.svelte';
-  import {
-    LEFT_RIGHT_COLORING_LIGHT,
-    MAIN_THEME_COLORING,
-  } from '$lib/constants';
+  import { LEFT_RIGHT_COLORING } from '$lib/constants';
   import {
     LimbError,
     PoseApproximation,
@@ -38,7 +35,6 @@
       : 100;
 
   let tracker = getContext('tracker').tracker;
-  const rightAvatarLineWidth = 5;
 
   /** @type {HTMLVideoElement} */
   let reviewVideoElement;
@@ -277,7 +273,7 @@ once per 250ms. -->
               skeleton={keypointSkeleton}
               {avatarSizePixels}
               lineWidth={3}
-              style={LEFT_RIGHT_COLORING_LIGHT}
+              style={LEFT_RIGHT_COLORING}
               {headRadius}
               {markedSegments}
             />
@@ -295,10 +291,9 @@ once per 250ms. -->
           showOverflow
         >
           <SvgAvatar2
-            lineWidth={rightAvatarLineWidth}
             skeleton={keypointSkeleton}
             {avatarSizePixels}
-            style={MAIN_THEME_COLORING}
+            style={LEFT_RIGHT_COLORING}
             {headRadius}
             {markedSegments}
           />
@@ -368,6 +363,7 @@ once per 250ms. -->
     border-radius: 10px;
     box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.55);
     text-align: center;
+    background-color: var(--theme-neutral-light);
   }
 
   .beat-label {
