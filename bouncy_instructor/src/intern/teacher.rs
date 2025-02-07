@@ -1,6 +1,8 @@
 use crate::skeleton::Cartesian2d;
 use crate::StepInfo;
 
+use super::step_pace::StepPace;
+
 /// Dynamically switch between steps, switch between views for showing the next
 /// step and going back to full camera mode for dancers to see themselves.
 #[derive(Default)]
@@ -9,64 +11,79 @@ pub(crate) struct Teacher {
 }
 
 enum Section {
-    Step { step: StepInfo, beats: u32 },
-    Freestyle { beats: u32 },
-    // more for later:
-    //     speed per section
+    Step {
+        step: StepInfo,
+        subbeats: u32,
+        pace: StepPace,
+    },
+    Freestyle {
+        subbeats: u32,
+    },
 }
 
 impl Teacher {
-    pub(crate) fn add_step(&mut self, step: StepInfo, beats: u32) {
-        self.sections.push(Section::Step { step, beats });
+    pub(crate) fn add_step(&mut self, step: StepInfo, beats: u32, pace: StepPace) {
+        assert_ne!(beats, 0);
+        self.sections.push(Section::Step {
+            step,
+            subbeats: beats * 2,
+            pace,
+        });
     }
 
     pub(crate) fn add_freestyle(&mut self, beats: u32) {
-        self.sections.push(Section::Freestyle { beats });
+        assert_ne!(beats, 0);
+        self.sections.push(Section::Freestyle {
+            subbeats: beats * 2,
+        });
     }
 
-    /// After n beats of the lesson, get the current step and beat remainder.
-    pub(crate) fn step_at_beat(&self, mut beat: u32) -> Option<(&StepInfo, u32)> {
+    /// After n subbeats of the lesson, get the current step and beat remainder.
+    ///
+    /// Full beat: only count 1,2,3,4 (used for bpm calculation)
+    /// Sub beat: also count the "and" between
+    pub(crate) fn step_at_subbeat(&self, mut subbeat: u32) -> Option<(&StepInfo, u32)> {
         for section in &self.sections {
-            if beat < section.beats() {
+            if subbeat < section.subbeats() {
                 match &section {
-                    Section::Step { step, .. } => {
-                        return Some((step, beat));
+                    Section::Step { step, pace, .. } => {
+                        return Some((step, pace.pose_at_subbeat(subbeat)));
                     }
                     Section::Freestyle { .. } => {
                         return None;
                     }
                 }
             }
-            beat -= section.beats();
+            subbeat -= section.subbeats();
         }
         None
     }
 
     /// How far the body position has moved from the origin at a specific beat.
-    pub(crate) fn pose_body_shift_at_beat(&self, mut beat: u32) -> Cartesian2d {
+    pub(crate) fn pose_body_shift_at_subbeat(&self, mut subbeat: u32) -> Cartesian2d {
         let mut shift = Cartesian2d::default();
         for section in &self.sections {
-            let beats_on_step = u32::min(section.beats(), beat);
+            let beats_on_step = u32::min(section.subbeats(), subbeat);
             shift = shift + section.body_shift(beats_on_step);
-            if beat < section.beats() {
+            if subbeat < section.subbeats() {
                 break;
             }
-            beat -= section.beats();
+            subbeat -= section.subbeats();
         }
         shift
     }
 
     /// How many beats to track for
-    pub(crate) fn tracked_beats(&self) -> u32 {
-        self.sections.iter().map(|section| section.beats()).sum()
+    pub(crate) fn tracked_subbeats(&self) -> u32 {
+        self.sections.iter().map(|section| section.subbeats()).sum()
     }
 }
 
 impl Section {
-    fn beats(&self) -> u32 {
+    fn subbeats(&self) -> u32 {
         match self {
-            Section::Step { beats, .. } => *beats,
-            Section::Freestyle { beats } => *beats,
+            Section::Step { subbeats, .. } => *subbeats,
+            Section::Freestyle { subbeats } => *subbeats,
         }
     }
 

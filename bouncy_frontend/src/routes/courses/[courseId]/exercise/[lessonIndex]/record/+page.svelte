@@ -9,7 +9,7 @@
   import LessonEndResults from './LessonEndResults.svelte';
   import VideoReview from '$lib/components/review/VideoReview.svelte';
   import Audio from '$lib/components/BeatAudio.svelte';
-  import { registerTracker, setHalfSpeed } from '$lib/stores/Beat';
+  import { registerTracker } from '$lib/stores/Beat';
   import Button from '$lib/components/ui/Button.svelte';
   import { writable } from 'svelte/store';
   import LessonEnd from './LessonEnd.svelte';
@@ -141,7 +141,6 @@
       tracker = course.trainingTracker();
     }
     if (tracker) {
-      setHalfSpeed(tracker.halfSpeed);
       registerTracker(tracker);
     } else {
       console.error('could not construct tracker for lesson');

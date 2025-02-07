@@ -150,8 +150,9 @@
           const future = performance.now() + animationTime;
           let newBeat = tracker.beat(future);
           if (newBeat !== currentBeat) {
-            instructorSkeleton = tracker.poseSkeletonAtBeat(newBeat);
-            instructorSkeletonBodyShift = tracker.poseBodyShiftAtBeat(newBeat);
+            instructorSkeleton = tracker.poseSkeletonAtSubbeat(newBeat);
+            instructorSkeletonBodyShift =
+              tracker.poseBodyShiftAtSubbeat(newBeat);
             currentBeat = newBeat;
           }
         } else if (before === 0 && !firstPoseIsShown) {
@@ -230,7 +231,7 @@
     const hip = tracker.hipPosition(recordingEnd || 0);
     lastSuccessSkeletonOrigin = new Cartesian2d(hip.x - 0.5, hip.y - 0.5);
 
-    const target = tracker.trackedBeats;
+    const target = tracker.trackedSubbeats;
     progress = Math.min(tracker.numDetectedPoses() / target, 1.0);
   }
 

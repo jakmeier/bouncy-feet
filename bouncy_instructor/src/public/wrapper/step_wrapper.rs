@@ -197,10 +197,10 @@ impl StepWrapper {
         self.info_unchecked().variation()
     }
 
-    /// The number of beats the step takes for one repetition.
+    /// The number of subbeats the step takes for one repetition.
     #[wasm_bindgen(getter)]
-    pub fn beats(&self) -> usize {
-        self.info_unchecked().beats()
+    pub fn subbeats(&self) -> usize {
+        self.info_unchecked().num_poses()
     }
 
     /// Look up poses from the global collection, do not use for courses that

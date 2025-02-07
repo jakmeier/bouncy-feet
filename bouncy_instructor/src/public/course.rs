@@ -1,6 +1,7 @@
 use super::parsing;
 use super::parsing::ParseFileError;
 use crate::intern::content_collection::ContentCollection;
+use crate::intern::step_pace::StepPace;
 use crate::intern::teacher::Teacher;
 use crate::intern::tracker_dance_collection::TrackerDanceCollection;
 use crate::wrapper::step_wrapper::StepWrapper;
@@ -93,13 +94,13 @@ impl Course {
 
         let mut teacher = Teacher::default();
         for step in steps {
-            // WIP: 16 beats per step, why not
-            teacher.add_step(step.info(&db), 16);
+            // WIP: hard coding this for testing
+            teacher.add_step(step.info(&db), 8, StepPace::quarter_speed());
+            teacher.add_step(step.info(&db), 8, StepPace::half_speed());
+            teacher.add_step(step.info(&db), 8, StepPace::normal());
         }
 
-        let mut tracker = Tracker::new_from_teacher(db, teacher);
-        tracker.detector.half_speed = false;
-        tracker
+        Tracker::new_from_teacher(db, teacher)
     }
 }
 
@@ -142,10 +143,7 @@ impl Lesson {
             .clone();
         // TODO: make this number configurable
         let target_step = Some(first_step.info(&db).clone());
-        let mut tracker = Tracker::new(db, target_step, Some(20));
-        // TODO: make half speed property configurable
-        tracker.detector.half_speed = true;
-        tracker
+        Tracker::new(db, target_step, Some(8))
     }
 }
 

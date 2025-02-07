@@ -84,10 +84,10 @@ impl DanceWrapper {
         self.info().skeleton(beat)
     }
 
-    /// The number of beats the dance takes for one repetition.
+    /// The number of subbeats the dance takes for one repetition.
     #[wasm_bindgen(getter)]
-    pub fn beats(&self) -> usize {
-        self.info().total_beats
+    pub fn subbeats(&self) -> usize {
+        self.info().total_subbeats
     }
 
     /// How much the body position deviates from the origin.

@@ -41,7 +41,7 @@
   $: lineWidth = selectLineWidth(width);
 
   let firstDancedBeat = Infinity;
-  const dancedBeats = (entryDance?.beats || 0) * entryDanceRepetitions;
+  const dancedBeats = (entryDance?.subbeats || 0) * entryDanceRepetitions;
   $: $beat, updateSkeleton();
 
   function updateSkeleton() {

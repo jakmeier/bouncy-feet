@@ -42,8 +42,8 @@ impl StepInfo {
     }
 
     /// How much the body position deviates from the origin.
-    pub fn body_shift(&self, beat: usize) -> Cartesian2d {
-        self.body_shift.at_beat(beat)
+    pub fn body_shift(&self, subbeat: usize) -> Cartesian2d {
+        self.body_shift.at_subbeat(subbeat)
     }
 
     /// Applies a rotation (in degree) and returns the resulting skelton.
@@ -76,8 +76,8 @@ impl StepInfo {
         self.step_variation.clone()
     }
 
-    /// The number of beats the step takes for one repetition.
-    pub fn beats(&self) -> usize {
+    /// The number of poses the step takes for one repetition.
+    pub fn num_poses(&self) -> usize {
         self.skeletons.len()
     }
 }

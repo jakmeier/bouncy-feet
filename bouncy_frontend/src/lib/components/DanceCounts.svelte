@@ -11,24 +11,24 @@
 
   let innerWidth = 300;
 
-  $: beats = dance.beats;
+  $: subbeat = dance.subbeats;
   $: poseWidth = innerWidth / 8;
   /** @type {number[]} */
   $: stepTransitions = dance.steps().reduce(
     (acc, step) => {
       const prev = acc.length === 0 ? 0 : acc[acc.length - 1];
-      acc.push(prev + step.beats);
+      acc.push(prev + step.subbeats);
       return acc;
     },
     /** @type {number[]} */
     []
   );
 
-  function count(beat) {
-    if (beat % 2 === 1) {
+  function count(subbeat) {
+    if (subbeat % 2 === 1) {
       return '+';
     } else {
-      return (beat % 8) / 2 + 1;
+      return (subbeat % 8) / 2 + 1;
     }
   }
 
@@ -38,7 +38,7 @@
 </script>
 
 <div class="poses" bind:clientWidth={innerWidth}>
-  {#each { length: beats } as _, beat}
+  {#each { length: subbeat } as _, beat}
     <!-- <Pose /> -->
     <div
       class="pose"
@@ -52,7 +52,7 @@
         }
       }}
     >
-      <div class="count" class:marked={beat === markedPoseIndex % beats}>
+      <div class="count" class:marked={beat === markedPoseIndex % subbeat}>
         {count(beat)}
       </div>
       {#if stepTransitions.includes(beat)}

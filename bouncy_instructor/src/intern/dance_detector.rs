@@ -7,6 +7,7 @@ use crate::{DetectionFailureReason, DetectionResult, PoseHint, StepInfo};
 
 use super::pose::PoseDirection;
 use super::skeleton_3d::Skeleton3d;
+use super::step_pace::StepPace;
 use super::teacher::Teacher;
 use super::tracker_dance_collection::TrackerDanceCollection;
 
@@ -18,7 +19,6 @@ type Timestamp = f64;
 pub(crate) struct DanceDetector {
     // config
     pub(crate) bpm: f32,
-    pub(crate) half_speed: bool,
     pub(crate) error_threshold: f32,
     /// When this is set, pose detection happens on the beat only.
     pub(crate) beat_alignment: Option<Timestamp>,
@@ -72,7 +72,6 @@ impl Default for DanceDetector {
     fn default() -> Self {
         Self {
             bpm: 120.0,
-            half_speed: false,
             error_threshold: 0.05,
             detected: DetectionResult::default(),
             beat_alignment: None,
@@ -103,8 +102,8 @@ impl DanceDetector {
         let mut teacher = Teacher::default();
 
         if let Some(step) = target_step {
-            let beats = tracked_beats.unwrap_or_else(|| step.beats() as u32);
-            teacher.add_step(step, beats);
+            let subbeats = tracked_beats.unwrap_or_else(|| step.num_poses() as u32);
+            teacher.add_step(step, subbeats, StepPace::half_speed());
         } else {
             let beats = tracked_beats.unwrap_or(64);
             teacher.add_freestyle(beats);
@@ -142,7 +141,7 @@ impl DanceDetector {
                 self.transition_to_state(DetectionState::Positioning, now);
             }
             DetectionState::Positioning => {
-                if let Some((target, _)) = self.teacher.step_at_beat(0) {
+                if let Some((target, _)) = self.teacher.step_at_subbeat(0) {
                     if let Some(skeleton) = skeletons.last() {
                         let resting_pose_idx = if target.skeleton(0).sideway {
                             db.pose_by_id("standing-straight-side")
@@ -161,7 +160,7 @@ impl DanceDetector {
             }
             DetectionState::CountDown => {
                 let time_between_poses = self.time_between_poses();
-                if now > self.detection_state_start + (time_between_poses * 8.0).floor() {
+                if now > self.detection_state_start + (time_between_poses * 15.0).floor() {
                     // the change to the next state must happen BEFORE it
                     // actually starts, to give time to the animation
                     let actual_start = self.next_pose_time(now + time_between_poses);
@@ -176,7 +175,7 @@ impl DanceDetector {
                         .with_failure_reason(DetectionFailureReason::NoNewData);
                 }
                 self.last_evaluation = now;
-                if self.num_detected_poses() as u32 >= self.teacher.tracked_beats() {
+                if self.num_detected_poses() as u32 >= self.teacher.tracked_subbeats() {
                     self.transition_to_state(DetectionState::TrackingDone, now);
                 }
 
@@ -233,7 +232,7 @@ impl DanceDetector {
         }
 
         let beat = num_detected_poses as u32;
-        let (step_id, beat_remainder) = match self.tracked_step_with_beat_count(beat) {
+        let (step_id, beat_remainder) = match self.tracked_step_with_remainder(beat) {
             Some((step, beat_remainder)) => (step.id(), beat_remainder),
             None => {
                 // TODO: To support freestyle, this should match against any step
@@ -336,21 +335,21 @@ impl DanceDetector {
         full + partial
     }
 
-    /// Returns the tracked step for a given beat after tracking started.
-    pub(crate) fn tracked_step(&self, beat: u32) -> Option<&StepInfo> {
-        self.teacher.step_at_beat(beat).map(|inner| inner.0)
+    /// Returns the tracked step for a given subbeat after tracking started.
+    pub(crate) fn tracked_step(&self, subbeat: u32) -> Option<&StepInfo> {
+        self.teacher.step_at_subbeat(subbeat).map(|inner| inner.0)
     }
 
-    /// Returns the tracked step and beat for a given beat after tracking started.
-    pub(crate) fn tracked_step_with_beat_count(&self, beat: u32) -> Option<(&StepInfo, u32)> {
-        self.teacher.step_at_beat(beat)
+    /// Returns the tracked step and subbeat for a given subbeat after tracking started.
+    pub(crate) fn tracked_step_with_remainder(&self, subbeat: u32) -> Option<(&StepInfo, u32)> {
+        self.teacher.step_at_subbeat(subbeat)
     }
 
     pub(crate) fn add_pose(&mut self, pose: PoseApproximation) {
         self.detected.add_pose(pose);
         self.on_beat_candidates.clear();
-        let beat = self.num_detected_poses() as u32;
-        if let Some((target_step, _beat)) = &self.teacher.step_at_beat(beat) {
+        let subbeat = self.num_detected_poses() as u32;
+        if let Some((target_step, _beat)) = &self.teacher.step_at_subbeat(subbeat) {
             self.detected.match_step(target_step);
         }
     }
@@ -370,14 +369,10 @@ impl DanceDetector {
     }
 
     pub(crate) fn time_between_poses(&self) -> f64 {
-        if self.half_speed {
-            2.0 * 30_000.0 / self.bpm as f64
-        } else {
-            30_000.0 / self.bpm as f64
-        }
+        30_000.0 / self.bpm as f64
     }
 
-    pub(crate) fn timestamp_to_beat(&self, t: Timestamp) -> u32 {
+    pub(crate) fn timestamp_to_subbeat(&self, t: Timestamp) -> u32 {
         let t0 = self.next_pose_time(self.beat_alignment.unwrap_or(0.0));
         let pose_duration = self.time_between_poses();
         ((t - t0) / pose_duration).floor() as u32
@@ -397,15 +392,15 @@ impl DanceDetector {
         self.ui_events.add_audio(next_beat, "and".to_owned());
         self.ui_events.add_audio(next_beat + beat, "one".to_owned());
         self.ui_events
-            .add_audio(next_beat + 3.0 * beat, "two".to_owned());
+            .add_audio(next_beat + 5.0 * beat, "two".to_owned());
         self.ui_events
-            .add_audio(next_beat + 5.0 * beat, "one".to_owned());
+            .add_audio(next_beat + 9.0 * beat, "one".to_owned());
         self.ui_events
-            .add_audio(next_beat + 6.0 * beat, "two".to_owned());
+            .add_audio(next_beat + 11.0 * beat, "two".to_owned());
         self.ui_events
-            .add_audio(next_beat + 7.0 * beat, "three".to_owned());
+            .add_audio(next_beat + 13.0 * beat, "three".to_owned());
         self.ui_events
-            .add_audio(next_beat + 8.0 * beat, "four".to_owned());
+            .add_audio(next_beat + 15.0 * beat, "four".to_owned());
     }
 
     /// For debugging pruposes, set the state directly.

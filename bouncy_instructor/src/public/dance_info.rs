@@ -11,7 +11,7 @@ use crate::{StepInfo, STATE};
 pub struct DanceInfo {
     pub(crate) steps: Vec<StepInfo>,
     /// invariant: total_beats is the sum of all steps beat lengths
-    pub(crate) total_beats: usize,
+    pub(crate) total_subbeats: usize,
     body_shift: BodyShift,
 }
 
@@ -28,12 +28,12 @@ impl DanceInfo {
         if self.steps.is_empty() {
             return None;
         }
-        debug_assert!(self.total_beats > 0);
-        let mut offset = beat % self.total_beats;
+        debug_assert!(self.total_subbeats > 0);
+        let mut offset = beat % self.total_subbeats;
 
         for step in &self.steps {
-            if step.beats() <= offset {
-                offset -= step.beats();
+            if step.num_poses() <= offset {
+                offset -= step.num_poses();
             } else {
                 return Some(step.skeleton(offset));
             }
@@ -41,14 +41,14 @@ impl DanceInfo {
         unreachable!("must find a skeleton");
     }
 
-    /// The number of beats the dance takes for one repetition.
-    pub fn beats(&self) -> usize {
-        self.total_beats
+    /// The number of subbeats the dance takes for one repetition.
+    pub fn subbeats(&self) -> usize {
+        self.total_subbeats
     }
 
     /// How much the body position deviates from the origin.
     pub fn body_shift(&self, beat: usize) -> Cartesian2d {
-        self.body_shift.at_beat(beat)
+        self.body_shift.at_subbeat(beat)
     }
 }
 
@@ -67,11 +67,11 @@ impl From<&Dance> for DanceInfo {
                 steps.push(step_info);
             }
         });
-        let total_beats = steps.iter().map(|step| step.beats()).sum();
+        let total_subbeats = steps.iter().map(|step| step.num_poses()).sum();
 
         Self {
             steps,
-            total_beats,
+            total_subbeats,
             body_shift,
         }
     }

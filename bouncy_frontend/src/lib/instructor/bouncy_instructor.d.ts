@@ -242,9 +242,9 @@ export class DanceWrapper {
    */
   readonly id: string;
   /**
-   * The number of beats the dance takes for one repetition.
+   * The number of subbeats the dance takes for one repetition.
    */
-  readonly beats: number;
+  readonly subbeats: number;
 }
 /**
  * A step detected on a video feed, ready for JS code to render.
@@ -628,9 +628,9 @@ export class StepWrapper {
    */
   readonly variation: string;
   /**
-   * The number of beats the step takes for one repetition.
+   * The number of subbeats the step takes for one repetition.
    */
-  readonly beats: number;
+  readonly subbeats: number;
 }
 /**
  * A Tracker gathers skeletons over time and passes it on to a DanceDetector.
@@ -678,7 +678,7 @@ export class Tracker {
   runDetection(): DetectionResult;
   poseHint(): PoseHint;
   currentPoseError(): PoseApproximation | undefined;
-  nextHalfBeat(now?: number | null): number;
+  nextSubbeat(now?: number | null): number;
   nextAudioEffect(): AudioEffect | undefined;
   /**
    * Return a skeleton for a pose.
@@ -693,9 +693,9 @@ export class Tracker {
    */
   expectedPoseSkeleton(): Skeleton;
   beat(t: number): number;
-  poseSkeletonAtBeat(beat: number): Skeleton;
+  poseSkeletonAtSubbeat(subbeat: number): Skeleton;
   expectedPoseBodyShift(): Cartesian2d;
-  poseBodyShiftAtBeat(beat: number): Cartesian2d;
+  poseBodyShiftAtSubbeat(beat: number): Cartesian2d;
   numDetectedPoses(): number;
   hipPosition(timestamp: number): Cartesian3d;
   /**
@@ -717,10 +717,9 @@ export class Tracker {
   renderedKeypointsAt(timestamp: number, width: number, height: number): SkeletonV2 | undefined;
   devSetState(state: DetectionState, timestamp: number): void;
   readonly detectionState: ReadableDetectionState;
-  readonly trackedBeats: number;
+  readonly trackedSubbeats: number;
   readonly timeBetweenPoses: number;
   readonly lastDetection: DetectionResult;
-  readonly halfSpeed: boolean;
 }
 export class ZError {
   private constructor();
