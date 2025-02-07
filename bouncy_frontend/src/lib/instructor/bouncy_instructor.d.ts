@@ -715,6 +715,7 @@ export class Tracker {
    * The original keypoints rendered as skeleton, at the given time frame.
    */
   renderedKeypointsAt(timestamp: number, width: number, height: number): SkeletonV2 | undefined;
+  devSetState(state: DetectionState, timestamp: number): void;
   readonly detectionState: ReadableDetectionState;
   readonly trackedBeats: number;
   readonly timeBetweenPoses: number;

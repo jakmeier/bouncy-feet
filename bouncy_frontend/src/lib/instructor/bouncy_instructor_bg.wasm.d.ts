@@ -157,6 +157,7 @@ export const tracker_clear: (a: number) => void;
 export const tracker_currentPoseError: (a: number) => number;
 export const tracker_detectDance: (a: number) => number;
 export const tracker_detectionState: (a: number) => number;
+export const tracker_devSetState: (a: number, b: number, c: number) => void;
 export const tracker_enforceBeat: (a: number, b: number) => void;
 export const tracker_expectedPoseBodyShift: (a: number) => number;
 export const tracker_expectedPoseSkeleton: (a: number) => number;

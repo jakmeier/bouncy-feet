@@ -384,6 +384,11 @@ impl Tracker {
             .map(|skeleton_info| skeleton_info.keypoints_skeleton(width, height))
     }
 
+    #[wasm_bindgen(js_name = devSetState)]
+    pub fn dev_set_state(&mut self, state: DetectionState, timestamp: Timestamp) {
+        self.detector.dev_set_state(state, timestamp);
+    }
+
     #[wasm_bindgen(getter, js_name = halfSpeed)]
     pub fn half_speed(&self) -> bool {
         self.detector.half_speed

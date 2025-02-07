@@ -155,7 +155,6 @@ impl DanceDetector {
                         let error_details = resting_pose.skeleton_error(skeleton);
                         if error_details.error_score() < 0.05 {
                             self.transition_to_state(DetectionState::CountDown, now);
-                            self.emit_countdown_audio(now);
                         }
                     }
                 }
@@ -360,6 +359,14 @@ impl DanceDetector {
         self.detection_state = state;
         self.detection_state_start = t;
         self.detection_state_store.set(state);
+
+        match state {
+            DetectionState::Init => (),
+            DetectionState::Positioning => (),
+            DetectionState::CountDown => self.emit_countdown_audio(t),
+            DetectionState::LiveTracking => (),
+            DetectionState::TrackingDone => (),
+        }
     }
 
     pub(crate) fn time_between_poses(&self) -> f64 {
@@ -399,5 +406,10 @@ impl DanceDetector {
             .add_audio(next_beat + 7.0 * beat, "three".to_owned());
         self.ui_events
             .add_audio(next_beat + 8.0 * beat, "four".to_owned());
+    }
+
+    /// For debugging pruposes, set the state directly.
+    pub(crate) fn dev_set_state(&mut self, state: DetectionState, t: Timestamp) {
+        self.transition_to_state(state, t);
     }
 }

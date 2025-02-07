@@ -13,6 +13,8 @@
   import Button from '$lib/components/ui/Button.svelte';
   import { writable } from 'svelte/store';
   import LessonEnd from './LessonEnd.svelte';
+  import { dev } from '$lib/stores/FeatureSelection';
+  import DevUtility from '$lib/components/dev/DevUtility.svelte';
 
   const { getCourse } = getContext('courses');
   const { recordFinishedLesson, computeDanceStats, addDanceToStats } =
@@ -279,6 +281,10 @@
   <button class="light wide" on:click={closeStartExercisePopUp}>OK</button>
   <slot />
 </Popup>
+
+{#if $dev}
+  <DevUtility />
+{/if}
 
 <style>
   .outer {

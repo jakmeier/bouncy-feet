@@ -192,7 +192,7 @@
     if (result.landmarks && result.landmarks.length >= 1) {
       landmarks = result.landmarks[0];
       const kp = landmarksToKeypoints(result.landmarks[0]);
-      if (kp.fullyVisible) {
+      if (kp.fullyVisible || $detectionState !== DetectionState.Positioning) {
         tracker.addKeypoints(kp, timestamp);
         recordingEnd = timestamp;
       } else if (lastAudioHint + audioHintDelay < performance.now()) {
