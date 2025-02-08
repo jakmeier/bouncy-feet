@@ -145,7 +145,10 @@
           'tracker returned no next expected pose'
         );
       }
-      if ($detectionState === DetectionState.LiveTracking) {
+      if (
+        $detectionState === DetectionState.LiveTracking ||
+        $detectionState === DetectionState.InstructorDemo
+      ) {
         if (forceBeat) {
           const future = performance.now() + animationTime;
           let newBeat = tracker.beat(future);
@@ -290,9 +293,11 @@
   function updateView(state) {
     if (state === DetectionState.LiveTracking) {
       videoOpacity = 1.0;
+      enableLiveAvatar = true;
     }
     if (state === DetectionState.InstructorDemo) {
       videoOpacity = 0.0;
+      enableLiveAvatar = false;
     }
   }
 
@@ -309,6 +314,7 @@
     height="{height}px"
     borderWidth="{borderWidth}px"
     zIndex={0}
+    backgroundColor={"var(--theme-neutral-light)"}
   >
     <Camera
       {width}

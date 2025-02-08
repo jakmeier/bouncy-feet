@@ -479,9 +479,6 @@ export class Segment {
 export class Skeleton {
   private constructor();
   free(): void;
-  static resting(sideway: boolean): Skeleton;
-  restingPose(): Skeleton;
-  debugString(): string;
   /**
    * Compute 2d coordinates for the skeleton for rendering.
    *
@@ -490,6 +487,9 @@ export class Skeleton {
    * segment will have its center at the given position.
    */
   render(hip_center: Cartesian2d, size: number): SkeletonV2;
+  static resting(sideway: boolean): Skeleton;
+  restingPose(): Skeleton;
+  debugString(): string;
   left: SkeletonSide;
   right: SkeletonSide;
   hip: Segment;
@@ -641,8 +641,6 @@ export class StepWrapper {
  */
 export class Tracker {
   free(): void;
-  exportFrame(timestamp: number): ExportedFrame;
-  exportKeypoints(): string;
   /**
    * Create a tracker for all known steps.
    */
@@ -720,6 +718,8 @@ export class Tracker {
    */
   renderedKeypointsAt(timestamp: number, width: number, height: number): SkeletonV2 | undefined;
   devSetState(state: DetectionState, timestamp: number): void;
+  exportFrame(timestamp: number): ExportedFrame;
+  exportKeypoints(): string;
   readonly detectionState: ReadableDetectionState;
   readonly trackedSubbeats: number;
   readonly timeBetweenPoses: number;

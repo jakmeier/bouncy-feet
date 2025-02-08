@@ -22,6 +22,8 @@ pub(crate) struct DanceDetector {
     pub(crate) error_threshold: f32,
     /// When this is set, pose detection happens on the beat only.
     pub(crate) beat_alignment: Option<Timestamp>,
+    /// The timestamp of when the beat zero was.
+    pub(crate) beat_zero: Option<Timestamp>,
     /// Enforce that a pose is evaluated on beat, regardless of how well it matches.
     pub(crate) force_beat: bool,
     /// How much time before or after the actual beat a pose can be to be
@@ -77,6 +79,7 @@ impl Default for DanceDetector {
             error_threshold: 0.05,
             detected: DetectionResult::default(),
             beat_alignment: None,
+            beat_zero: None,
             force_beat: false,
             // TODO: should this depend on bpm and system info?
             beat_tolerance: 250.0,
@@ -128,6 +131,7 @@ impl DanceDetector {
         self.detected.failure_reason = None;
         self.detected.pose_matches = 0;
         self.detected.pose_misses = 0;
+        self.beat_zero = None;
         self.transition_to_state(DetectionState::Init, self.detection_state_start);
     }
 
@@ -163,9 +167,11 @@ impl DanceDetector {
             DetectionState::CountDown => {
                 let time_between_poses = self.time_between_poses();
                 if now > self.detection_state_start + (time_between_poses * 15.0).floor() {
+                    let beat_zero = self.next_pose_time(now);
+                    self.beat_zero = Some(beat_zero);
                     // the change to the next state must happen BEFORE it
                     // actually starts, to give time to the animation
-                    let actual_start = self.next_pose_time(now + time_between_poses);
+                    let actual_start = beat_zero + time_between_poses;
                     self.transition_to_state(DetectionState::LiveTracking, actual_start);
                 }
             }
@@ -185,7 +191,7 @@ impl DanceDetector {
 
                 // Change state to "InstructorDemo" if there is currently no tracking going on.
                 let subbeat = self.timestamp_to_subbeat(now);
-                if self.teacher.is_tracking_at_subbeat(subbeat) {
+                if !self.teacher.is_tracking_at_subbeat(subbeat) {
                     self.transition_to_state(DetectionState::InstructorDemo, now);
                 }
 
@@ -390,7 +396,9 @@ impl DanceDetector {
     }
 
     pub(crate) fn timestamp_to_subbeat(&self, t: Timestamp) -> u32 {
-        let t0 = self.next_pose_time(self.beat_alignment.unwrap_or(0.0));
+        let t0 = self
+            .beat_zero
+            .unwrap_or(self.beat_alignment.unwrap_or(self.next_pose_time(0.0)));
         let pose_duration = self.time_between_poses();
         ((t - t0) / pose_duration).floor() as u32
     }

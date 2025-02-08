@@ -98,8 +98,8 @@ impl Teacher {
     pub(crate) fn is_tracking_at_subbeat(&self, subbeat: u32) -> bool {
         self.section_at_subbeat(subbeat)
             .map(|section| match &section {
-                Section::Step(_) | Section::Freestyle { .. } => false,
-                Section::ShowStep(_) => true,
+                Section::Step(_) | Section::Freestyle { .. } => true,
+                Section::ShowStep(_) => false,
             })
             .unwrap_or_default()
     }
