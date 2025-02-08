@@ -63,9 +63,11 @@ pub enum DetectionState {
     CountDown = 3,
     /// Tracking current movements.
     LiveTracking = 4,
+    /// The instructor is showing the next moving.
+    InstructorDemo = 5,
     /// No longer tracking but the results of the previous tracking are
     /// available.
-    TrackingDone = 5,
+    TrackingDone = 6,
 }
 
 impl Default for DanceDetector {
@@ -174,9 +176,17 @@ impl DanceDetector {
                         .clone()
                         .with_failure_reason(DetectionFailureReason::NoNewData);
                 }
+
+                // Finish once enough poses were found-
                 self.last_evaluation = now;
                 if self.num_detected_poses() as u32 >= self.teacher.tracked_subbeats() {
                     self.transition_to_state(DetectionState::TrackingDone, now);
+                }
+
+                // Change state to "InstructorDemo" if there is currently no tracking going on.
+                let subbeat = self.timestamp_to_subbeat(now);
+                if self.teacher.is_tracking_at_subbeat(subbeat) {
+                    self.transition_to_state(DetectionState::InstructorDemo, now);
                 }
 
                 if let Some(skeleton) = skeletons.last() {
@@ -186,6 +196,12 @@ impl DanceDetector {
                         .detected
                         .clone()
                         .with_failure_reason(DetectionFailureReason::NoData);
+                }
+            }
+            DetectionState::InstructorDemo => {
+                let subbeat = self.timestamp_to_subbeat(now);
+                if self.teacher.is_tracking_at_subbeat(subbeat) {
+                    self.transition_to_state(DetectionState::LiveTracking, now);
                 }
             }
             DetectionState::TrackingDone => (),
@@ -364,6 +380,7 @@ impl DanceDetector {
             DetectionState::Positioning => (),
             DetectionState::CountDown => self.emit_countdown_audio(t),
             DetectionState::LiveTracking => (),
+            DetectionState::InstructorDemo => (),
             DetectionState::TrackingDone => (),
         }
     }

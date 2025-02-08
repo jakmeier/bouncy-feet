@@ -282,6 +282,20 @@
     setChannelGain('audio-guide', 2.0);
   });
 
+  $: updateView($detectionState);
+
+  /**
+   * @param {DetectionState} state
+   */
+  function updateView(state) {
+    if (state === DetectionState.LiveTracking) {
+      videoOpacity = 1.0;
+    }
+    if (state === DetectionState.InstructorDemo) {
+      videoOpacity = 0.0;
+    }
+  }
+
   // onDestroy(() => {
   //   $hideNavigation = false;
   // });

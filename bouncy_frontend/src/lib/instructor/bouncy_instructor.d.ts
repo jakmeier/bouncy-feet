@@ -65,10 +65,14 @@ export enum DetectionState {
    */
   LiveTracking = 4,
   /**
+   * The instructor is showing the next moving.
+   */
+  InstructorDemo = 5,
+  /**
    * No longer tracking but the results of the previous tracking are
    * available.
    */
-  TrackingDone = 5,
+  TrackingDone = 6,
 }
 /**
  * Define in which direction a pose should be oriented.
