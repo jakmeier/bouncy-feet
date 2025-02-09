@@ -2,6 +2,8 @@
   import Area from '$lib/components/ui/Area.svelte';
   import { EXAMPLE_CUSTOM_COLORING } from '$lib/constants';
   import { t } from '$lib/i18n';
+  import { beatCounter } from '$lib/stores/Beat';
+  import { derived } from 'svelte/store';
   import DanceAnimation from './DanceAnimation.svelte';
 
   /** @type{import("$lib/instructor/bouncy_instructor").DanceWrapper} */
@@ -11,7 +13,27 @@
    * @type {number | undefined}
    */
   let trainingsWidth = 250;
-  let coach = 'chorok';
+
+  let firstMovement = $beatCounter + 5;
+  let storedBeat = 0;
+  let lastExternalBeat = firstMovement;
+  let shownBeat = derived([beatCounter], ([$beatCounter]) => {
+    const beatDiff = $beatCounter - lastExternalBeat;
+    if (beatDiff > 0) {
+      if (!freezeDancer(lastExternalBeat - firstMovement)) {
+        storedBeat += beatDiff;
+      }
+      lastExternalBeat = $beatCounter;
+    }
+    return storedBeat;
+  });
+
+  function freezeDancer(beat) {
+    // stop dancing after some time
+    if (beat >= 120) return true;
+
+    return beat % 20 >= 12;
+  }
 </script>
 
 <div class="container">
@@ -24,6 +46,7 @@
         beatDelay={3}
         hiddenBeats={3}
         showOverflow={true}
+        beat={shownBeat}
       />
     {:else}
       <Area
@@ -54,7 +77,7 @@
   }
 
   .half-transparent {
-    opacity: 0.2;
+    opacity: 0.38;
   }
 
   .accent {
@@ -74,7 +97,7 @@
 
   .overlay {
     position: absolute;
-    top: 38%;
+    top: 25%;
     left: 0;
     text-align: center;
   }

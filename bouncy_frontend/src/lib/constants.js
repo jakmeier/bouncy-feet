@@ -12,6 +12,13 @@ export const ZEBRA_COLORING = {
     bodyColor: 'var(--theme-neutral-dark)',
 };
 
+export const EXAMPLE_CUSTOM_COLORING = {
+    leftColor: 'var(--theme-accent)',
+    rightColor: 'var(--theme-main)',
+    headColor: 'var(--theme-main)',
+    bodyColor: 'var(--theme-main)',
+};
+
 export const GRAY_COLORING = {
     leftColor: '#00000040',
     rightColor: '#00000040',
