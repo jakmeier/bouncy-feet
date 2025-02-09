@@ -1,12 +1,12 @@
 <script>
   import { page } from '$app/stores';
   import AnimatedStep from '$lib/components/AnimatedStep.svelte';
-  import Header from '$lib/components/ui/Header.svelte';
   import { LEFT_RIGHT_COLORING, ORANGE_COLORING } from '$lib/constants';
   import { bpm, halfSpeed } from '$lib/stores/Beat';
-  import { getContext, onMount } from 'svelte';
+  import { getContext, onDestroy, onMount } from 'svelte';
   import { t } from '$lib/i18n';
-  import { dev } from '$lib/stores/FeatureSelection';
+  import BackButton from '$lib/components/ui/BackButton.svelte';
+  import { backgroundColor } from '$lib/stores/UiState';
 
   const coach = $page.params.coach;
   const { getCourse } = getContext('courses');
@@ -44,16 +44,43 @@
     }
   }
 
+  let swapBackgroundColor = 'var(--theme-neutral-white)';
+
   onMount(() => {
     setTrack('120bpm_tech_house');
+    swapBackgroundColor = $backgroundColor;
+    $backgroundColor = 'var(--theme-neutral-light)';
+  });
+  onDestroy(() => {
+    $backgroundColor = swapBackgroundColor;
   });
 </script>
 
-<Header title={coach} />
+<!-- <Header title={coach} /> -->
+<BackButton />
 
+<!-- TODO: translated texts -->
+<h2>Chorok: Master of heel-toe movements</h2>
+<h3>Ready for a training session with me?</h3>
 {#if step}
-  <AnimatedStep {step} size={150} {style}></AnimatedStep>
+  <AnimatedStep {step} size={150} {style} backgroundColor="transparent"
+  ></AnimatedStep>
 {/if}
+
+<div class="train">
+  <div class="link">
+    <a href="../../courses/{course.id}/exercise/-1/record">
+      <button class="light big">
+        <!-- {$t('courses.course-overview.start-lesson')} -->
+        Train
+      </button>
+    </a>
+  </div>
+</div>
+
+<!-- TODO: translated texts -->
+<h2>Learn something new</h2>
+<h3>I can show you my tricks</h3>
 
 <div class="ol">
   {#each course.lessons as lesson, index}
@@ -65,39 +92,29 @@
           <AnimatedStep
             step={lesson.parts[lesson.parts.length - 1].step}
             size={175}
+            backgroundColor="transparent"
           ></AnimatedStep>
         {/if}
       </div>
+      <!-- TODO: lesson names -->
+      <div class="lesson-name">Lesson X</div>
       <div class="link">
         <a href="../../courses/{course.id}/exercise/{index}">
           <button class="light">
             {$t('courses.course-overview.start-lesson')}
           </button>
         </a>
-        {#if $dev}
-          <a href="./{index}">
-            <button class="light"> text explanation (WIP) </button>
-          </a>
-        {/if}
       </div>
     </div>
   {/each}
 </div>
 
-<!-- WIP -->
-<div class="train">
-  Train
-
-  <div class="link">
-    <a href="../../courses/{course.id}/exercise/-1/record">
-      <button class="light">
-        {$t('courses.course-overview.start-lesson')}
-      </button>
-    </a>
-  </div>
-</div>
-
 <style>
+  h2,
+  h3,
+  .ol {
+    color: black;
+  }
   .ol {
     display: flex;
     overflow: scroll;
@@ -106,8 +123,8 @@
     /* justify-content: center; */
   }
   .course {
-    box-shadow: 0 0 4px 2px var(--theme-main);
-    background-color: var(--theme-neutral-light);
+    /* box-shadow: 0 0 4px 2px var(--theme-main); */
+    /* background-color: var(--theme-neutral-light); */
     padding: 5px 10px;
     max-width: 400px;
     font-size: var(--font-large);
@@ -120,18 +137,20 @@
     padding: 10px;
     text-align: center;
   }
-  .train {
-    box-shadow: 0 0 4px 2px var(--theme-main);
-    background-color: var(--theme-neutral-light);
-    padding: 5px 10px;
-    max-width: 400px;
-    font-size: var(--font-large);
-    margin: 30px auto;
+  .lesson-name {
     text-align: center;
   }
+
   button {
+    background-color: var(--theme-accent-light);
     margin: 10px;
     height: min-content;
     min-width: 160px;
+  }
+
+  .big {
+    background-color: var(--theme-main);
+    font-size: var(--font-large);
+    min-width: 250px;
   }
 </style>

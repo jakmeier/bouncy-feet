@@ -118,7 +118,7 @@ button.light {
     border-radius: 50px;
     font-size: var(--font-normal);
     padding: 10px;
-    box-shadow: 0 2px 4px #00000082;
+    /* box-shadow: 0 2px 4px #00000082; */
 }
 
 button:hover {

@@ -1,22 +1,30 @@
 <script>
+  import Arrow from './Arrow.svelte';
+
+  export let color = undefined;
+
   function goBack() {
     window.history.back();
   }
 </script>
 
 <button on:click={goBack}>
-  <span class="material-symbols-outlined" translate="no"> chevron_left </span>
+  <div class="arrow">
+    <Arrow {color} />
+  </div>
 </button>
 
 <style>
   button {
-    width: 50px;
+    width: 45px;
     height: 50px;
-    padding: auto;
-    background-color: var(--theme-neutral-light);
-    color: var(--theme-neutral-dark);
+    padding: 0 10px;
+    background-color: transparent;
   }
-  button span {
-    font-size: var(--font-large);
+  .arrow {
+    margin: auto;
+    max-width: 50px;
+    max-height: 50px;
+    transform: scaleX(-1);
   }
 </style>
