@@ -63,6 +63,6 @@
   .exp {
     margin: 35px 0 25px 0;
     text-align: center;
-    font-size: 1.3em;
+    font-size: var(--font-normal);
   }
 </style>

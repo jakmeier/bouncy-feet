@@ -194,7 +194,7 @@
       --border-focused="1.5px solid var(--theme-main)"
       --margin="10px auto"
       --padding="10px"
-      --font-size="20px"
+      --font-size="var(--font-normal)"
     />
   </div>
 {/if}

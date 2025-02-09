@@ -44,7 +44,7 @@
 
 <style>
   .info span {
-    font-size: 32px;
+    font-size: var(--font-large);
     cursor: pointer;
   }
 </style>

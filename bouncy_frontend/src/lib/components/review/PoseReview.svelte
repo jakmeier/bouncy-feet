@@ -120,7 +120,7 @@
   .beat-label {
     margin-top: 10px;
     padding: 5px;
-    font-size: 14px;
+    font-size: var(--font-normal);
     color: var(--theme-neutral-dark);
   }
 </style>

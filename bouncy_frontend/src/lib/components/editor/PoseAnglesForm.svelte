@@ -367,7 +367,7 @@
     text-align: center;
   }
   .turn-input {
-    font-size: 20px;
+    font-size: var(--font-normal);
   }
   .body-turn,
   .shift {

@@ -25,7 +25,7 @@
       justify-content: center;
       border: none;
       background: none;
-      font-size: 1.2rem;
+      font-size: var(--font-normal);
       transform: rotate(180deg);
       transition: transform 0.2s ease-in-out;
     }

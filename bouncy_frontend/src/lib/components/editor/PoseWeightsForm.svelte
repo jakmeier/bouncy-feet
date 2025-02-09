@@ -257,13 +257,13 @@
   .weight-input {
     width: 100%;
     text-align: center;
-    font-size: 20px;
+    font-size: var(--font-normal);
   }
   .name-input {
     border: none;
     width: 100%;
     text-align: center;
-    font-size: 32px;
+    font-size: var(--font-normal);
   }
 
   @media (max-width: 600px) {

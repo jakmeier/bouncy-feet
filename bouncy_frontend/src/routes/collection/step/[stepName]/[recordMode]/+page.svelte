@@ -290,7 +290,7 @@
     background-color: var(--theme-neutral-light);
     border-radius: 2px;
     text-align: center;
-    font-size: 23px;
+    font-size: var(--font-normal);
     overflow: hidden auto;
   }
 </style>

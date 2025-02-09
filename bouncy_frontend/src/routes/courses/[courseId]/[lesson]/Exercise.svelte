@@ -140,7 +140,7 @@
   }
 
   .bpm-option {
-    font-size: 35px;
+    font-size: var(--font-large);
     margin: 0 10px;
     cursor: pointer;
     transition: transform 0.2s ease-in-out;

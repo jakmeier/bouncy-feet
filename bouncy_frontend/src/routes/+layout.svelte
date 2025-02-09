@@ -10,7 +10,6 @@
   import PoseDetectionContext from './PoseDetectionContext.svelte';
   import UserContext from './UserContext.svelte';
   import LocalCollectionContext from './LocalCollectionContext.svelte';
-  import MovingBackground from '$lib/components/ui/MovingBackground.svelte';
   import { dev } from '$lib/stores/FeatureSelection';
   import MusicContext from './MusicContext.svelte';
 
@@ -28,23 +27,23 @@
   class="background"
   style="background: {$backgroundColor}; padding: {outerPadding}px;"
 >
-  <MovingBackground>
-    <main
-      style="margin:{mainMargin}px; height: calc(100vh - {navBarHeight}px); max-width: calc(min(730px, 100vw) - {2 *
-        mainMargin}px);"
-    >
-      <UserContext>
-        <LocalCollectionContext>
-          <PoseDetectionContext>
-            <MusicContext>
-              <slot />
-            </MusicContext>
-          </PoseDetectionContext>
-        </LocalCollectionContext>
-      </UserContext>
+  <main
+    style="margin:{mainMargin}px; height: calc(100vh - {navBarHeight}px); max-width: calc(min(730px, 100vw) - {2 *
+      mainMargin}px);"
+  >
+    <UserContext>
+      <LocalCollectionContext>
+        <PoseDetectionContext>
+          <MusicContext>
+            <slot />
+          </MusicContext>
+        </PoseDetectionContext>
+      </LocalCollectionContext>
+    </UserContext>
+    {#if !$hideNavigation}
       <div class="scroll-buffer"></div>
-    </main>
-  </MovingBackground>
+    {/if}
+  </main>
 </div>
 
 {#if !$hideNavigation}

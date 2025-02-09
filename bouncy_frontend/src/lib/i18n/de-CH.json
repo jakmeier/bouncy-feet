@@ -17,6 +17,8 @@
         "progress-title": "Dein Fortschritt",
         "collection-button": "Schau dir Schritte an",
         "courses-button": "Lerne Shuffle",
+        "continue-learning-button": "Lerne weiter mit mir",
+        "change-teacher-button": "Andere Lehrer",
         "nav": "Home"
     },
     "courses": {

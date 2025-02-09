@@ -22,7 +22,7 @@
   }
   .header {
     font-family: 'Pleasure Medium';
-    font-size: smaller;
+    font-size: var(--font-small);
     opacity: 0.5;
   }
 </style>

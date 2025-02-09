@@ -108,6 +108,6 @@
   }
 
   input {
-    font-size: 20px;
+    font-size: var(--font-normal);
   }
 </style>

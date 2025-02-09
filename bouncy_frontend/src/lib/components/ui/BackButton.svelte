@@ -17,6 +17,6 @@
     color: var(--theme-neutral-dark);
   }
   button span {
-    font-size: 30px;
+    font-size: var(--font-large);
   }
 </style>

@@ -91,7 +91,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 72px;
+    font-size: var(--font-large);
     margin: 5px;
     background-color: var(--theme-neutral-dark);
     color: var(--theme-neutral-white);
@@ -119,7 +119,7 @@
       background-color 0s step-start 1s;
   }
   span {
-    font-size: 36px;
+    font-size: var(--font-large);
     margin: 10px;
   }
   .explanation {

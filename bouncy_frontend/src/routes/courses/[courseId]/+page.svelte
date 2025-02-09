@@ -103,7 +103,7 @@
     background-color: var(--theme-neutral-light);
     padding: 5px 10px;
     max-width: 400px;
-    font-size: 30px;
+    font-size: var(--font-large);
     margin: 10px;
   }
   .step {

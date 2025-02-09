@@ -74,7 +74,7 @@
   .course-name {
     text-align: center;
     font-weight: 800;
-    font-size: 1.25em;
+    font-size: var(--font-normal);
     color: var(--theme-neutral-white);
   }
   .grayed-out {
@@ -87,8 +87,8 @@
   .start-here {
     background-color: var(--theme-accent);
     color: var(--theme-neutral-white);
-    font-size: 28px;
-    line-height: 28px;
+    font-size: var(--font-large);
+    line-height: var(--font-large);
     text-align: center;
     padding: 20px;
     border-radius: 10px;

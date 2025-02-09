@@ -44,7 +44,7 @@
     background-color: var(--theme-accent);
     color: var(--theme-neutral-white);
     border-radius: 50vh;
-    font-size: 18px;
+    font-size: var(--font-normal);
     padding: 2px;
     margin: 2px;
   }

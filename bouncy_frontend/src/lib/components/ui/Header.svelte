@@ -61,7 +61,7 @@
     background-color: var(--theme-neutral-light);
     border-radius: 2px;
     text-align: center;
-    font-size: 28px;
+    font-size: var(--font-large);
     overflow: hidden auto;
     white-space: nowrap;
   }

@@ -104,7 +104,7 @@
   .value-display input {
     border: none;
     text-align: center;
-    font-size: 20px;
+    font-size: var(--font-normal);
     background: none;
     width: 100%;
   }

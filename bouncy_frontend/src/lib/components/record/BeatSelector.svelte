@@ -126,7 +126,7 @@
     margin: 10px auto 30px;
   }
   .bpm {
-    font-size: 90px;
+    font-size: var(--font-large);
   }
   .visualizer {
     padding-top: 20px;
@@ -138,7 +138,7 @@
   .fixed-bpm-option {
     padding: 5px;
     margin: 5px;
-    font-size: 28px;
+    font-size: var(--font-normal);
     cursor: pointer;
     background-color: var(--theme-main);
     color: var(--theme-neutral-white);

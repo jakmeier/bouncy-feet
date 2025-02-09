@@ -17,6 +17,8 @@
         "progress-title": "Your Progress",
         "collection-button": "Browse moves",
         "courses-button": "Learn Shuffle",
+        "continue-learning-button": "Continue learning with me",
+        "change-teacher-button": "Change teacher",
         "nav": "Home"
     },
     "courses": {
@@ -161,7 +163,7 @@
         "start-button": "start",
         "record-button": "record video",
         "done-button": "done",
-        "learn-button": "Learn",
+        "learn-button": "Learn with me",
         "train-button": "Train",
         "reset-button": "Record again",
         "review-button": "Review Video",
