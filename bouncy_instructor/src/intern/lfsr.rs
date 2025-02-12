@@ -40,6 +40,15 @@ mod tests {
         // this test is mostly to show the first few values are reasonably
         // distributed at a first glance by human
 
+        // Running this test with multiple threads might cause the global seed
+        // to be accessed by other threads, which may result in missing values
+        // in the actual output compared to the expected one. This can make the
+        // CI fail for bad reasons in non-deterministic ways.
+        //
+        // The seed should remain global, so the only real fix I can think of
+        // would be to not run this test in parallel with others. If this
+        // problem happens more than once in a year, we should do that.
+
         super::SEED.store(4230144649, std::sync::atomic::Ordering::SeqCst);
         let nums: Vec<_> = std::iter::repeat_with(super::random_id).take(20).collect();
         expect![[r#"
