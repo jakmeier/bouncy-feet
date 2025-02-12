@@ -56,13 +56,13 @@
         {#if selectedIndex === index}
           <div class="selected">
             <Button
-              class="light small"
+              class="small"
               symbolSize={18}
               symbol="edit"
               on:click={editItem}
             />
             <Button
-              class="light small"
+              class="small"
               symbolSize={18}
               symbol="delete"
               on:click={deleteItem}

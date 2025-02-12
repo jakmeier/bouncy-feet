@@ -141,18 +141,18 @@
   </div>
 </div>
 
-<button class="light full-width short" on:click={copySkeleton}> ↓ </button>
+<button class="full-width short" on:click={copySkeleton}> ↓ </button>
 
 <PoseAnglesForm bind:loadSkeleton bind:readPose={poseFromForm}></PoseAnglesForm>
 
-<button class="light full-width short" on:click={copyPose}> ↓ </button>
+<button class="full-width short" on:click={copyPose}> ↓ </button>
 
 <PoseWeightsForm bind:loadPose bind:getPose></PoseWeightsForm>
 
 <Button
   symbol="save"
   symbolSize={29}
-  class="light full-width short"
+  class="full-width short"
   on:click={savePose}
 ></Button>
 

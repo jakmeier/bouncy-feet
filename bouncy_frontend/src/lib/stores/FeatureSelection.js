@@ -4,7 +4,7 @@ import { derived, readable, writable } from "svelte/store";
 import { dev as envDev, browser } from '$app/environment';
 
 let experimental = writable(false);
-let privDev = envDev;
+let privDev = false;
 export const dev = readable(privDev, (set) => {
     if (browser) {
         // @ts-ignore

@@ -16,21 +16,22 @@
 
 <style>
   p {
-    background-color: var(--theme-neutral-dark);
-    color: var(--theme-neutral-white);
+    background-color: var(--theme-neutral-black);
+    color: var(--theme-neutral-gray);
     margin: 0;
   }
   #container {
     min-width: 200px;
     text-align: center;
-    background-color: var(--theme-neutral-light);
+    background-color: var(--theme-neutral-dark);
+    color: var(--theme-neutral-gray);
     width: 100%;
   }
   .inner {
     display: flex;
     flex-direction: column;
     min-height: 100px;
-    padding: 10px;
+    padding: 20px;
     align-items: center;
     gap: 10px;
   }

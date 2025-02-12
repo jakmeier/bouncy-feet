@@ -101,11 +101,10 @@
     <div>
       {$t('courses.lesson.exercise-start-description')}
     </div>
-    <button class="light" on:click={closePopUp}
+    <button on:click={closePopUp}
       >{$t('courses.lesson.own-music-button')}</button
     >
     <button
-      class="light"
       on:click={() => {
         audioOn = true;
         closePopUp();

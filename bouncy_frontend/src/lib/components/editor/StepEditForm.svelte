@@ -127,7 +127,7 @@
 
 <div class="step-settings">
   <Button
-    class="light small"
+    class="small"
     symbolSize={28}
     symbol="first_page"
     on:click={() => beatCounter.reset()}

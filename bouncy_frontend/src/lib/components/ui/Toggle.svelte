@@ -27,7 +27,7 @@
     position: relative;
     width: 80px;
     height: 40px;
-    background-color: var(--theme-neutral-light);
+    background-color: var(--theme-neutral-dark);
     border-radius: 40px;
     cursor: pointer;
     transition: background-color 0.3s;

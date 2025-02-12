@@ -175,10 +175,10 @@
       ></VideoReview>
       <div>
         <a href={reviewVideoSrc} download>
-          <Button class="light wide" symbol="download" text="record.download" />
+          <Button class="wide" symbol="download" text="record.download" />
         </a>
         <Button
-          class="light wide"
+          class="wide"
           on:click={closeReview}
           symbol="arrow_back"
           text="record.back-button"
@@ -187,7 +187,7 @@
     {:else}
       {$t('record.no-video-for-review')}
       <Button
-        class="light wide"
+        class="wide"
         on:click={closeReview}
         symbol="arrow_back"
         text="record.back-button"
@@ -199,19 +199,19 @@
     </div>
     <div class="buttons">
       <Button
-        class="light wide"
+        class="wide"
         on:click={openReview}
         symbol="tv"
         text="record.review-button"
       />
       <Button
-        class="light wide"
+        class="wide"
         on:click={reset}
         symbol="videocam"
         text="record.reset-button"
       />
       <Button
-        class="light wide"
+        class="wide"
         on:click={goBackToStep}
         symbol="arrow_back"
         text="record.back-button"
@@ -235,7 +235,7 @@
     <div style="width: 50%;">
       <Button
         on:click={stopCameraAndRecording}
-        class="light wide"
+        class="wide"
         symbol="camera"
         text="record.stop-record"
       />
@@ -280,6 +280,7 @@
     display: grid;
     grid-template-columns: auto;
     width: 90%;
+    gap: 1rem;
   }
 
   div.title {

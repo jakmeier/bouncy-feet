@@ -3,6 +3,7 @@
   import '../app.css';
   import { t } from '$lib/i18n.js';
   import {
+    fontColor,
     backgroundColor,
     hideNavigation,
     wideView,
@@ -15,8 +16,8 @@
 
   $: hideNavigation.set(!$dev);
   $: navBarHeight = $hideNavigation ? 0 : 90;
-  $: outerPadding = $wideView ? 0 : 5;
-  $: mainMargin = $wideView ? 2 : 5;
+  $: outerPadding = $wideView ? '0rem' : '1rem';
+  $: mainMargin = $wideView ? 0 : 5;
 </script>
 
 <svelte:head>
@@ -25,11 +26,10 @@
 
 <div
   class="background"
-  style="background: {$backgroundColor}; padding: {outerPadding}px;"
+  style="--background-color: {$backgroundColor}; --color:{$fontColor}; padding: 0 {outerPadding};"
 >
   <main
-    style="margin:{mainMargin}px; height: calc(100vh - {navBarHeight}px); max-width: calc(min(730px, 100vw) - {2 *
-      mainMargin}px);"
+    style="margin:{mainMargin}px; height: calc(100vh - {navBarHeight}px); max-width: calc(min(730px, 100vw) - 2 * {outerPadding});"
   >
     <UserContext>
       <LocalCollectionContext>
@@ -60,6 +60,8 @@
     z-index: -2;
     overflow: hidden auto;
     width: 100%;
+    background-color: var(--background-color);
+    color: var(--color);
   }
 
   @media (min-width: 730px) {

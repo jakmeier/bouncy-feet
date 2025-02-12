@@ -10,6 +10,7 @@
   import { dev } from '$lib/stores/FeatureSelection.js';
   import { registerTracker } from '$lib/stores/Beat';
   import Button from '$lib/components/ui/Button.svelte';
+  import LightBackground from '$lib/components/ui/sections/LightBackground.svelte';
 
   const userCtx = getContext('user');
 
@@ -93,6 +94,8 @@
     recordingEnd = undefined;
   }
 </script>
+
+<LightBackground />
 
 <div id="outer">
   {#if !showCamera}

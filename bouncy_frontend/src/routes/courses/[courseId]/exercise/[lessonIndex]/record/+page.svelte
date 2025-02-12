@@ -15,6 +15,7 @@
   import LessonEnd from './LessonEnd.svelte';
   import { dev } from '$lib/stores/FeatureSelection';
   import DevUtility from '$lib/components/dev/DevUtility.svelte';
+  import LightBackground from '$lib/components/ui/sections/LightBackground.svelte';
 
   const { getCourse } = getContext('courses');
   const { recordFinishedLesson, computeDanceStats, addDanceToStats } =
@@ -174,6 +175,8 @@
   });
 </script>
 
+<LightBackground />
+
 <div class="outer">
   {#if !live}
     <!-- TODO: beat selector should be a layer above, optionally, by default it should be music from the app -->
@@ -183,7 +186,7 @@
       bind:useFixedBpm
     ></BeatSelector>
     <Button
-      class={beatDetected ? 'light wide' : 'locked wide'}
+      class={beatDetected ? 'wide' : 'locked wide'}
       on:click={beatDetected ? start : () => showHint.set(true)}
       symbol="play_arrow"
       text="courses.lesson.start-button"
@@ -202,18 +205,20 @@
           {recordingEnd}
         ></VideoReview>
       {:else}
-        {$t('record.no-video-for-review')}
+        <div class="no-review">
+          {$t('record.no-video-for-review')}
+        </div>
       {/if}
 
       <div class="buttons">
         <Button
-          class="light wide"
+          class="wide"
           on:click={restart}
           symbol=""
           text="courses.end.again-button"
         ></Button>
         <Button
-          class="light wide"
+          class="wide"
           on:click={goBack}
           symbol=""
           text="courses.end.back-button"
@@ -235,7 +240,7 @@
     ></LiveRecording>
 
     <Button
-      class="light wide"
+      class="wide"
       on:click={stop}
       symbol="camera"
       text="courses.lesson.stop-button"
@@ -257,11 +262,11 @@
   <div>
     {$t('courses.lesson.exercise-beat-description')}
   </div>
-  <button class="light wide" on:click={closeBeatPopUp}
+  <button class="wide" on:click={closeBeatPopUp}
     >{$t('courses.lesson.own-music-button')}</button
   >
   <button
-    class="light wide"
+    class="wide"
     on:click={() => {
       useFixedBpm = true;
       closeBeatPopUp();
@@ -277,7 +282,7 @@
   <div>
     {$t('courses.lesson.exercise-start-description')}
   </div>
-  <button class="light wide" on:click={closeStartExercisePopUp}>OK</button>
+  <button class="wide" on:click={closeStartExercisePopUp}>OK</button>
   <slot />
 </Popup>
 
@@ -286,12 +291,13 @@
 {/if}
 
 <style>
-  .outer {
-    text-align: center;
-  }
   .buttons {
     display: flex;
     flex-direction: column;
     margin-top: 10px;
+    gap: 1rem;
+  }
+  .no-review {
+    margin: 2rem;
   }
 </style>

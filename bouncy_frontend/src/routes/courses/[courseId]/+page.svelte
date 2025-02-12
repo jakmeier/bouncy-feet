@@ -32,7 +32,7 @@
 
     <div class="link">
       <a href="./exercise/-1/record">
-        <button class="light">
+        <button>
           {$t('courses.course-overview.start-lesson')}
         </button>
       </a>
@@ -70,13 +70,13 @@
       </div>
       <div class="link">
         <a href="./exercise/{index}">
-          <button class="light">
+          <button>
             {$t('courses.course-overview.start-lesson')}
           </button>
         </a>
         {#if $dev}
           <a href="./{index}">
-            <button class="light"> text explanation (WIP) </button>
+            <button> text explanation (WIP) </button>
           </a>
         {/if}
       </div>

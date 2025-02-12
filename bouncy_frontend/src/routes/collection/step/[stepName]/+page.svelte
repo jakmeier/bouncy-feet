@@ -208,11 +208,10 @@
 {#if $features.enableStepRecording(name) || $user.experimentalFeatures || !browser}
   <div class="label buttons">
     <a href="./learn">
-      <Button class="light" symbol="school" text="record.learn-button"></Button>
+      <Button symbol="school" text="record.learn-button"></Button>
     </a>
     <a href="./train">
-      <Button class="light" symbol="exercise" text="record.train-button"
-      ></Button>
+      <Button symbol="exercise" text="record.train-button"></Button>
     </a>
     <Info title="record.learn-button" text="record.info.learn" />
     <Info title="record.train-button" text="record.info.train" />

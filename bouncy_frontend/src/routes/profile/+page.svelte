@@ -87,7 +87,7 @@
 <h2 class="box">{$t('profile.leaderboard-title')}</h2>
 <Leaderboard users={scoreboardData} />
 <form class="inputs">
-  <button on:click={submit} class="light wide"
+  <button on:click={submit} class="wide"
     >{$t('profile.submit-stats')}</button
   >
 </form>
@@ -101,11 +101,11 @@
   <div>{$t('profile.consent.question')}</div>
 
   <div class="buttons">
-    <button class="light" on:click={() => consent(true)}>
+    <button on:click={() => consent(true)}>
       <p>{$t('profile.consent.yes')}</p>
     </button>
 
-    <button class="light" on:click={() => consent(false)}>
+    <button on:click={() => consent(false)}>
       <p>{$t('profile.consent.no')}</p>
     </button>
   </div>

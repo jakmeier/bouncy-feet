@@ -2,7 +2,6 @@
   import { t } from '$lib/i18n';
   import { getContext, onDestroy, onMount } from 'svelte';
   import Header from '$lib/components/ui/Header.svelte';
-  import { backgroundColor } from '$lib/stores/UiState';
   import { WHITE_COLORING } from '$lib/constants';
   import Step from '../collection/Step.svelte';
   import { counter } from '$lib/timer';
@@ -11,15 +10,6 @@
   const { courses } = getContext('courses');
   const beat = counter(-1, 1, $timeBetweenMoves);
 
-  let swapBackgroundColor = 'var(--theme-neutral-white)';
-  onMount(() => {
-    swapBackgroundColor = $backgroundColor;
-    $backgroundColor =
-      'linear-gradient(0deg, #ff7301 15%, #ffe72e 50%, #7fdb61 80%)';
-  });
-  onDestroy(() => {
-    $backgroundColor = swapBackgroundColor;
-  });
 </script>
 
 <Header title={$t('courses.title')} backButton={false} />

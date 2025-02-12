@@ -191,7 +191,7 @@
     <div class="direction">
       <!-- {PoseDirection[pose?.direction]} -->
       <Button
-        class="light short"
+        class="short"
         symbolSize={29}
         symbol="sync"
         on:click={() => {

@@ -1,6 +1,5 @@
 <script>
   import { version } from '$lib/stores/FeatureSelection';
-  import HomeFeedA from './HomeFeed_a.svelte';
   import HomeFeedB from './HomeFeed_b.svelte';
 
   /** @type {import('./$types').PageData} */
@@ -16,9 +15,4 @@
     .slice(0, 3);
 </script>
 
-<!-- Switch between stable and unstable HomeFeed -->
-{#if $version <= 0.005}
-  <HomeFeedA featuredDances={data.officialDances} />
-{:else}
-  <HomeFeedB featuredDances={data.officialDances} {featuredSteps} />
-{/if}
+<HomeFeedB featuredDances={data.officialDances} {featuredSteps} />

@@ -27,6 +27,9 @@
     --font-large: 36px;
     --font-normal: 20px;
     --font-small: 12px;
+
+    --color: var(--theme-neutral-white);
+    --background-color: var(--theme-neutral-black);
 }
 
 /*
@@ -35,8 +38,6 @@
 
 body {
     margin: 0;
-    background-color: var(--theme-neutral-black);
-    color: var(--theme-neutral-white);
 }
 
 body,
@@ -86,7 +87,7 @@ h5,
 h6 {
     font-size: var(--font-normal);
     font-weight: 500;
-    letter-spacing: 0.025rem;
+    letter-spacing: 0.02rem;
 }
 
 input {
@@ -97,7 +98,7 @@ input {
 }
 
 a {
-    color: var(--theme-neutral-dark);
+    color: var(--color);
     text-decoration: none;
 }
 
@@ -130,15 +131,6 @@ button.light:active {
     box-shadow: 0 0px 0px #00000082;
 }
 
-@media (max-width: 360px) {
-
-    /* Three buttons must fit next to each other, including margin */
-    button {
-        width: 75px;
-        height: fit-content;
-    }
-}
-
 button.big {
     width: 152px;
     height: 80px;
@@ -166,8 +158,8 @@ button.short {
 }
 
 button.locked {
-    background-color: var(--theme-neutral-gray);
-    color: var(--theme-neutral-dark);
+    background-color: var(--theme-neutral-dark);
+    color: var(--theme-neutral-gray);
     opacity: 0.5;
     cursor: not-allowed;
 }
@@ -180,8 +172,8 @@ button.cancel {
 button.reset {
     width: 80px;
     height: 30px;
-    background-color: var(--theme-accent-light);
     color: var(--theme-neutral-dark);
+    background-color: var(--theme-main);
     text-align: center;
     padding: 0;
 }

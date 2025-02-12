@@ -74,7 +74,7 @@
 
 <div class="centered">
   <a href="./new">
-    <button class="light big wide"> {$t('editor.pose.new')} </button>
+    <button class="big wide"> {$t('editor.pose.new')} </button>
   </a>
 </div>
 
@@ -98,13 +98,13 @@
 
 <Popup title={'editor.settings'} bind:isOpen={showSettings} showOkButton>
   <Button
-    class="light wide"
+    class="wide"
     symbol="upgrade"
     text={'editor.pose.export-all'}
     on:click={exportFile}
   />
   <Button
-    class="light wide"
+    class="wide"
     symbol="system_update_alt"
     text={'editor.pose.import'}
     on:click={() => document.querySelector('input#ron-upload')?.click()}

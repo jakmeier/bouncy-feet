@@ -11,7 +11,7 @@
   $: bigInnerSize = size * 0.95;
   $: padding = (bigInnerSize - innerSize) * 2 + 10;
   $: slotSize = size - 2 * padding;
-  $: innerColor = accentColor ? '--theme-accent-light' : '--theme-neutral-gray';
+  $: innerColor = accentColor ? '--theme-main' : '--theme-neutral-gray';
 
   $: timeBetweenBeats, start, replaceAnimation(timeBetweenBeats);
   /** @type {Element} */

@@ -16,10 +16,10 @@
 
   <div class="buttons">
     <a href="./pose">
-      <button class="light wide"> {$t('editor.pose.list')} </button>
+      <button class="wide"> {$t('editor.pose.list')} </button>
     </a>
     <a href="./step">
-      <button class="light wide"> {$t('editor.step.list')} </button>
+      <button class="wide"> {$t('editor.step.list')} </button>
     </a>
   </div>
 </div>

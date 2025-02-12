@@ -28,6 +28,7 @@
   let title;
 
   let size = 100;
+  // TODO: set from course lesson
   let bpm = 132;
   // use half speed
   $: stepTime = 60_000 / bpm;
@@ -70,11 +71,7 @@
 
 <div class="controls">
   <a href="./record">
-    <Button
-      class="light big"
-      symbol="start"
-      text="courses.lesson.start-button"
-    />
+    <Button class="big" symbol="start" text="courses.lesson.start-button" />
   </a>
 </div>
 

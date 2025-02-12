@@ -86,24 +86,19 @@
 
   <div class="controls">
     {#if done}
-      <button class="light" on:click={goBack}
-        >{$t('courses.lesson.back-button')}</button
-      >
+      <button on:click={goBack}>{$t('courses.lesson.back-button')}</button>
     {/if}
     {#if exercise === undefined && partIndex !== undefined && !done}
-      <button class="light" on:click={startExercise}
+      <button on:click={startExercise}
         >{$t('courses.lesson.start-button')}</button
       >
     {/if}
     {#if exercise}
-      <button class="light" on:click={stopExercise}
-        >{$t('courses.lesson.stop-button')}</button
+      <button on:click={stopExercise}>{$t('courses.lesson.stop-button')}</button
       >
     {/if}
     {#if partIndex === undefined}
-      <button class="light" on:click={next}
-        >{$t('courses.lesson.next-button')}</button
-      >
+      <button on:click={next}>{$t('courses.lesson.next-button')}</button>
     {/if}
   </div>
 </div>

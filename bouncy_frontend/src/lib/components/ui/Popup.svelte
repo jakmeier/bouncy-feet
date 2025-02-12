@@ -50,10 +50,9 @@
 
   .popup-content {
     padding: 0;
-    margin: 0;
+    margin: 10px;
     border-radius: 5px;
     overflow: auto;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     z-index: 10000;
   }
 
@@ -61,6 +60,5 @@
     width: 50px;
     height: 50px;
     padding: auto;
-    background-color: var(--theme-accent-light);
   }
 </style>

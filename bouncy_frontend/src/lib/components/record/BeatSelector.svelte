@@ -84,15 +84,17 @@
     <div>
       {$t('record.estimated-bpm-label')}
     </div>
-    {#if !useFixedBpm}
-      <Button
-        class="reset"
-        on:click={reset}
-        symbolClass="thin"
-        symbolSize={28}
-        symbol="cancel"
-      ></Button>
-    {/if}
+    <div class="place-holder">
+      {#if !useFixedBpm}
+        <Button
+          class="reset"
+          on:click={reset}
+          symbolClass="thin"
+          symbolSize={28}
+          symbol="cancel"
+        ></Button>
+      {/if}
+    </div>
   </div>
 
   <div class="fixed-bpm">
@@ -121,9 +123,9 @@
     justify-content: center;
     justify-items: center;
     width: 200px;
-    height: 160px;
+    min-height: 6rem;
     border-radius: 20px;
-    margin: 10px auto 30px;
+    margin: 2rem auto;
   }
   .bpm {
     font-size: var(--font-large);
@@ -134,15 +136,20 @@
   .fixed-bpm-options {
     display: flex;
     justify-content: center;
+    flex-wrap: wrap;
+    text-align: center;
+    min-height: 2rem;
+    padding: 0.75rem 1rem;
   }
   .fixed-bpm-option {
-    padding: 5px;
-    margin: 5px;
+    padding: 1rem;
+    margin: 0.5rem;
+    width: 40px;
     font-size: var(--font-normal);
     cursor: pointer;
     background-color: var(--theme-main);
-    color: var(--theme-neutral-white);
-    border-radius: 4px;
+    color: var(--theme-neutral-dark);
+    border-radius: 999px;
   }
   .bpm-source {
     display: flex;
@@ -150,5 +157,8 @@
     align-items: center;
     padding: 10px;
     gap: 20px;
+  }
+  .place-holder {
+    height: 2rem;
   }
 </style>

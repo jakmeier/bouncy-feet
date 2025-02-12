@@ -109,12 +109,8 @@
 </div>
 
 <Popup bind:isOpen={savingMethodPopupActive} title="editor.saving-prompt">
-  <button class="light" on:click={overwrite}
-    >{$t('editor.overwrite-existing-button')}</button
-  >
-  <button class="light" on:click={promptToPickName}
-    >{$t('editor.save-copy-button')}</button
-  >
+  <button on:click={overwrite}>{$t('editor.overwrite-existing-button')}</button>
+  <button on:click={promptToPickName}>{$t('editor.save-copy-button')}</button>
 </Popup>
 
 <Popup
@@ -125,9 +121,7 @@
     {$t('editor.new-dance.name-label')}
   </label>
   <input id="name" name="name" bind:value={danceName} />
-  <button class="light" on:click={save}
-    >{$t('editor.new-dance.save-button-label')}</button
-  >
+  <button on:click={save}>{$t('editor.new-dance.save-button-label')}</button>
 </Popup>
 
 <style>

@@ -119,15 +119,11 @@
   </Collapse>
 
   <h2 class="box">{$t('dance.counts')}</h2>
-  <DanceCounts
-    {dance}
-    bind:highlightedStep
-    markedPoseIndex={$beatCounter}
-  />
+  <DanceCounts {dance} bind:highlightedStep markedPoseIndex={$beatCounter} />
 </div>
 
 <Popup bind:isOpen={optionsPopupActive} title="editor.edit-dance-context-menu">
-  <button class="light" on:click={edit}>{$t('editor.edit-button')}</button>
+  <button on:click={edit}>{$t('editor.edit-button')}</button>
   <!-- <button class="light" on:click={copyAndEdit}
     >{$t('editor.edit-copy-button')}</button
   > -->

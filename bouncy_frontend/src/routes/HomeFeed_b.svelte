@@ -7,6 +7,8 @@
   import HomeEntry from './HomeEntry.svelte';
   import PathwayProgress from './PathwayProgress.svelte';
   import Arrow from '$lib/components/ui/Arrow.svelte';
+  import LightBackgroundSection from '$lib/components/ui/sections/LightSection.svelte';
+  import Footer from '$lib/components/ui/Footer.svelte';
 
   /** @type{import("$lib/instructor/bouncy_instructor").DanceWrapper[]} */
   export let featuredDances;
@@ -53,7 +55,7 @@
   </div>
 </div>
 
-<div class="light-background">
+<LightBackgroundSection>
   <div class="space">
     <div class="transparent-box">
       <h2>
@@ -91,31 +93,21 @@
       <div>
         {$t('home.go-to-github')}
       </div>
-      <div class="centered">
+      <div class="centered small-space">
         <a href="https://github.com/jakmeier/bouncy-feet/issues">
-          <button class="light"> GitHub </button>
+          <button> GitHub </button>
         </a>
       </div>
     </div>
   </div>
 
-  <div class="transparent-box">
-    <div>
-      <i>
-        {$t('home.version-label')}:
-        {$versionString}
-      </i>
-    </div>
+  <div class="small-space">
+    {$t('home.version-label')}:
+    {$versionString}
   </div>
 
-  <div class="brand-footer">
-    <img
-      class="logo rotated"
-      src="{base}/icons/bouncyfeet.svg"
-      alt="Bouncy Feet Logo"
-    />
-  </div>
-</div>
+  <Footer />
+</LightBackgroundSection>
 
 <style>
   .title {
@@ -129,39 +121,24 @@
   .title img.logo {
     height: 100%;
     /* Go outside the usual borders */
-    margin: -10px;
-  }
-
-  .light-background {
-    padding: 10px;
-    margin: -10px;
-    background-color: var(--theme-neutral-light);
-    color: var(--theme-neutral-black);
+    margin: 0 -1rem;
   }
 
   .transparent-box {
-    padding: 20px;
     border-radius: 10px;
-    margin: 15px 5px;
+    margin: 12rem 0;
     z-index: 1;
     position: relative;
-    text-align: center;
-    color: var(--theme-main-dark);
+    color: var(--theme-neutral-dark);
   }
 
   .centered {
-    margin-top: 15px;
     text-align: center;
-  }
-  .brand-footer img {
-    max-height: min(10vw, 50px);
-    max-width: unset;
-    margin: 10px 0;
   }
   .focus-card {
     max-width: 400px;
     padding: 5px 20px;
-    min-height: 92vh;
+    min-height: 93vh;
     margin: auto;
     display: flex;
     flex-direction: column;
@@ -173,8 +150,11 @@
     height: fit-content;
   }
 
+  .small-space {
+    margin: 1rem 0px;
+  }
   .space {
-    margin: 60px 10px;
+    margin: 3rem 0px;
   }
 
   .down-marker {

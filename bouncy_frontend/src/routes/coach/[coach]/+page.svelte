@@ -3,10 +3,11 @@
   import AnimatedStep from '$lib/components/AnimatedStep.svelte';
   import { LEFT_RIGHT_COLORING, ORANGE_COLORING } from '$lib/constants';
   import { bpm, halfSpeed } from '$lib/stores/Beat';
-  import { getContext, onDestroy, onMount } from 'svelte';
-  import { t } from '$lib/i18n';
-  import BackButton from '$lib/components/ui/BackButton.svelte';
-  import { backgroundColor } from '$lib/stores/UiState';
+  import { getContext, onMount } from 'svelte';
+  import LightBackground from '$lib/components/ui/sections/LightBackground.svelte';
+  import DarkSection from '$lib/components/ui/sections/DarkSection.svelte';
+  import Footer from '$lib/components/ui/Footer.svelte';
+  import Header from '$lib/components/ui/Header.svelte';
 
   const coach = $page.params.coach;
   const { getCourse } = getContext('courses');
@@ -48,20 +49,16 @@
 
   onMount(() => {
     setTrack('120bpm_tech_house');
-    swapBackgroundColor = $backgroundColor;
-    $backgroundColor = 'var(--theme-neutral-light)';
-  });
-  onDestroy(() => {
-    $backgroundColor = swapBackgroundColor;
   });
 </script>
 
-<!-- <Header title={coach} /> -->
-<BackButton />
+<LightBackground />
+
+<Header title={coach} />
 
 <!-- TODO: translated texts -->
-<h2>Chorok: Master of heel-toe movements</h2>
-<h3>Ready for a training session with me?</h3>
+<h3>Master of heel-toe movements</h3>
+<!-- <h3>Ready for a training session with me?</h3> -->
 {#if step}
   <AnimatedStep {step} size={150} {style} backgroundColor="transparent"
   ></AnimatedStep>
@@ -70,7 +67,7 @@
 <div class="train">
   <div class="link">
     <a href="../../courses/{course.id}/exercise/-1/record">
-      <button class="light big">
+      <button>
         <!-- {$t('courses.course-overview.start-lesson')} -->
         Train
       </button>
@@ -79,52 +76,42 @@
 </div>
 
 <!-- TODO: translated texts -->
-<h2>Learn something new</h2>
-<h3>I can show you my tricks</h3>
+<DarkSection>
+  <h2>Learn something new</h2>
+  <h3>I can show you my tricks</h3>
 
-<div class="ol">
-  {#each course.lessons as lesson, index}
-    <div class="course">
-      <div class="step">
-        {#if lesson.parts.length > 0}
-          <!-- TODO: show in coach style -->
-          <!-- TODO: show all parts, not just the last! -->
-          <AnimatedStep
-            step={lesson.parts[lesson.parts.length - 1].step}
-            size={175}
-            backgroundColor="transparent"
-          ></AnimatedStep>
-        {/if}
-      </div>
-      <!-- TODO: lesson names -->
-      <div class="lesson-name">Lesson X</div>
-      <div class="link">
+  <div class="ol">
+    {#each course.lessons as lesson, index}
+      <div class="course">
         <a href="../../courses/{course.id}/exercise/{index}">
-          <button class="light">
-            {$t('courses.course-overview.start-lesson')}
-          </button>
+          <div class="step">
+            {#if lesson.parts.length > 0}
+              <!-- TODO: show in coach style -->
+              <!-- TODO: show all parts, not just the last! -->
+              <AnimatedStep
+                step={lesson.parts[lesson.parts.length - 1].step}
+                size={175}
+                backgroundColor="transparent"
+              ></AnimatedStep>
+            {/if}
+          </div>
+          <!-- TODO: lesson names -->
+          <div class="lesson-name">Lesson X</div>
         </a>
       </div>
-    </div>
-  {/each}
-</div>
+    {/each}
+  </div>
+  <Footer white />
+</DarkSection>
 
 <style>
-  h2,
-  h3,
-  .ol {
-    color: black;
-  }
   .ol {
     display: flex;
     overflow: scroll;
-    margin: 15px 10px 10px;
-    /* gap: 10px; */
-    /* justify-content: center; */
+    padding-bottom: 1rem;
+    margin-left: -1rem;
   }
   .course {
-    /* box-shadow: 0 0 4px 2px var(--theme-main); */
-    /* background-color: var(--theme-neutral-light); */
     padding: 5px 10px;
     max-width: 400px;
     font-size: var(--font-large);
@@ -142,15 +129,11 @@
   }
 
   button {
-    background-color: var(--theme-accent);
     margin: 10px;
     height: min-content;
     min-width: 160px;
   }
-
-  .big {
-    background-color: var(--theme-main);
-    font-size: var(--font-large);
-    min-width: 250px;
+  .train {
+    margin-bottom: 3rem;
   }
 </style>

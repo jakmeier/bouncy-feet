@@ -1,5 +1,4 @@
 <script>
-  import { afterUpdate } from 'svelte';
   import BackButton from './BackButton.svelte';
 
   /** @type {string} */
@@ -10,22 +9,6 @@
 
   /** @type {Element} */
   let titleElement;
-
-  function adjustFontSize() {
-    let initialFontSize = 28;
-    titleElement.style.fontSize = initialFontSize + 'px';
-    const maxWidth =
-      titleElement.parentElement.getBoundingClientRect().width - 20;
-    const width = titleElement.getBoundingClientRect().width;
-    const ratio = maxWidth / width;
-    if (ratio < 1) {
-      titleElement.style.fontSize = ratio * initialFontSize + 'px';
-    }
-  }
-
-  afterUpdate(() => {
-    adjustFontSize();
-  });
 </script>
 
 <header>
@@ -50,20 +33,19 @@
   header {
     display: grid;
     grid-template-columns: auto 1fr auto;
-    height: 50px;
+    min-height: 50px;
+    align-content: center;
+    align-items: center;
   }
 
   .title-container {
     margin: auto;
-    height: 30px;
+    height: fit-content;
     width: calc(100% - 25px);
     padding: 10px;
-    background-color: var(--theme-neutral-light);
     border-radius: 2px;
     text-align: center;
     font-size: var(--font-large);
-    overflow: hidden auto;
-    white-space: nowrap;
   }
 
   span {
