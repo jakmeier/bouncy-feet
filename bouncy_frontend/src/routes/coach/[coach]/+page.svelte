@@ -142,7 +142,7 @@
   }
 
   button {
-    background-color: var(--theme-accent-light);
+    background-color: var(--theme-accent);
     margin: 10px;
     height: min-content;
     min-width: 160px;

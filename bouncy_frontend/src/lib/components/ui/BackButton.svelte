@@ -16,6 +16,7 @@
 
 <style>
   button {
+    min-width: unset;
     width: 45px;
     height: 50px;
     padding: 0 10px;

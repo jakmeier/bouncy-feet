@@ -59,14 +59,14 @@
   </div>
   <div class="overlay">
     <a href="./coach/chorok">
-      <div class="accent button">
+      <button>
         {$t('home.continue-learning-button')}
-      </div>
+      </button>
     </a>
     <a href="./coach/juhwang">
-      <div class="lime button">
+      <button>
         {$t('home.change-teacher-button')}
-      </div>
+      </button>
     </a>
   </div>
 </div>
@@ -80,18 +80,7 @@
     opacity: 0.38;
   }
 
-  .accent {
-    background-color: var(--theme-accent);
-  }
-  .lime {
-    background-color: var(--theme-main);
-  }
-  .button {
-    text-decoration: none;
-    border-radius: 999px;
-    width: fit-content;
-    padding: 10px 20px;
-    font-size: var(--font-normal);
+  button {
     margin: 30px auto;
   }
 
