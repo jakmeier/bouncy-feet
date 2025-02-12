@@ -40,12 +40,15 @@
 
   .title-container {
     margin: auto;
-    height: fit-content;
+    min-height: 1.15em;
     width: calc(100% - 25px);
-    padding: 10px;
+    /* padding: 10px; */
     border-radius: 2px;
-    text-align: center;
+    text-align: right;
     font-size: var(--font-large);
+    /* adjust to make font look centered vertically */
+    line-height: 1.15em;
+    padding-top: 0.15em;
   }
 
   span {
@@ -54,8 +57,8 @@
   }
 
   button {
-    width: 50px;
-    height: 50px;
+    width: 30px;
+    height: 30px;
     padding: auto;
     background-color: var(--theme-neutral-light);
     color: var(--theme-neutral-dark);

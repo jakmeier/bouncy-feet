@@ -3,7 +3,7 @@
   import AnimatedStep from '$lib/components/AnimatedStep.svelte';
   import { LEFT_RIGHT_COLORING, ORANGE_COLORING } from '$lib/constants';
   import { bpm, halfSpeed } from '$lib/stores/Beat';
-  import { getContext, onMount } from 'svelte';
+  import { getContext } from 'svelte';
   import LightBackground from '$lib/components/ui/sections/LightBackground.svelte';
   import DarkSection from '$lib/components/ui/sections/DarkSection.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
@@ -11,7 +11,6 @@
 
   const coach = $page.params.coach;
   const { getCourse } = getContext('courses');
-  const { setTrack } = getContext('music');
 
   const style = coachStyle(coach);
   const course = getCourse(coachCourseId(coach), true);
@@ -19,9 +18,6 @@
 
   $bpm = 120;
   $halfSpeed = true;
-
-  // TODO: let user turn it off
-  let audioOn = true;
 
   function coachStyle(coach) {
     switch (coach) {
@@ -44,12 +40,6 @@
         return '';
     }
   }
-
-  let swapBackgroundColor = 'var(--theme-neutral-white)';
-
-  onMount(() => {
-    setTrack('120bpm_tech_house');
-  });
 </script>
 
 <LightBackground />

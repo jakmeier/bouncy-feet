@@ -17,15 +17,15 @@
 <style>
   button {
     min-width: unset;
-    width: 45px;
-    height: 50px;
+    width: 15px;
+    height: 30px;
     padding: 0 10px;
     background-color: transparent;
   }
   .arrow {
     margin: auto;
-    max-width: 50px;
-    max-height: 50px;
+    max-width: 15px;
+    max-height: 30px;
     transform: scaleX(-1);
   }
 </style>

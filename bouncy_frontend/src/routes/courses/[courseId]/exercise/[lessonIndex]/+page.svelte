@@ -2,12 +2,13 @@
   import { page } from '$app/stores';
   import { t } from '$lib/i18n.js';
   import Header from '$lib/components/ui/Header.svelte';
-  import { getContext } from 'svelte';
+  import { getContext, onMount } from 'svelte';
   import { counter } from '$lib/timer';
   import Step from '../../../../collection/Step.svelte';
   import Video from '$lib/components/ui/Video.svelte';
   import { base } from '$app/paths';
   import Button from '$lib/components/ui/Button.svelte';
+  import LightBackground from '$lib/components/ui/sections/LightBackground.svelte';
 
   const { getCourse } = getContext('courses');
 
@@ -46,7 +47,14 @@
     done = false;
   }
   loadCourse();
+
+  const { setTrack } = getContext('music');
+  onMount(() => {
+    setTrack('120bpm_tech_house');
+  });
 </script>
+
+<LightBackground />
 
 <Header {title} />
 
