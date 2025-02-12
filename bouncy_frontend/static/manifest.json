@@ -20,14 +20,14 @@
             "sizes": "48x48"
         },
         {
-            "src": "icons/logo.svg",
+            "src": "icons/icon.svg",
             "sizes": "any"
         }
     ],
-    "background_color": "#a9eb66",
+    "background_color": "#1d1d1b",
     "display": "fullscreen",
     "scope": "/",
-    "theme_color": "#382eeb",
+    "theme_color": "#a9eb66",
     "description": "Learn to shuffle dance with the interactive app experience of Bouncy Feet.",
     "orientation": "portrait",
     "categories": [

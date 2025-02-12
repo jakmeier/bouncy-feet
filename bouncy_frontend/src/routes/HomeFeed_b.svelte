@@ -36,7 +36,7 @@
 <div class="title">
   <img
     class="logo"
-    src="{base}/icons/new-logo-white.svg"
+    src="{base}/icons/icon_on_black.svg"
     alt="Bouncy Feet Logo"
   />
 </div>
@@ -111,7 +111,7 @@
   <div class="brand-footer">
     <img
       class="logo rotated"
-      src="{base}/icons/bouncyfeet.png"
+      src="{base}/icons/bouncyfeet.svg"
       alt="Bouncy Feet Logo"
     />
   </div>
