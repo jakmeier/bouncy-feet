@@ -208,3 +208,33 @@ ol {
     list-style: none;
     padding: 0;
 }
+
+.corner-marked {
+    position: relative;
+    padding: 0.5rem;
+}
+
+.corner-marked::before,
+.corner-marked::after {
+    content: '';
+    position: absolute;
+    width: min(3em, 25%);
+    height: min(3em, 25%);
+    padding: 0;
+    margin: 0;
+    border: 0.5rem solid var(--theme-main);
+}
+
+.corner-marked::before {
+    top: 0.25rem;
+    left: 0.25rem;
+    border-right: none;
+    border-bottom: none;
+}
+
+.corner-marked::after {
+    bottom: 0.25rem;
+    right: 0.25rem;
+    border-left: none;
+    border-top: none;
+}

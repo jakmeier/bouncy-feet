@@ -3,12 +3,13 @@
   import { t } from '$lib/i18n.js';
   import Header from '$lib/components/ui/Header.svelte';
   import { getContext, onMount } from 'svelte';
-  import { counter } from '$lib/timer';
   import Step from '../../../../collection/Step.svelte';
   import Video from '$lib/components/ui/Video.svelte';
   import { base } from '$app/paths';
-  import Button from '$lib/components/ui/Button.svelte';
   import LightBackground from '$lib/components/ui/sections/LightBackground.svelte';
+  import Popup from '$lib/components/ui/Popup.svelte';
+  import { writable } from 'svelte/store';
+  import { beatCounter, timeBetweenMoves } from '$lib/stores/Beat';
 
   const { getCourse } = getContext('courses');
 
@@ -28,13 +29,8 @@
   /** @type {string} */
   let title;
 
+  let isVideoOpen = writable(false);
   let size = 100;
-  // TODO: set from course lesson
-  let bpm = 132;
-  // use half speed
-  $: stepTime = 60_000 / bpm;
-  $: animationTime = Math.min(stepTime * 0.7, 300);
-  $: i = counter(-1, 1, stepTime);
 
   function loadCourse() {
     id = $page.params.courseId;
@@ -58,30 +54,56 @@
 
 <Header {title} />
 
-<div class="background-strip">
-  {#if lesson.video && lesson.video.length > 0}
-    <Video path={`${base}${lesson.video}`}></Video>
-  {/if}
+<!-- TODO: translated texts -->
+<div class="description">
+  Kick, switch, kick, switch. Stop stalling, let's get moving!
 </div>
 
-<!-- <h3>{$t('courses.lesson.steps-subtitle')}</h3> -->
-<div class="overview">
-  {#each lesson.parts as part, index}
-    <div class="exercise-part">
-      <Step step={part.step} poseIndex={$i} {animationTime} {size}></Step>
-      <b>4x</b>
-    </div>
-    {#if index !== lesson.parts.length - 1}
-      <div class="arrow">→</div>
-    {/if}
-  {/each}
+<div class="background-strip">
+  <div class="overview">
+    <!-- <h3>{$t('courses.lesson.steps-subtitle')}</h3> -->
+    {#each lesson.parts as part, index}
+      <div class="exercise-part">
+        <Step
+          step={part.step}
+          poseIndex={$beatCounter}
+          animationTime={$timeBetweenMoves * 0.7}
+          {size}
+        ></Step>
+        <b>4x</b>
+      </div>
+      {#if index !== lesson.parts.length - 1}
+        <div class="arrow">→</div>
+      {/if}
+    {/each}
+  </div>
+</div>
+
+<!-- TODO: translated texts -->
+<div class="details">
+  <div>Foot steps</div>
+  <div>TODO</div>
+  <div>Duration</div>
+  <div>TODO</div>
+  <div>Explainer video</div>
+  <button on:click={() => ($isVideoOpen = true)}>-></button>
+  <div>Song</div>
+  <div>TODO</div>
 </div>
 
 <div class="controls">
   <a href="./record">
-    <Button class="big" symbol="start" text="courses.lesson.start-button" />
+    <button>{$t('courses.lesson.start-button')}</button>
   </a>
 </div>
+
+<Popup bind:isOpen={isVideoOpen} showOkButton>
+  <div class="video-wrapper">
+    {#if lesson.video && lesson.video.length > 0}
+      <Video path={`${base}${lesson.video}`}></Video>
+    {/if}
+  </div>
+</Popup>
 
 <style>
   .overview {
@@ -101,10 +123,29 @@
     text-align: center;
   }
 
+  .details,
+  .description {
+    margin: 2em 0em;
+  }
+
   .background-strip {
     margin: 10px -100%;
-    padding: 5px;
-    background-color: var(--theme-neutral-light);
+    padding: 2rem;
+    background-color: var(--theme-main);
+    rotate: 8deg;
+  }
+  .background-strip .overview {
+    rotate: -8deg;
+  }
+
+  .details {
     display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .video-wrapper {
+    width: 100vw;
   }
 </style>

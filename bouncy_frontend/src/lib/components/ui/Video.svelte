@@ -10,29 +10,31 @@
 </script>
 
 <div class="video-container" class:hide={videoLoading || !videoExists}>
-  <video
-    bind:this={videoElement}
-    controls
-    on:loadedmetadata={() => {
-      videoExists = true;
-      videoLoading = false;
-    }}
-    preload="metadata"
-  >
-    <source
-      src={path}
-      type="video/mp4"
-      on:error={() => {
+  <div class="corner-marked">
+    <video
+      bind:this={videoElement}
+      controls
+      on:loadedmetadata={() => {
+        videoExists = true;
         videoLoading = false;
-        videoExists = false;
       }}
-      on:suspend={() => {
-        videoLoading = false;
-        videoExists = false;
-      }}
-    />
-    Your browser does not support the video tag.
-  </video>
+      preload="metadata"
+    >
+      <source
+        src={path}
+        type="video/mp4"
+        on:error={() => {
+          videoLoading = false;
+          videoExists = false;
+        }}
+        on:suspend={() => {
+          videoLoading = false;
+          videoExists = false;
+        }}
+      />
+      Your browser does not support the video tag.
+    </video>
+  </div>
 </div>
 
 {#if videoLoading}
@@ -60,17 +62,14 @@
   .video-container {
     display: flex;
     width: 90%;
-    height: 300px;
     margin: 20px auto;
   }
 
   video {
     max-width: 80vw;
-    max-height: 300px;
+    max-height: 95vh;
     height: auto;
     margin: auto;
-    border: 4px solid var(--theme-main);
-    border-radius: 25px;
   }
 
   .hide {
