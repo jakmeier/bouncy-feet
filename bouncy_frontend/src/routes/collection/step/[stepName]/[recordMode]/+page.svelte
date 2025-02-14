@@ -1,5 +1,5 @@
 <script>
-  import { getContext, onMount, setContext, tick } from 'svelte';
+  import { getContext, onMount, tick } from 'svelte';
   import { t } from '$lib/i18n';
   import { Tracker } from '$lib/instructor/bouncy_instructor';
   import { stepsByName } from '$lib/instructor/bouncy_instructor';
@@ -8,7 +8,6 @@
   import VideoReview from '$lib/components/review/VideoReview.svelte';
   import Header from '$lib/components/ui/Header.svelte';
   import { hideNavigation } from '$lib/stores/UiState';
-  import LiveRecordingSettings from '$lib/components/record/LiveRecordingSettings.svelte';
   import Popup from '$lib/components/ui/Popup.svelte';
   import SessionReward from '$lib/components/SessionReward.svelte';
   import { registerTracker, setBpm, setHalfSpeed } from '$lib/stores/Beat';
@@ -59,7 +58,7 @@
   /** @type {() => any}*/
   let stopCamera;
   /** @type {() => any}*/
-  let endRecording;
+  let stopLiveRecording;
 
   $: trackingState = tracker ? tracker.detectionState : null;
   $: if ($trackingState === DetectionState.TrackingDone)
@@ -73,12 +72,8 @@
     recordingStart = undefined;
   }
 
-  function stop() {
-    stopCamera();
-    isModelOn = false;
-  }
-
   async function stopCameraAndRecording() {
+    isModelOn = false;
     stop();
     if (isLearnMode) {
       // Reuse all previous detections and show exactly that in the review.
@@ -102,13 +97,28 @@
         userCtx.addDanceToStats(sessionResult);
       }, 1000);
     }
-    const videoBlob = await endRecording();
+
+    stopLiveRecording();
+  }
+
+  /**
+   * @param {Blob | undefined} videoBlob
+   */
+  async function onRecordingStopped(videoBlob) {
+    tracker?.finishTracking();
+    isModelOn = false;
 
     if (videoBlob) {
+      if (reviewVideoSrc) {
+        URL.revokeObjectURL(reviewVideoSrc);
+      }
       reviewVideoSrc = URL.createObjectURL(videoBlob);
     } else {
       console.warn('ended recording and did not get video blob', videoBlob);
     }
+
+    // detectionResult = tracker?.lastDetection;
+    // detectedSteps = detectionResult?.steps();
   }
 
   async function reset() {
@@ -222,31 +232,15 @@
       bind:startCamera
       bind:stopCamera
       bind:startRecording
-      bind:endRecording
+      bind:stop={stopLiveRecording}
       bind:recordingStart
       bind:recordingEnd
+      onStop={onRecordingStopped}
       {videoOpacity}
       {enableLiveAvatar}
       {enableInstructorAvatar}
     ></LiveRecording>
   {/if}
-
-  {#if isModelOn}
-    <div style="width: 50%;">
-      <Button
-        on:click={stopCameraAndRecording}
-        class="wide"
-        symbol="camera"
-        text="record.stop-record"
-      />
-    </div>
-    <LiveRecordingSettings
-      bind:enableLiveAvatar
-      bind:enableInstructorAvatar
-      bind:videoOpacity
-    />
-  {/if}
-  <p style="width: 100px; height: 50px;"></p>
 </div>
 
 <Popup

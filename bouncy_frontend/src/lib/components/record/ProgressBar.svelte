@@ -12,7 +12,7 @@
     width: 100%;
     height: 30px;
     background-color: var(--theme-neutral-light);
-    border-radius: 5px;
+    border-radius: 3px;
     overflow: hidden;
     position: relative;
   }

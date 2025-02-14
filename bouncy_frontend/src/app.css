@@ -121,6 +121,10 @@ button {
     padding: 0.75rem 1rem;
 }
 
+button.symbol {
+    background-color: transparent;
+}
+
 button.light {
     background-color: var(--theme-accent-medium);
 }
@@ -222,19 +226,19 @@ ol {
     height: min(3em, 25%);
     padding: 0;
     margin: 0;
-    border: 0.5rem solid var(--theme-main);
+    border: 0.25rem solid var(--theme-main);
 }
 
 .corner-marked::before {
-    top: 0.25rem;
-    left: 0.25rem;
+    top: 0.125rem;
+    left: 0.125rem;
     border-right: none;
     border-bottom: none;
 }
 
 .corner-marked::after {
-    bottom: 0.25rem;
-    right: 0.25rem;
+    bottom: 0.125rem;
+    right: 0.125rem;
     border-left: none;
     border-top: none;
 }

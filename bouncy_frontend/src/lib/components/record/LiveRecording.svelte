@@ -1,5 +1,4 @@
 <script>
-  import Area from '$lib/components/ui/Area.svelte';
   import Camera from '$lib/components/record/Camera.svelte';
   import Canvas from '$lib/components/Canvas.svelte';
   import Avatar from '$lib/components/avatar/Avatar.svelte';
@@ -34,6 +33,8 @@
     recordTrackSyncDelay,
     recordMediaPipeDelay,
   } from '$lib/stores/System';
+  import FullScreenArea from '../ui/FullScreenArea.svelte';
+  // import LiveRecordingSettings from './LiveRecordingSettings.svelte';
 
   /** @type {boolean} */
   export let cameraOn = false;
@@ -51,9 +52,17 @@
   export const stopCamera = () => {
     camera.stopCamera();
   };
-  export const endRecording = async () => {
-    return await camera.endRecording();
+  export const stop = async () => {
+    camera.stopCamera();
+    const blob = await camera.endRecording();
+    onStop(blob);
   };
+  /**
+   * Function is called when the recording is stopped by the user with the stop
+   * button or by a explicit `stop` call from the parent component.
+   * The recording video blob is passed as as a parameter.
+   */
+  export let onStop = (/** @type {Blob | undefined} */ _recording) => {};
 
   export let enableLiveAvatar = false;
   export let enableInstructorAvatar = false;
@@ -91,20 +100,17 @@
   let dataListener;
 
   /** @type {number} */
-  const borderWidth = 2;
-  /** @type {number} */
   let outerWidth;
   /** @type {number} */
-  $: width = outerWidth - 2 * borderWidth;
-  /** @type {number} */
-  $: height = (width * 4) / 3;
+  let outerHeight;
+
   /** @type {import('svelte/store').Writable<number>} */
   let videoSrcWidth = writable(100);
   /** @type {import('svelte/store').Writable<number>} */
   let videoSrcHeight = writable(150);
 
   let lastDetectedSkeletonSize = 1.0;
-  $: instructorSkeletonSize = Math.min(lastDetectedSkeletonSize, 2.0);
+  $: instructorSkeletonSize = Math.min(lastDetectedSkeletonSize, 8.0);
   let lastSuccessSkeletonOrigin = new Cartesian2d(0.0, 0.0);
   /** @type {LimbError[]} */
   let worstLimbs = [];
@@ -300,31 +306,22 @@
       enableLiveAvatar = false;
     }
   }
-
-  // onDestroy(() => {
-  //   $hideNavigation = false;
-  // });
 </script>
 
-<div bind:clientWidth={outerWidth} style="width: 100%; transform: scaleX(-1);">
-  <BackgroundTask {onFrame}></BackgroundTask>
+<BackgroundTask {onFrame}></BackgroundTask>
 
-  <Area
-    width="{width}px"
-    height="{height}px"
-    borderWidth="{borderWidth}px"
-    zIndex={0}
-    backgroundColor={"var(--theme-neutral-light)"}
+<FullScreenArea>
+  <div
+    class="camera"
+    bind:clientWidth={outerWidth}
+    bind:clientHeight={outerHeight}
   >
     <Camera
-      {width}
-      {height}
       bind:opacity={videoOpacity}
       bind:videoElement={cameraVideoElement}
       bind:cameraOn
       bind:this={camera}
     />
-
     {#if enableInstructorAvatar && instructorSkeleton !== null}
       <div class="avatar-container">
         <InstructorAvatar
@@ -343,7 +340,7 @@
     {#if enableLiveAvatar}
       <div
         class="avatar-container"
-        style="left: {(width - $videoSrcWidth) / 2}px;"
+        style="left: {(outerWidth - $videoSrcWidth) / 2}px;"
       >
         <Canvas width={$videoSrcWidth} height={$videoSrcHeight}>
           <Avatar
@@ -357,16 +354,49 @@
         </Canvas>
       </div>
     {/if}
-  </Area>
 
-  <ProgressBar {progress}></ProgressBar>
-</div>
+    <div class="ui">
+      <!-- TODO: add this dev tooling again (ideally without mirroring it :P) -->
+      <!-- {#if true}
+        <LiveRecordingSettings
+          bind:enableLiveAvatar
+          bind:enableInstructorAvatar
+          bind:videoOpacity
+        />
+      {/if} -->
+
+      <ProgressBar {progress}></ProgressBar>
+      <button class="symbol" on:click={stop}>
+        <img src="{base}/img/symbols/bf_stop.svg" alt="stop" />
+      </button>
+    </div>
+  </div>
+</FullScreenArea>
 
 <style>
+  .camera {
+    width: 100%;
+    height: 100%;
+    transform: scaleX(-1);
+
+    position: relative;
+    display: grid;
+    align-items: center;
+    justify-items: center;
+  }
   .avatar-container {
     position: absolute;
     width: 100%;
     height: 100%;
     z-index: 0;
+  }
+  .ui {
+    text-align: center;
+    width: calc(100% - 2rem);
+    position: absolute;
+    bottom: 0;
+  }
+  button.symbol {
+    margin: 1rem;
   }
 </style>

@@ -117,7 +117,7 @@
       bind:startCamera={camera.startCamera}
       bind:stopCamera={camera.stopCamera}
       bind:startRecording={camera.startRecording}
-      bind:endRecording={camera.endRecording}
+      bind:stop={camera.endRecording}
       bind:recordingStart
       bind:recordingEnd
     ></LiveRecording>

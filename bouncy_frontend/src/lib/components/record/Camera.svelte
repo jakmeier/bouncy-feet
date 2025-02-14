@@ -3,13 +3,12 @@
   import { onDestroy } from 'svelte';
   import { waitForVideoMetaLoaded } from '$lib/promise_util';
   import Symbol from '../ui/Symbol.svelte';
+  import { base } from '$app/paths';
 
   /** @type HTMLVideoElement|null */
   export let videoElement = null;
   export let cameraOn = false;
 
-  export let width = 360;
-  export let height = 480;
   export let opacity = 1.0;
 
   let stream;
@@ -50,21 +49,6 @@
     videoElement.srcObject = stream;
     await waitForVideoMetaLoaded(videoElement);
     videoElement.play();
-    const w = videoElement.videoWidth;
-    const h = videoElement.videoHeight;
-    if (w / h > width / height) {
-      // video too wide, zoom to center to match height
-      videoElement.style.height = height + 'px';
-      const hiddenWidth = (height * w) / h;
-      videoElement.style.width = hiddenWidth + 'px';
-      videoElement.style['margin-left'] = `-${(hiddenWidth - width) / 2}px`;
-    } else {
-      // video too high, zoom to center to match width
-      videoElement.style.width = width + 'px';
-      const hiddenHeight = (width * h) / w;
-      videoElement.style.height = hiddenHeight + 'px';
-      videoElement.style['margin-top'] = `-${(hiddenHeight - height) / 2}px`;
-    }
 
     cameraOn = true;
   }
@@ -115,5 +99,29 @@
   style="opacity: {opacity}"
 ></video>
 {#if !cameraOn}
-  <Symbol size={100}>videocam</Symbol>
+  <div class="symbol corner-marked">
+    <img src="{base}/img/symbols/bf_eye.svg" alt="bouncy feet eye" />
+  </div>
 {/if}
+
+<style>
+  video {
+    /* not working as expected */
+    /* object-fit: cover; */
+    /* width: 100%; */
+    /* height: 100%; */
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100vw;
+    min-height: 100vh;
+    transform: translate(-50%, -50%);
+  }
+
+  .symbol {
+    max-width: 500px;
+    min-width: 10rem;
+    padding: 5rem;
+  }
+</style>

@@ -52,12 +52,10 @@
 
   /** @type {() => any}*/
   let startCamera;
-  /** @type {() => any}*/
+  /** @type {() => Promise<void>}*/
   let startRecording;
-  /** @type {() => any}*/
-  let stopCamera;
-  /** @type {() => any}*/
-  let endRecording;
+  /** @type {() => Promise<void>}*/
+  let stopLiveRecording;
   /** @type {Tracker | undefined} */
   let tracker;
   /** @type {import('svelte/store').Readable<DetectionState> | null} */
@@ -87,14 +85,11 @@
     await startRecording();
   }
 
-  async function stop() {
-    stopCamera();
+  /**
+   * @param {Blob | undefined} videoBlob
+   */
+  async function onRecordingStopped (videoBlob) {
     tracker?.finishTracking();
-
-    detectionResult = tracker?.lastDetection;
-    detectedSteps = detectionResult?.steps();
-    const videoBlob = await endRecording();
-
     if (videoBlob) {
       if (videoUrl) {
         URL.revokeObjectURL(videoUrl);
@@ -103,7 +98,10 @@
     } else {
       console.warn('ended recording and did not get video blob', videoBlob);
     }
-  }
+
+    detectionResult = tracker?.lastDetection;
+    detectedSteps = detectionResult?.steps();
+  };
 
   function restart() {
     tracker?.clear();
@@ -228,23 +226,16 @@
   {:else}
     <LiveRecording
       bind:startCamera
-      bind:stopCamera
       bind:startRecording
-      bind:endRecording
+      bind:stop={stopLiveRecording}
       bind:recordingStart
       bind:recordingEnd
+      onStop={onRecordingStopped}
       videoOpacity={0.5}
       enableLiveAvatar={true}
       enableInstructorAvatar={true}
       forceBeat
     ></LiveRecording>
-
-    <Button
-      class="wide"
-      on:click={stop}
-      symbol="camera"
-      text="courses.lesson.stop-button"
-    ></Button>
   {/if}
 </div>
 
@@ -291,6 +282,10 @@
 {/if}
 
 <style>
+  .outer {
+    text-align: center;
+    min-height: 100vh;
+  }
   .buttons {
     display: flex;
     flex-direction: column;
