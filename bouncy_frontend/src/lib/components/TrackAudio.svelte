@@ -6,20 +6,19 @@
     scheduleAudioOnChannel,
     loadTrack,
   } from '$lib/stores/Audio';
-  import { beatStart, timeBetweenMoves } from '$lib/stores/Beat';
+  import { beatStart, bpm } from '$lib/stores/Beat';
 
   export let isOn = false;
-  /** @type {string} */
+  /** @type {Song} */
   export let track;
 
   let initialized = false;
-  $: initialized && (isOn ? startAudio() : stopAudio());
+  $: initialized && (isOn ? startMusic() : stopMusic());
   // $: initialized && $timeBetweenMoves && resetAudio();
 
   /** @type {number} ms performance timestamp */
-  $: $beatStart, resetAudio();
+  $: $beatStart, resetMusic();
 
-  let isPlaying = false;
   /**
    * batches of connected audio nodes that should be disconnected at some point
    * @type {AudioBufferSourceNode[]}
@@ -32,44 +31,33 @@
   });
 
   onDestroy(() => {
-    stopAudio();
-    resetAudio();
+    stopMusic();
+    resetMusic();
   });
 
   $: track, loadAndPlayTrack();
   async function loadAndPlayTrack() {
-    if (track !== '') {
-      await loadTrack(track);
-      startAudio();
+    if (track) {
+      resetMusic();
+      await loadTrack(track.id);
+      startMusic();
+      $bpm = track.bpm;
     }
   }
 
-  /**
-   * @param {number} time
-   * @param {string} id
-   * @return {AudioBufferSourceNode}
-   */
-  function scheduleSong(time) {
-    return scheduleAudioOnChannel(track, time, 'audio-component');
-  }
-
-  function startAudio() {
-    if (isPlaying) return;
-    setChannelGain('audio-component', 1.0);
-    isPlaying = true;
-    const node = scheduleSong(0);
+  function startMusic() {
+    setChannelGain('music', 1.0);
+    const node = scheduleAudioOnChannel(track.id, 0, 'music');
     connectedNodes.push(node);
   }
 
-  function stopAudio() {
-    if (!isPlaying) return;
-    setChannelGain('audio-component', 0.0);
-    isPlaying = false;
+  function stopMusic() {
+    setChannelGain('music', 0.0);
   }
 
-  function resetAudio() {
+  function resetMusic() {
     for (const node of connectedNodes) {
-      cleanupAudioNode(node, 'audio-component');
+      cleanupAudioNode(node, 'music');
     }
     connectedNodes = [];
   }

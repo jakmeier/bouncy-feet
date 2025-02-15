@@ -1,16 +1,21 @@
 <script>
   import TrackAudio from '$lib/components/TrackAudio.svelte';
+  import { songs } from '$lib/stores/Songs';
   import { setContext } from 'svelte';
 
-  let track = '';
+  /** @type {Song | undefined} */
+  let track = undefined;
 
-  /** @param {string} newTrack */
-  async function setTrack(newTrack) {
-    track = newTrack;
+  /** @param {string} newTrackId */
+  async function setTrack(newTrackId) {
+    track = songs.get(newTrackId);
   }
 
   setContext('music', { setTrack });
 </script>
 
-<TrackAudio {track} />
+{#if track}
+  <TrackAudio {track} />
+{/if}
+
 <slot />

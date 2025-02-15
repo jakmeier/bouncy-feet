@@ -10,6 +10,7 @@
   import Popup from '$lib/components/ui/Popup.svelte';
   import { writable } from 'svelte/store';
   import { beatCounter, timeBetweenMoves } from '$lib/stores/Beat';
+  import { songs } from '$lib/stores/Songs';
 
   const { getCourse } = getContext('courses');
 
@@ -45,9 +46,15 @@
   loadCourse();
 
   const { setTrack } = getContext('music');
-  onMount(() => {
-    setTrack('120bpm_tech_house');
-  });
+
+  const songList = songs.list();
+  let trackIndex = 0;
+  function changeTrack(index) {
+    const track = songList[index % songList.length];
+    if (track) {
+      setTrack(track.id);
+    }
+  }
 </script>
 
 <LightBackground />
@@ -88,7 +95,12 @@
   <div>Explainer video</div>
   <button on:click={() => ($isVideoOpen = true)}>-></button>
   <div>Song</div>
-  <div>TODO</div>
+  <button
+    on:click={() => {
+      trackIndex += 1;
+      changeTrack(trackIndex);
+    }}>next</button
+  >
 </div>
 
 <div class="controls">
