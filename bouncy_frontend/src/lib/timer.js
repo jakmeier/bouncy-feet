@@ -3,6 +3,10 @@ import { readable } from 'svelte/store';
 /**
  * Increase a counter at a fixed interval and provides it as a svelte store.
  *
+ * TODO: To make this properly aligned with the music, setInterval is not
+ * accurate. Consider using something else, or at least recompute the actual
+ * delay to match the beat, rather than accumulating the error.
+ *
  * @param {number} start
  * @param {number} increment
  * @param {number} ms
@@ -47,7 +51,7 @@ export function dynamicCounter(start, increment, ms) {
       setTimeout(() => {
         counterValue += increment;
         set(counterValue);
-        foo();
+        fuse = foo();
       }, delay);
     fuse = foo();
     return () => clearTimeout(fuse);
