@@ -5,12 +5,12 @@
   export let color = undefined;
 </script>
 
-<div
+<section
   class="section-container"
   style="background-color: {bgColor}; color: {color}; --background-color: {bgColor}; --color: {color};"
 >
   <slot />
-</div>
+</section>
 
 <style>
   .section-container {
