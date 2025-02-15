@@ -125,6 +125,11 @@ button.symbol {
     background-color: transparent;
 }
 
+/* Action buttons that stay on the page, as opposed to changing the view. */
+button.action {
+    background-color: var(--theme-main);
+}
+
 button.light {
     background-color: var(--theme-accent-medium);
 }

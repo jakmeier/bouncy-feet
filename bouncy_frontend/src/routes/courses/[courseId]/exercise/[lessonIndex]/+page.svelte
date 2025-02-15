@@ -2,17 +2,20 @@
   import { page } from '$app/stores';
   import { t } from '$lib/i18n.js';
   import Header from '$lib/components/ui/Header.svelte';
-  import { getContext, onMount } from 'svelte';
+  import { getContext } from 'svelte';
   import Step from '../../../../collection/Step.svelte';
   import Video from '$lib/components/ui/Video.svelte';
   import { base } from '$app/paths';
   import LightBackground from '$lib/components/ui/sections/LightBackground.svelte';
   import Popup from '$lib/components/ui/Popup.svelte';
   import { writable } from 'svelte/store';
-  import { beatCounter, timeBetweenMoves } from '$lib/stores/Beat';
+  import { beatCounter, bpm, timeBetweenMoves } from '$lib/stores/Beat';
   import { songs } from '$lib/stores/Songs';
+  import DarkSection from '$lib/components/ui/sections/DarkSection.svelte';
+  import Footer from '$lib/components/ui/Footer.svelte';
 
   const { getCourse } = getContext('courses');
+  const { setTrack, songTitle, songAuthor } = getContext('music');
 
   let id;
   /** @type {import('$lib/instructor/bouncy_instructor').Course } */
@@ -45,8 +48,6 @@
   }
   loadCourse();
 
-  const { setTrack } = getContext('music');
-
   const songList = songs.list();
   let trackIndex = 0;
   function changeTrack(index) {
@@ -67,7 +68,7 @@
 </div>
 
 <div class="background-strip">
-  <div class="overview">
+  <div class="preview">
     <!-- <h3>{$t('courses.lesson.steps-subtitle')}</h3> -->
     {#each lesson.parts as part, index}
       <div class="exercise-part">
@@ -87,20 +88,11 @@
 </div>
 
 <!-- TODO: translated texts -->
-<div class="details">
+<div class="overview">
   <div>Foot steps</div>
   <div>TODO</div>
   <div>Duration</div>
   <div>TODO</div>
-  <div>Explainer video</div>
-  <button on:click={() => ($isVideoOpen = true)}>-></button>
-  <div>Song</div>
-  <button
-    on:click={() => {
-      trackIndex += 1;
-      changeTrack(trackIndex);
-    }}>next</button
-  >
 </div>
 
 <div class="controls">
@@ -108,6 +100,29 @@
     <button>{$t('courses.lesson.start-button')}</button>
   </a>
 </div>
+
+<DarkSection>
+  <h3>{$t('courses.lesson.settings-subtitle')}</h3>
+  <div class="about-lesson">
+    {#if lesson.video && lesson.video.length > 0}
+      <button class="action big-col" on:click={() => ($isVideoOpen = true)}
+        >{$t('courses.lesson.to-video-button')}</button
+      >
+    {/if}
+    <div class="left">{$songTitle} {$t('music.by')} {$songAuthor}</div>
+    <button
+      class="action right"
+      on:click={() => {
+        trackIndex += 1;
+        changeTrack(trackIndex);
+      }}>{$t('courses.lesson.next-song-button')}</button
+    >
+    <div class="left">{$t('courses.lesson.bpm-label')}</div>
+    <div class="left">{$bpm} BPM</div>
+  </div>
+
+  <Footer white />
+</DarkSection>
 
 <Popup bind:isOpen={isVideoOpen} showOkButton>
   <div class="video-wrapper">
@@ -118,7 +133,11 @@
 </Popup>
 
 <style>
-  .overview {
+  h3 {
+    margin: -0.5rem;
+  }
+
+  .preview {
     display: flex;
     justify-content: space-around;
   }
@@ -133,11 +152,7 @@
 
   .controls {
     text-align: center;
-  }
-
-  .details,
-  .description {
-    margin: 2em 0em;
+    margin: 2rem auto 5rem;
   }
 
   .background-strip {
@@ -146,18 +161,52 @@
     background-color: var(--theme-main);
     rotate: 8deg;
   }
-  .background-strip .overview {
+  .background-strip .preview {
     rotate: -8deg;
   }
 
-  .details {
+  .overview,
+  .about-lesson,
+  .description {
+    margin: 2em 0em 3rem;
+  }
+
+  .overview,
+  .about-lesson {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr max-content;
     gap: 1rem;
     align-items: center;
   }
 
+  .about-lesson > .left {
+    justify-self: start;
+  }
+  .about-lesson > .right {
+    justify-self: end;
+  }
+
+  .about-lesson button {
+    justify-self: center;
+    width: 100%;
+  }
+
+  .big-col {
+    grid-column-start: 1;
+    grid-column-end: 3;
+    margin: 1rem;
+  }
+
   .video-wrapper {
     width: 100vw;
+  }
+
+  @media (min-width: 730px) {
+    .background-strip {
+      rotate: 4deg;
+    }
+    .background-strip .preview {
+      rotate: -4deg;
+    }
   }
 </style>

@@ -18,10 +18,7 @@ export const beatDuration = derived([bpm], ([$bpm]) => {
 
 export let beatCounter = dynamicCounter(-1, 1, 100);
 
-let once = false;
-if (!once) {
-    timeBetweenMoves.subscribe((value) => beatCounter.setDelay(value));
-}
+const _sub = timeBetweenMoves.subscribe((value) => beatCounter.setDelay(value));
 
 /** @param {number} value */
 export function setBpm(value) {

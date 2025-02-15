@@ -42,10 +42,13 @@
         "lesson": {
             "title": "Lesson",
             "steps-subtitle": "Steps",
+            "settings-subtitle": "About the lesson",
             "next-button": "Next",
             "start-button": "Start exercise",
             "stop-button": "Stop exercise",
             "back-button": "Back to overview",
+            "to-video-button": "Explainer Video",
+            "next-song-button": "Next Song",
             "done-text": "Lesson complete",
             "audio-label": "Play beat",
             "bpm-label": "Speed",
@@ -249,6 +252,9 @@
     },
     "pathway": {
         "skill": "Skill"
+    },
+    "music": {
+        "by": "by"
     },
     "common": {
         "hint-popup-title": "Hint"

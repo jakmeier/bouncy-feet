@@ -82,7 +82,10 @@
  * @property {string} name
  * @property {number} index
  * @property {number} weight
+ * 
+ * @typedef {Object} Song
+ * @property {string} id
+ * @property {number} bpm
+ * @property {number} author
+ * @property {number} title
  */
-import { Cartesian2d } from "./instructor/bouncy_instructor";
-
-

@@ -42,10 +42,13 @@
         "lesson": {
             "title": "Lektion",
             "steps-subtitle": "Schritte",
+            "settings-subtitle": "Über die Lektion",
             "next-button": "Weiter",
             "start-button": "Übung beginnen",
             "stop-button": "Übung stoppen",
             "back-button": "Zurück zur Übersicht",
+            "to-video-button": "Videoerklärung",
+            "next-song-button": "Nächster Song",
             "done-text": "Lektion abgeschlossen",
             "audio-label": "Takt abspielen",
             "bpm-label": "Tempo",
@@ -249,6 +252,9 @@
     },
     "pathway": {
         "skill": "Fertigkeit"
+    },
+    "music": {
+        "by": "von"
     },
     "common": {
         "hint-popup-title": "Hinweis"

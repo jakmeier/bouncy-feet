@@ -17,4 +17,10 @@
     padding: 1rem;
     margin: calc(-1rem - 5px);
   }
+
+  @media (min-width: 730px) {
+    .section-container {
+      border-radius: 5px;
+    }
+  }
 </style>
