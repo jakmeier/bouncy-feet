@@ -223,6 +223,16 @@ ol {
     padding: 0.5rem;
 }
 
+
+.corner-marked2 {
+    position: relative;
+    padding: -0.125rem;
+    margin: 0;
+}
+
+
+.corner-marked2::before,
+.corner-marked2::after,
 .corner-marked::before,
 .corner-marked::after {
     content: '';
@@ -231,7 +241,7 @@ ol {
     height: min(3em, 25%);
     padding: 0;
     margin: 0;
-    border: 0.25rem solid var(--theme-main);
+    border: 0.125rem solid var(--theme-main);
 }
 
 .corner-marked::before {
@@ -245,5 +255,19 @@ ol {
     bottom: 0.125rem;
     right: 0.125rem;
     border-left: none;
+    border-top: none;
+}
+
+.corner-marked2::before {
+    top: 0.75rem;
+    right: 0.75rem;
+    border-left: none;
+    border-bottom: none;
+}
+
+.corner-marked2::after {
+    bottom: 0.75rem;
+    left: 0.75rem;
+    border-right: none;
     border-top: none;
 }

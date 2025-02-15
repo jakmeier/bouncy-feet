@@ -72,22 +72,25 @@
 
   <div class="ol">
     {#each course.lessons as lesson, index}
-      <div class="course">
-        <a href="../../courses/{course.id}/exercise/{index}">
-          <div class="step">
-            {#if lesson.parts.length > 0}
+      <div class="corner-marked2">
+        <div class="course corner-marked">
+
+          <a href="../../courses/{course.id}/exercise/{index}">
+            <div class="step">
+              {#if lesson.parts.length > 0}
               <!-- TODO: show in coach style -->
               <!-- TODO: show all parts, not just the last! -->
               <AnimatedStep
-                step={lesson.parts[lesson.parts.length - 1].step}
-                size={175}
-                backgroundColor="transparent"
+              step={lesson.parts[lesson.parts.length - 1].step}
+              size={175}
+              backgroundColor="transparent"
               ></AnimatedStep>
-            {/if}
-          </div>
-          <!-- TODO: lesson names -->
-          <div class="lesson-name">Lesson X</div>
-        </a>
+              {/if}
+            </div>
+            <!-- TODO: lesson names -->
+            <div class="lesson-name">Lesson X</div>
+          </a>
+        </div>
       </div>
     {/each}
   </div>
