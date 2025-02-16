@@ -34,6 +34,7 @@
     recordMediaPipeDelay,
   } from '$lib/stores/System';
   import FullScreenArea from '../ui/FullScreenArea.svelte';
+  import MusicControl from './MusicControl.svelte';
   // import LiveRecordingSettings from './LiveRecordingSettings.svelte';
 
   /** @type {boolean} */
@@ -309,6 +310,7 @@
 </script>
 
 <BackgroundTask {onFrame}></BackgroundTask>
+<MusicControl />
 
 <FullScreenArea>
   <div

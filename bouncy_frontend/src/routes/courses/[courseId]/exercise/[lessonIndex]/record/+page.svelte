@@ -1,10 +1,9 @@
 <script>
   import { page } from '$app/stores';
   import { t } from '$lib/i18n.js';
-  import { getContext, onDestroy, tick } from 'svelte';
+  import { getContext, onDestroy, onMount, tick } from 'svelte';
   import LiveRecording from '$lib/components/record/LiveRecording.svelte';
   import { DetectionState, Tracker } from '$lib/instructor/bouncy_instructor';
-  import BeatSelector from '$lib/components/record/BeatSelector.svelte';
   import Popup from '$lib/components/ui/Popup.svelte';
   import LessonEndResults from './LessonEndResults.svelte';
   import VideoReview from '$lib/components/review/VideoReview.svelte';
@@ -37,8 +36,6 @@
   let recordingEnd = undefined;
 
   /** @type {number} */
-  let bpmDetectionCounter;
-  /** @type {number} */
   let beatStart;
   let beatDetected = false;
   /** @type {import('svelte/store').Writable<boolean>} */
@@ -61,10 +58,7 @@
   /** @type {import('svelte/store').Readable<DetectionState> | null} */
   $: trackingState = tracker ? tracker.detectionState : null;
 
-  let live = false;
   let useFixedBpm = false;
-  /** @type {import('svelte/store').Writable<boolean>} */
-  let beatHintPopUpIsOpen = writable(true);
   /** @type {import('svelte/store').Writable<boolean>} */
   let startExercisePopUpIsOpen = writable(false);
 
@@ -79,7 +73,6 @@
       $startExercisePopUpIsOpen = true;
       return;
     }
-    live = true;
     await tick();
     await startCamera();
     await startRecording();
@@ -88,7 +81,7 @@
   /**
    * @param {Blob | undefined} videoBlob
    */
-  async function onRecordingStopped (videoBlob) {
+  async function onRecordingStopped(videoBlob) {
     tracker?.finishTracking();
     if (videoBlob) {
       if (videoUrl) {
@@ -101,13 +94,11 @@
 
     detectionResult = tracker?.lastDetection;
     detectedSteps = detectionResult?.steps();
-  };
+  }
 
   function restart() {
     tracker?.clear();
-    bpmDetectionCounter = -1;
     beatStart = 0;
-    live = false;
     recordingStart = undefined;
     recordingEnd = undefined;
     showResults = false;
@@ -116,10 +107,6 @@
   function goBack() {
     window.history.back();
     window.history.back();
-  }
-
-  function closeBeatPopUp() {
-    $beatHintPopUpIsOpen = false;
   }
 
   function closeStartExercisePopUp() {
@@ -166,6 +153,8 @@
   }
   $: if ($trackingState === DetectionState.TrackingDone) trackingDone();
 
+  onMount(start);
+
   onDestroy(() => {
     if (videoUrl) {
       URL.revokeObjectURL(videoUrl);
@@ -176,20 +165,7 @@
 <LightBackground />
 
 <div class="outer">
-  {#if !live}
-    <!-- TODO: beat selector should be a layer above, optionally, by default it should be music from the app -->
-    <BeatSelector
-      bind:counter={bpmDetectionCounter}
-      bind:bpmSelected={beatDetected}
-      bind:useFixedBpm
-    ></BeatSelector>
-    <Button
-      class={beatDetected ? 'wide' : 'locked wide'}
-      on:click={beatDetected ? start : () => showHint.set(true)}
-      symbol="play_arrow"
-      text="courses.lesson.start-button"
-    ></Button>
-  {:else if $trackingState === DetectionState.TrackingDone}
+  {#if $trackingState === DetectionState.TrackingDone}
     {#if !showResults}
       <LessonEnd bind:showResults></LessonEnd>
     {:else}
@@ -244,26 +220,6 @@
 
 <Popup bind:isOpen={showHint} showOkButton title={'common.hint-popup-title'}>
   {$t('record.estimate-bpm-hint')}
-</Popup>
-
-<Popup
-  isOpen={beatHintPopUpIsOpen}
-  title={'courses.lesson.exercise-popup-title'}
->
-  <div>
-    {$t('courses.lesson.exercise-beat-description')}
-  </div>
-  <button class="wide" on:click={closeBeatPopUp}
-    >{$t('courses.lesson.own-music-button')}</button
-  >
-  <button
-    class="wide"
-    on:click={() => {
-      useFixedBpm = true;
-      closeBeatPopUp();
-    }}>{$t('courses.lesson.play-beat-button')}</button
-  >
-  <slot />
 </Popup>
 
 <Popup

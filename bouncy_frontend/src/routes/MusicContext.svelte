@@ -1,7 +1,7 @@
 <script>
   import TrackAudio from '$lib/components/TrackAudio.svelte';
   import { songs } from '$lib/stores/Songs';
-  import { setContext } from 'svelte';
+  import { onMount, setContext } from 'svelte';
   import { readable } from 'svelte/store';
 
   /** @type {Song | undefined} */
@@ -24,11 +24,31 @@
     authorSetter(track?.author || '-');
   }
 
-  setContext('music', { setTrack, songTitle, songAuthor });
+  let resetTrackInternal = () => {};
+  function resetTrack() {
+    resetTrackInternal();
+  }
+
+  let stopTrackInternal = () => {};
+  function stopTrack() {
+    stopTrackInternal();
+  }
+
+  setContext('music', {
+    setTrack,
+    resetTrack,
+    stopTrack,
+    songTitle,
+    songAuthor,
+  });
 </script>
 
 {#if track}
-  <TrackAudio {track} />
+  <TrackAudio
+    {track}
+    bind:resetTrack={resetTrackInternal}
+    bind:stopMusic={stopTrackInternal}
+  />
 {/if}
 
 <slot />

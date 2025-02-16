@@ -11,6 +11,14 @@
   export let isOn = false;
   /** @type {Song} */
   export let track;
+  export function resetTrack() {
+    resetMusic();
+    startMusic();
+  }
+
+  export function stopMusic() {
+    setChannelGain('music', 0.0);
+  }
 
   let initialized = false;
   $: initialized && (isOn ? startMusic() : stopMusic());
@@ -49,10 +57,6 @@
     setChannelGain('music', 1.0);
     const node = scheduleAudioOnChannel(track.id, 0, 'music');
     connectedNodes.push(node);
-  }
-
-  function stopMusic() {
-    setChannelGain('music', 0.0);
   }
 
   function resetMusic() {
