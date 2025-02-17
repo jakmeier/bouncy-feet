@@ -17,6 +17,7 @@ use tower_sessions::{Expiry, MemoryStore, SessionManagerLayer};
 use user::{get_scores, post_stats};
 
 mod auth;
+mod client_session;
 mod user;
 mod user2;
 mod user_meta;
@@ -117,6 +118,14 @@ async fn main() -> anyhow::Result<()> {
         .layer(oidc_auth_service) // provides (optional) oidc claims
         .layer(session_layer)
         .route("/", get(root))
+        .route(
+            "/new_guest_session",
+            post(client_session::create_guest_session),
+        ) // consider rate-limiting
+        .route(
+            "/new_guest_activity",
+            post(client_session::record_guest_activity),
+        )
         .route("/scoreboard", get(get_scores))
         .route("/user/stats", post(post_stats))
         .layer(cors_layer)
