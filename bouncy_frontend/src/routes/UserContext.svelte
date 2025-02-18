@@ -3,11 +3,52 @@
    * Provides access to a user local storage
    */
   import { browser } from '$app/environment';
-  import { submitStats } from '$lib/stats';
+  import { requestNewGuestSession, submitStats } from '$lib/stats';
   import { generateRandomUsername } from '$lib/username';
   import { setContext } from 'svelte';
-  import { writable } from 'svelte/store';
+  import { readable, writable } from 'svelte/store';
   import { showExperimentalFeatures } from '$lib/stores/FeatureSelection.js';
+
+  /**
+   * Client sessions are available for registered users and guests.
+   *
+   * There can be multiple client sessions per user, when they use multiple
+   * devices, browsers, or browser profiles.
+   *
+   * To create a new guest session, the client has to make a request to the API server.
+   * This could be changed in the future, to allow offline initialization.
+   *
+   * TODO: registered user client sessions
+   */
+  let clientSession = readable({});
+  if (browser) {
+    clientSession = readable(
+      {
+        id: localStorage.clientSessionId,
+        secret: localStorage.clientSessionSecret,
+      },
+      (set) => {
+        if (!localStorage.clientSessionId) {
+          requestNewGuestSession().then((response) => {
+            if (response.client_session_id && response.client_session_secret) {
+              const newClientSession = {
+                id: response.client_session_id,
+                secret: response.client_session_secret,
+              };
+              localStorage.clientSessionId = newClientSession.id;
+              localStorage.clientSessionSecret = newClientSession.secret;
+              set(newClientSession);
+            } else {
+              console.error(
+                'Failed to create a guest session. Response:',
+                response
+              );
+            }
+          });
+        }
+      }
+    );
+  }
 
   function fromLocalStorage() {
     try {
@@ -164,6 +205,7 @@
 
   setContext('user', {
     store: user,
+    clientSession,
     computeDanceStats,
     addDanceToStats,
     recordFinishedLesson,

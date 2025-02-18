@@ -107,20 +107,27 @@ async fn main() -> anyhow::Result<()> {
     let user_layer = middleware::from_fn_with_state(state.clone(), user2::user_lookup);
 
     let app = Router::new()
+        .route("/testauth", get(authenticated))
+        .route("/auth", get(auth::oauth_callback))
+        .route("/user", get(user2::user_info))
         .route("/user/meta", get(user_meta::metadata))
         .route("/user/meta/update", post(user_meta::update_user_metadata))
-        .route("/user", get(user2::user_info))
-        .layer(user_layer)
-        // /auth is the endpoint for OICD code exchange
-        .route("/auth", get(auth::oauth_callback))
-        .layer(oidc_login_service) // enforces logging in
-        .route("/testauth", get(authenticated))
-        .layer(oidc_auth_service) // provides (optional) oidc claims
-        .layer(session_layer)
+        // Layer (middlewares) on the router affect routes added BEFORE only.
+        // So all API calls that require user login should be above.
+        .layer(
+            // axum: ServiceBuidler reverses order of middlewares (yay)
+            // -> so these here run top to bottom, layers affect only routes afterwards
+            ServiceBuilder::new()
+                .layer(session_layer)
+                .layer(oidc_auth_service) // provides (optional) oidc claims
+                .layer(oidc_login_service) // enforces logging in
+                // /auth is the endpoint for OICD code exchange
+                .layer(user_layer),
+        )
         .route("/", get(root))
         .route(
             "/new_guest_session",
-            post(client_session::create_guest_session),
+            get(client_session::create_guest_session),
         ) // consider rate-limiting
         .route(
             "/new_guest_activity",

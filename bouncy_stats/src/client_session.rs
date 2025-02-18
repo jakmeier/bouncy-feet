@@ -32,11 +32,12 @@ pub(crate) async fn create_guest_session(
     let client_session_secret = Uuid::new_v4();
 
     let result: Option<(i64,)> = sqlx::query_as(
-        "INSERT INTO client_session (client_session_secret) VALUES ($1) RETURNING client_session_id"
+        "INSERT INTO client_session (client_session_secret) VALUES ($1) RETURNING id",
     )
     .bind(client_session_secret)
     .fetch_optional(&state.pg_db_pool)
-    .await.map_err(internal_error)?;
+    .await
+    .map_err(internal_error)?;
 
     if let Some((client_session_id,)) = result {
         Ok(Json(ClientSessionResponse {

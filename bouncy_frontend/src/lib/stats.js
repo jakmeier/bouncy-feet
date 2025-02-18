@@ -67,8 +67,9 @@ export async function submitStats(user) {
     }
 }
 
-export async function fetchLeaderboard() {
-    const apiUrl = STATS_API_BASE + '/scoreboard';
+/** @param {string} path */
+async function apiGetRequest(path) {
+    const apiUrl = STATS_API_BASE + path;
 
     try {
         const response = await fetch(apiUrl);
@@ -76,12 +77,20 @@ export async function fetchLeaderboard() {
         if (response.ok) {
             return await response.json();
         } else {
-            console.error('Failed to read scoreboard');
+            console.error(`Failed GET request to ${apiUrl}`);
         }
     } catch (error) {
-        console.error('Error while reading scoreboard:', error);
-        return [];
+        console.error(`Error returned for GET request to ${apiUrl}`, error);
+        return null;
     }
+}
+
+export async function requestNewGuestSession() {
+    return await apiGetRequest('/new_guest_session');
+}
+
+export async function fetchLeaderboard() {
+    return await apiGetRequest('/scoreboard') || [];
 }
 
 /**
