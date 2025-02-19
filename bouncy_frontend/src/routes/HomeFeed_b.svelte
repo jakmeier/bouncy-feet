@@ -9,11 +9,15 @@
   import Arrow from '$lib/components/ui/Arrow.svelte';
   import LightBackgroundSection from '$lib/components/ui/sections/LightSection.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
+  import { getContext } from 'svelte';
+  import FirstVisist from './FirstVisist.svelte';
 
   /** @type{import("$lib/instructor/bouncy_instructor").DanceWrapper[]} */
   export let featuredDances;
   /** @type{import("$lib/instructor/bouncy_instructor").StepWrapper[]} */
   export let featuredSteps;
+
+  const { localState } = getContext('user');
 
   const entryDance = featuredDances.find(
     (dance) => dance.id === 'Home Animation (dev)'
@@ -42,6 +46,10 @@
     alt="Bouncy Feet Logo"
   />
 </div>
+
+{#if $localState.firstVisit}
+  <FirstVisist />
+{/if}
 
 <div class="focus-card">
   <h1>

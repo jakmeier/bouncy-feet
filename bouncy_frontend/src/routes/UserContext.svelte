@@ -5,9 +5,21 @@
   import { browser } from '$app/environment';
   import { requestNewGuestSession, submitStats } from '$lib/stats';
   import { generateRandomUsername } from '$lib/username';
-  import { setContext } from 'svelte';
+  import { onMount, setContext } from 'svelte';
   import { readable, writable } from 'svelte/store';
   import { showExperimentalFeatures } from '$lib/stores/FeatureSelection.js';
+
+  /** Local state, unlike user state, is not synchronized anywhere. */
+  const localStateValue =
+    browser && localStorage.localState
+      ? JSON.parse(localStorage.localState)
+      : {};
+  const localState = writable(localStateValue);
+  if (browser) {
+    localState.subscribe(
+      (value) => (localStorage.localState = JSON.stringify(value))
+    );
+  }
 
   /**
    * Client sessions are available for registered users and guests.
@@ -38,6 +50,9 @@
               localStorage.clientSessionId = newClientSession.id;
               localStorage.clientSessionSecret = newClientSession.secret;
               set(newClientSession);
+              $localState.firstVisit = true;
+              // trigger subscribers
+              $localState = $localState;
             } else {
               console.error(
                 'Failed to create a guest session. Response:',
@@ -206,9 +221,17 @@
   setContext('user', {
     store: user,
     clientSession,
+    localState,
     computeDanceStats,
     addDanceToStats,
     recordFinishedLesson,
+  });
+
+  onMount(() => {
+    // ensure the store is initialized
+    if (!$clientSession.id) {
+      console.warn('No client session');
+    }
   });
 </script>
 

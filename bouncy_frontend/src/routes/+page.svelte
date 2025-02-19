@@ -1,5 +1,4 @@
 <script>
-  import { version } from '$lib/stores/FeatureSelection';
   import HomeFeedB from './HomeFeed_b.svelte';
 
   /** @type {import('./$types').PageData} */
