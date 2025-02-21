@@ -37,6 +37,8 @@
  * @property {number} cy 
  * @property {number} r 
  * @property {string} fill 
+ * @property {string} stroke 
+ * @property {number} strokeWidth 
  *
  * @typedef {Object} Style
  * @property {String} color

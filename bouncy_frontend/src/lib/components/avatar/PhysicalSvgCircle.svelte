@@ -23,4 +23,11 @@
   $: circle, rStore.set(circle.r, $animation);
 </script>
 
-<circle cx={$cxStore} cy={$cyStore} r={$rStore} fill={circle.fill} />
+<circle
+  cx={$cxStore}
+  cy={$cyStore}
+  r={$rStore}
+  stroke={circle.stroke}
+  stroke-width={circle.strokeWidth}
+  fill={circle.fill}
+/>
