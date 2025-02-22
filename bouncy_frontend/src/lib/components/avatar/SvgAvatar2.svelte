@@ -1,15 +1,13 @@
 <script>
   import SvgAvatarSide from './SvgAvatarSide.svelte';
-  import SvgPolygon from './SvgPolygon.svelte';
   import SvgStyle from './SvgStyle.svelte';
-  import SvgCircle from './SvgCircle.svelte';
   import {
     Cartesian2d,
     RenderableSegment,
   } from '$lib/instructor/bouncy_instructor';
-  import { MAIN_THEME_COLORING } from '$lib/constants';
   import SvgLine from './SvgLine.svelte';
   import { getContext } from 'svelte';
+  import SvgAvatarHead from './SvgAvatarHead.svelte';
 
   /** @type import('$lib/instructor/bouncy_instructor').SkeletonV2 */
   export let skeleton;
@@ -40,18 +38,7 @@
   /** @type {AvatarColoring} */
   let coloring = avatarStyleCtx.coloring;
   let lineWidth = 10 * avatarStyleCtx.bodyShape.strokeWidth;
-  let headRadius = 0.055 * avatarSizePixels * avatarStyleCtx.headStyle.size;
   let headHeight = 1;
-  let headFill =
-    avatarStyleCtx.headStyle.shape === 'disk' ? coloring.headColor : undefined;
-  let headStroke =
-    avatarStyleCtx.headStyle.shape === 'circle'
-      ? coloring.headColor
-      : undefined;
-  let headStrokeWidth =
-    avatarStyleCtx.headStyle.shape === 'circle'
-      ? (headRadius / 2) * avatarStyleCtx.headStyle.strokeWidth
-      : undefined;
 
   /** @type {Cartesian2d} */
   $: leftHip = skeleton.hip.start;
@@ -67,18 +54,14 @@
   $: cy = leftShoulder.y - (avatarSizePixels * headHeight) / 10;
   let dummyUpdate = 0;
   $: skeleton, (dummyUpdate += 1);
-
-  $: console.log('headStrokeWidth', headStrokeWidth);
 </script>
 
-<SvgCircle
-  id="head"
+<SvgAvatarHead
   {cx}
   {cy}
-  r={headRadius}
-  fill={headFill}
-  stroke={headStroke}
-  strokeWidth={headStrokeWidth}
+  color={coloring.headColor}
+  headStyle={avatarStyleCtx.headStyle}
+  {avatarSizePixels}
   {dummyUpdate}
 />
 <SvgStyle color={coloring.leftColor} linecap="round" {lineWidth}>
