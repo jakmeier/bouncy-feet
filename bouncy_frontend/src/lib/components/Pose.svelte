@@ -7,12 +7,11 @@
   /** @type {PoseWrapper} */
   export let pose;
   export let size = 200;
-  export let style = LEFT_RIGHT_COLORING_LIGHT;
 </script>
 
 <div class="avatar">
   <Svg width={size} height={size} orderByZ>
-    <SvgAvatar skeleton={pose.skeleton()} width={size} height={size} {style}
+    <SvgAvatar skeleton={pose.skeleton()} width={size} height={size}
     ></SvgAvatar>
   </Svg>
 </div>

@@ -24,7 +24,6 @@
     leftColor: '#000000FF',
     rightColor: '#000000FF',
     headColor: '#00000040',
-    bodyColor: '#00000010',
   };
 
   getContext('canvas').addItem(draw);
@@ -48,7 +47,6 @@
    * the original image. Useful for overlapping a video stream.
    */
   function draw(ctx) {
-    ctx.strokeStyle = style.bodyColor;
     ctx.lineWidth = lineWidth;
     ctx.lineCap = 'round';
     ctx.fillStyle = style.headColor;

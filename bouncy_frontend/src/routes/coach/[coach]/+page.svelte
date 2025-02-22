@@ -50,8 +50,7 @@
 <h3>Master of heel-toe movements</h3>
 <!-- <h3>Ready for a training session with me?</h3> -->
 {#if step}
-  <AnimatedStep {step} size={150} {style} backgroundColor="transparent"
-  ></AnimatedStep>
+  <AnimatedStep {step} size={150} backgroundColor="transparent"></AnimatedStep>
 {/if}
 
 <div class="train">
@@ -74,17 +73,16 @@
     {#each course.lessons as lesson, index}
       <div class="corner-marked2">
         <div class="course corner-marked">
-
           <a href="../../courses/{course.id}/exercise/{index}">
             <div class="step">
               {#if lesson.parts.length > 0}
-              <!-- TODO: show in coach style -->
-              <!-- TODO: show all parts, not just the last! -->
-              <AnimatedStep
-              step={lesson.parts[lesson.parts.length - 1].step}
-              size={175}
-              backgroundColor="transparent"
-              ></AnimatedStep>
+                <!-- TODO: show in coach style -->
+                <!-- TODO: show all parts, not just the last! -->
+                <AnimatedStep
+                  step={lesson.parts[lesson.parts.length - 1].step}
+                  size={175}
+                  backgroundColor="transparent"
+                ></AnimatedStep>
               {/if}
             </div>
             <!-- TODO: lesson names -->

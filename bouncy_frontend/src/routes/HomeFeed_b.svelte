@@ -76,7 +76,6 @@
     <PathwayProgress
       teacherName="V-Step Master"
       step={featuredSteps[1]}
-      style={LEFT_RIGHT_COLORING}
       experience={700}
       skill={7}
       maxSkill={10}
@@ -88,7 +87,6 @@
     <PathwayProgress
       teacherName="Running Man Coach"
       step={featuredSteps[0]}
-      style={ORANGE_COLORING}
       experience={0}
       skill={0}
       maxSkill={10}

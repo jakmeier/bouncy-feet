@@ -20,9 +20,6 @@
   /** @type {boolean} */
   export let showOverflow = false;
 
-  /** @type{AvatarColoring} */
-  export let style = MAIN_THEME_COLORING;
-
   // When the beat is negative, it should show a resting position
   // according to the orientation of the first pose.
   const firstPost = dance.skeleton(0);
@@ -43,7 +40,7 @@
 <Animation {animationTime} jumpHeight={size * 0.025}>
   <Svg height={size} width={size} orderByZ {showOverflow}>
     {#if skeleton && $beat >= hiddenBeats - beatDelay}
-      <SvgAvatar width={size} height={size} {skeleton} {bodyShift} {style} />
+      <SvgAvatar width={size} height={size} {skeleton} {bodyShift} />
     {/if}
   </Svg>
 </Animation>

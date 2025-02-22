@@ -7,26 +7,12 @@
   export let skeleton;
   export let width = 100;
   export let height = 100;
-  export let lineWidth = 0;
   export let bodyShift = { x: 0, y: 0 };
   export let avatarSize = 1.0;
   /** @type LimbError[] */
   export let markedLimbs = [];
   /** @type number[] */
   export let markedLimbIndices = [];
-
-  /** @type {AvatarColoring} */
-  export let style = MAIN_THEME_COLORING;
-  export let headRadius = 0;
-  export let headHeight = 1.0;
-
-  $: displayedLineWidth = lineWidth
-    ? lineWidth
-    : Math.max(width, height) * 0.05;
-
-  $: displayedHeadRadius = headRadius
-    ? headRadius
-    : Math.min(height, width) * avatarSize * 0.055;
 
   /**
    * @param {number} s
@@ -57,16 +43,6 @@
   $: markedSegments = markedLimbs
     .map((limb) => limb.render(renderedSkeleton))
     .concat(markedLimbIndices.map((i) => renderedSkeleton.segment(i)));
-
-  // $: headRadius = 0.055 * avatarSizePixels;
 </script>
 
-<SvgAvatar2
-  {avatarSizePixels}
-  skeleton={renderedSkeleton}
-  lineWidth={displayedLineWidth}
-  {markedSegments}
-  headRadius={displayedHeadRadius}
-  {headHeight}
-  {style}
-/>
+<SvgAvatar2 {avatarSizePixels} skeleton={renderedSkeleton} {markedSegments} />

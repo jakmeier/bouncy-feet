@@ -5,6 +5,7 @@
   import { beatCounter } from '$lib/stores/Beat';
   import { derived } from 'svelte/store';
   import DanceAnimation from './DanceAnimation.svelte';
+  import AvatarStyleContext from '$lib/components/avatar/AvatarStyleContext.svelte';
 
   /** @type{import("$lib/instructor/bouncy_instructor").DanceWrapper} */
   export let dance;
@@ -39,15 +40,18 @@
 <div class="container">
   <div class="half-transparent">
     {#if dance}
-      <DanceAnimation
-        size={trainingsWidth}
-        {dance}
-        style={EXAMPLE_CUSTOM_COLORING}
-        beatDelay={3}
-        hiddenBeats={3}
-        showOverflow={true}
-        beat={shownBeat}
-      />
+      <AvatarStyleContext
+        headStyle={{ shape: 'circle', size: 0.8, strokeWidth: 1.2 }}
+      >
+        <DanceAnimation
+          size={trainingsWidth}
+          {dance}
+          beatDelay={3}
+          hiddenBeats={3}
+          showOverflow={true}
+          beat={shownBeat}
+        />
+      </AvatarStyleContext>
     {:else}
       <Area
         width="{trainingsWidth}px"

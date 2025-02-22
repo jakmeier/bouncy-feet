@@ -6,7 +6,6 @@
 
   export let size;
   export let step;
-  export let style;
   export let title;
   export let fitness;
   export let xp;
@@ -27,7 +26,7 @@
   <div>{$t(title)}</div>
   {#if selected}
     <a href="./coach/{coach}">
-      <AnimatedStep {size} {step} {style} />
+      <AnimatedStep {size} {step} />
       <div class="bubbles">
         <div>+{fitness} Fitness</div>
         <div>+{xp} XP</div>
@@ -35,7 +34,7 @@
       </div>
     </a>
   {:else}
-    <Step {size} {step} {style} />
+    <Step {size} {step}/>
   {/if}
 </div>
 

@@ -35,13 +35,6 @@
   $: beatCounter.setDelay(stepTime);
 
   let selected = selectItems[0];
-
-  let thickness = 10;
-  let headRadiusParam = 1;
-  let headHeightParam = 1;
-  let rightColor = '#a9eb66';
-  let leftColor = '#4c6633';
-  let headColor = '#4c6633';
 </script>
 
 <Header title={name} />
@@ -52,100 +45,7 @@
   {animationTime}
   size={200}
   rotation={degree}
-  lineWidth={thickness}
-  headRadius={100 * 0.1 * headRadiusParam}
-  headHeight={headHeightParam}
-  style={{
-    leftColor,
-    rightColor,
-    headColor,
-    bodyColor: 'var(--theme-neutral-light)',
-  }}
 />
-
-{#if $user.experimentalFeatures}
-  <div class="input-group">
-    <label>
-      Thickness
-      <input
-        type="number"
-        bind:value={thickness}
-        min="0.1"
-        max="50"
-        step="0.1"
-        class="number"
-      />
-      <input
-        type="range"
-        bind:value={thickness}
-        min="0.1"
-        max="50"
-        step="0.1"
-        class="range"
-      />
-    </label>
-
-    <label>
-      Head Size
-      <input
-        type="number"
-        bind:value={headRadiusParam}
-        min="0.1"
-        max="5"
-        step="0.1"
-        class="number"
-      />
-      <input
-        type="range"
-        bind:value={headRadiusParam}
-        min="0.1"
-        max="5"
-        step="0.1"
-        class="range"
-      />
-    </label>
-
-    <label>
-      Head Height
-      <input
-        type="number"
-        bind:value={headHeightParam}
-        min="0.1"
-        max="3"
-        step="0.1"
-        class="number"
-      />
-      <input
-        type="range"
-        bind:value={headHeightParam}
-        min="0.1"
-        max="3"
-        step="0.1"
-        class="range"
-      />
-    </label>
-  </div>
-
-  <div class="input-group">
-    <label>
-      Left Color
-      <input type="text" bind:value={leftColor} />
-      <input type="color" bind:value={leftColor} />
-    </label>
-
-    <label>
-      Right Color
-      <input type="text" bind:value={rightColor} />
-      <input type="color" bind:value={rightColor} />
-    </label>
-
-    <label>
-      Head Color
-      <input type="text" bind:value={headColor} />
-      <input type="color" bind:value={headColor} />
-    </label>
-  </div>
-{/if}
 
 <label>
   {$t('collection.step.speed')}

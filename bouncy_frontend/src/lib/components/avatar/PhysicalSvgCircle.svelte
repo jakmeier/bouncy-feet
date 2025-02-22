@@ -3,7 +3,7 @@
   import { getContext } from 'svelte';
   import { writable } from 'svelte/store';
 
-  /** @type{Circle} */
+  /** @type {Circle} */
   export let circle;
 
   const animationCtx = getContext('animation');

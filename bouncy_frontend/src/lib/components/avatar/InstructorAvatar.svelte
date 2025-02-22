@@ -10,6 +10,7 @@
   import { timeBetweenMoves } from '$lib/stores/Beat';
   import Svg from '../avatar/Svg.svelte';
   import { onMount } from 'svelte';
+  import AvatarStyleContext from './AvatarStyleContext.svelte';
 
   /** @type {number} */
   export let width;
@@ -31,7 +32,6 @@
     leftColor: '#000000FF',
     rightColor: '#000000FF',
     headColor: '#00000040',
-    bodyColor: '#00000010',
   };
 
   export let showCorrectTime = 100;
@@ -53,7 +53,7 @@
   /** @type {import('$lib/instructor/bouncy_instructor').Cartesian2d | null} */
   let correctBodyShift = null;
 
-  let displayedStyle = instructorStyle;
+  let coloring = instructorStyle;
   let displayedSkeleton = skeleton;
   let displayedBodyShift = bodyShift;
 
@@ -74,12 +74,12 @@
   }
 
   function displayCorrectPosition() {
-    displayedStyle = CORRECT_COLORING;
+    coloring = CORRECT_COLORING;
     displayedBodyShift = correctBodyShift || bodyShift;
     setTimeout(() => {
       // TODO: handle reentrance
       animationDelay = $timeBetweenMoves - animationTime - showCorrectTime;
-      displayedStyle = instructorStyle;
+      coloring = instructorStyle;
       displayedBodyShift = bodyShift;
       displayedSkeleton = skeleton;
     }, showCorrectTime);
@@ -94,14 +94,15 @@
 <div class="avatar-container">
   <Animation {animationTime} delay={animationDelay} jumpHeight={height * 0.025}>
     <Svg {width} {height} orderByZ>
-      <SvgAvatar
-        skeleton={displayedSkeleton}
-        {width}
-        {height}
-        {avatarSize}
-        style={displayedStyle}
-        bodyShift={displayedBodyShift.add(origin)}
-      ></SvgAvatar>
+      <AvatarStyleContext {coloring}>
+        <SvgAvatar
+          skeleton={displayedSkeleton}
+          {width}
+          {height}
+          {avatarSize}
+          bodyShift={displayedBodyShift.add(origin)}
+        ></SvgAvatar>
+      </AvatarStyleContext>
     </Svg>
   </Animation>
 </div>

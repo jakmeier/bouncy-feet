@@ -14,12 +14,7 @@
   export let borderWidth = 0;
   /** @type{number} animationTime in ms */
   export let animationTime = 500;
-  export let lineWidth = size * 0.05;
-  export let style = LEFT_RIGHT_COLORING;
   export let backgroundColor = 'var(--theme-neutral-light)';
-
-  export let headRadius = undefined;
-  export let headHeight = undefined;
 
   // When the pose index is negative, it should show a resting position
   // according to the orientation of the first pose.
@@ -58,16 +53,7 @@
 >
   <Animation {animationTime} {jumpHeight}>
     <Svg width={size} height={size} orderByZ>
-      <SvgAvatar
-        width={size}
-        height={size}
-        {skeleton}
-        {bodyShift}
-        {lineWidth}
-        {style}
-        {headRadius}
-        {headHeight}
-      />
+      <SvgAvatar width={size} height={size} {skeleton} {bodyShift} />
     </Svg>
   </Animation>
 </Area>

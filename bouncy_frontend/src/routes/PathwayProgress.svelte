@@ -5,7 +5,6 @@
   /** @type {string} */
   export let teacherName;
   export let step;
-  export let style;
   export let skill;
   export let maxSkill;
   export let experience;
@@ -18,7 +17,7 @@
 <div class="container">
   <div class="coach">
     {#if step}
-      <AnimatedStep {step} {style} size={220} backgroundColor="none" />
+      <AnimatedStep {step} size={220} backgroundColor="none" />
     {/if}
   </div>
 
