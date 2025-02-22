@@ -41,7 +41,7 @@
   <div class="half-transparent">
     {#if dance}
       <AvatarStyleContext
-        headStyle={{ shape: 'circle', size: 0.8, strokeWidth: 1.2 }}
+        headStyle={{ shape: 'square', size: 0.8, strokeWidth: 1.2 }}
       >
         <DanceAnimation
           size={trainingsWidth}
