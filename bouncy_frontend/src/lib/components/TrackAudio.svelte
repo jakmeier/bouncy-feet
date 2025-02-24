@@ -1,4 +1,6 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import { onDestroy, onMount } from 'svelte';
   import {
     setChannelGain,
@@ -8,9 +10,15 @@
   } from '$lib/stores/Audio';
   import { beatStart, bpm } from '$lib/stores/Beat';
 
-  export let isOn = false;
-  /** @type {Song} */
-  export let track;
+  
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [isOn]
+   * @property {Song} track
+   */
+
+  /** @type {Props} */
+  let { isOn = false, track } = $props();
   export function resetTrack() {
     resetMusic();
     startMusic();
@@ -20,12 +28,7 @@
     setChannelGain('music', 0.0);
   }
 
-  let initialized = false;
-  $: initialized && (isOn ? startMusic() : stopMusic());
-  // $: initialized && $timeBetweenMoves && resetAudio();
-
-  /** @type {number} ms performance timestamp */
-  $: $beatStart, resetMusic();
+  let initialized = $state(false);
 
   /**
    * batches of connected audio nodes that should be disconnected at some point
@@ -43,7 +46,6 @@
     resetMusic();
   });
 
-  $: track, loadAndPlayTrack();
   async function loadAndPlayTrack() {
     if (track) {
       resetMusic();
@@ -65,4 +67,16 @@
     }
     connectedNodes = [];
   }
+  run(() => {
+    initialized && (isOn ? startMusic() : stopMusic());
+  });
+  // $: initialized && $timeBetweenMoves && resetAudio();
+
+  /** @type {number} ms performance timestamp */
+  run(() => {
+    $beatStart, resetMusic();
+  });
+  run(() => {
+    track, loadAndPlayTrack();
+  });
 </script>

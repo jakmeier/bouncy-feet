@@ -20,25 +20,25 @@
   /** @type {PoseDetection} */
   let dataListener;
   /** @type {(skeleton: import("$lib/instructor/bouncy_instructor").SkeletonWrapper)=>void} */
-  let loadSkeleton;
+  let loadSkeleton = $state();
   /** @type {()=>import("$lib/instructor/bouncy_instructor").PoseWrapper} */
-  let poseFromForm;
+  let poseFromForm = $state();
   /** @type {(skeleton: import("$lib/instructor/bouncy_instructor").PoseWrapper)=>void} */
-  let loadPose;
+  let loadPose = $state();
   /** @type {()=>import("$lib/instructor/bouncy_instructor").PoseWrapper} */
-  let getPose;
+  let getPose = $state();
 
   /** @type {import("$lib/instructor/bouncy_instructor").SkeletonV2 | undefined} */
-  let liveSkeleton;
+  let liveSkeleton = $state();
   /** @type {import("$lib/instructor/bouncy_instructor").SkeletonWrapper | undefined} */
   let poseSkeleton;
 
   /** @type {HTMLInputElement}  */
-  let upload;
+  let upload = $state();
   /** @type {HTMLVideoElement}  */
-  let video;
-  let videoSrcWidth = 0;
-  let videoSrcHeight = 0;
+  let video = $state();
+  let videoSrcWidth = $state(0);
+  let videoSrcHeight = $state(0);
 
   /** @type {undefined | number} */
   let recordingStart;
@@ -115,11 +115,11 @@
     bind:this={upload}
     type="file"
     accept="video/*"
-    on:change={loadVideo}
+    onchange={loadVideo}
   />
 </p>
 
-<!-- svelte-ignore a11y-media-has-caption -->
+<!-- svelte-ignore a11y_media_has_caption -->
 <div class="side-by-side">
   <video
     bind:this={video}
@@ -141,11 +141,11 @@
   </div>
 </div>
 
-<button class="full-width short" on:click={copySkeleton}> ↓ </button>
+<button class="full-width short" onclick={copySkeleton}> ↓ </button>
 
 <PoseAnglesForm bind:loadSkeleton bind:readPose={poseFromForm}></PoseAnglesForm>
 
-<button class="full-width short" on:click={copyPose}> ↓ </button>
+<button class="full-width short" onclick={copyPose}> ↓ </button>
 
 <PoseWeightsForm bind:loadPose bind:getPose></PoseWeightsForm>
 

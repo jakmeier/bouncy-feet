@@ -1,4 +1,6 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import { getContext } from 'svelte';
   import DanceStats from './DanceStats.svelte';
   import { t } from '$lib/i18n';
@@ -16,12 +18,18 @@
   import { dev, displayedVersion } from '$lib/stores/FeatureSelection';
   import Symbol from '$lib/components/ui/Symbol.svelte';
 
-  /** @type {import('./$types').PageData} */
-  export let data;
+  
+  /**
+   * @typedef {Object} Props
+   * @property {import('./$types').PageData} data
+   */
+
+  /** @type {Props} */
+  let { data } = $props();
 
   const user = getContext('user').store;
-  let scoreboardData = data.leaderboard;
-  let showStatsSharingPopup = writable(!$user.consentSendingStats);
+  let scoreboardData = $state(data.leaderboard);
+  let showStatsSharingPopup = $state(writable(!$user.consentSendingStats));
 
   async function submit() {
     submitUserMetadata('publicName', $user.publicName);
@@ -47,7 +55,7 @@
     goto('./settings');
   }
 
-  let unlockHiddenFeatures = 0;
+  let unlockHiddenFeatures = $state(0);
   let lastIncrease = performance.now();
   function clickProfile() {
     if (lastIncrease + 500 > performance.now()) {
@@ -57,11 +65,15 @@
     }
     lastIncrease = performance.now();
   }
-  let devFeaturesOn = $dev;
-  let version005 = false;
+  let devFeaturesOn = $state($dev);
+  let version005 = $state(false);
   let standardVersion = $displayedVersion;
-  $: devFeaturesOn ? $dev || window.toggleDev() : $dev && window.toggleDev();
-  $: version005, displayedVersion.set(version005 ? 0.005 : standardVersion);
+  run(() => {
+    devFeaturesOn ? $dev || window.toggleDev() : $dev && window.toggleDev();
+  });
+  run(() => {
+    version005, displayedVersion.set(version005 ? 0.005 : standardVersion);
+  });
 </script>
 
 <Header
@@ -71,9 +83,9 @@
   on:click={openSettings}
 />
 
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-static-element-interactions -->
-<div class="profile-pic" on:click={clickProfile}>
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<div class="profile-pic" onclick={clickProfile}>
   <Symbol size={100}>person</Symbol>
   {$user.publicName}
 </div>
@@ -87,7 +99,7 @@
 <h2 class="box">{$t('profile.leaderboard-title')}</h2>
 <Leaderboard users={scoreboardData} />
 <form class="inputs">
-  <button on:click={submit} class="wide"
+  <button onclick={submit} class="wide"
     >{$t('profile.submit-stats')}</button
   >
 </form>
@@ -101,11 +113,11 @@
   <div>{$t('profile.consent.question')}</div>
 
   <div class="buttons">
-    <button on:click={() => consent(true)}>
+    <button onclick={() => consent(true)}>
       <p>{$t('profile.consent.yes')}</p>
     </button>
 
-    <button on:click={() => consent(false)}>
+    <button onclick={() => consent(false)}>
       <p>{$t('profile.consent.no')}</p>
     </button>
   </div>

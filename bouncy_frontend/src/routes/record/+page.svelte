@@ -18,35 +18,35 @@
   let reviewVideoElement;
   /** @type {undefined | import("$lib/instructor/bouncy_instructor").Skeleton} */
   /** @type {undefined | string} */
-  let reviewVideoSrc;
+  let reviewVideoSrc = $state();
   /** @type {import("$lib/instructor/bouncy_instructor").Skeleton | undefined} */
   let skeleton;
-  let isModelOn = false;
+  let isModelOn = $state(false);
   let cameraOn = false;
-  let showCamera = false;
-  let recordingStarted = false;
+  let showCamera = $state(false);
+  let recordingStarted = $state(false);
   /** @type {number | undefined} */
-  let recordingStart = undefined;
+  let recordingStart = $state(undefined);
   /** @type {number | undefined} */
-  let recordingEnd = undefined;
+  let recordingEnd = $state(undefined);
 
   /** @type {import("$lib/instructor/bouncy_instructor").DetectedStep[]} */
-  let detectedSteps = [];
+  let detectedSteps = $state([]);
 
-  let reviewStatsNumSteps = 0;
-  let reviewStatsSeconds = 0;
+  let reviewStatsNumSteps = $state(0);
+  let reviewStatsSeconds = $state(0);
 
   const tracker = new Tracker();
   registerTracker(tracker);
 
-  const camera = {
+  const camera = $state({
     startCamera: async () => {},
     stopCamera: async () => {},
     startRecording: async () => {},
     endRecording: async () => {
       return undefined;
     },
-  };
+  });
 
   async function startCamera() {
     showCamera = true;

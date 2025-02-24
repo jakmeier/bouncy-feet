@@ -1,14 +1,24 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import { t } from '$lib/i18n';
 
-  /** @type {import("$lib/instructor/bouncy_instructor").Tracker} */
-  export let tracker;
-  export let expand = false;
+  
+  /**
+   * @typedef {Object} Props
+   * @property {import("$lib/instructor/bouncy_instructor").Tracker} tracker
+   * @property {boolean} [expand]
+   */
 
-  let bpm = 120;
-  let double = false;
+  /** @type {Props} */
+  let { tracker, expand = $bindable(false) } = $props();
 
-  $: tracker.setBpm(bpm * (double ? 2 : 1));
+  let bpm = $state(120);
+  let double = $state(false);
+
+  run(() => {
+    tracker.setBpm(bpm * (double ? 2 : 1));
+  });
 
   function expandSettings(event) {
     if (
@@ -29,8 +39,8 @@
     class="material-symbols-outlined"
     role="button"
     tabindex="0"
-    on:click={expandSettings}
-    on:keydown={expandSettings}
+    onclick={expandSettings}
+    onkeydown={expandSettings}
     aria-expanded={expand}
   >
     edit

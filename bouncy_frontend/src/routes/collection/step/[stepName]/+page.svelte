@@ -1,4 +1,6 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import { page } from '$app/stores';
   import { t } from '$lib/i18n.js';
   import Step from '../../Step.svelte';
@@ -12,8 +14,14 @@
   import Symbol from '$lib/components/ui/Symbol.svelte';
   import Button from '$lib/components/ui/Button.svelte';
 
-  /** @type {import('./$types').PageData} */
-  export let data;
+  
+  /**
+   * @typedef {Object} Props
+   * @property {import('./$types').PageData} data
+   */
+
+  /** @type {Props} */
+  let { data } = $props();
 
   const user = getContext('user').store;
   const name = $page.params.stepName;
@@ -25,16 +33,18 @@
     return { value: step, label: $t(`step.variation.${step.variation}`) };
   });
 
-  let degree = 0;
-  let bpm = 120;
+  let degree = $state(0);
+  let bpm = $state(120);
   // step time is a half-beat
-  $: stepTime = 30_000 / bpm;
-  $: animationTime = stepTime * 0.85;
+  let stepTime = $derived(30_000 / bpm);
+  let animationTime = $derived(stepTime * 0.85);
 
   const beatCounter = dynamicCounter(-1, 1, stepTime);
-  $: beatCounter.setDelay(stepTime);
+  run(() => {
+    beatCounter.setDelay(stepTime);
+  });
 
-  let selected = selectItems[0];
+  let selected = $state(selectItems[0]);
 </script>
 
 <Header title={name} />

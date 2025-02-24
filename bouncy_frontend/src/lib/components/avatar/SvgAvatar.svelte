@@ -1,17 +1,33 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import { Cartesian2d, LimbError } from '$lib/instructor/bouncy_instructor';
   import SvgAvatar2 from './SvgAvatar2.svelte';
 
-  /** @type import('$lib/instructor/bouncy_instructor').Skeleton */
-  export let skeleton;
-  export let width = 100;
-  export let height = 100;
-  export let bodyShift = { x: 0, y: 0 };
-  export let avatarSize = 1.0;
-  /** @type LimbError[] */
-  export let markedLimbs = [];
-  /** @type number[] */
-  export let markedLimbIndices = [];
+  
+  
+  
+  /**
+   * @typedef {Object} Props
+   * @property {any} skeleton
+   * @property {number} [width]
+   * @property {number} [height]
+   * @property {any} [bodyShift]
+   * @property {number} [avatarSize]
+   * @property {any} [markedLimbs]
+   * @property {any} [markedLimbIndices]
+   */
+
+  /** @type {Props} */
+  let {
+    skeleton,
+    width = 100,
+    height = 100,
+    bodyShift = { x: 0, y: 0 },
+    avatarSize = 1.0,
+    markedLimbs = [],
+    markedLimbIndices = []
+  } = $props();
 
   /**
    * @param {number} s
@@ -26,22 +42,24 @@
     return wrapped + min;
   }
 
-  $: avatarSizePixels = Math.min(height, width) * avatarSize;
-  $: hip = {
+  let avatarSizePixels = $derived(Math.min(height, width) * avatarSize);
+  let hip = $derived({
     x: (0.5 + wrap(bodyShift.x, -0.75, 0.75)) * width,
     y: (0.5 + bodyShift.y) * height,
-  };
+  });
 
   /** @type {import("$lib/instructor/bouncy_instructor").SkeletonV2} */
-  $: renderedSkeleton = skeleton.render(
+  let renderedSkeleton = $derived(skeleton.render(
     new Cartesian2d(hip.x, hip.y),
     avatarSizePixels
-  );
-  let dummyUpdate = 0;
-  $: renderedSkeleton, (dummyUpdate += 1);
-  $: markedSegments = markedLimbs
+  ));
+  let dummyUpdate = $state(0);
+  run(() => {
+    renderedSkeleton, (dummyUpdate += 1);
+  });
+  let markedSegments = $derived(markedLimbs
     .map((limb) => limb.render(renderedSkeleton))
-    .concat(markedLimbIndices.map((i) => renderedSkeleton.segment(i)));
+    .concat(markedLimbIndices.map((i) => renderedSkeleton.segment(i))));
 </script>
 
 <SvgAvatar2 {avatarSizePixels} skeleton={renderedSkeleton} {markedSegments} />

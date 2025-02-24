@@ -12,4 +12,4 @@
 
 <h3>TODO: First time visit</h3>
 
-<button on:click={continueAsGuest}>kk</button>
+<button onclick={continueAsGuest}>kk</button>

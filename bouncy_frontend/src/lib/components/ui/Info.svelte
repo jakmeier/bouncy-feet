@@ -2,11 +2,10 @@
   import { t } from '$lib/i18n';
   import Popup from './Popup.svelte';
 
-  export let title;
-  export let text;
+  let { title, text, children } = $props();
 
   /** @type {import('svelte/store').Writable<boolean>} */
-  let isOpen;
+  let isOpen = $state();
 
   /** @param {KeyboardEvent | MouseEvent} event */
   function toggleOpen(event) {
@@ -25,8 +24,8 @@
   <span
     class="material-symbols-outlined"
     translate="no"
-    on:click={toggleOpen}
-    on:keydown={toggleOpen}
+    onclick={toggleOpen}
+    onkeydown={toggleOpen}
     role="button"
     tabindex="0"
     aria-expanded={$isOpen}
@@ -39,7 +38,7 @@
   <div>
     {$t(text)}
   </div>
-  <slot />
+  {@render children?.()}
 </Popup>
 
 <style>

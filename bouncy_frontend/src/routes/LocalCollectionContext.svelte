@@ -16,6 +16,13 @@
   } from '$lib/instructor/bouncy_instructor';
   import { setContext } from 'svelte';
   import { derived, writable } from 'svelte/store';
+  /**
+   * @typedef {Object} Props
+   * @property {import('svelte').Snippet} [children]
+   */
+
+  /** @type {Props} */
+  let { children } = $props();
 
   // handle corrupt local storage etc without the app crashing
   let corruptDances = false;
@@ -210,4 +217,4 @@
   }
 </script>
 
-<slot />
+{@render children?.()}

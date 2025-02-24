@@ -9,6 +9,13 @@
    * This is about raw media pipe poses, not bouncy feet poses.
    */
   import { setContext, onDestroy, getContext } from 'svelte';
+  /**
+   * @typedef {Object} Props
+   * @property {import('svelte').Snippet} [children]
+   */
+
+  /** @type {Props} */
+  let { children } = $props();
 
   /**
    * @type {PoseDetection[]}
@@ -34,4 +41,4 @@
   });
 </script>
 
-<slot />
+{@render children?.()}

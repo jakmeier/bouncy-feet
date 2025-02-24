@@ -1,17 +1,25 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import { getContext, onDestroy, onMount } from 'svelte';
 
-  /** @type{{ x: number; y: number; }[]} */
-  export let points;
+  
+  
+  
   /**
-   * @type {{ lineWidth: any; color: any; fill: any; linecap: any; }}
+   * @typedef {Object} Props
+   * @property {any} points
+   * @property {{ lineWidth: any; color: any; fill: any; linecap: any; }} style
+   * @property {string} id
    */
-  export let style;
-  /** @type {string} */
-  export let id;
+
+  /** @type {Props} */
+  let { points, style, id } = $props();
 
   const svg = getContext('svg');
-  $: svg.setPolygon(id, { points, style });
+  run(() => {
+    svg.setPolygon(id, { points, style });
+  });
 
   onMount(() => svg.setPolygon(id, { points, style }));
   onDestroy(() => svg.removePolygon(id));

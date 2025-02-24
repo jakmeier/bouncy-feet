@@ -3,10 +3,16 @@
   import Symbol from '../ui/Symbol.svelte';
   import Toggle from '../ui/Toggle.svelte';
 
-  export let enableLiveAvatar = false;
-  export let enableInstructorAvatar = false;
-  /** @type{number} */
-  export let videoOpacity = 0.5;
+  
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [enableLiveAvatar]
+   * @property {boolean} [enableInstructorAvatar]
+   * @property {number} [videoOpacity]
+   */
+
+  /** @type {Props} */
+  let { enableLiveAvatar = $bindable(false), enableInstructorAvatar = $bindable(false), videoOpacity = $bindable(0.5) } = $props();
 </script>
 
 <div id="control-panel">

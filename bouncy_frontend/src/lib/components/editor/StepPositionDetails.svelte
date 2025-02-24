@@ -1,4 +1,6 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import { t } from '$lib/i18n';
   import {
     PoseWrapper,
@@ -9,11 +11,11 @@
   import UiBox from '../ui/UiBox.svelte';
 
   /** @type {StepPositionBuilder | undefined} */
-  let position;
+  let position = $state();
   /** @type {PoseWrapper | undefined}*/
   let pose;
-  let jumpHeight = 1.0;
-  let selectedOrientation = Orientation[Orientation.Any];
+  let jumpHeight = $state(1.0);
+  let selectedOrientation = $state(Orientation[Orientation.Any]);
 
   /** @param {StepPositionBuilder|undefined} newPosition */
   export function loadPosition(newPosition) {
@@ -23,10 +25,18 @@
     pose = position?.pose();
   }
 
-  /** @param {StepPositionBuilder} newPosition */
-  export let onChange = (newPosition) => {};
+  
+  /**
+   * @typedef {Object} Props
+   * @property {any} [onChange]
+   */
 
-  $: console.log('selectedOrientation', selectedOrientation);
+  /** @type {Props} */
+  let { onChange = (newPosition) => {} } = $props();
+
+  run(() => {
+    console.log('selectedOrientation', selectedOrientation);
+  });
 
   const orientationOptions = Object.keys(Orientation).filter((key) =>
     isNaN(key)
@@ -62,7 +72,7 @@
           name="jh"
           type="number"
           bind:value={jumpHeight}
-          on:change={updateJumpHeight}
+          onchange={updateJumpHeight}
           min={0.0}
           max={10.0}
           step="0.1"
@@ -73,7 +83,7 @@
         <select
           name="direction"
           bind:value={selectedOrientation}
-          on:change={changedOrientation}
+          onchange={changedOrientation}
         >
           {#each orientationOptions as option}
             <option value={option}>

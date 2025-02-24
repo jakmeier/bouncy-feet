@@ -12,12 +12,12 @@
   /** @type {PoseWrapper | undefined} */
   let pose;
   /** @type {Skeleton | undefined} */
-  let skeleton;
+  let skeleton = $state();
   /** @type {WeightedPoseLimb[]} */
-  let weightedLimbs = [];
-  let poseName = '';
+  let weightedLimbs = $state([]);
+  let poseName = $state('');
 
-  export let onChange = () => {};
+  let { onChange = () => {} } = $props();
 
   /** @param {PoseWrapper} newPose */
   export function loadPose(newPose) {
@@ -46,9 +46,9 @@
     weightedLimbs = extractWeightedLimbs(newPose);
   }
 
-  $: markedLimbIndices = weightedLimbs
+  let markedLimbIndices = $derived(weightedLimbs
     .filter((limb) => limb.weight > 0.0)
-    .map((limb) => limb.index);
+    .map((limb) => limb.index));
 
   /**
    * @param {PoseWrapper} pose
@@ -141,7 +141,7 @@
       name="pose-name"
       class="name-input"
       bind:value={poseName}
-      on:input={() => updateName()}
+      oninput={() => updateName()}
       placeholder="Name"
     />
   </div>
@@ -170,7 +170,7 @@
             type="number"
             class="weight-input"
             bind:value={limb.weight}
-            on:change={() => updateAvatar(index)}
+            onchange={() => updateAvatar(index)}
             placeholder="Weight"
             min="0.0"
           />
@@ -189,7 +189,7 @@
             type="number"
             class="weight-input"
             bind:value={limb.weight}
-            on:change={() => updateAvatar(index)}
+            onchange={() => updateAvatar(index)}
             placeholder="Weight"
             min="0.0"
           />
@@ -208,7 +208,7 @@
             type="number"
             class="weight-input"
             bind:value={limb.weight}
-            on:change={() => updateAvatar(index)}
+            onchange={() => updateAvatar(index)}
             placeholder="Weight"
             min="0.0"
           />

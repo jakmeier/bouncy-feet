@@ -1,14 +1,22 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import { counter } from '$lib/timer';
   import { getContext, onDestroy, onMount } from 'svelte';
   import Experience from './Experience.svelte';
   import DanceStats from '../../routes/profile/DanceStats.svelte';
   import Step from '../../routes/collection/Step.svelte';
 
-  /** @type {DanceSessionResult?} */
-  export let data;
-  /** @type {import('$lib/instructor/bouncy_instructor').StepWrapper} */
-  export let step;
+  
+  
+  /**
+   * @typedef {Object} Props
+   * @property {DanceSessionResult?} data
+   * @property {import('$lib/instructor/bouncy_instructor').StepWrapper} step
+   */
+
+  /** @type {Props} */
+  let { data, step } = $props();
 
   const user = getContext('user').store;
 
@@ -19,15 +27,17 @@
   /**
    * @type {{ slow: number; mid: number; fast: number; veryFast: number; }}
    */
-  let stats;
-  let averageBpm = 0;
-  let gainedXp = 0;
-  $: if (data) {
-    stats = data.stats[step.name];
-    averageBpm =
-      data.bpms.reduce((acc, bpm) => acc + bpm, 0) / data.bpms.length;
-    gainedXp = data.experience;
-  }
+  let stats = $state();
+  let averageBpm = $state(0);
+  let gainedXp = $state(0);
+  run(() => {
+    if (data) {
+      stats = data.stats[step.name];
+      averageBpm =
+        data.bpms.reduce((acc, bpm) => acc + bpm, 0) / data.bpms.length;
+      gainedXp = data.experience;
+    }
+  });
 </script>
 
 <div class="step">

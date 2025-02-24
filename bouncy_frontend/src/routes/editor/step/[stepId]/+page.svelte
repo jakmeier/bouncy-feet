@@ -11,9 +11,9 @@
   const steps = localCollectionCtx.steps;
 
   /** @type {() => void} */
-  let save;
+  let save = $state();
   /** @type {(loadedStep: StepWrapper) => void} */
-  let loadStep;
+  let loadStep = $state();
 
   onMount(() => {
     const step = $steps.find(

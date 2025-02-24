@@ -24,7 +24,7 @@
   const stepTime = 300;
   const animationTime = stepTime * 0.7;
   const i = counter(-1, 1, stepTime);
-  let showSettings = writable(false);
+  let showSettings = $state(writable(false));
 
   /** @param {number} index */
   function editStep(index) {
@@ -89,15 +89,18 @@
 <h2 class="box">{$t('editor.step.list')}</h2>
 
 <EditOrDeleteList items={$steps} onDelete={deleteConfirmed} onEdit={editStep}>
-  <div class="list-item" slot="item" let:item let:index let:selected>
-    <div class:bold={selected}>{item.name}</div>
-    <Step
-      step={item}
-      poseIndex={$i}
-      {animationTime}
-      borderWidth={selected ? 4 : 2}
-    />
-  </div>
+  {#snippet item({ item, index, selected })}
+    <div class="list-item"    >
+      <div class:bold={selected}>{item.name}</div>
+      <Step
+        step={item}
+        poseIndex={$i}
+        {animationTime}
+        borderWidth={selected ? 4 : 2}
+      />
+    </div>
+  {/snippet}
+  <!-- @migration-task: migrate this slot by hand, `confirm-delete-text` is an invalid identifier -->
   <div slot="confirm-delete-text" let:item>
     <p>
       {$t('editor.step.delete-confirmation0')}
@@ -127,7 +130,7 @@
     id="ron-upload"
     type="file"
     accept=".ron"
-    on:change={handleFileUpload}
+    onchange={handleFileUpload}
   />
 </div>
 

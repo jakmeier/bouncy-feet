@@ -1,4 +1,6 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import { getContext, onMount, tick } from 'svelte';
   import { t } from '$lib/i18n';
   import { Tracker } from '$lib/instructor/bouncy_instructor';
@@ -30,39 +32,36 @@
   const userCtx = getContext('user');
 
   /** @type {undefined | string} */
-  let reviewVideoSrc;
+  let reviewVideoSrc = $state();
   let isModelOn = false;
-  let showReview = false;
-  let showSummary = false;
+  let showReview = $state(false);
+  let showSummary = $state(false);
   /** @type {import("svelte/store").Writable<boolean>} */
-  let showLearnModeHint;
+  let showLearnModeHint = $state();
   /** @type {import("svelte/store").Writable<boolean>} */
-  let showTrainModeHint;
+  let showTrainModeHint = $state();
   /** @type {number | undefined} */
-  let recordingStart = undefined;
+  let recordingStart = $state(undefined);
   /** @type {number | undefined} */
-  let recordingEnd = undefined;
+  let recordingEnd = $state(undefined);
   let enableLiveAvatar = isLearnMode;
   let enableInstructorAvatar = true;
   let videoOpacity = isTrainMode ? 0.25 : 0.0;
 
   /** @type {import("$lib/instructor/bouncy_instructor").DetectedStep[]} */
-  let detectedSteps = [];
+  let detectedSteps = $state([]);
   /** @type {DanceSessionResult?} */
-  let sessionResult;
+  let sessionResult = $state();
 
   /** @type {() => any}*/
-  let startCamera;
+  let startCamera = $state();
   /** @type {() => any}*/
-  let startRecording;
+  let startRecording = $state();
   /** @type {() => any}*/
-  let stopCamera;
+  let stopCamera = $state();
   /** @type {() => any}*/
-  let stopLiveRecording;
+  let stopLiveRecording = $state();
 
-  $: trackingState = tracker ? tracker.detectionState : null;
-  $: if ($trackingState === DetectionState.TrackingDone)
-    stopCameraAndRecording();
 
   async function turnOnRecording() {
     await startCamera();
@@ -162,6 +161,11 @@
         }
       });
     }
+  });
+  let trackingState = $derived(tracker ? tracker.detectionState : null);
+  run(() => {
+    if ($trackingState === DetectionState.TrackingDone)
+      stopCameraAndRecording();
   });
 </script>
 

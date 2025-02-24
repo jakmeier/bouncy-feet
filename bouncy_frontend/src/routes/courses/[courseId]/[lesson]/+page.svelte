@@ -1,4 +1,6 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import { page } from '$app/stores';
   import { t } from '$lib/i18n.js';
   import Header from '$lib/components/ui/Header.svelte';
@@ -11,19 +13,19 @@
 
   let id;
   /** @type {import('$lib/instructor/bouncy_instructor').Course } */
-  let course;
+  let course = $state();
   /** @type {number} */
   let lessonIndex;
   /** @type { import('$lib/instructor/bouncy_instructor').Lesson } */
-  let lesson;
+  let lesson = $state();
   /** @type {number | undefined} */
-  let partIndex;
+  let partIndex = $state();
   /** @type {import("$lib/instructor/bouncy_instructor").LessonPart | undefined} */
-  let exercise;
+  let exercise = $state();
   /** @type {boolean} */
-  let done;
+  let done = $state();
   /** @type {string} */
-  let title;
+  let title = $state();
 
   function loadCourse() {
     id = $page.params.courseId;
@@ -37,12 +39,15 @@
   }
   loadCourse();
 
-  $: explanationText = lesson.explanation || '';
+  let explanationText;
+  run(() => {
+    explanationText = lesson.explanation || '';
+  });
 
   /** @type {number} */
-  let outerWidth = 320;
-  $: explanationWidth =
-    outerWidth >= 320 ? 300 : Math.max(outerWidth - 20, 100);
+  let outerWidth = $state(320);
+  let explanationWidth =
+    $derived(outerWidth >= 320 ? 300 : Math.max(outerWidth - 20, 100));
 
   function next() {
     if (done) {
@@ -86,19 +91,19 @@
 
   <div class="controls">
     {#if done}
-      <button on:click={goBack}>{$t('courses.lesson.back-button')}</button>
+      <button onclick={goBack}>{$t('courses.lesson.back-button')}</button>
     {/if}
     {#if exercise === undefined && partIndex !== undefined && !done}
-      <button on:click={startExercise}
+      <button onclick={startExercise}
         >{$t('courses.lesson.start-button')}</button
       >
     {/if}
     {#if exercise}
-      <button on:click={stopExercise}>{$t('courses.lesson.stop-button')}</button
+      <button onclick={stopExercise}>{$t('courses.lesson.stop-button')}</button
       >
     {/if}
     {#if partIndex === undefined}
-      <button on:click={next}>{$t('courses.lesson.next-button')}</button>
+      <button onclick={next}>{$t('courses.lesson.next-button')}</button>
     {/if}
   </div>
 </div>

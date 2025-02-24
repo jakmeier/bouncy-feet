@@ -1,12 +1,18 @@
 <script>
   import Symbol from './Symbol.svelte';
 
-  /** @type {string} */
-  export let path;
-  let videoExists = false;
-  let videoLoading = true;
+  
+  /**
+   * @typedef {Object} Props
+   * @property {string} path
+   */
+
+  /** @type {Props} */
+  let { path } = $props();
+  let videoExists = $state(false);
+  let videoLoading = $state(true);
   /** @type {HTMLVideoElement} */
-  let videoElement;
+  let videoElement = $state();
 </script>
 
 <div class="video-container" class:hide={videoLoading || !videoExists}>
@@ -14,7 +20,7 @@
     <video
       bind:this={videoElement}
       controls
-      on:loadedmetadata={() => {
+      onloadedmetadata={() => {
         videoExists = true;
         videoLoading = false;
       }}
@@ -23,11 +29,11 @@
       <source
         src={path}
         type="video/mp4"
-        on:error={() => {
+        onerror={() => {
           videoLoading = false;
           videoExists = false;
         }}
-        on:suspend={() => {
+        onsuspend={() => {
           videoLoading = false;
           videoExists = false;
         }}

@@ -4,9 +4,15 @@
   import Svg from './avatar/Svg.svelte';
   import SvgAvatar from './avatar/SvgAvatar.svelte';
 
-  /** @type {PoseWrapper} */
-  export let pose;
-  export let size = 200;
+  
+  /**
+   * @typedef {Object} Props
+   * @property {PoseWrapper} pose
+   * @property {number} [size]
+   */
+
+  /** @type {Props} */
+  let { pose, size = 200 } = $props();
 </script>
 
 <div class="avatar">

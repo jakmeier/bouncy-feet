@@ -6,16 +6,27 @@
   } from '$lib/stats';
 
   // A component to show the level and experience of a step or dance.
-  /** @type {number} */
-  export let xp;
-  /** @type {number} */
-  export let height = 20;
-  export let lvlSize = 35;
-  export let twoRows = false;
+  
+  
+  /**
+   * @typedef {Object} Props
+   * @property {number} xp
+   * @property {number} [height]
+   * @property {number} [lvlSize]
+   * @property {boolean} [twoRows]
+   */
 
-  $: level = experienceToLevel(xp);
-  $: xpRequired = incrementalExperienceForLevel(level + 1);
-  $: xpProgress = xp - totalExperienceForLevel(level);
+  /** @type {Props} */
+  let {
+    xp,
+    height = 20,
+    lvlSize = 35,
+    twoRows = false
+  } = $props();
+
+  let level = $derived(experienceToLevel(xp));
+  let xpRequired = $derived(incrementalExperienceForLevel(level + 1));
+  let xpProgress = $derived(xp - totalExperienceForLevel(level));
 </script>
 
 <div

@@ -1,12 +1,25 @@
 <script>
   //! Show content on the full available screen, or, if it would exceed that
   //! maximum configured area, on a limited area on top of the other content.
-  //! Usually this means, full-screen on mobile only.
+  
 
-  export let maxWidth = 600;
-  export let maxHeight = 900;
-  export let backgroundColor = 'none';
-  export let overlayColor = 'none';
+  /**
+   * @typedef {Object} Props
+   * @property {number} [maxWidth] - ! Usually this means, full-screen on mobile only.
+   * @property {number} [maxHeight]
+   * @property {string} [backgroundColor]
+   * @property {string} [overlayColor]
+   * @property {import('svelte').Snippet} [children]
+   */
+
+  /** @type {Props} */
+  let {
+    maxWidth = 600,
+    maxHeight = 900,
+    backgroundColor = 'none',
+    overlayColor = 'none',
+    children
+  } = $props();
 </script>
 
 <div class="overlay" style="background-color: {overlayColor}">
@@ -14,7 +27,7 @@
     class="area"
     style="height: min(100vh, {maxHeight}px); width: min(100vw, {maxWidth}px); background-color: {backgroundColor};"
   >
-    <slot />
+    {@render children?.()}
   </div>
 </div>
 

@@ -9,8 +9,14 @@
   import { browser, dev } from '$app/environment';
   import Experience from '$lib/components/Experience.svelte';
 
-  /** @type {import('./$types').PageData} */
-  export let data;
+  
+  /**
+   * @typedef {Object} Props
+   * @property {import('./$types').PageData} data
+   */
+
+  /** @type {Props} */
+  let { data } = $props();
 
   const localCollection = getContext('localCollection');
   const localDances = localCollection.dances;

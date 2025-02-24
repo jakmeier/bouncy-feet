@@ -1,7 +1,13 @@
 <script>
   import { t } from '$lib/i18n';
-  /** @type {{name: string, steps: number}[]} */
-  export let users = [];
+  
+  /**
+   * @typedef {Object} Props
+   * @property {{name: string, steps: number}[]} [users]
+   */
+
+  /** @type {Props} */
+  let { users = [] } = $props();
 </script>
 
 <div class="container">

@@ -3,18 +3,24 @@
   import PoseError from './PoseError.svelte';
   import Symbol from '../ui/Symbol.svelte';
 
-  /** @type {HTMLVideoElement} */
-  export let reviewVideoElement;
+  
 
-  /** @type {number | undefined} */
-  export let recordingStart;
+  
+  /**
+   * @typedef {Object} Props
+   * @property {HTMLVideoElement} reviewVideoElement
+   * @property {number | undefined} recordingStart
+   */
+
+  /** @type {Props} */
+  let { reviewVideoElement, recordingStart } = $props();
 
   /**
    * @type {import("$lib/instructor/bouncy_instructor").PoseApproximation[]}
    */
-  let poseErrors = [];
+  let poseErrors = $state([]);
   /**  @type {number} */
-  let poseErrorTimestamp = 0.0;
+  let poseErrorTimestamp = $state(0.0);
 
   function computePoseErrors() {
     const ms = reviewVideoElement.currentTime * 1000;
@@ -28,7 +34,7 @@
 
 <div class="dev-area">
   <h2>Dev Area</h2>
-  <button on:click={computePoseErrors}>
+  <button onclick={computePoseErrors}>
     <Symbol>unfold_more_double</Symbol>
     <p>Print Frame Details</p>
   </button>

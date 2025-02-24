@@ -16,7 +16,7 @@
   import Button from '../ui/Button.svelte';
   import NumberSlider from '../ui/NumberSlider.svelte';
 
-  let bodyLimbs = [
+  let bodyLimbs = $state([
     { name: 'editor.body.arm', angle: 0, isKey: false, weight: null },
     { name: 'editor.body.arm', angle: 0, isKey: false, weight: null },
     { name: 'editor.body.forearm', angle: 0, isKey: false, weight: null },
@@ -27,9 +27,9 @@
     { name: 'editor.body.shin', angle: 0, isKey: false, weight: null },
     { name: 'editor.body.foot', angle: 0, isKey: false, weight: null },
     { name: 'editor.body.foot', angle: 0, isKey: false, weight: null },
-  ];
+  ]);
 
-  let bodyParts = [
+  let bodyParts = $state([
     // TODO: shoulder and hips should also be moveable (currently fixed by pose model)
     // { name: 'editor.body.shoulder', i: SkeletonPoint.LeftShoulder, z: 0.0 },
     // { name: 'editor.body.shoulder', i: SkeletonPoint.RightShoulder, z: 0.0 },
@@ -47,19 +47,25 @@
     { name: 'editor.body.ankle', i: SkeletonPoint.RightAnkle, z: 0.0 },
     { name: 'editor.body.toes', i: SkeletonPoint.LeftToes, z: 0.0 },
     { name: 'editor.body.toes', i: SkeletonPoint.RightToes, z: 0.0 },
-  ];
+  ]);
 
-  let bodyShift = { x: 0, y: 0 };
+  let bodyShift = $state({ x: 0, y: 0 });
 
   /** @type{Skeleton | undefined} */
-  let skeleton = Skeleton.resting(false);
+  let skeleton = $state(Skeleton.resting(false));
   /** @type{Skeleton} */
-  let sideSkeleton = Skeleton.resting(true);
+  let sideSkeleton = $state(Skeleton.resting(true));
   /** @type{PoseWrapper | undefined} */
-  let pose;
+  let pose = $state();
 
-  /** @param {PoseWrapper} pose */
-  export let onChange = (pose) => {};
+  
+  /**
+   * @typedef {Object} Props
+   * @property {any} [onChange]
+   */
+
+  /** @type {Props} */
+  let { onChange = (pose) => {} } = $props();
 
   /** @param {SkeletonWrapper} inputSkeleton */
   export function loadSkeleton(inputSkeleton) {
@@ -209,7 +215,7 @@
           type="number"
           class="turn-input angle-input"
           bind:value={pose.turnShoulder}
-          on:change={updateSkeleton}
+          onchange={updateSkeleton}
           placeholder={$t('editor.body.shoulder')}
           min={-45}
           max={45}
@@ -223,7 +229,7 @@
           type="number"
           class="turn-input angle-input"
           bind:value={pose.turnHip}
-          on:change={updateSkeleton}
+          onchange={updateSkeleton}
           placeholder={$t('editor.body.hip')}
           min={-45}
           max={45}
@@ -239,7 +245,7 @@
           type="number"
           class="turn-input angle-input"
           bind:value={bodyShift.x}
-          on:change={updateBodyShift}
+          onchange={updateBodyShift}
           min={-4}
           max={4}
           step={0.0125}
@@ -253,7 +259,7 @@
           type="number"
           class="turn-input angle-input"
           bind:value={bodyShift.y}
-          on:change={updateBodyShift}
+          onchange={updateBodyShift}
           min={-4}
           max={4}
           step={0.0125}

@@ -1,14 +1,14 @@
 <script>
   import Arrow from './Arrow.svelte';
 
-  export let color = undefined;
+  let { color = undefined } = $props();
 
   function goBack() {
     window.history.back();
   }
 </script>
 
-<button on:click={goBack}>
+<button onclick={goBack}>
   <div class="arrow">
     <Arrow {color} />
   </div>

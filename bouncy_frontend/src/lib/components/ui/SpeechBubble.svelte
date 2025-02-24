@@ -1,16 +1,30 @@
 <script>
   import { createParagraphs } from '$lib/text_utils';
 
-  /** @type {string} */
-  export let text;
-  export let backgroundColor = 'var(--theme-neutral-light)';
-  export let textColor = 'var(--theme-neutral-dark)';
-  export let position = 'top';
-  export let right = '50%';
-  export let width = '300px';
-  export let tailSize = 10;
+  
+  /**
+   * @typedef {Object} Props
+   * @property {string} text
+   * @property {string} [backgroundColor]
+   * @property {string} [textColor]
+   * @property {string} [position]
+   * @property {string} [right]
+   * @property {string} [width]
+   * @property {number} [tailSize]
+   */
 
-  $: textLines = createParagraphs(text);
+  /** @type {Props} */
+  let {
+    text,
+    backgroundColor = 'var(--theme-neutral-light)',
+    textColor = 'var(--theme-neutral-dark)',
+    position = 'top',
+    right = '50%',
+    width = '300px',
+    tailSize = 10
+  } = $props();
+
+  let textLines = $derived(createParagraphs(text));
 </script>
 
 <div

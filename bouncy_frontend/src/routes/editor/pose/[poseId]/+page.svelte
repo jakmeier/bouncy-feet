@@ -17,15 +17,15 @@
   const poses = localCollectionCtx.poses;
 
   /** @type {()=>import("$lib/instructor/bouncy_instructor").PoseWrapper} */
-  let poseFromForm;
+  let poseFromForm = $state();
   /** @type {(skeleton: import("$lib/instructor/bouncy_instructor").PoseWrapper)=>void} */
-  let loadPoseToAngles;
+  let loadPoseToAngles = $state();
   /** @type {(skeleton: import("$lib/instructor/bouncy_instructor").PoseWrapper)=>void} */
-  let loadPoseToWeights;
+  let loadPoseToWeights = $state();
   /** @type {()=>import("$lib/instructor/bouncy_instructor").PoseWrapper} */
-  let getPose;
+  let getPose = $state();
 
-  let isDirty = false;
+  let isDirty = $state(false);
 
   function copyPose() {
     let pose = poseFromForm();

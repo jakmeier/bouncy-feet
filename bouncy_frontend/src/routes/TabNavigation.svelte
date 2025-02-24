@@ -4,9 +4,14 @@
   import { base } from '$app/paths';
   import { features } from '$lib/stores/FeatureSelection';
 
-  export let height = 100;
+  /**
+   * @typedef {Object} Props
+   * @property {number} [height]
+   */
 
-  $: tabs = buildTabs($features);
+  /** @type {Props} */
+  let { height = 100 } = $props();
+
 
   /** @param {Features} features */
   function buildTabs(features) {
@@ -48,6 +53,7 @@
     }
     return tabs;
   }
+  let tabs = $derived(buildTabs($features));
 </script>
 
 <div class="nav-background">

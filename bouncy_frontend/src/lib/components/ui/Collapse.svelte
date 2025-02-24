@@ -1,5 +1,12 @@
 <script>
-    let isHidden = false;
+  /**
+   * @typedef {Object} Props
+   * @property {import('svelte').Snippet} [children]
+   */
+
+  /** @type {Props} */
+  let { children } = $props();
+    let isHidden = $state(false);
   
     function toggleHidden() {
       isHidden = !isHidden;
@@ -49,7 +56,7 @@
   <div class="container">
     <button
       class="toggle-button {isHidden ? 'hidden' : ''}"
-      on:click={toggleHidden}
+      onclick={toggleHidden}
       aria-label="Toggle content visibility"
     >
       ▶
@@ -58,7 +65,7 @@
     {#if isHidden}
       <div class="hidden-line"></div>
     {:else}
-      <slot />
+      {@render children?.()}
     {/if}
   </div>
   

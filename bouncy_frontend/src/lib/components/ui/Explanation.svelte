@@ -1,4 +1,6 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import Animation from '$lib/components/avatar/Animation.svelte';
   import SpeechBubble from '$lib/components/ui/SpeechBubble.svelte';
   import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
@@ -11,19 +13,28 @@
   import { onMount } from 'svelte';
   import { counter } from '$lib/timer';
 
-  export let text;
-  export let width = 250;
-  /** @type { null | DanceWrapper } */
-  export let entryDance = null;
-  export let entryDanceRepetitions = 1;
+  
+  /**
+   * @typedef {Object} Props
+   * @property {any} text
+   * @property {number} [width]
+   * @property { null | DanceWrapper } [entryDance]
+   * @property {number} [entryDanceRepetitions]
+   */
+
+  /** @type {Props} */
+  let {
+    text,
+    width = 250,
+    entryDance = null,
+    entryDanceRepetitions = 1
+  } = $props();
   /** @type { undefined | Skeleton } */
-  let skeleton = Skeleton.resting(false);
-  let bodyShift = new Cartesian2d(0, 0);
+  let skeleton = $state(Skeleton.resting(false));
+  let bodyShift = $state(new Cartesian2d(0, 0));
   const beat = counter(-1, 1, 227);
 
   const tailSize = 18;
-  $: figureWidth = (width * 2) / 3;
-  $: bubbleTailRightOffset = `${figureWidth / 2 - 2 * tailSize}px`;
 
   /** @param {number} width */
   function selectLineWidth(width) {
@@ -38,11 +49,9 @@
     }
     return 10;
   }
-  $: lineWidth = selectLineWidth(width);
 
   let firstDancedBeat = Infinity;
   const dancedBeats = (entryDance?.subbeats || 0) * entryDanceRepetitions;
-  $: $beat, updateSkeleton();
 
   function updateSkeleton() {
     if (entryDance) {
@@ -67,11 +76,17 @@
   onMount(() => {
     firstDancedBeat = $beat + 2;
   });
+  let figureWidth = $derived((width * 2) / 3);
+  let bubbleTailRightOffset = $derived(`${figureWidth / 2 - 2 * tailSize}px`);
+  let lineWidth = $derived(selectLineWidth(width));
+  run(() => {
+    $beat, updateSkeleton();
+  });
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-static-element-interactions -->
-<div class="explanation" style="width: {width}px" on:click={restartAnimation}>
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<div class="explanation" style="width: {width}px" onclick={restartAnimation}>
   <SpeechBubble
     {text}
     position="bottom"

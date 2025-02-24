@@ -1,6 +1,12 @@
 <script>
-  export let progress = 0.0;
-  $: percent = (1.0 - progress) * 100;
+  /**
+   * @typedef {Object} Props
+   * @property {number} [progress]
+   */
+
+  /** @type {Props} */
+  let { progress = 0.0 } = $props();
+  let percent = $derived((1.0 - progress) * 100);
 </script>
 
 <div class="progress-container">

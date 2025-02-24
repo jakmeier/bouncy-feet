@@ -18,12 +18,19 @@
     detectionDelayNum,
     detectionDelayTotal,
   } from '$lib/stores/System';
+  import { apiRequest } from '$lib/stats';
 
   const user = getContext('user').store;
 
   // format number
   function fnum(num) {
     return num.toFixed(2);
+  }
+
+  async function testLogin() {
+    const response = await apiRequest('/testauth');
+    console.log(response);
+    console.log(await response.text());
   }
 </script>
 
@@ -100,6 +107,13 @@
       </div>
     </div>
   </div>
+
+  <Button
+    class="full-width"
+    text="test login"
+    symbol="login"
+    on:click={testLogin}
+  ></Button>
 {/if}
 
 <style>
@@ -129,7 +143,7 @@
     align-items: center;
     padding: 0.5rem 5px;
     gap: 0.5rem;
-    font-size: 18px;
+    font-size: var(--font-normal);
   }
 
   .system-info {

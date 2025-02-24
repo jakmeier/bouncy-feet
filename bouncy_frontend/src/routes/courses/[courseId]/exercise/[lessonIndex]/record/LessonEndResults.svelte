@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
 <script>
   import Explanation from '$lib/components/ui/Explanation.svelte';
   import { t } from '$lib/i18n';

@@ -8,6 +8,13 @@
   import { onMount, setContext } from 'svelte';
   import { readable, writable } from 'svelte/store';
   import { showExperimentalFeatures } from '$lib/stores/FeatureSelection.js';
+  /**
+   * @typedef {Object} Props
+   * @property {import('svelte').Snippet} [children]
+   */
+
+  /** @type {Props} */
+  let { children } = $props();
 
   /** Local state, unlike user state, is not synchronized anywhere. */
   const localStateValue =
@@ -32,7 +39,7 @@
    *
    * TODO: registered user client sessions
    */
-  let clientSession = readable({});
+  let clientSession = $state(readable({}));
   if (browser) {
     clientSession = readable(
       {
@@ -235,4 +242,4 @@
   });
 </script>
 
-<slot />
+{@render children?.()}

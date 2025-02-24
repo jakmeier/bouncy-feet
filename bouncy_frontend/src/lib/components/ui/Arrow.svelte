@@ -1,5 +1,11 @@
 <script>
-  export let color = 'var(--theme-neutral-black)';
+  /**
+   * @typedef {Object} Props
+   * @property {string} [color]
+   */
+
+  /** @type {Props} */
+  let { color = 'var(--theme-neutral-black)' } = $props();
 </script>
 
 <svg width="50mm" height="100mm" viewBox="0 0 50 100">

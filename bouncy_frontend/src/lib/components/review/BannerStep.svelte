@@ -3,19 +3,32 @@
   import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
   import Svg from '$lib/components/avatar/Svg.svelte';
 
-  /** @type{import("$lib/instructor/bouncy_instructor").DetectedStep} */
-  export let step;
+  
 
-  /** @type{number} */
-  export let scrollableWidth;
-  /** @type{number} */
-  export let scrollOffset;
-  /** @type{number} */
-  export let reviewStart;
-  /** @type{number} */
-  export let reviewEnd;
-  /** @type{number} */
-  export let avatarSize = 60;
+  
+  
+  
+  
+  
+  /**
+   * @typedef {Object} Props
+   * @property {any} step
+   * @property {any} scrollableWidth
+   * @property {any} scrollOffset
+   * @property {any} reviewStart
+   * @property {any} reviewEnd
+   * @property {number} [avatarSize]
+   */
+
+  /** @type {Props} */
+  let {
+    step,
+    scrollableWidth,
+    scrollOffset,
+    reviewStart,
+    reviewEnd,
+    avatarSize = 60
+  } = $props();
 
   const trackerCtx = getContext('tracker');
 

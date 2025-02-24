@@ -6,14 +6,27 @@
   import SvgStyle from './SvgStyle.svelte';
   import PhysicalSvgPath from './PhysicalSvgPath.svelte';
 
-  /** @type {number} */
-  export let width;
-  /** @type {number} */
-  export let height;
-  /** @type {boolean} */
-  export let orderByZ = false;
-  /** @type {boolean} */
-  export let showOverflow = false;
+  
+  
+  
+  
+  /**
+   * @typedef {Object} Props
+   * @property {number} width
+   * @property {number} height
+   * @property {boolean} [orderByZ]
+   * @property {boolean} [showOverflow]
+   * @property {import('svelte').Snippet} [children]
+   */
+
+  /** @type {Props} */
+  let {
+    width,
+    height,
+    orderByZ = false,
+    showOverflow = false,
+    children
+  } = $props();
 
   let animationCtx = getContext('animation');
   let animationTime = null;
@@ -24,15 +37,15 @@
   /**  @type {Line[]}  */
   let lines = [];
   /**  @type {Line[]}  */
-  let displayedLines = [];
+  let displayedLines = $state([]);
   /**  @type {Path[]}  */
   let paths = [];
   /**  @type {Path[]}  */
-  let displayedPaths = [];
+  let displayedPaths = $state([]);
   /**  @type {Polygon[]}  */
-  let polygons = [];
+  let polygons = $state([]);
   /**  @type {Circle[]}  */
-  let circles = [];
+  let circles = $state([]);
 
   /**
    * @param {string} id
@@ -153,7 +166,7 @@
   style="overflow: {showOverflow ? 'visible' : 'hidden'};"
 >
   <SvgStyle>
-    <slot />
+    {@render children?.()}
   </SvgStyle>
 
   <!-- For now, polygons and circles are drawn below lines. Z ordering can be added if needed -->

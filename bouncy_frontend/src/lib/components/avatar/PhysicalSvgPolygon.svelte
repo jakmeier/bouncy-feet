@@ -1,14 +1,20 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import { tweened } from 'svelte/motion';
   import { getContext } from 'svelte';
   import { derived, writable } from 'svelte/store';
 
-  /** @type{Point[]} */
-  export let points;
+  
+  
   /**
-   * @type {{ lineWidth: any; color: any; fill: any; linecap: any; }}
+   * @typedef {Object} Props
+   * @property {any} points
+   * @property {{ lineWidth: any; color: any; fill: any; linecap: any; }} style
    */
-  export let style;
+
+  /** @type {Props} */
+  let { points, style } = $props();
 
   let displayedPoints = [...points];
 
@@ -19,7 +25,6 @@
 
   const coordinates = createTweens(points);
 
-  $: points, updateValues(points);
   /**
    * @param {Point[]} ps
    */
@@ -71,6 +76,9 @@
   function setY(i, y) {
     displayedPoints[i].y = y;
   }
+  run(() => {
+    points, updateValues(points);
+  });
 </script>
 
 <polygon

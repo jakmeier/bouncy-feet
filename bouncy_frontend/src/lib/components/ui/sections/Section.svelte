@@ -1,15 +1,22 @@
 <script>
-  /** @type {string | undefined} */
-  export let bgColor = undefined;
-  /** @type {string | undefined} */
-  export let color = undefined;
+  
+  
+  /**
+   * @typedef {Object} Props
+   * @property {string | undefined} [bgColor]
+   * @property {string | undefined} [color]
+   * @property {import('svelte').Snippet} [children]
+   */
+
+  /** @type {Props} */
+  let { bgColor = undefined, color = undefined, children } = $props();
 </script>
 
 <section
   class="section-container"
   style="background-color: {bgColor}; color: {color}; --background-color: {bgColor}; --color: {color};"
 >
-  <slot />
+  {@render children?.()}
 </section>
 
 <style>

@@ -3,9 +3,16 @@
   import { songs } from '$lib/stores/Songs';
   import { onMount, setContext } from 'svelte';
   import { readable } from 'svelte/store';
+  /**
+   * @typedef {Object} Props
+   * @property {import('svelte').Snippet} [children]
+   */
+
+  /** @type {Props} */
+  let { children } = $props();
 
   /** @type {Song | undefined} */
-  let track = undefined;
+  let track = $state(undefined);
 
   let titleSetter = (_) => {};
   const songTitle = readable('-', (set) => {
@@ -24,12 +31,12 @@
     authorSetter(track?.author || '-');
   }
 
-  let resetTrackInternal = () => {};
+  let resetTrackInternal = $state(() => {});
   function resetTrack() {
     resetTrackInternal();
   }
 
-  let stopTrackInternal = () => {};
+  let stopTrackInternal = $state(() => {});
   function stopTrack() {
     stopTrackInternal();
   }
@@ -51,4 +58,4 @@
   />
 {/if}
 
-<slot />
+{@render children?.()}

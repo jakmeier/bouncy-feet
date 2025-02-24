@@ -1,21 +1,30 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import { onMount } from 'svelte';
 
-  export let size = 50;
-  export let accentColor = true;
-  /** @type {number} */
-  export let start;
-  /** @type {number} */
-  export let timeBetweenBeats;
-  $: innerSize = size * 0.9;
-  $: bigInnerSize = size * 0.95;
-  $: padding = (bigInnerSize - innerSize) * 2 + 10;
-  $: slotSize = size - 2 * padding;
-  $: innerColor = accentColor ? '--theme-main' : '--theme-neutral-gray';
+  
+  
+  /**
+   * @typedef {Object} Props
+   * @property {number} [size]
+   * @property {boolean} [accentColor]
+   * @property {number} start
+   * @property {number} timeBetweenBeats
+   * @property {import('svelte').Snippet} [children]
+   */
 
-  $: timeBetweenBeats, start, replaceAnimation(timeBetweenBeats);
+  /** @type {Props} */
+  let {
+    size = 50,
+    accentColor = true,
+    start,
+    timeBetweenBeats,
+    children
+  } = $props();
+
   /** @type {Element} */
-  let disk;
+  let disk = $state();
 
   const keyframes = [
     {
@@ -56,6 +65,14 @@
   onMount(() => {
     replaceAnimation(timeBetweenBeats);
   });
+  let innerSize = $derived(size * 0.9);
+  let bigInnerSize = $derived(size * 0.95);
+  let padding = $derived((bigInnerSize - innerSize) * 2 + 10);
+  let slotSize = $derived(size - 2 * padding);
+  let innerColor = $derived(accentColor ? '--theme-main' : '--theme-neutral-gray');
+  run(() => {
+    timeBetweenBeats, start, replaceAnimation(timeBetweenBeats);
+  });
 </script>
 
 <div class="container" style="--outer-size: {size}px;">
@@ -69,7 +86,7 @@
       class="slot"
       style="width: {slotSize}px; height: {slotSize}; padding: {padding}px"
     >
-      <slot />
+      {@render children?.()}
     </div>
   </div>
 </div>

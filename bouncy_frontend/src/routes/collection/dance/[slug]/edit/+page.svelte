@@ -8,8 +8,14 @@
     danceBuilderFromDance,
   } from '$lib/instructor/bouncy_instructor';
 
-  /** @type {import('./$types').PageData} */
-  export let data;
+  
+  /**
+   * @typedef {Object} Props
+   * @property {import('./$types').PageData} data
+   */
+
+  /** @type {Props} */
+  let { data } = $props();
 
   const localCollection = getContext('localCollection');
   const localDances = localCollection.dances;

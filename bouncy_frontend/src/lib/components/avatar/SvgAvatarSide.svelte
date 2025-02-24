@@ -3,10 +3,16 @@
   import { getContext } from 'svelte';
   import SvgPath from './SvgPath.svelte';
 
-  /** @type {import("$lib/instructor/bouncy_instructor").SkeletonSideV2} */
-  export let side;
-  /** @type{string} */
-  export let sideId;
+  
+  
+  /**
+   * @typedef {Object} Props
+   * @property {import("$lib/instructor/bouncy_instructor").SkeletonSideV2} side
+   * @property {any} sideId
+   */
+
+  /** @type {Props} */
+  let { side, sideId } = $props();
 
   const svgStyle = getContext('svg-style');
 
@@ -43,16 +49,16 @@
   }
 
   // straight lines
-  $: lines = [
+  let lines = $derived([
     // svgLine('thigh', side.thigh, $svgStyle),
     // svgLine('shin', side.shin, $svgStyle),
     // svgLine('arm', side.arm, $svgStyle),
     // svgLine('forearm', side.forearm, $svgStyle),
     svgLine('foot', side.foot, $svgStyle),
-  ];
+  ]);
 
   // bezier curves
-  $: paths = [
+  let paths = $derived([
     svgPath(
       'leg',
       [
@@ -66,7 +72,7 @@
       side.thigh.z,
       $svgStyle
     ),
-  ];
+  ]);
 </script>
 
 {#each lines as line}

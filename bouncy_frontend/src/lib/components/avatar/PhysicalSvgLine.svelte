@@ -1,16 +1,24 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import { tweened } from 'svelte/motion';
   import { getContext } from 'svelte';
   import { writable } from 'svelte/store';
 
-  /** @type{Point} */
-  export let start;
-  /** @type{Point} */
-  export let end;
+  
+  
   /** @type{number} animationTime in ms */
 
-  /** @type{Style} */
-  export let style;
+  
+  /**
+   * @typedef {Object} Props
+   * @property {any} start
+   * @property {any} end
+   * @property {any} style
+   */
+
+  /** @type {Props} */
+  let { start, end, style } = $props();
 
   const animationCtx = getContext('animation');
   const animation = animationCtx
@@ -37,7 +45,9 @@
       animationTimeZero.set(performance.now());
     }
   }
-  $: start, end, updatePosition();
+  run(() => {
+    start, end, updatePosition();
+  });
 </script>
 
 <line

@@ -5,11 +5,17 @@
   import Symbol from '../ui/Symbol.svelte';
   import { base } from '$app/paths';
 
-  /** @type HTMLVideoElement|null */
-  export let videoElement = null;
-  export let cameraOn = false;
+  
 
-  export let opacity = 1.0;
+  /**
+   * @typedef {Object} Props
+   * @property {any} [videoElement]
+   * @property {boolean} [cameraOn]
+   * @property {number} [opacity]
+   */
+
+  /** @type {Props} */
+  let { videoElement = $bindable(null), cameraOn = $bindable(false), opacity = 1.0 } = $props();
 
   let stream;
   /**
@@ -92,7 +98,7 @@
   onDestroy(stopCamera);
 </script>
 
-<!-- svelte-ignore a11y-media-has-caption -->
+<!-- svelte-ignore a11y_media_has_caption -->
 <video
   bind:this={videoElement}
   class:hidden={!cameraOn}

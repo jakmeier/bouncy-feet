@@ -1,8 +1,14 @@
 <script>
   import { onDestroy, onMount } from 'svelte';
 
-  /** @type {undefined | (() => void)} */
-  export let onFrame = undefined;
+  
+  /**
+   * @typedef {Object} Props
+   * @property {undefined | (() => void)} [onFrame]
+   */
+
+  /** @type {Props} */
+  let { onFrame = undefined } = $props();
 
   export function stop() {
     stopped = true;

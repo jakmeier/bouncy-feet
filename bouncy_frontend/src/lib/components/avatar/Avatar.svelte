@@ -10,21 +10,35 @@
   } from '$lib/pose';
   import { getContext } from 'svelte';
 
-  /** @type import('@mediapipe/tasks-vision').NormalizedLandmark[] */
-  export let landmarks = [];
-  export let width = 100;
-  export let height = 100;
-  export let lineWidth = 10;
-  export let torsoLineWidth = lineWidth;
-  /** @type LimbError[] */
-  export let markedLimbs = [];
+  
+  
 
-  /** @type {AvatarColoring} */
-  export let style = {
+  
+  /**
+   * @typedef {Object} Props
+   * @property {any} [landmarks]
+   * @property {number} [width]
+   * @property {number} [height]
+   * @property {number} [lineWidth]
+   * @property {any} [torsoLineWidth]
+   * @property {any} [markedLimbs]
+   * @property {AvatarColoring} [style]
+   */
+
+  /** @type {Props} */
+  let {
+    landmarks = [],
+    width = 100,
+    height = 100,
+    lineWidth = 10,
+    torsoLineWidth = lineWidth,
+    markedLimbs = [],
+    style = {
     leftColor: '#000000FF',
     rightColor: '#000000FF',
     headColor: '#00000040',
-  };
+  }
+  } = $props();
 
   getContext('canvas').addItem(draw);
 

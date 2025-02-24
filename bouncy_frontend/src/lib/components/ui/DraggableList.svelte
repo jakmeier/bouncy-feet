@@ -2,32 +2,42 @@
   import Area from '$lib/components/ui/Area.svelte';
   import Symbol from '$lib/components/ui/Symbol.svelte';
 
-  /** @type {any[]} */
-  export let items;
-  export let elementSize = 100;
-  export let borderRadius = '25px';
+  
 
-  /** @type {(item: any, index: number) => void} */
-  export let onRemove = (_item, index) => {
-    items.splice(index, 1);
-  };
+  
 
-  /** @type {(item: any, index: number) => void} */
-  export let onDragStart = (_item, _index) => {};
+  
+
+  
+
+  
 
   /**
-   * Called when a dragged element is moved in place of another element.
-   * Returns the new index of the dragged element.
-   *
-   * @type {(
-   *    draggedItem: any,
-   *    draggedIndex: number,
-   *    swappedItem: any,
-   *    swappedIndex: number
-   * )
-   * => number
-   * } */
-  export let onDragMove = (
+   * @typedef {Object} Props
+   * @property {any[]} items
+   * @property {number} [elementSize]
+   * @property {string} [borderRadius]
+   * @property {(item: any, index: number) => void} [onRemove]
+   * @property {(item: any, index: number) => void} [onDragStart]
+   * @property {any} [onDragMove] - Called when a dragged element is moved in place of another element.
+Returns the new index of the dragged element.
+   * @property {(item: any, index: number) => void} [onDrop]
+   * @property {any} [selectedIndex]
+   * @property {boolean} [showAddNewItem]
+   * @property {import('svelte').Snippet<[any]>} [main]
+   * @property {import('svelte').Snippet<[any]>} [name]
+   */
+
+  /** @type {Props} */
+  let {
+    items = $bindable(),
+    elementSize = 100,
+    borderRadius = '25px',
+    onRemove = (_item, index) => {
+    items.splice(index, 1);
+  },
+    onDragStart = (_item, _index) => {},
+    onDragMove = (
     _draggedItem,
     draggedIndex,
     _swappedItem,
@@ -39,13 +49,13 @@
       items[draggedIndex],
     ];
     return swappedIndex;
-  };
-
-  /** @type {(item: any, index: number) => void} */
-  export let onDrop = (_item, _index) => {};
-
-  export let selectedIndex = -1;
-  export let showAddNewItem = false;
+  },
+    onDrop = (_item, _index) => {},
+    selectedIndex = $bindable(-1),
+    showAddNewItem = $bindable(false),
+    main,
+    name
+  } = $props();
 
   /**
    * @param {{preventDefault: () => void;}} event
@@ -61,7 +71,7 @@
   /** @type {string | null} */
   let draggedItem = null;
   /** @type {number} */
-  let draggedIndex = -1;
+  let draggedIndex = $state(-1);
 
   /**
    * @param {DragEvent} event
@@ -231,34 +241,34 @@
 
 <div class="items">
   {#each items as item, i}
-    <!-- svelte-ignore a11y-no-static-element-interactions -->
-    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
     <div
       class="item drop-zone"
       draggable="true"
       id={`${i}`}
-      on:dragstart={(event) => handleDragStart(event, i)}
-      on:dragover={(event) => handleDragOver(event, i)}
-      on:drop={handleDrop}
-      on:dragend={handleDrop}
-      on:click={() => selectItem(i)}
+      ondragstart={(event) => handleDragStart(event, i)}
+      ondragover={(event) => handleDragOver(event, i)}
+      ondrop={handleDrop}
+      ondragend={handleDrop}
+      onclick={() => selectItem(i)}
       style="opacity: {i === draggedIndex ? 0.3 : 1.0}"
     >
       <div class="fixed-size">
         <div class="center">
-          <slot name="main" {item} index={i} />
+          {@render main?.({ item, index: i, })}
         </div>
       </div>
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <div class="delete-button" on:click={(event) => handleRemove(event, i)}>
+      <!-- svelte-ignore a11y_click_events_have_key_events -->
+      <div class="delete-button" onclick={(event) => handleRemove(event, i)}>
         <Symbol>close</Symbol>
       </div>
       <p
         class="handle draggable"
         style="width: {elementSize}px"
-        on:touchstart={(event) => handleTouchStart(event, i)}
-        on:touchend={handleDrop}
-        on:touchmove={handleTouchMove}
+        ontouchstart={(event) => handleTouchStart(event, i)}
+        ontouchend={handleDrop}
+        ontouchmove={handleTouchMove}
       >
         <span
           class="material-symbols-outlined"
@@ -267,14 +277,14 @@
         >
       </p>
       <p class="label" style="width: {elementSize}px">
-        <slot name="name" {item} index={i} />
+        {@render name?.({ item, index: i, })}
       </p>
     </div>
   {/each}
 
-  <!-- svelte-ignore a11y-click-events-have-key-events -->
-  <!-- svelte-ignore a11y-no-static-element-interactions -->
-  <div on:click={clickAddButton}>
+  <!-- svelte-ignore a11y_click_events_have_key_events -->
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
+  <div onclick={clickAddButton}>
     <Area width="{elementSize}px" height="{elementSize}px" {borderRadius}>
       <span
         class="material-symbols-outlined add-button"

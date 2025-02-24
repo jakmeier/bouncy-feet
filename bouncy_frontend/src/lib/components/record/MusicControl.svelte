@@ -1,4 +1,6 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import { DetectionState } from '$lib/instructor/bouncy_instructor_bg';
   import { getContext } from 'svelte';
 
@@ -16,7 +18,6 @@
   /** @type {DetectionState} */
   let prevDetectionState = DetectionState.Init;
 
-  $: newDetectionState($detectionState);
 
   /** @param {DetectionState} newState */
   function newDetectionState(newState) {
@@ -30,4 +31,7 @@
       prevDetectionState = newState;
     }
   }
+  run(() => {
+    newDetectionState($detectionState);
+  });
 </script>

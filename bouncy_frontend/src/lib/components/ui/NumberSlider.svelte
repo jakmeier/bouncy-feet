@@ -1,19 +1,32 @@
 <script>
-  export let value = 0;
-  /** @type {number} */
-  export let min;
-  /** @type {number} */
-  export let max;
-  /** @type {number} */
-  export let decimals = 0;
-  export let name = '';
+  
+  
+  
 
-  /** @param {number} angle */
-  export let onChange = (angle) => {};
+  
+  /**
+   * @typedef {Object} Props
+   * @property {number} [value]
+   * @property {number} min
+   * @property {number} max
+   * @property {number} [decimals]
+   * @property {string} [name]
+   * @property {any} [onChange]
+   */
+
+  /** @type {Props} */
+  let {
+    value = $bindable(0),
+    min,
+    max,
+    decimals = 0,
+    name = '',
+    onChange = (angle) => {}
+  } = $props();
 
   let isDragging = false;
   /** @type {HTMLDivElement} */
-  let slider;
+  let slider = $state();
 
   function handleInput(event) {
     value = event.target.value;
@@ -66,8 +79,8 @@
       bind:value
       {min}
       {max}
-      on:input={handleInput}
-      on:change={() => onChange(value)}
+      oninput={handleInput}
+      onchange={() => onChange(value)}
       aria-valuenow={value}
       aria-valuemin={min}
       aria-valuemax={max}
@@ -83,9 +96,9 @@
     aria-valuemin={min}
     aria-valuemax={max}
     aria-label="Angle slider"
-    on:click={handleSliderChange}
-    on:mousedown={startDragging}
-    on:keydown={handleKeydown}
+    onclick={handleSliderChange}
+    onmousedown={startDragging}
+    onkeydown={handleKeydown}
   >
     <div
       class="slider-thumb"

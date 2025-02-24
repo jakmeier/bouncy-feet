@@ -1,4 +1,6 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import SvgAvatarSide from './SvgAvatarSide.svelte';
   import SvgStyle from './SvgStyle.svelte';
   import {
@@ -9,25 +11,18 @@
   import { getContext } from 'svelte';
   import SvgAvatarHead from './SvgAvatarHead.svelte';
 
-  /** @type import('$lib/instructor/bouncy_instructor').SkeletonV2 */
-  export let skeleton;
-  export let avatarSizePixels = 100;
-  /** @type {RenderableSegment[]} */
-  export let markedSegments = [];
+  
+  
+  /**
+   * @typedef {Object} Props
+   * @property {any} skeleton
+   * @property {number} [avatarSizePixels]
+   * @property {RenderableSegment[]} [markedSegments]
+   */
 
-  $: markedSegmentsLines = markedSegments.map((segment, i) => {
-    return {
-      id: `marker${i}`,
-      start: segment.start,
-      end: segment.end,
-      z: segment.z - 1,
-      style: {
-        color: markerColor,
-        linecap: 'round',
-        lineWidth: markerLineWidth,
-      },
-    };
-  });
+  /** @type {Props} */
+  let { skeleton, avatarSizePixels = 100, markedSegments = [] } = $props();
+
 
   const markerColor = '#ff111166';
   const markerLineWidth = 16;
@@ -40,20 +35,35 @@
   let lineWidth = 10 * avatarStyleCtx.bodyShape.strokeWidth;
   let headHeight = 1;
 
+  let dummyUpdate = $state(0);
+  let markedSegmentsLines = $derived(markedSegments.map((segment, i) => {
+    return {
+      id: `marker${i}`,
+      start: segment.start,
+      end: segment.end,
+      z: segment.z - 1,
+      style: {
+        color: markerColor,
+        linecap: 'round',
+        lineWidth: markerLineWidth,
+      },
+    };
+  }));
   /** @type {Cartesian2d} */
-  $: leftHip = skeleton.hip.start;
+  let leftHip = $derived(skeleton.hip.start);
   /** @type {Cartesian2d} */
-  $: leftShoulder = skeleton.shoulder.start;
+  let leftShoulder = $derived(skeleton.shoulder.start);
   /** @type {Cartesian2d} */
-  $: rightHip = skeleton.hip.end;
+  let rightHip = $derived(skeleton.hip.end);
   /** @type {Cartesian2d} */
-  $: rightShoulder = skeleton.shoulder.end;
+  let rightShoulder = $derived(skeleton.shoulder.end);
   /** @type {number} */
-  $: cx = (leftShoulder.x + rightShoulder.x) / 2;
+  let cx = $derived((leftShoulder.x + rightShoulder.x) / 2);
   /** @type {number} */
-  $: cy = leftShoulder.y - (avatarSizePixels * headHeight) / 10;
-  let dummyUpdate = 0;
-  $: skeleton, (dummyUpdate += 1);
+  let cy = $derived(leftShoulder.y - (avatarSizePixels * headHeight) / 10);
+  run(() => {
+    skeleton, (dummyUpdate += 1);
+  });
 </script>
 
 <SvgAvatarHead

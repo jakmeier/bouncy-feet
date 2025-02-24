@@ -13,10 +13,16 @@
   import FirstVisist from './FirstVisist.svelte';
   import AvatarCustomizer from '$lib/components/avatar/AvatarCustomizer.svelte';
 
-  /** @type{import("$lib/instructor/bouncy_instructor").DanceWrapper[]} */
-  export let featuredDances;
-  /** @type{import("$lib/instructor/bouncy_instructor").StepWrapper[]} */
-  export let featuredSteps;
+  
+  
+  /**
+   * @typedef {Object} Props
+   * @property {any} featuredDances
+   * @property {any} featuredSteps
+   */
+
+  /** @type {Props} */
+  let { featuredDances, featuredSteps } = $props();
 
   const { localState } = getContext('user');
 

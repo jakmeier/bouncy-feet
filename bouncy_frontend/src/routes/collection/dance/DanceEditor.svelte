@@ -1,4 +1,6 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import { t } from '$lib/i18n.js';
   import Header from '$lib/components/ui/Header.svelte';
   import DanceAnimation from '../../DanceAnimation.svelte';
@@ -8,20 +10,28 @@
   import { goto } from '$app/navigation';
   import { dynamicCounter } from '$lib/timer';
 
-  /** @type {import("$lib/instructor/bouncy_instructor").StepWrapper[]} */
-  export let availableSteps;
-  /** @type {import('$lib/instructor/bouncy_instructor').DanceBuilder} */
-  export let danceBuilder;
-  /** @type {string} */
-  let danceName = danceBuilder.danceInfo().id;
+  
+  
+  /**
+   * @typedef {Object} Props
+   * @property {import("$lib/instructor/bouncy_instructor").StepWrapper[]} availableSteps
+   * @property {import('$lib/instructor/bouncy_instructor').DanceBuilder} danceBuilder
+   */
 
-  let bpm = 100;
+  /** @type {Props} */
+  let { availableSteps, danceBuilder = $bindable() } = $props();
+  /** @type {string} */
+  let danceName = $state(danceBuilder.danceInfo().id);
+
+  let bpm = $state(100);
   // step time is a half-beat
-  $: stepTime = 30_000 / bpm;
-  $: animationTime = stepTime * 0.85;
+  let stepTime = $derived(30_000 / bpm);
+  let animationTime = $derived(stepTime * 0.85);
 
   const beatCounter = dynamicCounter(-1, 1, stepTime);
-  $: beatCounter.setDelay(stepTime);
+  run(() => {
+    beatCounter.setDelay(stepTime);
+  });
 
   const danceSize = 250;
 
@@ -30,11 +40,11 @@
   /** @type {import('svelte/store').Readable<import('$lib/instructor/bouncy_instructor').DanceWrapper[]>} */
   const localDances = localCollection.dances;
 
-  $: dancePreview = danceBuilder.danceInfo();
+  let dancePreview = $derived(danceBuilder.danceInfo());
   /** @type {import('svelte/store').Writable<boolean>} */
-  let pickNamePopupActive;
+  let pickNamePopupActive = $state();
   /** @type {import('svelte/store').Writable<boolean>} */
-  let savingMethodPopupActive;
+  let savingMethodPopupActive = $state();
 
   function openSavePopup() {
     const exists = $localDances.find((dance) => dance.id === danceName);
@@ -109,8 +119,8 @@
 </div>
 
 <Popup bind:isOpen={savingMethodPopupActive} title="editor.saving-prompt">
-  <button on:click={overwrite}>{$t('editor.overwrite-existing-button')}</button>
-  <button on:click={promptToPickName}>{$t('editor.save-copy-button')}</button>
+  <button onclick={overwrite}>{$t('editor.overwrite-existing-button')}</button>
+  <button onclick={promptToPickName}>{$t('editor.save-copy-button')}</button>
 </Popup>
 
 <Popup
@@ -121,7 +131,7 @@
     {$t('editor.new-dance.name-label')}
   </label>
   <input id="name" name="name" bind:value={danceName} />
-  <button on:click={save}>{$t('editor.new-dance.save-button-label')}</button>
+  <button onclick={save}>{$t('editor.new-dance.save-button-label')}</button>
 </Popup>
 
 <style>

@@ -1,4 +1,6 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   // An avatar component for showing the next step to perform.
   // This includes coloring and animations specific to the instructor mode
   // where users look at the video feed and position themselves as shown
@@ -12,66 +14,85 @@
   import { onMount } from 'svelte';
   import AvatarStyleContext from './AvatarStyleContext.svelte';
 
-  /** @type {number} */
-  export let width;
-  /** @type {number} */
-  export let height;
-  /** @type {import("$lib/instructor/bouncy_instructor").Skeleton} */
-  export let skeleton;
-  /** @type {Cartesian2d} */
-  export let bodyShift = new Cartesian2d(0, 0);
-  /** @type {boolean} */
-  export let lastPoseWasCorrect = true;
+  
+  
+  
+  
+  
 
-  /** @type {Cartesian2d} */
-  export let origin = new Cartesian2d(0.0, 0.0);
-  export let avatarSize = 1.0;
+  
 
-  /** @type {AvatarColoring} */
-  export let instructorStyle = {
+  
+
+  /**
+   * @typedef {Object} Props
+   * @property {number} width
+   * @property {number} height
+   * @property {import("$lib/instructor/bouncy_instructor").Skeleton} skeleton
+   * @property {Cartesian2d} [bodyShift]
+   * @property {boolean} [lastPoseWasCorrect]
+   * @property {Cartesian2d} [origin]
+   * @property {number} [avatarSize]
+   * @property {AvatarColoring} [instructorStyle]
+   * @property {number} [showCorrectTime]
+   * @property {number} [animationTime]
+   */
+
+  /** @type {Props} */
+  let {
+    width,
+    height,
+    skeleton,
+    bodyShift = new Cartesian2d(0, 0),
+    lastPoseWasCorrect = true,
+    origin = new Cartesian2d(0.0, 0.0),
+    avatarSize = 1.0,
+    instructorStyle = {
     leftColor: '#000000FF',
     rightColor: '#000000FF',
     headColor: '#00000040',
-  };
-
-  export let showCorrectTime = 100;
-  export let animationTime = 100;
+  },
+    showCorrectTime = 100,
+    animationTime = 100
+  } = $props();
 
   // This would work to show one pose ahead of time.
   // But currently, the pose is switched right when the animation should start,
   // so the delay can be 0.
   // let animationDelay = $timeBetweenMoves - animationTime;
-  let animationDelay = 0;
+  let animationDelay = $state(0);
 
   /** @type {import("$lib/instructor/bouncy_instructor").Skeleton | null} */
-  let prevSkeleton = null;
+  let prevSkeleton = $state(null);
   /** @type {import('$lib/instructor/bouncy_instructor').Cartesian2d | null} */
-  let prevBodyShift = null;
+  let prevBodyShift = $state(null);
 
   /** @type {import("$lib/instructor/bouncy_instructor").Skeleton | null} */
-  let correctSkeleton = null;
+  let correctSkeleton = $state(null);
   /** @type {import('$lib/instructor/bouncy_instructor').Cartesian2d | null} */
-  let correctBodyShift = null;
+  let correctBodyShift = $state(null);
 
-  let coloring = instructorStyle;
-  let displayedSkeleton = skeleton;
-  let displayedBodyShift = bodyShift;
+  let coloring = $state(instructorStyle);
+  let displayedSkeleton = $state(skeleton);
+  let displayedBodyShift = $state(bodyShift);
 
-  $: if (skeleton !== prevSkeleton) {
-    correctSkeleton = prevSkeleton;
-    correctBodyShift = prevBodyShift;
-    prevSkeleton = skeleton;
-    prevBodyShift = bodyShift;
-    // TODO: showing the correct position messes with the timing
-    // if (lastPoseWasCorrect) {
-    //   displayCorrectPosition();
-    // } else {
-    //   // animationDelay = $timeBetweenMoves - animationTime;
-    //   // animationDelay = 0;
-    displayedBodyShift = bodyShift;
-    displayedSkeleton = skeleton;
-    // }
-  }
+  run(() => {
+    if (skeleton !== prevSkeleton) {
+      correctSkeleton = prevSkeleton;
+      correctBodyShift = prevBodyShift;
+      prevSkeleton = skeleton;
+      prevBodyShift = bodyShift;
+      // TODO: showing the correct position messes with the timing
+      // if (lastPoseWasCorrect) {
+      //   displayCorrectPosition();
+      // } else {
+      //   // animationDelay = $timeBetweenMoves - animationTime;
+      //   // animationDelay = 0;
+      displayedBodyShift = bodyShift;
+      displayedSkeleton = skeleton;
+      // }
+    }
+  });
 
   function displayCorrectPosition() {
     coloring = CORRECT_COLORING;

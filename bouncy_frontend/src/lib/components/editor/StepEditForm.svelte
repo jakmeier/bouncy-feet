@@ -1,4 +1,6 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import { t } from '$lib/i18n';
   import {
     PoseWrapper,
@@ -30,18 +32,16 @@
   }
 
   /** @type {StepWrapper} */
-  let step = newStep();
-  let stepName = $t('editor.name-input-placeholder');
-  $: stepPositionBuilders = step.positions();
+  let step = $state(newStep());
+  let stepName = $state($t('editor.name-input-placeholder'));
 
-  let showAddNewItem = false;
-  let selectedIndex = -1;
+  let showAddNewItem = $state(false);
+  let selectedIndex = $state(-1);
   let isDirty = false;
-  let stepBpm = $bpm;
+  let stepBpm = $state($bpm);
 
   /** @type {(position: StepPositionBuilder|undefined)=>void} */
-  let loadPosition;
-  $: selectPosition(selectedIndex);
+  let loadPosition = $state();
 
   /** @param {number} index */
   function selectPosition(index) {
@@ -121,6 +121,10 @@
   onMount(() => {
     setHalfSpeed(true);
   });
+  let stepPositionBuilders = $derived(step.positions());
+  run(() => {
+    selectPosition(selectedIndex);
+  });
 </script>
 
 <AnimatedStep {step} size={200}></AnimatedStep>
@@ -137,7 +141,7 @@
     <input
       type="range"
       bind:value={stepBpm}
-      on:change={() => {
+      onchange={() => {
         $bpm = stepBpm;
       }}
       min="30"
@@ -150,7 +154,7 @@
     id="name"
     name="name"
     bind:value={stepName}
-    on:change={() => (step.name = stepName)}
+    onchange={() => (step.name = stepName)}
   />
 </div>
 
@@ -161,19 +165,23 @@
   {onDragMove}
   {onRemove}
 >
-  <div slot="main" let:item={position} let:index>
-    <div class="pose" class:selected={index === selectedIndex}>
-      <Pose pose={position.pose()}></Pose>
+  {#snippet main({ item: position, index })}
+    <div   >
+      <div class="pose" class:selected={index === selectedIndex}>
+        <Pose pose={position.pose()}></Pose>
+      </div>
     </div>
-  </div>
-  <div
-    slot="name"
-    let:item={position}
-    let:index
-    class:selected={index === selectedIndex}
-  >
-    {position.pose().name('en')}
-  </div>
+  {/snippet}
+  {#snippet name({ item: position, index })}
+    <div
+      
+      
+      
+      class:selected={index === selectedIndex}
+    >
+      {position.pose().name('en')}
+    </div>
+  {/snippet}
 </DraggableList>
 
 <StepPositionDetails bind:loadPosition onChange={onPositionDetailsChanged} />
@@ -183,10 +191,10 @@
     <div class="available-poses">
       {#each $availablePoses as pose}
         <div
-          on:click={() => addPose(pose)}
+          onclick={() => addPose(pose)}
           role="button"
           tabindex={0}
-          on:keydown={(event) => {
+          onkeydown={(event) => {
             if (event.key === 'Enter' || event.key === ' ') {
               addPose(pose);
             }

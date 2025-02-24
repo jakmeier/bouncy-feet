@@ -1,7 +1,13 @@
 <script>
   import { base } from '$app/paths';
 
-  export let white = false;
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [white]
+   */
+
+  /** @type {Props} */
+  let { white = false } = $props();
 </script>
 
 <div class="brand-footer">

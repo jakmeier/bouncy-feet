@@ -8,23 +8,30 @@
   import Step from '../../../collection/Step.svelte';
   import Symbol from '$lib/components/ui/Symbol.svelte';
 
-  /** @type {import("$lib/instructor/bouncy_instructor").LessonPart} */
-  export let lessonPart;
+  
+  /**
+   * @typedef {Object} Props
+   * @property {import("$lib/instructor/bouncy_instructor").LessonPart} lessonPart
+   * @property {import('svelte').Snippet} [children]
+   */
 
-  let outerWidth = 300;
+  /** @type {Props} */
+  let { lessonPart, children } = $props();
+
+  let outerWidth = $state(300);
   /** @type {boolean} */
-  let audioOn;
+  let audioOn = $state();
   /** @type {import('svelte/store').Writable<boolean>} */
   let popUpIsOpen = writable(true);
 
-  $: step = lessonPart.step;
-  let bpmIndex = 0;
-  $: bpm = lessonPart.bpms[bpmIndex];
-  $: stepTime = 30_000 / bpm;
-  $: animationTime = Math.min(stepTime * 0.7, 300);
-  $: i = counter(-1, 1, stepTime);
+  let step = $derived(lessonPart.step);
+  let bpmIndex = $state(0);
+  let bpm = $derived(lessonPart.bpms[bpmIndex]);
+  let stepTime = $derived(30_000 / bpm);
+  let animationTime = $derived(Math.min(stepTime * 0.7, 300));
+  let i = $derived(counter(-1, 1, stepTime));
 
-  $: size = Math.max(outerWidth, 100);
+  let size = $derived(Math.max(outerWidth, 100));
 
   /** @param {number} index */
   function selectBpm(index) {
@@ -73,8 +80,8 @@
           class="bpm-option
           {bpmIndex === index ? 'selected' : ''}
           "
-          on:click={() => selectBpm(index)}
-          on:keydown={(event) => selectBpmWithKeyboard(event, index)}
+          onclick={() => selectBpm(index)}
+          onkeydown={(event) => selectBpmWithKeyboard(event, index)}
           title={`BPM: ${bpm}`}
           role="radio"
           aria-checked={bpmIndex === index}
@@ -101,16 +108,16 @@
     <div>
       {$t('courses.lesson.exercise-start-description')}
     </div>
-    <button on:click={closePopUp}
+    <button onclick={closePopUp}
       >{$t('courses.lesson.own-music-button')}</button
     >
     <button
-      on:click={() => {
+      onclick={() => {
         audioOn = true;
         closePopUp();
       }}>{$t('courses.lesson.play-beat-button')}</button
     >
-    <slot />
+    {@render children?.()}
   </Popup>
 </div>
 

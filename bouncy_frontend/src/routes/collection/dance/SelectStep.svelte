@@ -2,19 +2,29 @@
   import Step from '../Step.svelte';
   import UiBox from '$lib/components/ui/UiBox.svelte';
 
-  /** @type {import('$lib/instructor/bouncy_instructor').StepWrapper[]} */
-  export let steps;
-  export let show = false;
+  
 
-  // animation
-  export let poseIndex = 0;
-  /** @type{number} animationTime in ms */
-  export let animationTime = 500;
+  
+  
 
+  
   /**
-   * @type {(step: import('$lib/instructor/bouncy_instructor').StepWrapper) => boolean}
+   * @typedef {Object} Props
+   * @property {import('$lib/instructor/bouncy_instructor').StepWrapper[]} steps
+   * @property {boolean} [show]
+   * @property {number} [poseIndex] - animation
+   * @property {number} [animationTime]
+   * @property {(step: import('$lib/instructor/bouncy_instructor').StepWrapper) => boolean} selectedCallback
    */
-  export let selectedCallback;
+
+  /** @type {Props} */
+  let {
+    steps,
+    show = $bindable(false),
+    poseIndex = 0,
+    animationTime = 500,
+    selectedCallback
+  } = $props();
 
   /**
    * @param {import("$lib/instructor/bouncy_instructor").StepWrapper} step
@@ -32,10 +42,10 @@
     <div>
       {#each steps as step}
         <div
-          on:click={() => select(step)}
+          onclick={() => select(step)}
           role="button"
           tabindex={0}
-          on:keydown={(event) => {
+          onkeydown={(event) => {
             if (event.key === 'Enter' || event.key === ' ') {
               select(step);
             }

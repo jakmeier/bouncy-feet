@@ -1,4 +1,6 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import { page } from '$app/stores';
   import { t } from '$lib/i18n.js';
   import { getContext, onDestroy, onMount, tick } from 'svelte';
@@ -15,6 +17,13 @@
   import { dev } from '$lib/stores/FeatureSelection';
   import DevUtility from '$lib/components/dev/DevUtility.svelte';
   import LightBackground from '$lib/components/ui/sections/LightBackground.svelte';
+  /**
+   * @typedef {Object} Props
+   * @property {import('svelte').Snippet} [children]
+   */
+
+  /** @type {Props} */
+  let { children } = $props();
 
   const { getCourse } = getContext('courses');
   const { recordFinishedLesson, computeDanceStats, addDanceToStats } =
@@ -31,32 +40,32 @@
   /** @type {number | undefined} */
   let partIndex;
   /** @type {number | undefined} */
-  let recordingStart = undefined;
+  let recordingStart = $state(undefined);
   /** @type {number | undefined} */
-  let recordingEnd = undefined;
+  let recordingEnd = $state(undefined);
 
   /** @type {number} */
   let beatStart;
   let beatDetected = false;
   /** @type {import('svelte/store').Writable<boolean>} */
-  let showHint;
+  let showHint = $state();
 
   let detectionResult;
   /** @type {string} */
-  let videoUrl;
+  let videoUrl = $state();
   /** @type {import("$lib/instructor/bouncy_instructor").DetectedStep[] | undefined} */
-  let detectedSteps;
+  let detectedSteps = $state();
 
   /** @type {() => any}*/
-  let startCamera;
+  let startCamera = $state();
   /** @type {() => Promise<void>}*/
-  let startRecording;
+  let startRecording = $state();
   /** @type {() => Promise<void>}*/
-  let stopLiveRecording;
+  let stopLiveRecording = $state();
   /** @type {Tracker | undefined} */
-  let tracker;
+  let tracker = $state();
   /** @type {import('svelte/store').Readable<DetectionState> | null} */
-  $: trackingState = tracker ? tracker.detectionState : null;
+  let trackingState = $derived(tracker ? tracker.detectionState : null);
 
   let useFixedBpm = false;
   /** @type {import('svelte/store').Writable<boolean>} */
@@ -64,7 +73,7 @@
 
   let showHintBeforeStart = true;
   // wait for a user input before showing stats
-  let showResults = false;
+  let showResults = $state(false);
 
   async function start() {
     if (showHintBeforeStart) {
@@ -134,8 +143,8 @@
   }
   loadCourse();
 
-  let hitRate = 0.0;
-  let passed = false;
+  let hitRate = $state(0.0);
+  let passed = $state(false);
   async function trackingDone() {
     await stop();
     // TODO: use bpm and accuracy stats to give star rating
@@ -151,7 +160,9 @@
       addDanceToStats(sessionResult);
     }
   }
-  $: if ($trackingState === DetectionState.TrackingDone) trackingDone();
+  run(() => {
+    if ($trackingState === DetectionState.TrackingDone) trackingDone();
+  });
 
   onMount(start);
 
@@ -229,8 +240,8 @@
   <div>
     {$t('courses.lesson.exercise-start-description')}
   </div>
-  <button class="wide" on:click={closeStartExercisePopUp}>OK</button>
-  <slot />
+  <button class="wide" onclick={closeStartExercisePopUp}>OK</button>
+  {@render children?.()}
 </Popup>
 
 {#if $dev}

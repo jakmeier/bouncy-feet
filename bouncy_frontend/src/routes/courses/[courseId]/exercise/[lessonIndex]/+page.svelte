@@ -23,7 +23,7 @@
   /** @type {number} */
   let lessonIndex;
   /** @type { import('$lib/instructor/bouncy_instructor').Lesson } */
-  let lesson;
+  let lesson = $state();
   /** @type {number | undefined} */
   let partIndex;
   /** @type {import("$lib/instructor/bouncy_instructor").LessonPart | undefined} */
@@ -31,9 +31,9 @@
   /** @type {boolean} */
   let done;
   /** @type {string} */
-  let title;
+  let title = $state();
 
-  let isVideoOpen = writable(false);
+  let isVideoOpen = $state(writable(false));
   let size = 100;
 
   function loadCourse() {
@@ -49,7 +49,7 @@
   loadCourse();
 
   const songList = songs.list();
-  let trackIndex = 0;
+  let trackIndex = $state(0);
   function changeTrack(index) {
     const track = songList[index % songList.length];
     if (track) {
@@ -105,14 +105,14 @@
   <h3>{$t('courses.lesson.settings-subtitle')}</h3>
   <div class="about-lesson">
     {#if lesson.video && lesson.video.length > 0}
-      <button class="action big-col" on:click={() => ($isVideoOpen = true)}
+      <button class="action big-col" onclick={() => ($isVideoOpen = true)}
         >{$t('courses.lesson.to-video-button')}</button
       >
     {/if}
     <div class="left">{$songTitle} {$t('music.by')} {$songAuthor}</div>
     <button
       class="action right"
-      on:click={() => {
+      onclick={() => {
         trackIndex += 1;
         changeTrack(trackIndex);
       }}>{$t('courses.lesson.next-song-button')}</button

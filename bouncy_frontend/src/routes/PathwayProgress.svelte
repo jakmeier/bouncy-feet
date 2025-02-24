@@ -2,14 +2,27 @@
   import AnimatedStep from '$lib/components/AnimatedStep.svelte';
   import { t } from '$lib/i18n';
 
-  /** @type {string} */
-  export let teacherName;
-  export let step;
-  export let skill;
-  export let maxSkill;
-  export let experience;
-  //   export let lastTraining;
-  export let totalSteps;
+  
+  
+  /**
+   * @typedef {Object} Props
+   * @property {string} teacherName
+   * @property {any} step
+   * @property {any} skill
+   * @property {any} maxSkill
+   * @property {any} experience
+   * @property {any} totalSteps - export let lastTraining;
+   */
+
+  /** @type {Props} */
+  let {
+    teacherName,
+    step,
+    skill,
+    maxSkill,
+    experience,
+    totalSteps
+  } = $props();
 </script>
 
 <h3>{teacherName}</h3>

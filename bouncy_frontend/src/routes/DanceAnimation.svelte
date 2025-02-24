@@ -6,26 +6,38 @@
   import { Skeleton } from '$lib/instructor/bouncy_instructor';
   import { counter } from '$lib/timer';
 
-  /** @type{import("$lib/instructor/bouncy_instructor").DanceWrapper} */
-  export let dance;
-  /** How long it takes before the dance animation begins */
-  export let beatDelay = 5;
-  /** How many beats the avatar should be hidden at the start */
-  export let hiddenBeats = 0;
+  
+  
+  
   const bpm = 260;
   const stepTime = 60_000 / bpm;
-  export let beat = counter(-beatDelay, 1, stepTime);
-  export let animationTime = stepTime * 0.85;
-  export let size = 100;
-  /** @type {boolean} */
-  export let showOverflow = false;
+  
+  /**
+   * @typedef {Object} Props
+   * @property {any} dance
+   * @property {number} [beatDelay] - How long it takes before the dance animation begins
+   * @property {number} [hiddenBeats] - How many beats the avatar should be hidden at the start
+   * @property {any} [beat]
+   * @property {any} [animationTime]
+   * @property {number} [size]
+   * @property {boolean} [showOverflow]
+   */
+
+  /** @type {Props} */
+  let {
+    dance,
+    beatDelay = 5,
+    hiddenBeats = 0,
+    beat = counter(-beatDelay, 1, stepTime),
+    animationTime = stepTime * 0.85,
+    size = 100,
+    showOverflow = false
+  } = $props();
 
   // When the beat is negative, it should show a resting position
   // according to the orientation of the first pose.
   const firstPost = dance.skeleton(0);
   const restingStep = Skeleton.resting(firstPost ? firstPost.sideway : false);
-  $: skeleton = $beat >= 0 ? dance.skeleton($beat) : restingStep;
-  $: bodyShift = $beat >= 0 ? danceBodyShift(dance, $beat) : { x: 0, y: 0 };
 
   /**
    * @param {import("$lib/instructor/bouncy_instructor").DanceWrapper} dance
@@ -35,6 +47,8 @@
     const cartesian = dance.bodyShift(poseIndex);
     return { x: cartesian.x, y: cartesian.y };
   }
+  let skeleton = $derived($beat >= 0 ? dance.skeleton($beat) : restingStep);
+  let bodyShift = $derived($beat >= 0 ? danceBodyShift(dance, $beat) : { x: 0, y: 0 });
 </script>
 
 <Animation {animationTime} jumpHeight={size * 0.025}>

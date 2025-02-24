@@ -4,7 +4,7 @@
   import { t } from '$lib/i18n';
 
   /** @type {() => void} */
-  let save;
+  let save = $state();
 </script>
 
 <Header title={$t('editor.step.new')} button="save" on:click={save}></Header>

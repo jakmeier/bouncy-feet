@@ -1,4 +1,6 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import { LEFT_RIGHT_COLORING } from '$lib/constants';
   import { Skeleton } from '$lib/instructor/bouncy_instructor';
   import Arrow from '../ui/Arrow.svelte';
@@ -11,10 +13,10 @@
   const height = 100;
 
   const shapes = ['disk', 'circle', 'square'];
-  let shapeIndex = 0;
+  let shapeIndex = $state(0);
 
   /** @type {AvatarHeadStyle} */
-  let headStyle = updateHeadstyle();
+  let headStyle = $state(updateHeadstyle());
   /** @type {AvatarColoring} */
   let coloring = LEFT_RIGHT_COLORING;
   /** @type {AvatarBodyShape} */
@@ -34,13 +36,15 @@
     headStyle = updateHeadstyle();
   }
 
-  $: console.log(shapeIndex);
+  run(() => {
+    console.log(shapeIndex);
+  });
 </script>
 
 <div class="container">
-  <!-- svelte-ignore a11y-click-events-have-key-events -->
-  <!-- svelte-ignore a11y-no-static-element-interactions -->
-  <div class="left arrow" on:click={() => changeShape(-1)}>
+  <!-- svelte-ignore a11y_click_events_have_key_events -->
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
+  <div class="left arrow" onclick={() => changeShape(-1)}>
     <Arrow color="var(--theme-neutral-white)" />
   </div>
   <AvatarStyleContext {headStyle} {coloring} {bodyShape}>
@@ -49,9 +53,9 @@
     </Svg>
   </AvatarStyleContext>
 
-  <!-- svelte-ignore a11y-click-events-have-key-events -->
-  <!-- svelte-ignore a11y-no-static-element-interactions -->
-  <div class="arrow" on:click={() => changeShape(1)}>
+  <!-- svelte-ignore a11y_click_events_have_key_events -->
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
+  <div class="arrow" onclick={() => changeShape(1)}>
     <Arrow color="var(--theme-neutral-white)" />
   </div>
 </div>

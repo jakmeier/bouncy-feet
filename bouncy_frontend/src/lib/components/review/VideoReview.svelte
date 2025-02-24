@@ -1,4 +1,6 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import { dev } from '$lib/stores/FeatureSelection.js';
   import AllPoseErrors from '$lib/components/dev/AllPoseErrors.svelte';
   import Svg from '$lib/components/avatar/Svg.svelte';
@@ -14,47 +16,60 @@
   import Toggle from '../ui/Toggle.svelte';
   import { t } from '$lib/i18n';
 
-  /** @type {string} URL (usually local) to the video for review  */
-  export let reviewVideoSrc;
-  /** @type {number} */
-  export let recordingStart;
-  /** @type {number} */
-  export let recordingEnd;
-  /** @type {import("$lib/instructor/bouncy_instructor").DetectedStep[]} */
-  export let detectedSteps = [];
+  
+  
+  
+  
+  /**
+   * @typedef {Object} Props
+   * @property {string} reviewVideoSrc
+   * @property {number} recordingStart
+   * @property {number} recordingEnd
+   * @property {import("$lib/instructor/bouncy_instructor").DetectedStep[]} [detectedSteps]
+   */
 
-  let videoSrcWidth = 0;
-  let videoSrcHeight = 0;
-  let videoLoaded = false;
-  let displayVideoOverlay = true;
+  /** @type {Props} */
+  let {
+    reviewVideoSrc,
+    recordingStart,
+    recordingEnd,
+    detectedSteps = []
+  } = $props();
 
-  $: firstPoseTime = detectedSteps.length > 0 ? detectedSteps[0].start : 0;
-  $: lastPoseTime =
-    detectedSteps.length > 0
+  let videoSrcWidth = $state(0);
+  let videoSrcHeight = $state(0);
+  let videoLoaded = $state(false);
+  let displayVideoOverlay = $state(true);
+
+  let firstPoseTime = $derived(detectedSteps.length > 0 ? detectedSteps[0].start : 0);
+  let lastPoseTime =
+    $derived(detectedSteps.length > 0
       ? detectedSteps[detectedSteps.length - 1].end
-      : 100;
+      : 100);
 
   let tracker = getContext('tracker').tracker;
 
   /** @type {HTMLVideoElement} */
-  let reviewVideoElement;
+  let reviewVideoElement = $state();
   /** @type {import("$lib/instructor/bouncy_instructor").Skeleton} */
   let skeleton;
   /** @type {import("$lib/instructor/bouncy_instructor").SkeletonV2} */
-  let keypointSkeleton;
+  let keypointSkeleton = $state();
   /** @type {LimbError[]} */
-  let limbErrors = [];
-  let selectedStep = -1;
-  let selectedBeat = -1;
-  $: beatsPerStep =
-    detectedSteps.length > 0 ? detectedSteps[0].poses.length : 4;
-  $: avatarSizePixels = videoSrcHeight;
-  $: headRadius = 0.075 * Math.min(videoSrcHeight, videoSrcWidth);
+  let limbErrors = $state([]);
+  let selectedStep = $state(-1);
+  let selectedBeat = $state(-1);
+  let beatsPerStep =
+    $derived(detectedSteps.length > 0 ? detectedSteps[0].poses.length : 4);
+  let avatarSizePixels = $derived(videoSrcHeight);
+  let headRadius = $derived(0.075 * Math.min(videoSrcHeight, videoSrcWidth));
   /** @type {import("$lib/instructor/bouncy_instructor").RenderableSegment[]} */
-  let markedSegments = [];
-  $: if (keypointSkeleton) {
-    markedSegments = limbErrors.map((limb) => limb.render(keypointSkeleton));
-  }
+  let markedSegments = $state([]);
+  run(() => {
+    if (keypointSkeleton) {
+      markedSegments = limbErrors.map((limb) => limb.render(keypointSkeleton));
+    }
+  });
 
   let prevTime = 0;
   function onFrame() {
@@ -192,7 +207,7 @@
   }
 
   /** @type {HTMLDivElement} */
-  let poseCards;
+  let poseCards = $state();
   function onScrollPoseCards() {
     const r =
       poseCards.scrollLeft / (poseCards.scrollWidth - poseCards.clientWidth);
@@ -225,13 +240,13 @@ be better, however, this fires at different rates per browser and often only
 once per 250ms. -->
 <BackgroundTask {onFrame}></BackgroundTask>
 
-<div class="poses-details" bind:this={poseCards} on:scroll={onScrollPoseCards}>
+<div class="poses-details" bind:this={poseCards} onscroll={onScrollPoseCards}>
   {#each detectedSteps as step, iStep}
     {#each step.poses as pose, iBeat}
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <!-- svelte-ignore a11y-no-static-element-interactions -->
+      <!-- svelte-ignore a11y_click_events_have_key_events -->
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
       <!-- TODO(performance): step.poses.length allocates a vector and an array every time it is read -->
-      <div on:click={() => selectBeat(iStep, iBeat)}>
+      <div onclick={() => selectBeat(iStep, iBeat)}>
         <PoseReview
           {pose}
           beatLabel={formatBeatLabel(iBeat, iStep, step.poses.length)}
@@ -247,10 +262,10 @@ once per 250ms. -->
   </div>
   <div class="upper">
     <div class="video-wrapper">
-      <!-- svelte-ignore a11y-media-has-caption -->
+      <!-- svelte-ignore a11y_media_has_caption -->
       <video
-        on:click={togglePlay}
-        on:loadeddata={() => {
+        onclick={togglePlay}
+        onloadeddata={() => {
           videoLoaded = true;
           onSeek();
         }}

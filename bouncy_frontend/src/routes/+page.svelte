@@ -1,8 +1,14 @@
 <script>
   import HomeFeedB from './HomeFeed_b.svelte';
 
-  /** @type {import('./$types').PageData} */
-  export let data;
+  
+  /**
+   * @typedef {Object} Props
+   * @property {import('./$types').PageData} data
+   */
+
+  /** @type {Props} */
+  let { data } = $props();
 
   // (mockup) learn today step
   const featuredSteps = data

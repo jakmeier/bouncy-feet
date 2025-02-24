@@ -9,24 +9,30 @@
   import { LEFT_RIGHT_COLORING_LIGHT } from '$lib/constants';
   import Symbol from '../ui/Symbol.svelte';
 
-  /** @type {PoseApproximation} */
-  export let pose;
-  export let beatLabel = '0';
-  /** @type {number} */
-  export let threshold = 0.05;
-  $: max = 3 * threshold;
+  
+  
+  /**
+   * @typedef {Object} Props
+   * @property {PoseApproximation} pose
+   * @property {string} [beatLabel]
+   * @property {number} [threshold]
+   */
+
+  /** @type {Props} */
+  let { pose, beatLabel = '0', threshold = 0.05 } = $props();
+  let max = $derived(3 * threshold);
 
   /** @type {number} */
   let barHeight = 30;
   /** @type {number} bound to client width of bar */
-  let width = 10;
+  let width = $state(10);
 
   /** @type {{tracker: Tracker}} */
   let { tracker } = getContext('tracker');
   let instructorSkeleton = tracker.poseSkeleton(pose.id);
 
-  $: badWidth = (1.0 - threshold / max) * width;
-  $: scoreWidth = ((max - pose.error) / max) * width;
+  let badWidth = $derived((1.0 - threshold / max) * width);
+  let scoreWidth = $derived(((max - pose.error) / max) * width);
 </script>
 
 <div class="pose" class:failed-pose={pose.error > threshold}>

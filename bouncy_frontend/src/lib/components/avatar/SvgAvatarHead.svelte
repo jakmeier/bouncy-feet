@@ -2,17 +2,30 @@
   import SvgCircle from './SvgCircle.svelte';
   import SvgPolygon from './SvgPolygon.svelte';
 
-  /** @type {number} */
-  export let cx;
-  /** @type {number} */
-  export let cy;
-  /** @type {number} */
-  export let avatarSizePixels;
-  /** @type {AvatarHeadStyle} */
-  export let headStyle;
-  /** @type {String} */
-  export let color;
-  export let dummyUpdate;
+  
+  
+  
+  
+  
+  /**
+   * @typedef {Object} Props
+   * @property {number} cx
+   * @property {number} cy
+   * @property {number} avatarSizePixels
+   * @property {AvatarHeadStyle} headStyle
+   * @property {String} color
+   * @property {any} dummyUpdate
+   */
+
+  /** @type {Props} */
+  let {
+    cx,
+    cy,
+    avatarSizePixels,
+    headStyle,
+    color,
+    dummyUpdate
+  } = $props();
 
   let r = 0.055 * avatarSizePixels * headStyle.size;
   let headFill = headStyle.shape === 'disk' ? color : undefined;
@@ -20,12 +33,12 @@
   let headStrokeWidth =
     headStyle.shape !== 'disk' ? (r / 2) * headStyle.strokeWidth : undefined;
 
-  $: corners = [
+  let corners = $derived([
     { x: cx - r, y: cy - r },
     { x: cx + r, y: cy - r },
     { x: cx + r, y: cy + r },
     { x: cx - r, y: cy + r },
-  ];
+  ]);
 </script>
 
 {#if headStyle.shape === 'disk' || headStyle.shape === 'circle'}

@@ -6,30 +6,38 @@
   import DraggableList from '$lib/components/ui/DraggableList.svelte';
   import { StepWrapper } from '$lib/instructor/bouncy_instructor';
 
-  /** @type {import("$lib/instructor/bouncy_instructor").StepWrapper[]} */
-  export let availableSteps;
-  /** @type {import("$lib/instructor/bouncy_instructor").StepWrapper[]} */
-  $: uniqueSteps = availableSteps.filter(
-    (step, index, self) => index === self.findIndex((t) => t.name === step.name)
-  );
-  /** @type {import('$lib/instructor/bouncy_instructor').DanceBuilder} */
-  export let danceBuilder;
+  
+  
 
-  export let animationTime;
-  export let stepTime;
 
   const stepSize = 100;
 
-  export let beatCounter = counter(-1, 1, stepTime);
+  /**
+   * @typedef {Object} Props
+   * @property {import("$lib/instructor/bouncy_instructor").StepWrapper[]} availableSteps
+   * @property {import('$lib/instructor/bouncy_instructor').DanceBuilder} danceBuilder
+   * @property {any} animationTime
+   * @property {any} stepTime
+   * @property {any} [beatCounter]
+   */
+
+  /** @type {Props} */
+  let {
+    availableSteps,
+    danceBuilder = $bindable(),
+    animationTime,
+    stepTime,
+    beatCounter = counter(-1, 1, stepTime)
+  } = $props();
 
   /**
    * @type {StepWrapper[]}
    */
-  let steps = danceBuilder.danceInfo().steps();
+  let steps = $state(danceBuilder.danceInfo().steps());
   /** @type {number} */
-  let selectedStepIndex = -1;
+  let selectedStepIndex = $state(-1);
 
-  let addNewStepActive = false;
+  let addNewStepActive = $state(false);
   /** @param {StepWrapper} stepWrapper */
   function selectedCallback(stepWrapper) {
     if (!stepWrapper) {
@@ -88,6 +96,10 @@
     steps = danceBuilder.danceInfo().steps();
     return swappedIndex;
   }
+  /** @type {import("$lib/instructor/bouncy_instructor").StepWrapper[]} */
+  let uniqueSteps = $derived(availableSteps.filter(
+    (step, index, self) => index === self.findIndex((t) => t.name === step.name)
+  ));
 </script>
 
 <div class="outer">
@@ -99,18 +111,22 @@
     {onDragMove}
     {onRemove}
   >
-    <div slot="main" let:item={step} let:index>
-      <Step
-        {step}
-        poseIndex={$beatCounter}
-        {animationTime}
-        size={stepSize}
-        borderWidth={selectedStepIndex === index ? 5 : 2}
-      />
-    </div>
-    <div slot="name" let:item={step}>
-      {step.name}
-    </div>
+    {#snippet main({ item: step, index })}
+        <div   >
+        <Step
+          {step}
+          poseIndex={$beatCounter}
+          {animationTime}
+          size={stepSize}
+          borderWidth={selectedStepIndex === index ? 5 : 2}
+        />
+      </div>
+      {/snippet}
+    {#snippet name({ item: step })}
+        <div  >
+        {step.name}
+      </div>
+      {/snippet}
   </DraggableList>
 
   {#if selectedStepIndex !== -1}

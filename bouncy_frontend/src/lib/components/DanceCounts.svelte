@@ -4,17 +4,23 @@
   import Svg from './avatar/Svg.svelte';
   import SvgAvatar from './avatar/SvgAvatar.svelte';
 
-  /** @type {DanceWrapper} */
-  export let dance;
-  export let highlightedStep = -1;
-  export let markedPoseIndex = -1;
+  
+  /**
+   * @typedef {Object} Props
+   * @property {DanceWrapper} dance
+   * @property {any} [highlightedStep]
+   * @property {any} [markedPoseIndex]
+   */
 
-  let innerWidth = 300;
+  /** @type {Props} */
+  let { dance, highlightedStep = $bindable(-1), markedPoseIndex = -1 } = $props();
 
-  $: subbeat = dance.subbeats;
-  $: poseWidth = innerWidth / 8;
+  let innerWidth = $state(300);
+
+  let subbeat = $derived(dance.subbeats);
+  let poseWidth = $derived(innerWidth / 8);
   /** @type {number[]} */
-  $: stepTransitions = dance.steps().reduce(
+  let stepTransitions = $derived(dance.steps().reduce(
     (acc, step) => {
       const prev = acc.length === 0 ? 0 : acc[acc.length - 1];
       acc.push(prev + step.subbeats);
@@ -22,7 +28,7 @@
     },
     /** @type {number[]} */
     []
-  );
+  ));
 
   function count(subbeat) {
     if (subbeat % 2 === 1) {
@@ -43,10 +49,10 @@
     <div
       class="pose"
       style="width: {poseWidth}px"
-      on:click={() => selectBeat(beat)}
+      onclick={() => selectBeat(beat)}
       role="button"
       tabindex={0}
-      on:keydown={(event) => {
+      onkeydown={(event) => {
         if (event.key === 'Enter' || event.key === ' ') {
           selectBeat(beat);
         }

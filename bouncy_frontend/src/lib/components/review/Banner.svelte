@@ -7,12 +7,9 @@
 
   const avatarSize = 60;
 
-  /** @type{import("$lib/instructor/bouncy_instructor").DetectedStep[]} */
-  export let steps = [];
-  /** @type {number} */
-  export let reviewStart;
-  /** @type {number} */
-  export let reviewEnd;
+  
+  
+  
 
   /**
    * @type {number}
@@ -30,28 +27,38 @@
     cursor = newCursorValue;
     adjustScroll(scrollableWidth, cursor);
   }
+  
   /**
-   * @type {undefined | ((cursor: number) => void)}
-   * called when the parent should be notified about scrolling
-   * (the other direction of setCursor)
+   * @typedef {Object} Props
+   * @property {any} [steps]
+   * @property {number} reviewStart
+   * @property {number} reviewEnd
+   * @property {undefined | ((cursor: number) => void)} [onScroll]
    */
-  export let onScroll = undefined;
+
+  /** @type {Props} */
+  let {
+    steps = [],
+    reviewStart,
+    reviewEnd,
+    onScroll = undefined
+  } = $props();
 
   /**
    * @type {HTMLDivElement}
    */
-  let stepsDiv;
-  let visibleBannerWidth = 0;
+  let stepsDiv = $state();
+  let visibleBannerWidth = $state(0);
 
   // minimum 500px wide banner, bu it should scale with more drawn avatars
-  $: scrollableWidth = Math.max(500, steps.length * avatarSize * 4);
+  let scrollableWidth = $derived(Math.max(500, steps.length * avatarSize * 4));
   // scroll position zero should put the first possible pose in the center
   // for this, we have to offset all positions by `scrollOffset`
-  $: scrollOffset = visibleBannerWidth / 2 - avatarSize;
+  let scrollOffset = $derived(visibleBannerWidth / 2 - avatarSize);
   // likewise, cursor=1 should center the last possible pose hence, put a fake
   // element in the banner to reserve extra space in it, here we compute the
   // position of it
-  $: innerWidth = scrollableWidth + 2 * scrollOffset;
+  let innerWidth = $derived(scrollableWidth + 2 * scrollOffset);
 
   /**
    * @param {number} scrollableWidth
@@ -78,7 +85,7 @@
 
 <div id="container" bind:clientWidth={visibleBannerWidth}>
   <img class="arrow" src="{base}/img/left_arrow.svg" alt="left arrow" />
-  <div id="steps" bind:this={stepsDiv} on:scroll={scrolled}>
+  <div id="steps" bind:this={stepsDiv} onscroll={scrolled}>
     {#each steps as step}
       <BannerStep
         {step}

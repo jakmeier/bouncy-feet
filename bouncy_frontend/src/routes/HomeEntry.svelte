@@ -7,8 +7,14 @@
   import DanceAnimation from './DanceAnimation.svelte';
   import AvatarStyleContext from '$lib/components/avatar/AvatarStyleContext.svelte';
 
-  /** @type{import("$lib/instructor/bouncy_instructor").DanceWrapper} */
-  export let dance;
+  
+  /**
+   * @typedef {Object} Props
+   * @property {any} dance
+   */
+
+  /** @type {Props} */
+  let { dance } = $props();
 
   /**
    * @type {number | undefined}

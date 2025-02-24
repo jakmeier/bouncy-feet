@@ -1,4 +1,6 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import { t } from '$lib/i18n';
   import {
     bpm,
@@ -12,9 +14,15 @@
   import Toggle from '../ui/Toggle.svelte';
   import BeatVisualizer from './BeatVisualizer.svelte';
 
-  export let counter = -1;
-  export let bpmSelected = false;
-  export let useFixedBpm = false;
+  /**
+   * @typedef {Object} Props
+   * @property {any} [counter]
+   * @property {boolean} [bpmSelected]
+   * @property {boolean} [useFixedBpm]
+   */
+
+  /** @type {Props} */
+  let { counter = $bindable(-1), bpmSelected = $bindable(false), useFixedBpm = $bindable(false) } = $props();
 
   let start = performance.now();
   let lastTap = performance.now();
@@ -22,8 +30,10 @@
   const fixedBpmOptions = [80, 100, 120, 132];
   const timeout = 2000;
 
-  $: bpmSelected = counter > 0 || useFixedBpm;
-  $: displayedBpm = bpmSelected ? $bpm : '?';
+  run(() => {
+    bpmSelected = counter > 0 || useFixedBpm;
+  });
+  let displayedBpm = $derived(bpmSelected ? $bpm : '?');
 
   function reset() {
     counter = -1;
@@ -64,7 +74,7 @@
 <Header title={$t('record.prepare-title')} backButton></Header>
 
 <div class="outer">
-  <div class="visualizer" on:pointerdown={tap}>
+  <div class="visualizer" onpointerdown={tap}>
     <BeatVisualizer
       size={200}
       accentColor={!useFixedBpm}
@@ -101,9 +111,9 @@
     <div>{$t('record.metronome-subtitle')}</div>
     <div class="fixed-bpm-options">
       {#each fixedBpmOptions as value}
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <!-- svelte-ignore a11y-no-static-element-interactions -->
-        <div class="fixed-bpm-option" on:click={() => setFixedBpm(value)}>
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
+        <div class="fixed-bpm-option" onclick={() => setFixedBpm(value)}>
           {value}
         </div>
       {/each}

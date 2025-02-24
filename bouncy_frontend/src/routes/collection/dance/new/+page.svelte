@@ -3,8 +3,14 @@
   import { DanceBuilder } from '$lib/instructor/bouncy_instructor';
   import DanceEditor from '../DanceEditor.svelte';
 
-  /** @type {import('./$types').PageData} */
-  export let data;
+  
+  /**
+   * @typedef {Object} Props
+   * @property {import('./$types').PageData} data
+   */
+
+  /** @type {Props} */
+  let { data } = $props();
 
   let danceName = $t('editor.new-dance.default-dance-name');
   /** @type {DanceBuilder} */

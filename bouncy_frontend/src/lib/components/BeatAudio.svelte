@@ -1,4 +1,6 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import { onDestroy, onMount } from 'svelte';
   import BackgroundTask from './BackgroundTask.svelte';
   import {
@@ -9,16 +11,17 @@
   } from '$lib/stores/Audio';
   import { beatStart, timeBetweenMoves } from '$lib/stores/Beat';
 
-  export let isOn = false;
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [isOn]
+   */
 
-  let initialized = false;
-  $: initialized && (isOn ? startAudio() : stopAudio());
-  $: initialized && $timeBetweenMoves && resetAudio();
+  /** @type {Props} */
+  let { isOn = false } = $props();
+
+  let initialized = $state(false);
 
   let kickAudioFiles = ['kick', 'kick2'];
-  /** @type {number} ms performance timestamp */
-  $: $beatStart, resetAudio();
-  $: nextNoteTime = $beatStart;
   let halfBeat = 0;
   let isPlaying = false;
   /**
@@ -112,6 +115,20 @@
       }
     }
   }
+  run(() => {
+    initialized && (isOn ? startAudio() : stopAudio());
+  });
+  run(() => {
+    initialized && $timeBetweenMoves && resetAudio();
+  });
+  /** @type {number} ms performance timestamp */
+  run(() => {
+    $beatStart, resetAudio();
+  });
+  let nextNoteTime;
+  run(() => {
+    nextNoteTime = $beatStart;
+  });
 </script>
 
 <BackgroundTask {onFrame}></BackgroundTask>

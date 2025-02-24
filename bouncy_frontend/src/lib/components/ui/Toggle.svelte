@@ -1,6 +1,12 @@
 <script>
-  export let isOn = false;
-  export let border = false;
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [isOn]
+   * @property {boolean} [border]
+   */
+
+  /** @type {Props} */
+  let { isOn = $bindable(false), border = false } = $props();
 
   /** @param {{ key: string; preventDefault: () => void; }} event */
   function handleKeydown(event) {
@@ -13,8 +19,8 @@
 
 <div
   class="toggle {isOn ? 'on' : ''} {border ? 'border' : ''}"
-  on:click={() => (isOn = !isOn)}
-  on:keydown={handleKeydown}
+  onclick={() => (isOn = !isOn)}
+  onkeydown={handleKeydown}
   role="switch"
   aria-checked={isOn}
   tabindex="0"

@@ -1,7 +1,13 @@
 <script>
-  /** @type {import("$lib/instructor/bouncy_instructor").PoseApproximation} */
-  export let data;
-  $: limbs = data.limbErrors();
+  
+  /**
+   * @typedef {Object} Props
+   * @property {import("$lib/instructor/bouncy_instructor").PoseApproximation} data
+   */
+
+  /** @type {Props} */
+  let { data } = $props();
+  let limbs = $derived(data.limbErrors());
   const precision = 3;
 </script>
 

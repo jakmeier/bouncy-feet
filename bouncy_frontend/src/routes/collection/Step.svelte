@@ -6,33 +6,33 @@
   import { Skeleton } from '$lib/instructor/bouncy_instructor';
   import { LEFT_RIGHT_COLORING } from '$lib/constants';
 
-  /** @type {import('$lib/instructor/bouncy_instructor').StepWrapper} */
-  export let step;
-  export let rotation = 0.0;
-  export let size = 100;
-  export let poseIndex = 0;
-  export let borderWidth = 0;
-  /** @type{number} animationTime in ms */
-  export let animationTime = 500;
-  export let backgroundColor = 'var(--theme-neutral-light)';
+  
+  
+  /**
+   * @typedef {Object} Props
+   * @property {import('$lib/instructor/bouncy_instructor').StepWrapper} step
+   * @property {number} [rotation]
+   * @property {number} [size]
+   * @property {number} [poseIndex]
+   * @property {number} [borderWidth]
+   * @property {number} [animationTime]
+   * @property {string} [backgroundColor]
+   */
+
+  /** @type {Props} */
+  let {
+    step,
+    rotation = 0.0,
+    size = 100,
+    poseIndex = 0,
+    borderWidth = 0,
+    animationTime = 500,
+    backgroundColor = 'var(--theme-neutral-light)'
+  } = $props();
 
   // When the pose index is negative, it should show a resting position
   // according to the orientation of the first pose.
   const restingStep = Skeleton.resting(step.skeleton(0).sideway);
-  // TODO: rotation and flipped orientation does not work
-  // $: skeleton =
-  //   poseIndex >= 0 ? step.rotatedSkeleton(poseIndex, rotation) : restingStep;
-  $: skeleton =
-    poseIndex >= 0
-      ? rotation === 0
-        ? step.skeleton(poseIndex)
-        : step.rotatedSkeleton(poseIndex, rotation)
-      : restingStep;
-  $: bodyShift =
-    poseIndex >= 0 ? stepBodyShift(step, poseIndex) : { x: 0, y: 0 };
-  $: maybeJumpHeight = step.jumpHeight(poseIndex);
-  $: jumpHeight =
-    size * (maybeJumpHeight === undefined ? 1.0 : maybeJumpHeight);
 
   /**
    * @param {import("$lib/instructor/bouncy_instructor").StepWrapper} step
@@ -42,6 +42,20 @@
     const cartesian = step.bodyShift(poseIndex);
     return { x: cartesian.x, y: cartesian.y };
   }
+  // TODO: rotation and flipped orientation does not work
+  // $: skeleton =
+  //   poseIndex >= 0 ? step.rotatedSkeleton(poseIndex, rotation) : restingStep;
+  let skeleton =
+    $derived(poseIndex >= 0
+      ? rotation === 0
+        ? step.skeleton(poseIndex)
+        : step.rotatedSkeleton(poseIndex, rotation)
+      : restingStep);
+  let bodyShift =
+    $derived(poseIndex >= 0 ? stepBodyShift(step, poseIndex) : { x: 0, y: 0 });
+  let maybeJumpHeight = $derived(step.jumpHeight(poseIndex));
+  let jumpHeight =
+    $derived(size * (maybeJumpHeight === undefined ? 1.0 : maybeJumpHeight));
 </script>
 
 <Area

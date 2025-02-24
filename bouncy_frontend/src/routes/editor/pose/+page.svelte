@@ -11,13 +11,19 @@
   import { downloadTextFile } from '$lib/text_utils';
   import { goto } from '$app/navigation';
 
-  /** @type {import('./$types').PageData} */
-  export let data;
+  
+  /**
+   * @typedef {Object} Props
+   * @property {import('./$types').PageData} data
+   */
+
+  /** @type {Props} */
+  let { data } = $props();
   // const poses = data.lookupPoses();
   const localCollectionCtx = getContext('localCollection');
   const poses = localCollectionCtx.poses;
   const builder = localCollectionCtx.poseBuilder;
-  let showSettings = writable(false);
+  let showSettings = $state(writable(false));
 
   /** @param {number} index */
   function editPose(index) {
@@ -81,12 +87,15 @@
 <h2 class="box">{$t('editor.pose.list')}</h2>
 
 <EditOrDeleteList items={$poses} onDelete={deleteConfirmed} onEdit={editPose}>
-  <div slot="item" let:item={pose} let:selected>
-    <div class="pose">
-      <div>{pose.name('en')}</div>
-      <Pose {pose}></Pose>
+  {#snippet item({ item: pose, selected })}
+    <div   >
+      <div class="pose">
+        <div>{pose.name('en')}</div>
+        <Pose {pose}></Pose>
+      </div>
     </div>
-  </div>
+  {/snippet}
+  <!-- @migration-task: migrate this slot by hand, `confirm-delete-text` is an invalid identifier -->
   <div slot="confirm-delete-text" let:item={pose}>
     <p>
       {$t('editor.pose.delete-confirmation0')}
@@ -116,7 +125,7 @@
     id="ron-upload"
     type="file"
     accept=".ron"
-    on:change={handleFileUpload}
+    onchange={handleFileUpload}
   />
 </div>
 

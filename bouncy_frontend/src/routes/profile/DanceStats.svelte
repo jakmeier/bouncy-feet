@@ -2,14 +2,29 @@
   import { formatDistanceStrict } from 'date-fns';
   import { t } from '$lib/i18n';
 
-  export let seconds = 0;
-  export let numDances = 0;
-  export let numSteps = 0;
-  export let veryFast = 0;
-  export let fast = 0;
-  export let mid = 0;
-  export let slow = 0;
-  export let averageBpm = 0;
+  /**
+   * @typedef {Object} Props
+   * @property {number} [seconds]
+   * @property {number} [numDances]
+   * @property {number} [numSteps]
+   * @property {number} [veryFast]
+   * @property {number} [fast]
+   * @property {number} [mid]
+   * @property {number} [slow]
+   * @property {number} [averageBpm]
+   */
+
+  /** @type {Props} */
+  let {
+    seconds = 0,
+    numDances = 0,
+    numSteps = 0,
+    veryFast = 0,
+    fast = 0,
+    mid = 0,
+    slow = 0,
+    averageBpm = 0
+  } = $props();
 </script>
 
 <div id="container">

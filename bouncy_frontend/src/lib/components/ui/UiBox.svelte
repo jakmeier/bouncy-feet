@@ -1,8 +1,15 @@
 <script>
   import { t } from '$lib/i18n.js';
 
-  /** @type{String|undefined} */
-  export let title = undefined;
+  
+  /**
+   * @typedef {Object} Props
+   * @property {any} [title]
+   * @property {import('svelte').Snippet} [children]
+   */
+
+  /** @type {Props} */
+  let { title = undefined, children } = $props();
 </script>
 
 <div id="container">
@@ -10,7 +17,7 @@
     <p>{$t(title)}</p>
   {/if}
   <div class="inner">
-    <slot />
+    {@render children?.()}
   </div>
 </div>
 

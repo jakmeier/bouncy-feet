@@ -1,7 +1,7 @@
 <script>
   import Button from '$lib/components/ui/Button.svelte';
 
-  export let showResults;
+  let { showResults = $bindable() } = $props();
 </script>
 
 <div class="outer">

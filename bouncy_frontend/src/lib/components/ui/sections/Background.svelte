@@ -2,10 +2,16 @@
   import { onDestroy, onMount } from 'svelte';
   import { backgroundColor, fontColor } from '$lib/stores/UiState';
 
-  /** @type {string | undefined} */
-  export let bgColor = undefined;
-  /** @type {string | undefined} */
-  export let color = undefined;
+  
+  
+  /**
+   * @typedef {Object} Props
+   * @property {string | undefined} [bgColor]
+   * @property {string | undefined} [color]
+   */
+
+  /** @type {Props} */
+  let { bgColor = undefined, color = undefined } = $props();
 
   /** @type {string | undefined} */
   let swapBackgroundColor = undefined;

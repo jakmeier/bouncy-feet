@@ -1,10 +1,18 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import { tweened } from 'svelte/motion';
   import { getContext } from 'svelte';
   import { writable } from 'svelte/store';
 
-  /** @type {Circle} */
-  export let circle;
+  
+  /**
+   * @typedef {Object} Props
+   * @property {Circle} circle
+   */
+
+  /** @type {Props} */
+  let { circle } = $props();
 
   const animationCtx = getContext('animation');
   const animation = animationCtx
@@ -18,9 +26,15 @@
     : tweened(circle.cy, $animation);
   const rStore = tweened(circle.r, $animation);
 
-  $: circle, cxStore.set(circle.cx, $animation);
-  $: circle, cyStore.set(circle.cy);
-  $: circle, rStore.set(circle.r, $animation);
+  run(() => {
+    circle, cxStore.set(circle.cx, $animation);
+  });
+  run(() => {
+    circle, cyStore.set(circle.cy);
+  });
+  run(() => {
+    circle, rStore.set(circle.r, $animation);
+  });
 </script>
 
 <circle

@@ -1,10 +1,25 @@
 <script>
-  export let width = '250px';
-  export let height = '250px';
-  export let borderRadius = '100px';
-  export let borderWidth = '5px';
-  export let zIndex = 0;
-  export let backgroundColor = 'none';
+  /**
+   * @typedef {Object} Props
+   * @property {string} [width]
+   * @property {string} [height]
+   * @property {string} [borderRadius]
+   * @property {string} [borderWidth]
+   * @property {number} [zIndex]
+   * @property {string} [backgroundColor]
+   * @property {import('svelte').Snippet} [children]
+   */
+
+  /** @type {Props} */
+  let {
+    width = '250px',
+    height = '250px',
+    borderRadius = '100px',
+    borderWidth = '5px',
+    zIndex = 0,
+    backgroundColor = 'none',
+    children
+  } = $props();
 </script>
 
 <div
@@ -15,7 +30,7 @@
     : 'z-index: ' + zIndex}
     background-color: {backgroundColor}"
 >
-  <slot />
+  {@render children?.()}
 </div>
 
 <style>

@@ -4,25 +4,37 @@
 
   const parentCtx = getContext('avatarStyle');
 
-  /** @type {AvatarColoring} */
-  export let coloring = parentCtx ? parentCtx.coloring : LEFT_RIGHT_COLORING;
+  
 
-  /** @type {AvatarHeadStyle} */
-  export let headStyle = parentCtx
+  
+  
+  /**
+   * @typedef {Object} Props
+   * @property {AvatarColoring} [coloring]
+   * @property {AvatarHeadStyle} [headStyle]
+   * @property {AvatarBodyShape} [bodyShape]
+   * @property {import('svelte').Snippet} [children]
+   */
+
+  /** @type {Props} */
+  let {
+    coloring = parentCtx ? parentCtx.coloring : LEFT_RIGHT_COLORING,
+    headStyle = parentCtx
     ? parentCtx.headStyle
     : {
         shape: 'disk',
         size: 1,
         strokeWidth: 1,
-      };
-  /** @type {AvatarBodyShape} */
-  export let bodyShape = parentCtx
+      },
+    bodyShape = parentCtx
     ? parentCtx.bodyShape
     : {
         // height: 1,
         // width: 1,
         strokeWidth: 1,
-      };
+      },
+    children
+  } = $props();
 
   /** @type {AvatarStyleContext} */
   let ctx = {
@@ -33,4 +45,4 @@
   setContext('avatarStyle', ctx);
 </script>
 
-<slot />
+{@render children?.()}

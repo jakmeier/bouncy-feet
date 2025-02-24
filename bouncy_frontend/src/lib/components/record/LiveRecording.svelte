@@ -1,4 +1,6 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import Camera from '$lib/components/record/Camera.svelte';
   import Canvas from '$lib/components/Canvas.svelte';
   import Avatar from '$lib/components/avatar/Avatar.svelte';
@@ -37,12 +39,9 @@
   import MusicControl from './MusicControl.svelte';
   // import LiveRecordingSettings from './LiveRecordingSettings.svelte';
 
-  /** @type {boolean} */
-  export let cameraOn = false;
-  /** @type {undefined | number} */
-  export let recordingStart;
-  /** @type {undefined | number} */
-  export let recordingEnd;
+  
+  
+  
 
   export const startCamera = async () => {
     await camera.startCamera();
@@ -58,29 +57,42 @@
     const blob = await camera.endRecording();
     onStop(blob);
   };
-  /**
-   * Function is called when the recording is stopped by the user with the stop
-   * button or by a explicit `stop` call from the parent component.
-   * The recording video blob is passed as as a parameter.
-   */
-  export let onStop = (/** @type {Blob | undefined} */ _recording) => {};
+  
 
-  export let enableLiveAvatar = false;
-  export let enableInstructorAvatar = false;
-  /** always evaluate the pose on beat and move on to the next pose, even when
-   * it does not match */
-  export let forceBeat = false;
-  export let videoOpacity = 0.0;
-  let lastPoseWasCorrect = true;
+  
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [cameraOn]
+   * @property {undefined | number} recordingStart
+   * @property {undefined | number} recordingEnd
+   * @property {any} [onStop] - Function is called when the recording is stopped by the user with the stop
+button or by a explicit `stop` call from the parent component.
+The recording video blob is passed as as a parameter.
+   * @property {boolean} [enableLiveAvatar]
+   * @property {boolean} [enableInstructorAvatar]
+   * @property {boolean} [forceBeat] - always evaluate the pose on beat and move on to the next pose, even when
+it does not match
+   * @property {number} [videoOpacity]
+   */
+
+  /** @type {Props} */
+  let {
+    cameraOn = $bindable(false),
+    recordingStart = $bindable(),
+    recordingEnd = $bindable(),
+    onStop = (/** @type {Blob | undefined} */ _recording) => {},
+    enableLiveAvatar = $bindable(false),
+    enableInstructorAvatar = false,
+    forceBeat = false,
+    videoOpacity = $bindable(0.0)
+  } = $props();
+  let lastPoseWasCorrect = $state(true);
 
   const poseCtx = getContext('pose');
   let tracker = getContext('tracker').tracker;
   let detectionState = tracker.detectionState;
   tracker.enforceBeat(forceBeat);
-  $: animationTime = Math.min($timeBetweenMoves / 3, 300);
-  // $: $hideNavigation = cameraOn;
-  $: $wideView = cameraOn;
-  let progress = 0.0;
+  let progress = $state(0.0);
   let currentBeat = -1;
   let firstPoseIsShown = false;
 
@@ -88,33 +100,32 @@
   let audioHintDelay = 5000;
 
   /** @type {Camera} */
-  let camera;
+  let camera = $state();
   /** @type {HTMLVideoElement} */
-  let cameraVideoElement;
+  let cameraVideoElement = $state();
   /** @type {import("$lib/instructor/bouncy_instructor").Skeleton} */
-  let instructorSkeleton = tracker.expectedPoseSkeleton().restingPose();
-  let instructorSkeletonBodyShift = tracker.expectedPoseBodyShift();
+  let instructorSkeleton = $state(tracker.expectedPoseSkeleton().restingPose());
+  let instructorSkeletonBodyShift = $state(tracker.expectedPoseBodyShift());
 
   /** @type {import("@mediapipe/tasks-vision").NormalizedLandmark[]} */
-  let landmarks = [];
+  let landmarks = $state([]);
   /** @type {PoseDetection} */
   let dataListener;
 
   /** @type {number} */
-  let outerWidth;
+  let outerWidth = $state();
   /** @type {number} */
-  let outerHeight;
+  let outerHeight = $state();
 
   /** @type {import('svelte/store').Writable<number>} */
   let videoSrcWidth = writable(100);
   /** @type {import('svelte/store').Writable<number>} */
   let videoSrcHeight = writable(150);
 
-  let lastDetectedSkeletonSize = 1.0;
-  $: instructorSkeletonSize = Math.min(lastDetectedSkeletonSize, 8.0);
-  let lastSuccessSkeletonOrigin = new Cartesian2d(0.0, 0.0);
+  let lastDetectedSkeletonSize = $state(1.0);
+  let lastSuccessSkeletonOrigin = $state(new Cartesian2d(0.0, 0.0));
   /** @type {LimbError[]} */
-  let worstLimbs = [];
+  let worstLimbs = $state([]);
 
   /**
    * @param {PoseHint} inputHint
@@ -129,7 +140,7 @@
         return BLACK_COLORING;
     }
   }
-  let avatarStyle = selectStyle(PoseHint.DontKnow);
+  let avatarStyle = $state(selectStyle(PoseHint.DontKnow));
 
   // this is called periodically in a background task
   function onFrame() {
@@ -292,7 +303,6 @@
     setChannelGain('audio-guide', 2.0);
   });
 
-  $: updateView($detectionState);
 
   /**
    * @param {DetectionState} state
@@ -307,6 +317,15 @@
       enableLiveAvatar = false;
     }
   }
+  let animationTime = $derived(Math.min($timeBetweenMoves / 3, 300));
+  // $: $hideNavigation = cameraOn;
+  run(() => {
+    $wideView = cameraOn;
+  });
+  let instructorSkeletonSize = $derived(Math.min(lastDetectedSkeletonSize, 8.0));
+  run(() => {
+    updateView($detectionState);
+  });
 </script>
 
 <BackgroundTask {onFrame}></BackgroundTask>
@@ -368,7 +387,7 @@
       {/if} -->
 
       <ProgressBar {progress}></ProgressBar>
-      <button class="symbol" on:click={stop}>
+      <button class="symbol" onclick={stop}>
         <img src="{base}/img/symbols/bf_stop.svg" alt="stop" />
       </button>
     </div>

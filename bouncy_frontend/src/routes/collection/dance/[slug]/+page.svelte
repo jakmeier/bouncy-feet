@@ -1,3 +1,6 @@
+<!-- @migration-task Error while migrating Svelte code: can't migrate `$: dance =
+    data.officialDances.find(isSelected) || $localDances.find(isSelected);` to `$derived` because there's a variable named derived.
+     Rename the variable and try again or migrate by hand. -->
 <script>
   import { page } from '$app/stores';
   import { t } from '$lib/i18n.js';

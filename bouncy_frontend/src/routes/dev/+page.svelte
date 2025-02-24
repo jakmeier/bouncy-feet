@@ -12,15 +12,15 @@
   import { downloadTextFile } from '$lib/text_utils';
 
   /** @type {HTMLInputElement}  */
-  let upload;
+  let upload = $state();
   /** @type {HTMLVideoElement}  */
-  let video;
+  let video = $state();
   let prevTime = -1;
   let selectedTimestamp = 0;
-  let videoSrcWidth = 0;
-  let videoSrcHeight = 0;
+  let videoSrcWidth = $state(0);
+  let videoSrcHeight = $state(0);
   /** @type {import("$lib/instructor/bouncy_instructor").SkeletonV2 | undefined} */
-  let liveSkeleton;
+  let liveSkeleton = $state();
 
   let dataListener;
   /** @type {(skeleton: import("$lib/instructor/bouncy_instructor").SkeletonWrapper)=>void} */
@@ -34,18 +34,18 @@
   const poseCtx = getContext('pose');
 
   /** @type {undefined | number} */
-  let recordingStart;
+  let recordingStart = $state();
   /** @type {undefined | number} */
-  let recordingEnd;
+  let recordingEnd = $state();
 
   /**
    * @type {import("$lib/instructor/bouncy_instructor").PoseApproximation[]}
    */
-  let poseErrors = [];
+  let poseErrors = $state([]);
   /**
    * @type {import("$lib/instructor/bouncy_instructor").DetectedStep[]}
    */
-  let detectedSteps = [];
+  let detectedSteps = $state([]);
 
   /** @param { Event } event */
   async function loadVideo(event) {
@@ -121,11 +121,11 @@
     bind:this={upload}
     type="file"
     accept="video/*"
-    on:change={loadVideo}
+    onchange={loadVideo}
   />
 </p>
 
-<!-- svelte-ignore a11y-media-has-caption -->
+<!-- svelte-ignore a11y_media_has_caption -->
 <div class="side-by-side">
   <video
     bind:this={video}
@@ -143,10 +143,10 @@
   </div>
 </div>
 
-<button on:click={downloadFrame}> Download Keypoints of Frame </button>
-<button on:click={downloadKeypoints}> Download Keypoints of Video </button>
+<button onclick={downloadFrame}> Download Keypoints of Frame </button>
+<button onclick={downloadKeypoints}> Download Keypoints of Video </button>
 <h2>Dance Evaluation</h2>
-<button on:click={logDance}> Log Dance </button>
+<button onclick={logDance}> Log Dance </button>
 {#if detectedSteps.length > 0 && video}
   <VideoReview
     reviewVideoSrc={video.src}
@@ -156,7 +156,7 @@
   ></VideoReview>
 {/if}
 <h2>Pose evaluations</h2>
-<button on:click={computePoseErrors}> Show Pose Evaluations </button>
+<button onclick={computePoseErrors}> Show Pose Evaluations </button>
 {#each poseErrors as pose}
   <PoseError data={pose} />
 {/each}

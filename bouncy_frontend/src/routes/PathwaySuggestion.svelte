@@ -4,22 +4,24 @@
 
   import Step from './collection/Step.svelte';
 
-  export let size;
-  export let step;
-  export let title;
-  export let fitness;
-  export let xp;
-  export let min;
-  export let coach;
+  let {
+    size,
+    step,
+    title,
+    fitness,
+    xp,
+    min,
+    coach
+  } = $props();
 
-  let selected = false;
+  let selected = $state(false);
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-static-element-interactions -->
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
   class="outer"
-  on:click={() => {
+  onclick={() => {
     selected = !selected;
   }}
 >

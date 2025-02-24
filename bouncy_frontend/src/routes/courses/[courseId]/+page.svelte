@@ -18,7 +18,7 @@
   const animationTime = stepTime * 0.7;
   const i = counter(-1, 1, stepTime);
 
-  $: courseProgress = $user.userLessonProgress[id];
+  let courseProgress = $derived($user.userLessonProgress[id]);
 </script>
 
 <Header title={course.name} />

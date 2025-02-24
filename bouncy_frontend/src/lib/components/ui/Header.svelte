@@ -1,14 +1,23 @@
 <script>
+  import { createBubbler } from 'svelte/legacy';
+
+  const bubble = createBubbler();
   import BackButton from './BackButton.svelte';
 
-  /** @type {string} */
-  export let title;
-  /** @type {null|string} */
-  export let button = null;
-  export let backButton = true;
+  
+  
+  /**
+   * @typedef {Object} Props
+   * @property {string} title
+   * @property {null|string} [button]
+   * @property {boolean} [backButton]
+   */
+
+  /** @type {Props} */
+  let { title, button = null, backButton = true } = $props();
 
   /** @type {Element} */
-  let titleElement;
+  let titleElement = $state();
 </script>
 
 <header>
@@ -21,7 +30,7 @@
     <span class="title" bind:this={titleElement}>{title}</span>
   </div>
   {#if button !== null}
-    <button on:click>
+    <button onclick={bubble('click')}>
       <span class="material-symbols-outlined button" translate="no">
         {button}
       </span>

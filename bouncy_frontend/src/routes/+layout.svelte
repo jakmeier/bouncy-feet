@@ -1,4 +1,6 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import TabNavigation from './TabNavigation.svelte';
   import '../app.css';
   import { t } from '$lib/i18n.js';
@@ -14,11 +16,20 @@
   import { dev } from '$lib/stores/FeatureSelection';
   import MusicContext from './MusicContext.svelte';
   import AvatarStyleContext from '$lib/components/avatar/AvatarStyleContext.svelte';
+  /**
+   * @typedef {Object} Props
+   * @property {import('svelte').Snippet} [children]
+   */
 
-  $: hideNavigation.set(!$dev);
-  $: navBarHeight = $hideNavigation ? 0 : 90;
-  $: outerPadding = $wideView ? '0rem' : '1rem';
-  $: mainMargin = $wideView ? 0 : 5;
+  /** @type {Props} */
+  let { children } = $props();
+
+  run(() => {
+    hideNavigation.set(!$dev);
+  });
+  let navBarHeight = $derived($hideNavigation ? 0 : 90);
+  let outerPadding = $derived($wideView ? '0rem' : '1rem');
+  let mainMargin = $derived($wideView ? 0 : 5);
 </script>
 
 <svelte:head>
@@ -37,7 +48,7 @@
         <PoseDetectionContext>
           <MusicContext>
             <AvatarStyleContext>
-              <slot />
+              {@render children?.()}
             </AvatarStyleContext>
           </MusicContext>
         </PoseDetectionContext>
