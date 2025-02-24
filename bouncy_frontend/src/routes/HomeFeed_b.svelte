@@ -11,6 +11,7 @@
   import Footer from '$lib/components/ui/Footer.svelte';
   import { getContext } from 'svelte';
   import FirstVisist from './FirstVisist.svelte';
+  import AvatarCustomizer from '$lib/components/avatar/AvatarCustomizer.svelte';
 
   /** @type{import("$lib/instructor/bouncy_instructor").DanceWrapper[]} */
   export let featuredDances;
@@ -50,6 +51,9 @@
 {#if $localState.firstVisit}
   <FirstVisist />
 {/if}
+
+<!-- WIP -->
+<AvatarCustomizer />
 
 <div class="focus-card">
   <h1>

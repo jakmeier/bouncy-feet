@@ -137,11 +137,7 @@
   <div>
     {#if liveSkeleton}
       <Svg width={videoSrcWidth} height={videoSrcHeight} orderByZ showOverflow>
-        <SvgAvatar2
-          skeleton={liveSkeleton}
-          lineWidth={3}
-          style={LEFT_RIGHT_COLORING_LIGHT}
-        />
+        <SvgAvatar2 skeleton={liveSkeleton} />
       </Svg>
     {/if}
   </div>

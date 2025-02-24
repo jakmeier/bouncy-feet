@@ -1,6 +1,5 @@
 <script>
   import { Cartesian2d, LimbError } from '$lib/instructor/bouncy_instructor';
-  import { MAIN_THEME_COLORING } from '$lib/constants';
   import SvgAvatar2 from './SvgAvatar2.svelte';
 
   /** @type import('$lib/instructor/bouncy_instructor').Skeleton */

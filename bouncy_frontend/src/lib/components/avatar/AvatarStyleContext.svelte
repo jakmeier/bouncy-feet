@@ -1,22 +1,28 @@
 <script>
   import { LEFT_RIGHT_COLORING } from '$lib/constants';
-  import { setContext } from 'svelte';
+  import { getContext, setContext } from 'svelte';
+
+  const parentCtx = getContext('avatarStyle');
 
   /** @type {AvatarColoring} */
-  export let coloring = LEFT_RIGHT_COLORING;
+  export let coloring = parentCtx ? parentCtx.coloring : LEFT_RIGHT_COLORING;
 
   /** @type {AvatarHeadStyle} */
-  export let headStyle = {
-    shape: 'disk',
-    size: 1,
-    strokeWidth: 1,
-  };
+  export let headStyle = parentCtx
+    ? parentCtx.headStyle
+    : {
+        shape: 'disk',
+        size: 1,
+        strokeWidth: 1,
+      };
   /** @type {AvatarBodyShape} */
-  export let bodyShape = {
-    // height: 1,
-    // width: 1,
-    strokeWidth: 1,
-  };
+  export let bodyShape = parentCtx
+    ? parentCtx.bodyShape
+    : {
+        // height: 1,
+        // width: 1,
+        strokeWidth: 1,
+      };
 
   /** @type {AvatarStyleContext} */
   let ctx = {
