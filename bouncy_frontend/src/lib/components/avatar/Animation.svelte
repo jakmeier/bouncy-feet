@@ -1,44 +1,23 @@
 <script>
-  import { run as run_1 } from 'svelte/legacy';
-
   import { setContext, tick } from 'svelte';
   import { quadIn } from 'svelte/easing';
   import { tweened } from 'svelte/motion';
   import { derived, writable } from 'svelte/store';
 
-  /**
-   * @typedef {Object} Props
-   * @property {number} [animationTime]
-   * @property {number} [delay]
-   * @property {any} [easing]
-   * @property {number} [jumpHeight]
-   * @property {import('svelte').Snippet} [children]
-   */
-
-  /** @type {Props} */
-  let {
-    animationTime = 0,
-    delay = 0,
-    easing = quadIn,
-    jumpHeight = 1,
-    children
-  } = $props();
+  export let animationTime = 0;
+  export let delay = 0;
+  export let easing = quadIn;
+  export let jumpHeight = 1;
 
   // this factor is chosen to have a jump height of 1.0 to be a reasonable default
   const jumpHeightFactor = 0.025;
 
   const animationTimeStore = writable(animationTime);
-  run_1(() => {
-    animationTimeStore.set(animationTime);
-  });
+  $: animationTimeStore.set(animationTime);
   const easingStore = writable(easing);
-  run_1(() => {
-    easingStore.set(easing);
-  });
+  $: easingStore.set(easing);
   const delayStore = writable(delay);
-  run_1(() => {
-    delayStore.set(delay);
-  });
+  $: delayStore.set(delay);
 
   const animation = derived(
     [animationTimeStore, delayStore, easingStore],
@@ -106,4 +85,4 @@
   });
 </script>
 
-{@render children?.()}
+<slot />

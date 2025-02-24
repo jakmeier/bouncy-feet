@@ -5,10 +5,8 @@
   import { getContext } from 'svelte';
   import { derived, writable } from 'svelte/store';
 
-  
   /** @type{number} animationTime in ms */
 
-  
   /**
    * @typedef {Object} Props
    * @property {any} points
@@ -89,8 +87,8 @@
       animationTimeZero.set(performance.now());
     }
   }
-  run(() => {
-    points, updatePosition();
+  $effect(() => {
+    updatePosition();
   });
 </script>
 

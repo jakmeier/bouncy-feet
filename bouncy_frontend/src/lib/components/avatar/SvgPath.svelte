@@ -1,9 +1,6 @@
 <script>
-  import { run } from 'svelte/legacy';
+  import { getContext, onDestroy, onMount, untrack } from 'svelte';
 
-  import { getContext, onDestroy, onMount } from 'svelte';
-  
-  
   /**
    * @typedef {Object} Props
    * @property {any} path
@@ -15,9 +12,12 @@
 
   const svg = getContext('svg');
 
-  // (optimization): can I avoid calling update on every line or path?
-  run(() => {
-    svg.setPath(id, path), svg.update();
+  $effect(() => {
+    svg.setPath(id, path);
+    untrack(() => {
+      // (optimization): can I avoid calling update on every line or path?
+      // svg.update();
+    });
   });
 
   onMount(() => svg.setPath(id, path));

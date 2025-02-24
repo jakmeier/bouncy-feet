@@ -1,9 +1,6 @@
 <script>
-  import { run } from 'svelte/legacy';
+  import { getContext, onDestroy, onMount, untrack } from 'svelte';
 
-  import { getContext, onDestroy, onMount } from 'svelte';
-  
-  
   /**
    * @typedef {Object} Props
    * @property {any} line
@@ -15,9 +12,8 @@
 
   const svg = getContext('svg');
 
-  // (optimization): can I avoid calling update on every line?
-  run(() => {
-    svg.setLine(id, line), svg.update();
+  $effect(() => {
+    svg.setLine(id, line);
   });
 
   onMount(() => svg.setLine(id, line));

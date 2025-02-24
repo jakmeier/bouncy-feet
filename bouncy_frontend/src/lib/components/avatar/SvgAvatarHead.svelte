@@ -2,11 +2,6 @@
   import SvgCircle from './SvgCircle.svelte';
   import SvgPolygon from './SvgPolygon.svelte';
 
-  
-  
-  
-  
-  
   /**
    * @typedef {Object} Props
    * @property {number} cx
@@ -14,18 +9,10 @@
    * @property {number} avatarSizePixels
    * @property {AvatarHeadStyle} headStyle
    * @property {String} color
-   * @property {any} dummyUpdate
    */
 
   /** @type {Props} */
-  let {
-    cx,
-    cy,
-    avatarSizePixels,
-    headStyle,
-    color,
-    dummyUpdate
-  } = $props();
+  let { cx, cy, avatarSizePixels, headStyle, color } = $props();
 
   let r = 0.055 * avatarSizePixels * headStyle.size;
   let headFill = headStyle.shape === 'disk' ? color : undefined;
@@ -50,7 +37,6 @@
     fill={headFill}
     stroke={headStroke}
     strokeWidth={headStrokeWidth}
-    {dummyUpdate}
   />
 {:else if headStyle.shape === 'square'}
   <SvgPolygon

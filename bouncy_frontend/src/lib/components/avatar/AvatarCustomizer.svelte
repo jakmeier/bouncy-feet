@@ -36,9 +36,7 @@
     headStyle = updateHeadstyle();
   }
 
-  run(() => {
-    console.log(shapeIndex);
-  });
+  $effect(() => console.log(shapeIndex));
 </script>
 
 <div class="container">

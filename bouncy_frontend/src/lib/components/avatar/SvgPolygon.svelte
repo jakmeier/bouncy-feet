@@ -1,11 +1,6 @@
 <script>
-  import { run } from 'svelte/legacy';
+  import { getContext, onDestroy, onMount, untrack } from 'svelte';
 
-  import { getContext, onDestroy, onMount } from 'svelte';
-
-  
-  
-  
   /**
    * @typedef {Object} Props
    * @property {any} points
@@ -17,7 +12,7 @@
   let { points, style, id } = $props();
 
   const svg = getContext('svg');
-  run(() => {
+  $effect(() => {
     svg.setPolygon(id, { points, style });
   });
 

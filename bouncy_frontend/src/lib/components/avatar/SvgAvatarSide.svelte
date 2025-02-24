@@ -3,8 +3,6 @@
   import { getContext } from 'svelte';
   import SvgPath from './SvgPath.svelte';
 
-  
-  
   /**
    * @typedef {Object} Props
    * @property {import("$lib/instructor/bouncy_instructor").SkeletonSideV2} side

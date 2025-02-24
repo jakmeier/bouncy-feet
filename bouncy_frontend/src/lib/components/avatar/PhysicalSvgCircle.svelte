@@ -1,11 +1,8 @@
 <script>
-  import { run } from 'svelte/legacy';
-
-  import { tweened } from 'svelte/motion';
+  import { Tween, tweened } from 'svelte/motion';
   import { getContext } from 'svelte';
   import { writable } from 'svelte/store';
 
-  
   /**
    * @typedef {Object} Props
    * @property {Circle} circle
@@ -20,27 +17,23 @@
     : writable({ duration: 0 });
 
   // use svelte/motion.tweened for smoothly changing x,y values
-  const cxStore = tweened(circle.cx, $animation);
-  const cyStore = animationCtx
+  let animatedCx = new Tween(circle.cx, $animation);
+  const animatedCy = animationCtx
     ? animationCtx.tweenedJump(circle.cy)
     : tweened(circle.cy, $animation);
-  const rStore = tweened(circle.r, $animation);
+  let animatedR = new Tween(circle.r, $animation);
 
-  run(() => {
-    circle, cxStore.set(circle.cx, $animation);
-  });
-  run(() => {
-    circle, cyStore.set(circle.cy);
-  });
-  run(() => {
-    circle, rStore.set(circle.r, $animation);
+  $effect(() => {
+    animatedCx.set(circle.cx, animation);
+    animatedCy.set(circle.cy, animation);
+    animatedR.set(circle.r, animation);
   });
 </script>
 
 <circle
-  cx={$cxStore}
-  cy={$cyStore}
-  r={$rStore}
+  cx={animatedCx.current}
+  cy={$animatedCy}
+  r={animatedR.current}
   stroke={circle.stroke}
   stroke-width={circle.strokeWidth}
   fill={circle.fill}

@@ -1,15 +1,12 @@
 <script>
-  import { getContext, setContext, tick } from 'svelte';
+  import { getContext, onDestroy, onMount, setContext } from 'svelte';
   import PhysicalSvgLine from './PhysicalSvgLine.svelte';
   import PhysicalSvgPolygon from './PhysicalSvgPolygon.svelte';
   import PhysicalSvgCircle from './PhysicalSvgCircle.svelte';
   import SvgStyle from './SvgStyle.svelte';
   import PhysicalSvgPath from './PhysicalSvgPath.svelte';
+  import { browser } from '$app/environment';
 
-  
-  
-  
-  
   /**
    * @typedef {Object} Props
    * @property {number} width
@@ -25,7 +22,7 @@
     height,
     orderByZ = false,
     showOverflow = false,
-    children
+    children,
   } = $props();
 
   let animationCtx = getContext('animation');
@@ -33,6 +30,8 @@
   if (animationCtx) {
     animationTime = animationCtx.animationTime;
   }
+
+  let stateDirty = false;
 
   /**  @type {Line[]}  */
   let lines = [];
@@ -43,9 +42,13 @@
   /**  @type {Path[]}  */
   let displayedPaths = $state([]);
   /**  @type {Polygon[]}  */
-  let polygons = $state([]);
+  let polygons = [];
+  /**  @type {Polygon[]}  */
+  let displayedPolygons = $state([]);
   /**  @type {Circle[]}  */
-  let circles = $state([]);
+  let circles = [];
+  /**  @type {Circle[]}  */
+  let displayedCircles = $state([]);
 
   /**
    * @param {string} id
@@ -59,6 +62,7 @@
     } else {
       lines.push(namedLine);
     }
+    stateDirty = true;
   }
 
   /**
@@ -67,7 +71,7 @@
   function removeLine(id) {
     let index = lines.findIndex((x) => x.id === id);
     lines.splice(index, 1);
-    lines = lines;
+    stateDirty = true;
   }
 
   /**
@@ -82,6 +86,7 @@
     } else {
       paths.push(namedPath);
     }
+    stateDirty = true;
   }
 
   /**
@@ -90,7 +95,7 @@
   function removePath(id) {
     let index = paths.findIndex((x) => x.id === id);
     paths.splice(index, 1);
-    paths = paths;
+    stateDirty = true;
   }
 
   /**
@@ -105,6 +110,7 @@
     } else {
       polygons.push(namedPolygon);
     }
+    stateDirty = true;
   }
 
   /**
@@ -114,6 +120,7 @@
     let index = polygons.findIndex((x) => x.id === id);
     polygons.splice(index, 1);
     polygons = polygons;
+    stateDirty = true;
   }
 
   /**
@@ -128,6 +135,7 @@
     } else {
       circles.push(namedCircle);
     }
+    stateDirty = true;
   }
 
   /**
@@ -137,15 +145,22 @@
     let index = circles.findIndex((x) => x.id === id);
     circles.splice(index, 1);
     circles = circles;
+    stateDirty = true;
   }
 
   async function update() {
+    if (!stateDirty) {
+      return;
+    }
     displayedLines = lines;
     displayedPaths = paths;
+    displayedCircles = circles;
+    displayedPolygons = polygons;
     if (orderByZ) {
       displayedLines = displayedLines.sort((a, b) => a.z - b.z);
       displayedPaths = displayedPaths.sort((a, b) => a.z - b.z);
     }
+    stateDirty = false;
   }
 
   setContext('svg', {
@@ -159,6 +174,26 @@
     removeCircle,
     update,
   });
+
+  let raf = 0;
+  let fuse = false;
+  function updateIfDirty() {
+    update();
+    if (fuse) {
+      return;
+    }
+    raf = requestAnimationFrame(updateIfDirty);
+  }
+  if (browser) {
+    onMount(() => {
+      stateDirty = true;
+      raf = requestAnimationFrame(updateIfDirty);
+    });
+    onDestroy(() => {
+      fuse = true;
+      cancelAnimationFrame(raf);
+    });
+  }
 </script>
 
 <svg
@@ -170,11 +205,11 @@
   </SvgStyle>
 
   <!-- For now, polygons and circles are drawn below lines. Z ordering can be added if needed -->
-  {#each polygons as polygon}
+  {#each displayedPolygons as polygon}
     <PhysicalSvgPolygon points={polygon.points} style={polygon.style} />
   {/each}
 
-  {#each circles as circle}
+  {#each displayedCircles as circle}
     <PhysicalSvgCircle {circle} />
   {/each}
 
@@ -183,10 +218,7 @@
   {/each}
 
   {#each displayedPaths as path (path.id)}
-    <PhysicalSvgPath
-      points={path.points}
-      style={path.style}
-    />
+    <PhysicalSvgPath points={path.points} style={path.style} />
   {/each}
 </svg>
 

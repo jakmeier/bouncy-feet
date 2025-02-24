@@ -1,12 +1,8 @@
 <script>
-  import { run } from 'svelte/legacy';
-
   import { tweened } from 'svelte/motion';
   import { getContext } from 'svelte';
   import { derived, writable } from 'svelte/store';
 
-  
-  
   /**
    * @typedef {Object} Props
    * @property {any} points
@@ -16,7 +12,7 @@
   /** @type {Props} */
   let { points, style } = $props();
 
-  let displayedPoints = [...points];
+  let displayedPoints = JSON.parse(JSON.stringify(points));
 
   const animationCtx = getContext('animation');
   const animation = animationCtx
@@ -76,9 +72,7 @@
   function setY(i, y) {
     displayedPoints[i].y = y;
   }
-  run(() => {
-    points, updateValues(points);
-  });
+  $effect(() => updateValues(points));
 </script>
 
 <polygon

@@ -4,9 +4,6 @@
   import { Cartesian2d, LimbError } from '$lib/instructor/bouncy_instructor';
   import SvgAvatar2 from './SvgAvatar2.svelte';
 
-  
-  
-  
   /**
    * @typedef {Object} Props
    * @property {any} skeleton
@@ -26,7 +23,7 @@
     bodyShift = { x: 0, y: 0 },
     avatarSize = 1.0,
     markedLimbs = [],
-    markedLimbIndices = []
+    markedLimbIndices = [],
   } = $props();
 
   /**
@@ -49,17 +46,14 @@
   });
 
   /** @type {import("$lib/instructor/bouncy_instructor").SkeletonV2} */
-  let renderedSkeleton = $derived(skeleton.render(
-    new Cartesian2d(hip.x, hip.y),
-    avatarSizePixels
-  ));
-  let dummyUpdate = $state(0);
-  run(() => {
-    renderedSkeleton, (dummyUpdate += 1);
-  });
-  let markedSegments = $derived(markedLimbs
-    .map((limb) => limb.render(renderedSkeleton))
-    .concat(markedLimbIndices.map((i) => renderedSkeleton.segment(i))));
+  let renderedSkeleton = $derived(
+    skeleton.render(new Cartesian2d(hip.x, hip.y), avatarSizePixels)
+  );
+  let markedSegments = $derived(
+    markedLimbs
+      .map((limb) => limb.render(renderedSkeleton))
+      .concat(markedLimbIndices.map((i) => renderedSkeleton.segment(i)))
+  );
 </script>
 
 <SvgAvatar2 {avatarSizePixels} skeleton={renderedSkeleton} {markedSegments} />

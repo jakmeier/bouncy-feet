@@ -49,7 +49,22 @@
  * @property {string} leftColor
  * @property {string} rightColor
  * @property {string} headColor
- * @property {string} bodyColor
+ *
+ * @typedef {Object} AvatarHeadStyle
+ * @property {string} shape
+ * @property {number} size
+ * @property {number} strokeWidth
+ * 
+ * @typedef {Object} AvatarBodyShape
+ * @property {number} strokeWidth
+ * TODO: add these later
+ * property {number} height
+ * property {number} width
+ * 
+ * @typedef {Object} AvatarStyleContext
+ * @property {AvatarColoring} coloring
+ * @property {AvatarHeadStyle} headStyle
+ * @property {AvatarBodyShape} bodyShape
  *
  * @typedef {Object} DanceSessionResult
  * @property {number} numSteps
