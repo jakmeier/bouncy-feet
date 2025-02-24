@@ -13,8 +13,6 @@
   import FirstVisist from './FirstVisist.svelte';
   import AvatarCustomizer from '$lib/components/avatar/AvatarCustomizer.svelte';
 
-  
-  
   /**
    * @typedef {Object} Props
    * @property {any} featuredDances

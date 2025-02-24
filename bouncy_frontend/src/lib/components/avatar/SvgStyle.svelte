@@ -1,6 +1,5 @@
 <script>
-  import { setContext, untrack } from 'svelte';
-  import { writable } from 'svelte/store';
+  import { setContext } from 'svelte';
 
   /**
    * @typedef {Object} Props
@@ -19,16 +18,17 @@
   } = $props();
 
   const ctx = {
-    color,
-    lineWidth,
-    linecap,
+    get color() {
+      return color;
+    },
+    get lineWidth() {
+      return lineWidth;
+    },
+    get linecap() {
+      return linecap;
+    },
   };
-  const reactiveCtx = writable(ctx);
-  setContext('svg-style', reactiveCtx);
-
-  $effect(() => {
-    untrack(() => reactiveCtx.set({ color, lineWidth, linecap }));
-  });
+  setContext('svg-style', ctx);
 </script>
 
 {@render children?.()}

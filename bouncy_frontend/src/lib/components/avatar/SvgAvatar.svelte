@@ -1,12 +1,10 @@
 <script>
-  import { run } from 'svelte/legacy';
-
-  import { Cartesian2d, LimbError } from '$lib/instructor/bouncy_instructor';
+  import { Cartesian2d, Skeleton } from '$lib/instructor/bouncy_instructor';
   import SvgAvatar2 from './SvgAvatar2.svelte';
 
   /**
    * @typedef {Object} Props
-   * @property {any} skeleton
+   * @property {Skeleton} skeleton
    * @property {number} [width]
    * @property {number} [height]
    * @property {any} [bodyShift]

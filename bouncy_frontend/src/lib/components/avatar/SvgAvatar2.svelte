@@ -17,7 +17,7 @@
    */
 
   /** @type {Props} */
-  let { skeleton, avatarSizePixels = 100, markedSegments = [] } = $props();
+  let { skeleton, avatarSizePixels, markedSegments = [] } = $props();
 
   const markerColor = '#ff111166';
   const markerLineWidth = 16;
@@ -26,8 +26,8 @@
   const avatarStyleCtx = getContext('avatarStyle');
 
   /** @type {AvatarColoring} */
-  let coloring = avatarStyleCtx.coloring;
-  let lineWidth = 10 * avatarStyleCtx.bodyShape.strokeWidth;
+  let coloring = $derived(avatarStyleCtx.coloring);
+  let lineWidth = $derived(10 * avatarStyleCtx.bodyShape.strokeWidth);
   let headHeight = 1;
 
   let markedSegmentsLines = $derived(

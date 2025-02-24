@@ -1,6 +1,4 @@
 <script>
-  import { run } from 'svelte/legacy';
-
   import { tweened } from 'svelte/motion';
   import { getContext } from 'svelte';
   import { derived, writable } from 'svelte/store';
@@ -10,7 +8,7 @@
   /**
    * @typedef {Object} Props
    * @property {any} points
-   * @property {any} style
+   * @property {Style} style
    */
 
   /** @type {Props} */
@@ -100,5 +98,3 @@
   fill="none"
 >
 </path>
-
-<path stroke="blue" fill="none" stroke-width="4" />

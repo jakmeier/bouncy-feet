@@ -1,10 +1,10 @@
 <script>
-  import { getContext, onDestroy, onMount, untrack } from 'svelte';
+  import { getContext, onDestroy, onMount } from 'svelte';
 
   /**
    * @typedef {Object} Props
    * @property {any} points
-   * @property {{ lineWidth: any; color: any; fill: any; linecap: any; }} style
+   * @property {Style} style
    * @property {string} id
    */
 

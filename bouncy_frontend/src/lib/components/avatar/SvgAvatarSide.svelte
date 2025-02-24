@@ -48,11 +48,11 @@
 
   // straight lines
   let lines = $derived([
-    // svgLine('thigh', side.thigh, $svgStyle),
-    // svgLine('shin', side.shin, $svgStyle),
-    // svgLine('arm', side.arm, $svgStyle),
-    // svgLine('forearm', side.forearm, $svgStyle),
-    svgLine('foot', side.foot, $svgStyle),
+    // svgLine('thigh', side.thigh, svgStyle),
+    // svgLine('shin', side.shin, svgStyle),
+    // svgLine('arm', side.arm, svgStyle),
+    // svgLine('forearm', side.forearm, svgStyle),
+    svgLine('foot', side.foot, svgStyle),
   ]);
 
   // bezier curves
@@ -68,7 +68,7 @@
         side.shin.end,
       ],
       side.thigh.z,
-      $svgStyle
+      svgStyle
     ),
   ]);
 </script>
