@@ -15,10 +15,11 @@
   let { cx, cy, avatarSizePixels, headStyle, color } = $props();
 
   let r = 0.055 * avatarSizePixels * headStyle.size;
-  let headFill = headStyle.shape === 'disk' ? color : undefined;
-  let headStroke = headStyle.shape !== 'disk' ? color : undefined;
-  let headStrokeWidth =
-    headStyle.shape !== 'disk' ? (r / 2) * headStyle.strokeWidth : undefined;
+  let headFill = $derived(headStyle.shape === 'disk' ? color : undefined);
+  let headStroke = $derived(headStyle.shape !== 'disk' ? color : undefined);
+  let headStrokeWidth = $derived(
+    headStyle.shape !== 'disk' ? (r / 2) * headStyle.strokeWidth : undefined
+  );
 
   let corners = $derived([
     { x: cx - r, y: cy - r },

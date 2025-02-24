@@ -16,27 +16,20 @@
   let shapeIndex = $state(0);
 
   /** @type {AvatarHeadStyle} */
-  let headStyle = $state(updateHeadstyle());
+  let headStyle = $derived({
+    shape: shapes[shapeIndex],
+    size: 1.0,
+    strokeWidth: 1.0,
+  });
   /** @type {AvatarColoring} */
   let coloring = LEFT_RIGHT_COLORING;
   /** @type {AvatarBodyShape} */
   let bodyShape = { strokeWidth: 1.0 };
 
-  function updateHeadstyle() {
-    return {
-      shape: shapes[shapeIndex],
-      size: 1.0,
-      strokeWidth: 1.0,
-    };
-  }
-
   /** @param {number} delta */
   function changeShape(delta) {
     shapeIndex = (shapeIndex + delta) % shapes.length;
-    headStyle = updateHeadstyle();
   }
-
-  $effect(() => console.log(shapeIndex));
 </script>
 
 <div class="container">

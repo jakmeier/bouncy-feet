@@ -4,10 +4,6 @@
 
   const parentCtx = getContext('avatarStyle');
 
-  
-
-  
-  
   /**
    * @typedef {Object} Props
    * @property {AvatarColoring} [coloring]
@@ -20,28 +16,34 @@
   let {
     coloring = parentCtx ? parentCtx.coloring : LEFT_RIGHT_COLORING,
     headStyle = parentCtx
-    ? parentCtx.headStyle
-    : {
-        shape: 'disk',
-        size: 1,
-        strokeWidth: 1,
-      },
+      ? parentCtx.headStyle
+      : {
+          shape: 'disk',
+          size: 1,
+          strokeWidth: 1,
+        },
     bodyShape = parentCtx
-    ? parentCtx.bodyShape
-    : {
-        // height: 1,
-        // width: 1,
-        strokeWidth: 1,
-      },
-    children
+      ? parentCtx.bodyShape
+      : {
+          // height: 1,
+          // width: 1,
+          strokeWidth: 1,
+        },
+    children,
   } = $props();
 
   /** @type {AvatarStyleContext} */
-  let ctx = {
-    coloring,
-    headStyle,
-    bodyShape,
-  };
+  let ctx = $state({
+    get coloring() {
+      return coloring;
+    },
+    get headStyle() {
+      return headStyle;
+    },
+    get bodyShape() {
+      return bodyShape;
+    },
+  });
   setContext('avatarStyle', ctx);
 </script>
 
