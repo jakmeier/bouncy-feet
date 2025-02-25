@@ -16,18 +16,6 @@
   /** @type {Props} */
   let { children } = $props();
 
-  /** Local state, unlike user state, is not synchronized anywhere. */
-  const localStateValue =
-    browser && localStorage.localState
-      ? JSON.parse(localStorage.localState)
-      : {};
-  const localState = writable(localStateValue);
-  if (browser) {
-    localState.subscribe(
-      (value) => (localStorage.localState = JSON.stringify(value))
-    );
-  }
-
   /**
    * Client sessions are available for registered users and guests.
    *
@@ -39,7 +27,7 @@
    *
    * TODO: registered user client sessions
    */
-  let clientSession = $state(readable({}));
+  let clientSession = readable({});
   if (browser) {
     clientSession = readable(
       {
@@ -57,9 +45,6 @@
               localStorage.clientSessionId = newClientSession.id;
               localStorage.clientSessionSecret = newClientSession.secret;
               set(newClientSession);
-              $localState.firstVisit = true;
-              // trigger subscribers
-              $localState = $localState;
             } else {
               console.error(
                 'Failed to create a guest session. Response:',
@@ -228,7 +213,6 @@
   setContext('user', {
     store: user,
     clientSession,
-    localState,
     computeDanceStats,
     addDanceToStats,
     recordFinishedLesson,

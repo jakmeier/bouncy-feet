@@ -15,7 +15,7 @@
   let { cx, cy, avatarSizePixels, headStyle, color } = $props();
 
   let r = 0.055 * avatarSizePixels * headStyle.size;
-  let headFill = $derived(headStyle.shape === 'disk' ? color : undefined);
+  let headFill = $derived(headStyle.shape === 'disk' ? color : 'transparent');
   let headStroke = $derived(headStyle.shape !== 'disk' ? color : undefined);
   let headStrokeWidth = $derived(
     headStyle.shape !== 'disk' ? (r / 2) * headStyle.strokeWidth : undefined

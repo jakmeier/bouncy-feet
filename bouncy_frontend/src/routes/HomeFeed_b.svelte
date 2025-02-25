@@ -1,6 +1,5 @@
 <script>
   import { t } from '$lib/i18n.js';
-  import { LEFT_RIGHT_COLORING, ORANGE_COLORING } from '$lib/constants';
   import { base } from '$app/paths';
   import { versionString } from '$lib/stores/FeatureSelection';
   import { beatCounter } from '$lib/stores/Beat';
@@ -9,10 +8,9 @@
   import Arrow from '$lib/components/ui/Arrow.svelte';
   import LightBackgroundSection from '$lib/components/ui/sections/LightSection.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
-  import { getContext } from 'svelte';
   import FirstVisist from './FirstVisist.svelte';
   import AvatarCustomizer from '$lib/components/avatar/AvatarCustomizer.svelte';
-
+  import { getContext } from 'svelte';
   /**
    * @typedef {Object} Props
    * @property {any} featuredDances
@@ -22,7 +20,8 @@
   /** @type {Props} */
   let { featuredDances, featuredSteps } = $props();
 
-  const { localState } = getContext('user');
+  /** @type {LocalState}*/
+  const localState = getContext('localState');
 
   const entryDance = featuredDances.find(
     (dance) => dance.id === 'Home Animation (dev)'
@@ -52,7 +51,7 @@
   />
 </div>
 
-{#if $localState.firstVisit}
+{#if localState.onboarding.firstVisit}
   <FirstVisist />
 {/if}
 

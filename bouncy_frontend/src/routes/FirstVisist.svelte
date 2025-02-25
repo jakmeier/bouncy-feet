@@ -1,12 +1,10 @@
 <script>
   import { getContext } from 'svelte';
 
-  const { localState } = getContext('user');
+  const localState = getContext('localState');
 
   function continueAsGuest() {
-    $localState.firstVisit = false;
-    // trigger subscribers
-    $localState = $localState;
+    localState.onboarding.firstVisit = false;
   }
 </script>
 

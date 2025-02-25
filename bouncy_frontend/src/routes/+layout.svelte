@@ -15,7 +15,8 @@
   import LocalCollectionContext from './LocalCollectionContext.svelte';
   import { dev } from '$lib/stores/FeatureSelection';
   import MusicContext from './MusicContext.svelte';
-  import AvatarStyleContext from '$lib/components/avatar/AvatarStyleContext.svelte';
+  import LocalStateContext from './LocalStateContext.svelte';
+  import UserAvatarStyleContext from '$lib/components/avatar/UserAvatarStyleContext.svelte';
   /**
    * @typedef {Object} Props
    * @property {import('svelte').Snippet} [children]
@@ -43,17 +44,19 @@
   <main
     style="margin:{mainMargin}px; height: calc(100vh - {navBarHeight}px); max-width: calc(min(730px, 100vw) - 2 * {outerPadding});"
   >
-    <UserContext>
-      <LocalCollectionContext>
-        <PoseDetectionContext>
-          <MusicContext>
-            <AvatarStyleContext>
-              {@render children?.()}
-            </AvatarStyleContext>
-          </MusicContext>
-        </PoseDetectionContext>
-      </LocalCollectionContext>
-    </UserContext>
+    <LocalStateContext>
+      <UserContext>
+        <LocalCollectionContext>
+          <PoseDetectionContext>
+            <MusicContext>
+              <UserAvatarStyleContext>
+                {@render children?.()}
+              </UserAvatarStyleContext>
+            </MusicContext>
+          </PoseDetectionContext>
+        </LocalCollectionContext>
+      </UserContext>
+    </LocalStateContext>
     {#if !$hideNavigation}
       <div class="scroll-buffer"></div>
     {/if}
