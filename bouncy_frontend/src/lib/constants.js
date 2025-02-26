@@ -23,7 +23,6 @@ export const GRAY_COLORING = {
 };
 
 export const BOLD_MAIN_THEME_COLORING = {
-
     leftColor: 'var(--theme-main)',
     rightColor: 'var(--theme-main)',
     headColor: 'var(--theme-main)',

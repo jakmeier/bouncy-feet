@@ -19,18 +19,18 @@
  * @property {Point} start
  * @property {Point} end
  * @property {number} z
- * @property {any} style
+ * @property {Style} style
  *
  * @typedef {Object} Path
  * @property {String} id
  * @property {Point[]} points
  * @property {number} z
- * @property {any} style
+ * @property {Style} style
  * 
  * @typedef {Object} Polygon
  * @property {String} id
  * @property {Point[]} points
- * @property {any} style
+ * @property {Style} style
  *
  * @typedef {Object} Circle
  * @property {number} cx 
@@ -105,4 +105,11 @@
  * @property {number} bpm
  * @property {number} author
  * @property {number} title
+ * 
+ * @typedef {Object} OnboardingState
+ * @property {boolean} firstVisit
+ * 
+ * @typedef {Object} LocalState
+ * @property {AvatarStyleContext} avatarStyle
+ * @property {OnboardingState} onboarding
  */
