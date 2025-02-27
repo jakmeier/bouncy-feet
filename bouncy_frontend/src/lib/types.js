@@ -89,6 +89,14 @@
  * @property {UserLessonProgress} userLessonProgress 
  * @property {boolean} consentSendingStats
  * @property {boolean} experimentalFeatures
+ * 
+ * @typedef {Object} UserContextData
+ * @property {import('svelte/store').Writable<UserData>} store,
+ * @property {ClientSession} clientSession,
+ * @property {any} setClientSessionMeta,
+ * @property {any} computeDanceStats,
+ * @property {any} addDanceToStats,
+ * @property {any} recordFinishedLesson,
  *
  * @typedef {Object} UserLessonProgress
  * @property {LessonProgress[]} lessons
@@ -106,10 +114,16 @@
  * @property {number} author
  * @property {number} title
  * 
- * @typedef {Object} OnboardingState
- * @property {boolean} firstVisit
+ * @typedef {string} OnboardingState
  * 
  * @typedef {Object} LocalState
  * @property {AvatarStyleContext} avatarStyle
- * @property {OnboardingState} onboarding
+ * 
+ * @typedef {Object} ClientSession
+ * @property {string} id
+ * @property {string} secret
+ * @property {ClientSessionMeta} meta
+ * 
+ * @typedef {Object} ClientSessionMeta
+ * @property {OnboardingState} [onboarding]
  */

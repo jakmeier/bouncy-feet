@@ -1,10 +1,12 @@
 <script>
   import { getContext } from 'svelte';
 
-  const localState = getContext('localState');
+  /** @type {UserContextData}*/
+  const { setClientSessionMeta } = getContext('user');
 
   function continueAsGuest() {
-    localState.onboarding.firstVisit = false;
+    // TODO: actually go to first warmup
+    // setClientSessionMeta('onboarding', ONBOARDING_STATE.STARTED_FIRST_WARMUP);
   }
 </script>
 

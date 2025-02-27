@@ -11,6 +11,7 @@
   import FirstVisist from './FirstVisist.svelte';
   import AvatarCustomizer from '$lib/components/avatar/AvatarCustomizer.svelte';
   import { getContext } from 'svelte';
+  import { ONBOARDING_STATE } from '$lib/onboarding';
   /**
    * @typedef {Object} Props
    * @property {any} featuredDances
@@ -20,8 +21,8 @@
   /** @type {Props} */
   let { featuredDances, featuredSteps } = $props();
 
-  /** @type {LocalState}*/
-  const localState = getContext('localState');
+  /** @type {UserContextData}*/
+  const user = getContext('user');
 
   const entryDance = featuredDances.find(
     (dance) => dance.id === 'Home Animation (dev)'
@@ -51,9 +52,11 @@
   />
 </div>
 
-{#if localState.onboarding.firstVisit}
-  <FirstVisist />
-{/if}
+{#await user.clientSession then clientSession}
+  {#if clientSession.meta.onboarding === ONBOARDING_STATE.FIRST_VISIT}
+    <FirstVisist />
+  {/if}
+{/await}
 
 <!-- WIP -->
 <AvatarCustomizer />

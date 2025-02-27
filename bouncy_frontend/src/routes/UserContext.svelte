@@ -8,6 +8,7 @@
   import { onMount, setContext } from 'svelte';
   import { readable, writable } from 'svelte/store';
   import { showExperimentalFeatures } from '$lib/stores/FeatureSelection.js';
+  import { ONBOARDING_STATE } from '$lib/onboarding';
   /**
    * @typedef {Object} Props
    * @property {import('svelte').Snippet} [children]
@@ -27,45 +28,97 @@
    *
    * TODO: registered user client sessions
    */
-  let clientSession = readable({});
-  if (browser) {
-    clientSession = readable(
-      {
+
+  // This state is read-only. Updates must go through setters. Otherwise, they
+  // are not persisted.
+  // Actually initialized in onMount
+  /** @type {ClientSession} */
+  const clientSession = $state({});
+
+  /**
+   * Load from localStorage or create a new client session through the API.
+   *
+   * @return {Promise<ClientSession>}
+   */
+  async function loadClientSessionAsync() {
+    if (!browser) {
+      return {
+        id: '',
+        secret: '',
+        meta: {},
+      };
+    }
+    if (localStorage.clientSessionId) {
+      return {
         id: localStorage.clientSessionId,
         secret: localStorage.clientSessionSecret,
-      },
-      (set) => {
-        if (!localStorage.clientSessionId) {
-          requestNewGuestSession().then((response) => {
-            if (response.client_session_id && response.client_session_secret) {
-              const newClientSession = {
-                id: response.client_session_id,
-                secret: response.client_session_secret,
-              };
-              localStorage.clientSessionId = newClientSession.id;
-              localStorage.clientSessionSecret = newClientSession.secret;
-              set(newClientSession);
-            } else {
-              console.error(
-                'Failed to create a guest session. Response:',
-                response
-              );
-            }
-          });
+        meta: parseOrNull(localStorage.clientSessionMeta) || {},
+      };
+    } else {
+      return await requestNewGuestSession().then((response) => {
+        if (response.client_session_id && response.client_session_secret) {
+          /** @type {ClientSession} */
+          const newClientSession = {
+            id: response.client_session_id,
+            secret: response.client_session_secret,
+            meta: {
+              onboarding: ONBOARDING_STATE.FIRST_VISIT,
+            },
+          };
+          localStorage.clientSessionId = newClientSession.id;
+          localStorage.clientSessionSecret = newClientSession.secret;
+          localStorage.clientSessionMeta = JSON.stringify(
+            newClientSession.meta
+          );
+          return newClientSession;
+        } else {
+          console.error(
+            'Failed to create a guest session. Response:',
+            response
+          );
+          return {
+            id: '',
+            secret: '',
+            meta: {},
+          };
         }
-      }
-    );
+      });
+    }
   }
 
-  function fromLocalStorage() {
+  /**
+   * @param {string} key
+   * @param {string} value
+   */
+  function setClientSessionMeta(key, value) {
+    if (key) {
+      // First persist in localStorage
+      const meta = JSON.parse(
+        localStorage.getItem('clientSessionMeta') || '{}'
+      );
+      meta[key] = value;
+      localStorage.setItem('clientSessionMeta', JSON.stringify(meta));
+
+      // Now also update client state
+      // @ts-ignore
+      clientSession.meta[key] = value;
+
+      // TODO: sync changes to API backend
+    }
+  }
+
+  /**
+   * @param {string} key
+   */
+  function parseOrNull(key) {
     try {
-      return JSON.parse(localStorage.user);
+      return JSON.parse(key);
     } catch (e) {
       return null;
     }
   }
 
-  const stored = browser ? fromLocalStorage() : null;
+  const stored = browser ? parseOrNull(localStorage.user) : null;
   if (stored && !stored.id) {
     stored.id = crypto.randomUUID();
   }
@@ -210,20 +263,31 @@
     $user = $user;
   }
 
-  setContext('user', {
+  /** @type {UserContextData} */
+  const userCtx = {
     store: user,
     clientSession,
+    setClientSessionMeta,
     computeDanceStats,
     addDanceToStats,
     recordFinishedLesson,
-  });
+  };
+  setContext('user', userCtx);
 
-  onMount(() => {
+  const has = $state({ mounted: false });
+  onMount(async () => {
     // ensure the store is initialized
-    if (!$clientSession.id) {
+
+    const actualClientSession = await loadClientSessionAsync();
+    Object.assign(clientSession, actualClientSession);
+
+    if (!clientSession.id) {
       console.warn('No client session');
     }
+    has.mounted = true;
   });
 </script>
 
-{@render children?.()}
+{#if has.mounted}
+  {@render children?.()}
+{/if}

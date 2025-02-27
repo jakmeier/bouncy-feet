@@ -30,15 +30,9 @@
     },
   };
 
-  /** @type {OnboardingState} */
-  const defaultOnboardingState = {
-    firstVisit: true,
-  };
-
   /** @type {LocalState} */
   const defaultState = {
     avatarStyle: defaultAvatarStyle,
-    onboarding: defaultOnboardingState,
   };
 
   /**
@@ -63,8 +57,6 @@
     Object.assign(state.avatarStyle.coloring, stored?.avatarStyle?.coloring);
     Object.assign(state.avatarStyle.headStyle, stored?.avatarStyle?.headStyle);
     Object.assign(state.avatarStyle.bodyShape, stored?.avatarStyle?.bodyShape);
-
-    Object.assign(state.onboarding, stored?.onboarding);
     return state;
   }
 
