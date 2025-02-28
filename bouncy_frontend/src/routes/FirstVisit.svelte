@@ -1,17 +1,19 @@
 <script>
   import Footer from '$lib/components/ui/Footer.svelte';
-  import BlackLogoHeader from '$lib/components/ui/LogoHeader.svelte';
+  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
   import Video from '$lib/components/ui/Video.svelte';
   import { t } from '$lib/i18n';
   import { getContext, onMount } from 'svelte';
-  import { fade, scale, slide } from 'svelte/transition';
+  import { fade, slide } from 'svelte/transition';
+  import { goto } from '$app/navigation';
+  import { ONBOARDING_STATE } from '$lib/onboarding';
 
   /** @type {UserContextData}*/
   const { setClientSessionMeta } = getContext('user');
 
   function goToWarmup() {
-    // TODO: actually go to first warmup
-    // setClientSessionMeta('onboarding', ONBOARDING_STATE.STARTED_FIRST_WARMUP);
+    setClientSessionMeta('onboarding', ONBOARDING_STATE.STARTED_FIRST_WARMUP);
+    goto('firstWarmup');
   }
 
   let showTitle = false;
@@ -59,7 +61,7 @@
 <div class="wrapper">
   {#if showLogo}
     <div transition:slide={{ duration: 1000 }}>
-      <BlackLogoHeader />
+      <LogoHeader />
     </div>
   {/if}
 

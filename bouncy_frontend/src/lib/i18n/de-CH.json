@@ -10,6 +10,8 @@
         "first-visit-1": "Der Beat ruft! Bist du bereit für Tanzzeit?",
         "first-visit-button-0": "Jawohl!",
         "first-visit-button-1": "Zeig mir deine Moves",
+        "continue-first-warmup": "Da bist du ja wieder! Komm, das Training geht weiter.",
+        "continue-button": "Weitermachen",
         "alpha-disclaimer": "Die Funktionen sind experimentell und unvollständig.",
         "go-to-github": "Melde Probleme oder hilf mit bei der Entwicklung.",
         "version-label": "Version",

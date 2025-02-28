@@ -3,6 +3,7 @@
   import { getContext } from 'svelte';
   import FirstVisit from './FirstVisit.svelte';
   import HomeFeedB from './HomeFeed_b.svelte';
+  import ContinueFirstWarmup from './ContinueFirstWarmup.svelte';
 
   /** @type {UserContextData}*/
   const user = getContext('user');
@@ -28,6 +29,8 @@
 {#await user.clientSession then clientSession}
   {#if clientSession.meta.onboarding === ONBOARDING_STATE.FIRST_VISIT}
     <FirstVisit />
+  {:else if clientSession.meta.onboarding === ONBOARDING_STATE.STARTED_FIRST_WARMUP}
+    <ContinueFirstWarmup />
   {:else}
     <HomeFeedB featuredDances={data.officialDances} {featuredSteps} />
   {/if}
