@@ -8,7 +8,7 @@
   import Arrow from '$lib/components/ui/Arrow.svelte';
   import LightBackgroundSection from '$lib/components/ui/sections/LightSection.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
-  import FirstVisist from './FirstVisist.svelte';
+  import FirstVisit from './FirstVisit.svelte';
   import AvatarCustomizer from '$lib/components/avatar/AvatarCustomizer.svelte';
   import { getContext } from 'svelte';
   import { ONBOARDING_STATE } from '$lib/onboarding';
@@ -54,7 +54,7 @@
 
 {#await user.clientSession then clientSession}
   {#if clientSession.meta.onboarding === ONBOARDING_STATE.FIRST_VISIT}
-    <FirstVisist />
+    <FirstVisit />
   {/if}
 {/await}
 
