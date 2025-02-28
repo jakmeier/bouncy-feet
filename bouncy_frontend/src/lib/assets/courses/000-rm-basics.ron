@@ -45,7 +45,7 @@
       // TODO: should I add an ID for better robustness in progress tracking across updates? 
       names: {"de": "Kick", "en": "Kick"},
       icon: "todo.svg",
-      video: "/video/l1.mp4",
+      video: "https://app.bouncy-feet.ch/media/videos/wip/l1.mp4",
       parts: [
         // Starting with the inbalance first requires better explanations / intergration work.
         // (step: "kick-forward-unbalanced", bpms: [60, 90]),
@@ -55,7 +55,7 @@
     (
       names: {"de": "Flacher Schritt 1", "en": "Flat Step 1"},
       icon: "todo.svg",
-      video: "/video/l2.mp4",
+      video: "https://app.bouncy-feet.ch/media/videos/wip/l2.mp4",
       parts: [
         (step: "flat-man-3-pause", bpms: [60, 90]),
       ],
@@ -63,7 +63,7 @@
     (
       names: {"de": "Flacher Schritt 2", "en": "Flat Step 2"},
       icon: "todo.svg",
-      video: "/video/l3.mp4",
+      video: "https://app.bouncy-feet.ch/media/videos/wip/l3.mp4",
       parts: [
         (step: "flat-man-2-2", bpms: [60, 90]),
       ],
@@ -71,7 +71,7 @@
     (
       names: {"de": "Flacher Schritt 3", "en": "Flat Step 3"},
       icon: "todo.svg",
-      video: "/video/l4.mp4",
+      video: "https://app.bouncy-feet.ch/media/videos/wip/l4.mp4",
       parts: [
         (step: "flat-man", bpms: [60, 90]),
       ],
@@ -79,7 +79,7 @@
     (
       names: {"de": "Running Man mit Pause", "en": "Running Man with pause"},
       icon: "todo.svg",
-      video: "/video/l5.mp4",
+      video: "https://app.bouncy-feet.ch/media/videos/wip/l5.mp4",
       parts: [
         (step: "running-man-3", bpms: [60, 90]),
       ],
@@ -87,7 +87,7 @@
     (
       names: {"de": "Running Man", "en": "Running Man"},
       icon: "todo.svg",
-      video: "/video/l6.mp4",
+      video: "https://app.bouncy-feet.ch/media/videos/wip/l6.mp4",
       parts: [
         (step: "running-man", bpms: [60, 90]),
       ],
