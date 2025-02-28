@@ -221,7 +221,6 @@ impl TrackerDanceCollection {
         let z_order = self.poses[i]
             .z_order
             .iter()
-            .map(From::from)
             .map(BodyPartOrdering::mirror)
             .collect();
         let other = &self.poses[i];
