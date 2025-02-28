@@ -1,7 +1,12 @@
 <script>
+  import { ONBOARDING_STATE } from '$lib/onboarding';
+  import { getContext } from 'svelte';
+  import FirstVisit from './FirstVisit.svelte';
   import HomeFeedB from './HomeFeed_b.svelte';
 
-  
+  /** @type {UserContextData}*/
+  const user = getContext('user');
+
   /**
    * @typedef {Object} Props
    * @property {import('./$types').PageData} data
@@ -20,4 +25,10 @@
     .slice(0, 3);
 </script>
 
-<HomeFeedB featuredDances={data.officialDances} {featuredSteps} />
+{#await user.clientSession then clientSession}
+  {#if clientSession.meta.onboarding === ONBOARDING_STATE.FIRST_VISIT}
+    <FirstVisit />
+  {:else}
+    <HomeFeedB featuredDances={data.officialDances} {featuredSteps} />
+  {/if}
+{/await}

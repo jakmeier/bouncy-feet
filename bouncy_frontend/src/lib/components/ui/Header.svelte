@@ -4,8 +4,6 @@
   const bubble = createBubbler();
   import BackButton from './BackButton.svelte';
 
-  
-  
   /**
    * @typedef {Object} Props
    * @property {string} title

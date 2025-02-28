@@ -1,30 +1,36 @@
 <script>
   import Symbol from './Symbol.svelte';
 
-  
   /**
    * @typedef {Object} Props
    * @property {string} path
+   * @property {boolean} [controls=true]
    */
 
   /** @type {Props} */
-  let { path } = $props();
+  let { path, controls = true } = $props();
   let videoExists = $state(false);
   let videoLoading = $state(true);
   /** @type {HTMLVideoElement} */
   let videoElement = $state();
+
+  export function startVideo() {
+    if (videoElement) {
+      videoElement.play();
+    }
+  }
 </script>
 
 <div class="video-container" class:hide={videoLoading || !videoExists}>
   <div class="corner-marked">
     <video
       bind:this={videoElement}
-      controls
+      {controls}
       onloadedmetadata={() => {
         videoExists = true;
         videoLoading = false;
       }}
-      preload="metadata"
+      preload="auto"
     >
       <source
         src={path}
@@ -68,12 +74,11 @@
   .video-container {
     display: flex;
     width: 90%;
-    margin: 20px auto;
   }
 
   video {
     max-width: 80vw;
-    max-height: 95vh;
+    max-height: 95dvh;
     height: auto;
     margin: auto;
   }

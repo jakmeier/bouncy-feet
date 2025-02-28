@@ -1,6 +1,5 @@
 <script>
   import { t } from '$lib/i18n.js';
-  import { base } from '$app/paths';
   import { versionString } from '$lib/stores/FeatureSelection';
   import { beatCounter } from '$lib/stores/Beat';
   import HomeEntry from './HomeEntry.svelte';
@@ -8,10 +7,8 @@
   import Arrow from '$lib/components/ui/Arrow.svelte';
   import LightBackgroundSection from '$lib/components/ui/sections/LightSection.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
-  import FirstVisit from './FirstVisit.svelte';
   import AvatarCustomizer from '$lib/components/avatar/AvatarCustomizer.svelte';
-  import { getContext } from 'svelte';
-  import { ONBOARDING_STATE } from '$lib/onboarding';
+  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
   /**
    * @typedef {Object} Props
    * @property {any} featuredDances
@@ -20,9 +17,6 @@
 
   /** @type {Props} */
   let { featuredDances, featuredSteps } = $props();
-
-  /** @type {UserContextData}*/
-  const user = getContext('user');
 
   const entryDance = featuredDances.find(
     (dance) => dance.id === 'Home Animation (dev)'
@@ -44,19 +38,7 @@
   });
 </script>
 
-<div class="title">
-  <img
-    class="logo"
-    src="{base}/icons/icon_on_black.svg"
-    alt="Bouncy Feet Logo"
-  />
-</div>
-
-{#await user.clientSession then clientSession}
-  {#if clientSession.meta.onboarding === ONBOARDING_STATE.FIRST_VISIT}
-    <FirstVisit />
-  {/if}
-{/await}
+<LogoHeader />
 
 <!-- WIP -->
 <AvatarCustomizer />
@@ -126,20 +108,6 @@
 </LightBackgroundSection>
 
 <style>
-  .title {
-    position: relative;
-    padding: 0 0 5px;
-    background-color: var(--theme-neutral-black);
-    color: var(--theme-neutral-white);
-    z-index: 1;
-    height: 8vh;
-  }
-  .title img.logo {
-    height: 100%;
-    /* Go outside the usual borders */
-    margin: 0 -1rem;
-  }
-
   .transparent-box {
     border-radius: 10px;
     margin: 12rem 0;
@@ -154,7 +122,7 @@
   .focus-card {
     max-width: 400px;
     padding: 5px 20px;
-    min-height: 93vh;
+    min-height: 93dvh;
     margin: auto;
     display: flex;
     flex-direction: column;

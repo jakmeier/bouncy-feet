@@ -20,12 +20,10 @@
 
 <style>
   .brand-footer {
-    margin: 0 -0.75rem;
     height: 2rem;
   }
   .brand-footer img {
-    max-height: min(10vw, 50px);
-    min-height: 1rem;
+    height: 1.5rem;
     max-width: unset;
   }
 </style>
