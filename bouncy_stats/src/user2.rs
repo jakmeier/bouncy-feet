@@ -6,6 +6,7 @@ use axum::response::Response;
 use axum::Extension;
 use axum_oidc::OidcClaims;
 use serde_json::json;
+use sqlx::PgPool;
 
 use crate::auth::AdditionalClaims;
 use crate::AppState;
@@ -13,7 +14,7 @@ use crate::AppState;
 #[derive(Clone)]
 pub struct UserId(i64);
 
-// Middleware to lookup user or create it lazily
+// Middleware to lookup user or create it lazily from an OIDC claim.
 pub async fn user_lookup(
     State(state): State<AppState>,
     claims: OidcClaims<AdditionalClaims>,
@@ -66,5 +67,20 @@ pub async fn user_info(
 impl UserId {
     pub fn num(&self) -> i64 {
         self.0
+    }
+
+    pub(crate) async fn create_new_guest(db: &PgPool) -> Self {
+        let user_id = sqlx::query!(
+            r#"
+            INSERT INTO users (oidc_subject) 
+            VALUES (null)
+            RETURNING id
+            "#,
+        )
+        .fetch_one(db)
+        .await
+        .expect("Failed to insert new guest user")
+        .id;
+        UserId(user_id)
     }
 }

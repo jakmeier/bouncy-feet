@@ -1,13 +1,16 @@
--- Lists all registered users.
+-- Lists all users.
 CREATE TABLE IF NOT EXISTS users (
+    -- internal DB id
     id BIGSERIAL PRIMARY KEY,
-    oidc_subject TEXT NOT NULL UNIQUE
+    -- Keycloak ID, or null for guests
+    -- note: pg checks treat null values as distinct
+    oidc_subject TEXT UNIQUE
 );
 -- Meta data about a user, in a flexible key-value store.
 --
--- The sole source-of-truth for this data the API server.
+-- The sole source-of-truth for this data is the API server.
 CREATE TABLE IF NOT EXISTS user_meta (
-    user_id BIGINT REFERENCES users(id),
+    user_id BIGINT REFERENCES users(id) NOT NULL,
     key_name VARCHAR(64) NOT NULL,
     key_value VARCHAR(1024) NOT NULL,
     -- Always stored as UTC
@@ -25,14 +28,10 @@ CREATE TABLE IF NOT EXISTS client_session (
     id BIGSERIAL PRIMARY KEY,
     -- client_session_secret is optional, if it is null, this is a registered user's session
     client_session_secret UUID,
-    -- user_id is optional, if it is null, this is a guest session
-    user_id BIGINT REFERENCES users(id),
+    -- connected user can be a guest or a fully registered user
+    user_id BIGINT REFERENCES users(id) NOT NULL,
     -- Always stored as UTC
-    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    -- user id xor client session must be set
-    CHECK (
-        (client_session_secret IS NULL) != (user_id IS NULL)
-    )
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 -- Stores all recorded activities of all users ever.
 --
