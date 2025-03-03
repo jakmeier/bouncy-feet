@@ -41,7 +41,7 @@
 <LogoHeader />
 
 <!-- WIP -->
-<AvatarCustomizer />
+<!-- <AvatarCustomizer /> -->
 
 <div class="focus-card">
   <h1>

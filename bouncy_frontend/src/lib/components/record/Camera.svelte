@@ -16,7 +16,7 @@
   let {
     videoElement = $bindable(),
     cameraOn = $bindable(false),
-    opacity = 1.0,
+    opacity = $bindable(1.0),
   } = $props();
 
   let stream;

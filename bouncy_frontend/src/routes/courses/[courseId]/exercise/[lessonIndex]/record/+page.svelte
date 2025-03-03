@@ -54,12 +54,6 @@
   let detectedSteps = $state();
 
   let liveRecording;
-  // /** @type {() => any}*/
-  // let startCamera = $state();
-  // /** @type {() => Promise<void>}*/
-  // let startRecording = $state();
-  // /** @type {() => Promise<void>}*/
-  // let stopLiveRecording = $state();
   /** @type {Tracker | undefined} */
   let tracker = $state();
   /** @type {import('svelte/store').Readable<DetectionState> | null} */

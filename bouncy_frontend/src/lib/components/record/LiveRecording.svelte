@@ -5,7 +5,7 @@
   import Canvas from '$lib/components/Canvas.svelte';
   import Avatar from '$lib/components/avatar/Avatar.svelte';
   import { wideView } from '$lib/stores/UiState';
-  import { getContext, onMount } from 'svelte';
+  import { getContext, onDestroy, onMount } from 'svelte';
   import { I, landmarksToKeypoints, PoseDetection } from '$lib/pose';
   import BackgroundTask from '../BackgroundTask.svelte';
   import { writable } from 'svelte/store';
@@ -39,10 +39,6 @@
   import MusicControl from './MusicControl.svelte';
   // import LiveRecordingSettings from './LiveRecordingSettings.svelte';
 
-  
-  
-  
-
   export const startCamera = async () => {
     await camera.startCamera();
   };
@@ -57,9 +53,7 @@
     const blob = await camera.endRecording();
     onStop(blob);
   };
-  
 
-  
   /**
    * @typedef {Object} Props
    * @property {boolean} [cameraOn]
@@ -84,7 +78,7 @@ it does not match
     enableLiveAvatar = $bindable(false),
     enableInstructorAvatar = false,
     forceBeat = false,
-    videoOpacity = $bindable(0.0)
+    videoOpacity = $bindable(0.0),
   } = $props();
   let lastPoseWasCorrect = $state(true);
 
@@ -301,8 +295,10 @@ it does not match
     // Low volume to not be louder than the music or beat.
     setChannelGain('live-feedback', 0.1);
     setChannelGain('audio-guide', 2.0);
-  });
 
+    await startCamera();
+    await startRecording();
+  });
 
   /**
    * @param {DetectionState} state
@@ -322,7 +318,9 @@ it does not match
   run(() => {
     $wideView = cameraOn;
   });
-  let instructorSkeletonSize = $derived(Math.min(lastDetectedSkeletonSize, 8.0));
+  let instructorSkeletonSize = $derived(
+    Math.min(lastDetectedSkeletonSize, 8.0)
+  );
   run(() => {
     updateView($detectionState);
   });

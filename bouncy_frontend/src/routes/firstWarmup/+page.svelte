@@ -1,6 +1,7 @@
 <script>
   import { base } from '$app/paths';
   import WarmUp from '$lib/components/activity/WarmUp.svelte';
+  import AvatarStyleContext from '$lib/components/avatar/AvatarStyleContext.svelte';
 
   /**
    * @typedef {Object} Props
@@ -18,7 +19,10 @@
 </script>
 
 <!-- TODO: real video, real step -->
-<WarmUp {step} videoUrl={`${base}`} {description} audioControl={false}></WarmUp>
+<AvatarStyleContext>
+  <WarmUp {step} videoUrl={`${base}`} {description} audioControl={false}
+  ></WarmUp>
+</AvatarStyleContext>
 
 <!-- After: Simplified review  -->
 <!-- Then: First (real) lesson: step side-to-side -->

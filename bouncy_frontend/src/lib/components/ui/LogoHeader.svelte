@@ -3,12 +3,12 @@
 
   /**
    * @typedef {Object} Props
-   * @property {string} title
-   * @property {boolean} white
+   * @property {string} [title]
+   * @property {boolean} [white]
    */
 
   /** @type {Props} */
-  let { white, title } = $props();
+  let { white = false, title = '' } = $props();
 
   let bgColor = $derived(
     white ? 'var(--theme-neutral-light)' : 'var(--theme-neutral-black)'
