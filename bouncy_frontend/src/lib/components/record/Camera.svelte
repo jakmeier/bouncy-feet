@@ -5,8 +5,6 @@
   import Symbol from '../ui/Symbol.svelte';
   import { base } from '$app/paths';
 
-  
-
   /**
    * @typedef {Object} Props
    * @property {any} [videoElement]
@@ -15,7 +13,11 @@
    */
 
   /** @type {Props} */
-  let { videoElement = $bindable(null), cameraOn = $bindable(false), opacity = 1.0 } = $props();
+  let {
+    videoElement = $bindable(),
+    cameraOn = $bindable(false),
+    opacity = 1.0,
+  } = $props();
 
   let stream;
   /**

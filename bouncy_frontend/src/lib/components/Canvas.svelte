@@ -6,17 +6,22 @@
    * Provides the "canvas" context for descendent components with the
    * `addItem(ctx2d)` function to register new canvas items.
    */
-  import { afterUpdate, onMount, tick, setContext } from 'svelte';
+  import { onMount, setContext } from 'svelte';
 
-  export let width = 100;
-  export let height = 100;
+  /**
+   * @typedef {Object} Props
+   * @property {number} [width]
+   * @property {number} [height]
+   */
+
+  /** @type {Props} */
+  let { width = 100, height = 100 } = $props();
 
   /** @type HTMLCanvasElement */
   let canvas;
   /** @type CanvasRenderingContext2D */
   let ctx;
   let items = new Set();
-  let scheduled = false;
 
   onMount(() => {
     ctx = canvas.getContext('2d');
@@ -31,17 +36,9 @@
       items.add(fn);
       return () => items.delete(fn);
     });
-
-    afterUpdate(async () => {
-      if (scheduled) return;
-
-      scheduled = true;
-      await tick();
-      scheduled = false;
-
-      draw();
-    });
   }
+
+  $effect(() => draw());
 
   function draw() {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);

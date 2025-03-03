@@ -3,8 +3,6 @@
   import { writable } from 'svelte/store';
   import UiBox from '$lib/components/ui/UiBox.svelte';
 
-  
-  
   /**
    * @typedef {Object} Props
    * @property {import("svelte/store").Writable<boolean>} [isOpen]
@@ -15,10 +13,10 @@
 
   /** @type {Props} */
   let {
-    isOpen = writable(false),
+    isOpen = $bindable(writable(false)),
     title = undefined,
     showOkButton = false,
-    children
+    children,
   } = $props();
 
   function handleClose() {

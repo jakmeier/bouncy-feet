@@ -1,6 +1,5 @@
 <script>
   import { run } from 'svelte/legacy';
-
   import { page } from '$app/stores';
   import { t } from '$lib/i18n.js';
   import { getContext, onDestroy, onMount, tick } from 'svelte';
@@ -47,8 +46,6 @@
   /** @type {number} */
   let beatStart;
   let beatDetected = false;
-  /** @type {import('svelte/store').Writable<boolean>} */
-  let showHint = $state();
 
   let detectionResult;
   /** @type {string} */
@@ -56,12 +53,13 @@
   /** @type {import("$lib/instructor/bouncy_instructor").DetectedStep[] | undefined} */
   let detectedSteps = $state();
 
-  /** @type {() => any}*/
-  let startCamera = $state();
-  /** @type {() => Promise<void>}*/
-  let startRecording = $state();
-  /** @type {() => Promise<void>}*/
-  let stopLiveRecording = $state();
+  let liveRecording;
+  // /** @type {() => any}*/
+  // let startCamera = $state();
+  // /** @type {() => Promise<void>}*/
+  // let startRecording = $state();
+  // /** @type {() => Promise<void>}*/
+  // let stopLiveRecording = $state();
   /** @type {Tracker | undefined} */
   let tracker = $state();
   /** @type {import('svelte/store').Readable<DetectionState> | null} */
@@ -82,9 +80,11 @@
       $startExercisePopUpIsOpen = true;
       return;
     }
-    await tick();
-    await startCamera();
-    await startRecording();
+    if (liveRecording) {
+      await tick();
+      await liveRecording.startCamera();
+      await liveRecording.startRecording();
+    }
   }
 
   /**
@@ -160,7 +160,7 @@
       addDanceToStats(sessionResult);
     }
   }
-  run(() => {
+  $effect(() => {
     if ($trackingState === DetectionState.TrackingDone) trackingDone();
   });
 
@@ -212,9 +212,7 @@
     {/if}
   {:else}
     <LiveRecording
-      bind:startCamera
-      bind:startRecording
-      bind:stop={stopLiveRecording}
+      bind:this={liveRecording}
       bind:recordingStart
       bind:recordingEnd
       onStop={onRecordingStopped}
@@ -229,7 +227,7 @@
 <Audio isOn={useFixedBpm && $trackingState !== DetectionState.TrackingDone}
 ></Audio>
 
-<Popup bind:isOpen={showHint} showOkButton title={'common.hint-popup-title'}>
+<Popup showOkButton title={'common.hint-popup-title'}>
   {$t('record.estimate-bpm-hint')}
 </Popup>
 

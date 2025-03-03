@@ -16,10 +16,6 @@
   import Toggle from '../ui/Toggle.svelte';
   import { t } from '$lib/i18n';
 
-  
-  
-  
-  
   /**
    * @typedef {Object} Props
    * @property {string} reviewVideoSrc
@@ -33,7 +29,7 @@
     reviewVideoSrc,
     recordingStart,
     recordingEnd,
-    detectedSteps = []
+    detectedSteps = [],
   } = $props();
 
   let videoSrcWidth = $state(0);
@@ -41,11 +37,12 @@
   let videoLoaded = $state(false);
   let displayVideoOverlay = $state(true);
 
-  let firstPoseTime = $derived(detectedSteps.length > 0 ? detectedSteps[0].start : 0);
-  let lastPoseTime =
-    $derived(detectedSteps.length > 0
-      ? detectedSteps[detectedSteps.length - 1].end
-      : 100);
+  let firstPoseTime = $derived(
+    detectedSteps.length > 0 ? detectedSteps[0].start : 0
+  );
+  let lastPoseTime = $derived(
+    detectedSteps.length > 0 ? detectedSteps[detectedSteps.length - 1].end : 100
+  );
 
   let tracker = getContext('tracker').tracker;
 
@@ -59,8 +56,9 @@
   let limbErrors = $state([]);
   let selectedStep = $state(-1);
   let selectedBeat = $state(-1);
-  let beatsPerStep =
-    $derived(detectedSteps.length > 0 ? detectedSteps[0].poses.length : 4);
+  let beatsPerStep = $derived(
+    detectedSteps.length > 0 ? detectedSteps[0].poses.length : 4
+  );
   let avatarSizePixels = $derived(videoSrcHeight);
   let headRadius = $derived(0.075 * Math.min(videoSrcHeight, videoSrcWidth));
   /** @type {import("$lib/instructor/bouncy_instructor").RenderableSegment[]} */
@@ -287,8 +285,6 @@ once per 250ms. -->
             <SvgAvatar2
               skeleton={keypointSkeleton}
               {avatarSizePixels}
-              lineWidth={3}
-              style={LEFT_RIGHT_COLORING}
               {headRadius}
               {markedSegments}
             />
@@ -308,8 +304,6 @@ once per 250ms. -->
           <SvgAvatar2
             skeleton={keypointSkeleton}
             {avatarSizePixels}
-            style={LEFT_RIGHT_COLORING}
-            {headRadius}
             {markedSegments}
           />
         </Svg>
