@@ -44,7 +44,7 @@
   .bubbles div {
     background-color: var(--theme-accent);
     color: var(--theme-neutral-white);
-    border-radius: 50vh;
+    border-radius: 50dvh;
     font-size: var(--font-normal);
     padding: 2px;
     margin: 2px;

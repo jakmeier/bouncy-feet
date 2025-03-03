@@ -25,7 +25,7 @@
 <div class="overlay" style="background-color: {overlayColor}">
   <div
     class="area"
-    style="height: min(100vh, {maxHeight}px); width: min(100vw, {maxWidth}px); background-color: {backgroundColor};"
+    style="height: min(100dvh, {maxHeight}px); width: min(100vw, {maxWidth}px); background-color: {backgroundColor};"
   >
     {@render children?.()}
   </div>

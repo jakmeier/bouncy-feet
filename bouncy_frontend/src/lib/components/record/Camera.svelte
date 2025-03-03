@@ -121,7 +121,7 @@
     top: 50%;
     left: 50%;
     min-width: 100vw;
-    min-height: 100vh;
+    min-height: 100dvh;
     transform: translate(-50%, -50%);
   }
 

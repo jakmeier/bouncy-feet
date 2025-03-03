@@ -251,7 +251,7 @@
 <style>
   .outer {
     text-align: center;
-    min-height: 100vh;
+    min-height: 100dvh;
   }
   .buttons {
     display: flex;
