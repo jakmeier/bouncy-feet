@@ -5,17 +5,24 @@
    * @typedef {Object} Props
    * @property {string} [title]
    * @property {boolean} [white]
+   * @property {boolean} [gray]
    */
 
   /** @type {Props} */
-  let { white = false, title = '' } = $props();
+  let { white = false, gray = false, title = '' } = $props();
 
   let bgColor = $derived(
-    white ? 'var(--theme-neutral-light)' : 'var(--theme-neutral-black)'
+    white
+      ? 'var(--theme-neutral-light)'
+      : gray
+        ? 'var(--theme-neutral-dark)'
+        : 'var(--theme-neutral-black)'
   );
 
   let imgUrl = $derived(
-    white ? `${base}/icons/logo.svg` : `${base}/icons/icon_tight_on_black.svg`
+    white
+      ? `${base}/icons/logo.svg`
+      : `${base}/icons/icon_tight_on_transparent.png`
   );
 </script>
 

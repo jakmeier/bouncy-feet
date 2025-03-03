@@ -5,16 +5,17 @@
   /**
    * @typedef {Object} Props
    * @property {import('svelte').Snippet} [children]
-   * @property {string} title
-   * @property {boolean} white
+   * @property {string} [title]
+   * @property {boolean} [white]
+   * @property {boolean} [gray]
    */
   /** @type {Props} */
-  let { children, title, white } = $props();
+  let { children, title, white, gray } = $props();
 </script>
 
 <div class="wrapper">
   <div>
-    <LogoHeader {white} {title} />
+    <LogoHeader {white} {gray} {title} />
   </div>
 
   {@render children?.()}
