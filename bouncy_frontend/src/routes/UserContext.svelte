@@ -3,7 +3,11 @@
    * Provides access to a user local storage
    */
   import { browser } from '$app/environment';
-  import { requestNewGuestSession, submitStats } from '$lib/stats';
+  import {
+    requestNewGuestSession,
+    submitStats,
+    submitUserMetadata,
+  } from '$lib/stats';
   import { generateRandomUsername } from '$lib/username';
   import { onMount, setContext } from 'svelte';
   import { readable, writable } from 'svelte/store';
@@ -52,7 +56,7 @@
       return {
         id: localStorage.clientSessionId,
         secret: localStorage.clientSessionSecret,
-        meta: parseOrNull(localStorage.clientSessionMeta) || {},
+        meta: parseOrNull(localStorage.userMeta) || {},
       };
     } else {
       return await requestNewGuestSession().then((response) => {
@@ -67,9 +71,7 @@
           };
           localStorage.clientSessionId = newClientSession.id;
           localStorage.clientSessionSecret = newClientSession.secret;
-          localStorage.clientSessionMeta = JSON.stringify(
-            newClientSession.meta
-          );
+          localStorage.userMeta = JSON.stringify(newClientSession.meta);
           return newClientSession;
         } else {
           console.error(
@@ -90,20 +92,19 @@
    * @param {string} key
    * @param {string} value
    */
-  function setClientSessionMeta(key, value) {
+  async function setUserMeta(key, value) {
     if (key) {
       // First persist in localStorage
-      const meta = JSON.parse(
-        localStorage.getItem('clientSessionMeta') || '{}'
-      );
+      const meta = JSON.parse(localStorage.getItem('userMeta') || '{}');
       meta[key] = value;
-      localStorage.setItem('clientSessionMeta', JSON.stringify(meta));
+      localStorage.setItem('userMeta', JSON.stringify(meta));
 
       // Now also update client state
       // @ts-ignore
       clientSession.meta[key] = value;
 
-      // TODO: sync changes to API backend
+      // sync changes to API backend
+      await submitUserMetadata(key, value);
     }
   }
 
@@ -267,7 +268,7 @@
   const userCtx = {
     store: user,
     clientSession,
-    setClientSessionMeta,
+    setUserMeta,
     computeDanceStats,
     addDanceToStats,
     recordFinishedLesson,

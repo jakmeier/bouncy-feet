@@ -77,7 +77,7 @@ async function apiGetRequest(path) {
         if (response.ok) {
             return await response.json();
         } else {
-            console.error(`Failed GET request to ${apiUrl}`);
+            console.error(`Failed GET request to ${apiUrl}`, response);
         }
     } catch (error) {
         console.error(`Error returned for GET request to ${apiUrl}`, error);
@@ -104,11 +104,12 @@ export async function apiRequest(endpoint, options = {}) {
         credentials: 'include', // Include cookies in the request
     });
 
-    if (response.status === 401 || response.headers.get('WWW-Authenticate')) {
-        // If unauthorized, redirect to the login endpoint on the api server
-        window.location.href = loginUrl;
-        return response;
-    }
+    // TODO: add this back in when users are properly implemented
+    // if (response.status === 401 || response.headers.get('WWW-Authenticate')) {
+    //     // If unauthorized, redirect to the login endpoint on the api server
+    //     window.location.href = loginUrl;
+    //     return response;
+    // }
 
     if (!response.ok) {
         throw new Error(`API request failed with status ${response.status}`);

@@ -9,10 +9,10 @@
   import { ONBOARDING_STATE } from '$lib/onboarding';
 
   /** @type {UserContextData}*/
-  const { setClientSessionMeta } = getContext('user');
+  const { setUserMeta } = getContext('user');
 
   function goToWarmup() {
-    setClientSessionMeta('onboarding', ONBOARDING_STATE.STARTED_FIRST_WARMUP);
+    setUserMeta('onboarding', ONBOARDING_STATE.STARTED_FIRST_WARMUP);
     goto('firstWarmup');
   }
 

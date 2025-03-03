@@ -93,7 +93,7 @@
  * @typedef {Object} UserContextData
  * @property {import('svelte/store').Writable<UserData>} store,
  * @property {ClientSession} clientSession,
- * @property {any} setClientSessionMeta,
+ * @property {any} setUserMeta,
  * @property {any} computeDanceStats,
  * @property {any} addDanceToStats,
  * @property {any} recordFinishedLesson,
@@ -122,8 +122,8 @@
  * @typedef {Object} ClientSession
  * @property {string} id
  * @property {string} secret
- * @property {ClientSessionMeta} meta
+ * @property {UserMeta} meta
  * 
- * @typedef {Object} ClientSessionMeta
+ * @typedef {Object} UserMeta
  * @property {OnboardingState} [onboarding]
  */
