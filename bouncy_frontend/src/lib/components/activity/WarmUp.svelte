@@ -26,7 +26,7 @@
   const { setTrack, songTitle, songAuthor } = getContext('music');
 
   let isVideoOpen = $state(writable(false));
-  let size = 100;
+  let size = 120;
 
   const songList = songs.list();
   let trackIndex = $state(0);

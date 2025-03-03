@@ -66,8 +66,8 @@
   {backgroundColor}
 >
   <Animation {animationTime} {jumpHeight}>
-    <Svg width={size} height={size} orderByZ>
-      <SvgAvatar width={size} height={size} {skeleton} {bodyShift} />
+    <Svg width={250} height={250} orderByZ>
+      <SvgAvatar width={250} height={250} {skeleton} {bodyShift} />
     </Svg>
   </Animation>
 </Area>

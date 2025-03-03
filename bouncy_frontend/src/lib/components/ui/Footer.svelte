@@ -13,7 +13,7 @@
 <div class="brand-footer">
   <img
     class="logo"
-    src="{base}/icons/bouncyfeet{white ? '_white' : ''}.svg"
+    src="{base}/icons/bouncyfeet{white ? '_white' : '_black'}.svg"
     alt="Bouncy Feet Logo"
   />
 </div>

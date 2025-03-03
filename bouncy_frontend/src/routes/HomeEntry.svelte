@@ -1,13 +1,12 @@
 <script>
   import Area from '$lib/components/ui/Area.svelte';
-  import { EXAMPLE_CUSTOM_COLORING } from '$lib/constants';
+  import { EXAMPLE_CUSTOM_COLORING, ORANGE_COLORING } from '$lib/constants';
   import { t } from '$lib/i18n';
   import { beatCounter } from '$lib/stores/Beat';
   import { derived } from 'svelte/store';
   import DanceAnimation from './DanceAnimation.svelte';
   import AvatarStyleContext from '$lib/components/avatar/AvatarStyleContext.svelte';
 
-  
   /**
    * @typedef {Object} Props
    * @property {any} dance
@@ -46,18 +45,20 @@
 <div class="container">
   <div class="half-transparent">
     {#if dance}
-      <AvatarStyleContext
+      <!-- <AvatarStyleContext
         headStyle={{ shape: 'square', size: 0.8, strokeWidth: 1.2 }}
-      >
-        <DanceAnimation
-          size={trainingsWidth}
-          {dance}
-          beatDelay={3}
-          hiddenBeats={3}
-          showOverflow={true}
-          beat={shownBeat}
-        />
-      </AvatarStyleContext>
+        bodyShape={{ strokeWidth: 1.5 }}
+        coloring={ORANGE_COLORING}
+      > -->
+      <DanceAnimation
+        size={trainingsWidth}
+        {dance}
+        beatDelay={3}
+        hiddenBeats={3}
+        showOverflow={true}
+        beat={shownBeat}
+      />
+      <!-- </AvatarStyleContext> -->
     {:else}
       <Area
         width="{trainingsWidth}px"

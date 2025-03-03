@@ -31,6 +31,7 @@
     min-height: 50px;
     align-content: center;
     align-items: center;
+    height: 5rem;
   }
 
   header img.logo {
