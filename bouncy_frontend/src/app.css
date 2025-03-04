@@ -10,6 +10,7 @@
     --theme-main-medium: #cbf3a3;
     --theme-main-light: #ddf7c2;
     --theme-neutral-dark: #1d1d1b;
+    --theme-neutral-dark-transparent: #1d1d1b96;
     --theme-neutral-black: #000000;
     --theme-neutral-gray: #e6f2ef;
     --theme-neutral-light: #f0f7f5;
@@ -226,8 +227,8 @@ ol {
 
 .corner-marked2 {
     position: relative;
-    padding: -0.125rem;
     margin: 0;
+    padding: 0.625rem;
 }
 
 

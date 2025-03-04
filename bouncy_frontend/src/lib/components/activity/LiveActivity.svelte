@@ -1,6 +1,6 @@
 <script>
   import { t } from '$lib/i18n.js';
-  import { getContext, onMount, tick } from 'svelte';
+  import { getContext, onMount } from 'svelte';
   import LiveRecording from '$lib/components/record/LiveRecording.svelte';
   import {
     DetectionResult,
@@ -50,6 +50,9 @@
   let showHintBeforeStart = true;
 
   async function start() {
+    if (liveRecording) {
+      await liveRecording.startCamera();
+    }
     if (showHintBeforeStart) {
       // only show the hint once per sessions
       showHintBeforeStart = false;
@@ -57,8 +60,6 @@
       return;
     }
     if (liveRecording) {
-      await tick();
-      await liveRecording.startCamera();
       await liveRecording.startRecording();
     }
   }
@@ -132,15 +133,6 @@
   {$t('record.estimate-bpm-hint')}
 </Popup>
 
-<Popup
-  isOpen={startExercisePopUpIsOpen}
-  title={'courses.lesson.exercise-popup-title'}
->
-  <div>
-    {$t('courses.lesson.exercise-start-description')}
-  </div>
-  <button class="wide" onclick={closeStartExercisePopUp}>OK</button>
-</Popup>
 
 {#if $dev}
   <DevUtility />

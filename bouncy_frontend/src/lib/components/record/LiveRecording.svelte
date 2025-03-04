@@ -1,11 +1,8 @@
 <script>
-  import { run } from 'svelte/legacy';
-
   import Camera from '$lib/components/record/Camera.svelte';
   import Canvas from '$lib/components/Canvas.svelte';
   import Avatar from '$lib/components/avatar/Avatar.svelte';
-  import { wideView } from '$lib/stores/UiState';
-  import { getContext, onDestroy, onMount } from 'svelte';
+  import { getContext, onMount } from 'svelte';
   import { I, landmarksToKeypoints, PoseDetection } from '$lib/pose';
   import BackgroundTask from '../BackgroundTask.svelte';
   import { writable } from 'svelte/store';
@@ -28,7 +25,7 @@
   import { BLACK_COLORING, LEFT_RIGHT_COLORING_LIGHT } from '$lib/constants';
   import { base } from '$app/paths';
   import ProgressBar from './ProgressBar.svelte';
-  import { locale } from '$lib/i18n';
+  import { locale, t } from '$lib/i18n';
   import { timeBetweenMoves } from '$lib/stores/Beat';
   import {
     recordDetectionDelay,
@@ -37,13 +34,14 @@
   } from '$lib/stores/System';
   import FullScreenArea from '../ui/FullScreenArea.svelte';
   import MusicControl from './MusicControl.svelte';
-  // import LiveRecordingSettings from './LiveRecordingSettings.svelte';
+  import LogoHeader from '../ui/LogoHeader.svelte';
 
   export const startCamera = async () => {
     await camera.startCamera();
   };
   export const startRecording = async () => {
     await camera.startRecording();
+    recordingOn = true;
   };
   export const stopCamera = () => {
     camera.stopCamera();
@@ -81,6 +79,7 @@ it does not match
     videoOpacity = $bindable(0.0),
   } = $props();
   let lastPoseWasCorrect = $state(true);
+  let recordingOn = $state(false);
 
   const poseCtx = getContext('pose');
   let tracker = getContext('tracker').tracker;
@@ -138,7 +137,7 @@ it does not match
 
   // this is called periodically in a background task
   function onFrame() {
-    if (cameraOn && dataListener) {
+    if (cameraOn && dataListener && recordingOn) {
       const start = performance.now();
       dataListener.trackFrame(cameraVideoElement);
       const t = performance.now() - start;
@@ -295,9 +294,6 @@ it does not match
     // Low volume to not be louder than the music or beat.
     setChannelGain('live-feedback', 0.1);
     setChannelGain('audio-guide', 2.0);
-
-    await startCamera();
-    await startRecording();
   });
 
   /**
@@ -314,14 +310,10 @@ it does not match
     }
   }
   let animationTime = $derived(Math.min($timeBetweenMoves / 3, 300));
-  // $: $hideNavigation = cameraOn;
-  run(() => {
-    $wideView = cameraOn;
-  });
   let instructorSkeletonSize = $derived(
     Math.min(lastDetectedSkeletonSize, 8.0)
   );
-  run(() => {
+  $effect(() => {
     updateView($detectionState);
   });
 </script>
@@ -341,7 +333,7 @@ it does not match
       bind:cameraOn
       bind:this={camera}
     />
-    {#if enableInstructorAvatar && instructorSkeleton !== null}
+    {#if enableInstructorAvatar && instructorSkeleton !== null && recordingOn}
       <div class="avatar-container">
         <InstructorAvatar
           width={$videoSrcWidth}
@@ -356,7 +348,7 @@ it does not match
         />
       </div>
     {/if}
-    {#if enableLiveAvatar}
+    {#if enableLiveAvatar && recordingOn}
       <div
         class="avatar-container"
         style="left: {(outerWidth - $videoSrcWidth) / 2}px;"
@@ -367,7 +359,7 @@ it does not match
             width={$videoSrcWidth}
             height={$videoSrcHeight}
             style={avatarStyle}
-            torsoLineWidth={3}
+            torsoLineWidth={5}
             markedLimbs={worstLimbs}
           ></Avatar>
         </Canvas>
@@ -383,13 +375,34 @@ it does not match
           bind:videoOpacity
         />
       {/if} -->
-
-      <ProgressBar {progress}></ProgressBar>
-      <button class="symbol" onclick={stop}>
-        <img src="{base}/img/symbols/bf_stop.svg" alt="stop" />
-      </button>
+      {#if recordingOn}
+        <ProgressBar {progress}></ProgressBar>
+        <button class="symbol" onclick={stop}>
+          <img src="{base}/img/symbols/bf_stop.svg" alt="stop" />
+        </button>
+      {/if}
     </div>
   </div>
+  {#if !recordingOn}
+    <div class="overlay">
+      <!-- <div class="overlay-logo">
+        <LogoHeader white></LogoHeader>
+      </div> -->
+      <div class="frame">
+        <div class="corner-marked2">
+          <div class="corner-marked">
+            <div class="overlay-text">
+              {$t('courses.lesson.exercise-start-description')}
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="symbol" onclick={startRecording}>
+        <img src="{base}/img/symbols/bf_eye.svg" alt="start" />
+        <div class="accent">Start recording</div>
+      </button>
+    </div>
+  {/if}
 </FullScreenArea>
 
 <style>
@@ -414,8 +427,35 @@ it does not match
     width: calc(100% - 2rem);
     position: absolute;
     bottom: 0;
+    transform: scaleX(-1);
   }
   button.symbol {
     margin: 1rem;
+  }
+  button img {
+    width: 3rem;
+  }
+  .overlay {
+    position: absolute;
+    top: 0;
+    height: 100dvh;
+    color: var(--theme-neutral-white);
+    background-color: var(--theme-neutral-dark-transparent);
+  }
+  .overlay-text {
+    height: 50dvh;
+    display: grid;
+    justify-content: center;
+    align-content: center;
+  }
+  .frame {
+    margin: 10dvh 2rem;
+  }
+  .overlay button {
+    position: relative;
+    bottom: 3rem;
+  }
+  .accent {
+    color: var(--theme-accent);
   }
 </style>
