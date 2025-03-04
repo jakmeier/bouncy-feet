@@ -59,32 +59,43 @@
         meta: parseOrNull(localStorage.userMeta) || {},
       };
     } else {
-      return await requestNewGuestSession().then((response) => {
-        if (response.client_session_id && response.client_session_secret) {
-          /** @type {ClientSession} */
-          const newClientSession = {
-            id: response.client_session_id,
-            secret: response.client_session_secret,
+      return await requestNewGuestSession()
+        .then((response) => {
+          if (response.client_session_id && response.client_session_secret) {
+            /** @type {ClientSession} */
+            const newClientSession = {
+              id: response.client_session_id,
+              secret: response.client_session_secret,
+              meta: {
+                onboarding: ONBOARDING_STATE.FIRST_VISIT,
+              },
+            };
+            localStorage.clientSessionId = newClientSession.id;
+            localStorage.clientSessionSecret = newClientSession.secret;
+            localStorage.userMeta = JSON.stringify(newClientSession.meta);
+            return newClientSession;
+          } else {
+            console.error(
+              'Failed to create a guest session. Response:',
+              response
+            );
+            return {
+              id: '',
+              secret: '',
+              meta: {},
+            };
+          }
+        })
+        .catch((err) => {
+          console.error('Failed to create a guest session. Error:', err);
+          return {
+            id: '',
+            secret: '',
             meta: {
               onboarding: ONBOARDING_STATE.FIRST_VISIT,
             },
           };
-          localStorage.clientSessionId = newClientSession.id;
-          localStorage.clientSessionSecret = newClientSession.secret;
-          localStorage.userMeta = JSON.stringify(newClientSession.meta);
-          return newClientSession;
-        } else {
-          console.error(
-            'Failed to create a guest session. Response:',
-            response
-          );
-          return {
-            id: '',
-            secret: '',
-            meta: {},
-          };
-        }
-      });
+        });
     }
   }
 
