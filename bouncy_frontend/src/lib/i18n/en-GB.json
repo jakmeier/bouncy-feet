@@ -56,7 +56,8 @@
             "bpm-label": "Speed",
             "exercise-popup-title": "Start exercise",
             "exercise-beat-description": "You can either dance along a simple beat or play your own music outside Bouncy Feet and match the beat.",
-            "exercise-start-description": "Place your phone on the floor and stand where the camera can see you. Your entire body from head to toes must be visible.",
+            "exercise-start-description": "Place your phone far enough for the camera to see your whole body.",
+            "exercise-start-description-1": "Then click blow.",
             "play-beat-button": "Play a beat",
             "own-music-button": "I have my own music"
         }
@@ -173,6 +174,7 @@
         "reset-button": "Record again",
         "review-button": "Review Video",
         "results-button": "Show results",
+        "review-details": "Results",
         "stop-camera": "stop camera",
         "stop-record": "stop video",
         "learn-dance-prefix": "Learn",

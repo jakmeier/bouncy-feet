@@ -53,9 +53,17 @@
     recordedVideoUrl = videoUrl;
   }
 
-  function onRestart() {}
+  function onRestart() {
+    previewDone = false;
+    URL.revokeObjectURL(recordedVideoUrl);
+    recordedVideoUrl = null;
+    detection = null;
+    tracker?.clear();
+  }
 
-  function onBack() {}
+  function onBack() {
+    window.history.back();
+  }
 
   onDestroy(() => {
     if (recordedVideoUrl) {
@@ -78,7 +86,7 @@
   <!-- TODO: warmup should be with video instead of avatar -->
   <LiveActivity
     onDone={onRecordingStopped}
-    videoOpacity={0.5}
+    videoOpacity={1.0}
     enableLiveAvatar={false}
     enableInstructorAvatar={true}
   ></LiveActivity>

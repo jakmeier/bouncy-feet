@@ -5,13 +5,13 @@
    */
 
   /** @type {Props} */
-  let { color = 'var(--theme-neutral-black)' } = $props();
+  let { color = 'var(--color)' } = $props();
 </script>
 
-<svg width="50mm" height="100mm" viewBox="0 0 50 100">
+<svg width="100mm" height="60mm" viewBox="0 0 100 60">
   <path
-    style="fill:none;stroke:{color};stroke-width:13;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-    d="M 7,7 43,50 7,93"
+    style="fill:none;stroke:{color};stroke-width:10;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+    d="M 5,5 50,55 M 95,5 50,55"
     id="pathid"
   />
 </svg>

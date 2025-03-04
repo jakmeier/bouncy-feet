@@ -7,7 +7,6 @@
   import { getContext, onMount } from 'svelte';
   import BackgroundTask from '$lib/components/BackgroundTask.svelte';
   import PoseReview from './PoseReview.svelte';
-  import { LEFT_RIGHT_COLORING } from '$lib/constants';
   import {
     LimbError,
     PoseApproximation,
@@ -15,6 +14,7 @@
   import SvgAvatar2 from '../avatar/SvgAvatar2.svelte';
   import Toggle from '../ui/Toggle.svelte';
   import { t } from '$lib/i18n';
+  import LightSection from '../ui/sections/LightSection.svelte';
 
   /**
    * @typedef {Object} Props
@@ -60,7 +60,6 @@
     detectedSteps.length > 0 ? detectedSteps[0].poses.length : 4
   );
   let avatarSizePixels = $derived(videoSrcHeight);
-  let headRadius = $derived(0.075 * Math.min(videoSrcHeight, videoSrcWidth));
   /** @type {import("$lib/instructor/bouncy_instructor").RenderableSegment[]} */
   let markedSegments = $state([]);
   run(() => {
@@ -238,106 +237,83 @@ be better, however, this fires at different rates per browser and often only
 once per 250ms. -->
 <BackgroundTask {onFrame}></BackgroundTask>
 
-<div class="poses-details" bind:this={poseCards} onscroll={onScrollPoseCards}>
-  {#each detectedSteps as step, iStep}
-    {#each step.poses as pose, iBeat}
-      <!-- svelte-ignore a11y_click_events_have_key_events -->
-      <!-- svelte-ignore a11y_no_static_element_interactions -->
-      <!-- TODO(performance): step.poses.length allocates a vector and an array every time it is read -->
-      <div onclick={() => selectBeat(iStep, iBeat)}>
-        <PoseReview
-          {pose}
-          beatLabel={formatBeatLabel(iBeat, iStep, step.poses.length)}
-        ></PoseReview>
-      </div>
-    {/each}
-  {/each}
-</div>
-
-<div class="background-strip">
-  <div class="beat-label">
-    {formatBeatLabel(selectedBeat, selectedStep, beatsPerStep)}
-  </div>
+<LightSection>
   <div class="upper">
-    <div class="video-wrapper">
-      <!-- svelte-ignore a11y_media_has_caption -->
-      <video
-        onclick={togglePlay}
-        onloadeddata={() => {
-          videoLoaded = true;
-          onSeek();
-        }}
-        bind:this={reviewVideoElement}
-        bind:videoWidth={videoSrcWidth}
-        bind:videoHeight={videoSrcHeight}
-        src={reviewVideoSrc}
-        playsinline
-        style="max-width: 100%"
-      ></video>
-      {#if keypointSkeleton && displayVideoOverlay}
-        <div class="video-overlay" style="pointer-events: none;">
-          <Svg
-            width={videoSrcWidth}
-            height={videoSrcHeight}
-            orderByZ
-            showOverflow
-          >
-            <SvgAvatar2
-              skeleton={keypointSkeleton}
-              {avatarSizePixels}
-              {headRadius}
-              {markedSegments}
-            />
-          </Svg>
-        </div>
-      {/if}
+    <div class="corner-marked2">
+      <div class="video-wrapper corner-marked">
+        <!-- svelte-ignore a11y_media_has_caption -->
+        <video
+          onclick={togglePlay}
+          onloadeddata={() => {
+            videoLoaded = true;
+            onSeek();
+          }}
+          bind:this={reviewVideoElement}
+          bind:videoWidth={videoSrcWidth}
+          bind:videoHeight={videoSrcHeight}
+          src={reviewVideoSrc}
+          playsinline
+          style="max-width: 100%"
+        ></video>
+        {#if keypointSkeleton && displayVideoOverlay}
+          <div class="video-overlay" style="pointer-events: none;">
+            <Svg
+              width={videoSrcWidth}
+              height={videoSrcHeight}
+              orderByZ
+              showOverflow
+            >
+              <SvgAvatar2
+                skeleton={keypointSkeleton}
+                {avatarSizePixels}
+                {markedSegments}
+              />
+            </Svg>
+          </div>
+        {/if}
+      </div>
     </div>
 
-    {#if keypointSkeleton}
-      <div>
-        <Svg
-          height={videoSrcHeight}
-          width={videoSrcWidth}
-          orderByZ
-          showOverflow
-        >
-          <SvgAvatar2
-            skeleton={keypointSkeleton}
-            {avatarSizePixels}
-            {markedSegments}
-          />
-        </Svg>
-      </div>
-    {/if}
     <div class="toggle-item">
       <div>{$t('record.settings.enable-tracking')}</div>
       <Toggle bind:isOn={displayVideoOverlay} />
     </div>
   </div>
-  {#if $dev}
-    {#each limbErrors as limb}
-      <div>
-        {limb.name.split(' ')[0]}
-      </div>
+
+  <div class="poses-details" bind:this={poseCards} onscroll={onScrollPoseCards}>
+    {#each detectedSteps as step, iStep}
+      {#each step.poses as pose, iBeat}
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
+        <!-- TODO(performance): step.poses.length allocates a vector and an array every time it is read -->
+        <div onclick={() => selectBeat(iStep, iBeat)}>
+          <PoseReview
+            {pose}
+            beatLabel={formatBeatLabel(iBeat, iStep, step.poses.length)}
+          ></PoseReview>
+        </div>
+      {/each}
     {/each}
+  </div>
+
+  <div class="background-strip">
+    {#if $dev}
+      {#each limbErrors as limb}
+        <div>
+          {limb.name.split(' ')[0]}
+        </div>
+      {/each}
+    {/if}
+  </div>
+
+  {#if $dev}
+    <AllPoseErrors {reviewVideoElement} {recordingStart}></AllPoseErrors>
   {/if}
-</div>
-
-<!-- <Banner
-  steps={detectedSteps}
-  bind:setCursor
-  reviewStart={recordingStart}
-  reviewEnd={recordingEnd}
-  onScroll={seekVideoToCursor}
-></Banner> -->
-
-{#if $dev}
-  <AllPoseErrors {reviewVideoElement} {recordingStart}></AllPoseErrors>
-{/if}
+</LightSection>
 
 <style>
   video {
-    border-radius: 10px;
+    /* border-radius: 10px; */
     overflow: hidden;
   }
 
@@ -356,7 +332,7 @@ once per 250ms. -->
 
   .upper {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     align-items: center;
   }
 
@@ -369,19 +345,15 @@ once per 250ms. -->
   .background-strip {
     margin: 10px -25px;
     padding: 10px 30px;
-    border-radius: 10px;
-    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.55);
     text-align: center;
-    background-color: var(--theme-neutral-light);
-  }
-
-  .beat-label {
-    margin-bottom: 10px;
   }
 
   .toggle-item {
     display: flex;
     justify-content: space-around;
     align-items: center;
+    flex-wrap: wrap;
+    margin: 1rem;
+    gap: 1rem;
   }
 </style>

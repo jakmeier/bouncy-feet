@@ -3,7 +3,9 @@
   import LessonEnd from '../../../routes/courses/[courseId]/exercise/[lessonIndex]/record/LessonEnd.svelte';
   import LessonEndResults from '../../../routes/courses/[courseId]/exercise/[lessonIndex]/record/LessonEndResults.svelte';
   import VideoReview from '../review/VideoReview.svelte';
-  import Button from '../ui/Button.svelte';
+  import Arrow from '../ui/Arrow.svelte';
+  import Background from '../ui/sections/Background.svelte';
+  import StandardPage from '../ui/StandardPage.svelte';
 
   let { detection, videoUrl, recordingStart, recordingEnd, onRestart, onBack } =
     $props();
@@ -18,48 +20,74 @@
   let showResults = $state(false);
 </script>
 
+<Background
+  bgColor="var(--theme-neutral-dark)"
+  color="var(--theme-neutral-white)"
+></Background>
+
 {#if !showResults}
   <LessonEnd bind:showResults></LessonEnd>
 {:else}
-  <LessonEndResults {hitRate} {passed}></LessonEndResults>
-
-  {#if recordingStart !== undefined && recordingEnd !== undefined}
-    <VideoReview
-      reviewVideoSrc={videoUrl}
-      {detectedSteps}
-      {recordingStart}
-      {recordingEnd}
-    ></VideoReview>
-  {:else}
-    <div class="no-review">
-      {$t('record.no-video-for-review')}
+  <StandardPage gray>
+    <div class="top-summary">
+      <LessonEndResults {hitRate} {passed}></LessonEndResults>
+      <div class="down-marker">
+        <div class="down-marker-text">{$t('record.review-details')}</div>
+        <div class="down-marker-arrow">
+          <Arrow color="var(--theme-neutral-white)" />
+        </div>
+      </div>
     </div>
-  {/if}
 
-  <div class="buttons">
-    <Button
-      class="wide"
-      onclick={onRestart}
-      symbol=""
-      text="courses.end.again-button"
-    ></Button>
-    <Button
-      class="wide"
-      onclick={onBack}
-      symbol=""
-      text="courses.end.back-button"
-    ></Button>
-  </div>
+    {#if recordingStart !== undefined && recordingEnd !== undefined}
+      <VideoReview
+        reviewVideoSrc={videoUrl}
+        {detectedSteps}
+        {recordingStart}
+        {recordingEnd}
+      ></VideoReview>
+    {:else}
+      <div class="no-review">
+        {$t('record.no-video-for-review')}
+      </div>
+    {/if}
+
+    <div class="buttons">
+      <button class="wide" onclick={onRestart}>
+        {$t('courses.end.again-button')}
+      </button>
+      <button class="wide" onclick={onBack}>
+        {$t('courses.end.back-button')}</button
+      >
+    </div>
+  </StandardPage>
 {/if}
 
 <style>
   .buttons {
     display: flex;
     flex-direction: column;
-    margin-top: 10px;
+    margin-top: 2rem;
     gap: 1rem;
   }
   .no-review {
     margin: 2rem;
+  }
+  .top-summary {
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+  }
+  .down-marker {
+    margin: 5rem auto 0;
+  }
+  .down-marker-text {
+    text-align: center;
+  }
+  .down-marker-arrow {
+    margin: auto;
+    max-width: 3rem;
+    max-height: 3rem;
   }
 </style>

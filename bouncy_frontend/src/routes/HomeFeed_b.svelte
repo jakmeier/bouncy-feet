@@ -144,7 +144,6 @@
   .down-marker {
     max-width: 80px;
     max-height: 80px;
-    rotate: 90deg;
     margin: 100px auto 0;
     padding: 10px 5px;
   }

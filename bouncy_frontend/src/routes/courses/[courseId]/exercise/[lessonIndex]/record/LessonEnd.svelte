@@ -1,5 +1,4 @@
 <script>
-  import Background from '$lib/components/ui/sections/Background.svelte';
   import DarkSection from '$lib/components/ui/sections/DarkSection.svelte';
   import StandardPage from '$lib/components/ui/StandardPage.svelte';
   import Symbol from '$lib/components/ui/Symbol.svelte';
@@ -7,11 +6,6 @@
 
   let { showResults = $bindable() } = $props();
 </script>
-
-<Background
-  bgColor="var(--theme-neutral-dark)"
-  color="var(--theme-neutral-white)"
-></Background>
 
 <StandardPage gray>
   <!-- <h3>That was fun, wasn't it?</h3> -->

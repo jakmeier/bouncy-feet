@@ -6,11 +6,9 @@
   } from '$lib/instructor/bouncy_instructor';
   import { getContext } from 'svelte';
   import InstructorAvatar from '../avatar/InstructorAvatar.svelte';
-  import { LEFT_RIGHT_COLORING_LIGHT } from '$lib/constants';
-  import Symbol from '../ui/Symbol.svelte';
+  import { LEFT_RIGHT_COLORING } from '$lib/constants';
+  import { base } from '$app/paths';
 
-  
-  
   /**
    * @typedef {Object} Props
    * @property {PoseApproximation} pose
@@ -20,27 +18,20 @@
 
   /** @type {Props} */
   let { pose, beatLabel = '0', threshold = 0.05 } = $props();
-  let max = $derived(3 * threshold);
+  let passed = $derived(pose.error < threshold);
 
-  /** @type {number} */
-  let barHeight = 30;
   /** @type {number} bound to client width of bar */
   let width = $state(10);
 
   /** @type {{tracker: Tracker}} */
   let { tracker } = getContext('tracker');
   let instructorSkeleton = tracker.poseSkeleton(pose.id);
-
-  let badWidth = $derived((1.0 - threshold / max) * width);
-  let scoreWidth = $derived(((max - pose.error) / max) * width);
 </script>
 
 <div class="pose" class:failed-pose={pose.error > threshold}>
-  {#if pose.error <= threshold}
-    <Symbol class="white">verified</Symbol>
-  {:else}
-    <Symbol class="white">release_alert</Symbol>
-  {/if}
+  <div class="beat-label">
+    {beatLabel}
+  </div>
 
   <div class="skeleton">
     <div class="avatar-container">
@@ -50,45 +41,26 @@
           height={width}
           avatarSize={1.0}
           skeleton={instructorSkeleton}
-          instructorStyle={LEFT_RIGHT_COLORING_LIGHT}
+          instructorStyle={LEFT_RIGHT_COLORING}
         />
       {/if}
     </div>
   </div>
 
-  <div class="stats">
-    <div
-      class="background"
-      bind:clientWidth={width}
-      style="--h: {barHeight}px;"
-    >
-      <div class="score" style="width: {scoreWidth}px;"></div>
-      <div class="bad" style="width: {badWidth}px;"></div>
-    </div>
-  </div>
-  <div class="beat-label">
-    {beatLabel}
+  <div class="result">
+    {#if passed}
+      <img src="{base}/img/symbols/bf_check.svg" alt="passed" />
+    {:else}
+      <img src="{base}/img/symbols/bf_cross.svg" alt="F" />
+    {/if}
   </div>
 </div>
 
 <style>
   .pose {
     height: 230px;
-    background-color: var(--theme-neutral-light);
-    border-radius: 5px;
-    border: solid 2px #33a86d;
     padding: 0 10px;
     margin: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.55);
-  }
-  .pose:hover {
-    box-shadow: 0 4px 8px #33a86d;
-  }
-  .failed-pose {
-    border: solid 2px #eb3b3b;
-  }
-  .failed-pose:hover {
-    box-shadow: 0 4px 8px #eb3b3b;
   }
   .pose:active {
     box-shadow: none;
@@ -103,30 +75,25 @@
   .skeleton {
     height: 150px;
   }
-  .background {
-    border: solid 1px;
-    border-radius: var(--h);
-    height: var(--h);
-    overflow: hidden;
-  }
-  .bad,
-  .score {
-    height: var(--h);
-    position: absolute !important;
-    top: 0;
-    left: 0;
-  }
-  .bad {
-    border-right: solid 3px white;
-  }
-  .score {
-    background-color: var(--theme-main);
-  }
-
   .beat-label {
-    margin-top: 10px;
-    padding: 5px;
+    display: grid;
+    align-content: center;
+    justify-content: center;
+    margin: auto;
+    padding: 0.5rem;
+    min-width: 1rem;
+    height: 1rem;
     font-size: var(--font-normal);
-    color: var(--theme-neutral-dark);
+    color: var(--theme-neutral-white);
+    background-color: var(--theme-neutral-dark);
+    border-radius: 2rem;
+    width: fit-content;
+  }
+  .result {
+    width: 1.5rem;
+    margin: auto;
+  }
+  .result img {
+    width: 100%;
   }
 </style>

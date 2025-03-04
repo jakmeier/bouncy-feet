@@ -1,7 +1,6 @@
 <script>
   import { onDestroy, onMount } from 'svelte';
 
-  
   /**
    * @typedef {Object} Props
    * @property {undefined | (() => void)} [onFrame]

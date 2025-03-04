@@ -70,7 +70,7 @@
 
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <!-- svelte-ignore a11y_no_static_element_interactions -->
-  <div class="arrow" onclick={() => changeShape(1)}>
+  <div class="right arrow" onclick={() => changeShape(1)}>
     <Arrow color="var(--theme-neutral-white)" />
   </div>
 
@@ -81,7 +81,7 @@
   </div>
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <!-- svelte-ignore a11y_no_static_element_interactions -->
-  <div class="arrow" onclick={() => changeStrokeWidth(1)}>
+  <div class="right arrow" onclick={() => changeStrokeWidth(1)}>
     <Arrow color="var(--theme-neutral-white)" />
   </div>
 
@@ -92,7 +92,7 @@
   </div>
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <!-- svelte-ignore a11y_no_static_element_interactions -->
-  <div class="arrow" onclick={() => changeColoring(1)}>
+  <div class="right arrow" onclick={() => changeColoring(1)}>
     <Arrow color="var(--theme-neutral-white)" />
   </div>
 
@@ -121,7 +121,10 @@
     max-height: 2rem;
   }
   .left {
-    rotate: 180deg;
+    rotate: 90deg;
+  }
+  .right {
+    rotate: -90deg;
   }
   .button {
     grid-column: 1 / span 3;

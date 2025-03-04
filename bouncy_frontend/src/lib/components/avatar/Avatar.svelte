@@ -10,10 +10,6 @@
   } from '$lib/pose';
   import { getContext } from 'svelte';
 
-  
-  
-
-  
   /**
    * @typedef {Object} Props
    * @property {any} [landmarks]
@@ -34,10 +30,10 @@
     torsoLineWidth = lineWidth,
     markedLimbs = [],
     style = {
-    leftColor: '#000000FF',
-    rightColor: '#000000FF',
-    headColor: '#00000040',
-  }
+      leftColor: '#000000FF',
+      rightColor: '#000000FF',
+      headColor: '#00000040',
+    },
   } = $props();
 
   getContext('canvas').addItem(draw);

@@ -13,7 +13,6 @@
   import { onMount } from 'svelte';
   import { counter } from '$lib/timer';
 
-  
   /**
    * @typedef {Object} Props
    * @property {any} text
@@ -27,7 +26,7 @@
     text,
     width = 250,
     entryDance = null,
-    entryDanceRepetitions = 1
+    entryDanceRepetitions = 1,
   } = $props();
   /** @type { undefined | Skeleton } */
   let skeleton = $state(Skeleton.resting(false));
@@ -98,14 +97,9 @@
   <div class="figure-cell" style="height: {figureWidth + tailSize}px">
     <div class="figure" style="max-width: {figureWidth}px;">
       <Animation animationTime={200} jumpHeight={0.025}>
-        <Svg width={figureWidth} height={figureWidth} showOverflow>
+        <Svg width={250} height={250} showOverflow>
           {#if skeleton}
-            <SvgAvatar
-              {skeleton}
-              width={figureWidth}
-              height={figureWidth}
-              {lineWidth}
-              {bodyShift}
+            <SvgAvatar {skeleton} width={250} height={250} {bodyShift}
             ></SvgAvatar>
           {/if}
         </Svg>

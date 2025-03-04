@@ -3,26 +3,30 @@
   import Explanation from '$lib/components/ui/Explanation.svelte';
   import { t } from '$lib/i18n';
   import { dances } from '$lib/instructor/bouncy_instructor';
-  import { onMount, afterUpdate } from 'svelte';
+  import { onMount } from 'svelte';
 
-  /** @type {number} */
-  export let hitRate;
-  /** @type {boolean} */
-  export let passed;
+  /**
+   * @typedef {Object} Props
+   * @property {number} hitRate
+   * @property {boolean} passed
+   */
 
-  $: text =
+  let { hitRate, passed } = $props();
+
+  let text = $derived(
     hitRate >= 0.6
       ? 'courses.end.success'
       : hitRate > 0.44
         ? 'courses.end.failed'
-        : 'courses.end.failed-hard';
-  $: displayedPercent = (Number(hitRate || 0) * 100).toFixed(0);
-  let scoreColor = 'var(--theme-neutral-gray)';
+        : 'courses.end.failed-hard'
+  );
+  let displayedPercent = $derived((Number(hitRate || 0) * 100).toFixed(0));
+  let scoreColor = $state('var(--theme-neutral-gray)');
   let borderWidth = '3px';
 
-  let outerWidth;
-  $: explanationWidth = outerWidth ? outerWidth / 2 : 200;
-  let scoreWidth = 0;
+  let outerWidth = $state();
+  let explanationWidth = $derived(outerWidth ? outerWidth / 2 : 200);
+  let scoreWidth = $state(0);
 
   const celebrationDance = passed
     ? dances().find((dance) => dance.id === 'Celebrate')
@@ -32,14 +36,11 @@
     // set this after the initial render to trigger the animation
     setResult();
   });
-  afterUpdate(() => {
-    setResult();
-  });
 
   function setResult() {
     scoreWidth = hitRate * 100;
     if (passed) {
-      scoreColor = '#33a86d';
+      scoreColor = 'var(--theme-main-alt)';
       // borderWidth = '5px';
     } else {
       scoreColor = '#eb3b3b';
@@ -99,7 +100,7 @@
     /* width and color overwritten by inline style */
     border: solid 3px var(--theme-neutral-gray);
     /* border-radius: 38px; */
-    overflow: hidden;
+    /* overflow: hidden; */
     transition:
       border-color 0s step-start 1s,
       border-width 0s step-start 1s;
@@ -111,7 +112,8 @@
   .score {
     position: absolute;
     background-color: var(--score-color);
-    height: 100%;
+    height: calc(100% + 2px);
+    margin: -1px;
     top: 0;
     left: 0;
     width: 0;
