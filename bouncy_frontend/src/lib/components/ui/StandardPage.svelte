@@ -18,7 +18,9 @@
     <LogoHeader {white} {gray} {title} />
   </div>
 
-  {@render children?.()}
+  <div class="content">
+    {@render children?.()}
+  </div>
 
   <div class="footer">
     <Footer white={!white} />
@@ -27,13 +29,18 @@
 
 <style>
   .wrapper {
-    position: relative;
-    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
     margin: 0;
   }
 
+  .content {
+    flex-grow: 1;
+  }
+
   .footer {
-    position: absolute;
-    bottom: 1rem;
+    margin-top: 3rem;
+    margin-bottom: 1rem;
   }
 </style>
