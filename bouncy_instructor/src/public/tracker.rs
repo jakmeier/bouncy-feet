@@ -2,15 +2,18 @@ mod detection_output;
 mod frame_output;
 mod pose_output;
 mod step_output;
+mod teacher_output;
 
 pub use detection_output::{DetectionFailureReason, DetectionResult, PoseHint};
 pub use pose_output::PoseApproximation;
 pub use step_output::DetectedStep;
+pub use teacher_output::TeacherView;
 
 use super::renderable::RenderableSkeleton;
 use super::wrapper::skeleton_wrapper::SkeletonWrapper;
 use crate::intern::dance_detector::{DanceDetector, DetectionState};
 use crate::intern::skeleton_3d::{Direction, Skeleton3d};
+use crate::intern::step_pace::StepPace;
 use crate::intern::teacher::Teacher;
 use crate::intern::tracker_dance_collection::{ForeignCollectionError, TrackerDanceCollection};
 use crate::keypoints::{Cartesian3d, Keypoints};
@@ -123,6 +126,70 @@ impl Tracker {
         Ok(Tracker::new(db, Some(step_info), None))
     }
 
+    /// Mix a warmup with the given steps, by name.
+    ///
+    ///
+    #[wasm_bindgen(js_name = "WarmUp")]
+    pub fn new_warm_up(
+        step_names: Vec<String>,
+        num_beats: u32,
+    ) -> Result<Tracker, ForeignCollectionError> {
+        assert_ne!(
+            0,
+            step_names.len(),
+            "must have at least one step for warmup"
+        );
+        let mut db = TrackerDanceCollection::default();
+        let mut teacher = Teacher::default();
+        // TODO: Allow different paces
+        let pace = StepPace::half_speed();
+
+        // Warmup structure: Go through all steps in order, then do the first
+        // again, after which the warmup is done.
+        let fair_beats_per_step = num_beats / (step_names.len() + 1) as u32;
+        // Each step should be repeated for some time to follow more easily.
+        // If there are too many steps, not all will be shown but still tracked.
+        let min_beats_per_step = 8;
+        let beats_per_step = fair_beats_per_step.max(min_beats_per_step);
+
+        crate::STATE.with_borrow(|state| {
+            let mut beats_to_fill = num_beats - beats_per_step;
+            // add idle steps to DB, those should always be included in a tracker
+            for step in state.global_db.tracker_view.idle_steps() {
+                db.add_foreign_step(&state.global_db.tracker_view, &step.id)?;
+            }
+            // add all tracked steps to the DB and also to the teacher
+            for step_name in &step_names {
+                // For now, only show one variation per step.
+                let mut step_added = false;
+                for step in state.global_db.tracker_view.steps_by_name(step_name) {
+                    db.add_foreign_step(&state.global_db.tracker_view, &step.id)?;
+                    if !step_added && beats_to_fill > beats_per_step {
+                        teacher.add_warmup(
+                            StepInfo::from_step(step.clone(), &db),
+                            beats_per_step,
+                            pace,
+                        );
+                        step_added = true;
+                        beats_to_fill -= beats_per_step;
+                    }
+                }
+            }
+            // Add the first step again to the teacher, as a sign to that it is about to finish.
+            let Some(first_step) = db.steps_by_name(&step_names[0]).next() else {
+                panic!("Just added step");
+            };
+            teacher.add_warmup(
+                StepInfo::from_step(first_step.clone(), &db),
+                beats_per_step,
+                pace,
+            );
+            Ok(())
+        })?;
+
+        Ok(Tracker::new_from_teacher(db, teacher))
+    }
+
     #[wasm_bindgen(js_name = "finishTracking")]
     pub fn finish_tracking(&mut self) {
         let now = *self.timestamps.last().unwrap_or(&0.0);
@@ -216,6 +283,11 @@ impl Tracker {
         self.detector.detected.pose_error()
     }
 
+    #[wasm_bindgen(js_name = currentView)]
+    pub fn current_view(&mut self, t: Timestamp) -> TeacherView {
+        self.detector.current_view(t)
+    }
+
     #[wasm_bindgen(getter, js_name = detectionState)]
     pub fn detection_state(&self) -> ReadableDetectionState {
         self.detector.detection_state_store.get_store().into()
@@ -273,13 +345,7 @@ impl Tracker {
 
     #[wasm_bindgen(js_name = poseSkeletonAtSubbeat)]
     pub fn pose_skeleton_at_subbeat(&self, subbeat: i32) -> Skeleton {
-        let resting_pose = || {
-            self.detector
-                .tracked_step(0)
-                .expect("must have at least one step")
-                .skeleton(0)
-                .resting_pose()
-        };
+        let resting_pose = || Skeleton::resting(false);
         match u32::try_from(subbeat) {
             Ok(subbeat) => {
                 if let Some((step, beat_remainder)) =

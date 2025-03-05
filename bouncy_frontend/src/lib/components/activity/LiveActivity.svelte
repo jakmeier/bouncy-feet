@@ -26,12 +26,11 @@
   /** @type {Props} */
   let { onDone, videoOpacity, enableLiveAvatar, enableInstructorAvatar } =
     $props();
-  const { computeDanceStats, addDanceToStats } = getContext('user');
 
-  /** @type {number | undefined} */
-  let recordingStart = $state(undefined);
-  /** @type {number | undefined} */
-  let recordingEnd = $state(undefined);
+  /** @type {number} */
+  let recordingStart = $state(0);
+  /** @type {number} */
+  let recordingEnd = $state(0);
 
   let detectionResult;
   /** @type {string} */
@@ -41,7 +40,7 @@
   /** @type {Tracker | undefined} */
   let { tracker } = getContext('tracker');
   /** @type {import('svelte/store').Readable<DetectionState> | null} */
-  let trackingState = $derived(tracker ? tracker.detectionState : null);
+  let trackingState = tracker.detectionState;
 
   let useFixedBpm = false;
   /** @type {import('svelte/store').Writable<boolean>} */
@@ -79,6 +78,11 @@
     }
 
     detectionResult = tracker?.lastDetection;
+    // TODO: consider storing stats here
+    // const sessionResult = computeDanceStats(detected.steps());
+    // if (sessionResult) {
+    //   addDanceToStats(sessionResult);
+    // }
     if (onDone) {
       onDone(detectionResult, recordingStart, recordingEnd, videoUrl);
     }
@@ -88,25 +92,6 @@
     $startExercisePopUpIsOpen = false;
     start();
   }
-
-  //   let hitRate = $state(0.0);
-  //   let passed = $state(false);
-  //   async function trackingDone() {
-  //     await stop();
-  //     // TODO: use bpm and accuracy stats to give star rating
-  //     const detected = tracker.lastDetection;
-  //     hitRate =
-  //       detected.poseMatches / (detected.poseMisses + detected.poseMatches);
-  //     passed = hitRate >= 0.6;
-
-  //     const sessionResult = computeDanceStats(detected.steps());
-  //     if (sessionResult) {
-  //       addDanceToStats(sessionResult);
-  //     }
-  //   }
-  //   $effect(() => {
-  //     if ($trackingState === DetectionState.TrackingDone) trackingDone();
-  //   });
 
   onMount(start);
 </script>
@@ -132,7 +117,6 @@
 <Popup showOkButton title={'common.hint-popup-title'}>
   {$t('record.estimate-bpm-hint')}
 </Popup>
-
 
 {#if $dev}
   <DevUtility />

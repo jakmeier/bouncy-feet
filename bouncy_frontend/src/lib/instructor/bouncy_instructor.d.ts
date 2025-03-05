@@ -136,6 +136,24 @@ export enum SkeletonPoint {
   RightHeel = 14,
   RightToes = 15,
 }
+/**
+ * Hint to the UI, which information should be shown to the user during the
+ * current section.
+ */
+export enum TeacherView {
+  /**
+   * Show the instructor, no need to show the user camera.
+   */
+  InstructorOnly = 1,
+  /**
+   * The user camera should be shown with a tracked avatar.
+   */
+  UserCameraWithTracking = 2,
+  /**
+   * Show nothing
+   */
+  Off = 3,
+}
 
 import type { Readable } from "svelte/store";
 
@@ -479,6 +497,9 @@ export class Segment {
 export class Skeleton {
   private constructor();
   free(): void;
+  static resting(sideway: boolean): Skeleton;
+  restingPose(): Skeleton;
+  debugString(): string;
   /**
    * Compute 2d coordinates for the skeleton for rendering.
    *
@@ -487,9 +508,6 @@ export class Skeleton {
    * segment will have its center at the given position.
    */
   render(hip_center: Cartesian2d, size: number): SkeletonV2;
-  static resting(sideway: boolean): Skeleton;
-  restingPose(): Skeleton;
-  debugString(): string;
   left: SkeletonSide;
   right: SkeletonSide;
   hip: Segment;
@@ -656,6 +674,11 @@ export class Tracker {
    * specific training session without much regard for timing etc.
    */
   static UniqueStepTracker(step_id: string): Tracker;
+  /**
+   * Mix a warmup with the given steps, by name.
+   *
+   */
+  static WarmUp(step_names: string[], num_beats: number): Tracker;
   finishTracking(): void;
   clear(): void;
   /**
@@ -680,6 +703,7 @@ export class Tracker {
   runDetection(): DetectionResult;
   poseHint(): PoseHint;
   currentPoseError(): PoseApproximation | undefined;
+  currentView(t: number): TeacherView;
   nextSubbeat(now?: number | null): number;
   nextAudioEffect(): AudioEffect | undefined;
   /**

@@ -1,7 +1,7 @@
-use crate::skeleton::Cartesian2d;
-use crate::StepInfo;
-
 use super::step_pace::StepPace;
+use crate::skeleton::Cartesian2d;
+use crate::tracker::TeacherView;
+use crate::StepInfo;
 
 /// Dynamically switch between steps, switch between views for showing the next
 /// step and going back to full camera mode for dancers to see themselves.
@@ -18,6 +18,9 @@ enum Section {
     ShowStep(StepSection),
     /// Any move allowed from the student.
     Freestyle { subbeats: u32 },
+    /// The instructor shows some move but the student doesn't have to follow
+    /// exactly. Just make sure to always move.
+    Warmup(StepSection),
 }
 
 struct StepSection {
@@ -55,6 +58,16 @@ impl Teacher {
         });
     }
 
+    /// Show a step to copy by the student but be more lenient in tracking.
+    pub(crate) fn add_warmup(&mut self, step: StepInfo, beats: u32, pace: StepPace) {
+        assert_ne!(beats, 0);
+        self.sections.push(Section::Warmup(StepSection {
+            step,
+            subbeats: beats * 2,
+            pace,
+        }));
+    }
+
     /// After n subbeats of the lesson, get the current step and beat remainder.
     ///
     /// Full beat: only count 1,2,3,4 (used for bpm calculation)
@@ -62,7 +75,9 @@ impl Teacher {
     pub(crate) fn step_at_subbeat(&self, subbeat: u32) -> Option<(&StepInfo, u32)> {
         self.section_at_subbeat(subbeat)
             .and_then(|section| match &section {
-                Section::Step(step_section) | Section::ShowStep(step_section) => {
+                Section::Step(step_section)
+                | Section::ShowStep(step_section)
+                | Section::Warmup(step_section) => {
                     let StepSection { step, pace, .. } = step_section;
                     Some((step, pace.pose_at_subbeat(subbeat)))
                 }
@@ -98,10 +113,25 @@ impl Teacher {
     pub(crate) fn is_tracking_at_subbeat(&self, subbeat: u32) -> bool {
         self.section_at_subbeat(subbeat)
             .map(|section| match &section {
-                Section::Step(_) | Section::Freestyle { .. } => true,
+                Section::Step(_) | Section::Freestyle { .. } | Section::Warmup(_) => true,
                 Section::ShowStep(_) => false,
             })
             .unwrap_or_default()
+    }
+
+    /// What information the UI should show.
+    pub(crate) fn ui_view_at_subbeat(&self, subbeat: u32) -> TeacherView {
+        self.section_at_subbeat(subbeat)
+            .map(|section| match &section {
+                Section::Step(_) | Section::Freestyle { .. } => TeacherView::UserCameraWithTracking,
+                Section::Warmup(_) | Section::ShowStep(_) => TeacherView::InstructorOnly,
+            })
+            .unwrap_or(TeacherView::Off)
+    }
+
+    /// The teacher is done when there is no more to show or track.
+    pub(crate) fn is_done(&self, subbeat: u32) -> bool {
+        self.section_at_subbeat(subbeat).is_none()
     }
 
     /// How many beats to track for
@@ -113,7 +143,9 @@ impl Teacher {
 impl Section {
     fn subbeats(&self) -> u32 {
         match self {
-            Section::Step(step_section) | Section::ShowStep(step_section) => {
+            Section::Step(step_section)
+            | Section::ShowStep(step_section)
+            | Section::Warmup(step_section) => {
                 let StepSection { subbeats, .. } = step_section;
                 *subbeats
             }
@@ -123,7 +155,9 @@ impl Section {
 
     fn body_shift(&self, beat: u32) -> Cartesian2d {
         match self {
-            Section::Step(step_section) | Section::ShowStep(step_section) => {
+            Section::Step(step_section)
+            | Section::ShowStep(step_section)
+            | Section::Warmup(step_section) => {
                 let StepSection { step, .. } = step_section;
                 step.body_shift(beat as usize)
             }

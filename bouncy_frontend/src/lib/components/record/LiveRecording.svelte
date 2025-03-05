@@ -34,7 +34,7 @@
   } from '$lib/stores/System';
   import FullScreenArea from '../ui/FullScreenArea.svelte';
   import MusicControl from './MusicControl.svelte';
-  import LogoHeader from '../ui/LogoHeader.svelte';
+  import { TeacherView } from '$lib/instructor/bouncy_instructor_bg';
 
   export const startCamera = async () => {
     await camera.startCamera();
@@ -137,6 +137,13 @@ it does not match
 
   // this is called periodically in a background task
   function onFrame() {
+    const teacherView = tracker.currentView(performance.now());
+    updateView(teacherView);
+
+    if ($detectionState === DetectionState.TrackingDone) {
+      stop();
+    }
+
     if (cameraOn && dataListener && recordingOn) {
       const start = performance.now();
       dataListener.trackFrame(cameraVideoElement);
@@ -297,25 +304,29 @@ it does not match
   });
 
   /**
-   * @param {DetectionState} state
+   * @param {TeacherView} view
    */
-  function updateView(state) {
-    if (state === DetectionState.LiveTracking) {
+  function updateView(view) {
+    if (view === TeacherView.UserCameraWithTracking) {
       videoOpacity = 1.0;
       enableLiveAvatar = true;
+      enableInstructorAvatar = false;
     }
-    if (state === DetectionState.InstructorDemo) {
+    if (view === TeacherView.InstructorOnly) {
       videoOpacity = 0.0;
       enableLiveAvatar = false;
+      enableInstructorAvatar = true;
+    }
+    if (view === TeacherView.Off) {
+      videoOpacity = 0.0;
+      enableLiveAvatar = false;
+      enableInstructorAvatar = false;
     }
   }
   let animationTime = $derived(Math.min($timeBetweenMoves / 3, 300));
   let instructorSkeletonSize = $derived(
     Math.min(lastDetectedSkeletonSize, 8.0)
   );
-  $effect(() => {
-    updateView($detectionState);
-  });
 </script>
 
 <BackgroundTask {onFrame}></BackgroundTask>
@@ -427,7 +438,6 @@ it does not match
     width: calc(100% - 2rem);
     position: absolute;
     bottom: 0;
-    transform: scaleX(-1);
   }
   button.symbol {
     margin: 1rem;

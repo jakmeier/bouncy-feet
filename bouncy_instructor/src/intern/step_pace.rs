@@ -1,6 +1,6 @@
 /// At what pace the poses of a step are matched to beats.
 ///
-#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct StepPace {
     /// The normal pace is one pose per subbeat, meaning 2 poses on a full
     /// beat. This gives 8 poses on a full 4/4 count.
@@ -13,9 +13,7 @@ impl StepPace {
     fn new(subbeats_per_pose: u32) -> Self {
         // (I1) `subbeats_per_pose` i` not zero
         assert_ne!(subbeats_per_pose, 0);
-        Self {
-            subbeats_per_pose,
-        }
+        Self { subbeats_per_pose }
     }
 
     // Two poses per full beat.

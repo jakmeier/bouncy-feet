@@ -1,7 +1,7 @@
 use svelte_store::Readable;
 use wasm_bindgen::prelude::wasm_bindgen;
 
-use crate::tracker::PoseApproximation;
+use crate::tracker::{PoseApproximation, TeacherView};
 use crate::ui_event::UiEvents;
 use crate::{DetectionFailureReason, DetectionResult, PoseHint, StepInfo};
 
@@ -183,15 +183,14 @@ impl DanceDetector {
                         .with_failure_reason(DetectionFailureReason::NoNewData);
                 }
 
-                // Finish once enough poses were found-
+                // Finish activity when the teacher is done.
                 self.last_evaluation = now;
-                if self.num_detected_poses() as u32 >= self.teacher.tracked_subbeats() {
+                let subbeat = self.timestamp_to_subbeat(now);
+                if self.teacher.is_done(subbeat) {
                     self.transition_to_state(DetectionState::TrackingDone, now);
                 }
-
                 // Change state to "InstructorDemo" if there is currently no tracking going on.
-                let subbeat = self.timestamp_to_subbeat(now);
-                if !self.teacher.is_tracking_at_subbeat(subbeat) {
+                else if !self.teacher.is_tracking_at_subbeat(subbeat) {
                     self.transition_to_state(DetectionState::InstructorDemo, now);
                 }
 
@@ -341,6 +340,21 @@ impl DanceDetector {
         detection_result
     }
 
+    pub(crate) fn current_view(&mut self, t: Timestamp) -> TeacherView {
+        match self.detection_state {
+            DetectionState::Init | DetectionState::Positioning => {
+                TeacherView::UserCameraWithTracking
+            }
+            DetectionState::CountDown
+            | DetectionState::LiveTracking
+            | DetectionState::InstructorDemo => {
+                let subbeat = self.timestamp_to_subbeat(t);
+                self.teacher.ui_view_at_subbeat(subbeat)
+            }
+            DetectionState::TrackingDone => TeacherView::Off,
+        }
+    }
+
     /// Return how many poses have been detected so far.
     pub(crate) fn num_detected_poses(&self) -> usize {
         let full: usize = self
@@ -355,11 +369,6 @@ impl DanceDetector {
             0
         };
         full + partial
-    }
-
-    /// Returns the tracked step for a given subbeat after tracking started.
-    pub(crate) fn tracked_step(&self, subbeat: u32) -> Option<&StepInfo> {
-        self.teacher.step_at_subbeat(subbeat).map(|inner| inner.0)
     }
 
     /// Returns the tracked step and subbeat for a given subbeat after tracking started.
