@@ -5,12 +5,11 @@
     StepWrapper,
     Tracker,
   } from '$lib/instructor/bouncy_instructor';
-  import ActivityReview from './ActivityReview.svelte';
   import LiveActivity from './LiveActivity.svelte';
   import WarmUpPreview from './WarmUpPreview.svelte';
   import { registerTracker } from '$lib/stores/Beat';
-  import { onDestroy } from 'svelte';
   import StandardPage from '../ui/StandardPage.svelte';
+  import WarmupReview from './WarmupReview.svelte';
 
   /**
    * @typedef {Object} Props
@@ -30,10 +29,7 @@
   $effect(() => registerTracker(tracker));
   let trackingDone = $state(false);
 
-  let recordingStart = $state(0);
-  let recordingEnd = $state(0);
   let detection = $state();
-  let recordedVideoUrl = $state();
   /**
    * @param {DetectionResult} newDetection
    * @param {number} newRecordingStart
@@ -47,30 +43,13 @@
     videoUrl
   ) {
     detection = newDetection;
-    recordingStart = newRecordingStart;
-    recordingEnd = newRecordingEnd;
-    recordedVideoUrl = videoUrl;
+    URL.revokeObjectURL(videoUrl);
     trackingDone = true;
   }
 
-  function onRestart() {
-    previewDone = false;
-    URL.revokeObjectURL(recordedVideoUrl);
-    recordedVideoUrl = null;
-    detection = null;
-    tracker?.clear();
-    trackingDone = false;
+  function onContinue() {
+    // todo
   }
-
-  function onBack() {
-    window.history.back();
-  }
-
-  onDestroy(() => {
-    if (recordedVideoUrl) {
-      URL.revokeObjectURL(recordedVideoUrl);
-    }
-  });
 </script>
 
 <LightBackground />
@@ -92,17 +71,7 @@
     enableInstructorAvatar={true}
   ></LiveActivity>
 {:else if detection !== undefined}
-  <ActivityReview
-    {detection}
-    {recordingStart}
-    {recordingEnd}
-    {onBack}
-    {onRestart}
-    videoUrl={recordedVideoUrl}
-  ></ActivityReview>
+  <WarmupReview {detection} {onContinue}></WarmupReview>
 {:else}
   <StandardPage white><h3>bug: missing detection</h3></StandardPage>
 {/if}
-
-<style>
-</style>

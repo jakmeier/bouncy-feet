@@ -176,6 +176,9 @@
         "results-button": "Zur Auswertung",
         "review-details": "Ergebnis",
         "review-title": "Rückblick",
+        "warmup-review-title": "Aufwärmen fertig",
+        "warmup-result": "Deine Ausbeute",
+        "energy-level": "Energielevel",
         "stop-camera": "Kamera stoppen",
         "stop-record": "Video stoppen",
         "learn-dance-prefix": "Lerne",
@@ -211,13 +214,16 @@
         }
     },
     "stats": {
-        "num-dances": "Anzahl Tänze",
-        "num-steps": "Anzahl Schritte",
+        "num-dances": "Tänze",
+        "num-steps": "Schritte",
         "average-bpm": "BPM",
         "slow": "Langsam (<50)",
         "mid": "Normal (50-100)",
         "fast": "Schnell (100-130)",
         "very-fast": "Übertrieben schnell (>130)",
+        "today": "heute",
+        "week": "diese Woche",
+        "lifetime": "zu Lebzeit",
         "time-danced": "Getanzt für"
     },
     "profile": {

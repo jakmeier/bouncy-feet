@@ -176,6 +176,9 @@
         "results-button": "Show results",
         "review-details": "Results",
         "review-title": "Review",
+        "warmup-review-title": "Warmup done",
+        "warmup-result": "You have completed",
+        "energy-level": "Energy level",
         "stop-camera": "stop camera",
         "stop-record": "stop video",
         "learn-dance-prefix": "Learn",
@@ -218,6 +221,9 @@
         "mid": "Normal (50-100)",
         "fast": "Fast (100-130)",
         "very-fast": "Ludicrous speed (>130)",
+        "today": "today",
+        "week": "this week",
+        "lifetime": "lifetime",
         "time-danced": "Danced for"
     },
     "profile": {
