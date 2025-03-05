@@ -335,7 +335,6 @@ impl Tracker {
         self.pose_skeleton_at_subbeat(beat as i32)
     }
 
-    #[wasm_bindgen(js_name = beat)]
     pub fn subbeat(&self, t: f64) -> i32 {
         self.detector.timestamp_to_subbeat(t) as i32
             - self

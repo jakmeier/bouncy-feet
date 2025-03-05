@@ -65,23 +65,21 @@
   let displayedBodyShift = $state(bodyShift);
 
   $effect(() => {
-    untrack(() => {
-      if (skeleton !== prevSkeleton) {
-        correctSkeleton = prevSkeleton;
-        correctBodyShift = prevBodyShift;
-        prevSkeleton = skeleton;
-        prevBodyShift = bodyShift;
-        // TODO: showing the correct position messes with the timing
-        // if (lastPoseWasCorrect) {
-        //   displayCorrectPosition();
-        // } else {
-        //   // animationDelay = $timeBetweenMoves - animationTime;
-        //   // animationDelay = 0;
-        displayedBodyShift = bodyShift;
-        displayedSkeleton = skeleton;
-        // }
-      }
-    });
+    if (skeleton !== prevSkeleton) {
+      correctSkeleton = prevSkeleton;
+      correctBodyShift = prevBodyShift;
+      prevSkeleton = skeleton;
+      prevBodyShift = bodyShift;
+      // TODO: showing the correct position messes with the timing
+      // if (lastPoseWasCorrect) {
+      //   displayCorrectPosition();
+      // } else {
+      //   // animationDelay = $timeBetweenMoves - animationTime;
+      //   // animationDelay = 0;
+      displayedBodyShift = bodyShift;
+      displayedSkeleton = skeleton;
+      // }
+    }
   });
 
   function displayCorrectPosition() {

@@ -718,7 +718,7 @@ export class Tracker {
    * (experimenting with live instructor, I probably want to change this when cleaning up the impl)
    */
   expectedPoseSkeleton(): Skeleton;
-  beat(t: number): number;
+  subbeat(t: number): number;
   poseSkeletonAtSubbeat(subbeat: number): Skeleton;
   expectedPoseBodyShift(): Cartesian2d;
   poseBodyShiftAtSubbeat(beat: number): Cartesian2d;

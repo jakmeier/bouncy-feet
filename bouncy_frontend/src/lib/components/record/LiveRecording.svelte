@@ -169,7 +169,7 @@ it does not match
       ) {
         if (forceBeat) {
           const future = performance.now() + animationTime;
-          let newBeat = tracker.beat(future);
+          let newBeat = tracker.subbeat(future);
           if (newBeat !== currentBeat) {
             instructorSkeleton = tracker.poseSkeletonAtSubbeat(newBeat);
             instructorSkeletonBodyShift =
