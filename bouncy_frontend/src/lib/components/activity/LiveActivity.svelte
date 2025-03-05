@@ -27,11 +27,6 @@
   let { onDone, videoOpacity, enableLiveAvatar, enableInstructorAvatar } =
     $props();
 
-  /** @type {number} */
-  let recordingStart = $state(0);
-  /** @type {number} */
-  let recordingEnd = $state(0);
-
   let detectionResult;
   /** @type {string} */
   let videoUrl = $state();
@@ -66,7 +61,7 @@
   /**
    * @param {Blob | undefined} videoBlob
    */
-  async function onRecordingStopped(videoBlob) {
+  async function onRecordingStopped(videoBlob, recordingStart, recordingEnd) {
     tracker?.finishTracking();
     if (videoBlob) {
       if (videoUrl) {
@@ -101,8 +96,6 @@
 <div class="outer">
   <LiveRecording
     bind:this={liveRecording}
-    bind:recordingStart
-    bind:recordingEnd
     onStop={onRecordingStopped}
     {videoOpacity}
     {enableLiveAvatar}

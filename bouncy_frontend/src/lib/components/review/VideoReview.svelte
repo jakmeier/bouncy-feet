@@ -70,10 +70,10 @@
 
   let prevTime = 0;
   function onFrame() {
-    if (prevTime !== reviewVideoElement.currentTime) {
+    if (reviewVideoElement && prevTime !== reviewVideoElement.currentTime) {
       onSeek();
+      prevTime = reviewVideoElement.currentTime;
     }
-    prevTime = reviewVideoElement.currentTime;
   }
 
   function onSeek() {
@@ -334,6 +334,8 @@ once per 250ms. -->
     display: grid;
     grid-template-columns: 1fr;
     align-items: center;
+    width: fit-content;
+    margin: auto;
   }
 
   .poses-details {

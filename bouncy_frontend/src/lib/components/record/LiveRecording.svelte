@@ -42,21 +42,22 @@
   export const startRecording = async () => {
     await camera.startRecording();
     recordingOn = true;
+    stopped = false;
   };
   export const stopCamera = () => {
     camera.stopCamera();
   };
+  let stopped = $state(false);
   export const stop = async () => {
+    stopped = true;
     camera.stopCamera();
     const blob = await camera.endRecording();
-    onStop(blob);
+    onStop(blob, recordingStart, recordingEnd);
   };
 
   /**
    * @typedef {Object} Props
    * @property {boolean} [cameraOn]
-   * @property {undefined | number} recordingStart
-   * @property {undefined | number} recordingEnd
    * @property {any} [onStop] - Function is called when the recording is stopped by the user with the stop
 button or by a explicit `stop` call from the parent component.
 The recording video blob is passed as as a parameter.
@@ -70,8 +71,6 @@ it does not match
   /** @type {Props} */
   let {
     cameraOn = $bindable(false),
-    recordingStart = $bindable(),
-    recordingEnd = $bindable(),
     onStop = (/** @type {Blob | undefined} */ _recording) => {},
     enableLiveAvatar = $bindable(false),
     enableInstructorAvatar = false,
@@ -80,6 +79,9 @@ it does not match
   } = $props();
   let lastPoseWasCorrect = $state(true);
   let recordingOn = $state(false);
+
+  let recordingStart = $state(0);
+  let recordingEnd = $state(0);
 
   const poseCtx = getContext('pose');
   let tracker = getContext('tracker').tracker;
@@ -137,6 +139,10 @@ it does not match
 
   // this is called periodically in a background task
   function onFrame() {
+    if (stopped) {
+      return;
+    }
+
     const teacherView = tracker.currentView(performance.now());
     updateView(teacherView);
 
@@ -208,7 +214,7 @@ it does not match
     /** @type {{ landmarks: import('@mediapipe/tasks-vision').Landmark[][]; }} */ result,
     /** @type {number} */ timestamp
   ) => {
-    if (recordingStart === undefined) {
+    if (recordingStart === 0) {
       recordingStart = timestamp;
     }
     recordMediaPipeDelay(performance.now() - timestamp);
