@@ -52,6 +52,10 @@
       </div>
     {/if}
 
+    <div class="vspace down-marker-arrow">
+      <Arrow></Arrow>
+    </div>
+
     <div class="buttons">
       <button class="wide" onclick={onRestart}>
         {$t('courses.end.again-button')}
@@ -67,7 +71,6 @@
   .buttons {
     display: flex;
     flex-direction: column;
-    margin-top: 2rem;
     gap: 1rem;
   }
   .no-review {
@@ -89,5 +92,8 @@
     margin: auto;
     max-width: 3rem;
     max-height: 3rem;
+  }
+  .vspace {
+    margin: 1.5rem auto;
   }
 </style>

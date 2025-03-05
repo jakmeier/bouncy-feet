@@ -36,7 +36,7 @@
         },
         "end": {
             "again-button": "Nochmals tanzen",
-            "back-button": "Zurück zum Kurs",
+            "back-button": "Fertig",
             "failed-hard": "Versuch es nochmals.",
             "failed": "Beinahe 60% geschafft!",
             "success": "Geschafft!"
@@ -175,6 +175,7 @@
         "review-button": "Videorückblick",
         "results-button": "Zur Auswertung",
         "review-details": "Ergebnis",
+        "review-title": "Rückblick",
         "stop-camera": "Kamera stoppen",
         "stop-record": "Video stoppen",
         "learn-dance-prefix": "Lerne",
@@ -196,7 +197,7 @@
         "no-video-for-review": "Kein Video wurde aufgezeichnet. Versichere dich, dass die Kamera und der Ton aktiviert sind, dann folge den Instruktionen während der Aufzeichnung. Erst wenn der gesamte Körper von der Kamera erfasst wurde, begint die Aufzeichnung.",
         "settings": {
             "title": "Einstellungen",
-            "enable-tracking": "Tracking",
+            "enable-tracking": "Zeige Tracking",
             "enable-instructor": "Vorzeigen",
             "opacity": "Video Sichtbarkeit",
             "description": "Wie schnell wirst du tanzen?",

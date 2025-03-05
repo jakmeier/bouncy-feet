@@ -58,7 +58,6 @@
 
 <style>
   .pose {
-    height: 230px;
     padding: 0 10px;
     margin: 10px;
   }

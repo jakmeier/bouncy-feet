@@ -1,6 +1,4 @@
 <script>
-  
-  
   /**
    * @typedef {Object} Props
    * @property {string | undefined} [bgColor]
@@ -22,7 +20,7 @@
 <style>
   .section-container {
     padding: 1rem;
-    margin: calc(-1rem - 5px);
+    margin: 2rem calc(-1rem - 5px);
   }
 
   @media (min-width: 730px) {

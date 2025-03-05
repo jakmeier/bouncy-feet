@@ -238,6 +238,8 @@ once per 250ms. -->
 <BackgroundTask {onFrame}></BackgroundTask>
 
 <LightSection>
+  <h2>{$t('record.review-title')}</h2>
+
   <div class="upper">
     <div class="corner-marked2">
       <div class="video-wrapper corner-marked">
@@ -275,8 +277,8 @@ once per 250ms. -->
     </div>
 
     <div class="toggle-item">
-      <div>{$t('record.settings.enable-tracking')}</div>
       <Toggle bind:isOn={displayVideoOverlay} />
+      <div>{$t('record.settings.enable-tracking')}</div>
     </div>
   </div>
 
@@ -294,16 +296,6 @@ once per 250ms. -->
         </div>
       {/each}
     {/each}
-  </div>
-
-  <div class="background-strip">
-    {#if $dev}
-      {#each limbErrors as limb}
-        <div>
-          {limb.name.split(' ')[0]}
-        </div>
-      {/each}
-    {/if}
   </div>
 
   {#if $dev}
@@ -328,6 +320,7 @@ once per 250ms. -->
     left: 0;
     height: 100%;
     width: 100%;
+    overflow: hidden;
   }
 
   .upper {
@@ -341,13 +334,9 @@ once per 250ms. -->
   .poses-details {
     display: flex;
     overflow-x: auto;
-    max-width: 100%;
-  }
-
-  .background-strip {
-    margin: 10px -25px;
-    padding: 10px 30px;
-    text-align: center;
+    /* Use space all the way to the edge */
+    margin-left: -1rem;
+    margin-right: -1rem;
   }
 
   .toggle-item {
