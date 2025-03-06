@@ -654,6 +654,19 @@ export class StepWrapper {
    */
   readonly subbeats: number;
 }
+export class TextEffect {
+  private constructor();
+  free(): void;
+  /**
+   * When the text should be displayed, could be in the future.
+   */
+  timestamp: number;
+  /**
+   * How long to show the text, in ms
+   */
+  duration: number;
+  readonly text: string;
+}
 /**
  * A Tracker gathers skeletons over time and passes it on to a DanceDetector.
  */
@@ -706,6 +719,7 @@ export class Tracker {
   currentView(t: number): TeacherView;
   nextSubbeat(now?: number | null): number;
   nextAudioEffect(): AudioEffect | undefined;
+  nextTextEffect(after: number): TextEffect | undefined;
   /**
    * Return a skeleton for a pose.
    */

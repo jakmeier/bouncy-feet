@@ -79,6 +79,7 @@ it does not match
   } = $props();
   let lastPoseWasCorrect = $state(true);
   let recordingOn = $state(false);
+  let showTextEffect = $state(false);
 
   let recordingStart = $state(0);
   let recordingEnd = $state(0);
@@ -93,6 +94,9 @@ it does not match
 
   let lastAudioHint = performance.now() - 2000;
   let audioHintDelay = 5000;
+  let effectText = $state('');
+  /** @type {number | undefined} */
+  let clearTextTime = undefined;
 
   /** @type {Camera} */
   let camera = $state();
@@ -201,6 +205,20 @@ it does not match
       audio = tracker.nextAudioEffect()
     ) {
       scheduleAudio(audio.soundId, Number(audio.timestamp));
+    }
+    if (clearTextTime !== undefined && performance.now() >= clearTextTime) {
+      clearTextTime = undefined;
+      effectText = '';
+      showTextEffect = false;
+    }
+    for (
+      let textEffect = tracker.nextTextEffect(performance.now());
+      textEffect !== undefined;
+      textEffect = tracker.nextTextEffect(performance.now())
+    ) {
+      clearTextTime = textEffect.timestamp + textEffect.duration;
+      effectText = textEffect.text;
+      showTextEffect = true;
     }
   }
 
@@ -420,6 +438,19 @@ it does not match
       </button>
     </div>
   {/if}
+  {#if showTextEffect}
+    <div class="overlay">
+      <div class="frame">
+        <div class="corner-marked2">
+          <div class="corner-marked">
+            <div class="effect-text">
+              {effectText}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {/if}
 </FullScreenArea>
 
 <style>
@@ -455,6 +486,7 @@ it does not match
     position: absolute;
     top: 0;
     height: 100dvh;
+    width: 100vw;
     color: var(--theme-neutral-white);
     background-color: var(--theme-neutral-dark-transparent);
   }
@@ -463,6 +495,14 @@ it does not match
     display: grid;
     justify-content: center;
     align-content: center;
+  }
+  .effect-text {
+    height: 50dvh;
+    display: grid;
+    justify-content: center;
+    align-content: center;
+    font-size: 16rem;
+    color: var(--theme-main);
   }
   .frame {
     margin: 10dvh 2rem;

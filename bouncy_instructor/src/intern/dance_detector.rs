@@ -422,19 +422,36 @@ impl DanceDetector {
     pub(crate) fn emit_countdown_audio(&mut self, not_before: Timestamp) {
         let beat = self.time_between_poses();
         let next_beat = self.next_pose_time(not_before);
+        // long enough to not clear too early
+        let text_dur = 8.0 * beat;
 
         self.ui_events.add_audio(next_beat, "and".to_owned());
+
         self.ui_events.add_audio(next_beat + beat, "one".to_owned());
+        self.ui_events
+            .add_text(next_beat + beat, "4".to_owned(), text_dur);
+
         self.ui_events
             .add_audio(next_beat + 5.0 * beat, "two".to_owned());
         self.ui_events
+            .add_text(next_beat + 5.0 * beat, "3".to_owned(), text_dur);
+
+        self.ui_events
             .add_audio(next_beat + 9.0 * beat, "one".to_owned());
+        self.ui_events
+            .add_text(next_beat + 9.0 * beat, "2".to_owned(), text_dur);
+
         self.ui_events
             .add_audio(next_beat + 11.0 * beat, "two".to_owned());
         self.ui_events
             .add_audio(next_beat + 13.0 * beat, "three".to_owned());
         self.ui_events
+            .add_text(next_beat + 13.0 * beat, "1".to_owned(), text_dur);
+
+        self.ui_events
             .add_audio(next_beat + 15.0 * beat, "four".to_owned());
+        self.ui_events
+            .add_text(next_beat + 17.0 * beat, "0".to_owned(), beat);
     }
 
     /// For debugging pruposes, set the state directly.

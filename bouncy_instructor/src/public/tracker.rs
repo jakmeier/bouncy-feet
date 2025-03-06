@@ -11,6 +11,7 @@ pub use teacher_output::TeacherView;
 
 use super::renderable::RenderableSkeleton;
 use super::wrapper::skeleton_wrapper::SkeletonWrapper;
+use super::TextEffect;
 use crate::intern::dance_detector::{DanceDetector, DetectionState};
 use crate::intern::skeleton_3d::{Direction, Skeleton3d};
 use crate::intern::step_pace::StepPace;
@@ -312,6 +313,11 @@ impl Tracker {
     #[wasm_bindgen(js_name = nextAudioEffect)]
     pub fn next_audio_effect(&mut self) -> Option<AudioEffect> {
         self.detector.ui_events.next_audio()
+    }
+
+    #[wasm_bindgen(js_name = nextTextEffect)]
+    pub fn next_text_effect(&mut self, after: Timestamp) -> Option<TextEffect> {
+        self.detector.ui_events.next_text(after)
     }
 
     /// Return a skeleton for a pose.
