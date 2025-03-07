@@ -17,13 +17,15 @@
   import MusicContext from './MusicContext.svelte';
   import LocalStateContext from './LocalStateContext.svelte';
   import UserAvatarStyleContext from '$lib/components/avatar/UserAvatarStyleContext.svelte';
+  import { setContext } from 'svelte';
+  import { readable } from 'svelte/store';
   /**
    * @typedef {Object} Props
    * @property {import('svelte').Snippet} [children]
    */
 
   /** @type {Props} */
-  let { children } = $props();
+  let { children, data } = $props();
 
   run(() => {
     hideNavigation.set(!$dev);
@@ -31,6 +33,11 @@
   let navBarHeight = $derived($hideNavigation ? 0 : 90);
   let outerPadding = $derived($wideView ? '0rem' : '1rem');
   let mainMargin = $derived($wideView ? 0 : 5);
+
+  const courses = data.courses;
+  const getCourse = (/** @type {string} */ id) =>
+    courses.find((course) => course.id === id);
+  setContext('courses', { courses: readable(courses), getCourse });
 </script>
 
 <svelte:head>

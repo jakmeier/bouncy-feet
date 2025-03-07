@@ -1,4 +1,6 @@
 import { addTranslations, loadTranslations, locale, setLocale, setRoute } from '$lib/i18n.js';
+import { Course } from '$lib/instructor/bouncy_instructor';
+import { parseCourseString } from '$lib/instructor/bouncy_instructor';
 import {
     loadDanceString,
     loadPoseString,
@@ -21,7 +23,7 @@ export const trailingSlash = 'always';
 let loadedOnce = false;
 
 /** @type {import('@sveltejs/kit').Load} */
-export const load = async ({ data }) => {
+export const load = async ({ fetch, data }) => {
     const { i18n, translations } = data;
     const { locale, route } = i18n;
 
@@ -33,14 +35,33 @@ export const load = async ({ data }) => {
     const { lookupSteps, lookupPoses } = await loadCollectionAssets();
     const officialDances = dances();
 
+    const coursePromises = [
+        import('$lib/assets/courses/000-rm-basics.ron?raw'),
+        import('$lib/assets/courses/002-v-step-basics.ron?raw'),
+        import('$lib/assets/courses/003-intro.ron?raw')
+    ].map(promise => promise
+        .then(
+            (data) => data.default
+        ).then(
+            (text) => parseCourseString(text, locale)
+        )
+        .catch((e) => console.error(e)));
+
+    /** @type {(Course|void)[]} */
+    const coursesResults = await Promise.all(coursePromises);
+    /** @type {Course[]} */
+    // @ts-ignore
+    const courses = coursesResults.filter((c) => c);
+
     return {
         i18n,
         translations,
         officialDances,
+        courses,
         lookupSteps,
         lookupPoses,
     };
-};
+}
 
 
 async function loadCollectionAssets() {

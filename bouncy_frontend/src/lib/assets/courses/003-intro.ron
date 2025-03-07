@@ -1,0 +1,119 @@
+#![enable(implicit_some)]
+(
+  version: 0,
+  id: "intro-lessons",
+  names: {"de": "Einführung", "en": "Introduction"},
+  featured_step: "rm-0",
+  explanations: {
+    "de": "Einzelne Lektionen um die ersten Tanzschritte zu erlernen.",
+    "en": "First lessons to learn the first dance moves.",
+  },
+  lessons: [
+    // TODO: start with heel forward move
+    // TODO: mix 4-2-1 side-to-side steps
+    (
+      names: {"de": "1. Lektion", "en": "1st Lesson"},
+      explanations: {
+        "de": "So!
+        Jetzt aber richtig.
+        Wir lernen den ersten Schritt.",
+        "en": "Alright!
+        But now for real.
+        This is going to be the first move you learn.
+        ",
+      },
+      icon: "todo.svg",
+      parts: [
+        (
+          step: "side-to-side-4",
+          bpms: [105],
+          explanations: {
+            "de": "(Keine Beschreibung)",
+            "en": "(No description)",
+          },
+        ),
+      ],
+    ),
+  ],
+  steps: [
+    (
+      name: "Side to side 4",
+      id: "side-to-side-4",
+      keyframes: [
+        (pose: "in-place-right-up", orientation: ToCamera, jump_height: 2.0),
+        (pose: "in-place-right-up", orientation: ToCamera, jump_height: 2.0),
+        (pose: "in-place-right-up", orientation: ToCamera, jump_height: 2.0),
+        (pose: "in-place-right-up", orientation: ToCamera, jump_height: 2.0),
+        (pose: "in-place-left-up", orientation: ToCamera, jump_height: 2.0),
+        (pose: "in-place-left-up", orientation: ToCamera, jump_height: 2.0),
+        (pose: "in-place-left-up", orientation: ToCamera, jump_height: 2.0),
+        (pose: "in-place-left-up", orientation: ToCamera, jump_height: 2.0),
+      ],
+    ),
+    (
+      name: "Side to side 2",
+      id: "side-to-side-2",
+      keyframes: [
+        (pose: "in-place-right-up", orientation: ToCamera, jump_height: 2.0),
+        (pose: "in-place-right-up", orientation: ToCamera, jump_height: 2.0),
+        (pose: "in-place-left-up", orientation: ToCamera, jump_height: 2.0),
+        (pose: "in-place-left-up", orientation: ToCamera, jump_height: 2.0),
+      ],
+    ),
+    (
+      name: "Side to side 1",
+      id: "side-to-side-1",
+      keyframes: [
+        (pose: "in-place-right-up", orientation: ToCamera, jump_height: 2.0),
+        (pose: "in-place-left-up", orientation: ToCamera, jump_height: 2.0),
+      ],
+    ),
+    
+  ],
+  poses: [
+    (
+      id: "in-place-right-up",
+      direction: Front,
+      limbs: [
+        (limb: LeftThigh, weight: 1.0, angle: -1, tolerance: 0),
+        (limb: LeftShin, weight: 1.0, angle: 3, tolerance: 0),
+        (limb: LeftFoot, weight: 1.0, angle: -7, tolerance: 0),
+        (limb: LeftArm, weight: 0.0, angle: -2, tolerance: 0),
+        (limb: LeftForearm, weight: 0.0, angle: -4, tolerance: 0),
+        (limb: RightThigh, weight: 1.0, angle: 1, tolerance: 0),
+        (limb: RightShin, weight: 1.0, angle: 5, tolerance: 0),
+        (limb: RightFoot, weight: 1.0, angle: 10, tolerance: 0),
+        (limb: RightArm, weight: 0.0, angle: 16, tolerance: 0),
+        (limb: RightForearm, weight: 0.0, angle: -49, tolerance: 0),
+        (limb: LeftLeg, weight: 0.0, angle: 1, tolerance: 0),
+        (limb: RightLeg, weight: 0.0, angle: 3, tolerance: 0),
+      ],
+      turn_hip: 1,
+      z: (
+        absolute: {(side: Right, part: Knee): -1.0, (side: Left, part: Heel): 1.0},
+      ),
+    ),
+    (
+      id: "in-place-left-up",
+      direction: Front,
+      limbs: [
+        (limb: LeftThigh, weight: 1.0, angle: 2, tolerance: 0),
+        (limb: LeftShin, weight: 1.0, angle: 5, tolerance: 0),
+        (limb: LeftFoot, weight: 1.0, angle: -1, tolerance: 0),
+        (limb: LeftArm, weight: 0.0, angle: -3, tolerance: 0),
+        (limb: LeftForearm, weight: 0.0, angle: 130, tolerance: 0),
+        (limb: RightThigh, weight: 1.0, angle: 0, tolerance: 0),
+        (limb: RightShin, weight: 1.0, angle: -1, tolerance: 0),
+        (limb: RightFoot, weight: 1.0, angle: 9, tolerance: 0),
+        (limb: RightArm, weight: 1.0, angle: 9, tolerance: 0),
+        (limb: RightForearm, weight: 1.0, angle: 4, tolerance: 0),
+        (limb: LeftLeg, weight: 0.0, angle: 3, tolerance: 0),
+        (limb: RightLeg, weight: 0.0, angle: 0, tolerance: 0),
+      ],
+      turn_hip: -28,
+      z: (
+        absolute: {(side: Left, part: Knee): -1.0, (side: Right, part: Heel): 1.0},
+      ),
+    ),
+  ],
+)

@@ -1,5 +1,7 @@
 <script>
   import { base } from '$app/paths';
+  import Course from '$lib/components/activity/Course.svelte';
+  import CourseLesson from '$lib/components/activity/CourseLesson.svelte';
   import WarmUp from '$lib/components/activity/WarmUp.svelte';
   import AvatarStyleContext from '$lib/components/avatar/AvatarStyleContext.svelte';
   import ClassProgress from '$lib/components/class/ClassProgress.svelte';
@@ -24,12 +26,19 @@
     'I will make some moves, you try to copy me. Can you keep up?';
 
   let progress = $state(initProgress());
-  let showProgressScreen = $state(false);
+  let showProgressScreen = $state(progress > 0);
 
   function onWarmupDone() {
     progress = 1;
     setUserMeta('onboarding', ONBOARDING_STATE.FINISHED_FIRST_WARMUP);
     showProgressScreen = true;
+  }
+
+  function onLessonDone() {
+    showProgressScreen = true;
+    if (progress === 2) {
+      setUserMeta('onboarding', ONBOARDING_STATE.FINISHED_FIRST_LESSON);
+    }
   }
 
   function initProgress() {
@@ -54,9 +63,17 @@
     }
   }
 
+  function onContinue() {
+    showProgressScreen = false;
+    if (progress === 1) {
+      setUserMeta('onboarding', ONBOARDING_STATE.STARTED_FIRST_LESSON);
+    }
+    if (progress === 2) {
+      setUserMeta('onboarding', ONBOARDING_STATE.STARTED_SECOND_LESSON);
+    }
+  }
+
   onMount(() => {
-    console.log("progress", progress);
-    console.log("clientSession.meta.onboarding", clientSession.meta.onboarding);
     if (progress > 0) {
       showProgressScreen = true;
     }
@@ -64,12 +81,7 @@
 </script>
 
 {#if showProgressScreen}
-  <ClassProgress
-    {progress}
-    onContinue={() => {
-      showProgressScreen = false;
-    }}
-  ></ClassProgress>
+  <ClassProgress {progress} {onContinue}></ClassProgress>
 {:else}
   <!-- TODO: real video, real step -->
   <AvatarStyleContext>
@@ -84,7 +96,7 @@
     {/if}
 
     {#if progress === 1}
-      TODO: show next lesson
+      <Course courseId="intro-lessons" onDone={onLessonDone}></Course>
     {/if}
   </AvatarStyleContext>
 {/if}
