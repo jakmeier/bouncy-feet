@@ -14,8 +14,7 @@
   let coachWidth;
 </script>
 
-<!-- TODO: Translate text -->
-<StandardPage white title={'Coaches'}>
+<StandardPage white>
   {#each coaches as coach}
     <div
       class="coach"
@@ -56,7 +55,7 @@
   .coach {
     margin-top: 5rem;
     position: relative;
-    width: 90%;
+    width: min(90%, 60dvh);
     z-index: 1;
   }
 
@@ -70,19 +69,21 @@
     text-transform: capitalize;
     font-size: calc(2 * var(--font-large));
     text-align: right;
-    /* rotate: -7deg; 
-   bottom: 2rem;
    */
     mix-blend-mode: multiply;
   }
 
   .title {
-    top: 2rem;
+    rotate: -3deg;
+    top: 0.8rem;
+    font-size: var(--font-normal);
   }
 
   .description {
-    top: 7rem;
-    font-size: var(--font-large);
+    top: 6rem;
+    font-size: var(--font-nnormal);
+    padding: 2rem;
+    background-color: #FFFFFFFF;
   }
 
   .coach .selected {
@@ -90,7 +91,7 @@
     grid-template-columns: min-content auto;
     gap: 1rem;
     width: 100%;
-    top: -1rem;
+    top: -6rem;
     align-items: center;
     justify-content: end;
     z-index: 1;
@@ -106,7 +107,7 @@
   .avatar {
     position: relative;
     top: 0;
-    height: 80vw;
-    width: 80vw;
+    height: min(80vw, 60dvh);
+    width: min(80vw, 60dvh);
   }
 </style>
