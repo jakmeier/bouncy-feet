@@ -2,6 +2,7 @@
   import { base } from '$app/paths';
   import WarmUp from '$lib/components/activity/WarmUp.svelte';
   import AvatarStyleContext from '$lib/components/avatar/AvatarStyleContext.svelte';
+  import ClassProgress from '$lib/components/class/ClassProgress.svelte';
 
   /**
    * @typedef {Object} Props
@@ -16,13 +17,41 @@
   // TODO: This should be defined in the course / lesson / warmup
   const description =
     'I will make some moves, you try to copy me. Can you keep up?';
+
+  let progress = $state(0);
+  let showProgressScreen = $state(false);
+
+  function onWarmupDone() {
+    progress = 1;
+    showProgressScreen = true;
+  }
 </script>
 
-<!-- TODO: real video, real step -->
-<AvatarStyleContext>
-  <WarmUp {step} videoUrl={`${base}`} {description} audioControl={false}
-  ></WarmUp>
-</AvatarStyleContext>
+{#if showProgressScreen}
+  <ClassProgress
+    {progress}
+    onContinue={() => {
+      showProgressScreen = false;
+    }}
+  ></ClassProgress>
+{:else}
+  <!-- TODO: real video, real step -->
+  <AvatarStyleContext>
+    {#if progress === 0}
+      <WarmUp
+        {step}
+        videoUrl={`${base}`}
+        {description}
+        audioControl={false}
+        onDone={onWarmupDone}
+      ></WarmUp>
+    {/if}
+
+    {#if progress === 1}
+      TODO: show next lesson
+    {/if}
+  </AvatarStyleContext>
+{/if}
 
 <!-- After: Simplified review  -->
 <!-- Then: First (real) lesson: step side-to-side -->

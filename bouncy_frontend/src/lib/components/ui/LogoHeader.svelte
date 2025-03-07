@@ -6,21 +6,33 @@
    * @property {string} [title]
    * @property {boolean} [white]
    * @property {boolean} [gray]
+   * @property {boolean} [accent]
+   * @property {boolean} [mainColor]
    */
 
   /** @type {Props} */
-  let { white = false, gray = false, title = '' } = $props();
+  let {
+    white = false,
+    gray = false,
+    accent = false,
+    mainColor = false,
+    title = '',
+  } = $props();
 
   let bgColor = $derived(
     white
       ? 'var(--theme-neutral-light)'
       : gray
         ? 'var(--theme-neutral-dark)'
-        : 'var(--theme-neutral-black)'
+        : accent
+          ? 'var(--theme-accent)'
+          : mainColor
+            ? 'var(--theme-main)'
+            : 'var(--theme-neutral-black)'
   );
 
   let imgUrl = $derived(
-    white
+    white || accent || mainColor
       ? `${base}/icons/logo.svg`
       : `${base}/icons/icon_tight_on_transparent.png`
   );

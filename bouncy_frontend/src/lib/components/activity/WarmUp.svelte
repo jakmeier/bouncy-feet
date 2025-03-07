@@ -17,10 +17,17 @@
    * @property {string} videoUrl
    * @property {string} description
    * @property {boolean} audioControl
+   * @property {function} onDone
    */
 
   /** @type {Props} */
-  let { step, videoUrl: previewVideoUrl, description, audioControl } = $props();
+  let {
+    step,
+    videoUrl: previewVideoUrl,
+    description,
+    audioControl,
+    onDone,
+  } = $props();
 
   let previewDone = $state(false);
 
@@ -48,7 +55,7 @@
   }
 
   function onContinue() {
-    // todo
+    onDone();
   }
 </script>
 

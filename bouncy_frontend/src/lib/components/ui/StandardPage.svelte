@@ -8,14 +8,16 @@
    * @property {string} [title]
    * @property {boolean} [white]
    * @property {boolean} [gray]
+   * @property {boolean} [accent]
+   * @property {boolean} [mainColor]
    */
   /** @type {Props} */
-  let { children, title, white, gray } = $props();
+  let { children, title, white, gray, accent, mainColor } = $props();
 </script>
 
 <div class="wrapper">
   <div>
-    <LogoHeader {white} {gray} {title} />
+    <LogoHeader {white} {gray} {accent} {mainColor} {title} />
   </div>
 
   <div class="content">
@@ -23,7 +25,7 @@
   </div>
 
   <div class="footer">
-    <Footer white={!white} />
+    <Footer white={!(white || accent || mainColor)} />
   </div>
 </div>
 
