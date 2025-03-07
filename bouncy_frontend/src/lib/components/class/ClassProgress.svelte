@@ -25,7 +25,8 @@
 
 <Background bgColor="var(--theme-main)" color="var(--theme-neutral-black)"
 ></Background>
-<StandardPage mainColor title="Your Daily Vibe">
+<!-- TODO: come up with translated title -->
+<StandardPage mainColor title="Daily Vibe">
   <div class="elements">
     {#each elements as element, i}
       {#if i < elementsShown}

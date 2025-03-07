@@ -89,9 +89,9 @@
         .catch((err) => {
           console.error('Failed to create a guest session. Error:', err);
           return {
-            id: '',
-            secret: '',
-            meta: {
+            id: localStorage.clientSessionId,
+            secret: localStorage.clientSessionSecret,
+            meta: parseOrNull(localStorage.userMeta) || {
               onboarding: ONBOARDING_STATE.FIRST_VISIT,
             },
           };
