@@ -49,6 +49,8 @@
             "start-button": "Start exercise",
             "stop-button": "Stop exercise",
             "back-button": "Back to overview",
+            "done-button": "Done",
+            "show-teachers-button": "Visit coaches",
             "to-video-button": "Explainer Video",
             "next-song-button": "Next Song",
             "done-text": "Lesson complete",

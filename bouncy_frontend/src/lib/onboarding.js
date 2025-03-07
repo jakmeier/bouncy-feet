@@ -14,6 +14,8 @@ export const ONBOARDING_STATE = {
     STARTED_SECOND_LESSON: "STARTED_SECOND_LESSON",
     FINISHED_SECOND_LESSON: "FINISHED_SECOND_LESSON",
 
+    FINISHED_INTRO_PART1: "FINISHED_INTRO_PART1",
+
     // TODO: show activated moves, teacher profiles, ...
     // : "",
 

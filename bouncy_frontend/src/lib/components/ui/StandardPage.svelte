@@ -1,6 +1,7 @@
 <script>
   import Footer from '$lib/components/ui/Footer.svelte';
   import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
+  import Background from './sections/Background.svelte';
 
   /**
    * @typedef {Object} Props
@@ -14,6 +15,11 @@
   /** @type {Props} */
   let { children, title, white, gray, accent, mainColor } = $props();
 </script>
+
+{#if mainColor}
+  <Background bgColor="var(--theme-main)" color="var(--theme-neutral-black)"
+  ></Background>
+{/if}
 
 <div class="wrapper">
   <div>

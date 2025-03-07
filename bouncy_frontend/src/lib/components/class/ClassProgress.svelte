@@ -2,11 +2,10 @@
   import { base } from '$app/paths';
   import { t } from '$lib/i18n';
   import { fade, slide } from 'svelte/transition';
-  import Background from '../ui/sections/Background.svelte';
   import StandardPage from '../ui/StandardPage.svelte';
   import { onMount } from 'svelte';
 
-  let { progress, onContinue } = $props();
+  let { progress, onContinue, onDone } = $props();
 
   const elements = ['warmup', 'lesson', 'lesson', 'wrap'];
   let elementsShown = $state(0);
@@ -23,8 +22,6 @@
   });
 </script>
 
-<Background bgColor="var(--theme-main)" color="var(--theme-neutral-black)"
-></Background>
 <!-- TODO: come up with translated title -->
 <StandardPage mainColor title="Daily Vibe">
   <div class="elements">
@@ -63,9 +60,15 @@
 
   {#if showButton}
     <div class="buttons" in:fade>
-      <button class="wide" onclick={onContinue}>
-        {$t('courses.lesson.next-button')}
-      </button>
+      {#if progress === elements.length}
+        <button class="wide" onclick={onDone}>
+          {$t('courses.lesson.done-button')}
+        </button>
+      {:else}
+        <button class="wide" onclick={onContinue}>
+          {$t('courses.lesson.next-button')}
+        </button>
+      {/if}
     </div>
   {/if}
 </StandardPage>

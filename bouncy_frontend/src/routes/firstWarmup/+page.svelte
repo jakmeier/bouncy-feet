@@ -1,9 +1,12 @@
 <script>
+  import { goto } from '$app/navigation';
   import { base } from '$app/paths';
   import Course from '$lib/components/activity/Course.svelte';
   import WarmUp from '$lib/components/activity/WarmUp.svelte';
   import AvatarStyleContext from '$lib/components/avatar/AvatarStyleContext.svelte';
   import ClassProgress from '$lib/components/class/ClassProgress.svelte';
+  import StandardPage from '$lib/components/ui/StandardPage.svelte';
+  import { t } from '$lib/i18n';
   import { ONBOARDING_STATE } from '$lib/onboarding';
   import { getContext, onMount } from 'svelte';
 
@@ -40,6 +43,11 @@
     if (progress === 1) {
       setUserMeta('onboarding', ONBOARDING_STATE.FINISHED_FIRST_LESSON);
       progress = 2;
+    } else {
+      // TODO: second lesson + wrapup lesson
+      // WIP: directly go to end
+      setUserMeta('onboarding', ONBOARDING_STATE.FINISHED_INTRO_PART1);
+      progress = 4;
     }
   }
 
@@ -60,6 +68,7 @@
       case ONBOARDING_STATE.FINISHED_SECOND_LESSON: {
         return 3;
       }
+      case ONBOARDING_STATE.FINISHED_INTRO_PART1:
       default:
         return 4;
     }
@@ -73,6 +82,15 @@
     if (progress === 2) {
       setUserMeta('onboarding', ONBOARDING_STATE.STARTED_SECOND_LESSON);
     }
+    // TODO: handle further progress
+  }
+
+  function onClassDone() {
+    showProgressScreen = false;
+  }
+
+  function onLeave() {
+    goto('/teacherProfiles');
   }
 
   onMount(() => {
@@ -83,7 +101,7 @@
 </script>
 
 {#if showProgressScreen}
-  <ClassProgress {progress} {onContinue}></ClassProgress>
+  <ClassProgress {progress} {onContinue} onDone={onClassDone}></ClassProgress>
 {:else}
   <!-- TODO: real video, real step -->
   <AvatarStyleContext>
@@ -97,17 +115,27 @@
       ></WarmUp>
     {/if}
 
-    {#if progress === 1}
+    {#if progress === 1 || progress === 2}
+      <!-- TODO: Should go to a different lesson on progress = 2-->
       <Course courseId="intro-lessons" onDone={onLessonDone}></Course>
+    {/if}
+    {#if progress === 4}
+      <!-- TODO: translate text -->
+      <StandardPage mainColor title={'Done'}>
+        <h1>Well Done!</h1>
+        <h3>Congrats on finishing your first class with Bouncy Feet!</h3>
+        <h3>
+          You can now select a coach to develop your skill in the direction of
+          your choice.
+        </h3>
+        <h3>And don't forget to come back for your daily vibe!</h3>
+        <button onclick={onLeave}>
+          {$t('courses.lesson.show-teachers-button')}
+        </button>
+      </StandardPage>
     {/if}
   </AvatarStyleContext>
 {/if}
-
-<!-- After: Simplified review  -->
-<!-- Then: First (real) lesson: step side-to-side -->
-<!-- Then: Show full review -->
-<!-- Then: Second lesson: heel forward left and right -->
-<!-- Then: Show full review -->
 
 <!-- Then: Show list of active moves for repetition lesson -->
 <!-- Then: First repetition lesson -->
