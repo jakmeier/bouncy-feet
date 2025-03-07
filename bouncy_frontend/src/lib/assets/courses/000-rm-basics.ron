@@ -9,38 +9,6 @@
     "en": "Learn the basic step for all shuffle dance, the Running Man.",
   },
   lessons: [
-    // LESSON 1: This might be a good warm-up. For now, focus on the actual exercises.
-    // (
-    //   names: {"de": "Einstieg", "en": "Getting started"},
-    //   explanations: {
-    //     "de": "Hallo!
-    //     Wilkommen beim Running Man Anfängerkurs.
-    //     Fangen wir mit einer Übung an, um den Körper an den Ryhthmus des Running Mans zu gewöhnen.",
-    //     "en": "Hello!
-    //     Welcome to the Running Man beginners course.
-    //     Let's start with a few excericses to accustom your body to the rhythm of the Running Man move.
-    //     ",
-    //   },
-    //   icon: "todo.svg",
-    //   parts: [
-    //     (
-    //       step: "run-in-place",
-    //       bpms: [60, 100],
-    //       explanations: {
-    //         "de": "Fangen wir an mit leichten hüpfern, abwechselnd auf dem linken und rechten Bein. Such dir das langsame oder schnelle Tempo aus, was besser für dich passt.",
-    //         "en": "Let's start with light jumps, switching between the left and the right leg. Pick the speed that works best for you.",
-    //       },
-    //     ),
-    //     (
-    //       step: "double-run-in-place",
-    //       bpms: [60, 100, 120],
-    //       explanations: {
-    //         "de": "Beim Running Man ist das tragende Bein zwei Mal hintereinander das Gleiche. Daher gewöhnen wir uns jetzt an einen Doppelrhythmus. Zwei mal richts dann zwei mal links. ",
-    //         "en": "In the Running Man, the weight stays on the same leg for two jumps before switching to the other leg. Get your body used to this double-rhythm. Jump twice on the right leg, then twice on the left leg.",
-    //       },
-    //     ),
-    //   ],
-    // ),
     (
       // TODO: should I add an ID for better robustness in progress tracking across updates? 
       names: {"de": "Kick", "en": "Kick"},

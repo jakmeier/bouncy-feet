@@ -1,7 +1,6 @@
 <script>
   import { base } from '$app/paths';
   import Course from '$lib/components/activity/Course.svelte';
-  import CourseLesson from '$lib/components/activity/CourseLesson.svelte';
   import WarmUp from '$lib/components/activity/WarmUp.svelte';
   import AvatarStyleContext from '$lib/components/avatar/AvatarStyleContext.svelte';
   import ClassProgress from '$lib/components/class/ClassProgress.svelte';
@@ -26,7 +25,9 @@
     'I will make some moves, you try to copy me. Can you keep up?';
 
   let progress = $state(initProgress());
-  let showProgressScreen = $state(progress > 0);
+  // svelte-ignore state_referenced_locally
+  const initialProgress = progress > 0;
+  let showProgressScreen = $state(initialProgress);
 
   function onWarmupDone() {
     progress = 1;
@@ -36,8 +37,9 @@
 
   function onLessonDone() {
     showProgressScreen = true;
-    if (progress === 2) {
+    if (progress === 1) {
       setUserMeta('onboarding', ONBOARDING_STATE.FINISHED_FIRST_LESSON);
+      progress = 2;
     }
   }
 

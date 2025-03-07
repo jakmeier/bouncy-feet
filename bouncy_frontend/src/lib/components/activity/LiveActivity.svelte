@@ -43,6 +43,12 @@
 
   let showHintBeforeStart = true;
 
+  export function clear() {
+    videoUrl = '';
+    tracker.clear();
+    trackingState = tracker.detectionState;
+  }
+
   async function start() {
     if (liveRecording) {
       await liveRecording.startCamera();

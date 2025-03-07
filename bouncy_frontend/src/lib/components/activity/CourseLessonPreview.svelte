@@ -88,11 +88,8 @@
   <div>1 min</div>
 </div>
 
-<!-- TODO: link  not working like this -->
 <div class="controls">
-  <a href="./record">
-    <button>{$t('courses.lesson.start-button')}</button>
-  </a>
+  <button onclick={onDone}>{$t('courses.lesson.start-button')}</button>
 </div>
 
 <DarkSection>
