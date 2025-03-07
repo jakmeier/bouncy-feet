@@ -126,4 +126,8 @@
  * 
  * @typedef {Object} UserMeta
  * @property {OnboardingState} [onboarding]
+ * 
+ * @typedef {Object} TranslatedText
+ * @property {string} de
+ * @property {string} en
  */

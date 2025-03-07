@@ -497,9 +497,6 @@ export class Segment {
 export class Skeleton {
   private constructor();
   free(): void;
-  static resting(sideway: boolean): Skeleton;
-  restingPose(): Skeleton;
-  debugString(): string;
   /**
    * Compute 2d coordinates for the skeleton for rendering.
    *
@@ -508,6 +505,9 @@ export class Skeleton {
    * segment will have its center at the given position.
    */
   render(hip_center: Cartesian2d, size: number): SkeletonV2;
+  static resting(sideway: boolean): Skeleton;
+  restingPose(): Skeleton;
+  debugString(): string;
   left: SkeletonSide;
   right: SkeletonSide;
   hip: Segment;

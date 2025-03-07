@@ -90,7 +90,7 @@
   }
 
   function onLeave() {
-    goto('/teacherProfiles');
+    goto('/coach/select');
   }
 
   onMount(() => {

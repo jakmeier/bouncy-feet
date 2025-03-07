@@ -19,6 +19,11 @@
 {#if mainColor}
   <Background bgColor="var(--theme-main)" color="var(--theme-neutral-black)"
   ></Background>
+{:else if white}
+  <Background
+    bgColor="var(--theme-neutral-light)"
+    color="var(--theme-neutral-black)"
+  ></Background>
 {/if}
 
 <div class="wrapper">
