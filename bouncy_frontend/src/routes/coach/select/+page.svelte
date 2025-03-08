@@ -5,8 +5,10 @@
   import AnimatedStep from '$lib/components/AnimatedStep.svelte';
   import StandardPage from '$lib/components/ui/StandardPage.svelte';
   import { locale, t } from '$lib/i18n';
-  import { base } from '$app/paths';
+  import { goto } from '$app/navigation';
 
+  /** @type {LocalState}*/
+  const localState = getContext('localState');
   const { getCourse } = getContext('courses');
 
   // TODO: read from user
@@ -14,56 +16,51 @@
   let coachWidth;
 
   function selectCoach(coach) {
-    console.log('selected', coach);
+    // TODO: store as the coach for lessons, rather than as user style
+    Object.assign(localState.avatarStyle.headStyle, coach.style.headStyle);
+    Object.assign(localState.avatarStyle.coloring, coach.style.coloring);
+    Object.assign(localState.avatarStyle.bodyShape, coach.style.bodyShape);
+
+    goto('/');
   }
 </script>
 
 <StandardPage white>
-  <div class="coaches">
-    {#each coaches as coach}
-      <div
-        class="coach"
-        bind:clientWidth={coachWidth}
-        style="height: {1.25 * coachWidth}px"
-      >
-        <div class="avatar">
-          <AvatarStyleContext
-            coloring={coach.style.coloring}
-            bodyShape={coach.style.bodyShape}
-            headStyle={coach.style.headStyle}
-          >
-            <AnimatedStep
-              step={getCourse(coach.courseIds[0]).lessons[0].parts[0].step}
-              size={coachWidth}
-              backgroundColor={'var(--theme-neutral-light)'}
-            ></AnimatedStep>
-          </AvatarStyleContext>
-        </div>
-        <div class="title">{coach.title[$locale.substring(0, 2)]}</div>
-        <div class="name" style="color: {coach.style.coloring.headColor}">
-          {coach.name}
-        </div>
-        <div class="description">
-          {coach.description[$locale.substring(0, 2)]}
-        </div>
-        {#if selected === coach.name}
-          <!-- <div class="selected">
-      <div>Current selection</div>
-      <img src="{base}/img/symbols/bf_eye.svg" alt="bf_eye" />
-      </div> -->
-        {/if}
-        <button onclick={() => selectCoach(coach)}>
-          {$t('coach.select-coach-button')}
-        </button>
+  {#each coaches as coach}
+    <div
+      class="coach"
+      bind:clientWidth={coachWidth}
+      style="height: {1.25 * coachWidth}px"
+    >
+      <div class="avatar">
+        <AvatarStyleContext
+          coloring={coach.style.coloring}
+          bodyShape={coach.style.bodyShape}
+          headStyle={coach.style.headStyle}
+        >
+          <AnimatedStep
+            step={getCourse(coach.courseIds[0]).lessons[0].parts[0].step}
+            size={coachWidth}
+            backgroundColor={'var(--theme-neutral-light)'}
+          ></AnimatedStep>
+        </AvatarStyleContext>
       </div>
-    {/each}
-  </div>
+      <div class="title">{coach.title[$locale.substring(0, 2)]}</div>
+      <div class="name" style="color: {coach.style.coloring.headColor}">
+        {coach.name}
+      </div>
+      <div class="description">
+        {coach.description[$locale.substring(0, 2)]}
+      </div>
+      {#if selected === coach.name}{/if}
+      <button onclick={() => selectCoach(coach)}>
+        {$t('coach.select-coach-button')}
+      </button>
+    </div>
+  {/each}
 </StandardPage>
 
 <style>
-  .coaches {
-    /* padding: 10rem 0; */
-  }
   .coach {
     display: grid;
     margin-top: 8rem;
