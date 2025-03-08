@@ -3,12 +3,14 @@
   import { versionString } from '$lib/stores/FeatureSelection';
   import { beatCounter } from '$lib/stores/Beat';
   import HomeEntry from './HomeEntry.svelte';
-  import PathwayProgress from './PathwayProgress.svelte';
   import Arrow from '$lib/components/ui/Arrow.svelte';
-  import LightBackgroundSection from '$lib/components/ui/sections/LightSection.svelte';
+  import LightSection from '$lib/components/ui/sections/LightSection.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
-  import AvatarCustomizer from '$lib/components/avatar/AvatarCustomizer.svelte';
   import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
+  import Github from '$lib/components/info/Github.svelte';
+  import LifetimeStats from './profile/LifetimeStats.svelte';
+  import About from '$lib/components/info/About.svelte';
+  import Section from '$lib/components/ui/sections/Section.svelte';
   /**
    * @typedef {Object} Props
    * @property {any} featuredDances
@@ -40,9 +42,6 @@
 
 <LogoHeader />
 
-<!-- WIP -->
-<!-- <AvatarCustomizer /> -->
-
 <div class="focus-card">
   <h1>
     {$t('home.test0')}
@@ -55,49 +54,23 @@
   </div>
 </div>
 
-<LightBackgroundSection>
-  <div class="space">
-    <div class="transparent-box">
-      <h2>
-        {$t('home.progress-title')}
-      </h2>
-    </div>
-  </div>
+<Section bgColor={'var(--theme-main)'} color={'var(--theme-neutral-dark)'}>
+  <LifetimeStats></LifetimeStats>
 
-  <div class="transparent-box">
-    <PathwayProgress
-      teacherName="V-Step Master"
-      step={featuredSteps[1]}
-      experience={700}
-      skill={7}
-      maxSkill={10}
-      totalSteps={1703}
-    />
+  <!-- TODO lesson for user picked coach -->
+  <div class="section-end-button">
+    <a href="./coach/chorok">
+      <button>
+        {$t('home.continue-learning-button')}
+      </button>
+    </a>
   </div>
+</Section>
 
-  <div class="transparent-box">
-    <PathwayProgress
-      teacherName="Running Man Coach"
-      step={featuredSteps[0]}
-      experience={0}
-      skill={0}
-      maxSkill={10}
-      totalSteps={0}
-    />
-  </div>
+<About></About>
 
-  <div class="space">
-    <div class="transparent-box">
-      <div>
-        {$t('home.go-to-github')}
-      </div>
-      <div class="centered small-space">
-        <a href="https://github.com/jakmeier/bouncy-feet/issues">
-          <button> GitHub </button>
-        </a>
-      </div>
-    </div>
-  </div>
+<LightSection>
+  <Github />
 
   <div class="small-space">
     {$t('home.version-label')}:
@@ -105,20 +78,9 @@
   </div>
 
   <Footer />
-</LightBackgroundSection>
+</LightSection>
 
 <style>
-  .transparent-box {
-    border-radius: 10px;
-    margin: 12rem 0;
-    z-index: 1;
-    position: relative;
-    color: var(--theme-neutral-dark);
-  }
-
-  .centered {
-    text-align: center;
-  }
   .focus-card {
     max-width: 400px;
     padding: 5px 20px;
@@ -128,17 +90,9 @@
     flex-direction: column;
     justify-content: space-between;
   }
-  button {
-    margin: 5px;
-    width: fit-content;
-    height: fit-content;
-  }
 
   .small-space {
     margin: 1rem 0px;
-  }
-  .space {
-    margin: 3rem 0px;
   }
 
   .down-marker {
@@ -146,5 +100,9 @@
     max-height: 80px;
     margin: 100px auto 0;
     padding: 10px 5px;
+  }
+
+  .section-end-button {
+    margin: 4rem 0 1rem;
   }
 </style>

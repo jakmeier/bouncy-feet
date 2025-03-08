@@ -69,12 +69,13 @@
     {/if}
   </div>
   <div class="overlay">
+    <!-- TODO lesson for user picked coach -->
     <a href="./coach/chorok">
       <button>
         {$t('home.continue-learning-button')}
       </button>
     </a>
-    <a href="./coach/juhwang">
+    <a href="./coach/select">
       <button>
         {$t('home.change-teacher-button')}
       </button>
