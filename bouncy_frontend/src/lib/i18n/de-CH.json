@@ -266,6 +266,9 @@
     "pathway": {
         "skill": "Fertigkeit"
     },
+    "coach": {
+        "select-coach-button": "Wähle diesen Coach"
+    },
     "music": {
         "by": "von"
     },

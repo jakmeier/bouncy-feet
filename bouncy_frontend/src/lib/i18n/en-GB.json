@@ -266,6 +266,9 @@
     "pathway": {
         "skill": "Skill"
     },
+    "coach": {
+        "select-coach-button": "Select this coach"
+    },
     "music": {
         "by": "by"
     },
