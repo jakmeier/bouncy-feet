@@ -1,4 +1,5 @@
 import i18n from 'sveltekit-i18n';
+import { enUS, enGB, de } from 'date-fns/locale';
 
 export const defaultLocale = 'en-GB';
 
@@ -32,3 +33,22 @@ const config = ({
 });
 
 export const { t, locale, locales, loading, loadTranslations, translations, addTranslations, setLocale, setRoute } = new i18n(config);
+
+/** @param {string} locale */
+export function dateLocale(locale) {
+    return { locale: selectDateLocale(locale) };
+}
+
+/** @param {string} locale */
+function selectDateLocale(locale) {
+    switch (locale) {
+        case 'en-GB':
+            return enGB;
+        case 'en-US':
+            return enUS;
+        case 'de-CH':
+            return de;
+        default:
+            return enGB;
+    }
+}

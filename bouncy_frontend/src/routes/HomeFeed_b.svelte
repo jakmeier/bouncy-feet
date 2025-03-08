@@ -7,10 +7,12 @@
   import LightSection from '$lib/components/ui/sections/LightSection.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
   import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
-  import Github from '$lib/components/info/Github.svelte';
+  import HelpUs from '$lib/components/info/HelpUs.svelte';
   import LifetimeStats from './profile/LifetimeStats.svelte';
   import About from '$lib/components/info/About.svelte';
   import Section from '$lib/components/ui/sections/Section.svelte';
+  import BugReports from '$lib/components/info/BugReports.svelte';
+  import Nerds from '$lib/components/info/Nerds.svelte';
   /**
    * @typedef {Object} Props
    * @property {any} featuredDances
@@ -44,7 +46,7 @@
 
 <div class="focus-card">
   <h1>
-    {$t('home.test0')}
+    {$t('home.slogan-1')}
   </h1>
   <div>
     <HomeEntry dance={entryDance}></HomeEntry>
@@ -68,10 +70,14 @@
 </Section>
 
 <About></About>
+<Section bgColor={'var(--theme-accent)'} color={'var(--theme-neutral-dark)'}>
+  <HelpUs />
+</Section>
+
+<Nerds />
 
 <LightSection>
-  <Github />
-
+  <BugReports />
   <div class="small-space">
     {$t('home.version-label')}:
     {$versionString}
@@ -92,7 +98,7 @@
   }
 
   .small-space {
-    margin: 1rem 0px;
+    margin: 3rem 0px 1rem;
   }
 
   .down-marker {

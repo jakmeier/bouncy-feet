@@ -83,7 +83,7 @@
     position: fixed;
     z-index: -2;
     overflow: hidden auto;
-    width: 100%;
+    width: calc(100% - 2rem);
     background-color: var(--background-color);
     color: var(--color);
   }
