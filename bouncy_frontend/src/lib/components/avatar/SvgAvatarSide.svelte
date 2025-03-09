@@ -5,7 +5,7 @@
 
   /**
    * @typedef {Object} Props
-   * @property {import("$lib/instructor/bouncy_instructor").SkeletonSideV2} side
+   * @property {import("bouncy_instructor").SkeletonSideV2} side
    * @property {any} sideId
    */
 
@@ -16,7 +16,7 @@
 
   /**
    * @param {string} id
-   * @param {import("$lib/instructor/bouncy_instructor").RenderableSegment} segment
+   * @param {import("bouncy_instructor").RenderableSegment} segment
    * @param {any} style
    * @returns {Line}
    */

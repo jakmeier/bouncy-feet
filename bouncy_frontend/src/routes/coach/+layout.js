@@ -1,4 +1,4 @@
-import { Course, parseCourseString } from '$lib/instructor/bouncy_instructor';
+import { Course, parseCourseString } from 'bouncy_instructor';
 import { base } from '$app/paths';
 
 

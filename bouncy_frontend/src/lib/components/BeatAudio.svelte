@@ -8,6 +8,7 @@
     cleanupAudioNode,
     loadBeatSounds,
     scheduleAudioOnChannel,
+    initAudioContext,
   } from '$lib/stores/Audio';
   import { beatStart, timeBetweenMoves } from '$lib/stores/Beat';
 
@@ -31,6 +32,7 @@
   let connectedNodes = [];
 
   onMount(async () => {
+    await initAudioContext();
     await loadBeatSounds();
     if (isOn) startAudio();
     initialized = true;

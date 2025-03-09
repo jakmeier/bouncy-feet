@@ -10,7 +10,7 @@
   import { songs } from '$lib/stores/Songs';
   import DarkSection from '$lib/components/ui/sections/DarkSection.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
-  import { Course } from '$lib/instructor/bouncy_instructor';
+  import { Course } from 'bouncy_instructor';
   import Step from '../../../routes/collection/Step.svelte';
   import LogoHeader from '../ui/LogoHeader.svelte';
 
@@ -33,7 +33,7 @@
 
   /** @type {number | undefined} */
   let partIndex;
-  /** @type {import("$lib/instructor/bouncy_instructor").LessonPart | undefined} */
+  /** @type {import("bouncy_instructor").LessonPart | undefined} */
   let exercise;
 
   let isVideoOpen = $state(writable(false));

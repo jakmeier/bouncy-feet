@@ -1,5 +1,5 @@
 <script>
-  import { Tracker } from '$lib/instructor/bouncy_instructor';
+  import { Tracker } from 'bouncy_instructor';
   import { getContext, onMount } from 'svelte';
   import { landmarksToKeypoints } from '$lib/pose';
   import { registerTracker } from '$lib/stores/Beat';
@@ -19,18 +19,18 @@
 
   /** @type {PoseDetection} */
   let dataListener;
-  /** @type {(skeleton: import("$lib/instructor/bouncy_instructor").SkeletonWrapper)=>void} */
+  /** @type {(skeleton: import("bouncy_instructor").SkeletonWrapper)=>void} */
   let loadSkeleton = $state();
-  /** @type {()=>import("$lib/instructor/bouncy_instructor").PoseWrapper} */
+  /** @type {()=>import("bouncy_instructor").PoseWrapper} */
   let poseFromForm = $state();
-  /** @type {(skeleton: import("$lib/instructor/bouncy_instructor").PoseWrapper)=>void} */
+  /** @type {(skeleton: import("bouncy_instructor").PoseWrapper)=>void} */
   let loadPose = $state();
-  /** @type {()=>import("$lib/instructor/bouncy_instructor").PoseWrapper} */
+  /** @type {()=>import("bouncy_instructor").PoseWrapper} */
   let getPose = $state();
 
-  /** @type {import("$lib/instructor/bouncy_instructor").SkeletonV2 | undefined} */
+  /** @type {import("bouncy_instructor").SkeletonV2 | undefined} */
   let liveSkeleton = $state();
-  /** @type {import("$lib/instructor/bouncy_instructor").SkeletonWrapper | undefined} */
+  /** @type {import("bouncy_instructor").SkeletonWrapper | undefined} */
   let poseSkeleton;
 
   /** @type {HTMLInputElement}  */

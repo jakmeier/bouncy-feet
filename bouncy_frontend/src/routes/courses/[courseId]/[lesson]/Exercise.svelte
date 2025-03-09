@@ -11,7 +11,7 @@
   
   /**
    * @typedef {Object} Props
-   * @property {import("$lib/instructor/bouncy_instructor").LessonPart} lessonPart
+   * @property {import("bouncy_instructor").LessonPart} lessonPart
    * @property {import('svelte').Snippet} [children]
    */
 

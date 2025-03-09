@@ -12,13 +12,14 @@
     DetectionState,
     LimbError,
     PoseHint,
-  } from '$lib/instructor/bouncy_instructor';
+  } from 'bouncy_instructor';
   import {
     loadSuccessSound,
     loadAudio,
     scheduleAudio,
     scheduleAudioOnChannel,
     setChannelGain,
+    initAudioContext,
   } from '$lib/stores/Audio';
   import InstructorAvatar from '../avatar/InstructorAvatar.svelte';
   import { distance2d } from '$lib/math';
@@ -34,7 +35,7 @@
   } from '$lib/stores/System';
   import FullScreenArea from '../ui/FullScreenArea.svelte';
   import MusicControl from './MusicControl.svelte';
-  import { TeacherView } from '$lib/instructor/bouncy_instructor_bg';
+  import { TeacherView } from 'bouncy_instructor';
 
   export const startCamera = async () => {
     await camera.startCamera();
@@ -102,7 +103,7 @@ it does not match
   let camera = $state();
   /** @type {HTMLVideoElement} */
   let cameraVideoElement = $state();
-  /** @type {import("$lib/instructor/bouncy_instructor").Skeleton} */
+  /** @type {import("bouncy_instructor").Skeleton} */
   let instructorSkeleton = $state(tracker.expectedPoseSkeleton().restingPose());
   let instructorSkeletonBodyShift = $state(tracker.expectedPoseBodyShift());
 
@@ -300,6 +301,7 @@ it does not match
   }
 
   onMount(async () => {
+    await initAudioContext();
     dataListener = await poseCtx.newPoseDetection(onPoseDetection);
     onVideoResized();
     loadSuccessSound();

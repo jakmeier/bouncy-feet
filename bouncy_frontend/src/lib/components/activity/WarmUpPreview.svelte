@@ -8,7 +8,7 @@
   import { beatCounter, bpm, timeBetweenMoves } from '$lib/stores/Beat';
   import { songs } from '$lib/stores/Songs';
   import DarkSection from '$lib/components/ui/sections/DarkSection.svelte';
-  import { StepWrapper } from '$lib/instructor/bouncy_instructor';
+  import { StepWrapper } from 'bouncy_instructor';
   import Step from '../../../routes/collection/Step.svelte';
   import StandardPage from '../ui/StandardPage.svelte';
 

@@ -10,7 +10,7 @@
   let { detection, videoUrl, recordingStart, recordingEnd, onRestart, onBack } =
     $props();
 
-  /** @type {import("$lib/instructor/bouncy_instructor").DetectedStep[] | undefined} */
+  /** @type {import("bouncy_instructor").DetectedStep[] | undefined} */
   let detectedSteps = $derived(detection.steps());
   let hitRate = $derived(
     detection.poseMatches / (detection.poseMisses + detection.poseMatches)

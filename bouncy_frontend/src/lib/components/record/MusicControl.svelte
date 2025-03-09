@@ -1,7 +1,7 @@
 <script>
   import { run } from 'svelte/legacy';
 
-  import { DetectionState } from '$lib/instructor/bouncy_instructor_bg';
+  import { DetectionState } from 'bouncy_instructor';
   import { getContext } from 'svelte';
 
   /**

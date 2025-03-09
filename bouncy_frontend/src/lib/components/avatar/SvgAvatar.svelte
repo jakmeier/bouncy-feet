@@ -1,5 +1,5 @@
 <script>
-  import { Cartesian2d, Skeleton } from '$lib/instructor/bouncy_instructor';
+  import { Cartesian2d, Skeleton } from 'bouncy_instructor';
   import SvgAvatar2 from './SvgAvatar2.svelte';
 
   /**
@@ -43,7 +43,7 @@
     y: (0.5 + bodyShift.y) * height,
   });
 
-  /** @type {import("$lib/instructor/bouncy_instructor").SkeletonV2} */
+  /** @type {import("bouncy_instructor").SkeletonV2} */
   let renderedSkeleton = $derived(
     skeleton.render(new Cartesian2d(hip.x, hip.y), avatarSizePixels)
   );

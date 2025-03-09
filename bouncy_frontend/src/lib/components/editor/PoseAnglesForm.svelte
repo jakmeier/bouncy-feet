@@ -5,11 +5,9 @@
     PoseWrapper,
     Skeleton,
     SkeletonWrapper,
-  } from '$lib/instructor/bouncy_instructor';
-  import {
     SkeletonLimb,
     SkeletonPoint,
-  } from '$lib/instructor/bouncy_instructor_bg';
+  } from 'bouncy_instructor';
   import Svg from '../avatar/Svg.svelte';
   import SvgAvatar from '../avatar/SvgAvatar.svelte';
   import AngleInput from '../ui/AngleInput.svelte';
@@ -58,7 +56,6 @@
   /** @type{PoseWrapper | undefined} */
   let pose = $state();
 
-  
   /**
    * @typedef {Object} Props
    * @property {any} [onChange]

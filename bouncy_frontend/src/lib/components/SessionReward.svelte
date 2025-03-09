@@ -12,7 +12,7 @@
   /**
    * @typedef {Object} Props
    * @property {DanceSessionResult?} data
-   * @property {import('$lib/instructor/bouncy_instructor').StepWrapper} step
+   * @property {import('bouncy_instructor').StepWrapper} step
    */
 
   /** @type {Props} */

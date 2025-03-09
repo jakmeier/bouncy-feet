@@ -3,7 +3,7 @@
   import { t } from '$lib/i18n.js';
   import { getContext, onDestroy, onMount, tick } from 'svelte';
   import LiveRecording from '$lib/components/record/LiveRecording.svelte';
-  import { DetectionState, Tracker } from '$lib/instructor/bouncy_instructor';
+  import { DetectionState, Tracker } from 'bouncy_instructor';
   import Popup from '$lib/components/ui/Popup.svelte';
   import LessonEndResults from './LessonEndResults.svelte';
   import VideoReview from '$lib/components/review/VideoReview.svelte';
@@ -29,11 +29,11 @@
 
   /** @type {string} */
   let id;
-  /** @type {import('$lib/instructor/bouncy_instructor').Course } */
+  /** @type {import('bouncy_instructor').Course } */
   let course;
   /** @type {number} */
   let lessonIndex;
-  /** @type { import('$lib/instructor/bouncy_instructor').Lesson } */
+  /** @type { import('bouncy_instructor').Lesson } */
   let lesson;
   /** @type {number | undefined} */
   let partIndex;
@@ -49,7 +49,7 @@
   let detectionResult;
   /** @type {string} */
   let videoUrl = $state();
-  /** @type {import("$lib/instructor/bouncy_instructor").DetectedStep[] | undefined} */
+  /** @type {import("bouncy_instructor").DetectedStep[] | undefined} */
   let detectedSteps = $state();
 
   let liveRecording;

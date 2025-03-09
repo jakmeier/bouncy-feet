@@ -16,7 +16,7 @@
   let { reviewVideoElement, recordingStart } = $props();
 
   /**
-   * @type {import("$lib/instructor/bouncy_instructor").PoseApproximation[]}
+   * @type {import("bouncy_instructor").PoseApproximation[]}
    */
   let poseErrors = $state([]);
   /**  @type {number} */

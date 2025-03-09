@@ -3,7 +3,7 @@
   import VideoReview from '$lib/components/review/VideoReview.svelte';
   import { getContext, setContext, tick } from 'svelte';
   import { t } from '$lib/i18n';
-  import { Tracker } from '$lib/instructor/bouncy_instructor';
+  import { Tracker } from 'bouncy_instructor';
   import DanceStats from '../profile/DanceStats.svelte';
   import Settings from '$lib/components/record/Settings.svelte';
   import AllPoseErrors from '$lib/components/dev/AllPoseErrors.svelte';
@@ -16,10 +16,10 @@
 
   /** @type {HTMLVideoElement} */
   let reviewVideoElement;
-  /** @type {undefined | import("$lib/instructor/bouncy_instructor").Skeleton} */
+  /** @type {undefined | import("bouncy_instructor").Skeleton} */
   /** @type {undefined | string} */
   let reviewVideoSrc = $state();
-  /** @type {import("$lib/instructor/bouncy_instructor").Skeleton | undefined} */
+  /** @type {import("bouncy_instructor").Skeleton | undefined} */
   let skeleton;
   let isModelOn = $state(false);
   let cameraOn = false;
@@ -30,7 +30,7 @@
   /** @type {number | undefined} */
   let recordingEnd = $state(undefined);
 
-  /** @type {import("$lib/instructor/bouncy_instructor").DetectedStep[]} */
+  /** @type {import("bouncy_instructor").DetectedStep[]} */
   let detectedSteps = $state([]);
 
   let reviewStatsNumSteps = $state(0);

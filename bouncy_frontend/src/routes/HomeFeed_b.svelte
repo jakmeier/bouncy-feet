@@ -29,7 +29,7 @@
 
   /**
    * @param {number} i
-   * @returns {import("$lib/instructor/bouncy_instructor").DanceWrapper}
+   * @returns {import("bouncy_instructor").DanceWrapper}
    */
   function dance(i) {
     return featuredDances[i % featuredDances.length];

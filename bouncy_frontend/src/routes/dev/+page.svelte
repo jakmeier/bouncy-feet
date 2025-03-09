@@ -1,5 +1,5 @@
 <script>
-  import { Tracker } from '$lib/instructor/bouncy_instructor';
+  import { Tracker } from 'bouncy_instructor';
   import { landmarksToKeypoints } from '$lib/pose';
   import { fileToUrl, waitForVideoMetaLoaded } from '$lib/promise_util';
   import { getContext, onMount } from 'svelte';
@@ -19,15 +19,15 @@
   let selectedTimestamp = 0;
   let videoSrcWidth = $state(0);
   let videoSrcHeight = $state(0);
-  /** @type {import("$lib/instructor/bouncy_instructor").SkeletonV2 | undefined} */
+  /** @type {import("bouncy_instructor").SkeletonV2 | undefined} */
   let liveSkeleton = $state();
 
   let dataListener;
-  /** @type {(skeleton: import("$lib/instructor/bouncy_instructor").SkeletonWrapper)=>void} */
+  /** @type {(skeleton: import("bouncy_instructor").SkeletonWrapper)=>void} */
   let loadSkeleton;
-  /** @type {()=>import("$lib/instructor/bouncy_instructor").PoseWrapper} */
+  /** @type {()=>import("bouncy_instructor").PoseWrapper} */
   let poseFromForm;
-  /** @type {(skeleton: import("$lib/instructor/bouncy_instructor").PoseWrapper)=>void} */
+  /** @type {(skeleton: import("bouncy_instructor").PoseWrapper)=>void} */
   let loadPose;
   let tracker = new Tracker();
   registerTracker(tracker);
@@ -39,11 +39,11 @@
   let recordingEnd = $state();
 
   /**
-   * @type {import("$lib/instructor/bouncy_instructor").PoseApproximation[]}
+   * @type {import("bouncy_instructor").PoseApproximation[]}
    */
   let poseErrors = $state([]);
   /**
-   * @type {import("$lib/instructor/bouncy_instructor").DetectedStep[]}
+   * @type {import("bouncy_instructor").DetectedStep[]}
    */
   let detectedSteps = $state([]);
 

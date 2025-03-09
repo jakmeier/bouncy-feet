@@ -6,7 +6,7 @@
   import Animation from '$lib/components/avatar/Animation.svelte';
   import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
   import { CORRECT_COLORING } from '$lib/constants';
-  import { Cartesian2d } from '$lib/instructor/bouncy_instructor';
+  import { Cartesian2d } from 'bouncy_instructor';
   import { timeBetweenMoves } from '$lib/stores/Beat';
   import Svg from '../avatar/Svg.svelte';
   import { onMount, untrack } from 'svelte';
@@ -16,7 +16,7 @@
    * @typedef {Object} Props
    * @property {number} width
    * @property {number} height
-   * @property {import("$lib/instructor/bouncy_instructor").Skeleton} skeleton
+   * @property {import("bouncy_instructor").Skeleton} skeleton
    * @property {Cartesian2d} [bodyShift]
    * @property {boolean} [lastPoseWasCorrect]
    * @property {Cartesian2d} [origin]
@@ -50,14 +50,14 @@
   // let animationDelay = $timeBetweenMoves - animationTime;
   let animationDelay = $state(0);
 
-  /** @type {import("$lib/instructor/bouncy_instructor").Skeleton | null} */
+  /** @type {import("bouncy_instructor").Skeleton | null} */
   let prevSkeleton = $state(null);
-  /** @type {import('$lib/instructor/bouncy_instructor').Cartesian2d | null} */
+  /** @type {import('bouncy_instructor').Cartesian2d | null} */
   let prevBodyShift = $state(null);
 
-  /** @type {import("$lib/instructor/bouncy_instructor").Skeleton | null} */
+  /** @type {import("bouncy_instructor").Skeleton | null} */
   let correctSkeleton = $state(null);
-  /** @type {import('$lib/instructor/bouncy_instructor').Cartesian2d | null} */
+  /** @type {import('bouncy_instructor').Cartesian2d | null} */
   let correctBodyShift = $state(null);
 
   let coloring = $state(instructorStyle);

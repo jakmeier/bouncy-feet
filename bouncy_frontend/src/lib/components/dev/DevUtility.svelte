@@ -1,13 +1,12 @@
 <script>
   import { run } from 'svelte/legacy';
 
-  import { Tracker } from '$lib/instructor/bouncy_instructor';
-  import { DetectionState } from '$lib/instructor/bouncy_instructor_bg';
-  import { getContext, onDestroy, onMount } from 'svelte';
+  import { Tracker } from 'bouncy_instructor';
+  import { DetectionState } from 'bouncy_instructor';
+  import { getContext, onDestroy } from 'svelte';
   import { readable } from 'svelte/store';
 
   const trackerCtx = getContext('tracker');
-
 
   onDestroy(unregisterTracker);
 

@@ -1,7 +1,7 @@
 <script>
   import Symbol from '$lib/components/ui/Symbol.svelte';
   import UiBox from '$lib/components/ui/UiBox.svelte';
-  import { stepById } from '$lib/instructor/bouncy_instructor';
+  import { stepById } from 'bouncy_instructor';
   import Step from '../Step.svelte';
 
   
@@ -14,11 +14,11 @@
   
   /**
    * @typedef {Object} Props
-   * @property {import("$lib/instructor/bouncy_instructor").StepWrapper[]} allSteps
-   * @property {import("$lib/instructor/bouncy_instructor").StepWrapper} selectedStep
+   * @property {import("bouncy_instructor").StepWrapper[]} allSteps
+   * @property {import("bouncy_instructor").StepWrapper} selectedStep
    * @property {number} poseIndex
    * @property {number} animationTime
-   * @property {(step: import('$lib/instructor/bouncy_instructor').StepWrapper) => void } selectedVariationCallback
+   * @property {(step: import('bouncy_instructor').StepWrapper) => void } selectedVariationCallback
    * @property {(flipped: boolean) => void } setFlippedCallback
    * @property {boolean} flipped
    */
@@ -38,7 +38,7 @@
     selectedStep.skeleton(0).sideway || selectedStep.skeleton(1).sideway;
   const baseStep = stepById(selectedStep.id, false) || selectedStep;
   const flippedStep = stepById(selectedStep.id, true) || selectedStep;
-  /** @type {import("$lib/instructor/bouncy_instructor").StepWrapper[]} */
+  /** @type {import("bouncy_instructor").StepWrapper[]} */
   let variations = $derived(allSteps.filter((step) => step.name == selectedStep.name));
 </script>
 

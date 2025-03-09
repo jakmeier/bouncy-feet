@@ -13,7 +13,7 @@
     loadLocalSteps,
     addLocalPoses,
     DanceWrapper,
-  } from '$lib/instructor/bouncy_instructor';
+  } from 'bouncy_instructor';
   import { setContext } from 'svelte';
   import { derived, writable } from 'svelte/store';
   /**

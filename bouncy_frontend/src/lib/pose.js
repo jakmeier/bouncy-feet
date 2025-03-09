@@ -13,7 +13,7 @@
  */
 
 import { PoseLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
-import { Cartesian3d, Keypoints, KeypointsSide } from './instructor/bouncy_instructor';
+import { Cartesian3d, Keypoints, KeypointsSide } from 'bouncy_instructor';
 import { base } from '$app/paths';
 
 /**

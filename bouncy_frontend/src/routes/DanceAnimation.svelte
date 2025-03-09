@@ -3,7 +3,7 @@
   import Svg from '$lib/components/avatar/Svg.svelte';
   import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
   import { MAIN_THEME_COLORING } from '$lib/constants';
-  import { Skeleton } from '$lib/instructor/bouncy_instructor';
+  import { Skeleton } from 'bouncy_instructor';
   import { counter } from '$lib/timer';
 
   
@@ -40,7 +40,7 @@
   const restingStep = Skeleton.resting(firstPost ? firstPost.sideway : false);
 
   /**
-   * @param {import("$lib/instructor/bouncy_instructor").DanceWrapper} dance
+   * @param {import("bouncy_instructor").DanceWrapper} dance
    * @param {number} poseIndex
    */
   function danceBodyShift(dance, poseIndex) {

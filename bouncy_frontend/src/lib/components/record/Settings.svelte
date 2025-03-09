@@ -6,7 +6,7 @@
   
   /**
    * @typedef {Object} Props
-   * @property {import("$lib/instructor/bouncy_instructor").Tracker} tracker
+   * @property {import("bouncy_instructor").Tracker} tracker
    * @property {boolean} [expand]
    */
 

@@ -7,10 +7,10 @@
     cleanupAudioNode,
     scheduleAudioOnChannel,
     loadTrack,
+    initAudioContext,
   } from '$lib/stores/Audio';
   import { beatStart, bpm } from '$lib/stores/Beat';
 
-  
   /**
    * @typedef {Object} Props
    * @property {boolean} [isOn]
@@ -37,6 +37,7 @@
   let connectedNodes = [];
 
   onMount(async () => {
+    await initAudioContext();
     await loadAndPlayTrack();
     initialized = true;
   });

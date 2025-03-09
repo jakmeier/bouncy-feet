@@ -11,7 +11,7 @@ const audioBuffers = {};
 const audioStore = writable(audioBuffers);
 const channels = {};
 
-async function initAudioContext() {
+export async function initAudioContext() {
   if (audioContext) {
     return;
   }
@@ -157,5 +157,3 @@ export function setChannelGain(channel, gain) {
     channels[channel].gain.value = gain;
   }
 }
-
-await initAudioContext();

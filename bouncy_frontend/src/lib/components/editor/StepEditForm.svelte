@@ -6,7 +6,7 @@
     PoseWrapper,
     StepPositionBuilder,
     StepWrapper,
-  } from '$lib/instructor/bouncy_instructor';
+  } from 'bouncy_instructor';
   import { getContext, onMount } from 'svelte';
   import DraggableList from '../ui/DraggableList.svelte';
   import UiBox from '../ui/UiBox.svelte';

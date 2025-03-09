@@ -2,7 +2,7 @@
 <script>
   import Explanation from '$lib/components/ui/Explanation.svelte';
   import { t } from '$lib/i18n';
-  import { dances } from '$lib/instructor/bouncy_instructor';
+  import { dances } from 'bouncy_instructor';
   import { onMount } from 'svelte';
 
   /**

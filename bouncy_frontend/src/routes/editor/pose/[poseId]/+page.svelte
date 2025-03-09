@@ -2,7 +2,7 @@
   import { page } from '$app/state';
   import PoseWeightsForm from '$lib/components/editor/PoseWeightsForm.svelte';
   import PoseAnglesForm from '$lib/components/editor/PoseAnglesForm.svelte';
-  import { PoseWrapper } from '$lib/instructor/bouncy_instructor';
+  import { PoseWrapper } from 'bouncy_instructor';
   import { getContext, onMount } from 'svelte';
   import Header from '$lib/components/ui/Header.svelte';
   import { t } from '$lib/i18n';
@@ -16,13 +16,13 @@
   /** @type {Readable<PoseWrapper[]>} */
   const poses = localCollectionCtx.poses;
 
-  /** @type {()=>import("$lib/instructor/bouncy_instructor").PoseWrapper} */
+  /** @type {()=>import("bouncy_instructor").PoseWrapper} */
   let poseFromForm = $state();
-  /** @type {(skeleton: import("$lib/instructor/bouncy_instructor").PoseWrapper)=>void} */
+  /** @type {(skeleton: import("bouncy_instructor").PoseWrapper)=>void} */
   let loadPoseToAngles = $state();
-  /** @type {(skeleton: import("$lib/instructor/bouncy_instructor").PoseWrapper)=>void} */
+  /** @type {(skeleton: import("bouncy_instructor").PoseWrapper)=>void} */
   let loadPoseToWeights = $state();
-  /** @type {()=>import("$lib/instructor/bouncy_instructor").PoseWrapper} */
+  /** @type {()=>import("bouncy_instructor").PoseWrapper} */
   let getPose = $state();
 
   let isDirty = $state(false);

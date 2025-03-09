@@ -4,7 +4,7 @@
   import SelectStep from './SelectStep.svelte';
   import DanceStepDetails from './DanceStepDetails.svelte';
   import DraggableList from '$lib/components/ui/DraggableList.svelte';
-  import { StepWrapper } from '$lib/instructor/bouncy_instructor';
+  import { StepWrapper } from 'bouncy_instructor';
 
   
   
@@ -14,8 +14,8 @@
 
   /**
    * @typedef {Object} Props
-   * @property {import("$lib/instructor/bouncy_instructor").StepWrapper[]} availableSteps
-   * @property {import('$lib/instructor/bouncy_instructor').DanceBuilder} danceBuilder
+   * @property {import("bouncy_instructor").StepWrapper[]} availableSteps
+   * @property {import('bouncy_instructor').DanceBuilder} danceBuilder
    * @property {any} animationTime
    * @property {any} stepTime
    * @property {any} [beatCounter]
@@ -96,7 +96,7 @@
     steps = danceBuilder.danceInfo().steps();
     return swappedIndex;
   }
-  /** @type {import("$lib/instructor/bouncy_instructor").StepWrapper[]} */
+  /** @type {import("bouncy_instructor").StepWrapper[]} */
   let uniqueSteps = $derived(availableSteps.filter(
     (step, index, self) => index === self.findIndex((t) => t.name === step.name)
   ));

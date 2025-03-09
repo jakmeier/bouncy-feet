@@ -10,11 +10,11 @@
   
   /**
    * @typedef {Object} Props
-   * @property {import('$lib/instructor/bouncy_instructor').StepWrapper[]} steps
+   * @property {import('bouncy_instructor').StepWrapper[]} steps
    * @property {boolean} [show]
    * @property {number} [poseIndex] - animation
    * @property {number} [animationTime]
-   * @property {(step: import('$lib/instructor/bouncy_instructor').StepWrapper) => boolean} selectedCallback
+   * @property {(step: import('bouncy_instructor').StepWrapper) => boolean} selectedCallback
    */
 
   /** @type {Props} */
@@ -27,7 +27,7 @@
   } = $props();
 
   /**
-   * @param {import("$lib/instructor/bouncy_instructor").StepWrapper} step
+   * @param {import("bouncy_instructor").StepWrapper} step
    */
   function select(step) {
     const close = selectedCallback(step);

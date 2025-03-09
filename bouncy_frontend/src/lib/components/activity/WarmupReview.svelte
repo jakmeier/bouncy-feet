@@ -6,7 +6,8 @@
   let { detection, onContinue } = $props();
 
   //   TODO: Do something specific to warmup, where the energy level is measured rather than error.
-  let energyLevel = $derived(Math.min(1.0, detection.steps().length / 100));
+  // let energyLevel = $derived(Math.min(1.0, detection.steps().length / 100));
+  let energyLevel = 0.8;
   // TODO: read/store in user
   let lifetimeSteps = 17520;
   let weeklySteps = 873;

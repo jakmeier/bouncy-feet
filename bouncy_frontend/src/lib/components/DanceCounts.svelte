@@ -1,6 +1,6 @@
 <script>
   import { LEFT_RIGHT_COLORING_LIGHT } from '$lib/constants';
-  import { DanceWrapper } from '$lib/instructor/bouncy_instructor';
+  import { DanceWrapper } from 'bouncy_instructor';
   import Svg from './avatar/Svg.svelte';
   import SvgAvatar from './avatar/SvgAvatar.svelte';
 

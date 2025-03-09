@@ -169,7 +169,7 @@
   }
 
   /**
-   * @param {import("$lib/instructor/bouncy_instructor").DetectedStep[]} dance
+   * @param {import("bouncy_instructor").DetectedStep[]} dance
    * @returns {DanceSessionResult?}
    */
   function computeDanceStats(dance) {

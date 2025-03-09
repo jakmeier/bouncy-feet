@@ -3,14 +3,14 @@
   import Animation from '$lib/components/avatar/Animation.svelte';
   import Svg from '$lib/components/avatar/Svg.svelte';
   import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
-  import { Skeleton } from '$lib/instructor/bouncy_instructor';
+  import { Skeleton } from 'bouncy_instructor';
   import { LEFT_RIGHT_COLORING } from '$lib/constants';
 
   
   
   /**
    * @typedef {Object} Props
-   * @property {import('$lib/instructor/bouncy_instructor').StepWrapper} step
+   * @property {import('bouncy_instructor').StepWrapper} step
    * @property {number} [rotation]
    * @property {number} [size]
    * @property {number} [poseIndex]
@@ -35,7 +35,7 @@
   const restingStep = Skeleton.resting(step.skeleton(0).sideway);
 
   /**
-   * @param {import("$lib/instructor/bouncy_instructor").StepWrapper} step
+   * @param {import("bouncy_instructor").StepWrapper} step
    * @param {number} poseIndex
    */
   function stepBodyShift(step, poseIndex) {

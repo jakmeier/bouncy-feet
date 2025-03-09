@@ -4,7 +4,7 @@
     DetectionResult,
     StepWrapper,
     Tracker,
-  } from '$lib/instructor/bouncy_instructor';
+  } from 'bouncy_instructor';
   import LiveActivity from './LiveActivity.svelte';
   import WarmUpPreview from './WarmUpPreview.svelte';
   import { registerTracker } from '$lib/stores/Beat';

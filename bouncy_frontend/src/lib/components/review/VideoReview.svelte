@@ -10,7 +10,7 @@
   import {
     LimbError,
     PoseApproximation,
-  } from '$lib/instructor/bouncy_instructor';
+  } from 'bouncy_instructor';
   import SvgAvatar2 from '../avatar/SvgAvatar2.svelte';
   import Toggle from '../ui/Toggle.svelte';
   import { t } from '$lib/i18n';
@@ -21,7 +21,7 @@
    * @property {string} reviewVideoSrc
    * @property {number} recordingStart
    * @property {number} recordingEnd
-   * @property {import("$lib/instructor/bouncy_instructor").DetectedStep[]} [detectedSteps]
+   * @property {import("bouncy_instructor").DetectedStep[]} [detectedSteps]
    */
 
   /** @type {Props} */
@@ -48,9 +48,9 @@
 
   /** @type {HTMLVideoElement} */
   let reviewVideoElement = $state();
-  /** @type {import("$lib/instructor/bouncy_instructor").Skeleton} */
+  /** @type {import("bouncy_instructor").Skeleton} */
   let skeleton;
-  /** @type {import("$lib/instructor/bouncy_instructor").SkeletonV2} */
+  /** @type {import("bouncy_instructor").SkeletonV2} */
   let keypointSkeleton = $state();
   /** @type {LimbError[]} */
   let limbErrors = $state([]);
@@ -60,7 +60,7 @@
     detectedSteps.length > 0 ? detectedSteps[0].poses.length : 4
   );
   let avatarSizePixels = $derived(videoSrcHeight);
-  /** @type {import("$lib/instructor/bouncy_instructor").RenderableSegment[]} */
+  /** @type {import("bouncy_instructor").RenderableSegment[]} */
   let markedSegments = $state([]);
   run(() => {
     if (keypointSkeleton) {

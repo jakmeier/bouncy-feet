@@ -12,15 +12,15 @@
   const { getCourse } = getContext('courses');
 
   let id;
-  /** @type {import('$lib/instructor/bouncy_instructor').Course } */
+  /** @type {import('bouncy_instructor').Course } */
   let course = $state();
   /** @type {number} */
   let lessonIndex;
-  /** @type { import('$lib/instructor/bouncy_instructor').Lesson } */
+  /** @type { import('bouncy_instructor').Lesson } */
   let lesson = $state();
   /** @type {number | undefined} */
   let partIndex = $state();
-  /** @type {import("$lib/instructor/bouncy_instructor").LessonPart | undefined} */
+  /** @type {import("bouncy_instructor").LessonPart | undefined} */
   let exercise = $state();
   /** @type {boolean} */
   let done = $state();

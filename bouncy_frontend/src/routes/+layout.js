@@ -1,6 +1,6 @@
 import { addTranslations, loadTranslations, locale, setLocale, setRoute } from '$lib/i18n.js';
-import { Course } from '$lib/instructor/bouncy_instructor';
-import { parseCourseString } from '$lib/instructor/bouncy_instructor';
+import { Course } from 'bouncy_instructor';
+import { parseCourseString } from 'bouncy_instructor';
 import {
     loadDanceString,
     loadPoseString,
@@ -12,7 +12,7 @@ import {
     init,
     PoseWrapper,
     poses,
-} from '$lib/instructor/bouncy_instructor';
+} from 'bouncy_instructor';
 
 // This is the root layout, hence it defines prerendering for the entire app default.
 // Translations act weird with prerender on, so I'm disabling it.

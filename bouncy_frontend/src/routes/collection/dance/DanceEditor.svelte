@@ -14,8 +14,8 @@
   
   /**
    * @typedef {Object} Props
-   * @property {import("$lib/instructor/bouncy_instructor").StepWrapper[]} availableSteps
-   * @property {import('$lib/instructor/bouncy_instructor').DanceBuilder} danceBuilder
+   * @property {import("bouncy_instructor").StepWrapper[]} availableSteps
+   * @property {import('bouncy_instructor').DanceBuilder} danceBuilder
    */
 
   /** @type {Props} */
@@ -37,7 +37,7 @@
 
   const localCollection = getContext('localCollection');
 
-  /** @type {import('svelte/store').Readable<import('$lib/instructor/bouncy_instructor').DanceWrapper[]>} */
+  /** @type {import('svelte/store').Readable<import('bouncy_instructor').DanceWrapper[]>} */
   const localDances = localCollection.dances;
 
   let dancePreview = $derived(danceBuilder.danceInfo());

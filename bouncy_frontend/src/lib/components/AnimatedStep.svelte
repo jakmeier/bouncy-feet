@@ -1,6 +1,6 @@
 <script>
   import { LEFT_RIGHT_COLORING } from '$lib/constants';
-  import { StepWrapper } from '$lib/instructor/bouncy_instructor';
+  import { StepWrapper } from 'bouncy_instructor';
   import { beatCounter, timeBetweenMoves } from '$lib/stores/Beat';
   import Step from '../../routes/collection/Step.svelte';
 

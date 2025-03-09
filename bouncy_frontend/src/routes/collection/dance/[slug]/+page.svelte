@@ -28,7 +28,7 @@
 
   const id = derived(page, ($page) => $page.params.slug);
   const isSelected = (
-    /** @type {import('$lib/instructor/bouncy_instructor').DanceWrapper} */ dance
+    /** @type {import('bouncy_instructor').DanceWrapper} */ dance
   ) => dance.id === $id;
   $: dance =
     data.officialDances.find(isSelected) || $localDances.find(isSelected);

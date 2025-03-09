@@ -2,7 +2,7 @@
   
   /**
    * @typedef {Object} Props
-   * @property {import("$lib/instructor/bouncy_instructor").PoseApproximation} data
+   * @property {import("bouncy_instructor").PoseApproximation} data
    */
 
   /** @type {Props} */

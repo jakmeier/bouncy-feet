@@ -7,7 +7,7 @@
   import Popup from '$lib/components/ui/Popup.svelte';
   import Button from '$lib/components/ui/Button.svelte';
   import { writable } from 'svelte/store';
-  import { PoseFileWrapper } from '$lib/instructor/bouncy_instructor';
+  import { PoseFileWrapper } from 'bouncy_instructor';
   import { downloadTextFile } from '$lib/text_utils';
   import { goto } from '$app/navigation';
 
