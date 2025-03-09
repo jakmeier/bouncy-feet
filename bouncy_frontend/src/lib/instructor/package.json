@@ -1,0 +1,15 @@
+{
+  "name": "bouncy_instructor",
+  "type": "module",
+  "version": "0.1.0",
+  "files": [
+    "bouncy_instructor_bg.wasm",
+    "bouncy_instructor.js",
+    "bouncy_instructor.d.ts"
+  ],
+  "main": "bouncy_instructor.js",
+  "types": "bouncy_instructor.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
