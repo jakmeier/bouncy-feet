@@ -2,8 +2,6 @@
   import { onDestroy, onMount } from 'svelte';
   import { backgroundColor, fontColor } from '$lib/stores/UiState';
 
-  
-  
   /**
    * @typedef {Object} Props
    * @property {string | undefined} [bgColor]

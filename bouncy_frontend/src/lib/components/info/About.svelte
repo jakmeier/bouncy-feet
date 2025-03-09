@@ -22,7 +22,7 @@
 
 <style>
   .picture {
-    width: 50vw;
+    width: min(50vw, 200px);
     rotate: 7deg;
     margin: auto;
   }

@@ -13,6 +13,7 @@
   import Section from '$lib/components/ui/sections/Section.svelte';
   import BugReports from '$lib/components/info/BugReports.svelte';
   import Nerds from '$lib/components/info/Nerds.svelte';
+  import Background from '$lib/components/ui/sections/Background.svelte';
   /**
    * @typedef {Object} Props
    * @property {any} featuredDances
@@ -42,6 +43,7 @@
   });
 </script>
 
+<Background bgColor="var(--theme-neutral-black)" color="var(--theme-neutral-white)"></Background>
 <LogoHeader />
 
 <div class="focus-card">
