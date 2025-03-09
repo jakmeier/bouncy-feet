@@ -1,12 +1,12 @@
 <script>
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import StepEditForm from '$lib/components/editor/StepEditForm.svelte';
   import Header from '$lib/components/ui/Header.svelte';
   import { t } from '$lib/i18n';
   import { StepWrapper } from '$lib/instructor/bouncy_instructor';
   import { getContext, onMount } from 'svelte';
 
-  let stepId = $page.params.stepId;
+  let stepId = page.params.stepId;
   const localCollectionCtx = getContext('localCollection');
   const steps = localCollectionCtx.steps;
 

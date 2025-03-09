@@ -1,5 +1,5 @@
 <script>
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import { t } from '$lib/i18n.js';
   import { base } from '$app/paths';
   import { features } from '$lib/stores/FeatureSelection';
@@ -61,7 +61,7 @@
     {#each tabs as { label, route, icon }}
       <a
         class="tab"
-        class:active-tab={$page.url.pathname === route}
+        class:active-tab={page.url.pathname === route}
         href={route}
         title={label}
       >

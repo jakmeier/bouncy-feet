@@ -1,5 +1,5 @@
 <script>
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import PoseWeightsForm from '$lib/components/editor/PoseWeightsForm.svelte';
   import PoseAnglesForm from '$lib/components/editor/PoseAnglesForm.svelte';
   import { PoseWrapper } from '$lib/instructor/bouncy_instructor';
@@ -8,7 +8,7 @@
   import { t } from '$lib/i18n';
   import { beforeNavigate } from '$app/navigation';
 
-  const poseId = $page.params.poseId;
+  const poseId = page.params.poseId;
 
   const poseCtx = getContext('pose');
   const localCollectionCtx = getContext('localCollection');

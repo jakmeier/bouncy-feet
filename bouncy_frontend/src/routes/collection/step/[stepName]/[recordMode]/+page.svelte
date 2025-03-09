@@ -5,7 +5,7 @@
   import { t } from '$lib/i18n';
   import { Tracker } from '$lib/instructor/bouncy_instructor';
   import { stepsByName } from '$lib/instructor/bouncy_instructor';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import LiveRecording from '$lib/components/record/LiveRecording.svelte';
   import VideoReview from '$lib/components/review/VideoReview.svelte';
   import Header from '$lib/components/ui/Header.svelte';
@@ -16,10 +16,10 @@
   import Button from '$lib/components/ui/Button.svelte';
   import { DetectionState } from '$lib/instructor/bouncy_instructor_bg';
 
-  const stepName = $page.params.stepName;
+  const stepName = page.params.stepName;
   const instructorStep = stepsByName(stepName)[0];
   // 'learn' | 'train'
-  const mode = $page.params.recordMode;
+  const mode = page.params.recordMode;
   const isLearnMode = mode === 'learn';
   const isTrainMode = mode === 'train';
 

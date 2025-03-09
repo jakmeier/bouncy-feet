@@ -1,7 +1,7 @@
 <script>
   import { run } from 'svelte/legacy';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import { t } from '$lib/i18n.js';
   import Step from '../../Step.svelte';
   import Header from '$lib/components/ui/Header.svelte';
@@ -24,7 +24,7 @@
   let { data } = $props();
 
   const user = getContext('user').store;
-  const name = $page.params.stepName;
+  const name = page.params.stepName;
   const variations = data.lookupSteps({
     uniqueNames: false,
     stepName: name,

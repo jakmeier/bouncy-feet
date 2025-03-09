@@ -1,6 +1,5 @@
 <script>
-  import { run } from 'svelte/legacy';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import { t } from '$lib/i18n.js';
   import { getContext, onDestroy, onMount, tick } from 'svelte';
   import LiveRecording from '$lib/components/record/LiveRecording.svelte';
@@ -118,9 +117,9 @@
   }
 
   function loadCourse() {
-    id = $page.params.courseId;
+    id = page.params.courseId;
     course = getCourse(id);
-    lessonIndex = Number.parseInt($page.params.lessonIndex);
+    lessonIndex = Number.parseInt(page.params.lessonIndex);
     lesson = course.lessons[lessonIndex];
     partIndex = undefined;
 

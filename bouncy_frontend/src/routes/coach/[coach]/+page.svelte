@@ -1,5 +1,5 @@
 <script>
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import AnimatedStep from '$lib/components/AnimatedStep.svelte';
   import { LEFT_RIGHT_COLORING, ORANGE_COLORING } from '$lib/constants';
   import { bpm, halfSpeed } from '$lib/stores/Beat';
@@ -9,7 +9,7 @@
   import Footer from '$lib/components/ui/Footer.svelte';
   import Header from '$lib/components/ui/Header.svelte';
 
-  const coach = $page.params.coach;
+  const coach = page.params.coach;
   const { getCourse } = getContext('courses');
 
   const style = coachStyle(coach);

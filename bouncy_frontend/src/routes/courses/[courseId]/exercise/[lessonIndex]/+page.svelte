@@ -1,5 +1,5 @@
 <script>
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import { t } from '$lib/i18n.js';
   import Header from '$lib/components/ui/Header.svelte';
   import { getContext } from 'svelte';
@@ -37,9 +37,9 @@
   let size = 100;
 
   function loadCourse() {
-    id = $page.params.courseId;
+    id = page.params.courseId;
     course = getCourse(id);
-    lessonIndex = Number.parseInt($page.params.lessonIndex);
+    lessonIndex = Number.parseInt(page.params.lessonIndex);
     lesson = course.lessons[lessonIndex];
     title = $t('courses.lesson.title') + ' ' + (lessonIndex + 1);
     partIndex = undefined;

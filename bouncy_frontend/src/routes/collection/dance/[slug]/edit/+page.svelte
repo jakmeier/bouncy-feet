@@ -1,6 +1,6 @@
 <script>
   import { getContext } from 'svelte';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import DanceEditor from '../../DanceEditor.svelte';
   import { t } from '$lib/i18n';
   import {
@@ -21,7 +21,7 @@
   const localDances = localCollection.dances;
   const fileBuilder = localCollection.danceBuilder;
 
-  const id = $page.params.slug;
+  const id = page.params.slug;
 
   /** @type {DanceBuilder} */
   let danceBuilder = createDanceBuilder(id);
