@@ -1,6 +1,4 @@
 <script>
-  import { run } from 'svelte/legacy';
-
   import { onDestroy, onMount } from 'svelte';
   import {
     setChannelGain,
@@ -68,16 +66,15 @@
     }
     connectedNodes = [];
   }
-  run(() => {
+  $effect(() => {
     initialized && (isOn ? startMusic() : stopMusic());
   });
-  // $: initialized && $timeBetweenMoves && resetAudio();
 
-  /** @type {number} ms performance timestamp */
-  run(() => {
-    $beatStart, resetMusic();
+  $effect(() => {
+    // keeping track on beat (poorly...)
+    if ($beatStart) resetMusic();
   });
-  run(() => {
-    track, loadAndPlayTrack();
+  $effect(() => {
+    if (track) loadAndPlayTrack();
   });
 </script>
