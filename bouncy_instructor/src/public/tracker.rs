@@ -143,7 +143,8 @@ impl Tracker {
         let mut db = TrackerDanceCollection::default();
         let mut teacher = Teacher::default();
         // TODO: Allow different paces
-        let pace = StepPace::half_speed();
+        let pace1 = StepPace::half_speed();
+        let pace2 = StepPace::normal();
 
         // Warmup structure: Go through all steps in order, then do the first
         // again, after which the warmup is done.
@@ -165,11 +166,19 @@ impl Tracker {
                 let mut step_added = false;
                 for step in state.global_db.tracker_view.steps_by_name(step_name) {
                     db.add_foreign_step(&state.global_db.tracker_view, &step.id)?;
-                    if !step_added && beats_to_fill > beats_per_step {
+                    let local_step = db.step(&step.id).expect("just added step");
+                    if !step_added && beats_to_fill >= beats_per_step {
+                        let slow = beats_per_step / 2;
+                        let fast = beats_per_step - slow;
                         teacher.add_warmup(
-                            StepInfo::from_step(step.clone(), &db),
-                            beats_per_step,
-                            pace,
+                            StepInfo::from_step(local_step.clone(), &db),
+                            slow,
+                            pace1,
+                        );
+                        teacher.add_warmup(
+                            StepInfo::from_step(local_step.clone(), &db),
+                            fast,
+                            pace2,
                         );
                         step_added = true;
                         beats_to_fill -= beats_per_step;
@@ -183,7 +192,7 @@ impl Tracker {
             teacher.add_warmup(
                 StepInfo::from_step(first_step.clone(), &db),
                 beats_per_step,
-                pace,
+                pace1,
             );
             Ok(())
         })?;
@@ -318,6 +327,12 @@ impl Tracker {
     #[wasm_bindgen(js_name = nextTextEffect)]
     pub fn next_text_effect(&mut self, after: Timestamp) -> Option<TextEffect> {
         self.detector.ui_events.next_text(after)
+    }
+
+    /// How long the tracked activity is in total, measured in milliseconds.
+    #[wasm_bindgen(js_name = duration)]
+    pub fn duration(&mut self) -> f64 {
+        self.time_between_poses() * self.tracked_subbeats() as f64
     }
 
     /// Return a skeleton for a pose.

@@ -561,7 +561,7 @@ function __wbg_adapter_25(arg0, arg1, arg2) {
     wasm.__wbindgen_export_6(arg0, arg1, addHeapObject(arg2));
 }
 
-function __wbg_adapter_398(arg0, arg1, arg2, arg3) {
+function __wbg_adapter_399(arg0, arg1, arg2, arg3) {
     wasm.__wbindgen_export_7(arg0, arg1, addHeapObject(arg2), addHeapObject(arg3));
 }
 
@@ -4434,6 +4434,14 @@ export class Tracker {
         return ret === 0 ? undefined : TextEffect.__wrap(ret);
     }
     /**
+     * How long the tracked activity is in total, measured in milliseconds.
+     * @returns {number}
+     */
+    duration() {
+        const ret = wasm.tracker_duration(this.__wbg_ptr);
+        return ret;
+    }
+    /**
      * Return a skeleton for a pose.
      * @param {string} id
      * @returns {Skeleton | undefined}
@@ -4825,7 +4833,7 @@ function __wbg_get_imports() {
                 const a = state0.a;
                 state0.a = 0;
                 try {
-                    return __wbg_adapter_398(a, state0.b, arg0, arg1);
+                    return __wbg_adapter_399(a, state0.b, arg0, arg1);
                 } finally {
                     state0.a = a;
                 }
@@ -4936,12 +4944,12 @@ function __wbg_get_imports() {
         const ret = false;
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper1466 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 154, __wbg_adapter_25);
+    imports.wbg.__wbindgen_closure_wrapper1057 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 99, __wbg_adapter_22);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper754 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 83, __wbg_adapter_22);
+    imports.wbg.__wbindgen_closure_wrapper1468 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 154, __wbg_adapter_25);
         return addHeapObject(ret);
     };
     imports.wbg.__wbindgen_debug_string = function(arg0, arg1) {

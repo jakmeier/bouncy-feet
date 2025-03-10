@@ -1,19 +1,16 @@
 <script>
   import LightBackground from '$lib/components/ui/sections/LightBackground.svelte';
-  import {
-    DetectionResult,
-    StepWrapper,
-    Tracker,
-  } from 'bouncy_instructor';
+  import { DetectionResult, StepWrapper, Tracker } from 'bouncy_instructor';
   import LiveActivity from './LiveActivity.svelte';
   import WarmUpPreview from './WarmUpPreview.svelte';
   import { registerTracker } from '$lib/stores/Beat';
   import StandardPage from '../ui/StandardPage.svelte';
   import WarmupReview from './WarmupReview.svelte';
+  import { onDestroy } from 'svelte';
 
   /**
    * @typedef {Object} Props
-   * @property {StepWrapper} step
+   * @property {string[]} stepNames
    * @property {string} videoUrl
    * @property {string} description
    * @property {boolean} audioControl
@@ -22,7 +19,7 @@
 
   /** @type {Props} */
   let {
-    step,
+    stepNames,
     videoUrl: previewVideoUrl,
     description,
     audioControl,
@@ -32,8 +29,12 @@
   let previewDone = $state(false);
 
   /** @type {Tracker} */
-  let tracker = Tracker.WarmUp([step.name], 120);
-  $effect(() => registerTracker(tracker));
+  let tracker = Tracker.WarmUp(
+    stepNames,
+    // TODO: maybe let user decide duration?
+    120
+  );
+  const unregisterTracker = registerTracker(tracker);
   let trackingDone = $state(false);
 
   let detection = $state();
@@ -57,6 +58,8 @@
   function onContinue() {
     onDone();
   }
+
+  onDestroy(unregisterTracker);
 </script>
 
 <LightBackground />
@@ -66,7 +69,7 @@
     {audioControl}
     {description}
     videoUrl={previewVideoUrl}
-    {step}
+    trackId={'105bpm_tropical_house'}
     onDone={() => (previewDone = true)}
   />
 {:else if !trackingDone}

@@ -1,10 +1,8 @@
 <script>
-  import { LEFT_RIGHT_COLORING } from '$lib/constants';
   import { StepWrapper } from 'bouncy_instructor';
   import { beatCounter, timeBetweenMoves } from '$lib/stores/Beat';
   import Step from '../../routes/collection/Step.svelte';
 
-  
   /**
    * @typedef {Object} Props
    * @property {StepWrapper} step
@@ -13,7 +11,11 @@
    */
 
   /** @type {Props} */
-  let { step, size = 100, backgroundColor = 'var(--theme-neutral-white)' } = $props();
+  let {
+    step,
+    size = 100,
+    backgroundColor = 'var(--theme-neutral-white)',
+  } = $props();
 
   const beat = beatCounter;
 </script>

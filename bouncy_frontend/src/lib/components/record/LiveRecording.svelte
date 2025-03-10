@@ -103,6 +103,8 @@ it does not match
   let camera = $state();
   /** @type {HTMLVideoElement} */
   let cameraVideoElement = $state();
+  /** @type {TeacherView} */
+  let teacherView = $state(TeacherView.Off);
   /** @type {import("bouncy_instructor").Skeleton} */
   let instructorSkeleton = $state(tracker.expectedPoseSkeleton().restingPose());
   let instructorSkeletonBodyShift = $state(tracker.expectedPoseBodyShift());
@@ -123,9 +125,24 @@ it does not match
   let videoSrcHeight = writable(150);
 
   let lastDetectedSkeletonSize = $state(1.0);
+  /** When the last step was detected, where was the center of the skeleton on camera. */
   let lastSuccessSkeletonOrigin = $state(new Cartesian2d(0.0, 0.0));
+  /** Where should the instructor origin be display. It can be on top of the
+   * detection, or it can be fixed on screen, depending on the view. */
+  let instructorOrigin = $derived(
+    teacherView === TeacherView.InstructorOnly
+      ? new Cartesian2d(0.0, 0.0)
+      : lastSuccessSkeletonOrigin
+  );
+  let instructorSkeletonSize = $derived(
+    teacherView === TeacherView.InstructorOnly
+      ? 2.0
+      : Math.min(lastDetectedSkeletonSize, 4.0)
+  );
   /** @type {LimbError[]} */
   let worstLimbs = $state([]);
+
+  let animationTime = $derived(Math.min($timeBetweenMoves / 3, 300));
 
   /**
    * @param {PoseHint} inputHint
@@ -148,7 +165,7 @@ it does not match
       return;
     }
 
-    const teacherView = tracker.currentView(performance.now());
+    teacherView = tracker.currentView(performance.now());
     updateView(teacherView);
 
     if ($detectionState === DetectionState.TrackingDone) {
@@ -349,10 +366,6 @@ it does not match
       enableInstructorAvatar = false;
     }
   }
-  let animationTime = $derived(Math.min($timeBetweenMoves / 3, 300));
-  let instructorSkeletonSize = $derived(
-    Math.min(lastDetectedSkeletonSize, 8.0)
-  );
 </script>
 
 <BackgroundTask {onFrame}></BackgroundTask>
@@ -378,7 +391,7 @@ it does not match
           avatarSize={instructorSkeletonSize}
           skeleton={instructorSkeleton}
           bodyShift={instructorSkeletonBodyShift}
-          origin={lastSuccessSkeletonOrigin}
+          origin={instructorOrigin}
           instructorStyle={LEFT_RIGHT_COLORING_LIGHT}
           {lastPoseWasCorrect}
           {animationTime}

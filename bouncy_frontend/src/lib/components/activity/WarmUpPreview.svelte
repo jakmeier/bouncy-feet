@@ -1,33 +1,38 @@
 <script>
-  import { t } from '$lib/i18n.js';
-  import { getContext } from 'svelte';
+  import { t, locale, dateLocale } from '$lib/i18n';
+  import { formatDuration, intervalToDuration } from 'date-fns';
+  import { getContext, onDestroy, onMount } from 'svelte';
   import Video from '$lib/components/ui/Video.svelte';
   import LightBackground from '$lib/components/ui/sections/LightBackground.svelte';
   import Popup from '$lib/components/ui/Popup.svelte';
   import { writable } from 'svelte/store';
-  import { beatCounter, bpm, timeBetweenMoves } from '$lib/stores/Beat';
+  import { bpm } from '$lib/stores/Beat';
   import { songs } from '$lib/stores/Songs';
   import DarkSection from '$lib/components/ui/sections/DarkSection.svelte';
-  import { StepWrapper } from 'bouncy_instructor';
-  import Step from '../../../routes/collection/Step.svelte';
   import StandardPage from '../ui/StandardPage.svelte';
+  import TrackerPreview from '../avatar/TrackerPreview.svelte';
 
   /**
    * @typedef {Object} Props
-   * @property {StepWrapper} step
    * @property {string} videoUrl
    * @property {string} description
    * @property {boolean} audioControl
+   * @property {string} trackId
    * @property {()=>void} onDone
    */
 
   /** @type {Props} */
-  let { step, videoUrl, description, audioControl, onDone } = $props();
+  let { videoUrl, description, audioControl, trackId, onDone } = $props();
 
-  const { setTrack, songTitle, songAuthor } = getContext('music');
+  const { setTrack, stopTrack, songTitle, songAuthor } = getContext('music');
+  let { tracker } = getContext('tracker');
 
   let isVideoOpen = $state(writable(false));
-  let size = 120;
+
+  /** @type {import('date-fns').FormatDurationOptions} */
+  const formatOpts = $derived({
+    ...dateLocale($locale),
+  });
 
   const songList = songs.list();
   let trackIndex = $state(0);
@@ -37,6 +42,18 @@
       setTrack(track.id);
     }
   }
+  /** @type {import('date-fns').Duration} */
+  let trainingDuration = $derived(
+    intervalToDuration({ start: 0, end: tracker.duration() })
+  );
+  let trainingBeats = $derived(tracker.trackedSubbeats / 2);
+
+  onMount(() => {
+    setTrack(trackId);
+  });
+  onDestroy(() => {
+    stopTrack();
+  });
 </script>
 
 <LightBackground />
@@ -51,23 +68,23 @@
   <div class="background-strip">
     <div class="preview">
       <div class="exercise-part">
-        <Step
-          {step}
-          poseIndex={$beatCounter}
-          animationTime={$timeBetweenMoves * 0.7}
-          {size}
-        ></Step>
+        <TrackerPreview {tracker} />
       </div>
     </div>
   </div>
 
-  <!-- TODO: translated texts with real data -->
   <div class="overview">
-    <div>Duration</div>
-    <div>1 min</div>
+    <div>{$t('courses.lesson.duration-label')}</div>
+    <div>
+      {formatDuration(trainingDuration, formatOpts)}
+    </div>
+    <div>{$t('courses.lesson.num-beats-label')}</div>
+    <div>
+      {trainingBeats} @
+      {$bpm} bpm
+    </div>
   </div>
 
-  <!-- TODO: fix link -->
   <div class="controls">
     <button onclick={onDone}>{$t('courses.lesson.start-button')}</button>
   </div>

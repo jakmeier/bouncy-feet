@@ -35,16 +35,24 @@ export function setHalfSpeed(yes) {
     halfSpeed.set(yes);
 }
 
-/** @param {Tracker} tracker */
+/** 
+ * @param {Tracker} tracker 
+ * @returns {()=>void} unsub
+ * */
 export function registerTracker(tracker) {
-    bpm.subscribe((value) => {
+    const unsubBpm = bpm.subscribe((value) => {
         tracker.setBpm(value);
     });
-    beatStart.subscribe((value) => {
+    const unsubBeat = beatStart.subscribe((value) => {
         tracker.alignBeat(value);
     });
 
     setContext('tracker', {
         tracker,
-    })
+    });
+
+    return () => {
+        unsubBpm();
+        unsubBeat();
+    };
 }

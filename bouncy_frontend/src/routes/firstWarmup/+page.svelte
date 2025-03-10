@@ -10,18 +10,10 @@
   import { ONBOARDING_STATE } from '$lib/onboarding';
   import { getContext, onMount } from 'svelte';
 
-  /**
-   * @typedef {Object} Props
-   * @property {import('./$types').PageData} data
-   */
-
-  /** @type {Props} */
-  let { data } = $props();
-
   /** @type {UserContextData}*/
   const { setUserMeta, clientSession } = getContext('user');
 
-  const step = data.lookupSteps({ stepName: 'Knee Up', uniqueNames: true })[0];
+  const stepNames = ['Pendulum', 'Knee Up'];
 
   // TODO: This should be defined in the course / lesson / warmup
   const description =
@@ -107,7 +99,7 @@
   <AvatarStyleContext>
     {#if progress === 0}
       <WarmUp
-        {step}
+        {stepNames}
         videoUrl={`${base}`}
         {description}
         audioControl={false}
