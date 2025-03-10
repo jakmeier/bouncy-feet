@@ -18,8 +18,8 @@
 
   const { getCourse } = getContext('courses');
 
-  let course = $derived(getCourse(courseId));
-  let lessonIndex = $state(0);
+  let course = getCourse(courseId);
+  let lessonIndex = 0;
   let previewDone = $state(false);
   let trackingDone = $state(false);
   let liveActivity = $state();
@@ -29,8 +29,8 @@
   let recordingStart = $state(0);
   let recordingEnd = $state(0);
 
-  let tracker = $derived(course.tracker(lessonIndex));
-  $effect(() => registerTracker(tracker));
+  let tracker = course.tracker(lessonIndex);
+  let unregisterTracker = registerTracker(tracker);
 
   /**
    * @param {DetectionResult} newDetection
@@ -77,6 +77,7 @@
       URL.revokeObjectURL(videoUrl);
       videoUrl = '';
     }
+    unregisterTracker();
   });
 </script>
 

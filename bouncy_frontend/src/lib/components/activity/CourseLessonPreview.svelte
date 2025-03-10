@@ -1,20 +1,19 @@
 <script>
-  import { t } from '$lib/i18n.js';
-  import { getContext } from 'svelte';
+  import { t, locale, dateLocale } from '$lib/i18n';
+  import { getContext, onDestroy, onMount } from 'svelte';
   import Video from '$lib/components/ui/Video.svelte';
   import { base } from '$app/paths';
   import LightBackground from '$lib/components/ui/sections/LightBackground.svelte';
   import Popup from '$lib/components/ui/Popup.svelte';
   import { writable } from 'svelte/store';
-  import { beatCounter, bpm, timeBetweenMoves } from '$lib/stores/Beat';
+  import { bpm } from '$lib/stores/Beat';
   import { songs } from '$lib/stores/Songs';
   import DarkSection from '$lib/components/ui/sections/DarkSection.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
   import { Course } from 'bouncy_instructor';
-  import Step from '../../../routes/collection/Step.svelte';
   import LogoHeader from '../ui/LogoHeader.svelte';
-
-  const { setTrack, songTitle, songAuthor } = getContext('music');
+  import { formatDuration, intervalToDuration } from 'date-fns';
+  import TrackerPreview from '../avatar/TrackerPreview.svelte';
 
   /**
    * @typedef {Object} Props
@@ -26,15 +25,13 @@
   /** @type {Props}*/
   let { course, lessonIndex, onDone } = $props();
 
+  const { stopTrack, setTrack, songTitle, songAuthor } = getContext('music');
+  const { tracker } = getContext('tracker');
+
   let lesson = course.lessons[lessonIndex];
   /** @type {string} */
   let title = course.lessons[lessonIndex].name;
   let lessonDescription = course.lessons[lessonIndex].explanation;
-
-  /** @type {number | undefined} */
-  let partIndex;
-  /** @type {import("bouncy_instructor").LessonPart | undefined} */
-  let exercise;
 
   let isVideoOpen = $state(writable(false));
   let size = 100;
@@ -48,6 +45,23 @@
       setTrack(track.id);
     }
   }
+
+  /** @type {import('date-fns').FormatDurationOptions} */
+  const formatOpts = $derived({
+    ...dateLocale($locale),
+  });
+  /** @type {import('date-fns').Duration} */
+  let trainingDuration = $derived(
+    intervalToDuration({ start: 0, end: tracker.duration() })
+  );
+  let trainingBeats = $derived(tracker.trackedSubbeats / 2);
+
+  onMount(() => {
+    setTrack(songList[0].id);
+  });
+  onDestroy(() => {
+    stopTrack();
+  });
 </script>
 
 <LightBackground />
@@ -60,32 +74,26 @@
 
 <div class="background-strip">
   <div class="preview">
-    <!-- <h3>{$t('courses.lesson.steps-subtitle')}</h3> -->
-    {#each lesson.parts as part, index}
-      <div class="exercise-part">
-        <Step
-          step={part.step}
-          poseIndex={$beatCounter}
-          animationTime={$timeBetweenMoves * 0.7}
-          {size}
-        ></Step>
-        <b>4x</b>
-      </div>
-      {#if index !== lesson.parts.length - 1}
-        <div class="arrow">→</div>
-      {/if}
-    {/each}
+    <TrackerPreview {tracker} />
   </div>
 </div>
 
-<!-- TODO: translated texts, data from actual course lesson -->
 <div class="overview">
+  <img src="{base}/img/symbols/bf_eye.svg" alt="bf_eye" />
+  <div>
+    {formatDuration(trainingDuration, formatOpts)}
+  </div>
+  <img src="{base}/img/symbols/bf_eye.svg" alt="bf_eye" />
+  <div>
+    {trainingBeats}
+    {$t('courses.lesson.num-beats-label')} @
+    {$bpm} bpm
+  </div>
+  <!-- TODO: translated texts, data from actual course lesson -->
   <img src="{base}/img/symbols/bf_eye.svg" alt="bf_eye" />
   <div>easy difficulty</div>
   <img src="{base}/img/symbols/bf_eye.svg" alt="bf_eye" />
   <div>medium energy</div>
-  <img src="{base}/img/symbols/bf_eye.svg" alt="bf_eye" />
-  <div>1 min</div>
 </div>
 
 <div class="controls">

@@ -13,6 +13,8 @@
 
   /** @type {Song | undefined} */
   let track = $state(undefined);
+  /** @type {TrackAudio | undefined} */
+  let audio = $state();
 
   let titleSetter = (_) => {};
   const songTitle = readable('-', (set) => {
@@ -31,14 +33,12 @@
     authorSetter(track?.author || '-');
   }
 
-  let resetTrackInternal = $state(() => {});
   function resetTrack() {
-    resetTrackInternal();
+    audio?.resetTrack();
   }
 
-  let stopTrackInternal = $state(() => {});
   function stopTrack() {
-    stopTrackInternal();
+    audio?.stopMusic();
   }
 
   setContext('music', {
@@ -51,11 +51,7 @@
 </script>
 
 {#if track}
-  <TrackAudio
-    {track}
-    bind:resetTrack={resetTrackInternal}
-    bind:stopMusic={stopTrackInternal}
-  />
+  <TrackAudio bind:this={audio} {track} />
 {/if}
 
 {@render children?.()}

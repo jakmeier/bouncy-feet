@@ -7,8 +7,6 @@
   import DanceStats from '../../routes/profile/DanceStats.svelte';
   import Step from '../../routes/collection/Step.svelte';
 
-  
-  
   /**
    * @typedef {Object} Props
    * @property {DanceSessionResult?} data
