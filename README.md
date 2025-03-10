@@ -1,5 +1,11 @@
 # Bouncy Feet
 
+<p align="center">
+  <img src="./bouncy_frontend/static/screenshots/lesson.png" width="200px">
+  <img src="./bouncy_frontend/static/screenshots/camera.png" width="200px">
+  <img src="./bouncy_frontend/static/screenshots/daily_vibe.png" width="200px">
+</p>
+
 Try it: [app.bouncy-feet.ch](https://app.bouncy-feet.ch)
 
 A web app that assists you in learning to shuffle dance. Bouncy Feet shows you
