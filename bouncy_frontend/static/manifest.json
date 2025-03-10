@@ -43,33 +43,21 @@
     },
     "screenshots": [
         {
-            "src": "screenshots/00_step.jpg",
-            "sizes": "1080x2400",
-            "type": "image/jpg",
+            "src": "screenshots/lesson.png",
+            "sizes": "720x1600",
+            "type": "image/png",
             "platform": "narrow"
         },
         {
-            "src": "screenshots/01_collection.jpg",
-            "sizes": "1080x2400",
-            "type": "image/jpg",
+            "src": "screenshots/camera.png",
+            "sizes": "720x1600",
+            "type": "image/png",
             "platform": "narrow"
         },
         {
-            "src": "screenshots/02_choreo.jpg",
-            "sizes": "1080x2400",
-            "type": "image/jpg",
-            "platform": "narrow"
-        },
-        {
-            "src": "screenshots/03_leaderboard.jpg",
-            "sizes": "1080x2400",
-            "type": "image/jpg",
-            "platform": "narrow"
-        },
-        {
-            "src": "screenshots/04_lesson_review.jpg",
-            "sizes": "1080x2400",
-            "type": "image/jpg",
+            "src": "screenshots/daily_vibe.png",
+            "sizes": "720x1600",
+            "type": "image/png",
             "platform": "narrow"
         }
     ]
