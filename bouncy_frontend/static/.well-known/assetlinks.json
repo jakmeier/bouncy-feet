@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "ch.bouncy_feet.app.twa",
+        "sha256_cert_fingerprints": ["95:6D:3D:B6:41:7C:56:F5:4D:CB:FC:DE:B8:4D:F9:E4:36:84:B4:53:AC:DC:6A:C8:98:E0:4D:52:FD:5A:E6:DB"]
+      }
+    }]
