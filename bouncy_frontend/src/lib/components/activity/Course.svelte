@@ -3,7 +3,7 @@
   import CourseLessonPreview from './CourseLessonPreview.svelte';
   import LiveActivity from './LiveActivity.svelte';
   import StandardPage from '../ui/StandardPage.svelte';
-  import { DetectionResult } from 'bouncy_instructor';
+  import { DetectionResult } from '$lib/instructor/bouncy_instructor';
   import ActivityReview from './ActivityReview.svelte';
   import { registerTracker } from '$lib/stores/Beat';
 

@@ -3,8 +3,8 @@
 
   import { getContext, onMount, tick } from 'svelte';
   import { t } from '$lib/i18n';
-  import { Tracker } from 'bouncy_instructor';
-  import { stepsByName } from 'bouncy_instructor';
+  import { Tracker } from '$lib/instructor/bouncy_instructor';
+  import { stepsByName } from '$lib/instructor/bouncy_instructor';
   import { page } from '$app/state';
   import LiveRecording from '$lib/components/record/LiveRecording.svelte';
   import VideoReview from '$lib/components/review/VideoReview.svelte';
@@ -14,7 +14,7 @@
   import SessionReward from '$lib/components/SessionReward.svelte';
   import { registerTracker, setBpm, setHalfSpeed } from '$lib/stores/Beat';
   import Button from '$lib/components/ui/Button.svelte';
-  import { DetectionState } from 'bouncy_instructor';
+  import { DetectionState } from '$lib/instructor/bouncy_instructor';
 
   const stepName = page.params.stepName;
   const instructorStep = stepsByName(stepName)[0];

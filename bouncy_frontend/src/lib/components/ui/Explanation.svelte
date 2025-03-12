@@ -9,7 +9,7 @@
     Cartesian2d,
     Skeleton,
     DanceWrapper,
-  } from 'bouncy_instructor';
+  } from '$lib/instructor/bouncy_instructor';
   import { onMount } from 'svelte';
   import { counter } from '$lib/timer';
 

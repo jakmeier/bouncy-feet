@@ -1,5 +1,5 @@
 <script>
-  import { Tracker } from 'bouncy_instructor';
+  import { Tracker } from '$lib/instructor/bouncy_instructor';
   import { landmarksToKeypoints } from '$lib/pose';
   import { fileToUrl, waitForVideoMetaLoaded } from '$lib/promise_util';
   import { getContext, onMount } from 'svelte';

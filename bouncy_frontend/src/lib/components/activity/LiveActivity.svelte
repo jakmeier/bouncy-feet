@@ -6,7 +6,7 @@
     DetectionResult,
     DetectionState,
     Tracker,
-  } from 'bouncy_instructor';
+  } from '$lib/instructor/bouncy_instructor';
   import Popup from '$lib/components/ui/Popup.svelte';
 
   import Audio from '$lib/components/BeatAudio.svelte';

@@ -6,7 +6,7 @@
   import Animation from '$lib/components/avatar/Animation.svelte';
   import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
   import { CORRECT_COLORING } from '$lib/constants';
-  import { Cartesian2d } from 'bouncy_instructor';
+  import { Cartesian2d } from '$lib/instructor/bouncy_instructor';
   import { timeBetweenMoves } from '$lib/stores/Beat';
   import Svg from '../avatar/Svg.svelte';
   import { onMount, untrack } from 'svelte';

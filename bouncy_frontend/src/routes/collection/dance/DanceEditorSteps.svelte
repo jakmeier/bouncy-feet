@@ -4,7 +4,7 @@
   import SelectStep from './SelectStep.svelte';
   import DanceStepDetails from './DanceStepDetails.svelte';
   import DraggableList from '$lib/components/ui/DraggableList.svelte';
-  import { StepWrapper } from 'bouncy_instructor';
+  import { StepWrapper } from '$lib/instructor/bouncy_instructor';
 
   
   

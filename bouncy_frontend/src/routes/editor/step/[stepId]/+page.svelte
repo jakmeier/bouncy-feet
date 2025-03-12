@@ -3,7 +3,7 @@
   import StepEditForm from '$lib/components/editor/StepEditForm.svelte';
   import Header from '$lib/components/ui/Header.svelte';
   import { t } from '$lib/i18n';
-  import { StepWrapper } from 'bouncy_instructor';
+  import { StepWrapper } from '$lib/instructor/bouncy_instructor';
   import { getContext, onMount } from 'svelte';
 
   let stepId = page.params.stepId;

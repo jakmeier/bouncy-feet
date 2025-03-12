@@ -2,7 +2,7 @@
   import { page } from '$app/state';
   import PoseWeightsForm from '$lib/components/editor/PoseWeightsForm.svelte';
   import PoseAnglesForm from '$lib/components/editor/PoseAnglesForm.svelte';
-  import { PoseWrapper } from 'bouncy_instructor';
+  import { PoseWrapper } from '$lib/instructor/bouncy_instructor';
   import { getContext, onMount } from 'svelte';
   import Header from '$lib/components/ui/Header.svelte';
   import { t } from '$lib/i18n';

@@ -3,7 +3,7 @@
   import Svg from '$lib/components/avatar/Svg.svelte';
   import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
   import { MAIN_THEME_COLORING } from '$lib/constants';
-  import { Skeleton } from 'bouncy_instructor';
+  import { Skeleton } from '$lib/instructor/bouncy_instructor';
   import { counter } from '$lib/timer';
 
   

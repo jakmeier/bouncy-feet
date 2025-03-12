@@ -1,6 +1,6 @@
 <script>
   import { t } from '$lib/i18n.js';
-  import { DanceBuilder } from 'bouncy_instructor';
+  import { DanceBuilder } from '$lib/instructor/bouncy_instructor';
   import DanceEditor from '../DanceEditor.svelte';
 
   

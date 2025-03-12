@@ -1,5 +1,5 @@
 <script>
-  import { Cartesian2d, Skeleton } from 'bouncy_instructor';
+  import { Cartesian2d, Skeleton } from '$lib/instructor/bouncy_instructor';
   import SvgAvatar2 from './SvgAvatar2.svelte';
 
   /**

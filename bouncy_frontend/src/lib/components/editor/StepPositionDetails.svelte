@@ -5,8 +5,8 @@
   import {
     PoseWrapper,
     StepPositionBuilder,
-  } from 'bouncy_instructor';
-  import { Orientation } from 'bouncy_instructor';
+  } from '$lib/instructor/bouncy_instructor';
+  import { Orientation } from '$lib/instructor/bouncy_instructor';
   import Info from '../ui/Info.svelte';
   import UiBox from '../ui/UiBox.svelte';
 

@@ -4,7 +4,7 @@
   import {
     Cartesian2d,
     RenderableSegment,
-  } from 'bouncy_instructor';
+  } from '$lib/instructor/bouncy_instructor';
   import SvgLine from './SvgLine.svelte';
   import { getContext } from 'svelte';
   import SvgAvatarHead from './SvgAvatarHead.svelte';

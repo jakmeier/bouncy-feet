@@ -1,7 +1,7 @@
 <script>
   import Symbol from '$lib/components/ui/Symbol.svelte';
   import UiBox from '$lib/components/ui/UiBox.svelte';
-  import { stepById } from 'bouncy_instructor';
+  import { stepById } from '$lib/instructor/bouncy_instructor';
   import Step from '../Step.svelte';
 
   

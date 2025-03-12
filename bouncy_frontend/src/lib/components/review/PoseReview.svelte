@@ -3,7 +3,7 @@
   import {
     PoseApproximation,
     Tracker,
-  } from 'bouncy_instructor';
+  } from '$lib/instructor/bouncy_instructor';
   import { getContext } from 'svelte';
   import InstructorAvatar from '../avatar/InstructorAvatar.svelte';
   import { LEFT_RIGHT_COLORING } from '$lib/constants';

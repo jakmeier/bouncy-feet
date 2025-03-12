@@ -1,5 +1,5 @@
 <script>
-  import { Tracker } from 'bouncy_instructor';
+  import { Tracker } from '$lib/instructor/bouncy_instructor';
   import { getContext, onMount } from 'svelte';
   import { landmarksToKeypoints } from '$lib/pose';
   import { registerTracker } from '$lib/stores/Beat';

@@ -10,7 +10,7 @@
   import {
     LimbError,
     PoseApproximation,
-  } from 'bouncy_instructor';
+  } from '$lib/instructor/bouncy_instructor';
   import SvgAvatar2 from '../avatar/SvgAvatar2.svelte';
   import Toggle from '../ui/Toggle.svelte';
   import { t } from '$lib/i18n';

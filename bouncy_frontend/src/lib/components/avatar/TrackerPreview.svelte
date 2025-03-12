@@ -6,7 +6,7 @@
   import Animation from '$lib/components/avatar/Animation.svelte';
   import Svg from '$lib/components/avatar/Svg.svelte';
   import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
-  import { Tracker } from 'bouncy_instructor';
+  import { Tracker } from '$lib/instructor/bouncy_instructor';
   import { timeBetweenMoves, beatCounter } from '$lib/stores/Beat';
 
   /**

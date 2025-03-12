@@ -5,7 +5,7 @@
     PoseWrapper,
     Skeleton,
     SkeletonLimb,
-  } from 'bouncy_instructor';
+  } from '$lib/instructor/bouncy_instructor';
   import Svg from '../avatar/Svg.svelte';
   import SvgAvatar from '../avatar/SvgAvatar.svelte';
 

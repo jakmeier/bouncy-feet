@@ -1,4 +1,4 @@
-import { Tracker } from 'bouncy_instructor';
+import { Tracker } from '$lib/instructor/bouncy_instructor';
 import { dynamicCounter } from '$lib/timer';
 import { setContext } from 'svelte';
 import { derived, writable } from 'svelte/store';

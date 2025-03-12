@@ -1,6 +1,6 @@
 <script>
   import { LEFT_RIGHT_COLORING, ORANGE_COLORING } from '$lib/constants';
-  import { Skeleton } from 'bouncy_instructor';
+  import { Skeleton } from '$lib/instructor/bouncy_instructor';
   import { getContext } from 'svelte';
   import Arrow from '../ui/Arrow.svelte';
   import AvatarStyleContext from './AvatarStyleContext.svelte';

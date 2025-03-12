@@ -8,7 +8,7 @@
   import {
     StepFileWrapper,
     StepWrapper,
-  } from 'bouncy_instructor';
+  } from '$lib/instructor/bouncy_instructor';
   import EditOrDeleteList from '$lib/components/ui/EditOrDeleteList.svelte';
   import Popup from '$lib/components/ui/Popup.svelte';
   import { writable } from 'svelte/store';

@@ -7,7 +7,7 @@
     SkeletonWrapper,
     SkeletonLimb,
     SkeletonPoint,
-  } from 'bouncy_instructor';
+  } from '$lib/instructor/bouncy_instructor';
   import Svg from '../avatar/Svg.svelte';
   import SvgAvatar from '../avatar/SvgAvatar.svelte';
   import AngleInput from '../ui/AngleInput.svelte';

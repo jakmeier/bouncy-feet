@@ -6,7 +6,7 @@
   import {
     DanceBuilder,
     danceBuilderFromDance,
-  } from 'bouncy_instructor';
+  } from '$lib/instructor/bouncy_instructor';
 
   
   /**

@@ -12,7 +12,7 @@
     DetectionState,
     LimbError,
     PoseHint,
-  } from 'bouncy_instructor';
+  } from '$lib/instructor/bouncy_instructor';
   import {
     loadSuccessSound,
     loadAudio,
@@ -35,7 +35,7 @@
   } from '$lib/stores/System';
   import FullScreenArea from '../ui/FullScreenArea.svelte';
   import MusicControl from './MusicControl.svelte';
-  import { TeacherView } from 'bouncy_instructor';
+  import { TeacherView } from '$lib/instructor/bouncy_instructor';
 
   export const startCamera = async () => {
     await camera.startCamera();

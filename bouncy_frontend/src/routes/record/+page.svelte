@@ -3,7 +3,7 @@
   import VideoReview from '$lib/components/review/VideoReview.svelte';
   import { getContext, setContext, tick } from 'svelte';
   import { t } from '$lib/i18n';
-  import { Tracker } from 'bouncy_instructor';
+  import { Tracker } from '$lib/instructor/bouncy_instructor';
   import DanceStats from '../profile/DanceStats.svelte';
   import Settings from '$lib/components/record/Settings.svelte';
   import AllPoseErrors from '$lib/components/dev/AllPoseErrors.svelte';

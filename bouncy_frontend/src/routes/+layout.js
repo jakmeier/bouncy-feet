@@ -1,18 +1,19 @@
-import { addTranslations, loadTranslations, locale, setLocale, setRoute } from '$lib/i18n.js';
-import { Course } from 'bouncy_instructor';
-import { parseCourseString } from 'bouncy_instructor';
+import { addTranslations, locale, setLocale, setRoute } from '$lib/i18n.js';
+import { initInstructorWasmOnce } from '$lib/instructor/loader.js';
 import {
+    Course,
+    dances,
+    init,
     loadDanceString,
     loadPoseString,
     loadStepString,
-    dances,
+    parseCourseString,
+    poses,
+    PoseWrapper,
     steps,
     stepsBySource,
     StepWrapper,
-    init,
-    PoseWrapper,
-    poses,
-} from 'bouncy_instructor';
+} from '$lib/instructor/bouncy_instructor';
 
 // This is the root layout, hence it defines prerendering for the entire app default.
 // Translations act weird with prerender on, so I'm disabling it.
@@ -24,6 +25,7 @@ let loadedOnce = false;
 
 /** @type {import('@sveltejs/kit').Load} */
 export const load = async ({ fetch, data }) => {
+    await initInstructorWasmOnce();
     const { i18n, translations } = data;
     const { locale, route } = i18n;
 
