@@ -5,6 +5,7 @@ all:
 	wasm-pack build --target web
 	sort ./pkg/bouncy_instructor_bg.wasm.d.ts -o ./pkg/bouncy_instructor_bg.wasm.d.ts
 	cp -r pkg/* ../bouncy_frontend/src/lib/instructor/
+	cp -r pkg/bouncy_instructor_bg.wasm ../bouncy_frontend/static/wasm/
 
 debug:
 	RUSTFLAGS=-g cargo build --release --target=wasm32-unknown-unknown

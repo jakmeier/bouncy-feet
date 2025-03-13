@@ -25,7 +25,7 @@ let loadedOnce = false;
 
 /** @type {import('@sveltejs/kit').Load} */
 export const load = async ({ fetch, data }) => {
-    await initInstructorWasmOnce();
+    await initInstructorWasmOnce(fetch);
     const { i18n, translations } = data;
     const { locale, route } = i18n;
 
