@@ -136,5 +136,6 @@
   .footer {
     position: absolute;
     bottom: 1rem;
+    z-index: -1;
   }
 </style>
