@@ -14,6 +14,7 @@
   import LogoHeader from '../ui/LogoHeader.svelte';
   import { formatDuration, intervalToDuration } from 'date-fns';
   import TrackerPreview from '../avatar/TrackerPreview.svelte';
+  import Background from '../ui/sections/Background.svelte';
 
   /**
    * @typedef {Object} Props
@@ -64,18 +65,16 @@
   });
 </script>
 
-<LightBackground />
+<Background bgColor="var(--theme-main)" color="var(--theme-black)" />
 
-<LogoHeader white {title} />
+<LogoHeader mainColor {title} />
 
 <div class="description">
   {lessonDescription}
 </div>
 
-<div class="background-strip">
-  <div class="preview">
-    <TrackerPreview {tracker} />
-  </div>
+<div class="preview">
+  <TrackerPreview {tracker} />
 </div>
 
 <div class="overview">
@@ -141,27 +140,9 @@
     justify-content: space-around;
   }
 
-  .exercise-part {
-    text-align: center;
-  }
-
-  .arrow {
-    line-height: 100px;
-  }
-
   .controls {
     text-align: center;
     margin: 2rem auto 5rem;
-  }
-
-  .background-strip {
-    margin: 10px -100%;
-    padding: 2rem;
-    background-color: var(--theme-main);
-    rotate: 8deg;
-  }
-  .background-strip .preview {
-    rotate: -8deg;
   }
 
   .overview,
@@ -204,14 +185,5 @@
   .overview img {
     width: 2rem;
     height: 2rem;
-  }
-
-  @media (min-width: 730px) {
-    .background-strip {
-      rotate: 4deg;
-    }
-    .background-strip .preview {
-      rotate: -4deg;
-    }
   }
 </style>

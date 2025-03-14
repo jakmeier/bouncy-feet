@@ -25,7 +25,7 @@
   }
 </script>
 
-<StandardPage white>
+<StandardPage>
   {#each coaches as coach}
     <div
       class="coach"
@@ -41,7 +41,7 @@
           <AnimatedStep
             step={getCourse(coach.courseIds[0]).lessons[0].parts[0].step}
             size={coachWidth}
-            backgroundColor={'var(--theme-neutral-light)'}
+            backgroundColor={'var(--theme-neutral-black)'}
           ></AnimatedStep>
         </AvatarStyleContext>
       </div>
@@ -89,7 +89,6 @@
   }
 
   .title {
-    rotate: -3deg;
     top: -2.2rem;
     font-size: var(--font-normal);
   }

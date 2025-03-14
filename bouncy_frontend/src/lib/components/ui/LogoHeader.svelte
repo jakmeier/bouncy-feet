@@ -40,27 +40,20 @@
 
 <header style="background-color: {bgColor};">
   <img class="logo" src={imgUrl} alt="Bouncy Feet Logo" />
-  <h1 class="title">{title}</h1>
+  <h3 class="title">{title}</h3>
 </header>
 
 <style>
   header {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
+    display: flex;
+    flex-direction: column;
     min-height: 50px;
-    align-content: center;
-    align-items: center;
     height: 5rem;
+    margin: 1rem 0;
   }
 
   header img.logo {
     height: 3rem;
-  }
-
-  header h1 {
-    text-align: right;
-    /* adjust to make font look centered vertically */
-    line-height: 1.15em;
-    padding-top: 0.15em;
+    align-self: baseline;
   }
 </style>

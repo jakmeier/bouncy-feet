@@ -116,6 +116,7 @@
     position: relative;
     height: 100dvh;
     margin: 0;
+    color: var(--theme-main);
   }
   .text {
     height: 100%;

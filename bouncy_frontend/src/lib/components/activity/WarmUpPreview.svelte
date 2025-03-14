@@ -56,20 +56,16 @@
   });
 </script>
 
-<LightBackground />
-
-<!-- TODO: translated title -->
-<StandardPage title="Warm-up" white>
+<!-- TODO: translated title, better title -->
+<StandardPage title="Warm-up" mainColor>
   <!-- TODO: translated texts -->
   <div class="description">
     {description}
   </div>
 
-  <div class="background-strip">
-    <div class="preview">
-      <div class="exercise-part">
-        <TrackerPreview {tracker} />
-      </div>
+  <div class="preview">
+    <div class="exercise-part">
+      <TrackerPreview {tracker} />
     </div>
   </div>
 
@@ -138,16 +134,6 @@
   .controls {
     text-align: center;
     margin: 2rem auto 5rem;
-  }
-
-  .background-strip {
-    margin: 10px -100%;
-    padding: 2rem;
-    background-color: var(--theme-main);
-    rotate: 8deg;
-  }
-  .background-strip .preview {
-    rotate: -8deg;
   }
 
   .overview,
