@@ -66,6 +66,8 @@
             "done-text": "Lektion abgeschlossen",
             "audio-label": "Takt abspielen",
             "bpm-label": "Tempo",
+            "duration-label": "Zeit",
+            "num-beats-label": "Takte",
             "exercise-popup-title": "Übung beginnen",
             "exercise-beat-description": "Du kannst entweder zu einem simplen Metronom tanzen, oder deine eigene Musik ausserhalb der Bouncy Feet App laufen lassen.",
             "exercise-start-description": "Stell dein Telefon genug weit weg, dass dein ganzer Körper sichtbar ist.",
