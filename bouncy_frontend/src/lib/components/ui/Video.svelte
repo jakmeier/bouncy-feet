@@ -23,29 +23,31 @@
 
 <div class="video-container" class:hide={videoLoading || !videoExists}>
   <div class="corner-marked">
-    <video
-      bind:this={videoElement}
-      {controls}
-      onloadedmetadata={() => {
-        videoExists = true;
-        videoLoading = false;
-      }}
-      preload="auto"
-    >
-      <source
-        src={path}
-        type="video/mp4"
-        onerror={() => {
+    <div class="inner-video-container">
+      <video
+        bind:this={videoElement}
+        {controls}
+        onloadedmetadata={() => {
+          videoExists = true;
           videoLoading = false;
-          videoExists = false;
         }}
-        onsuspend={() => {
-          videoLoading = false;
-          videoExists = false;
-        }}
-      />
-      Your browser does not support the video tag.
-    </video>
+        preload="auto"
+      >
+        <source
+          src={path}
+          type="video/mp4"
+          onerror={() => {
+            videoLoading = false;
+            videoExists = false;
+          }}
+          onsuspend={() => {
+            videoLoading = false;
+            videoExists = false;
+          }}
+        />
+        Your browser does not support the video tag.
+      </video>
+    </div>
   </div>
 </div>
 
@@ -60,6 +62,35 @@
 {/if}
 
 <style>
+  .video-container {
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: 100%;
+  }
+
+  .corner-marked,
+  .inner-video-container {
+    width: 100%;
+    height: 100%;
+  }
+
+  .inner-video-container {
+    position: relative;
+    overflow: hidden;
+  }
+
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .hide {
+    display: none;
+  }
+
   .video-unavailable {
     width: 200px;
     height: 300px;
@@ -69,21 +100,5 @@
     text-align: center;
     line-height: 370px;
     border-radius: 25px;
-  }
-
-  .video-container {
-    display: flex;
-    width: 90%;
-  }
-
-  video {
-    max-width: 80vw;
-    max-height: 95dvh;
-    height: auto;
-    margin: auto;
-  }
-
-  .hide {
-    display: none;
   }
 </style>

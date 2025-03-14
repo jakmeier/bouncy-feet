@@ -2,7 +2,7 @@
   import Footer from '$lib/components/ui/Footer.svelte';
   import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
   import Video from '$lib/components/ui/Video.svelte';
-  import { t } from '$lib/i18n';
+  import { locale, t } from '$lib/i18n';
   import { getContext, onMount } from 'svelte';
   import { fade, slide } from 'svelte/transition';
   import { goto } from '$app/navigation';
@@ -16,14 +16,20 @@
     goto('firstWarmup');
   }
 
-  let showTitle = false;
-  let showText = false;
-  let showButton = false;
-  let showLogo = false;
-  let showVideo = false;
+  let showTitle = $state(false);
+  let showText = $state(false);
+  let showButton = $state(false);
+  let showLogo = $state(false);
+  let showVideo = $state(false);
 
   /** @type {Video} */
-  let video;
+  let video = $state();
+  const videoName = $derived(
+    $locale.toLowerCase().startsWith('de') ? 'hello_de.mp4' : 'hello_en.mp4'
+  );
+  const videoPath = $derived(
+    `https://app.bouncy-feet.ch/media/videos/${videoName}`
+  );
 
   onMount(() => {
     // triggers first animation
@@ -93,11 +99,9 @@
         video.startVideo();
       }}
     >
-      <Video
-        controls={false}
-        path="https://app.bouncy-feet.ch/media/videos/wip/l1.mp4"
-        bind:this={video}
-      ></Video>
+      <div class="video">
+        <Video controls={false} path={videoPath} bind:this={video}></Video>
+      </div>
       <button onclick={goToWarmup}>
         {$t('home.first-visit-button-1')}
       </button>
@@ -122,6 +126,14 @@
     height: 100%;
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .video {
+    height: 50dvh;
+    width: 100%;
+    display: flex;
     justify-content: center;
     align-items: center;
   }
