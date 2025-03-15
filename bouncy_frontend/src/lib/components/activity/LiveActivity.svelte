@@ -9,7 +9,7 @@
   } from '$lib/instructor/bouncy_instructor';
   import Popup from '$lib/components/ui/Popup.svelte';
 
-  import Audio from '$lib/components/BeatAudio.svelte';
+  import Audio from '$lib/components/audio/BeatAudio.svelte';
   import { writable } from 'svelte/store';
 
   import { dev } from '$lib/stores/FeatureSelection';

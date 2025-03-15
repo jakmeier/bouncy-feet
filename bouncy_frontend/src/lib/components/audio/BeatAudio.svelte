@@ -2,7 +2,7 @@
   import { run } from 'svelte/legacy';
 
   import { onDestroy, onMount } from 'svelte';
-  import BackgroundTask from './BackgroundTask.svelte';
+  import BackgroundTask from '../BackgroundTask.svelte';
   import {
     setChannelGain,
     cleanupAudioNode,

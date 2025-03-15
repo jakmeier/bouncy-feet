@@ -1,5 +1,5 @@
 <script>
-  import TrackAudio from '$lib/components/TrackAudio.svelte';
+  import TrackAudio from '$lib/components/audio/TrackAudio.svelte';
   import { songs } from '$lib/stores/Songs';
   import { onMount, setContext } from 'svelte';
   import { readable } from 'svelte/store';

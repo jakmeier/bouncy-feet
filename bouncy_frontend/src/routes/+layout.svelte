@@ -14,7 +14,7 @@
   import UserContext from './UserContext.svelte';
   import LocalCollectionContext from './LocalCollectionContext.svelte';
   import { dev } from '$lib/stores/FeatureSelection';
-  import MusicContext from './MusicContext.svelte';
+  import MusicContext from '../lib/components/audio/MusicContext.svelte';
   import LocalStateContext from './LocalStateContext.svelte';
   import UserAvatarStyleContext from '$lib/components/avatar/UserAvatarStyleContext.svelte';
   import { setContext } from 'svelte';
