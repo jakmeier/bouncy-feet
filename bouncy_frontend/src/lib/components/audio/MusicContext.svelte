@@ -1,7 +1,8 @@
 <script>
   import TrackAudio from '$lib/components/audio/TrackAudio.svelte';
+  import { setChannelGain } from '$lib/stores/Audio';
   import { songs } from '$lib/stores/Songs';
-  import { onMount, setContext } from 'svelte';
+  import { setContext } from 'svelte';
   import { readable } from 'svelte/store';
   /**
    * @typedef {Object} Props
@@ -26,6 +27,8 @@
     authorSetter = set;
   });
 
+  let gain = $state(1.0);
+
   /** @param {string} newTrackId */
   async function setTrack(newTrackId) {
     track = songs.get(newTrackId);
@@ -41,12 +44,29 @@
     audio?.stopMusic();
   }
 
+  function resumeTrack() {
+    audio?.resumeMusic();
+  }
+
+  function setVolume(vol) {
+    gain = vol;
+  }
+
   setContext('music', {
     setTrack,
     resetTrack,
     stopTrack,
+    resumeTrack,
+    setVolume,
     songTitle,
     songAuthor,
+    get gain() {
+      return gain;
+    },
+  });
+
+  $effect(() => {
+    setChannelGain('music', gain);
   });
 </script>
 

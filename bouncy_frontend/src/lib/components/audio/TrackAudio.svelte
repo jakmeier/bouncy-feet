@@ -1,5 +1,5 @@
 <script>
-  import { onDestroy, onMount } from 'svelte';
+  import { getContext, onDestroy, onMount } from 'svelte';
   import {
     setChannelGain,
     cleanupAudioNode,
@@ -17,6 +17,9 @@
 
   /** @type {Props} */
   let { isOn = false, track } = $props();
+
+  let musicContext = getContext('music');
+
   export function resetTrack() {
     resetMusic();
     startMusic();
@@ -26,13 +29,17 @@
     setChannelGain('music', 0.0);
   }
 
+  export function resumeMusic() {
+    setChannelGain('music', musicContext.gain);
+  }
+
   let initialized = $state(false);
 
   /**
-   * batches of connected audio nodes that should be disconnected at some point
-   * @type {AudioBufferSourceNode[]}
+   * Currently playing music
+   * @type {AudioBufferSourceNode | null}
    */
-  let connectedNodes = [];
+  let musicNode = null;
 
   onMount(async () => {
     await initAudioContext();
@@ -55,16 +62,18 @@
   }
 
   function startMusic() {
-    setChannelGain('music', 1.0);
-    const node = scheduleAudioOnChannel(track.id, 0, 'music');
-    connectedNodes.push(node);
+    if (musicNode) {
+      resetMusic();
+    }
+    setChannelGain('music', musicContext.gain);
+    musicNode = scheduleAudioOnChannel(track.id, 0, 'music');
   }
 
   function resetMusic() {
-    for (const node of connectedNodes) {
-      cleanupAudioNode(node, 'music');
+    if (musicNode !== null) {
+      cleanupAudioNode(musicNode, 'music');
+      musicNode = null;
     }
-    connectedNodes = [];
   }
   $effect(() => {
     initialized && (isOn ? startMusic() : stopMusic());

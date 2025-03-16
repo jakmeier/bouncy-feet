@@ -3,7 +3,6 @@
   import { formatDuration, intervalToDuration } from 'date-fns';
   import { getContext, onDestroy, onMount } from 'svelte';
   import Video from '$lib/components/ui/Video.svelte';
-  import LightBackground from '$lib/components/ui/sections/LightBackground.svelte';
   import Popup from '$lib/components/ui/Popup.svelte';
   import { writable } from 'svelte/store';
   import { bpm } from '$lib/stores/Beat';
@@ -11,6 +10,7 @@
   import DarkSection from '$lib/components/ui/sections/DarkSection.svelte';
   import StandardPage from '../ui/StandardPage.svelte';
   import TrackerPreview from '../avatar/TrackerPreview.svelte';
+  import MusicVolumeControl from '../audio/MusicVolumeControl.svelte';
 
   /**
    * @typedef {Object} Props
@@ -83,6 +83,7 @@
 
   <div class="controls">
     <button onclick={onDone}>{$t('courses.lesson.start-button')}</button>
+    <MusicVolumeControl />
   </div>
 
   {#if audioControl}

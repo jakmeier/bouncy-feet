@@ -1,6 +1,6 @@
 <script>
   import LightBackground from '$lib/components/ui/sections/LightBackground.svelte';
-  import { DetectionResult, StepWrapper, Tracker } from '$lib/instructor/bouncy_instructor';
+  import { DetectionResult, Tracker } from '$lib/instructor/bouncy_instructor';
   import LiveActivity from './LiveActivity.svelte';
   import WarmUpPreview from './WarmUpPreview.svelte';
   import { registerTracker } from '$lib/stores/Beat';
