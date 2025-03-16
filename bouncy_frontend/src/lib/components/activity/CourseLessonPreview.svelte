@@ -74,7 +74,7 @@
 </div>
 
 <div class="preview">
-  <TrackerPreview {tracker} />
+  <TrackerPreview {tracker} size={200} />
 </div>
 
 <div class="overview">

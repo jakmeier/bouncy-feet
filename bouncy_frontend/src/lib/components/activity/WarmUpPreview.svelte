@@ -11,6 +11,7 @@
   import StandardPage from '../ui/StandardPage.svelte';
   import TrackerPreview from '../avatar/TrackerPreview.svelte';
   import MusicVolumeControl from '../audio/MusicVolumeControl.svelte';
+  import { base } from '$app/paths';
 
   /**
    * @typedef {Object} Props
@@ -56,9 +57,7 @@
   });
 </script>
 
-<!-- TODO: translated title, better title -->
-<StandardPage title="Warm-up" mainColor>
-  <!-- TODO: translated texts -->
+<StandardPage title={$t('record.warmup-preview-title')} mainColor>
   <div class="description">
     {description}
   </div>
@@ -70,13 +69,14 @@
   </div>
 
   <div class="overview">
-    <div>{$t('courses.lesson.duration-label')}</div>
+    <img src="{base}/img/symbols/bf_eye.svg" alt="bf_eye" />
     <div>
       {formatDuration(trainingDuration, formatOpts)}
     </div>
-    <div>{$t('courses.lesson.num-beats-label')}</div>
+    <img src="{base}/img/symbols/bf_eye.svg" alt="bf_eye" />
     <div>
-      {trainingBeats} @
+      {trainingBeats}
+      {$t('courses.lesson.num-beats-label')} @
       {$bpm} bpm
     </div>
   </div>
@@ -146,9 +146,10 @@
   .overview,
   .about-lesson {
     display: grid;
-    grid-template-columns: 1fr max-content;
+    grid-template-columns: auto auto;
     gap: 1rem;
     align-items: center;
+    justify-content: left;
   }
 
   .about-lesson > .left {
@@ -173,12 +174,8 @@
     width: 100vw;
   }
 
-  @media (min-width: 730px) {
-    .background-strip {
-      rotate: 4deg;
-    }
-    .background-strip .preview {
-      rotate: -4deg;
-    }
+  .overview img {
+    width: 2rem;
+    height: 2rem;
   }
 </style>

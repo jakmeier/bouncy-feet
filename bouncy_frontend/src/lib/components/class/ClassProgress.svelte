@@ -61,11 +61,11 @@
   {#if showButton}
     <div class="buttons" in:fade>
       {#if progress === elements.length}
-        <button class="wide" onclick={onDone}>
+        <button class="center" onclick={onDone}>
           {$t('courses.lesson.done-button')}
         </button>
       {:else}
-        <button class="wide" onclick={onContinue}>
+        <button class="center" onclick={onContinue}>
           {$t('courses.lesson.next-button')}
         </button>
       {/if}
@@ -129,6 +129,9 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
+  }
+  .center {
+    align-self: center;
   }
 
   /* .element:last-child {

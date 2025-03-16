@@ -4,7 +4,9 @@
   import FullLogo from '../ui/FullLogo.svelte';
 </script>
 
-<FullLogo color="var(--theme-main)"></FullLogo>
+<div class="logo">
+  <FullLogo color="var(--theme-main)"></FullLogo>
+</div>
 
 <p>
   {$t('home.about-0')}
@@ -21,6 +23,12 @@
 </div>
 
 <style>
+  .logo {
+    padding: 2rem;
+    max-width: 160px;
+    margin: auto;
+  }
+
   .picture {
     width: min(50vw, 200px);
     rotate: 7deg;

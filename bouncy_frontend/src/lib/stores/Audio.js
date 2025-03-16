@@ -1,12 +1,10 @@
-
 import { writable } from 'svelte/store';
 import { base } from '$app/paths';
 import { browser } from '$app/environment';
 import { audioDelay } from '$lib/stores/System';
 
-
 /** @type {AudioContext} */
-export let audioContext;
+let audioContext;
 const audioBuffers = {};
 const audioStore = writable(audioBuffers);
 const channels = {};
@@ -111,11 +109,7 @@ export function scheduleAudioEx(id, audioTime, channel) {
     channels[channel] = new GainNode(audioContext, { gain: 1.0 });
   }
 
-  if (audioContext.state === 'suspended') {
-    // on a page reload, the audio context is usually prevented from starting
-    // automatically, we have to wait for a user interaction.
-    audioContext.resume();
-  }
+  resumeAudio();
   const source = getAudio(id);
   if (source) {
     source.connect(channels[channel]);
@@ -150,10 +144,23 @@ export function cleanupAudioNode(node, channel) {
  * @param {number} gain
 */
 export function setChannelGain(channel, gain) {
+  if (!audioContext)
+    return;
+
+  resumeAudio();
+
   if (!channels[channel]) {
     channels[channel] = new GainNode(audioContext, { gain });
     channels[channel].connect(audioContext.destination);
   } else {
     channels[channel].gain.value = gain;
+  }
+}
+
+// on a page reload, the audio context is usually prevented from starting
+// automatically, we have to wait for a user interaction.
+function resumeAudio() {
+  if (audioContext && audioContext.state === 'suspended') {
+    audioContext.resume();
   }
 }

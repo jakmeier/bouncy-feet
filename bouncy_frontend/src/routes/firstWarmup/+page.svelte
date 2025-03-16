@@ -15,10 +15,6 @@
 
   const stepNames = ['Pendulum', 'Knee Up'];
 
-  // TODO: This should be defined in the course / lesson / warmup
-  const description =
-    'I will make some moves, you try to copy me. Can you keep up?';
-
   let progress = $state(initProgress());
   // svelte-ignore state_referenced_locally
   const initialProgress = progress > 0;
@@ -101,7 +97,7 @@
       <WarmUp
         {stepNames}
         videoUrl={`${base}`}
-        {description}
+        description={$t('record.warmup-preview-description')}
         audioControl={false}
         onDone={onWarmupDone}
       ></WarmUp>

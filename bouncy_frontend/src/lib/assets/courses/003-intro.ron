@@ -12,14 +12,12 @@
     // TODO: start with heel forward move
     // TODO: mix 4-2-1 side-to-side steps
     (
-      names: {"de": "1. Lektion", "en": "1st Lesson"},
+      names: {"de": "So, jetzt aber richtig!", "en": "Alright, now for real!"},
       explanations: {
-        "de": "So!
-        Jetzt aber richtig.
-        Wir lernen den ersten Schritt.",
-        "en": "Alright!
-        But now for real.
-        This is going to be the first move you learn.
+        "de": "
+        Gleich lernst du deinen ersten Schritt. Schon aufgeregt? :)",
+        "en": "
+        You are about to learn your first move! I hope you are excited! :)
         ",
       },
       icon: "todo.svg",

@@ -9,7 +9,9 @@
     --theme-main-dark: #596e35;
     --theme-main-medium: #cbf3a3;
     --theme-main-light: #ddf7c2;
-    --theme-neutral-dark: #1d1d1b;
+    /* This color is probably no longer used */
+    /* --theme-neutral-dark: #1d1d1b; */
+    --theme-neutral-dark: #000000;
     --theme-neutral-dark-transparent: #1d1d1b96;
     --theme-neutral-black: #000000;
     --theme-neutral-gray: #e6f2ef;
@@ -154,11 +156,12 @@ button.small {
     height: 50px;
 }
 
-button.wide {
+/* Removed from CI */
+/* button.wide {
     margin: 5px auto;
     width: 90%;
     max-width: 450px;
-}
+} */
 
 button.full-width {
     margin: 5px auto;

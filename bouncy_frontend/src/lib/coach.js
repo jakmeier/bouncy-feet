@@ -23,7 +23,7 @@ export const coaches = [
             },
             headStyle: {
                 shape: 'disk',
-                size: 1.5,
+                size: 1,
                 strokeWidth: 1,
             },
         },
@@ -48,7 +48,7 @@ export const coaches = [
             },
             headStyle: {
                 shape: 'circle',
-                size: 1,
+                size: 0.75,
                 strokeWidth: 1.5,
             },
         },
