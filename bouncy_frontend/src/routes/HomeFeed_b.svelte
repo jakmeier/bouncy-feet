@@ -14,6 +14,7 @@
   import BugReports from '$lib/components/info/BugReports.svelte';
   import Nerds from '$lib/components/info/Nerds.svelte';
   import Background from '$lib/components/ui/sections/Background.svelte';
+  import { base } from '$app/paths';
   /**
    * @typedef {Object} Props
    * @property {any} featuredDances
@@ -41,9 +42,13 @@
       animationDelay = 0;
     }
   });
+  let imageHeight = $state(100);
 </script>
 
-<Background bgColor="var(--theme-neutral-black)" color="var(--theme-neutral-white)"></Background>
+<Background
+  bgColor="var(--theme-neutral-black)"
+  color="var(--theme-neutral-white)"
+></Background>
 <LogoHeader />
 
 <div class="focus-card">
@@ -59,21 +64,32 @@
 </div>
 
 <Section bgColor={'var(--theme-main)'} color={'var(--theme-neutral-dark)'}>
-  <LifetimeStats></LifetimeStats>
+  <div class="wrapper">
+    <LifetimeStats></LifetimeStats>
 
-  <!-- TODO lesson for user picked coach -->
-  <div class="section-end-button">
-    <a href="./coach/chorok">
-      <button>
-        {$t('home.continue-learning-button')}
-      </button>
-    </a>
+    <!-- TODO lesson for user picked coach -->
+    <div class="section-end-button">
+      <a href="./coach/chorok">
+        <button>
+          {$t('home.continue-learning-button')}
+        </button>
+      </a>
+    </div>
   </div>
 </Section>
 
-<About></About>
+<div class="about" style="margin-bottom: {-imageHeight / 2}px">
+  <About></About>
+</div>
+
+<div class="lowered picture" bind:clientHeight={imageHeight}>
+  <img src="{base}/img/jpg/jakob_smile.jpg" alt="Guy dancing" />
+</div>
+
 <Section bgColor={'var(--theme-accent)'} color={'var(--theme-neutral-dark)'}>
-  <HelpUs />
+  <div class="help-us" style="padding-top: {imageHeight / 2}px">
+    <HelpUs />
+  </div>
 </Section>
 
 <Nerds />
@@ -91,7 +107,6 @@
 <style>
   .focus-card {
     max-width: 400px;
-    padding: 5px 20px;
     min-height: 93dvh;
     margin: auto;
     display: flex;
@@ -112,5 +127,26 @@
 
   .section-end-button {
     margin: 4rem 0 1rem;
+  }
+
+  .wrapper {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .picture {
+    width: min(90vw, 250px);
+    rotate: 7deg;
+    margin: auto;
+  }
+  img {
+    width: 100%;
+  }
+
+  .lowered {
+    margin-top: 5rem;
+    transform: translate(15%, 50%);
   }
 </style>

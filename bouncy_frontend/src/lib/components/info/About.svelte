@@ -9,6 +9,10 @@
 </div>
 
 <p>
+  {$t('home.about-title')}
+</p>
+
+<p>
   {$t('home.about-0')}
 </p>
 <p>
@@ -18,28 +22,10 @@
   {$t('home.about-2')}
 </p>
 
-<div class="lowered picture">
-  <img src="{base}/img/jpg/jakob_smile.jpg" alt="Guy dancing" />
-</div>
-
 <style>
   .logo {
     padding: 2rem;
     max-width: 160px;
     margin: auto;
-  }
-
-  .picture {
-    width: min(50vw, 200px);
-    rotate: 7deg;
-    margin: auto;
-  }
-  img {
-    width: 100%;
-  }
-
-  .lowered {
-    transform: translateY(5rem);
-    margin-top: -4rem;
   }
 </style>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="logo_pfad"
+   data-name="logo pfad"
+   viewBox="0 0 200 200"
+   version="1.1"
+   sodipodi:docname="bf_eye_black.svg"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview11"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="4.21"
+     inkscape:cx="99.643705"
+     inkscape:cy="100.35629"
+     inkscape:window-width="1854"
+     inkscape:window-height="1011"
+     inkscape:window-x="66"
+     inkscape:window-y="32"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="logo_pfad" />
+  <defs
+     id="defs4">
+    <style
+       id="style2">
+      .cls-1 {
+        fill: #ff7301;
+      }
+    </style>
+  </defs>
+  <path
+     class="cls-1"
+     d="M142.252,9.391C92.21-13.944,32.726,7.706,9.391,57.748c-23.335,50.042-1.685,109.526,48.357,132.861,50.042,23.335,109.526,1.685,132.861-48.357,23.335-50.042,1.685-109.526-48.357-132.861ZM80.987,140.774c-28.432-13.258-46.688-39.362-51.169-68.099-.551-3.532,1.079-7.026,4.138-8.874,24.894-15.039,56.625-17.834,85.057-4.575,28.432,13.258,46.688,39.362,51.169,68.099.551,3.532-1.079,7.026-4.138,8.874-24.894,15.039-56.625,17.834-85.057,4.575Z"
+     id="path6"
+     style="fill:#000000;fill-opacity:1" />
+  <circle
+     class="cls-1"
+     cx="100"
+     cy="100"
+     r="33.325"
+     id="circle8"
+     style="fill:#000000;fill-opacity:1" />
+</svg>

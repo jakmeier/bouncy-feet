@@ -12,6 +12,7 @@
   import TrackerPreview from '../avatar/TrackerPreview.svelte';
   import MusicVolumeControl from '../audio/MusicVolumeControl.svelte';
   import { base } from '$app/paths';
+  import PreviewDetails from './PreviewDetails.svelte';
 
   /**
    * @typedef {Object} Props
@@ -68,18 +69,11 @@
     </div>
   </div>
 
-  <div class="overview">
-    <img src="{base}/img/symbols/bf_eye.svg" alt="bf_eye" />
-    <div>
-      {formatDuration(trainingDuration, formatOpts)}
-    </div>
-    <img src="{base}/img/symbols/bf_eye.svg" alt="bf_eye" />
-    <div>
-      {trainingBeats}
-      {$t('courses.lesson.num-beats-label')} @
-      {$bpm} bpm
-    </div>
-  </div>
+  <PreviewDetails
+    durationMs={tracker.duration()}
+    beats={tracker.trackedSubbeats / 2}
+    {bpm}
+  />
 
   <div class="controls">
     <button onclick={onDone}>{$t('courses.lesson.start-button')}</button>
@@ -137,13 +131,11 @@
     margin: 2rem auto 5rem;
   }
 
-  .overview,
   .about-lesson,
   .description {
     margin: 2em 0em 3rem;
   }
 
-  .overview,
   .about-lesson {
     display: grid;
     grid-template-columns: auto auto;
@@ -172,10 +164,5 @@
 
   .video-wrapper {
     width: 100vw;
-  }
-
-  .overview img {
-    width: 2rem;
-    height: 2rem;
   }
 </style>

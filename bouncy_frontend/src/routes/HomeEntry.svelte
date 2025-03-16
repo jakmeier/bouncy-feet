@@ -43,7 +43,7 @@
 </script>
 
 <div class="container">
-  <div class="half-transparent">
+  <div>
     {#if dance}
       <!-- <AvatarStyleContext
         headStyle={{ shape: 'square', size: 0.8, strokeWidth: 1.2 }}
@@ -88,18 +88,7 @@
     position: relative;
   }
 
-  .half-transparent {
-    opacity: 0.38;
-  }
-
   button {
-    margin: 30px auto;
-  }
-
-  .overlay {
-    position: absolute;
-    top: 25%;
-    left: 0;
-    text-align: center;
+    margin: 1rem auto;
   }
 </style>

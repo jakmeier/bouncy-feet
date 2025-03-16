@@ -66,7 +66,6 @@
     margin-top: 8rem;
     margin-bottom: 16rem;
     position: relative;
-    width: min(90%, 60dvh);
     z-index: 1;
   }
 
@@ -101,7 +100,7 @@
 
   button {
     align-self: flex-end;
-    justify-self: end;
+    justify-self: center;
   }
 
   .avatar {

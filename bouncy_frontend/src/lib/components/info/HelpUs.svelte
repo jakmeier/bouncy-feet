@@ -11,7 +11,6 @@
   Instagram: <a href="https://www.instagram.com/bouncy_feet/">@bouncy_feet</a>
 </p>
 <p>
-  Email:
   <a href="mailto:jakob@bouncy-feet.ch">jakob@bouncy-feet.ch</a>.
 </p>
 <p>{$t('home.help-2')}</p>

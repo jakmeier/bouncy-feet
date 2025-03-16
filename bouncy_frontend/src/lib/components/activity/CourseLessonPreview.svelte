@@ -1,9 +1,8 @@
 <script>
-  import { t, locale, dateLocale } from '$lib/i18n';
+  import { t } from '$lib/i18n';
   import { getContext, onDestroy, onMount } from 'svelte';
   import Video from '$lib/components/ui/Video.svelte';
   import { base } from '$app/paths';
-  import LightBackground from '$lib/components/ui/sections/LightBackground.svelte';
   import Popup from '$lib/components/ui/Popup.svelte';
   import { writable } from 'svelte/store';
   import { bpm } from '$lib/stores/Beat';
@@ -12,9 +11,10 @@
   import Footer from '$lib/components/ui/Footer.svelte';
   import { Course } from '$lib/instructor/bouncy_instructor';
   import LogoHeader from '../ui/LogoHeader.svelte';
-  import { formatDuration, intervalToDuration } from 'date-fns';
   import TrackerPreview from '../avatar/TrackerPreview.svelte';
   import Background from '../ui/sections/Background.svelte';
+  import PreviewDetails from './PreviewDetails.svelte';
+  import MusicVolumeControl from '../audio/MusicVolumeControl.svelte';
 
   /**
    * @typedef {Object} Props
@@ -35,7 +35,7 @@
   let lessonDescription = course.lessons[lessonIndex].explanation;
 
   let isVideoOpen = $state(writable(false));
-  let size = 100;
+  let size = 300;
 
   const songList = songs.list();
   let trackIndex = $state(0);
@@ -46,16 +46,6 @@
       setTrack(track.id);
     }
   }
-
-  /** @type {import('date-fns').FormatDurationOptions} */
-  const formatOpts = $derived({
-    ...dateLocale($locale),
-  });
-  /** @type {import('date-fns').Duration} */
-  let trainingDuration = $derived(
-    intervalToDuration({ start: 0, end: tracker.duration() })
-  );
-  let trainingBeats = $derived(tracker.trackedSubbeats / 2);
 
   onMount(() => {
     setTrack(songList[0].id);
@@ -74,49 +64,47 @@
 </div>
 
 <div class="preview">
-  <TrackerPreview {tracker} size={200} />
+  <TrackerPreview {tracker} {size} />
 </div>
 
-<div class="overview">
-  <img src="{base}/img/symbols/bf_eye.svg" alt="bf_eye" />
-  <div>
-    {formatDuration(trainingDuration, formatOpts)}
-  </div>
-  <img src="{base}/img/symbols/bf_eye.svg" alt="bf_eye" />
-  <div>
-    {trainingBeats}
-    {$t('courses.lesson.num-beats-label')} @
-    {$bpm} bpm
-  </div>
-  <!-- TODO: translated texts, data from actual course lesson -->
-  <img src="{base}/img/symbols/bf_eye.svg" alt="bf_eye" />
-  <div>easy difficulty</div>
-  <img src="{base}/img/symbols/bf_eye.svg" alt="bf_eye" />
-  <div>medium energy</div>
-</div>
+<PreviewDetails
+  durationMs={tracker.duration()}
+  beats={tracker.trackedSubbeats / 2}
+  {bpm}
+/>
 
 <div class="controls">
+  <MusicVolumeControl />
   <button onclick={onDone}>{$t('courses.lesson.start-button')}</button>
 </div>
 
 <DarkSection>
   <h3>{$t('courses.lesson.settings-subtitle')}</h3>
   <div class="about-lesson">
-    {#if lesson.video && lesson.video.length > 0}
-      <button class="action big-col" onclick={() => ($isVideoOpen = true)}
-        >{$t('courses.lesson.to-video-button')}</button
+    <div class="row">
+      <div class="song">
+        <div>{$songTitle} {$t('music.by')} {$songAuthor}</div>
+        <div class="speed">
+          <div>{$bpm} BPM</div>
+        </div>
+      </div>
+      <button
+        class="action right"
+        onclick={() => {
+          trackIndex += 1;
+          changeTrack(trackIndex);
+        }}>{$t('courses.lesson.next-song-button')}</button
       >
+    </div>
+    {#if lesson.video && lesson.video.length > 0}
+      <div class="row">
+        <div>{$t('record.preview-video-title')}</div>
+
+        <button class="action big-col" onclick={() => ($isVideoOpen = true)}
+          >{$t('courses.lesson.to-video-button')}</button
+        >
+      </div>
     {/if}
-    <div class="left">{$songTitle} {$t('music.by')} {$songAuthor}</div>
-    <button
-      class="action right"
-      onclick={() => {
-        trackIndex += 1;
-        changeTrack(trackIndex);
-      }}>{$t('courses.lesson.next-song-button')}</button
-    >
-    <div class="left">{$t('courses.lesson.bpm-label')}</div>
-    <div class="left">{$bpm} BPM</div>
   </div>
 
   <Footer white />
@@ -132,58 +120,42 @@
 
 <style>
   h3 {
-    margin: -0.5rem;
+    margin: -0.5rem 0;
   }
 
   .preview {
     display: flex;
     justify-content: space-around;
+    /* margin: -2rem; */
   }
 
   .controls {
-    text-align: center;
-    margin: 2rem auto 5rem;
+    margin: 2rem auto;
+  }
+  .controls button {
+    margin: 2rem 0 1rem;
   }
 
-  .overview,
   .about-lesson,
   .description {
-    margin: 2em 0em 3rem;
+    margin: 2rem 0rem;
   }
 
-  .overview,
-  .about-lesson {
-    display: grid;
-    grid-template-columns: auto auto;
+  .about-lesson .row {
+    display: flex;
+    /* margin: 2rem 0; */
     gap: 1rem;
     align-items: center;
-    justify-content: left;
+    justify-content: space-between;
   }
 
-  .about-lesson > .left {
-    justify-self: start;
-  }
-  .about-lesson > .right {
-    justify-self: end;
-  }
-
-  .about-lesson button {
-    justify-self: center;
-    width: 100%;
-  }
-
-  .big-col {
-    grid-column-start: 1;
-    grid-column-end: 3;
-    margin: 1rem;
+  .row {
+    display: flex;
+    flex-wrap: nowrap;
+    margin: 1rem 0;
   }
 
   .video-wrapper {
     width: 100vw;
-  }
-
-  .overview img {
-    width: 2rem;
-    height: 2rem;
   }
 </style>
