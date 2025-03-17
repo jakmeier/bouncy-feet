@@ -138,15 +138,18 @@ impl Lesson {
 impl Lesson {
     pub(crate) fn tracker(&self, db: impl Into<Rc<TrackerDanceCollection>>) -> crate::Tracker {
         let db = db.into();
-        let first_step = self
-            .parts
-            .first()
-            .expect("no step in lesson to track")
-            .step_wrapper
-            .clone();
-        // TODO: make this number configurable
-        let target_step = Some(first_step.info(&db).clone());
-        Tracker::new(db, target_step, Some(8))
+        let mut teacher = Teacher::default();
+
+        for part in &self.parts {
+            let step = &part.step_wrapper;
+
+            // TODO: variable speed per part
+            // TODO: use view with instructor and camera combined
+            teacher.show_step(step.info(&db), 4, StepPace::half_speed());
+            teacher.add_step(step.info(&db), 4, StepPace::half_speed());
+        }
+
+        Tracker::new_from_teacher(db, teacher)
     }
 }
 
