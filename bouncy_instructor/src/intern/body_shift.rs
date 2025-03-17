@@ -39,16 +39,20 @@ impl BodyShift {
             let before = skeleton[0].position(*pivot);
             let after = skeleton[1].position(*pivot);
             let diff = after - before;
+            // don't accumulate on the y-axis - dancers usually can't levitate
+            let x_diff = Cartesian2d::new(diff.x, 0.0);
             self.accumulated_body_shift
-                .push(*self.accumulated_body_shift.last().unwrap() - diff);
+                .push(*self.accumulated_body_shift.last().unwrap() - x_diff);
         }
         if !skeletons.is_empty() && !step.pivots.is_empty() {
             let pivot = step.pivots[0];
             let before = skeletons.last().unwrap().position(pivot);
             let after = skeletons[0].position(pivot);
             let diff = after - before;
+            // don't accumulate on the y-axis - dancers usually can't levitate
+            let x_diff = Cartesian2d::new(diff.x, 0.0);
             self.accumulated_body_shift
-                .push(*self.accumulated_body_shift.last().unwrap() - diff);
+                .push(*self.accumulated_body_shift.last().unwrap() - x_diff);
         }
 
         debug_assert_eq!(
