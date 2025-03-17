@@ -73,6 +73,7 @@
   export function loadPose(inputPose) {
     pose = inputPose;
     updateAnglesFromPose(pose);
+    updateZFromPose(pose);
     bodyShift.x = pose.xShift;
     bodyShift.y = pose.yShift;
   }
@@ -82,6 +83,7 @@
     return pose;
   }
 
+  /** @param {PoseWrapper} pose */
   function updateAnglesFromPose(pose) {
     skeleton = pose.skeleton();
     sideSkeleton = pose.sideSkeleton();
@@ -96,6 +98,22 @@
     bodyLimbs[7].angle = pose.getAngle(SkeletonLimb.RightShin) - 90.0;
     bodyLimbs[8].angle = pose.getAngle(SkeletonLimb.LeftFoot) - 90.0;
     bodyLimbs[9].angle = pose.getAngle(SkeletonLimb.RightFoot) - 90.0;
+  }
+
+  /** @param {PoseWrapper} pose */
+  function updateZFromPose(pose) {
+    bodyParts[0].z = pose.getZ(SkeletonPoint.LeftElbow);
+    bodyParts[1].z = pose.getZ(SkeletonPoint.RightElbow);
+    bodyParts[2].z = pose.getZ(SkeletonPoint.LeftWrist);
+    bodyParts[3].z = pose.getZ(SkeletonPoint.RightWrist);
+    bodyParts[4].z = pose.getZ(SkeletonPoint.LeftKnee);
+    bodyParts[5].z = pose.getZ(SkeletonPoint.RightKnee);
+    bodyParts[6].z = pose.getZ(SkeletonPoint.LeftHeel);
+    bodyParts[7].z = pose.getZ(SkeletonPoint.RightHeel);
+    bodyParts[8].z = pose.getZ(SkeletonPoint.LeftAnkle);
+    bodyParts[9].z = pose.getZ(SkeletonPoint.RightAnkle);
+    bodyParts[9].z = pose.getZ(SkeletonPoint.LeftToes);
+    bodyParts[9].z = pose.getZ(SkeletonPoint.RightToes);
   }
 
   function updateAvatarAngles() {
@@ -171,6 +189,7 @@
             name="right-{index}"
             bind:value={part.angle}
             onChange={updateAvatarAngles}
+            thumbColor={'var(--theme-accent)'}
           ></AngleInput>
         </div>
       {/if}
@@ -180,12 +199,7 @@
   <div class="avatar">
     <Svg width={200} height={200} orderByZ>
       {#if skeleton}
-        <SvgAvatar
-          {skeleton}
-          width={200}
-          height={200}
-          style={LEFT_RIGHT_COLORING_LIGHT}
-        ></SvgAvatar>
+        <SvgAvatar {skeleton} width={200} height={200}></SvgAvatar>
       {/if}
     </Svg>
   </div>
@@ -298,6 +312,7 @@
             min={-5.0}
             max={5.0}
             decimals={1}
+            thumbColor={'var(--theme-accent)'}
           ></NumberSlider>
         </div>
       {/if}
@@ -360,10 +375,12 @@
     padding: 10px 5px;
   }
   .left .body-part {
-    background-color: var(--theme-accent-light);
+    background-color: var(--theme-accent);
+    color: var(--theme-neutral-black);
   }
   .right .body-part {
-    background-color: var(--theme-neutral-light);
+    background-color: var(--theme-main);
+    color: var(--theme-neutral-black);
   }
   .angle-input {
     width: 100%;

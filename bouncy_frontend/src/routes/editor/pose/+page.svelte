@@ -84,7 +84,6 @@
 </div>
 
 <h2 class="box">{$t('editor.pose.list')}</h2>
-
 <EditOrDeleteList items={$poses} onDelete={deleteConfirmed} onEdit={editPose}>
   {#snippet itemWrapper({ item: pose })}
     <div>

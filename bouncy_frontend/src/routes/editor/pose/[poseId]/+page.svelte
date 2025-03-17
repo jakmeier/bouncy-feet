@@ -16,27 +16,23 @@
   /** @type {Readable<PoseWrapper[]>} */
   const poses = localCollectionCtx.poses;
 
-  /** @type {()=>import("bouncy_instructor").PoseWrapper} */
-  let poseFromForm = $state();
-  /** @type {(skeleton: import("bouncy_instructor").PoseWrapper)=>void} */
-  let loadPoseToAngles = $state();
-  /** @type {(skeleton: import("bouncy_instructor").PoseWrapper)=>void} */
-  let loadPoseToWeights = $state();
-  /** @type {()=>import("bouncy_instructor").PoseWrapper} */
-  let getPose = $state();
+  /** @type {PoseAnglesForm} */
+  let anglesForm;
+  /** @type {PoseWeightsForm} */
+  let weightsForm;
 
   let isDirty = $state(false);
 
   function copyPose() {
-    let pose = poseFromForm();
+    let pose = anglesForm.readPose();
     if (pose) {
-      loadPoseToWeights(pose);
+      weightsForm.loadPose(pose);
       isDirty = true;
     }
   }
 
   function savePose() {
-    let pose = getPose();
+    let pose = weightsForm.getPose();
     localCollectionCtx.addPose(pose);
     isDirty = false;
   }
@@ -52,8 +48,8 @@
   onMount(() => {
     let pose = $poses.find((p) => p.id() === poseId);
     if (pose) {
-      loadPoseToAngles(pose);
-      loadPoseToWeights(pose);
+      anglesForm.loadPose(pose);
+      weightsForm.loadPose(pose);
     }
   });
 </script>
@@ -63,16 +59,8 @@
 
 <h2 class="box">{$t('editor.pose.angles-subtitle')}</h2>
 
-<PoseAnglesForm
-  bind:loadPose={loadPoseToAngles}
-  bind:readPose={poseFromForm}
-  onChange={copyPose}
-/>
+<PoseAnglesForm bind:this={anglesForm} onChange={copyPose} />
 
 <h2 class="box">{$t('editor.pose.weights-subtitle')}</h2>
 
-<PoseWeightsForm
-  bind:loadPose={loadPoseToWeights}
-  bind:getPose
-  onChange={() => (isDirty = true)}
-/>
+<PoseWeightsForm bind:this={weightsForm} onChange={() => (isDirty = true)} />

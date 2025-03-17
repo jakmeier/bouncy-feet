@@ -1,9 +1,4 @@
 <script>
-  
-  
-  
-
-  
   /**
    * @typedef {Object} Props
    * @property {number} [value]
@@ -12,6 +7,7 @@
    * @property {number} [decimals]
    * @property {string} [name]
    * @property {any} [onChange]
+   * @property {string} [thumbColor]
    */
 
   /** @type {Props} */
@@ -21,7 +17,8 @@
     max,
     decimals = 0,
     name = '',
-    onChange = (angle) => {}
+    onChange = (angle) => {},
+    thumbColor = 'var(--theme-main)',
   } = $props();
 
   let isDragging = false;
@@ -102,7 +99,8 @@
   >
     <div
       class="slider-thumb"
-      style="left: calc({((value - min) / (max - min)) * 100}% - 10px)"
+      style="left: calc({((value - min) / (max - min)) *
+        100}% - 10px); background-color: {thumbColor};"
       aria-hidden="true"
     ></div>
   </div>
@@ -134,7 +132,6 @@
     top: calc(-50% - 2px);
     width: 20px;
     height: 20px;
-    background-color: var(--theme-main);
     border-radius: 50%;
     cursor: pointer;
   }

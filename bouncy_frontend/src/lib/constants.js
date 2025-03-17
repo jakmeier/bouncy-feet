@@ -40,6 +40,12 @@ export const LEFT_RIGHT_COLORING = {
     headColor: 'var(--avatar-head)',
 };
 
+export const UGLY_LEFT_RIGHT_COLORING = {
+    leftColor: 'var(--theme-accent)',
+    rightColor: 'var(--theme-main)',
+    headColor: 'var(--theme-main)',
+};
+
 export const LEFT_RIGHT_COLORING_LIGHT = {
     leftColor: '#4c6633D0',
     rightColor: '#a9eb66D0',

@@ -5,7 +5,6 @@
   import { registerTracker } from '$lib/stores/Beat';
   import Svg from '$lib/components/avatar/Svg.svelte';
   import SvgAvatar2 from '$lib/components/avatar/SvgAvatar2.svelte';
-  import { LEFT_RIGHT_COLORING_LIGHT } from '$lib/constants';
   import PoseAnglesForm from '$lib/components/editor/PoseAnglesForm.svelte';
   import PoseWeightsForm from '$lib/components/editor/PoseWeightsForm.svelte';
   import { fileToUrl, waitForVideoMetaLoaded } from '$lib/promise_util';
@@ -19,14 +18,11 @@
 
   /** @type {PoseDetection} */
   let dataListener;
-  /** @type {(skeleton: import("bouncy_instructor").SkeletonWrapper)=>void} */
-  let loadSkeleton = $state();
-  /** @type {()=>import("bouncy_instructor").PoseWrapper} */
-  let poseFromForm = $state();
-  /** @type {(skeleton: import("bouncy_instructor").PoseWrapper)=>void} */
-  let loadPose = $state();
-  /** @type {()=>import("bouncy_instructor").PoseWrapper} */
-  let getPose = $state();
+
+  /** @type {PoseAnglesForm} */
+  let anglesForm;
+  /** @type {PoseWeightsForm} */
+  let weightsForm;
 
   /** @type {import("bouncy_instructor").SkeletonV2 | undefined} */
   let liveSkeleton = $state();
@@ -93,30 +89,25 @@
   function copySkeleton() {
     poseSkeleton = tracker.skeletonWrapperAt(selectedTimestamp);
     if (poseSkeleton) {
-      loadSkeleton(poseSkeleton);
+      anglesForm.loadSkeleton(poseSkeleton);
     }
   }
 
   function copyPose() {
-    let pose = poseFromForm();
+    let pose = anglesForm.readPose();
     if (pose) {
-      loadPose(pose);
+      weightsForm.loadPose(pose);
     }
   }
 
   function savePose() {
-    let pose = getPose();
+    let pose = weightsForm.getPose();
     localCollectionCtx.addPose(pose);
   }
 </script>
 
 <p>
-  <input
-    bind:this={upload}
-    type="file"
-    accept="video/*"
-    onchange={loadVideo}
-  />
+  <input bind:this={upload} type="file" accept="video/*" onchange={loadVideo} />
 </p>
 
 <!-- svelte-ignore a11y_media_has_caption -->
@@ -131,11 +122,7 @@
   <div>
     {#if liveSkeleton}
       <Svg width={videoSrcWidth} height={videoSrcHeight} orderByZ showOverflow>
-        <SvgAvatar2
-          skeleton={liveSkeleton}
-          lineWidth={3}
-          style={LEFT_RIGHT_COLORING_LIGHT}
-        />
+        <SvgAvatar2 skeleton={liveSkeleton} />
       </Svg>
     {/if}
   </div>
@@ -143,11 +130,11 @@
 
 <button class="full-width short" onclick={copySkeleton}> ↓ </button>
 
-<PoseAnglesForm bind:loadSkeleton bind:readPose={poseFromForm}></PoseAnglesForm>
+<PoseAnglesForm bind:this={anglesForm}></PoseAnglesForm>
 
 <button class="full-width short" onclick={copyPose}> ↓ </button>
 
-<PoseWeightsForm bind:loadPose bind:getPose></PoseWeightsForm>
+<PoseWeightsForm bind:this={weightsForm}></PoseWeightsForm>
 
 <Button
   symbol="save"

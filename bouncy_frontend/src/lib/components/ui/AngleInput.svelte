@@ -1,8 +1,6 @@
 <script>
   import NumberSlider from './NumberSlider.svelte';
 
-
-  
   /**
    * @typedef {Object} Props
    * @property {number} [value]
@@ -10,6 +8,7 @@
    * @property {number} [max]
    * @property {string} [name]
    * @property {any} [onChange]
+   * @property {string} [thumbColor]
    */
 
   /** @type {Props} */
@@ -18,8 +17,10 @@
     min = -360,
     max = 360,
     name = '',
-    onChange = $bindable((angle) => {})
+    thumbColor,
+    onChange = $bindable((_angle) => {}),
   } = $props();
 </script>
 
-<NumberSlider {name} {min} {max} bind:value bind:onChange></NumberSlider>
+<NumberSlider {name} {min} {max} {thumbColor} bind:value {onChange}
+></NumberSlider>
