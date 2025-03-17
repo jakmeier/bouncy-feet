@@ -1,28 +1,29 @@
 <!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script>
   import { t } from '$lib/i18n';
-  import { counter } from '$lib/timer';
-  import { getContext } from 'svelte';
   import Button from '$lib/components/ui/Button.svelte';
-  import { goto } from '$app/navigation';
   import Popup from '$lib/components/ui/Popup.svelte';
+  import { writable } from 'svelte/store';
 
-  const localCollectionCtx = getContext('localCollection');
+  /** @typedef {Object} Props
+   * @property {import('svelte').Snippet<[{item: any, index: number, selected: boolean}]>} itemWrapper
+   * @property {import('svelte').Snippet<[{item: any, index: number}]>} confirmDeleteText
+   * @property {any[]} items
+   * @property { (index: number) => void } onEdit
+   * @property { (index: number) => void } onDelete
+   */
 
-  /** @type {any[]} */
-  export let items;
+  /** @type {Props} */
+  let { itemWrapper, confirmDeleteText, items, onEdit, onDelete } = $props();
 
-  let selectedIndex = -1;
+  let selectedIndex = $state(-1);
   /** @type {import('svelte/store').Writable.<boolean>}*/
-  let showDeleteConfirmation;
+  let showDeleteConfirmation = $state(writable(false));
 
   /** @param {number} index */
   function select(index) {
     selectedIndex = index;
   }
-
-  export let onEdit = (_index) => {};
-  export let onDelete = (_index) => {};
 
   function editItem() {
     onEdit(selectedIndex);
@@ -47,13 +48,17 @@
   {#each items as item, index}
     <div
       class="item"
-      on:click={() => select(index)}
-      on:keydown={() => select(index)}
+      onclick={() => select(index)}
+      onkeydown={() => select(index)}
       role="button"
       tabindex={0}
     >
       <div class="inner-item">
-        <slot name="item" {index} {item} selected={index === selectedIndex} />
+        {@render itemWrapper({
+          selected: index === selectedIndex,
+          index,
+          item,
+        })}
         {#if selectedIndex === index}
           <div class="selected">
             <Button
@@ -79,16 +84,15 @@
   bind:isOpen={showDeleteConfirmation}
   title={'editor.delete-confirmation-title'}
 >
-  <slot
-    name="confirm-delete-text"
-    index={selectedIndex}
-    item={items[selectedIndex]}
-  />
+  {@render confirmDeleteText({
+    index: selectedIndex,
+    item: items[selectedIndex],
+  })}
 
-  <button class="danger wide" on:click={deleteConfirmed}
+  <button class="danger wide" onclick={deleteConfirmed}
     >{$t('editor.confirm-delete-button')}</button
   >
-  <button class="cancel wide" on:click={cancelDelete}
+  <button class="cancel wide" onclick={cancelDelete}
     >{$t('editor.cancel-delete-button')}</button
   >
 </Popup>

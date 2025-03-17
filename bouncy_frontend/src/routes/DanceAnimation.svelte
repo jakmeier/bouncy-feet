@@ -6,12 +6,9 @@
   import { Skeleton } from '$lib/instructor/bouncy_instructor';
   import { counter } from '$lib/timer';
 
-  
-  
-  
   const bpm = 260;
   const stepTime = 60_000 / bpm;
-  
+
   /**
    * @typedef {Object} Props
    * @property {any} dance
@@ -30,10 +27,10 @@
     hiddenBeats = 0,
     beat = counter(-beatDelay, 1, stepTime),
     animationTime = stepTime * 0.85,
-    size = 100,
-    showOverflow = false
+    showOverflow = false,
   } = $props();
 
+  const size = 250;
   // When the beat is negative, it should show a resting position
   // according to the orientation of the first pose.
   const firstPost = dance.skeleton(0);
@@ -48,7 +45,9 @@
     return { x: cartesian.x, y: cartesian.y };
   }
   let skeleton = $derived($beat >= 0 ? dance.skeleton($beat) : restingStep);
-  let bodyShift = $derived($beat >= 0 ? danceBodyShift(dance, $beat) : { x: 0, y: 0 });
+  let bodyShift = $derived(
+    $beat >= 0 ? danceBodyShift(dance, $beat) : { x: 0, y: 0 }
+  );
 </script>
 
 <Animation {animationTime} jumpHeight={size * 0.025}>

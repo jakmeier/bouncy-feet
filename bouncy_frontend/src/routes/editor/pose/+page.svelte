@@ -11,7 +11,6 @@
   import { downloadTextFile } from '$lib/text_utils';
   import { goto } from '$app/navigation';
 
-  
   /**
    * @typedef {Object} Props
    * @property {import('./$types').PageData} data
@@ -87,22 +86,24 @@
 <h2 class="box">{$t('editor.pose.list')}</h2>
 
 <EditOrDeleteList items={$poses} onDelete={deleteConfirmed} onEdit={editPose}>
-  {#snippet item({ item: pose, selected })}
-    <div   >
+  {#snippet itemWrapper({ item: pose })}
+    <div>
       <div class="pose">
         <div>{pose.name('en')}</div>
         <Pose {pose}></Pose>
       </div>
     </div>
   {/snippet}
-  <!-- @migration-task: migrate this slot by hand, `confirm-delete-text` is an invalid identifier -->
-  <div slot="confirm-delete-text" let:item={pose}>
-    <p>
-      {$t('editor.pose.delete-confirmation0')}
-      "{pose.name('en')}"
-      {$t('editor.pose.delete-confirmation1')}
-    </p>
-  </div>
+
+  {#snippet confirmDeleteText({ item: pose })}
+    <div>
+      <p>
+        {$t('editor.pose.delete-confirmation0')}
+        "{pose.name('en')}"
+        {$t('editor.pose.delete-confirmation1')}
+      </p>
+    </div>
+  {/snippet}
 </EditOrDeleteList>
 
 <Popup title={'editor.settings'} bind:isOpen={showSettings} showOkButton>

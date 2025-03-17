@@ -89,8 +89,8 @@
 <h2 class="box">{$t('editor.step.list')}</h2>
 
 <EditOrDeleteList items={$steps} onDelete={deleteConfirmed} onEdit={editStep}>
-  {#snippet item({ item, index, selected })}
-    <div class="list-item"    >
+  {#snippet itemWrapper({ item, index, selected })}
+    <div class="list-item">
       <div class:bold={selected}>{item.name}</div>
       <Step
         step={item}
@@ -100,14 +100,16 @@
       />
     </div>
   {/snippet}
-  <!-- @migration-task: migrate this slot by hand, `confirm-delete-text` is an invalid identifier -->
-  <div slot="confirm-delete-text" let:item>
-    <p>
-      {$t('editor.step.delete-confirmation0')}
-      "{item.name}"
-      {$t('editor.step.delete-confirmation1')}
-    </p>
-  </div>
+
+  {#snippet confirmDeleteText({ item })}
+    <div>
+      <p>
+        {$t('editor.step.delete-confirmation0')}
+        "{item.name}"
+        {$t('editor.step.delete-confirmation1')}
+      </p>
+    </div>
+  {/snippet}
 </EditOrDeleteList>
 
 <Popup title={'editor.settings'} bind:isOpen={showSettings} showOkButton>
