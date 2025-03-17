@@ -14,7 +14,7 @@
       icon: "todo.svg",
       // video: "/video/todo.mp4",
       parts: [
-        (step: "open-v-right", bpms: [60, 90]),
+        (step: "open-v-right", repeat: 16, subbeats_per_move: 2),
       ],
     ),
     (
@@ -22,7 +22,7 @@
       icon: "todo.svg",
       // video: "/video/todo.mp4",
       parts: [
-        (step: "open-v-left", bpms: [60, 90]),
+        (step: "open-v-left", repeat: 16, subbeats_per_move: 2),
       ],
     ),
     (
@@ -30,8 +30,8 @@
       icon: "todo.svg",
       // video: "/video/todo.mp4",
       parts: [
-        (step: "open-v-left", bpms: [60, 90]),
-        (step: "open-v-right", bpms: [60, 90]),
+        (step: "open-v-left", repeat: 16, subbeats_per_move: 2),
+        (step: "open-v-right", repeat: 16, subbeats_per_move: 2),
       ],
     ),
     (
@@ -39,10 +39,10 @@
       icon: "todo.svg",
       // video: "/video/todo.mp4",
       parts: [
-        (step: "v-0", bpms: [60, 90]),
-        (step: "v-0", bpms: [60, 90]),
-        (step: "v-1", bpms: [60, 90]),
-        (step: "v-1", bpms: [60, 90]),
+        (step: "v-0", repeat: 16, subbeats_per_move: 2),
+        (step: "v-0", repeat: 16, subbeats_per_move: 2),
+        (step: "v-1", repeat: 16, subbeats_per_move: 2),
+        (step: "v-1", repeat: 16, subbeats_per_move: 2),
       ],
     ),
     (
@@ -50,9 +50,9 @@
       icon: "todo.svg",
       // video: "/video/todo.mp4",
       parts: [
-        (step: "happy-feet-0", bpms: [110, 120, 130]),
-        (step: "v-step-back", bpms: [110, 120, 130]),
-        (step: "step-back", bpms: [110, 120, 130]),
+        (step: "happy-feet-0", repeat: 16, subbeats_per_move: 2),
+        (step: "v-step-back", repeat: 16, subbeats_per_move: 2),
+        (step: "step-back", repeat: 16, subbeats_per_move: 2),
       ],
     ),
   ],

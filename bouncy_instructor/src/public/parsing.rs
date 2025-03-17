@@ -122,8 +122,8 @@ mod tests {
           names: {"de": "Micro Bounce", "en": "Micro Bounce"},
           icon: "todo.svg",
           parts: [
-            (step: "run-in-place", bpms: [60, 100, 280]),
-            (step: "another-step", bpms: [1, 100, 130]),
+            (step: "run-in-place", repeat: 1, subbeats_per_move: 1),
+            (step: "another-step", repeat: 2, subbeats_per_move: 4),
           ],
         ),
       ],
@@ -295,19 +295,17 @@ mod tests {
                         parts: [
                             LessonPart {
                                 step_name: "run-in-place",
-                                bpms: [
-                                    60,
-                                    100,
-                                    280,
-                                ],
+                                repeat: 1,
+                                pace: StepPace {
+                                    subbeats_per_pose: 1,
+                                },
                             },
                             LessonPart {
                                 step_name: "another-step",
-                                bpms: [
-                                    1,
-                                    100,
-                                    130,
-                                ],
+                                repeat: 2,
+                                pace: StepPace {
+                                    subbeats_per_pose: 4,
+                                },
                             },
                         ],
                     },
@@ -345,8 +343,8 @@ mod tests {
                 },
                 icon: "todo.svg",
                 parts: [
-                  (step: "run-in-place", bpms: [60, 100, 280]),
-                  (step: "micro-bounce", bpms: [1, 100, 130]),
+                  (step: "run-in-place", repeat: 1, subbeats_per_move: 1),
+                  (step: "micro-bounce", repeat: 2, subbeats_per_move: 4),
                 ]
               ),
             ],

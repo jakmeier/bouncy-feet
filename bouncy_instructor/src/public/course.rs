@@ -33,10 +33,12 @@ pub struct Lesson {
 #[derive(Clone)]
 #[wasm_bindgen]
 pub struct LessonPart {
-    pub(crate) explanation: Option<String>,
     pub(crate) step_name: String,
     pub(crate) step_wrapper: StepWrapper,
-    pub(crate) bpms: Vec<u16>,
+    // How many times the step should be repeated.
+    pub(crate) repeat: u32,
+    // At what pace the step should be danced.
+    pub(crate) pace: StepPace,
 }
 
 #[derive(Debug)]
@@ -142,11 +144,12 @@ impl Lesson {
 
         for part in &self.parts {
             let step = &part.step_wrapper;
+            let pace = part.pace;
+            let beats = part.repeat * step.poses().len() as u32 * pace.subbeats_per_pose();
 
-            // TODO: variable speed per part
             // TODO: use view with instructor and camera combined
-            teacher.show_step(step.info(&db), 4, StepPace::half_speed());
-            teacher.add_step(step.info(&db), 4, StepPace::half_speed());
+            teacher.show_step(step.info(&db), beats, pace);
+            teacher.add_step(step.info(&db), beats, pace);
         }
 
         Tracker::new_from_teacher(db, teacher)
@@ -162,17 +165,8 @@ impl LessonPart {
     }
 
     #[wasm_bindgen(getter)]
-    pub fn explanation(&self) -> Option<String> {
-        self.explanation.clone()
-    }
-
-    #[wasm_bindgen(getter)]
     pub fn step(&self) -> StepWrapper {
         self.step_wrapper.clone()
-    }
-    #[wasm_bindgen(getter)]
-    pub fn bpms(&self) -> Vec<u16> {
-        self.bpms.clone()
     }
 }
 
@@ -184,18 +178,10 @@ impl Course {
         video: Option<String>,
         lesson_icon: String,
         lesson_parts: Vec<parsing::course_file::Part>,
-        lang: &str,
     ) -> Result<(), CourseError> {
         let parts = lesson_parts
             .into_iter()
-            .map(|p| {
-                LessonPart::new(
-                    p.step,
-                    p.explanations.and_then(|translated| translated.take(lang)),
-                    p.bpms,
-                    &self.collection,
-                )
-            })
+            .map(|p| LessonPart::new(p.step, &self.collection, p.repeat, p.subbeats_per_move))
             .collect::<Result<_, _>>()?;
         let lesson = Lesson {
             explanation,
@@ -212,20 +198,22 @@ impl Course {
 impl LessonPart {
     fn new(
         step_name: String,
-        explanation: Option<String>,
-        bpms: Vec<u16>,
         state: &ContentCollection,
+        repeat: u32,
+        subbeats_per_move: u8,
     ) -> Result<Self, CourseError> {
         let step_wrapper = state
             .step(&step_name)
             .cloned()
             .ok_or_else(|| CourseError::MissingStep(step_name.clone()))?;
 
+        let pace = StepPace::new(subbeats_per_move as u32);
+
         Ok(LessonPart {
-            explanation,
             step_name,
             step_wrapper,
-            bpms,
+            repeat,
+            pace,
         })
     }
 }
@@ -244,7 +232,8 @@ impl std::fmt::Debug for LessonPart {
             .field("step_name", &self.step_name)
             // intentionally omitted for brevity
             // .field("step_info", &self.step_info)
-            .field("bpms", &self.bpms)
+            .field("repeat", &self.repeat)
+            .field("pace", &self.pace)
             .finish()
     }
 }

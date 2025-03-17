@@ -37,9 +37,10 @@ pub(crate) struct Lesson {
 #[derive(Debug, Serialize, Deserialize)]
 pub(crate) struct Part {
     pub(crate) step: String,
-    pub(crate) bpms: Vec<u16>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub(crate) explanations: Option<TranslatedString>,
+    // How many times the step should be repeated.
+    pub(crate) repeat: u32,
+    // At what pace the step should be danced.
+    pub(crate) subbeats_per_move: u8,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default, Clone, PartialEq)]
@@ -121,7 +122,6 @@ impl CourseFile {
                 lesson.video,
                 lesson.icon,
                 lesson.parts,
-                lang,
             )?;
         }
         Ok(course)

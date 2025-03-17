@@ -53,8 +53,6 @@ export const keypointsside_new: (a: number, b: number, c: number, d: number, e: 
 export const lesson_explanation: (a: number, b: number) => void;
 export const lesson_iconUrl: (a: number, b: number) => void;
 export const lesson_name: (a: number, b: number) => void;
-export const lessonpart_bpms: (a: number, b: number) => void;
-export const lessonpart_explanation: (a: number, b: number) => void;
 export const lesson_parts: (a: number, b: number) => void;
 export const lessonpart_step: (a: number) => number;
 export const lessonpart_stepName: (a: number, b: number) => void;

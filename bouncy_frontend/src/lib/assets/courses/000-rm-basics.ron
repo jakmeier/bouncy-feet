@@ -17,7 +17,7 @@
       parts: [
         // Starting with the inbalance first requires better explanations / intergration work.
         // (step: "kick-forward-unbalanced", bpms: [60, 90]),
-        (step: "kick-forward", bpms: [60, 90]),
+        (step: "kick-forward", repeat: 16, subbeats_per_move: 2),
       ],
     ),
     (
@@ -25,7 +25,7 @@
       icon: "todo.svg",
       video: "https://app.bouncy-feet.ch/media/videos/wip/l2.mp4",
       parts: [
-        (step: "flat-man-3-pause", bpms: [60, 90]),
+        (step: "flat-man-3-pause", repeat: 16, subbeats_per_move: 2),
       ],
     ),
     (
@@ -33,7 +33,7 @@
       icon: "todo.svg",
       video: "https://app.bouncy-feet.ch/media/videos/wip/l3.mp4",
       parts: [
-        (step: "flat-man-2-2", bpms: [60, 90]),
+        (step: "flat-man-2-2", repeat: 16, subbeats_per_move: 2),
       ],
     ),
     (
@@ -41,7 +41,7 @@
       icon: "todo.svg",
       video: "https://app.bouncy-feet.ch/media/videos/wip/l4.mp4",
       parts: [
-        (step: "flat-man", bpms: [60, 90]),
+        (step: "flat-man", repeat: 16, subbeats_per_move: 2),
       ],
     ),
     (
@@ -49,7 +49,7 @@
       icon: "todo.svg",
       video: "https://app.bouncy-feet.ch/media/videos/wip/l5.mp4",
       parts: [
-        (step: "running-man-3", bpms: [60, 90]),
+        (step: "running-man-3", repeat: 16, subbeats_per_move: 2),
       ],
     ),
     (
@@ -57,7 +57,7 @@
       icon: "todo.svg",
       video: "https://app.bouncy-feet.ch/media/videos/wip/l6.mp4",
       parts: [
-        (step: "running-man", bpms: [60, 90]),
+        (step: "running-man", repeat: 16, subbeats_per_move: 2),
       ],
     ),
   ],

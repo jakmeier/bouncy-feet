@@ -10,7 +10,7 @@ pub(crate) struct StepPace {
 }
 
 impl StepPace {
-    fn new(subbeats_per_pose: u32) -> Self {
+    pub(crate) fn new(subbeats_per_pose: u32) -> Self {
         // (I1) `subbeats_per_pose` i` not zero
         assert_ne!(subbeats_per_pose, 0);
         Self { subbeats_per_pose }
@@ -29,6 +29,10 @@ impl StepPace {
     // One pose per two full beats.
     pub(crate) fn quarter_speed() -> Self {
         Self::new(4)
+    }
+
+    pub(crate) fn subbeats_per_pose(&self) -> u32 {
+        self.subbeats_per_pose
     }
 
     /// Get the pose index after N mini-beats on the given pace.
