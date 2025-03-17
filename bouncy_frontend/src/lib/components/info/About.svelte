@@ -8,9 +8,9 @@
   <FullLogo color="var(--theme-main)"></FullLogo>
 </div>
 
-<p>
+<h1>
   {$t('home.about-title')}
-</p>
+</h1>
 
 <p>
   {$t('home.about-0')}
