@@ -24,7 +24,7 @@
       video: "https://app.bouncy-feet.ch/media/videos/c3/simple_heel.mp4",
       parts: [
         (
-          step: "side-to-side-4",
+          step: "heels-starter",
           bpms: [108],
           explanations: {
             "de": "(Keine Beschreibung)",
@@ -46,7 +46,7 @@
       video: "https://app.bouncy-feet.ch/media/videos/c3/side_jumps.mp4",
       parts: [
         (
-          step: "side-to-side-4",
+          step: "side-to-side-2",
           bpms: [108],
           explanations: {
             "de": "(Keine Beschreibung)",
@@ -68,7 +68,7 @@
       video: "https://app.bouncy-feet.ch/media/videos/c3/combo_slow.mp4",
       parts: [
         (
-          step: "side-to-side-4",
+          step: "side-to-side-1",
           bpms: [108],
           explanations: {
             "de": "(Keine Beschreibung)",
@@ -99,38 +99,80 @@
         ),
       ],
     ),
+    (
+      names: {"de": "TODO Titel", "en": "TODO title"},
+      explanations: {
+        "de": "
+        TODO Beschreibung",
+        "en": "
+        TODO description
+        ",
+      },
+      icon: "",
+      video: "https://app.bouncy-feet.ch/media/videos/c3/combo_fast.mp4",
+      parts: [
+        (
+          step: "heels-combo",
+          bpms: [108],
+          explanations: {
+            "de": "(Keine Beschreibung)",
+            "en": "(No description)",
+          },
+        ),
+      ],
+    ),
   ],
   steps: [
     (
       name: "Side to side 4",
       id: "side-to-side-4",
       keyframes: [
-        (pose: "in-place-right-up", orientation: ToCamera, jump_height: 2.0),
-        (pose: "in-place-right-up", orientation: ToCamera, jump_height: 2.0),
-        (pose: "in-place-right-up", orientation: ToCamera, jump_height: 2.0),
-        (pose: "in-place-right-up", orientation: ToCamera, jump_height: 2.0),
-        (pose: "in-place-left-up", orientation: ToCamera, jump_height: 2.0),
-        (pose: "in-place-left-up", orientation: ToCamera, jump_height: 2.0),
-        (pose: "in-place-left-up", orientation: ToCamera, jump_height: 2.0),
-        (pose: "in-place-left-up", orientation: ToCamera, jump_height: 2.0),
+        (pose: "jump-left-wide", orientation: ToCamera, jump_height: 2.0),
+        (pose: "jump-left-short", orientation: ToCamera, jump_height: 2.0, pivot: (side: Left, part: Toes)),
+        (pose: "jump-left-short", orientation: ToCamera, jump_height: 2.0, pivot: (side: Left, part: Toes)),
+        (pose: "jump-left-short", orientation: ToCamera, jump_height: 2.0, pivot: (side: Left, part: Toes)),
+        (pose: "jump-right-wide", orientation: ToCamera, jump_height: 2.0),
+        (pose: "jump-right-short", orientation: ToCamera, jump_height: 2.0, pivot: (side: Right, part: Toes)),
+        (pose: "jump-right-short", orientation: ToCamera, jump_height: 2.0, pivot: (side: Right, part: Toes)),
+        (pose: "jump-right-short", orientation: ToCamera, jump_height: 2.0, pivot: (side: Right, part: Toes)),
       ],
     ),
     (
       name: "Side to side 2",
       id: "side-to-side-2",
       keyframes: [
-        (pose: "in-place-right-up", orientation: ToCamera, jump_height: 2.0),
-        (pose: "in-place-right-up", orientation: ToCamera, jump_height: 2.0),
-        (pose: "in-place-left-up", orientation: ToCamera, jump_height: 2.0),
-        (pose: "in-place-left-up", orientation: ToCamera, jump_height: 2.0),
+        (pose: "jump-left-wide", orientation: ToCamera, jump_height: 2.0),
+        (pose: "jump-left-short", orientation: ToCamera, jump_height: 2.0, pivot: (side: Left, part: Toes)),
+        (pose: "jump-right-wide", orientation: ToCamera, jump_height: 2.0),
+        (pose: "jump-right-short", orientation: ToCamera, jump_height: 2.0, pivot: (side: Right, part: Toes)),
       ],
     ),
     (
       name: "Side to side 1",
       id: "side-to-side-1",
       keyframes: [
-        (pose: "in-place-right-up", orientation: ToCamera, jump_height: 2.0),
-        (pose: "in-place-left-up", orientation: ToCamera, jump_height: 2.0),
+        (pose: "jump-left-wide", orientation: ToCamera, jump_height: 2.0),
+        (pose: "jump-right-wide", orientation: ToCamera, jump_height: 2.0),
+      ],
+    ),
+    (
+      name: "Heels Starter",
+      id: "heels-starter",
+      keyframes: [
+        (pose: "simple-heel-left", orientation: ToCamera, jump_height: 0.5),
+        (pose: "standing-straight-front", orientation: ToCamera, jump_height: 0.5),
+        (pose: "simple-heel-right", orientation: ToCamera, jump_height: 0.5),
+        (pose: "standing-straight-front", orientation: ToCamera, jump_height: 0.5),
+      ],
+    ),
+    (
+      name: "Side Jump Heels",
+      id: "heels-combo",
+      keyframes: [
+        (pose: "jump-left-short", orientation: ToCamera, jump_height: 4.0),
+        (pose: "heel-in-combo-right", orientation: ToCamera, jump_height: 0.25, pivot: (side: Right, part: Toes)),
+        (pose: "jump-right-short", orientation: ToCamera, jump_height: 4.0),
+        (pose: "heel-in-combo-left", orientation: ToCamera, jump_height: 0.25, pivot: (side: Left, part: Toes)),
       ],
     ),
     
@@ -180,6 +222,115 @@
         absolute: {(side: Left, part: Knee): -1.0, (side: Right, part: Heel): 1.0},
       ),
     ),
+    (
+      id: "simple-heel-right",
+      names: Some({
+          "en": "simple-heel-right",
+      }),
+      direction: Front,
+      limbs: [
+          (limb: LeftThigh, weight: 0.5, angle: 0, tolerance: 0),
+          (limb: LeftShin, weight: 0.0, angle: 1, tolerance: 0),
+          (limb: LeftFoot, weight: 0.0, angle: 7, tolerance: 0),
+          (limb: LeftArm, weight: 0.0, angle: -43, tolerance: 0),
+          (limb: LeftForearm, weight: 0.0, angle: -34, tolerance: 0),
+          (limb: RightThigh, weight: 1.0, angle: 36, tolerance: 0),
+          (limb: RightShin, weight: 1.0, angle: 19, tolerance: 0),
+          (limb: RightFoot, weight: 1.0, angle: 98, tolerance: 0),
+          (limb: RightArm, weight: 0.0, angle: 5, tolerance: 0),
+          (limb: RightForearm, weight: 0.0, angle: 48, tolerance: 0),
+          (limb: LeftLeg, weight: 1.0, angle: 1, tolerance: 0),
+          (limb: RightLeg, weight: 1.0, angle: 27, tolerance: 0),
+      ],
+      turn_hip: 4,
+      y_shift: -0.15,
+      z: (
+          absolute: {(side: Right, part: Toes): 2.0, (side: Right, part: Elbow): 0.0, (side: Left, part: Heel): 0.0, (side: Right, part: Heel): 1.5, (side: Right, part: Wrist): 0.0, (side: Right, part: Ankle): 1.5, (side: Right, part: Knee): 1.0, (side: Left, part: Toes): 2.0, (side: Left, part: Ankle): 0.0, (side: Left, part: Knee): 1.0, (side: Left, part: Wrist): 0.0, (side: Left, part: Elbow): 0.0},
+      ),
+    ),
+    ( id: "simple-heel-left", names: {"en": "simple-heel-left"}, mirror_of: "simple-heel-right", direction: Front ),
+    (
+      id: "jump-right-wide",
+      names: Some({
+          "en": "jump-right-wide",
+      }),
+      direction: Front,
+      limbs: [
+          (limb: LeftThigh, weight: 1.0, angle: 13, tolerance: 0),
+          (limb: LeftShin, weight: 1.0, angle: -14, tolerance: 0),
+          (limb: LeftFoot, weight: 0.0, angle: 24, tolerance: 0),
+          (limb: LeftArm, weight: 0.0, angle: -14, tolerance: 0),
+          (limb: LeftForearm, weight: 0.0, angle: 51, tolerance: 0),
+          (limb: RightThigh, weight: 1.0, angle: 32, tolerance: 0),
+          (limb: RightShin, weight: 1.0, angle: 18, tolerance: 0),
+          (limb: RightFoot, weight: 0.0, angle: 77, tolerance: 0),
+          (limb: RightArm, weight: 0.0, angle: 16, tolerance: 0),
+          (limb: RightForearm, weight: 0.0, angle: 34, tolerance: 0),
+          (limb: LeftLeg, weight: 1.0, angle: 3, tolerance: 0),
+          (limb: RightLeg, weight: 1.0, angle: 25, tolerance: 0),
+      ],
+      turn_hip: -1,
+      x_shift: 0.05,
+      y_shift: -0.05,
+      z: (
+          absolute: {(side: Right, part: Heel): -0.5, (side: Right, part: Knee): 0.0, (side: Left, part: Heel): -2.0, (side: Left, part: Toes): -1.0, (side: Left, part: Knee): 1.0, (side: Right, part: Elbow): 0.0, (side: Left, part: Ankle): -2.0, (side: Right, part: Toes): 0.0, (side: Left, part: Wrist): 0.0, (side: Right, part: Wrist): 0.0, (side: Right, part: Ankle): 0.0, (side: Left, part: Elbow): 0.0},
+      ),
+    ),
+    ( id: "jump-left-wide", names: {"en": "jump-left-wide"}, mirror_of: "jump-right-wide", direction: Front ),
+    (
+      id: "jump-right-short",
+      names: Some({
+          "en": "jump-right-short",
+      }),
+      direction: Front,
+      limbs: [
+          (limb: LeftThigh, weight: 1.0, angle: 8, tolerance: 0),
+          (limb: LeftShin, weight: 1.0, angle: -43, tolerance: 0),
+          (limb: LeftFoot, weight: 0.0, angle: 24, tolerance: 0),
+          (limb: LeftArm, weight: 0.0, angle: -32, tolerance: 0),
+          (limb: LeftForearm, weight: 0.0, angle: 62, tolerance: 0),
+          (limb: RightThigh, weight: 1.0, angle: 6, tolerance: 0),
+          (limb: RightShin, weight: 1.0, angle: -23, tolerance: 0),
+          (limb: RightFoot, weight: 0.0, angle: 65, tolerance: 0),
+          (limb: RightArm, weight: 0.0, angle: 14, tolerance: 0),
+          (limb: RightForearm, weight: 0.0, angle: -45, tolerance: 0),
+          (limb: LeftLeg, weight: 1.0, angle: 1, tolerance: 0),
+          (limb: RightLeg, weight: 1.0, angle: -9, tolerance: 0),
+      ],
+      turn_hip: 2,
+      x_shift: 0.05,
+      z: (
+          absolute: {(side: Left, part: Heel): 0.0, (side: Right, part: Knee): 0.0, (side: Left, part: Wrist): 0.0, (side: Left, part: Knee): 1.0, (side: Right, part: Toes): 0.0, (side: Left, part: Ankle): 0.0, (side: Right, part: Ankle): 0.0, (side: Right, part: Wrist): 0.0, (side: Left, part: Toes): -1.0, (side: Right, part: Elbow): 0.0, (side: Right, part: Heel): -1.0, (side: Left, part: Elbow): 0.0},
+      ),
+    ),
+    ( id: "jump-left-short", names: {"en": "jump-left-short"}, mirror_of: "jump-right-short", direction: Front ),
+    (
+      id: "heel-in-combo-right",
+      names: Some({
+        "en": "heel-in-combo-right",
+      }),
+      direction: Front,
+      limbs: [
+        (limb: LeftThigh, weight: 1.0, angle: -3, tolerance: 0),
+        (limb: LeftShin, weight: 1.0, angle: 0, tolerance: 0),
+        (limb: LeftFoot, weight: 0.0, angle: -40, tolerance: 0),
+        (limb: LeftArm, weight: 0.0, angle: -37, tolerance: 0),
+        (limb: LeftForearm, weight: 0.0, angle: -31, tolerance: 0),
+        (limb: RightThigh, weight: 1.0, angle: 24, tolerance: 0),
+        (limb: RightShin, weight: 1.0, angle: 10, tolerance: 0),
+        (limb: RightFoot, weight: 1.0, angle: 98, tolerance: 0),
+        (limb: RightArm, weight: 0.0, angle: 21, tolerance: 0),
+        (limb: RightForearm, weight: 0.0, angle: 32, tolerance: 0),
+        (limb: LeftLeg, weight: 1.0, angle: -1, tolerance: 0),
+        (limb: RightLeg, weight: 1.0, angle: 17, tolerance: 0),
+      ],
+      turn_hip: 10,
+      y_shift: -0.06,
+      z: (
+        absolute: {(side: Right, part: Elbow): 0.0, (side: Right, part: Wrist): 0.0, (side: Right, part: Heel): 0.0, (side: Left, part: Elbow): 0.0, (side: Left, part: Knee): 0.5, (side: Right, part: Ankle): 0.0, (side: Left, part: Toes): 0.0, (side: Right, part: Knee): 0.0, (side: Left, part: Wrist): 0.0, (side: Left, part: Heel): 0.0, (side: Right, part: Toes): 0.0, (side: Left, part: Ankle): 0.0},
+      ),
+    ),
+    ( id: "heel-in-combo-left", names: {"en": "heel-in-combo-left"}, mirror_of: "heel-in-combo-right", direction: Front ),
     // TODO: Resting poses should either be added by default or not be required
     // to exist with exactly these ids
     (

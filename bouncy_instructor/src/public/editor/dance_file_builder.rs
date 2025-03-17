@@ -102,7 +102,12 @@ impl DanceFileBuilder {
                 .cloned()
                 .collect(),
         };
-        let string = ron::ser::to_string_pretty(&file_data, ron::ser::PrettyConfig::default())?;
+        let string = ron::ser::to_string_pretty(
+            &file_data,
+            ron::ser::PrettyConfig::default()
+                .depth_limit(4)
+                .indentor("  ".to_owned()),
+        )?;
         Ok(string)
     }
 
