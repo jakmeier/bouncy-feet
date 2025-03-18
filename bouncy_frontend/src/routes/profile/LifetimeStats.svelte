@@ -14,23 +14,27 @@
   }
 </script>
 
-<h3>{$t('stats.lifetime-stats-title')}</h3>
-<div class="big">{num(steps)} {$t('stats.num-steps')}</div>
-<div class="big">{num(activities)} {$t('stats.num-lessons')}</div>
+<h1>{$t('stats.lifetime-stats-title')}</h1>
 
-<h3>{$t('stats.learned-stats-title')}</h3>
-<div class="big">{num(uniqueSteps)} {$t('stats.unique-steps')}</div>
-
-<h3>{$t('stats.fun-stats-title')}</h3>
-
-<div class="big">
-  {formatDistance(0, seconds * 1000, formatOpts)}
-  {$t('stats.time-danced-2')}
+<div class="block">
+  <div>{$t('stats.lifetime-stats-subtitle')}</div>
+  <div>{num(steps)} {$t('stats.num-steps')}</div>
+  <div>{num(activities)} {$t('stats.num-lessons')}</div>
+  <div>
+    {formatDistance(0, seconds * 1000, formatOpts)}
+    {$t('stats.time-danced-2')}
+  </div>
 </div>
 
+<div class="block">
+  <div>{$t('stats.learned-stats-title')}</div>
+  <div>{num(uniqueSteps)} {$t('stats.unique-steps')}</div>
+</div>
+
+<div>{$t('stats.fun-stats-title')}</div>
+
 <style>
-  .big {
-    font-size: var(--font-large);
-    /* margin-bottom: 1rem; */
+  .block {
+    margin-bottom: 1rem;
   }
 </style>

@@ -49,12 +49,9 @@
   bgColor="var(--theme-neutral-black)"
   color="var(--theme-neutral-white)"
 ></Background>
-<LogoHeader />
+<LogoHeader title={$t('home.slogan-1')} />
 
 <div class="focus-card">
-  <h1>
-    {$t('home.slogan-1')}
-  </h1>
   <div>
     <HomeEntry dance={entryDance}></HomeEntry>
   </div>
@@ -131,9 +128,9 @@
 
   .wrapper {
     min-height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    /* display: flex; */
+    /* flex-direction: column; */
+    /* justify-content: center; */
   }
 
   .picture {
