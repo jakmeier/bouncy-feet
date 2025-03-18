@@ -16,9 +16,9 @@
 <style>
   .progress-container {
     width: 100%;
-    height: 30px;
+    height: 2rem;
     background-color: var(--theme-neutral-light);
-    border-radius: 3px;
+    border-radius: 1rem;
     overflow: hidden;
     position: relative;
   }

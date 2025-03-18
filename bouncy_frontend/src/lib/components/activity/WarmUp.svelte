@@ -32,7 +32,7 @@
   let tracker = Tracker.WarmUp(
     stepNames,
     // TODO: maybe let user decide duration?
-    120
+    80
   );
   const unregisterTracker = registerTracker(tracker);
   let trackingDone = $state(false);

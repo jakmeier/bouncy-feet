@@ -13,4 +13,6 @@ pub enum TeacherView {
     UserCameraWithTracking = 2,
     /// Show the camera (without tracking) and the instructor.
     InstructorAndCamera = 3,
+    /// Show just the plain camera.
+    CameraOnly = 4,
 }

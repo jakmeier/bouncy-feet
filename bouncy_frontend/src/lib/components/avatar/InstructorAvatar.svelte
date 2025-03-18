@@ -14,8 +14,6 @@
 
   /**
    * @typedef {Object} Props
-   * @property {number} width
-   * @property {number} height
    * @property {import("bouncy_instructor").Skeleton} skeleton
    * @property {Cartesian2d} [bodyShift]
    * @property {boolean} [lastPoseWasCorrect]
@@ -28,8 +26,6 @@
 
   /** @type {Props} */
   let {
-    width,
-    height,
     skeleton,
     bodyShift = new Cartesian2d(0, 0),
     lastPoseWasCorrect = true,
@@ -101,7 +97,7 @@
 </script>
 
 <div class="avatar-container">
-  <Animation {animationTime} delay={animationDelay} jumpHeight={height * 0.025}>
+  <Animation {animationTime} delay={animationDelay}>
     <Svg width={250} height={250} orderByZ>
       <AvatarStyleContext {coloring}>
         <SvgAvatar
@@ -118,7 +114,6 @@
 
 <style>
   .avatar-container {
-    position: absolute;
     width: 100%;
     height: 100%;
   }

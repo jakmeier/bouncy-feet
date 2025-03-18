@@ -8,7 +8,12 @@
   // within this component.
 
   import { base } from '$app/paths';
-  import { BLACK_COLORING, LEFT_RIGHT_COLORING_LIGHT } from '$lib/constants';
+  import {
+    BLACK_COLORING,
+    LEFT_RIGHT_COLORING,
+    LEFT_RIGHT_COLORING_LIGHT,
+    UGLY_LEFT_RIGHT_COLORING,
+  } from '$lib/constants';
   import { t } from '$lib/i18n';
   import { timeBetweenMoves } from '$lib/stores/Beat';
   import {
@@ -23,7 +28,11 @@
   import FullScreenArea from '../ui/FullScreenArea.svelte';
   import InstructorAvatar from '../avatar/InstructorAvatar.svelte';
   import ProgressBar from './ProgressBar.svelte';
-  import { PoseHint } from '$lib/instructor/bouncy_instructor_bg';
+  import {
+    DetectionState,
+    PoseHint,
+  } from '$lib/instructor/bouncy_instructor_bg';
+  import { fade } from 'svelte/transition';
 
   /**
    * @typedef {Object} Props
@@ -59,12 +68,12 @@
   let enableLiveAvatar = $state(false);
   let enableInstructorAvatar = $state(false);
   let showOverlay = $state(true);
-  let beforeRecording = $state(true);
+  let showExplanation = $state(true);
   let recordingOn = $state(false);
   let videoOpacity = $state(0.0);
   let view = $state(TeacherView.Off);
   let poseHint = $state();
-  let avatarStyle = $state(selectStyle(PoseHint.DontKnow));
+  let userStyle = $state(selectStyle(PoseHint.DontKnow));
 
   /** Where should the instructor origin be display. It can be on top of the
    * detection, or it can be fixed on screen, depending on the view. */
@@ -75,7 +84,7 @@
   );
   let instructorSkeletonSize = $derived(
     view === TeacherView.InstructorOnly
-      ? 2.0
+      ? 1.25
       : Math.min(lastDetectedSkeletonSize, 4.0)
   );
 
@@ -104,10 +113,6 @@
   }
   export async function startRecording() {
     await camera.startRecording();
-    recordingOn = true;
-
-    beforeRecording = false;
-    showOverlay = false;
   }
   export async function endRecording() {
     camera.stopCamera();
@@ -119,8 +124,9 @@
 
   /**
    * @param {TeacherView} newView
+   * @param {DetectionState} newDetectionState
    */
-  export function updateView(newView) {
+  export function updateView(newView, newDetectionState) {
     view = newView;
     switch (view) {
       case TeacherView.Off:
@@ -147,15 +153,27 @@
         enableInstructorAvatar = true;
         break;
 
+      case TeacherView.CameraOnly:
+        videoOpacity = 1.0;
+        enableLiveAvatar = false;
+        enableInstructorAvatar = false;
+        break;
+
       default:
         console.warn('Unexpected TeacherView', view);
     }
+
+    showExplanation = [
+      DetectionState.Init,
+      DetectionState.Positioning,
+    ].includes(newDetectionState);
+    showOverlay = showExplanation || !!effectText;
   }
 
   /** @param {PoseHint} newPoseHint  */
   export function updatePoseHint(newPoseHint) {
     poseHint = newPoseHint;
-    avatarStyle = selectStyle(poseHint);
+    userStyle = selectStyle(poseHint);
   }
 
   /**
@@ -168,12 +186,12 @@
       case PoseHint.ZOrder:
         return BLACK_COLORING;
       default:
-        return BLACK_COLORING;
+        return UGLY_LEFT_RIGHT_COLORING;
     }
   }
 </script>
 
-<FullScreenArea>
+<FullScreenArea backgroundColor="var(--theme-neutral-black)">
   <div class="camera" bind:clientWidth={outerWidth}>
     <Camera
       bind:opacity={videoOpacity}
@@ -182,36 +200,34 @@
       bind:this={camera}
     />
 
-    {#if enableInstructorAvatar && instructorSkeleton && recordingOn}
-      <div class="avatar-container">
+    {#if enableInstructorAvatar && instructorSkeleton}
+      <div class="instructor">
         <InstructorAvatar
-          width={camVideoElement.clientWidth}
-          height={camVideoElement.clientHeight}
           avatarSize={instructorSkeletonSize}
           skeleton={instructorSkeleton}
           bodyShift={instructorSkeletonBodyShift}
           origin={instructorOrigin}
-          instructorStyle={LEFT_RIGHT_COLORING_LIGHT}
+          instructorStyle={LEFT_RIGHT_COLORING}
           {lastPoseWasCorrect}
           {animationTime}
         />
       </div>
     {/if}
 
-    {#if enableLiveAvatar && recordingOn}
+    {#if enableLiveAvatar}
       <div
         class="avatar-container"
-        style="left: {(outerWidth - camVideoElement.clientWidth) / 2}px;"
+        style="left: {(outerWidth - camVideoElement?.clientWidth) / 2}px;"
       >
         <Canvas
-          width={camVideoElement.clientWidth}
-          height={camVideoElement.clientHeight}
+          width={camVideoElement?.clientWidth}
+          height={camVideoElement?.clientHeight}
         >
           <Avatar
             landmarks={userLandmarks}
-            width={camVideoElement.clientWidth}
-            height={camVideoElement.clientHeight}
-            style={avatarStyle}
+            width={camVideoElement?.clientWidth}
+            height={camVideoElement?.clientHeight}
+            style={userStyle}
             torsoLineWidth={5}
             {markedLimbs}
           ></Avatar>
@@ -219,32 +235,24 @@
       </div>
     {/if}
 
-    <div class="ui">
-      <!-- TODO: add this dev tooling again (ideally without mirroring it :P) -->
-      <!-- {#if true}
-        <LiveRecordingSettings
-          bind:enableLiveAvatar
-          bind:enableInstructorAvatar
-          bind:videoOpacity
-        />
-      {/if} -->
-      {#if recordingOn}
-        <ProgressBar {progress}></ProgressBar>
-        <button class="symbol" onclick={stop}>
-          <img src="{base}/img/symbols/bf_stop.svg" alt="stop" />
-        </button>
-      {/if}
+    <div class="progress">
+      <ProgressBar {progress}></ProgressBar>
     </div>
   </div>
 
-  {#if showOverlay}
-    <div class="overlay">
-      <div class="frame">
-        <div class="corner-marked2">
-          <div class="corner-marked">
-            {#if beforeRecording}
+  <div class="overlay" class:transparent={!showOverlay} transition:fade>
+    <div class="frame">
+      <div class="corner-marked2">
+        <div class="corner-marked">
+          <div class="framed">
+            {#if showExplanation}
               <div class="overlay-text">
-                {$t('courses.lesson.exercise-start-description')}
+                <div>
+                  {$t('courses.lesson.exercise-start-description-0')}
+                </div>
+                <div>
+                  {$t('courses.lesson.exercise-start-description-1')}
+                </div>
               </div>
             {/if}
             {#if effectText}
@@ -255,14 +263,22 @@
           </div>
         </div>
       </div>
-      {#if beforeRecording}
-        <button class="symbol" onclick={startRecording}>
-          <img src="{base}/img/symbols/bf_eye.svg" alt="start" />
-          <div class="accent">Start recording</div>
-        </button>
-      {/if}
     </div>
-  {/if}
+  </div>
+
+  <div class="ui">
+    <!-- TODO: add this dev tooling again (ideally without mirroring it :P) -->
+    <!-- {#if true}
+      <LiveRecordingSettings
+        bind:enableLiveAvatar
+        bind:enableInstructorAvatar
+        bind:videoOpacity
+      />
+    {/if} -->
+    <button class="symbol" onclick={stop}>
+      <img src="{base}/img/symbols/bf_stop.svg" alt="stop" />
+    </button>
+  </div>
 </FullScreenArea>
 
 <style>
@@ -275,6 +291,17 @@
     display: grid;
     align-items: center;
     justify-items: center;
+  }
+  .progress {
+    position: absolute;
+    top: 1rem;
+    width: 90vw;
+  }
+  .instructor {
+    position: absolute;
+    top: 4rem;
+    width: 100%;
+    height: calc(100dvh - 8em);
   }
   .avatar-container {
     position: absolute;
@@ -302,28 +329,27 @@
     color: var(--theme-neutral-white);
     background-color: var(--theme-neutral-dark-transparent);
   }
+  .overlay.transparent {
+    background-color: transparent;
+  }
+  .effect-text,
   .overlay-text {
-    height: 50dvh;
+    height: 100%;
     display: grid;
     justify-content: center;
     align-content: center;
   }
+  .overlay-text div {
+    padding: 1rem;
+  }
   .effect-text {
-    height: 50dvh;
-    display: grid;
-    justify-content: center;
-    align-content: center;
     font-size: 16rem;
     color: var(--theme-main);
   }
   .frame {
     margin: 10dvh 2rem;
   }
-  .overlay button {
-    position: relative;
-    bottom: 3rem;
-  }
-  .accent {
-    color: var(--theme-accent);
+  .framed {
+    height: calc(100dvh - 8em);
   }
 </style>

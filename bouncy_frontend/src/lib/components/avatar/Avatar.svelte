@@ -1,5 +1,4 @@
 <script>
-  import { LimbError } from '$lib/instructor/bouncy_instructor';
   import { distance2d } from '$lib/math';
   import {
     I,

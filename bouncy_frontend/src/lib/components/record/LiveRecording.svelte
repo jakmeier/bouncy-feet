@@ -124,10 +124,18 @@ it does not match
     }
 
     const teacherView = tracker.currentView(performance.now());
-    screen.updateView(teacherView);
+    screen.updateView(teacherView, $detectionState);
 
     if ($detectionState === DetectionState.TrackingDone) {
       stop();
+    }
+
+    if (
+      !recordingOn &&
+      $detectionState !== DetectionState.Init &&
+      $detectionState !== DetectionState.Positioning
+    ) {
+      startRecording();
     }
 
     if (screen.isCameraOn() && dataListener) {

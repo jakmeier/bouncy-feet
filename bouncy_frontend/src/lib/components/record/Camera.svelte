@@ -106,11 +106,6 @@
   class:hidden={!cameraOn}
   style="opacity: {opacity}"
 ></video>
-{#if !cameraOn}
-  <div class="symbol corner-marked">
-    <img src="{base}/img/symbols/bf_eye.svg" alt="bouncy feet eye" />
-  </div>
-{/if}
 
 <style>
   video {
@@ -125,6 +120,7 @@
     min-width: 100vw;
     min-height: 100dvh;
     transform: translate(-50%, -50%);
+    transition: opacity 0.5s ease-in-out;
   }
 
   .symbol {

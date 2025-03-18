@@ -342,9 +342,7 @@ impl DanceDetector {
 
     pub(crate) fn current_view(&mut self, t: Timestamp) -> TeacherView {
         match self.detection_state {
-            DetectionState::Init | DetectionState::Positioning => {
-                TeacherView::UserCameraWithTracking
-            }
+            DetectionState::Init | DetectionState::Positioning => TeacherView::CameraOnly,
             DetectionState::CountDown
             | DetectionState::LiveTracking
             | DetectionState::InstructorDemo => {
@@ -446,12 +444,10 @@ impl DanceDetector {
         self.ui_events
             .add_audio(next_beat + 13.0 * beat, "three".to_owned());
         self.ui_events
-            .add_text(next_beat + 13.0 * beat, "1".to_owned(), text_dur);
+            .add_text(next_beat + 13.0 * beat, "1".to_owned(), beat);
 
         self.ui_events
             .add_audio(next_beat + 15.0 * beat, "four".to_owned());
-        self.ui_events
-            .add_text(next_beat + 17.0 * beat, "0".to_owned(), beat);
     }
 
     /// For debugging pruposes, set the state directly.
