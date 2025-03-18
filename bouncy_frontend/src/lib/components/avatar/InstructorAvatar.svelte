@@ -22,6 +22,7 @@
    * @property {AvatarColoring} [instructorStyle]
    * @property {number} [showCorrectTime]
    * @property {number} [animationTime]
+   * @property {number} [jumpHeight]
    */
 
   /** @type {Props} */
@@ -38,6 +39,7 @@
     },
     showCorrectTime = 100,
     animationTime = 100,
+    jumpHeight = 1.0,
   } = $props();
 
   // This would work to show one pose ahead of time.
@@ -97,8 +99,8 @@
 </script>
 
 <div class="avatar-container">
-  <Animation {animationTime} delay={animationDelay}>
-    <Svg width={250} height={250} orderByZ>
+  <Animation {animationTime} delay={animationDelay} {jumpHeight}>
+    <Svg width={250} height={250} orderByZ showOverflow>
       <AvatarStyleContext {coloring}>
         <SvgAvatar
           skeleton={displayedSkeleton}

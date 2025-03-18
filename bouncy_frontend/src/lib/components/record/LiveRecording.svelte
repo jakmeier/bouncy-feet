@@ -19,6 +19,7 @@
   import BackgroundTask from '../BackgroundTask.svelte';
   import {
     Cartesian2d,
+    DanceCursor,
     DetectionResult,
     DetectionState,
     LimbError,
@@ -90,7 +91,8 @@ it does not match
   let detectionState = tracker.detectionState;
   tracker.enforceBeat(forceBeat);
   let progress = $state(0.0);
-  let currentBeat = -1;
+  /** @type {DanceCursor | null} */
+  let tailCursor = null;
   let firstPoseIsShown = false;
 
   let lastAudioHint = performance.now() - 2000;
@@ -102,6 +104,7 @@ it does not match
   /** @type {import("bouncy_instructor").Skeleton} */
   let instructorSkeleton = $state(tracker.expectedPoseSkeleton().restingPose());
   let instructorSkeletonBodyShift = $state(tracker.expectedPoseBodyShift());
+  let instructorJumpHeight = $state(1.0);
 
   /** @type {import("@mediapipe/tasks-vision").NormalizedLandmark[]} */
   let landmarks = $state([]);
@@ -205,11 +208,14 @@ it does not match
     ) {
       if (forceBeat) {
         const future = performance.now() + animationTime;
-        let newBeat = tracker.subbeat(future);
-        if (newBeat !== currentBeat) {
-          instructorSkeleton = tracker.poseSkeletonAtSubbeat(newBeat);
-          instructorSkeletonBodyShift = tracker.poseBodyShiftAtSubbeat(newBeat);
-          currentBeat = newBeat;
+
+        /** @type {DanceCursor} */
+        let newCursor = tracker.cursor(future);
+        if (!tailCursor?.isSamePose(newCursor)) {
+          instructorSkeleton = tracker.poseSkeletonAt(newCursor);
+          instructorSkeletonBodyShift = tracker.poseBodyShift(newCursor);
+          instructorJumpHeight = tracker.jumpHeight(newCursor);
+          tailCursor = newCursor;
 
           updateInstructorPosition();
         }
@@ -230,6 +236,7 @@ it does not match
   function updateInstructor() {
     instructorSkeleton = tracker.expectedPoseSkeleton();
     instructorSkeletonBodyShift = tracker.expectedPoseBodyShift();
+    instructorJumpHeight = tracker.expectedJumpHeight();
     updateInstructorPosition();
   }
 
@@ -339,13 +346,14 @@ it does not match
 <LiveRecordingScreen
   bind:this={screen}
   {effectText}
+  {instructorJumpHeight}
   {instructorSkeleton}
-  {userSkeletonSize}
-  {userSkeletonOrigin}
-  markedLimbs={worstLimbs}
-  {progress}
   {instructorSkeletonBodyShift}
   {lastPoseWasCorrect}
+  {progress}
+  {userSkeletonOrigin}
+  {userSkeletonSize}
+  markedLimbs={worstLimbs}
   userLandmarks={landmarks}
   onStop={stop}
 ></LiveRecordingScreen>

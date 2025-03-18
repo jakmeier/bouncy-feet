@@ -23,8 +23,26 @@
     backgroundColor = 'var(--theme-neutral-light)',
   } = $props();
 
-  let skeleton = $derived(tracker.poseSkeletonAtSubbeat($beatCounter));
-  let bodyShift = $derived(tracker.poseBodyShiftAtSubbeat($beatCounter));
+  /**
+   * @type {import("$lib/instructor/bouncy_instructor").DanceCursor}
+   */
+  let prevCursor;
+
+  // Only update cursor when it changes pose
+  let cursor = $derived.by(() => {
+    const next = tracker.cursorAtSubbeat($beatCounter);
+    if (prevCursor && prevCursor.isSamePose(next)) {
+      return prevCursor;
+    }
+    prevCursor = next;
+    return next;
+  });
+
+  // These values are derived by the cursor, when it changes
+  let skeleton = $derived(tracker.poseSkeletonAt(cursor));
+  let bodyShift = $derived(tracker.poseBodyShift(cursor));
+  let jumpHeight = $derived(tracker.jumpHeight(cursor));
+
   let animationTime = $derived($timeBetweenMoves * 0.8);
 </script>
 
@@ -35,8 +53,7 @@
   borderRadius="20px"
   {backgroundColor}
 >
-  <!-- TODO: jump height per move -->
-  <Animation {animationTime} jumpHeight={1.0}>
+  <Animation {animationTime} {jumpHeight}>
     <Svg width={250} height={250} orderByZ>
       <SvgAvatar width={250} height={250} {skeleton} {bodyShift} />
     </Svg>

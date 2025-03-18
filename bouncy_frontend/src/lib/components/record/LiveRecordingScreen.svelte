@@ -42,6 +42,7 @@
    * @property {number} userSkeletonSize How large the dancer is on camera. Don't update between poses.
    * @property {number} progress
    * @property {Cartesian2d} instructorSkeletonBodyShift
+   * @property {number} instructorJumpHeight
    * @property {boolean} lastPoseWasCorrect
    * @property {import("@mediapipe/tasks-vision").NormalizedLandmark[]} userLandmarks Where on camera the user has been detected.
    * @property {LimbError[]} [markedLimbs]
@@ -57,6 +58,7 @@
     markedLimbs,
     progress,
     instructorSkeletonBodyShift,
+    instructorJumpHeight,
     lastPoseWasCorrect,
     userLandmarks,
     onStop,
@@ -217,6 +219,7 @@
           instructorStyle={LEFT_RIGHT_COLORING}
           {lastPoseWasCorrect}
           {animationTime}
+          jumpHeight={instructorJumpHeight}
         />
       </div>
     {/if}

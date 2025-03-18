@@ -1,6 +1,6 @@
 use super::step_pace::StepPace;
 use crate::skeleton::Cartesian2d;
-use crate::tracker::TeacherView;
+use crate::tracker::{DanceCursor, TeacherView};
 use crate::StepInfo;
 
 /// Dynamically switch between steps, switch between views for showing the next
@@ -68,6 +68,18 @@ impl Teacher {
         }));
     }
 
+    pub(crate) fn step(&self, cursor: &DanceCursor) -> Option<&StepInfo> {
+        self.section(cursor).and_then(|section| match &section {
+            Section::Step(step_section)
+            | Section::ShowStep(step_section)
+            | Section::Warmup(step_section) => {
+                let StepSection { step, .. } = step_section;
+                Some(step)
+            }
+            Section::Freestyle { .. } => None,
+        })
+    }
+
     /// After n subbeats of the lesson, get the current step and beat remainder.
     ///
     /// Full beat: only count 1,2,3,4 (used for bpm calculation)
@@ -83,6 +95,42 @@ impl Teacher {
                 }
                 Section::Freestyle { .. } => None,
             })
+    }
+
+    pub(crate) fn cursor_at_subbeat(&self, subbeat: u32) -> DanceCursor {
+        let (step_index, remainder) = self.index_at_subbeat(subbeat);
+        let section = self.sections.get(step_index);
+        let pose_index = section
+            .map(|section| match section {
+                Section::Step(step_section)
+                | Section::ShowStep(step_section)
+                | Section::Warmup(step_section) => {
+                    let StepSection { pace, .. } = step_section;
+                    pace.pose_at_subbeat(remainder as u32) as usize
+                }
+                Section::Freestyle { .. } => 0,
+            })
+            .unwrap_or(0);
+        DanceCursor {
+            subbeat,
+            step_index,
+            pose_index,
+        }
+    }
+
+    fn index_at_subbeat(&self, subbeat: u32) -> (usize, usize) {
+        let mut subbeat_remainder = subbeat;
+        for (index, section) in self.sections.iter().enumerate() {
+            if subbeat_remainder < section.subbeats() {
+                return (index, subbeat_remainder as usize);
+            }
+            subbeat_remainder -= section.subbeats();
+        }
+        (self.sections.len(), 0)
+    }
+
+    fn section(&self, cursor: &DanceCursor) -> Option<&Section> {
+        self.sections.get(cursor.step_index)
     }
 
     fn section_at_subbeat(&self, mut subbeat: u32) -> Option<&Section> {

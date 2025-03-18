@@ -7,6 +7,7 @@ mod teacher_output;
 pub use detection_output::{DetectionFailureReason, DetectionResult, PoseHint};
 pub use pose_output::PoseApproximation;
 pub use step_output::DetectedStep;
+pub use teacher_output::DanceCursor;
 pub use teacher_output::TeacherView;
 
 use super::renderable::RenderableSkeleton;
@@ -356,6 +357,12 @@ impl Tracker {
         self.pose_skeleton_at_subbeat(beat as i32)
     }
 
+    #[wasm_bindgen(js_name = expectedJumpHeight)]
+    pub fn expected_jump_height(&self) -> f32 {
+        let beat = self.detector.num_detected_poses();
+        self.jump_height_at_subbeat(beat as i32)
+    }
+
     pub fn subbeat(&self, t: f64) -> i32 {
         self.detector.timestamp_to_subbeat(t) as i32
             - self
@@ -363,21 +370,50 @@ impl Tracker {
                 .timestamp_to_subbeat(self.detector.detection_state_start) as i32
     }
 
-    #[wasm_bindgen(js_name = poseSkeletonAtSubbeat)]
-    pub fn pose_skeleton_at_subbeat(&self, subbeat: i32) -> Skeleton {
-        let resting_pose = || Skeleton::resting(false);
-        match u32::try_from(subbeat) {
-            Ok(subbeat) => {
-                if let Some((step, beat_remainder)) =
-                    self.detector.tracked_step_with_remainder(subbeat)
-                {
-                    step.skeleton(beat_remainder as usize)
-                } else {
-                    resting_pose()
-                }
-            }
-            _else => resting_pose(),
-        }
+    pub fn cursor(&self, t: f64) -> DanceCursor {
+        let subbeat = self.subbeat(t);
+        self.cursor_at_subbeat(subbeat)
+    }
+
+    #[wasm_bindgen(js_name = cursorAtSubbeat)]
+    pub fn cursor_at_subbeat(&self, subbeat: i32) -> DanceCursor {
+        self.detector
+            .teacher
+            .cursor_at_subbeat(u32::try_from(subbeat).unwrap_or(0))
+    }
+
+    #[wasm_bindgen(js_name = poseSkeletonAt)]
+    pub fn pose_skeleton_at(&self, cursor: &DanceCursor) -> Skeleton {
+        self.detector
+            .step(cursor)
+            .map(|step| step.skeleton(cursor.pose_index))
+            .unwrap_or_else(|| Skeleton::resting(false))
+    }
+
+    // TODO: replace all usage with at cursor calls
+    fn pose_skeleton_at_subbeat(&self, subbeat: i32) -> Skeleton {
+        u32::try_from(subbeat)
+            .ok()
+            .and_then(|s| self.detector.tracked_step_with_remainder(s))
+            .map(|(step, beat)| step.skeleton(beat as usize))
+            .unwrap_or_else(|| Skeleton::resting(false))
+    }
+
+    #[wasm_bindgen(js_name = jumpHeight)]
+    pub fn jump_height(&self, cursor: &DanceCursor) -> f32 {
+        self.detector
+            .step(cursor)
+            .and_then(|step| step.jump_height(cursor.pose_index))
+            .unwrap_or(0.0)
+    }
+
+    // TODO: replace all usage with at cursor calls
+    fn jump_height_at_subbeat(&self, subbeat: i32) -> f32 {
+        u32::try_from(subbeat)
+            .ok()
+            .and_then(|s| self.detector.tracked_step_with_remainder(s))
+            .and_then(|(step, beat)| step.jump_height(beat as usize))
+            .unwrap_or(1.0)
     }
 
     #[wasm_bindgen(js_name = expectedPoseBodyShift)]
@@ -387,8 +423,14 @@ impl Tracker {
         self.pose_body_shift_at_subbeat(subbeat)
     }
 
-    #[wasm_bindgen(js_name = poseBodyShiftAtSubbeat)]
-    pub fn pose_body_shift_at_subbeat(&self, beat: usize) -> Cartesian2d {
+    #[wasm_bindgen(js_name = poseBodyShift)]
+    pub fn pose_body_shift(&self, cursor: &DanceCursor) -> Cartesian2d {
+        // TOOD: maybe this could be done more efficiently
+        self.pose_body_shift_at_subbeat(cursor.subbeat as usize)
+    }
+
+    // TODO: replace all usage with at cursor calls
+    fn pose_body_shift_at_subbeat(&self, beat: usize) -> Cartesian2d {
         self.detector
             .teacher
             .pose_body_shift_at_subbeat(beat as u32)

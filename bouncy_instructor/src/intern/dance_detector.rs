@@ -1,7 +1,7 @@
 use svelte_store::Readable;
 use wasm_bindgen::prelude::wasm_bindgen;
 
-use crate::tracker::{PoseApproximation, TeacherView};
+use crate::tracker::{DanceCursor, PoseApproximation, TeacherView};
 use crate::ui_event::UiEvents;
 use crate::{DetectionFailureReason, DetectionResult, PoseHint, StepInfo};
 
@@ -372,6 +372,10 @@ impl DanceDetector {
     /// Returns the tracked step and subbeat for a given subbeat after tracking started.
     pub(crate) fn tracked_step_with_remainder(&self, subbeat: u32) -> Option<(&StepInfo, u32)> {
         self.teacher.step_at_subbeat(subbeat)
+    }
+
+    pub(crate) fn step(&self, cursor: &DanceCursor) -> Option<&StepInfo> {
+        self.teacher.step(cursor)
     }
 
     pub(crate) fn add_pose(&mut self, pose: PoseApproximation) {
