@@ -97,7 +97,10 @@
 <LightBackground />
 
 <div class="outer">
-  <LiveRecording bind:this={liveRecording} onStop={onRecordingStopped} forceBeat
+  <LiveRecording
+    bind:this={liveRecording}
+    onStop={onRecordingStopped}
+    forceBeat={true}
   ></LiveRecording>
 </div>
 

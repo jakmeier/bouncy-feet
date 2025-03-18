@@ -38,8 +38,8 @@
    * @typedef {Object} Props
    * @property {Skeleton} [instructorSkeleton]
    * @property {string} effectText
-   * @property {Cartesian2d} lastSuccessSkeletonOrigin
-   * @property {number} lastDetectedSkeletonSize
+   * @property {Cartesian2d} userSkeletonOrigin Where the dancer is on camera. Don't update between poses.
+   * @property {number} userSkeletonSize How large the dancer is on camera. Don't update between poses.
    * @property {number} progress
    * @property {Cartesian2d} instructorSkeletonBodyShift
    * @property {boolean} lastPoseWasCorrect
@@ -52,8 +52,8 @@
   let {
     instructorSkeleton,
     effectText,
-    lastSuccessSkeletonOrigin,
-    lastDetectedSkeletonSize,
+    userSkeletonOrigin,
+    userSkeletonSize,
     markedLimbs,
     progress,
     instructorSkeletonBodyShift,
@@ -77,15 +77,22 @@
 
   /** Where should the instructor origin be display. It can be on top of the
    * detection, or it can be fixed on screen, depending on the view. */
-  let instructorOrigin = $derived(
-    view === TeacherView.InstructorOnly
-      ? new Cartesian2d(0.0, 0.0)
-      : lastSuccessSkeletonOrigin
-  );
+  let instructorOrigin = $derived.by(() => {
+    if (view === TeacherView.InstructorOnly) {
+      return new Cartesian2d(0.0, 0.0);
+    } else if (
+      userSkeletonOrigin.x > -1 &&
+      userSkeletonOrigin.x < 1 &&
+      userSkeletonOrigin.y > -1 &&
+      userSkeletonOrigin.y < 1
+    ) {
+      return userSkeletonOrigin;
+    } else {
+      return new Cartesian2d(0.0, 0.0);
+    }
+  });
   let instructorSkeletonSize = $derived(
-    view === TeacherView.InstructorOnly
-      ? 1.25
-      : Math.min(lastDetectedSkeletonSize, 4.0)
+    view === TeacherView.InstructorOnly ? 1.25 : Math.min(userSkeletonSize, 2.5)
   );
 
   // bindings to DOM

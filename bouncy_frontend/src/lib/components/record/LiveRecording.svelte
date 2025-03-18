@@ -108,9 +108,15 @@ it does not match
   /** @type {PoseDetection} */
   let dataListener;
 
+  /** When the last step was detected, where was the user detected on camera.
+   * last detection -> updated on every detection
+   * user skeleton -> updated on pose to not interfere with animations
+   */
   let lastDetectedSkeletonSize = $state(1.0);
-  /** When the last step was detected, where was the center of the skeleton on camera. */
   let lastSuccessSkeletonOrigin = $state(new Cartesian2d(0.0, 0.0));
+
+  let userSkeletonSize = $state(1.0);
+  let userSkeletonOrigin = $state(new Cartesian2d(0.0, 0.0));
 
   /** @type {LimbError[]} */
   let worstLimbs = $state([]);
@@ -204,6 +210,8 @@ it does not match
           instructorSkeleton = tracker.poseSkeletonAtSubbeat(newBeat);
           instructorSkeletonBodyShift = tracker.poseBodyShiftAtSubbeat(newBeat);
           currentBeat = newBeat;
+
+          updateInstructorPosition();
         }
       } else if (before === 0 && !firstPoseIsShown) {
         updateInstructor();
@@ -222,6 +230,12 @@ it does not match
   function updateInstructor() {
     instructorSkeleton = tracker.expectedPoseSkeleton();
     instructorSkeletonBodyShift = tracker.expectedPoseBodyShift();
+    updateInstructorPosition();
+  }
+
+  function updateInstructorPosition() {
+    userSkeletonSize = lastDetectedSkeletonSize;
+    userSkeletonOrigin = lastSuccessSkeletonOrigin;
   }
 
   // this is called anytime media pipe has a frame with landmarks
@@ -326,8 +340,8 @@ it does not match
   bind:this={screen}
   {effectText}
   {instructorSkeleton}
-  {lastDetectedSkeletonSize}
-  {lastSuccessSkeletonOrigin}
+  {userSkeletonSize}
+  {userSkeletonOrigin}
   markedLimbs={worstLimbs}
   {progress}
   {instructorSkeletonBodyShift}
