@@ -19,8 +19,8 @@
 
 <style>
   .section-container {
-    padding: 1rem;
-    margin: 2rem calc(-1rem - 5px);
+    padding: 0.5rem 1.5rem;
+    margin: 0rem -1.5rem;
   }
 
   @media (min-width: 730px) {

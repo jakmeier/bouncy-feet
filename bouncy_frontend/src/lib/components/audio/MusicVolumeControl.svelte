@@ -57,26 +57,26 @@
 <style>
   .music-control {
     display: grid;
-    grid-template-columns: 3rem auto;
+    grid-template-columns: 4rem auto;
     align-items: center;
-    justify-items: center;
+    justify-items: start;
     gap: 0.5rem;
-    max-width: 300px;
-    margin: 1rem auto;
   }
 
   .toggle {
-    width: 3rem;
-    height: 3rem;
+    width: 4rem;
+    height: 4rem;
     border: none;
     background-color: transparent;
     cursor: pointer;
     padding: 0;
+    margin: 0;
+    min-width: 0;
   }
 
   .toggle img {
-    width: 100%;
-    height: 100%;
+    width: 4rem;
+    height: 4rem;
   }
 
   .volume-slider {

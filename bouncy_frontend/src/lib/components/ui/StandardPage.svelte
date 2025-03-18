@@ -51,9 +51,4 @@
   .content {
     flex-grow: 1;
   }
-
-  .footer {
-    margin-top: 3rem;
-    margin-bottom: 1rem;
-  }
 </style>

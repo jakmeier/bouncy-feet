@@ -21,6 +21,8 @@
 <style>
   .brand-footer {
     height: 2rem;
+    margin-bottom: 1.5rem;
+    margin-top: 3rem;
   }
   .brand-footer img {
     height: 1.5rem;

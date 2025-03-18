@@ -40,16 +40,14 @@
 
 <header style="background-color: {bgColor};">
   <img class="logo" src={imgUrl} alt="Bouncy Feet Logo" />
-  <h3 class="title">{title}</h3>
+  <h1 class="title">{title}</h1>
 </header>
 
 <style>
   header {
     display: flex;
     flex-direction: column;
-    min-height: 50px;
-    height: 5rem;
-    margin: 1rem 0;
+    margin-top: 1.5rem;
   }
 
   header img.logo {

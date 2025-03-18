@@ -31,8 +31,7 @@
     hideNavigation.set(!$dev);
   });
   let navBarHeight = $derived($hideNavigation ? 0 : 90);
-  let outerPadding = $derived($wideView ? '0rem' : '1rem');
-  let mainMargin = $derived($wideView ? 0 : 5);
+  let outerPadding = $derived($wideView ? '0rem' : '1.5rem');
 
   const courses = data.courses;
   const getCourse = (/** @type {string} */ id) =>
@@ -49,7 +48,7 @@
   style="--background-color: {$backgroundColor}; --color:{$fontColor}; padding: 0 {outerPadding};"
 >
   <main
-    style="margin:{mainMargin}px; height: calc(100vh - {navBarHeight}px); max-width: calc(min(730px, 100vw) - 2 * {outerPadding});"
+    style="height: calc(100vh - {navBarHeight}px); max-width: calc(min(730px, 100vw) - 2 * {outerPadding});"
   >
     <LocalStateContext>
       <UserContext>
@@ -83,7 +82,7 @@
     position: fixed;
     z-index: -2;
     overflow: hidden auto;
-    width: calc(100% - 2rem);
+    width: calc(100% - 3rem);
     background-color: var(--background-color);
     color: var(--color);
   }

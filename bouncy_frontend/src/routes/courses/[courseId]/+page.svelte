@@ -53,7 +53,6 @@
             {animationTime}
             size={175}
             borderWidth={0}
-            lineWidth={8}
           ></Step>
         {/if}
         <div class="rank">

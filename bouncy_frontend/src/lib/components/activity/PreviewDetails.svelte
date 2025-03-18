@@ -17,27 +17,41 @@
 </script>
 
 <div class="overview">
-  <div>
-    {beats}
-    {$t('courses.lesson.num-beats-label')} @
-    {$bpm} bpm
-  </div>
-  <div>
-    = {formatDuration(trainingDuration, formatOpts)}
+  <div class="row">
+    <div class="flex">
+      <div>
+        {beats}
+        {$t('courses.lesson.num-beats-label')}
+      </div>
+      <div>
+        @ {$bpm} bpm
+      </div>
+    </div>
+    <div>
+      {formatDuration(trainingDuration, formatOpts)}
+    </div>
   </div>
 
   <div class="rated">
     <div>{$t('record.preview-difficulty-title')}</div>
     <div class="rating">
-      {#each { length: difficulty } as _}
-        <img src="{base}/img/symbols/bf_eye_black.svg" alt="bf_eye" />
+      {#each { length: 5 } as _, i}
+        <img
+          src="{base}/img/symbols/bf_eye_black.svg"
+          alt="bf_eye"
+          class:shadow={i >= difficulty}
+        />
       {/each}
     </div>
 
     <div>{$t('record.preview-energy-title')}</div>
     <div class="rating">
-      {#each { length: energy } as _}
-        <img src="{base}/img/symbols/bf_eye_black.svg" alt="bf_eye" />
+      {#each { length: 5 } as _, i}
+        <img
+          src="{base}/img/symbols/bf_eye_black.svg"
+          alt="bf_eye"
+          class:shadow={i >= energy}
+        />
       {/each}
     </div>
   </div>
@@ -45,18 +59,24 @@
 
 <style>
   .overview img {
-    height: 1.5rem;
+    height: 2rem;
   }
 
   .overview {
     margin: 2em 0em 3rem;
   }
 
+  .row {
+    display: grid;
+    grid-template-columns: 1fr max-content;
+    gap: 1.5rem;
+  }
+
   .rated {
-    margin: 2rem 0;
+    margin: 3rem 0;
     display: grid;
     grid-template-columns: max-content auto;
-    gap: 1rem;
+    gap: 2rem 1rem;
     align-items: center;
     justify-content: left;
   }
@@ -66,5 +86,15 @@
     gap: 0.25rem;
     align-items: center;
     justify-content: end;
+  }
+
+  .flex {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+
+  .shadow {
+    opacity: 10%;
   }
 </style>
