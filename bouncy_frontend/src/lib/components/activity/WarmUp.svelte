@@ -74,12 +74,7 @@
   />
 {:else if !trackingDone}
   <!-- TODO: warmup should be with video instead of avatar -->
-  <LiveActivity
-    onDone={onRecordingStopped}
-    videoOpacity={1.0}
-    enableLiveAvatar={false}
-    enableInstructorAvatar={true}
-  ></LiveActivity>
+  <LiveActivity onDone={onRecordingStopped}></LiveActivity>
 {:else if detection !== undefined}
   <WarmupReview {detection} {onContinue}></WarmupReview>
 {:else}

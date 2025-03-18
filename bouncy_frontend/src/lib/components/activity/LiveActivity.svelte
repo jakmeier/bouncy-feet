@@ -18,19 +18,16 @@
   /**
    * @typedef {Object} Props
    * @property {(detection: DetectionResult, recordingStart: number, recordingEnd: number, videoUrl: string)=>void} [onDone]
-   * @property {number} videoOpacity
-   * @property {boolean} enableLiveAvatar
-   * @property {boolean} enableInstructorAvatar
    */
 
   /** @type {Props} */
-  let { onDone, videoOpacity, enableLiveAvatar, enableInstructorAvatar } =
-    $props();
+  let { onDone } = $props();
 
   let detectionResult;
   /** @type {string} */
   let videoUrl = $state();
 
+  /** @type {LiveRecording} */
   let liveRecording;
   /** @type {Tracker | undefined} */
   let { tracker } = getContext('tracker');
@@ -100,13 +97,7 @@
 <LightBackground />
 
 <div class="outer">
-  <LiveRecording
-    bind:this={liveRecording}
-    onStop={onRecordingStopped}
-    {videoOpacity}
-    {enableLiveAvatar}
-    {enableInstructorAvatar}
-    forceBeat
+  <LiveRecording bind:this={liveRecording} onStop={onRecordingStopped} forceBeat
   ></LiveRecording>
 </div>
 

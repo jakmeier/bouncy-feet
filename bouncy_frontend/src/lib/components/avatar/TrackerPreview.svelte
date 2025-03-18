@@ -35,7 +35,8 @@
   borderRadius="20px"
   {backgroundColor}
 >
-  <Animation {animationTime}>
+  <!-- TODO: jump height per move -->
+  <Animation {animationTime} jumpHeight={1.0}>
     <Svg width={250} height={250} orderByZ>
       <SvgAvatar width={250} height={250} {skeleton} {bodyShift} />
     </Svg>

@@ -1,17 +1,27 @@
 <script>
-  import Camera from '$lib/components/record/Camera.svelte';
-  import Canvas from '$lib/components/Canvas.svelte';
-  import Avatar from '$lib/components/avatar/Avatar.svelte';
+  import LiveRecordingScreen from './LiveRecordingScreen.svelte';
+
+  // This is the big component at the center of anything related to a live
+  // activity. This includes:
+  // - Showing an instructor avatar with the moves to make
+  // - Starting a camera to show the user how they move
+  // - Feeding frames of the camera to the tracker for detection
+  // - Switching between different views during the activity
+  // - Syncing the music and audio effects to the exercise
+  //
+  // This makes this file fairly large, beyond what I usually see as a healthy
+  // component size. Mostly just too much JS code. Thus, I make this a pure
+  // controller class and move all the HTML + CSS in a separate component
+  // (LiveREcordingScreen). This separates at least the logic from the display.
+
   import { getContext, onMount } from 'svelte';
   import { I, landmarksToKeypoints, PoseDetection } from '$lib/pose';
   import BackgroundTask from '../BackgroundTask.svelte';
-  import { writable } from 'svelte/store';
   import {
     Cartesian2d,
     DetectionResult,
     DetectionState,
     LimbError,
-    PoseHint,
   } from '$lib/instructor/bouncy_instructor';
   import {
     loadSuccessSound,
@@ -21,38 +31,32 @@
     setChannelGain,
     initAudioContext,
   } from '$lib/stores/Audio';
-  import InstructorAvatar from '../avatar/InstructorAvatar.svelte';
   import { distance2d } from '$lib/math';
-  import { BLACK_COLORING, LEFT_RIGHT_COLORING_LIGHT } from '$lib/constants';
   import { base } from '$app/paths';
-  import ProgressBar from './ProgressBar.svelte';
-  import { locale, t } from '$lib/i18n';
+  import { locale } from '$lib/i18n';
   import { timeBetweenMoves } from '$lib/stores/Beat';
   import {
     recordDetectionDelay,
     recordTrackSyncDelay,
     recordMediaPipeDelay,
   } from '$lib/stores/System';
-  import FullScreenArea from '../ui/FullScreenArea.svelte';
   import MusicControl from './MusicControl.svelte';
-  import { TeacherView } from '$lib/instructor/bouncy_instructor';
 
   export const startCamera = async () => {
-    await camera.startCamera();
+    await screen.startCamera();
   };
   export const startRecording = async () => {
-    await camera.startRecording();
+    await screen.startRecording();
     recordingOn = true;
     stopped = false;
   };
   export const stopCamera = () => {
-    camera.stopCamera();
+    screen.stopCamera();
   };
-  let stopped = $state(false);
+  let stopped = $state(true);
   export const stop = async () => {
     stopped = true;
-    camera.stopCamera();
-    const blob = await camera.endRecording();
+    const blob = await screen.endRecording();
     onStop(blob, recordingStart, recordingEnd);
   };
 
@@ -62,25 +66,21 @@
    * @property {any} [onStop] - Function is called when the recording is stopped by the user with the stop
 button or by a explicit `stop` call from the parent component.
 The recording video blob is passed as as a parameter.
-   * @property {boolean} [enableLiveAvatar]
-   * @property {boolean} [enableInstructorAvatar]
    * @property {boolean} [forceBeat] - always evaluate the pose on beat and move on to the next pose, even when
 it does not match
-   * @property {number} [videoOpacity]
    */
 
   /** @type {Props} */
   let {
-    cameraOn = $bindable(false),
     onStop = (/** @type {Blob | undefined} */ _recording) => {},
-    enableLiveAvatar = $bindable(false),
-    enableInstructorAvatar = false,
     forceBeat = false,
-    videoOpacity = $bindable(0.0),
   } = $props();
+
+  /** @type {LiveRecordingScreen} */
+  let screen;
+
   let lastPoseWasCorrect = $state(true);
   let recordingOn = $state(false);
-  let showTextEffect = $state(false);
 
   let recordingStart = $state(0);
   let recordingEnd = $state(0);
@@ -99,12 +99,6 @@ it does not match
   /** @type {number | undefined} */
   let clearTextTime = undefined;
 
-  /** @type {Camera} */
-  let camera = $state();
-  /** @type {HTMLVideoElement} */
-  let cameraVideoElement = $state();
-  /** @type {TeacherView} */
-  let teacherView = $state(TeacherView.Off);
   /** @type {import("bouncy_instructor").Skeleton} */
   let instructorSkeleton = $state(tracker.expectedPoseSkeleton().restingPose());
   let instructorSkeletonBodyShift = $state(tracker.expectedPoseBodyShift());
@@ -114,50 +108,14 @@ it does not match
   /** @type {PoseDetection} */
   let dataListener;
 
-  /** @type {number} */
-  let outerWidth = $state();
-  /** @type {number} */
-  let outerHeight = $state();
-
-  /** @type {import('svelte/store').Writable<number>} */
-  let videoSrcWidth = writable(100);
-  /** @type {import('svelte/store').Writable<number>} */
-  let videoSrcHeight = writable(150);
-
   let lastDetectedSkeletonSize = $state(1.0);
   /** When the last step was detected, where was the center of the skeleton on camera. */
   let lastSuccessSkeletonOrigin = $state(new Cartesian2d(0.0, 0.0));
-  /** Where should the instructor origin be display. It can be on top of the
-   * detection, or it can be fixed on screen, depending on the view. */
-  let instructorOrigin = $derived(
-    teacherView === TeacherView.InstructorOnly
-      ? new Cartesian2d(0.0, 0.0)
-      : lastSuccessSkeletonOrigin
-  );
-  let instructorSkeletonSize = $derived(
-    teacherView === TeacherView.InstructorOnly
-      ? 2.0
-      : Math.min(lastDetectedSkeletonSize, 4.0)
-  );
+
   /** @type {LimbError[]} */
   let worstLimbs = $state([]);
 
   let animationTime = $derived(Math.min($timeBetweenMoves / 3, 300));
-
-  /**
-   * @param {PoseHint} inputHint
-   */
-  function selectStyle(inputHint) {
-    switch (inputHint) {
-      case PoseHint.LeftRight:
-        return LEFT_RIGHT_COLORING_LIGHT;
-      case PoseHint.ZOrder:
-        return BLACK_COLORING;
-      default:
-        return BLACK_COLORING;
-    }
-  }
-  let avatarStyle = $state(selectStyle(PoseHint.DontKnow));
 
   // this is called periodically in a background task
   function onFrame() {
@@ -165,58 +123,21 @@ it does not match
       return;
     }
 
-    teacherView = tracker.currentView(performance.now());
-    updateView(teacherView);
+    const teacherView = tracker.currentView(performance.now());
+    screen.updateView(teacherView);
 
     if ($detectionState === DetectionState.TrackingDone) {
       stop();
     }
 
-    if (cameraOn && dataListener && recordingOn) {
-      const start = performance.now();
-      dataListener.trackFrame(cameraVideoElement);
-      const t = performance.now() - start;
-      if (t > 50) console.debug(`trackFrame took ${t}ms`);
-      recordTrackSyncDelay(t);
-
-      const before = tracker.numDetectedPoses();
-      let detectionResult = tracker.runDetection();
-      if (tracker.numDetectedPoses() > before) {
-        onStepDetection(detectionResult);
-        if (!forceBeat) {
-          updateInstructor();
-        }
-        console.assert(
-          instructorSkeleton,
-          'tracker returned no next expected pose'
-        );
-      }
-      if (
-        $detectionState === DetectionState.LiveTracking ||
-        $detectionState === DetectionState.InstructorDemo
-      ) {
-        if (forceBeat) {
-          const future = performance.now() + animationTime;
-          let newBeat = tracker.subbeat(future);
-          if (newBeat !== currentBeat) {
-            instructorSkeleton = tracker.poseSkeletonAtSubbeat(newBeat);
-            instructorSkeletonBodyShift =
-              tracker.poseBodyShiftAtSubbeat(newBeat);
-            currentBeat = newBeat;
-          }
-        } else if (before === 0 && !firstPoseIsShown) {
-          updateInstructor();
-          firstPoseIsShown = true;
-        }
-      }
-      displayPoseHint();
-
-      const t2 = performance.now() - start;
-      if (t2 - t > 30) {
-        console.debug(`detectDance took ${t2 - t}ms`);
-      }
-      recordDetectionDelay(t2 - t);
+    if (screen.isCameraOn() && dataListener) {
+      processNextFrame(dataListener);
     }
+    processAudioEffects();
+    processTextEffects();
+  }
+
+  function processAudioEffects() {
     for (
       let audio = tracker.nextAudioEffect();
       audio !== undefined;
@@ -224,10 +145,12 @@ it does not match
     ) {
       scheduleAudio(audio.soundId, Number(audio.timestamp));
     }
+  }
+
+  function processTextEffects() {
     if (clearTextTime !== undefined && performance.now() >= clearTextTime) {
       clearTextTime = undefined;
       effectText = '';
-      showTextEffect = false;
     }
     for (
       let textEffect = tracker.nextTextEffect(performance.now());
@@ -236,8 +159,56 @@ it does not match
     ) {
       clearTextTime = textEffect.timestamp + textEffect.duration;
       effectText = textEffect.text;
-      showTextEffect = true;
     }
+  }
+
+  /** @param {PoseDetection} dataListener */
+  function processNextFrame(dataListener) {
+    if (!screen.cameraVideoElement()) {
+      return;
+    }
+    const start = performance.now();
+    dataListener.trackFrame(screen.cameraVideoElement());
+    const t = performance.now() - start;
+    if (t > 50) console.debug(`trackFrame took ${t}ms`);
+    recordTrackSyncDelay(t);
+
+    const before = tracker.numDetectedPoses();
+    let detectionResult = tracker.runDetection();
+    if (tracker.numDetectedPoses() > before) {
+      onStepDetection(detectionResult);
+      if (!forceBeat) {
+        updateInstructor();
+      }
+      console.assert(
+        instructorSkeleton,
+        'tracker returned no next expected pose'
+      );
+    }
+    if (
+      $detectionState === DetectionState.LiveTracking ||
+      $detectionState === DetectionState.InstructorDemo
+    ) {
+      if (forceBeat) {
+        const future = performance.now() + animationTime;
+        let newBeat = tracker.subbeat(future);
+        if (newBeat !== currentBeat) {
+          instructorSkeleton = tracker.poseSkeletonAtSubbeat(newBeat);
+          instructorSkeletonBodyShift = tracker.poseBodyShiftAtSubbeat(newBeat);
+          currentBeat = newBeat;
+        }
+      } else if (before === 0 && !firstPoseIsShown) {
+        updateInstructor();
+        firstPoseIsShown = true;
+      }
+    }
+    displayPoseHint();
+
+    const t2 = performance.now() - start;
+    if (t2 - t > 30) {
+      console.debug(`detectDance took ${t2 - t}ms`);
+    }
+    recordDetectionDelay(t2 - t);
   }
 
   function updateInstructor() {
@@ -271,8 +242,6 @@ it does not match
         scheduleAudioOnChannel('take-position', lastAudioHint, 'audio-guide');
       }
     }
-    // TODO(performance): do this less often
-    onVideoResized();
   };
 
   /**
@@ -301,7 +270,7 @@ it does not match
   /** Display visual clues on the avatar to show what the correct position is. */
   function displayPoseHint() {
     const poseHint = tracker.poseHint();
-    avatarStyle = selectStyle(poseHint);
+    screen.updatePoseHint(poseHint);
     const poseError = tracker.currentPoseError();
     if (poseError) {
       worstLimbs = poseError
@@ -312,15 +281,9 @@ it does not match
     }
   }
 
-  function onVideoResized() {
-    $videoSrcWidth = cameraVideoElement.clientWidth;
-    $videoSrcHeight = cameraVideoElement.clientHeight;
-  }
-
   onMount(async () => {
     await initAudioContext();
     dataListener = await poseCtx.newPoseDetection(onPoseDetection);
-    onVideoResized();
     loadSuccessSound();
     const promises = [
       loadAudio('mistake', `${base}/audio/one-shot-kick.mp3`),
@@ -344,203 +307,23 @@ it does not match
     // Low volume to not be louder than the music or beat.
     setChannelGain('live-feedback', 0.1);
     setChannelGain('audio-guide', 2.0);
+    stopped = false;
   });
-
-  /**
-   * @param {TeacherView} view
-   */
-
-  function updateView(view) {
-    switch (view) {
-      case TeacherView.Off:
-        videoOpacity = 0.0;
-        enableLiveAvatar = false;
-        enableInstructorAvatar = false;
-        break;
-
-      case TeacherView.UserCameraWithTracking:
-        videoOpacity = 1.0;
-        enableLiveAvatar = true;
-        enableInstructorAvatar = false;
-        break;
-
-      case TeacherView.InstructorOnly:
-        videoOpacity = 0.0;
-        enableLiveAvatar = false;
-        enableInstructorAvatar = true;
-        break;
-
-      case TeacherView.InstructorAndCamera:
-        videoOpacity = 1.0;
-        enableLiveAvatar = false;
-        enableInstructorAvatar = true;
-        break;
-
-      default:
-        console.warn('Unexpected TeacherView', view);
-    }
-  }
 </script>
 
 <BackgroundTask {onFrame}></BackgroundTask>
 <MusicControl />
 
-<FullScreenArea>
-  <div
-    class="camera"
-    bind:clientWidth={outerWidth}
-    bind:clientHeight={outerHeight}
-  >
-    <Camera
-      bind:opacity={videoOpacity}
-      bind:videoElement={cameraVideoElement}
-      bind:cameraOn
-      bind:this={camera}
-    />
-    {#if enableInstructorAvatar && instructorSkeleton !== null && recordingOn}
-      <div class="avatar-container">
-        <InstructorAvatar
-          width={$videoSrcWidth}
-          height={$videoSrcHeight}
-          avatarSize={instructorSkeletonSize}
-          skeleton={instructorSkeleton}
-          bodyShift={instructorSkeletonBodyShift}
-          origin={instructorOrigin}
-          instructorStyle={LEFT_RIGHT_COLORING_LIGHT}
-          {lastPoseWasCorrect}
-          {animationTime}
-        />
-      </div>
-    {/if}
-    {#if enableLiveAvatar && recordingOn}
-      <div
-        class="avatar-container"
-        style="left: {(outerWidth - $videoSrcWidth) / 2}px;"
-      >
-        <Canvas width={$videoSrcWidth} height={$videoSrcHeight}>
-          <Avatar
-            {landmarks}
-            width={$videoSrcWidth}
-            height={$videoSrcHeight}
-            style={avatarStyle}
-            torsoLineWidth={5}
-            markedLimbs={worstLimbs}
-          ></Avatar>
-        </Canvas>
-      </div>
-    {/if}
-
-    <div class="ui">
-      <!-- TODO: add this dev tooling again (ideally without mirroring it :P) -->
-      <!-- {#if true}
-        <LiveRecordingSettings
-          bind:enableLiveAvatar
-          bind:enableInstructorAvatar
-          bind:videoOpacity
-        />
-      {/if} -->
-      {#if recordingOn}
-        <ProgressBar {progress}></ProgressBar>
-        <button class="symbol" onclick={stop}>
-          <img src="{base}/img/symbols/bf_stop.svg" alt="stop" />
-        </button>
-      {/if}
-    </div>
-  </div>
-  {#if !recordingOn}
-    <div class="overlay">
-      <!-- <div class="overlay-logo">
-        <LogoHeader white></LogoHeader>
-      </div> -->
-      <div class="frame">
-        <div class="corner-marked2">
-          <div class="corner-marked">
-            <div class="overlay-text">
-              {$t('courses.lesson.exercise-start-description')}
-            </div>
-          </div>
-        </div>
-      </div>
-      <button class="symbol" onclick={startRecording}>
-        <img src="{base}/img/symbols/bf_eye.svg" alt="start" />
-        <div class="accent">Start recording</div>
-      </button>
-    </div>
-  {/if}
-  {#if showTextEffect}
-    <div class="overlay">
-      <div class="frame">
-        <div class="corner-marked2">
-          <div class="corner-marked">
-            <div class="effect-text">
-              {effectText}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  {/if}
-</FullScreenArea>
-
-<style>
-  .camera {
-    width: 100%;
-    height: 100%;
-    transform: scaleX(-1);
-
-    position: relative;
-    display: grid;
-    align-items: center;
-    justify-items: center;
-  }
-  .avatar-container {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-  }
-  .ui {
-    text-align: center;
-    width: calc(100% - 2rem);
-    position: absolute;
-    bottom: 0;
-  }
-  button.symbol {
-    margin: 1rem;
-  }
-  button img {
-    width: 3rem;
-  }
-  .overlay {
-    position: absolute;
-    top: 0;
-    height: 100dvh;
-    width: 100vw;
-    color: var(--theme-neutral-white);
-    background-color: var(--theme-neutral-dark-transparent);
-  }
-  .overlay-text {
-    height: 50dvh;
-    display: grid;
-    justify-content: center;
-    align-content: center;
-  }
-  .effect-text {
-    height: 50dvh;
-    display: grid;
-    justify-content: center;
-    align-content: center;
-    font-size: 16rem;
-    color: var(--theme-main);
-  }
-  .frame {
-    margin: 10dvh 2rem;
-  }
-  .overlay button {
-    position: relative;
-    bottom: 3rem;
-  }
-  .accent {
-    color: var(--theme-accent);
-  }
-</style>
+<LiveRecordingScreen
+  bind:this={screen}
+  {effectText}
+  {instructorSkeleton}
+  {lastDetectedSkeletonSize}
+  {lastSuccessSkeletonOrigin}
+  markedLimbs={worstLimbs}
+  {progress}
+  {instructorSkeletonBodyShift}
+  {lastPoseWasCorrect}
+  userLandmarks={landmarks}
+  onStop={stop}
+></LiveRecordingScreen>

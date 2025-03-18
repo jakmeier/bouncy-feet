@@ -92,12 +92,7 @@
     <StandardPage white><h3>bug: course missing</h3></StandardPage>
   {/if}
 {:else if !trackingDone}
-  <LiveActivity
-    bind:this={liveActivity}
-    onDone={onRecordingStopped}
-    videoOpacity={1.0}
-    enableLiveAvatar={false}
-    enableInstructorAvatar={true}
+  <LiveActivity bind:this={liveActivity} onDone={onRecordingStopped}
   ></LiveActivity>
 {:else if detection !== undefined}
   <ActivityReview
