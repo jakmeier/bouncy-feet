@@ -1,20 +1,7 @@
 <script>
-  import { t } from '$lib/i18n';
-  import { getContext, onDestroy, onMount } from 'svelte';
-  import Video from '$lib/components/ui/Video.svelte';
-  import { base } from '$app/paths';
-  import Popup from '$lib/components/ui/Popup.svelte';
-  import { writable } from 'svelte/store';
-  import { bpm } from '$lib/stores/Beat';
+  import { getContext } from 'svelte';
   import { songs } from '$lib/stores/Songs';
-  import DarkSection from '$lib/components/ui/sections/DarkSection.svelte';
-  import Footer from '$lib/components/ui/Footer.svelte';
   import { Course } from '$lib/instructor/bouncy_instructor';
-  import LogoHeader from '../ui/LogoHeader.svelte';
-  import TrackerPreview from '../avatar/TrackerPreview.svelte';
-  import Background from '../ui/sections/Background.svelte';
-  import PreviewDetails from './PreviewDetails.svelte';
-  import MusicVolumeControl from '../audio/MusicVolumeControl.svelte';
   import ActivityPreview from './ActivityPreview.svelte';
 
   /**

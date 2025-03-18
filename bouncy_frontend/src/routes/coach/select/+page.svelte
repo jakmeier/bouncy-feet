@@ -6,6 +6,7 @@
   import StandardPage from '$lib/components/ui/StandardPage.svelte';
   import { locale, t } from '$lib/i18n';
   import { goto } from '$app/navigation';
+  import TrackerPreview from '$lib/components/avatar/TrackerPreview.svelte';
 
   /** @type {LocalState}*/
   const localState = getContext('localState');
@@ -38,11 +39,11 @@
           bodyShape={coach.style.bodyShape}
           headStyle={coach.style.headStyle}
         >
-          <AnimatedStep
-            step={getCourse(coach.courseIds[0]).lessons[0].parts[0].step}
+          <TrackerPreview
+            tracker={getCourse(coach.courseIds[0]).tracker(0)}
             size={coachWidth}
             backgroundColor={'var(--theme-neutral-black)'}
-          ></AnimatedStep>
+          ></TrackerPreview>
         </AvatarStyleContext>
       </div>
       <div class="title">{coach.title[$locale.substring(0, 2)]}</div>
