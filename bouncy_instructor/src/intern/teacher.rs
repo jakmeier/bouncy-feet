@@ -123,7 +123,8 @@ impl Teacher {
     pub(crate) fn ui_view_at_subbeat(&self, subbeat: u32) -> TeacherView {
         self.section_at_subbeat(subbeat)
             .map(|section| match &section {
-                Section::Step(_) | Section::Freestyle { .. } => TeacherView::UserCameraWithTracking,
+                Section::Step(_) => TeacherView::InstructorAndCamera,
+                Section::Freestyle { .. } => TeacherView::UserCameraWithTracking,
                 Section::Warmup(_) | Section::ShowStep(_) => TeacherView::InstructorOnly,
             })
             .unwrap_or(TeacherView::Off)

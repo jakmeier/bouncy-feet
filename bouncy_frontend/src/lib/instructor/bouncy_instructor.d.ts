@@ -142,6 +142,10 @@ export enum SkeletonPoint {
  */
 export enum TeacherView {
   /**
+   * Show nothing
+   */
+  Off = 0,
+  /**
    * Show the instructor, no need to show the user camera.
    */
   InstructorOnly = 1,
@@ -150,9 +154,9 @@ export enum TeacherView {
    */
   UserCameraWithTracking = 2,
   /**
-   * Show nothing
+   * Show the camera (without tracking) and the instructor.
    */
-  Off = 3,
+  InstructorAndCamera = 3,
 }
 
 import type { Readable } from "svelte/store";
@@ -670,8 +674,6 @@ export class TextEffect {
  */
 export class Tracker {
   free(): void;
-  exportFrame(timestamp: number): ExportedFrame;
-  exportKeypoints(): string;
   /**
    * Create a tracker for all known steps.
    */
@@ -760,6 +762,8 @@ export class Tracker {
    */
   renderedKeypointsAt(timestamp: number, width: number, height: number): SkeletonV2 | undefined;
   devSetState(state: DetectionState, timestamp: number): void;
+  exportFrame(timestamp: number): ExportedFrame;
+  exportKeypoints(): string;
   readonly detectionState: ReadableDetectionState;
   readonly trackedSubbeats: number;
   readonly timeBetweenPoses: number;
@@ -870,6 +874,51 @@ export interface InitOutput {
   readonly detectionresult_steps: (a: number, b: number) => void;
   readonly detectionresult_poseHint: (a: number) => number;
   readonly detectionresult_poseError: (a: number) => number;
+  readonly __wbg_dancedetector_free: (a: number, b: number) => void;
+  readonly __wbg_tracker_free: (a: number, b: number) => void;
+  readonly __wbg_skeletons_free: (a: number, b: number) => void;
+  readonly __wbg_get_skeletons_front: (a: number) => number;
+  readonly __wbg_set_skeletons_front: (a: number, b: number) => void;
+  readonly __wbg_get_skeletons_side: (a: number) => number;
+  readonly __wbg_set_skeletons_side: (a: number, b: number) => void;
+  readonly tracker_new_from_global_collection: () => number;
+  readonly tracker_StepTracker: (a: number, b: number, c: number) => void;
+  readonly tracker_UniqueStepTracker: (a: number, b: number, c: number) => void;
+  readonly tracker_WarmUp: (a: number, b: number, c: number, d: number) => void;
+  readonly tracker_finishTracking: (a: number) => void;
+  readonly tracker_clear: (a: number) => void;
+  readonly tracker_addKeypoints: (a: number, b: number, c: number) => number;
+  readonly tracker_setBpm: (a: number, b: number) => void;
+  readonly tracker_alignBeat: (a: number, b: number) => void;
+  readonly tracker_enforceBeat: (a: number, b: number) => void;
+  readonly tracker_setErrorThreshold: (a: number, b: number) => void;
+  readonly tracker_detectDance: (a: number) => number;
+  readonly tracker_runDetection: (a: number) => number;
+  readonly tracker_poseHint: (a: number) => number;
+  readonly tracker_currentPoseError: (a: number) => number;
+  readonly tracker_currentView: (a: number, b: number) => number;
+  readonly tracker_detectionState: (a: number) => number;
+  readonly tracker_trackedSubbeats: (a: number) => number;
+  readonly tracker_nextSubbeat: (a: number, b: number, c: number) => number;
+  readonly tracker_timeBetweenPoses: (a: number) => number;
+  readonly tracker_nextAudioEffect: (a: number) => number;
+  readonly tracker_nextTextEffect: (a: number, b: number) => number;
+  readonly tracker_duration: (a: number) => number;
+  readonly tracker_poseSkeleton: (a: number, b: number, c: number) => number;
+  readonly tracker_expectedPoseSkeleton: (a: number) => number;
+  readonly tracker_subbeat: (a: number, b: number) => number;
+  readonly tracker_poseSkeletonAtSubbeat: (a: number, b: number) => number;
+  readonly tracker_expectedPoseBodyShift: (a: number) => number;
+  readonly tracker_poseBodyShiftAtSubbeat: (a: number, b: number) => number;
+  readonly tracker_lastDetection: (a: number) => number;
+  readonly tracker_numDetectedPoses: (a: number) => number;
+  readonly tracker_hipPosition: (a: number, b: number) => number;
+  readonly tracker_bestFitPose: (a: number, b: number, c: number) => number;
+  readonly tracker_allPoseErrors: (a: number, b: number, c: number) => void;
+  readonly tracker_skeletonAt: (a: number, b: number) => number;
+  readonly tracker_skeletonWrapperAt: (a: number, b: number) => number;
+  readonly tracker_renderedKeypointsAt: (a: number, b: number, c: number, d: number) => number;
+  readonly tracker_devSetState: (a: number, b: number, c: number) => void;
   readonly cartesian2d_new: (a: number, b: number) => number;
   readonly cartesian2d_add: (a: number, b: number) => number;
   readonly __wbg_dancebuilder_free: (a: number, b: number) => void;
@@ -1015,78 +1064,6 @@ export interface InitOutput {
   readonly stepfilewrapper_removeStep: (a: number, b: number, c: number, d: number) => void;
   readonly stepfilewrapper_buildRon: (a: number, b: number) => void;
   readonly stepfilewrapper_buildPrettyRon: (a: number, b: number) => void;
-  readonly __wbg_exportedframe_free: (a: number, b: number) => void;
-  readonly tracker_exportFrame: (a: number, b: number) => number;
-  readonly tracker_exportKeypoints: (a: number, b: number) => void;
-  readonly exportedframe_pose: (a: number, b: number) => void;
-  readonly exportedframe_keypoints: (a: number, b: number) => void;
-  readonly __wbg_posewrapper_free: (a: number, b: number) => void;
-  readonly posewrapper_skeleton: (a: number) => number;
-  readonly posewrapper_sideSkeleton: (a: number) => number;
-  readonly posewrapper_id: (a: number, b: number) => void;
-  readonly posewrapper_name: (a: number, b: number, c: number, d: number) => void;
-  readonly posewrapper_setName: (a: number, b: number, c: number, d: number, e: number) => void;
-  readonly posewrapper_setAngle: (a: number, b: number, c: number) => void;
-  readonly posewrapper_getAngle: (a: number, b: number) => number;
-  readonly posewrapper_setZ: (a: number, b: number, c: number) => void;
-  readonly posewrapper_getZ: (a: number, b: number) => number;
-  readonly posewrapper_setWeight: (a: number, b: number, c: number) => void;
-  readonly posewrapper_getWeight: (a: number, b: number) => number;
-  readonly posewrapper_direction: (a: number) => number;
-  readonly posewrapper_setDirection: (a: number, b: number) => void;
-  readonly posewrapper_xShift: (a: number) => number;
-  readonly posewrapper_set_xShift: (a: number, b: number) => void;
-  readonly posewrapper_yShift: (a: number) => number;
-  readonly posewrapper_set_yShift: (a: number, b: number) => void;
-  readonly posewrapper_turnShoulder: (a: number) => number;
-  readonly posewrapper_set_turnShoulder: (a: number, b: number) => void;
-  readonly posewrapper_turnHip: (a: number) => number;
-  readonly posewrapper_set_turnHip: (a: number, b: number) => void;
-  readonly __wbg_dancedetector_free: (a: number, b: number) => void;
-  readonly __wbg_tracker_free: (a: number, b: number) => void;
-  readonly __wbg_skeletons_free: (a: number, b: number) => void;
-  readonly __wbg_get_skeletons_front: (a: number) => number;
-  readonly __wbg_set_skeletons_front: (a: number, b: number) => void;
-  readonly __wbg_get_skeletons_side: (a: number) => number;
-  readonly __wbg_set_skeletons_side: (a: number, b: number) => void;
-  readonly tracker_new_from_global_collection: () => number;
-  readonly tracker_StepTracker: (a: number, b: number, c: number) => void;
-  readonly tracker_UniqueStepTracker: (a: number, b: number, c: number) => void;
-  readonly tracker_WarmUp: (a: number, b: number, c: number, d: number) => void;
-  readonly tracker_finishTracking: (a: number) => void;
-  readonly tracker_clear: (a: number) => void;
-  readonly tracker_addKeypoints: (a: number, b: number, c: number) => number;
-  readonly tracker_setBpm: (a: number, b: number) => void;
-  readonly tracker_alignBeat: (a: number, b: number) => void;
-  readonly tracker_enforceBeat: (a: number, b: number) => void;
-  readonly tracker_setErrorThreshold: (a: number, b: number) => void;
-  readonly tracker_detectDance: (a: number) => number;
-  readonly tracker_runDetection: (a: number) => number;
-  readonly tracker_poseHint: (a: number) => number;
-  readonly tracker_currentPoseError: (a: number) => number;
-  readonly tracker_currentView: (a: number, b: number) => number;
-  readonly tracker_detectionState: (a: number) => number;
-  readonly tracker_trackedSubbeats: (a: number) => number;
-  readonly tracker_nextSubbeat: (a: number, b: number, c: number) => number;
-  readonly tracker_timeBetweenPoses: (a: number) => number;
-  readonly tracker_nextAudioEffect: (a: number) => number;
-  readonly tracker_nextTextEffect: (a: number, b: number) => number;
-  readonly tracker_duration: (a: number) => number;
-  readonly tracker_poseSkeleton: (a: number, b: number, c: number) => number;
-  readonly tracker_expectedPoseSkeleton: (a: number) => number;
-  readonly tracker_subbeat: (a: number, b: number) => number;
-  readonly tracker_poseSkeletonAtSubbeat: (a: number, b: number) => number;
-  readonly tracker_expectedPoseBodyShift: (a: number) => number;
-  readonly tracker_poseBodyShiftAtSubbeat: (a: number, b: number) => number;
-  readonly tracker_lastDetection: (a: number) => number;
-  readonly tracker_numDetectedPoses: (a: number) => number;
-  readonly tracker_hipPosition: (a: number, b: number) => number;
-  readonly tracker_bestFitPose: (a: number, b: number, c: number) => number;
-  readonly tracker_allPoseErrors: (a: number, b: number, c: number) => void;
-  readonly tracker_skeletonAt: (a: number, b: number) => number;
-  readonly tracker_skeletonWrapperAt: (a: number, b: number) => number;
-  readonly tracker_renderedKeypointsAt: (a: number, b: number, c: number, d: number) => number;
-  readonly tracker_devSetState: (a: number, b: number, c: number) => void;
   readonly __wbg_steppositionbuilder_free: (a: number, b: number) => void;
   readonly steppositionbuilder_new: (a: number) => number;
   readonly steppositionbuilder_pose: (a: number) => number;
@@ -1127,6 +1104,33 @@ export interface InitOutput {
   readonly __wbg_set_renderablesegment_z: (a: number, b: number) => void;
   readonly skeletonv2_segment: (a: number, b: number) => number;
   readonly skeleton_render: (a: number, b: number, c: number) => number;
+  readonly __wbg_exportedframe_free: (a: number, b: number) => void;
+  readonly tracker_exportFrame: (a: number, b: number) => number;
+  readonly tracker_exportKeypoints: (a: number, b: number) => void;
+  readonly exportedframe_pose: (a: number, b: number) => void;
+  readonly exportedframe_keypoints: (a: number, b: number) => void;
+  readonly __wbg_posewrapper_free: (a: number, b: number) => void;
+  readonly posewrapper_skeleton: (a: number) => number;
+  readonly posewrapper_sideSkeleton: (a: number) => number;
+  readonly posewrapper_id: (a: number, b: number) => void;
+  readonly posewrapper_name: (a: number, b: number, c: number, d: number) => void;
+  readonly posewrapper_setName: (a: number, b: number, c: number, d: number, e: number) => void;
+  readonly posewrapper_setAngle: (a: number, b: number, c: number) => void;
+  readonly posewrapper_getAngle: (a: number, b: number) => number;
+  readonly posewrapper_setZ: (a: number, b: number, c: number) => void;
+  readonly posewrapper_getZ: (a: number, b: number) => number;
+  readonly posewrapper_setWeight: (a: number, b: number, c: number) => void;
+  readonly posewrapper_getWeight: (a: number, b: number) => number;
+  readonly posewrapper_direction: (a: number) => number;
+  readonly posewrapper_setDirection: (a: number, b: number) => void;
+  readonly posewrapper_xShift: (a: number) => number;
+  readonly posewrapper_set_xShift: (a: number, b: number) => void;
+  readonly posewrapper_yShift: (a: number) => number;
+  readonly posewrapper_set_yShift: (a: number, b: number) => void;
+  readonly posewrapper_turnShoulder: (a: number) => number;
+  readonly posewrapper_set_turnShoulder: (a: number, b: number) => void;
+  readonly posewrapper_turnHip: (a: number) => number;
+  readonly posewrapper_set_turnHip: (a: number, b: number) => void;
   readonly __wbindgen_export_0: (a: number) => void;
   readonly __wbindgen_export_1: (a: number, b: number, c: number) => void;
   readonly __wbindgen_export_2: (a: number, b: number) => number;

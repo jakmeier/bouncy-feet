@@ -144,11 +144,10 @@ impl Lesson {
 
         for part in &self.parts {
             let step = &part.step_wrapper;
+            let step_info = step.info(&db);
             let pace = part.pace;
-            let beats = part.repeat * step.poses().len() as u32 * pace.subbeats_per_pose();
+            let beats = part.repeat * step_info.num_poses() as u32 * pace.subbeats_per_pose();
 
-            // TODO: use view with instructor and camera combined
-            teacher.show_step(step.info(&db), beats, pace);
             teacher.add_step(step.info(&db), beats, pace);
         }
 

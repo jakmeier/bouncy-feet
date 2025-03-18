@@ -349,21 +349,35 @@ it does not match
   /**
    * @param {TeacherView} view
    */
+
   function updateView(view) {
-    if (view === TeacherView.UserCameraWithTracking) {
-      videoOpacity = 1.0;
-      enableLiveAvatar = true;
-      enableInstructorAvatar = false;
-    }
-    if (view === TeacherView.InstructorOnly) {
-      videoOpacity = 0.0;
-      enableLiveAvatar = false;
-      enableInstructorAvatar = true;
-    }
-    if (view === TeacherView.Off) {
-      videoOpacity = 0.0;
-      enableLiveAvatar = false;
-      enableInstructorAvatar = false;
+    switch (view) {
+      case TeacherView.Off:
+        videoOpacity = 0.0;
+        enableLiveAvatar = false;
+        enableInstructorAvatar = false;
+        break;
+
+      case TeacherView.UserCameraWithTracking:
+        videoOpacity = 1.0;
+        enableLiveAvatar = true;
+        enableInstructorAvatar = false;
+        break;
+
+      case TeacherView.InstructorOnly:
+        videoOpacity = 0.0;
+        enableLiveAvatar = false;
+        enableInstructorAvatar = true;
+        break;
+
+      case TeacherView.InstructorAndCamera:
+        videoOpacity = 1.0;
+        enableLiveAvatar = false;
+        enableInstructorAvatar = true;
+        break;
+
+      default:
+        console.warn('Unexpected TeacherView', view);
     }
   }
 </script>
