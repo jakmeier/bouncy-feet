@@ -98,7 +98,18 @@ h6 {
     font-size: var(--font-normal);
     font-weight: 500;
     letter-spacing: 0.02em;
-    margin: 1.5rem 0;
+    margin-bottom: 1.5rem;
+    margin-top: 0;
+    /* The font starts with a small offset, to align it with the page, I have to
+    move it slightly. */
+    margin-left: -1px;
+}
+
+
+p {
+    /* The font starts with a small offset, to align it with the page, I have to
+    move it slightly. */
+    margin-left: -1px;
 }
 
 input {

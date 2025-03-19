@@ -10,16 +10,16 @@
   /**
    * @typedef {Object} Props
    * @property {string} courseId
+   * @property {number} lessonIndex
    * @property {function} onDone
    */
 
   /** @type {Props}*/
-  let { courseId, onDone } = $props();
+  let { courseId, lessonIndex, onDone } = $props();
 
   const { getCourse } = getContext('courses');
 
   let course = getCourse(courseId);
-  let lessonIndex = 0;
   let previewDone = $state(false);
   let trackingDone = $state(false);
   let liveActivity = $state();

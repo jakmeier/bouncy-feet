@@ -12,48 +12,49 @@
     (
       names: {"de": "So, jetzt aber richtig!", "en": "It's getting serious!"},
       explanations: {
-        "de": "
-        Gleich lernst du deinen ersten Schritt. Schon aufgeregt? :)",
-        "en": "
-        You are about to learn your first move! I hope you are excited! :)
-        ",
+        "de": "Gleich lernst du deinen ersten Schritt. Hast du den Groove?",
+        "en": "You are about to learn your first move! Do you have the groove?",
       },
       icon: "",
       video: "https://app.bouncy-feet.ch/media/videos/c3/simple_heel.mp4",
       parts: [
-        ( step: "heels-starter", repeat: 16, subbeats_per_move: 2 ),
+        ( step: "heels-starter", repeat: 4, subbeats_per_move: 2 ),
+        ( step: "heels-starter", repeat: 4, subbeats_per_move: 1 ),
+        ( step: "heels-starter", repeat: 4, subbeats_per_move: 2 ),
+        ( step: "heels-starter", repeat: 4, subbeats_per_move: 1 ),
       ],
     ),
     (
-      names: {"de": "TODO Titel", "en": "TODO title"},
+      names: {"de": "Mehr Energie!", "en": "More energy!"},
       explanations: {
-        "de": "
-        TODO Beschreibung",
-        "en": "
-        TODO description
-        ",
+        "de": "Wie bouncy sind deine Füsse? Erwischst du die schnellen Sprünge?",
+        "en": "How bouncy are your feet? Will you hit the quick jumps?",
       },
       icon: "",
       video: "https://app.bouncy-feet.ch/media/videos/c3/side_jumps.mp4",
       parts: [
-        ( step: "side-to-side-2", repeat: 16, subbeats_per_move: 2 ),
+        ( step: "side-to-side-2", repeat: 2, subbeats_per_move: 2 ),
+        ( step: "side-to-side-4", repeat: 2, subbeats_per_move: 1 ),
+        ( step: "side-to-side-2", repeat: 2, subbeats_per_move: 1 ),
+        ( step: "side-to-side-1", repeat: 2, subbeats_per_move: 2 ),
+        ( step: "side-to-side-1", repeat: 2, subbeats_per_move: 1 ),
+        ( step: "side-to-side-2", repeat: 2, subbeats_per_move: 2 ),
       ],
     ),
     (
-      names: {"de": "TODO Titel", "en": "TODO title"},
+      names: {"de": "Bereit für eine Challenge?", "en": "Ready for a challenge?"},
       explanations: {
-        "de": "
-        TODO Beschreibung",
-        "en": "
-        TODO description
-        ",
+        "de": "Aus zwei Moves, mach einen! Die Kombination ist schwieriger, aber auch cooler. B)",
+        "en": "Make one move out of two! The combination is more difficult, but also cooler. B)",
       },
       icon: "",
       video: "https://app.bouncy-feet.ch/media/videos/c3/combo_slow.mp4",
       parts: [
-        ( step: "heels-combo", repeat: 16, subbeats_per_move: 2 ),
+        ( step: "heels-combo", repeat: 1, subbeats_per_move: 4 ),
+        ( step: "heels-combo", repeat: 8, subbeats_per_move: 2 ),
       ],
     ),
+    // TODO: this list one is for later, training more
     (
       names: {"de": "TODO Titel", "en": "TODO title"},
       explanations: {
@@ -66,7 +67,6 @@
       icon: "",
       video: "https://app.bouncy-feet.ch/media/videos/c3/combo_fast.mp4",
       parts: [
-        // TODO
         ( step: "side-to-side-4", repeat: 16, subbeats_per_move: 2 ),
       ],
     ),
@@ -78,12 +78,12 @@
       keyframes: [
         (pose: "jump-left-wide", orientation: ToCamera, jump_height: 2.0),
         (pose: "jump-left-short", orientation: ToCamera, jump_height: 2.0, pivot: (side: Left, part: Toes)),
-        (pose: "jump-left-short", orientation: ToCamera, jump_height: 2.0, pivot: (side: Left, part: Toes)),
-        (pose: "jump-left-short", orientation: ToCamera, jump_height: 2.0, pivot: (side: Left, part: Toes)),
+        (pose: "jump-left-short", orientation: ToCamera, jump_height: 2.0),
+        (pose: "jump-left-short", orientation: ToCamera, jump_height: 2.0),
         (pose: "jump-right-wide", orientation: ToCamera, jump_height: 2.0),
         (pose: "jump-right-short", orientation: ToCamera, jump_height: 2.0, pivot: (side: Right, part: Toes)),
-        (pose: "jump-right-short", orientation: ToCamera, jump_height: 2.0, pivot: (side: Right, part: Toes)),
-        (pose: "jump-right-short", orientation: ToCamera, jump_height: 2.0, pivot: (side: Right, part: Toes)),
+        (pose: "jump-right-short", orientation: ToCamera, jump_height: 2.0),
+        (pose: "jump-right-short", orientation: ToCamera, jump_height: 2.0),
       ],
     ),
     (
@@ -119,9 +119,9 @@
       id: "heels-combo",
       keyframes: [
         (pose: "jump-left-short", orientation: ToCamera, jump_height: 4.0),
-        (pose: "heel-in-combo-right", orientation: ToCamera, jump_height: 0.25, pivot: (side: Right, part: Toes)),
+        (pose: "heel-in-combo-right", orientation: ToCamera, jump_height: 0.25, pivot: (side: Left, part: Heel)),
         (pose: "jump-right-short", orientation: ToCamera, jump_height: 4.0),
-        (pose: "heel-in-combo-left", orientation: ToCamera, jump_height: 0.25, pivot: (side: Left, part: Toes)),
+        (pose: "heel-in-combo-left", orientation: ToCamera, jump_height: 0.25, pivot: (side: Right, part: Heel)),
       ],
     ),
     

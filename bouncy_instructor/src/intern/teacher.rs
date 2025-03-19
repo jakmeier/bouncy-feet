@@ -159,7 +159,8 @@ impl Teacher {
             }
             subbeat -= section.subbeats();
         }
-        shift
+        // Don't accumulate y-shift, it struggles with pivots
+        Cartesian2d::new(shift.x, 0.0)
     }
 
     /// Whether at the given subbeat, the student should be tracked.

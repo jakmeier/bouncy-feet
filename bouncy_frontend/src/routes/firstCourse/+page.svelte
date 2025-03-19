@@ -1,15 +1,14 @@
 <script>
   import { browser } from '$app/environment';
   import { goto } from '$app/navigation';
-  import { base } from '$app/paths';
-  import Course from '$lib/components/activity/Course.svelte';
+  import CourseLesson from '$lib/components/activity/CourseLesson.svelte';
   import WarmUp from '$lib/components/activity/WarmUp.svelte';
   import AvatarStyleContext from '$lib/components/avatar/AvatarStyleContext.svelte';
   import ClassProgress from '$lib/components/class/ClassProgress.svelte';
   import StandardPage from '$lib/components/ui/StandardPage.svelte';
   import { t } from '$lib/i18n';
   import { ONBOARDING_STATE } from '$lib/onboarding';
-  import { getContext, onMount, tick } from 'svelte';
+  import { getContext, onMount } from 'svelte';
 
   /** @type {UserContextData}*/
   const { setUserMeta, clientSession } = getContext('user');
@@ -29,14 +28,19 @@
 
   function onLessonDone() {
     showProgressScreen = true;
-    if (progress === 1) {
-      setUserMeta('onboarding', ONBOARDING_STATE.FINISHED_FIRST_LESSON);
-      progress = 2;
-    } else {
-      // TODO: second lesson + wrapup lesson
-      // WIP: directly go to end
-      setUserMeta('onboarding', ONBOARDING_STATE.FINISHED_INTRO_PART1);
-      progress = 4;
+    switch (progress) {
+      case 1:
+        setUserMeta('onboarding', ONBOARDING_STATE.FINISHED_FIRST_LESSON);
+        progress = 2;
+        break;
+      case 2:
+        setUserMeta('onboarding', ONBOARDING_STATE.FINISHED_SECOND_LESSON);
+        progress = 3;
+        break;
+      case 3:
+        setUserMeta('onboarding', ONBOARDING_STATE.FINISHED_INTRO_PART1);
+        progress = 4;
+        break;
     }
   }
 
@@ -54,7 +58,8 @@
       case ONBOARDING_STATE.STARTED_SECOND_LESSON: {
         return 2;
       }
-      case ONBOARDING_STATE.FINISHED_SECOND_LESSON: {
+      case ONBOARDING_STATE.FINISHED_SECOND_LESSON:
+      case ONBOARDING_STATE.STARTED_THIRD_LESSON: {
         return 3;
       }
       case ONBOARDING_STATE.FINISHED_INTRO_PART1:
@@ -73,7 +78,9 @@
     if (progress === 2) {
       setUserMeta('onboarding', ONBOARDING_STATE.STARTED_SECOND_LESSON);
     }
-    // TODO: handle further progress
+    if (progress === 3) {
+      setUserMeta('onboarding', ONBOARDING_STATE.STARTED_THIRD_LESSON);
+    }
   }
 
   function onClassDone() {
@@ -101,32 +108,31 @@
 {#if showProgressScreen}
   <ClassProgress {progress} {onContinue} onDone={onClassDone}></ClassProgress>
 {:else}
-  <!-- TODO: real video, real step -->
+  <!-- TODO: real video -->
   <AvatarStyleContext>
     {#if progress === 0}
       <WarmUp
         {stepNames}
-        videoUrl={`${base}`}
+        videoUrl={''}
         description={$t('record.warmup-preview-description')}
         audioControl={false}
         onDone={onWarmupDone}
       ></WarmUp>
     {/if}
 
-    {#if progress === 1 || progress === 2}
-      <!-- TODO: Should go to a different lesson on progress = 2-->
-      <Course courseId="intro-lessons" onDone={onLessonDone}></Course>
+    {#if 1 <= progress && progress <= 3}
+      <CourseLesson
+        courseId="intro-lessons"
+        lessonIndex={progress - 1}
+        onDone={onLessonDone}
+      ></CourseLesson>
     {/if}
     {#if progress === 4}
       <!-- TODO: translate text -->
-      <StandardPage mainColor title={'Done'}>
-        <h1>Well Done!</h1>
-        <h3>Congrats on finishing your first class with Bouncy Feet!</h3>
-        <h3>
-          You can now select a coach to develop your skill in the direction of
-          your choice.
-        </h3>
-        <h3>And don't forget to come back for your daily vibe!</h3>
+      <StandardPage mainColor title={$t('home.first-visit-done-title')}>
+        <p>{$t('home.first-visit-done-0')}</p>
+        <p>{$t('home.first-visit-done-1')}</p>
+        <p>{$t('home.first-visit-done-2')}</p>
         <button onclick={onLeave}>
           {$t('courses.lesson.show-teachers-button')}
         </button>
@@ -134,9 +140,3 @@
     {/if}
   </AvatarStyleContext>
 {/if}
-
-<!-- Then: Show list of active moves for repetition lesson -->
-<!-- Then: First repetition lesson -->
-<!-- Then: Show full review -->
-
-<!-- Then: Show teacher selection -->
