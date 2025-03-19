@@ -147,8 +147,8 @@ impl Teacher {
     pub(crate) fn pose_body_shift_at_subbeat(&self, mut subbeat: u32) -> Cartesian2d {
         let mut shift = Cartesian2d::default();
         for section in &self.sections {
-            let beats_on_step = u32::min(section.subbeats(), subbeat);
-            shift = shift + section.body_shift(beats_on_step);
+            let subbeats_on_step = u32::min(section.subbeats(), subbeat);
+            shift = shift + section.body_shift(subbeats_on_step);
             if subbeat < section.subbeats() {
                 break;
             }
@@ -202,13 +202,14 @@ impl Section {
         }
     }
 
-    fn body_shift(&self, beat: u32) -> Cartesian2d {
+    fn body_shift(&self, subbeat: u32) -> Cartesian2d {
         match self {
             Section::Step(step_section)
             | Section::ShowStep(step_section)
             | Section::Warmup(step_section) => {
-                let StepSection { step, .. } = step_section;
-                step.body_shift(beat as usize)
+                let StepSection { step, pace, .. } = step_section;
+                let pose = pace.pose_at_subbeat(subbeat);
+                step.body_shift(pose as usize)
             }
             Section::Freestyle { .. } => Cartesian2d::default(),
         }
