@@ -255,6 +255,7 @@ once per 250ms. -->
           bind:videoHeight={videoSrcHeight}
           src={reviewVideoSrc}
           playsinline
+          webkit-playsinline
           style="max-width: 100%"
         ></video>
         {#if keypointSkeleton && displayVideoOverlay}

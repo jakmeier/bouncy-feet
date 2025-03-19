@@ -117,6 +117,7 @@
     bind:videoWidth={videoSrcWidth}
     bind:videoHeight={videoSrcHeight}
     playsinline
+    webkit-playsinline
     controls
   ></video>
   <div>

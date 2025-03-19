@@ -32,6 +32,8 @@
           videoLoading = false;
         }}
         preload="auto"
+        playsinline
+        webkit-playsinline
       >
         <source
           src={path}

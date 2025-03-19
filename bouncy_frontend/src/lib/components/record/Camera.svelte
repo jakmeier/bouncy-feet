@@ -105,6 +105,8 @@
   bind:this={videoElement}
   class:hidden={!cameraOn}
   style="opacity: {opacity}"
+  playsinline
+  webkit-playsinline
 ></video>
 
 <style>
