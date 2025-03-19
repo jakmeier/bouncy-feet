@@ -1,4 +1,5 @@
 <script>
+  import { browser } from '$app/environment';
   import { goto } from '$app/navigation';
   import { base } from '$app/paths';
   import Course from '$lib/components/activity/Course.svelte';
@@ -8,7 +9,7 @@
   import StandardPage from '$lib/components/ui/StandardPage.svelte';
   import { t } from '$lib/i18n';
   import { ONBOARDING_STATE } from '$lib/onboarding';
-  import { getContext, onMount } from 'svelte';
+  import { getContext, onMount, tick } from 'svelte';
 
   /** @type {UserContextData}*/
   const { setUserMeta, clientSession } = getContext('user');
@@ -64,6 +65,8 @@
 
   function onContinue() {
     showProgressScreen = false;
+    resetScroll();
+
     if (progress === 1) {
       setUserMeta('onboarding', ONBOARDING_STATE.STARTED_FIRST_LESSON);
     }
@@ -75,15 +78,22 @@
 
   function onClassDone() {
     showProgressScreen = false;
+    resetScroll();
   }
 
   function onLeave() {
     goto('/coach/select');
   }
 
+  async function resetScroll() {
+    if (!browser) return;
+    document.querySelector('.background')?.scrollTo(0, 0);
+  }
+
   onMount(() => {
     if (progress > 0) {
       showProgressScreen = true;
+      resetScroll();
     }
   });
 </script>
