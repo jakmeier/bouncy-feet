@@ -15,6 +15,7 @@
   import Nerds from '$lib/components/info/Nerds.svelte';
   import Background from '$lib/components/ui/sections/Background.svelte';
   import { base } from '$app/paths';
+  import { onMount } from 'svelte';
   /**
    * @typedef {Object} Props
    * @property {any} featuredDances
@@ -43,6 +44,10 @@
     }
   });
   let imageHeight = $state(100);
+
+  onMount(() => {
+    document.querySelector('.background')?.scrollTo(0, 0);
+  });
 </script>
 
 <Background
