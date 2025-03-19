@@ -68,7 +68,7 @@
       ></Area>
     {/if}
   </div>
-  <div class="overlay">
+  <div class="buttons">
     <!-- TODO lesson for user picked coach -->
     <a href="./coach/chorok">
       <button>
@@ -78,6 +78,11 @@
     <a href="./coach/select">
       <button>
         {$t('home.change-teacher-button')}
+      </button>
+    </a>
+    <a href="./firstCourse">
+      <button>
+        {$t('home.tutorial-button')}
       </button>
     </a>
   </div>
@@ -90,5 +95,10 @@
 
   button {
     margin: 1rem auto;
+  }
+
+  .buttons {
+    display: flex;
+    flex-direction: column;
   }
 </style>
