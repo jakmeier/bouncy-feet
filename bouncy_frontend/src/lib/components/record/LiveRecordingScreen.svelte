@@ -79,23 +79,27 @@
 
   /** Where should the instructor origin be display. It can be on top of the
    * detection, or it can be fixed on screen, depending on the view. */
-  let instructorOrigin = $derived.by(() => {
-    if (view === TeacherView.InstructorOnly) {
-      return new Cartesian2d(0.0, 0.0);
-    } else if (
-      userSkeletonOrigin.x > -1 &&
-      userSkeletonOrigin.x < 1 &&
-      userSkeletonOrigin.y > -1 &&
-      userSkeletonOrigin.y < 1
-    ) {
-      return userSkeletonOrigin;
-    } else {
-      return new Cartesian2d(0.0, 0.0);
-    }
-  });
-  let instructorSkeletonSize = $derived(
-    view === TeacherView.InstructorOnly ? 1.25 : Math.min(userSkeletonSize, 2.5)
-  );
+  // let instructorOrigin = $derived.by(() => {
+  //   if (view === TeacherView.InstructorOnly) {
+  //     return new Cartesian2d(0.0, 0.0);
+  //   } else if (
+  //     userSkeletonOrigin.x > -1 &&
+  //     userSkeletonOrigin.x < 1 &&
+  //     userSkeletonOrigin.y > -1 &&
+  //     userSkeletonOrigin.y < 1
+  //   ) {
+  //     return userSkeletonOrigin;
+  //   } else {
+  //     return new Cartesian2d(0.0, 0.0);
+  //   }
+  // });
+  // let instructorSkeletonSize = $derived(
+  //   view === TeacherView.InstructorOnly ? 1.25 : Math.min(userSkeletonSize, 2.5)
+  // );
+
+  // Keep it simpl for now: No following the user, just display it in the center.
+  let instructorOrigin = new Cartesian2d(0.0, -0.125);
+  let instructorSkeletonSize = 1.25;
 
   // bindings to DOM
   /** @type {Camera} */
