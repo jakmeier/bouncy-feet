@@ -13,7 +13,7 @@
 
   function goToWarmup() {
     setUserMeta('onboarding', ONBOARDING_STATE.STARTED_FIRST_WARMUP);
-    goto('firstWarmup');
+    goto('firstCourse');
   }
 
   let showTitle = $state(false);

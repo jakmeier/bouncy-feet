@@ -6,7 +6,7 @@
 
 <StandardPage title="" white={false}>
   <h3>{$t('home.continue-first-warmup')}</h3>
-  <button onclick={() => goto('firstWarmup')}>
+  <button onclick={() => goto('firstCourse')}>
     {$t('home.continue-button')}
   </button>
 </StandardPage>

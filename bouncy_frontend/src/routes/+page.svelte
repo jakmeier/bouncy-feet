@@ -3,7 +3,7 @@
   import { getContext } from 'svelte';
   import FirstVisit from './FirstVisit.svelte';
   import HomeFeedB from './HomeFeed_b.svelte';
-  import ContinueFirstWarmup from './ContinueFirstWarmup.svelte';
+  import ContinueFirstCourse from './ContinueFirstCourse.svelte';
 
   /** @type {UserContextData}*/
   const user = getContext('user');
@@ -30,10 +30,10 @@
   {#if clientSession.meta.onboarding === ONBOARDING_STATE.FIRST_VISIT}
     <FirstVisit />
   {:else if clientSession.meta.onboarding === ONBOARDING_STATE.STARTED_FIRST_WARMUP}
-    <ContinueFirstWarmup />
+    <ContinueFirstCourse />
   {:else if [ONBOARDING_STATE.FINISHED_FIRST_WARMUP, ONBOARDING_STATE.STARTED_FIRST_LESSON, ONBOARDING_STATE.FINISHED_FIRST_LESSON, ONBOARDING_STATE.STARTED_SECOND_LESSON].includes(clientSession.meta.onboarding)}
     <!-- Maybe show a different continuation screen? -->
-    <ContinueFirstWarmup />
+    <ContinueFirstCourse />
   {:else}
     <HomeFeedB featuredDances={data.officialDances} {featuredSteps} />
   {/if}
