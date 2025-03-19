@@ -30,7 +30,7 @@
 
   // Only update cursor when it changes pose
   let cursor = $derived.by(() => {
-    const next = tracker.cursorAtSubbeat($beatCounter);
+    const next = tracker.cursorAtSubbeat($beatCounter, true);
     if (prevCursor && prevCursor.isSamePose(next)) {
       return prevCursor;
     }

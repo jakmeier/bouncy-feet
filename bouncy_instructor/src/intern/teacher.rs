@@ -8,6 +8,7 @@ use crate::StepInfo;
 #[derive(Default)]
 pub(crate) struct Teacher {
     sections: Vec<Section>,
+    total_subbeats: u32,
     // TODO: audio hints by the teacher
 }
 
@@ -38,6 +39,7 @@ impl Teacher {
             subbeats: beats * 2,
             pace,
         }));
+        self.update_tracked_subbeats();
     }
 
     /// The instructor shows the step, the student can watch.
@@ -48,6 +50,7 @@ impl Teacher {
             subbeats: beats * 2,
             pace,
         }));
+        self.update_tracked_subbeats();
     }
 
     /// Any move allowed from the student.
@@ -56,6 +59,7 @@ impl Teacher {
         self.sections.push(Section::Freestyle {
             subbeats: beats * 2,
         });
+        self.update_tracked_subbeats();
     }
 
     /// Show a step to copy by the student but be more lenient in tracking.
@@ -66,6 +70,7 @@ impl Teacher {
             subbeats: beats * 2,
             pace,
         }));
+        self.update_tracked_subbeats();
     }
 
     pub(crate) fn step(&self, cursor: &DanceCursor) -> Option<&StepInfo> {
@@ -183,9 +188,13 @@ impl Teacher {
         self.section_at_subbeat(subbeat).is_none()
     }
 
+    fn update_tracked_subbeats(&mut self) {
+        self.total_subbeats = self.sections.iter().map(|section| section.subbeats()).sum();
+    }
+
     /// How many beats to track for
     pub(crate) fn tracked_subbeats(&self) -> u32 {
-        self.sections.iter().map(|section| section.subbeats()).sum()
+        self.total_subbeats
     }
 }
 

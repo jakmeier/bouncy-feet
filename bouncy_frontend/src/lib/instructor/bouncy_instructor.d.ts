@@ -762,8 +762,18 @@ export class Tracker {
   expectedPoseSkeleton(): Skeleton;
   expectedJumpHeight(): number;
   subbeat(t: number): number;
-  cursor(t: number): DanceCursor;
-  cursorAtSubbeat(subbeat: number): DanceCursor;
+  /**
+   * Return a cursor to a pose inside the tracker by timestamp.
+   *
+   * If `looped` is true, the subbeat wraps around when exceeding the tracked range.
+   */
+  cursor(t: number, looped: boolean): DanceCursor;
+  /**
+   * Return a cursor to a pose inside the tracker by beat count.
+   *
+   * If `looped` is true, the subbeat wraps around when exceeding the tracked range.
+   */
+  cursorAtSubbeat(subbeat: number, looped: boolean): DanceCursor;
   poseSkeletonAt(cursor: DanceCursor): Skeleton;
   jumpHeight(cursor: DanceCursor): number;
   expectedPoseBodyShift(): Cartesian2d;
@@ -846,8 +856,8 @@ export interface InitOutput {
   readonly tracker_expectedPoseSkeleton: (a: number) => number;
   readonly tracker_expectedJumpHeight: (a: number) => number;
   readonly tracker_subbeat: (a: number, b: number) => number;
-  readonly tracker_cursor: (a: number, b: number) => number;
-  readonly tracker_cursorAtSubbeat: (a: number, b: number) => number;
+  readonly tracker_cursor: (a: number, b: number, c: number) => number;
+  readonly tracker_cursorAtSubbeat: (a: number, b: number, c: number) => number;
   readonly tracker_poseSkeletonAt: (a: number, b: number) => number;
   readonly tracker_jumpHeight: (a: number, b: number) => number;
   readonly tracker_expectedPoseBodyShift: (a: number) => number;

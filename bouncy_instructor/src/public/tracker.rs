@@ -370,16 +370,29 @@ impl Tracker {
                 .timestamp_to_subbeat(self.detector.detection_state_start) as i32
     }
 
-    pub fn cursor(&self, t: f64) -> DanceCursor {
+    /// Return a cursor to a pose inside the tracker by timestamp.
+    ///
+    /// If `looped` is true, the subbeat wraps around when exceeding the tracked range.
+    pub fn cursor(&self, t: f64, looped: bool) -> DanceCursor {
         let subbeat = self.subbeat(t);
-        self.cursor_at_subbeat(subbeat)
+        self.cursor_at_subbeat(subbeat, looped)
     }
 
+    /// Return a cursor to a pose inside the tracker by beat count.
+    ///
+    /// If `looped` is true, the subbeat wraps around when exceeding the tracked range.
     #[wasm_bindgen(js_name = cursorAtSubbeat)]
-    pub fn cursor_at_subbeat(&self, subbeat: i32) -> DanceCursor {
-        self.detector
-            .teacher
-            .cursor_at_subbeat(u32::try_from(subbeat).unwrap_or(0))
+    pub fn cursor_at_subbeat(&self, subbeat: i32, looped: bool) -> DanceCursor {
+        let subbeat_u32 = u32::try_from(subbeat).unwrap_or(0);
+        let total = self.detector.teacher.tracked_subbeats();
+
+        let lookup = if looped && total > 0 {
+            subbeat_u32 % total
+        } else {
+            subbeat_u32
+        };
+
+        self.detector.teacher.cursor_at_subbeat(lookup)
     }
 
     #[wasm_bindgen(js_name = poseSkeletonAt)]

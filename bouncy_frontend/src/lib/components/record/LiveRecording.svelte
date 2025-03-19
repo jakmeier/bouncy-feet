@@ -212,7 +212,7 @@ it does not match
         const future = performance.now() + animationTime;
 
         /** @type {DanceCursor} */
-        let newCursor = tracker.cursor(future);
+        let newCursor = tracker.cursor(future, false);
         if (!tailCursor?.isSamePose(newCursor)) {
           instructorSkeleton = tracker.poseSkeletonAt(newCursor);
           instructorSkeletonBodyShift = tracker.poseBodyShift(newCursor);
