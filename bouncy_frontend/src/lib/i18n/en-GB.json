@@ -34,8 +34,8 @@
         "progress-title": "Your Progress",
         "collection-button": "Browse moves",
         "courses-button": "Learn Shuffle",
-        "continue-learning-button": "Come dance with me! ->",
-        "change-teacher-button": "Other teachers ->",
+        "continue-learning-button": "Come dance with me!",
+        "change-teacher-button": "Other teachers",
         "nav": "Home"
     },
     "courses": {

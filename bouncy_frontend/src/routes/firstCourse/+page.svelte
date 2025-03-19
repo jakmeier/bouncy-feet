@@ -17,10 +17,15 @@
 
   let progress = $state(initProgress());
   // svelte-ignore state_referenced_locally
+  let selectedLesson = $state(Math.max(0, progress - 1));
+
+  // svelte-ignore state_referenced_locally
   const initialProgress = progress > 0;
   let showProgressScreen = $state(initialProgress);
+  let showEndScreen = $state(false);
 
   function onWarmupDone() {
+    if (progress !== 0) return;
     progress = 1;
     setUserMeta('onboarding', ONBOARDING_STATE.FINISHED_FIRST_WARMUP);
     showProgressScreen = true;
@@ -68,23 +73,30 @@
     }
   }
 
+  function onSelectLesson(lessonIndex) {
+    selectedLesson = lessonIndex;
+    showProgressScreen = false;
+    resetScroll();
+  }
+
   function onContinue() {
     showProgressScreen = false;
     resetScroll();
 
-    if (progress === 1) {
+    if (progress === 1 && selectedLesson == 0) {
       setUserMeta('onboarding', ONBOARDING_STATE.STARTED_FIRST_LESSON);
     }
-    if (progress === 2) {
+    if (progress === 2 && selectedLesson == 1) {
       setUserMeta('onboarding', ONBOARDING_STATE.STARTED_SECOND_LESSON);
     }
-    if (progress === 3) {
+    if (progress === 3 && selectedLesson == 2) {
       setUserMeta('onboarding', ONBOARDING_STATE.STARTED_THIRD_LESSON);
     }
   }
 
   function onClassDone() {
     showProgressScreen = false;
+    showEndScreen = true;
     resetScroll();
   }
 
@@ -97,6 +109,11 @@
     document.querySelector('.background')?.scrollTo(0, 0);
   }
 
+  function backFromLesson() {
+    showProgressScreen = true;
+    resetScroll();
+  }
+
   onMount(() => {
     if (progress > 0) {
       showProgressScreen = true;
@@ -106,37 +123,36 @@
 </script>
 
 {#if showProgressScreen}
-  <ClassProgress {progress} {onContinue} onDone={onClassDone}></ClassProgress>
+  <ClassProgress {progress} {onContinue} onDone={onClassDone} {onSelectLesson}
+  ></ClassProgress>
+{:else if showEndScreen}
+  <StandardPage mainColor title={$t('home.first-visit-done-title')}>
+    <p>{$t('home.first-visit-done-0')}</p>
+    <p>{$t('home.first-visit-done-1')}</p>
+    <p>{$t('home.first-visit-done-2')}</p>
+    <button onclick={onLeave}>
+      {$t('courses.lesson.show-teachers-button')}
+    </button>
+  </StandardPage>
 {:else}
   <!-- TODO: real video -->
   <AvatarStyleContext>
-    {#if progress === 0}
+    {#if selectedLesson === 0}
       <WarmUp
         {stepNames}
         videoUrl={''}
         description={$t('record.warmup-preview-description')}
         audioControl={false}
         onDone={onWarmupDone}
+        onBack={backFromLesson}
       ></WarmUp>
-    {/if}
-
-    {#if 1 <= progress && progress <= 3}
+    {:else}
       <CourseLesson
         courseId="intro-lessons"
-        lessonIndex={progress - 1}
+        lessonIndex={selectedLesson - 1}
         onDone={onLessonDone}
+        onBack={backFromLesson}
       ></CourseLesson>
-    {/if}
-    {#if progress === 4}
-      <!-- TODO: translate text -->
-      <StandardPage mainColor title={$t('home.first-visit-done-title')}>
-        <p>{$t('home.first-visit-done-0')}</p>
-        <p>{$t('home.first-visit-done-1')}</p>
-        <p>{$t('home.first-visit-done-2')}</p>
-        <button onclick={onLeave}>
-          {$t('courses.lesson.show-teachers-button')}
-        </button>
-      </StandardPage>
     {/if}
   </AvatarStyleContext>
 {/if}

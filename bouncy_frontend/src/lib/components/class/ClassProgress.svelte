@@ -5,7 +5,7 @@
   import StandardPage from '../ui/StandardPage.svelte';
   import { onMount } from 'svelte';
 
-  let { progress, onContinue, onDone } = $props();
+  let { progress, onContinue, onDone, onSelectLesson } = $props();
 
   const elements = ['warmup', 'lesson', 'lesson', 'wrap'];
   let elementsShown = $state(0);
@@ -27,7 +27,9 @@
   <div class="elements">
     {#each elements as element, i}
       {#if i < elementsShown}
-        <div class="element" in:slide>
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
+        <div class="element" in:slide onclick={() => onSelectLesson(i)}>
           <div class="element-number">
             {i + 1}
           </div>

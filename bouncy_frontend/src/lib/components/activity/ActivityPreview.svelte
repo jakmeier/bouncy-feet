@@ -26,11 +26,20 @@
    * @property {string} trackId
    * @property {number} difficulty
    * @property {number} energy
+   * @property {()=>void} onBack
    */
 
   /** @type {Props}*/
-  let { title, description, tracker, onDone, video, difficulty, energy } =
-    $props();
+  let {
+    title,
+    description,
+    tracker,
+    onDone,
+    video,
+    difficulty,
+    energy,
+    onBack,
+  } = $props();
 
   const { stopTrack, setTrack, songTitle, songAuthor } = getContext('music');
 
@@ -55,9 +64,9 @@
   });
 </script>
 
-<Background bgColor="var(--theme-main)" color="var(--theme-black)" />
+<Background bgColor="var(--theme-main)" color="var(--theme-neutral-black)" />
 
-<LogoHeader mainColor {title} />
+<LogoHeader mainColor {title} backButton {onBack} />
 
 <div class="description">
   {description}

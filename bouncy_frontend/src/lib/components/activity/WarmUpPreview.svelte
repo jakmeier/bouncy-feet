@@ -11,6 +11,7 @@
    * @property {boolean} audioControl
    * @property {string} trackId
    * @property {()=>void} onDone
+   * @property {()=>void} onBack
    */
 
   /** @type {Props} */
@@ -20,6 +21,7 @@
     audioControl,
     trackId,
     onDone,
+    onBack,
   } = $props();
 
   let { tracker } = getContext('tracker');
@@ -35,6 +37,7 @@
   {title}
   {description}
   {onDone}
+  {onBack}
   {tracker}
   {video}
   {trackId}

@@ -9,10 +9,11 @@
    * @property {Course} course
    * @property {number} lessonIndex
    * @property {function} onDone
+   * @property {()=>void} onBack
    */
 
   /** @type {Props}*/
-  let { course, lessonIndex, onDone } = $props();
+  let { course, lessonIndex, onDone, onBack } = $props();
 
   const { tracker } = getContext('tracker');
 
@@ -39,4 +40,5 @@
   {trackId}
   {difficulty}
   {energy}
+  {onBack}
 />

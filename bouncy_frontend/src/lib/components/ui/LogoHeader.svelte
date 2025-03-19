@@ -1,5 +1,6 @@
 <script>
   import { base } from '$app/paths';
+  import Arrow from './Arrow.svelte';
 
   /**
    * @typedef {Object} Props
@@ -8,6 +9,8 @@
    * @property {boolean} [gray]
    * @property {boolean} [accent]
    * @property {boolean} [mainColor]
+   * @property {boolean} [backButton]
+   * @property {()=>void} [onBack]
    */
 
   /** @type {Props} */
@@ -17,6 +20,8 @@
     accent = false,
     mainColor = false,
     title = '',
+    backButton = false,
+    onBack = () => {},
   } = $props();
 
   let bgColor = $derived(
@@ -39,7 +44,15 @@
 </script>
 
 <header style="background-color: {bgColor};">
-  <img class="logo" src={imgUrl} alt="Bouncy Feet Logo" />
+  {#if backButton}
+    <div class="arrow-wrapper" onclick={onBack}>
+      <div class="arrow">
+        <Arrow />
+      </div>
+    </div>
+  {:else}
+    <img class="logo" src={imgUrl} alt="Bouncy Feet Logo" />
+  {/if}
   <h1 class="title">{title}</h1>
 </header>
 
@@ -53,5 +66,19 @@
   header img.logo {
     height: 3rem;
     align-self: baseline;
+  }
+
+  .arrow-wrapper {
+    height: 3rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  .arrow {
+    max-width: 3rem;
+    max-height: 1.8rem;
+    transform: rotate(90deg) translateY(-100%);
+    transform-origin: top left;
   }
 </style>

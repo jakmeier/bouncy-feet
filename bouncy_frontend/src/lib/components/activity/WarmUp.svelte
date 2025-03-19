@@ -15,6 +15,7 @@
    * @property {string} description
    * @property {boolean} audioControl
    * @property {function} onDone
+   * @property {()=>void} onBack
    */
 
   /** @type {Props} */
@@ -24,6 +25,7 @@
     description,
     audioControl,
     onDone,
+    onBack,
   } = $props();
 
   let previewDone = $state(false);
@@ -71,6 +73,7 @@
     videoUrl={previewVideoUrl}
     trackId={'105bpm_tropical_house'}
     onDone={() => (previewDone = true)}
+    {onBack}
   />
 {:else if !trackingDone}
   <!-- TODO: warmup should be with video instead of avatar -->

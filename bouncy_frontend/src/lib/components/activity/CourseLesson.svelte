@@ -12,10 +12,11 @@
    * @property {string} courseId
    * @property {number} lessonIndex
    * @property {function} onDone
+   * @property {()=>void} onBack
    */
 
   /** @type {Props}*/
-  let { courseId, lessonIndex, onDone } = $props();
+  let { courseId, lessonIndex, onDone, onBack } = $props();
 
   const { getCourse } = getContext('courses');
 
@@ -87,6 +88,7 @@
       {course}
       {lessonIndex}
       onDone={() => (previewDone = true)}
+      {onBack}
     ></CourseLessonPreview>
   {:else}
     <StandardPage white><h3>bug: course missing</h3></StandardPage>
