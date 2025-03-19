@@ -152,15 +152,14 @@ impl Teacher {
     pub(crate) fn pose_body_shift_at_subbeat(&self, mut subbeat: u32) -> Cartesian2d {
         let mut shift = Cartesian2d::default();
         for section in &self.sections {
-            let subbeats_on_step = u32::min(section.subbeats(), subbeat);
+            let subbeats_on_step = u32::min(section.subbeats() - 1, subbeat);
             shift = shift + section.body_shift(subbeats_on_step);
             if subbeat < section.subbeats() {
                 break;
             }
             subbeat -= section.subbeats();
         }
-        // Don't accumulate y-shift, it struggles with pivots
-        Cartesian2d::new(shift.x, 0.0)
+        shift
     }
 
     /// Whether at the given subbeat, the student should be tracked.

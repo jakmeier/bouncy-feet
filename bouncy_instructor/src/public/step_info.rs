@@ -42,8 +42,8 @@ impl StepInfo {
     }
 
     /// How much the body position deviates from the origin.
-    pub fn body_shift(&self, subbeat: usize) -> Cartesian2d {
-        self.body_shift.at_subbeat(subbeat)
+    pub fn body_shift(&self, pose: usize) -> Cartesian2d {
+        self.body_shift.after_pose(pose)
     }
 
     /// Applies a rotation (in degree) and returns the resulting skelton.

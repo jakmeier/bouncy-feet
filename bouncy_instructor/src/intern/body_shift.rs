@@ -61,8 +61,8 @@ impl BodyShift {
         );
     }
 
-    /// How much the body position deviates from the origin after N subbeats.
-    pub(crate) fn at_subbeat(&self, subbeat: usize) -> Cartesian2d {
+    /// How much the body position deviates from the origin after N poses.
+    pub(crate) fn after_pose(&self, pose: usize) -> Cartesian2d {
         if self.accumulated_body_shift.is_empty() {
             return Cartesian2d::default();
         }
@@ -70,14 +70,14 @@ impl BodyShift {
         if len == 0 {
             return Cartesian2d::default();
         }
-        let n_full_turns = subbeat / len;
+        let n_full_turns = pose / len;
         let shift_full_turn = self
             .accumulated_body_shift
             .last()
             .copied()
             .unwrap_or_default();
-        let pose_shift = self.pose_body_shift[subbeat % len];
-        pose_shift + shift_full_turn * n_full_turns + self.accumulated_body_shift[subbeat % len]
+        let pose_shift = self.pose_body_shift[pose % len];
+        pose_shift + shift_full_turn * n_full_turns + self.accumulated_body_shift[pose % len]
     }
 }
 

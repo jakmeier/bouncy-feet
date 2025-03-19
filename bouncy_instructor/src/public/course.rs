@@ -142,7 +142,7 @@ impl Lesson {
             let step = &part.step_wrapper;
             let step_info = step.info(&db);
             let pace = part.pace;
-            let beats = part.repeat * step_info.num_poses() as u32 * pace.subbeats_per_pose();
+            let beats = part.repeat * step_info.num_poses() as u32 * pace.subbeats_per_pose() / 2;
 
             teacher.add_step(step.info(&db), beats, pace);
         }

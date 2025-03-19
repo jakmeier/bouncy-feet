@@ -48,7 +48,7 @@ impl DanceInfo {
 
     /// How much the body position deviates from the origin.
     pub fn body_shift(&self, beat: usize) -> Cartesian2d {
-        self.body_shift.at_subbeat(beat)
+        self.body_shift.after_pose(beat)
     }
 }
 
