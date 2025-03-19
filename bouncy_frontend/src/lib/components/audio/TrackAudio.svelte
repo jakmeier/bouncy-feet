@@ -11,29 +11,30 @@
 
   /**
    * @typedef {Object} Props
-   * @property {boolean} [isOn]
    * @property {Song} track
    */
 
   /** @type {Props} */
-  let { isOn = false, track } = $props();
+  let { track } = $props();
 
   let musicContext = getContext('music');
+  let isPlaying = false;
 
   export function resetTrack() {
     resetMusic();
     startMusic();
+    isPlaying = true;
   }
 
   export function stopMusic() {
     setChannelGain('music', 0.0);
+    isPlaying = false;
   }
 
   export function resumeMusic() {
     setChannelGain('music', musicContext.gain);
+    isPlaying = true;
   }
-
-  let initialized = $state(false);
 
   /**
    * Currently playing music
@@ -44,13 +45,28 @@
   onMount(async () => {
     await initAudioContext();
     await loadAndPlayTrack();
-    initialized = true;
+    isPlaying = true;
+
+    document.addEventListener('visibilitychange', visibilityHandler, false);
   });
 
   onDestroy(() => {
     stopMusic();
     resetMusic();
+    document.removeEventListener('visibilitychange', visibilityHandler, false);
   });
+
+  let mutedDueToVisibility = false;
+  function visibilityHandler() {
+    // especially annoying on mobile if I don't do this
+    if (document.hidden && isPlaying) {
+      stopMusic();
+      mutedDueToVisibility = true;
+    } else if (!document.hidden && mutedDueToVisibility) {
+      resumeMusic();
+      mutedDueToVisibility = false;
+    }
+  }
 
   async function loadAndPlayTrack() {
     if (track) {
@@ -75,9 +91,6 @@
       musicNode = null;
     }
   }
-  $effect(() => {
-    initialized && (isOn ? startMusic() : stopMusic());
-  });
 
   $effect(() => {
     // keeping track on beat (poorly...)

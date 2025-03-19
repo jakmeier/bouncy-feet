@@ -104,8 +104,7 @@
   ></LiveRecording>
 </div>
 
-<Audio isOn={useFixedBpm && $trackingState !== DetectionState.TrackingDone}
-></Audio>
+<Audio></Audio>
 
 <Popup showOkButton title={'common.hint-popup-title'}>
   {$t('record.estimate-bpm-hint')}

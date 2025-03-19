@@ -41,7 +41,8 @@
     onBack,
   } = $props();
 
-  const { stopTrack, setTrack, songTitle, songAuthor } = getContext('music');
+  const { stopTrack, setTrack, resumeTrack, songTitle, songAuthor } =
+    getContext('music');
 
   let isVideoOpen = $state(writable(false));
   let fullWidth = $state();
@@ -53,11 +54,13 @@
     const track = songList[index % songList.length];
     if (track) {
       setTrack(track.id);
+      resumeTrack();
     }
   }
 
   onMount(() => {
     setTrack(songList[0].id);
+    resumeTrack();
   });
   onDestroy(() => {
     stopTrack();

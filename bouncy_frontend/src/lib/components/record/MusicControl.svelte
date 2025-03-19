@@ -2,7 +2,7 @@
   import { run } from 'svelte/legacy';
 
   import { DetectionState } from '$lib/instructor/bouncy_instructor';
-  import { getContext } from 'svelte';
+  import { getContext, onDestroy } from 'svelte';
 
   /**
    * Music control component for LiveRecording, to keep that component reasonably sized.
@@ -18,7 +18,6 @@
   /** @type {DetectionState} */
   let prevDetectionState = DetectionState.Init;
 
-
   /** @param {DetectionState} newState */
   function newDetectionState(newState) {
     if (newState !== prevDetectionState) {
@@ -33,5 +32,9 @@
   }
   run(() => {
     newDetectionState($detectionState);
+  });
+
+  onDestroy(() => {
+    stopTrack();
   });
 </script>
