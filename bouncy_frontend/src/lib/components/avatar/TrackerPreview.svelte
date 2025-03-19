@@ -41,7 +41,7 @@
   // These values are derived by the cursor, when it changes
   let skeleton = $derived(tracker.poseSkeletonAt(cursor));
   let bodyShift = $derived(tracker.poseBodyShift(cursor));
-  let jumpHeight = $derived(tracker.jumpHeight(cursor));
+  let jumpHeight = $derived(tracker.jumpHeight(cursor) * 250);
 
   let animationTime = $derived($timeBetweenMoves * 0.8);
 </script>

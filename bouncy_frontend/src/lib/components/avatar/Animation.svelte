@@ -9,7 +9,7 @@
   export let easing = quadIn;
   export let jumpHeight = 1;
 
-  // this factor is chosen to have a jump height of 1.0 to be a reasonable default
+  // this factor is chosen to have a jump height of 1.0 * size to be a reasonable default
   const jumpHeightFactor = 0.025;
 
   const animationTimeStore = writable(animationTime);

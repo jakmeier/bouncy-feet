@@ -62,6 +62,10 @@
   let displayedSkeleton = $state(skeleton);
   let displayedBodyShift = $state(bodyShift);
 
+  // This became the standard size for all SVGs, making for a standard width of
+  // lines in SVG. Here it's also used for jump height normalization.
+  const svgSize = 250;
+
   $effect(() => {
     if (skeleton !== prevSkeleton) {
       correctSkeleton = prevSkeleton;
@@ -99,13 +103,17 @@
 </script>
 
 <div class="avatar-container">
-  <Animation {animationTime} delay={animationDelay} {jumpHeight}>
-    <Svg width={250} height={250} orderByZ showOverflow>
+  <Animation
+    {animationTime}
+    delay={animationDelay}
+    jumpHeight={jumpHeight * svgSize}
+  >
+    <Svg width={svgSize} height={svgSize} orderByZ showOverflow>
       <AvatarStyleContext {coloring}>
         <SvgAvatar
           skeleton={displayedSkeleton}
-          width={250}
-          height={250}
+          width={svgSize}
+          height={svgSize}
           {avatarSize}
           bodyShift={displayedBodyShift.add(origin)}
         ></SvgAvatar>
