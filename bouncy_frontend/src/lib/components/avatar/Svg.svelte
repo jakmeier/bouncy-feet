@@ -1,5 +1,5 @@
 <script>
-  import { getContext, onDestroy, onMount, setContext } from 'svelte';
+  import { onDestroy, onMount, setContext } from 'svelte';
   import PhysicalSvgLine from './PhysicalSvgLine.svelte';
   import PhysicalSvgPolygon from './PhysicalSvgPolygon.svelte';
   import PhysicalSvgCircle from './PhysicalSvgCircle.svelte';
@@ -24,12 +24,6 @@
     showOverflow = false,
     children,
   } = $props();
-
-  let animationCtx = getContext('animation');
-  let animationTime = null;
-  if (animationCtx) {
-    animationTime = animationCtx.animationTime;
-  }
 
   let stateDirty = false;
 
@@ -148,10 +142,12 @@
     stateDirty = true;
   }
 
+  let updating = false;
   async function update() {
-    if (!stateDirty) {
+    if (!stateDirty || updating) {
       return;
     }
+    updating = true;
     displayedLines = lines;
     displayedPaths = paths;
     displayedCircles = circles;
@@ -161,6 +157,7 @@
       displayedPaths = displayedPaths.sort((a, b) => a.z - b.z);
     }
     stateDirty = false;
+    updating = false;
   }
 
   setContext('svg', {
