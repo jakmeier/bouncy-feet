@@ -11,7 +11,8 @@
   lessons: [
     (
       names: {"de": "V rechts öffnen", "en": "Open V to the right"},
-      icon: "todo.svg",
+      difficulty: 1,
+      energy: 1,
       // video: "/video/todo.mp4",
       parts: [
         (step: "open-v-right", repeat: 16, subbeats_per_move: 2),
@@ -19,7 +20,8 @@
     ),
     (
       names: {"de": "V links öffnen", "en": "Open V to the left"},
-      icon: "todo.svg",
+      difficulty: 1,
+      energy: 1,
       // video: "/video/todo.mp4",
       parts: [
         (step: "open-v-left", repeat: 16, subbeats_per_move: 2),
@@ -27,7 +29,8 @@
     ),
     (
       names: {"de": "V beidseitig", "en": "V both ways"},
-      icon: "todo.svg",
+      difficulty: 1,
+      energy: 1,
       // video: "/video/todo.mp4",
       parts: [
         (step: "open-v-left", repeat: 16, subbeats_per_move: 2),
@@ -36,7 +39,8 @@
     ),
     (
       names: {"de": "V-Step", "en": "V-Step"},
-      icon: "todo.svg",
+      difficulty: 1,
+      energy: 1,
       // video: "/video/todo.mp4",
       parts: [
         (step: "v-0", repeat: 16, subbeats_per_move: 2),
@@ -47,7 +51,8 @@
     ),
     (
       names: {"de": "Fortgeschrittenes Training", "en": "Advanced Training"},
-      icon: "todo.svg",
+      difficulty: 1,
+      energy: 1,
       // video: "/video/todo.mp4",
       parts: [
         (step: "happy-feet-0", repeat: 16, subbeats_per_move: 2),

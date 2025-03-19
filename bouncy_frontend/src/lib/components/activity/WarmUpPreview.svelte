@@ -24,7 +24,20 @@
 
   let { tracker } = getContext('tracker');
 
+  // TODO: Get this from somewhere
+  const difficulty = 1;
+  const energy = 3;
+
   const title = $t('record.warmup-preview-title');
 </script>
 
-<ActivityPreview {title} {description} {onDone} {tracker} {video} {trackId} />
+<ActivityPreview
+  {title}
+  {description}
+  {onDone}
+  {tracker}
+  {video}
+  {trackId}
+  {difficulty}
+  {energy}
+/>

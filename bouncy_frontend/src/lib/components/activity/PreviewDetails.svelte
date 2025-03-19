@@ -3,8 +3,7 @@
   import { formatDuration, intervalToDuration } from 'date-fns';
   import { base } from '$app/paths';
 
-  //   TODO: set proper difficulty / energy
-  let { beats, bpm, durationMs, difficulty = 1, energy = 3 } = $props();
+  let { beats, bpm, durationMs, difficulty, energy } = $props();
 
   /** @type {import('date-fns').FormatDurationOptions} */
   const formatOpts = $derived({

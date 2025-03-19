@@ -24,10 +24,13 @@
    * @property {Tracker} tracker
    * @property {string} [video]
    * @property {string} trackId
+   * @property {number} difficulty
+   * @property {number} energy
    */
 
   /** @type {Props}*/
-  let { title, description, tracker, onDone, video } = $props();
+  let { title, description, tracker, onDone, video, difficulty, energy } =
+    $props();
 
   const { stopTrack, setTrack, songTitle, songAuthor } = getContext('music');
 
@@ -68,6 +71,8 @@
   durationMs={tracker.duration()}
   beats={tracker.trackedSubbeats / 2}
   {bpm}
+  {difficulty}
+  {energy}
 />
 
 <div class="controls">

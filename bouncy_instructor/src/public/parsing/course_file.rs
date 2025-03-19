@@ -30,8 +30,9 @@ pub(crate) struct Lesson {
     explanations: Option<TranslatedString>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     video: Option<String>,
-    icon: String,
     parts: Vec<Part>,
+    energy: u8,
+    difficulty: u8,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -120,8 +121,9 @@ impl CourseFile {
                 name,
                 lesson_explanation,
                 lesson.video,
-                lesson.icon,
                 lesson.parts,
+                lesson.difficulty,
+                lesson.energy,
             )?;
         }
         Ok(course)

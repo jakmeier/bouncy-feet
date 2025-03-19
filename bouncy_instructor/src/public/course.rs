@@ -26,7 +26,8 @@ pub struct Lesson {
     pub(crate) name: String,
     pub(crate) explanation: Option<String>,
     pub(crate) video: Option<String>,
-    pub(crate) icon: String,
+    pub energy: u8,
+    pub difficulty: u8,
     pub(crate) parts: Vec<LessonPart>,
 }
 
@@ -130,11 +131,6 @@ impl Lesson {
     pub fn parts(&self) -> Vec<LessonPart> {
         self.parts.clone()
     }
-
-    #[wasm_bindgen(getter, js_name = "iconUrl")]
-    pub fn icon_url(&self) -> String {
-        self.icon.clone()
-    }
 }
 
 impl Lesson {
@@ -175,8 +171,9 @@ impl Course {
         lesson_name: String,
         explanation: Option<String>,
         video: Option<String>,
-        lesson_icon: String,
         lesson_parts: Vec<parsing::course_file::Part>,
+        difficulty: u8,
+        energy: u8,
     ) -> Result<(), CourseError> {
         let parts = lesson_parts
             .into_iter()
@@ -186,8 +183,9 @@ impl Course {
             explanation,
             video,
             name: lesson_name,
-            icon: lesson_icon,
             parts,
+            difficulty,
+            energy,
         };
         self.lessons.push(lesson);
         Ok(())

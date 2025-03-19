@@ -120,7 +120,8 @@ mod tests {
       lessons: [
         (
           names: {"de": "Micro Bounce", "en": "Micro Bounce"},
-          icon: "todo.svg",
+          difficulty: 2,
+          energy: 3,
           parts: [
             (step: "run-in-place", repeat: 1, subbeats_per_move: 1),
             (step: "another-step", repeat: 2, subbeats_per_move: 4),
@@ -291,7 +292,8 @@ mod tests {
                         name: "Micro Bounce",
                         explanation: None,
                         video: None,
-                        icon: "todo.svg",
+                        energy: 3,
+                        difficulty: 2,
                         parts: [
                             LessonPart {
                                 step_name: "run-in-place",
@@ -341,7 +343,8 @@ mod tests {
                   "de": "Micro Bounce",
                   "en": "Micro Bounce",
                 },
-                icon: "todo.svg",
+                difficulty: 1,
+                energy: 2,
                 parts: [
                   (step: "run-in-place", repeat: 1, subbeats_per_move: 1),
                   (step: "micro-bounce", repeat: 2, subbeats_per_move: 4),

@@ -21,6 +21,8 @@
   /** @type {string} */
   let title = course.lessons[lessonIndex].name;
   let description = course.lessons[lessonIndex].explanation;
+  const difficulty = course.lessons[lessonIndex].difficulty;
+  const energy = course.lessons[lessonIndex].energy;
 
   const songList = songs.list();
 
@@ -28,4 +30,13 @@
   const trackId = songList[0].id;
 </script>
 
-<ActivityPreview {title} {description} {onDone} {tracker} {video} {trackId} />
+<ActivityPreview
+  {title}
+  {description}
+  {onDone}
+  {tracker}
+  {video}
+  {trackId}
+  {difficulty}
+  {energy}
+/>
