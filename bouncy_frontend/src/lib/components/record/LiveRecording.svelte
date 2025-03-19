@@ -181,11 +181,13 @@ it does not match
 
   /** @param {PoseDetection} dataListener */
   function processNextFrame(dataListener) {
-    if (!screen.cameraVideoElement()) {
+    const videoElement = screen.cameraVideoElement();
+    const videoAvailable = videoElement && videoElement.videoHeight > 0;
+    if (!videoAvailable) {
       return;
     }
     const start = performance.now();
-    dataListener.trackFrame(screen.cameraVideoElement());
+    dataListener.trackFrame(videoElement);
     const t = performance.now() - start;
     if (t > 50) console.debug(`trackFrame took ${t}ms`);
     recordTrackSyncDelay(t);
