@@ -93,8 +93,8 @@ of the modification needs to be included.
 
 ### Client data authority
 
-1. Each client has authority over the activities(*) done through it. This list
-   of activities can be appended to only on this client session.
+1. Each client has authority over the activities(*) done through it. To this list
+   of activities, only this client session can append.
 2. The API server keeps a copy of all activity lists and presents a global user
    state. This composition of client states is a data point of its own, which
    the API server has data authority over. Only through that, clients get to see

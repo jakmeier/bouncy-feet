@@ -14,7 +14,7 @@ RUN cargo build --release
 FROM docker.io/debian:bookworm-slim AS runtime
 WORKDIR /app
 RUN mkdir /app/data
-COPY --from=builder /app/target/release/bouncy_stats /usr/local/bin
+COPY --from=builder /app/target/release/bouncy_backend /usr/local/bin
 COPY ./db_migrations ./db_migrations
 EXPOSE 3000
-CMD ["/usr/local/bin/bouncy_stats"]
+CMD ["/usr/local/bin/bouncy_backend"]

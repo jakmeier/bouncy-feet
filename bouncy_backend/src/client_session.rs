@@ -2,10 +2,12 @@ use axum::http::StatusCode;
 use axum::response::Response;
 use axum::{extract, response::Json};
 use sqlx::PgPool;
+use tower_sessions::Session;
 use tracing::{error, info};
 use uuid::Uuid;
 
-use crate::user2::UserId;
+use crate::auth::ClientSecretAuthPayload;
+use crate::user2::{user_lookup_by_client_secret, UserId};
 use crate::{internal_error, AppState};
 
 #[derive(serde::Serialize)]
@@ -26,9 +28,13 @@ pub(crate) struct RecordActivityRequest {
 /// Authenticated client session
 pub struct ClientSessionId(i64);
 
+pub const CLIENT_SESSION_ID_KEY: &str = "CLIENT_SESSION_ID";
+pub const USER_ID_KEY: &str = "USER_ID";
+
 /// Public API to create a new guest session.
 pub(crate) async fn create_guest_session(
     extract::State(state): extract::State<AppState>,
+    session: Session,
 ) -> Result<Json<ClientSessionResponse>, (StatusCode, String)> {
     let client_session_secret = Uuid::new_v4();
 
@@ -44,6 +50,15 @@ pub(crate) async fn create_guest_session(
     .map_err(internal_error)?;
 
     if let Some((client_session_id,)) = result {
+        session
+            .insert(CLIENT_SESSION_ID_KEY, client_session_id)
+            .await
+            .expect("session storage failed");
+        session
+            .insert(USER_ID_KEY, user_id.num())
+            .await
+            .expect("session storage failed");
+
         Ok(Json(ClientSessionResponse {
             client_session_id,
             client_session_secret,
@@ -56,11 +71,51 @@ pub(crate) async fn create_guest_session(
     }
 }
 
+pub(crate) async fn continue_guest_session(
+    extract::State(state): extract::State<AppState>,
+    session: Session,
+    Json(payload): Json<ClientSecretAuthPayload>,
+) -> Response {
+    let session_id = ClientSessionId::authenticate_guest_session(
+        &state.pg_db_pool,
+        payload.client_session_id,
+        &payload.client_session_secret,
+    )
+    .await;
+
+    match session_id {
+        Some(ClientSessionId(id)) => {
+            session
+                .insert(CLIENT_SESSION_ID_KEY, id)
+                .await
+                .expect("session storage failed");
+
+            if let Some(user) = user_lookup_by_client_secret(&state, &payload).await {
+                session
+                    .insert(USER_ID_KEY, user.num())
+                    .await
+                    .expect("session storage failed");
+                Response::new("OK".into())
+            } else {
+                Response::builder()
+                    .status(StatusCode::FORBIDDEN)
+                    .body("No user for that session".into())
+                    .expect("response builder should succeed")
+            }
+        }
+        None => Response::builder()
+            .status(StatusCode::FORBIDDEN)
+            .body("Failed session authentication".into())
+            .expect("response builder should succeed"),
+    }
+}
+
 /// (WIP) API to add an activity to a guest session.
 pub(crate) async fn record_guest_activity(
     extract::State(state): extract::State<AppState>,
     Json(payload): Json<RecordActivityRequest>,
 ) -> Response {
+    // TODO: use session key instead
     let session = ClientSessionId::authenticate_guest_session(
         &state.pg_db_pool,
         payload.client_session_id,
@@ -81,6 +136,26 @@ pub(crate) async fn record_guest_activity(
 }
 
 impl ClientSessionId {
+    // pub(crate) async fn authenticate_from_session(session: Session) -> Option<Self> {
+    //     let client_session_id = session
+    //         .get::<i64>(CLIENT_SESSION_ID_KEY)
+    //         .await
+    //         .expect("failed reading session key");
+    //     client_session_id.map(|id| ClientSessionId(id))
+    // }
+
+    pub(crate) async fn authenticate_guest_session_from_request(
+        state: &AppState,
+        auth: &ClientSecretAuthPayload,
+    ) -> Option<Self> {
+        Self::authenticate_guest_session(
+            &state.pg_db_pool,
+            auth.client_session_id,
+            &auth.client_session_secret,
+        )
+        .await
+    }
+
     // Authenticate a guest client session by its secret.
     pub async fn authenticate_guest_session(
         db_pool: &PgPool,
@@ -121,5 +196,11 @@ impl ClientSessionId {
                 None
             }
         }
+    }
+}
+
+impl ClientSessionId {
+    pub fn num(&self) -> i64 {
+        self.0
     }
 }

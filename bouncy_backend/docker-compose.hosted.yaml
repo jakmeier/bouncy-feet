@@ -1,7 +1,7 @@
 version: "3.6"
 services:
-  bouncy_stats:
-    image: jakmeier/bouncy-feet:bouncy_stats
+  bouncy_backend:
+    image: jakmeier/bouncy-feet:bouncy_backend
     environment:
       CLIENT_URL: https://app.bouncy-feet.ch
       API_URL: https://stats.bouncy-feet.ch

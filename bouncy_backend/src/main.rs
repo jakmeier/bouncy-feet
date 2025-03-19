@@ -68,10 +68,12 @@ async fn main() -> anyhow::Result<()> {
         .with_http_only(true)
         // we need cross-origin requests from the PWA to the API sub domains
         .with_same_site(SameSite::None)
+        // .with_domain(domain)
         .with_expiry(Expiry::OnInactivity(Duration::hours(24)));
 
     let oidc_login_service = ServiceBuilder::new()
         .layer(HandleErrorLayer::new(|e: MiddlewareError| async {
+            println!("oidc_login_service {e:?}");
             e.into_response()
         }))
         .layer(OidcLoginLayer::<AdditionalClaims>::new());
@@ -79,6 +81,7 @@ async fn main() -> anyhow::Result<()> {
     let parsed_api_url = Uri::from_maybe_shared(api_url).expect("valid api url");
     let oidc_auth_service = ServiceBuilder::new()
         .layer(HandleErrorLayer::new(|e: MiddlewareError| async {
+            println!("oidc_auth_service {e:?}");
             e.into_response()
         }))
         .layer(
@@ -108,20 +111,20 @@ async fn main() -> anyhow::Result<()> {
 
     let app = Router::new()
         .route("/testauth", get(authenticated))
+        // /auth is the endpoint for OICD code exchange
         .route("/auth", get(auth::oauth_callback))
+        .layer(oidc_login_service) // enforces logging in
         .route("/user", get(user2::user_info))
         .route("/user/meta", get(user_meta::metadata))
         .route("/user/meta/update", post(user_meta::update_user_metadata))
+        .route("/guest/auth", post(client_session::continue_guest_session))
         // Layer (middlewares) on the router affect routes added BEFORE only.
         // So all API calls that require user login should be above.
         .layer(
-            // axum: ServiceBuidler reverses order of middlewares (yay)
+            // axum: ServiceBuilder reverses order of middlewares (yay)
             // -> so these here run top to bottom, layers affect only routes afterwards
             ServiceBuilder::new()
-                .layer(session_layer)
                 .layer(oidc_auth_service) // provides (optional) oidc claims
-                .layer(oidc_login_service) // enforces logging in
-                // /auth is the endpoint for OICD code exchange
                 .layer(user_layer),
         )
         .route("/", get(root))
@@ -133,6 +136,7 @@ async fn main() -> anyhow::Result<()> {
             "/new_guest_activity",
             post(client_session::record_guest_activity),
         )
+        .layer(session_layer)
         .route("/scoreboard", get(get_scores))
         .route("/user/stats", post(post_stats))
         .layer(cors_layer)

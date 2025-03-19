@@ -6,7 +6,7 @@ use axum::response::{IntoResponse, Response};
 use axum::{Extension, Json};
 use chrono::{DateTime, Utc};
 
-#[derive(serde::Deserialize)]
+#[derive(serde::Deserialize, Debug)]
 pub struct UpdateMetaDataRequest {
     key_name: String,
     key_value: String,
@@ -65,6 +65,7 @@ pub async fn update_user_metadata(
     State(state): State<AppState>,
     Json(payload): Json<UpdateMetaDataRequest>,
 ) -> Response {
+    println!("update_user_metadata {:?}", payload);
     let key_name = payload.key_name.trim();
     let key_value = payload.key_value;
     let new_last_modified = payload.last_modified.naive_utc();
