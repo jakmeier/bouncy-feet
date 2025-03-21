@@ -8,12 +8,12 @@
    * @property {import('svelte').Snippet} [children]
    * @property {string} [title]
    * @property {boolean} [white]
-   * @property {boolean} [gray]
+   * @property {boolean} [black]
    * @property {boolean} [accent]
    * @property {boolean} [mainColor]
    */
   /** @type {Props} */
-  let { children, title, white, gray, accent, mainColor } = $props();
+  let { children, title, white, black, accent, mainColor } = $props();
 </script>
 
 {#if mainColor}
@@ -24,11 +24,16 @@
     bgColor="var(--theme-neutral-light)"
     color="var(--theme-neutral-black)"
   ></Background>
+{:else if black}
+  <Background
+    bgColor="var(--theme-neutral-black)"
+    color="var(--theme-neutral-white)"
+  ></Background>
 {/if}
 
 <div class="wrapper">
   <div>
-    <LogoHeader {white} {gray} {accent} {mainColor} {title} />
+    <LogoHeader {white} {black} {accent} {mainColor} {title} />
   </div>
 
   <div class="content">

@@ -6,7 +6,7 @@
    * @typedef {Object} Props
    * @property {string} [title]
    * @property {boolean} [white]
-   * @property {boolean} [gray]
+   * @property {boolean} [black]
    * @property {boolean} [accent]
    * @property {boolean} [mainColor]
    * @property {boolean} [backButton]
@@ -16,7 +16,7 @@
   /** @type {Props} */
   let {
     white = false,
-    gray = false,
+    black = false,
     accent = false,
     mainColor = false,
     title = '',
@@ -27,7 +27,7 @@
   let bgColor = $derived(
     white
       ? 'var(--theme-neutral-light)'
-      : gray
+      : black
         ? 'var(--theme-neutral-dark)'
         : accent
           ? 'var(--theme-accent)'

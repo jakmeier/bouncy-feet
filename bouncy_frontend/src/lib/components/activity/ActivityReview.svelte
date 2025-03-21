@@ -28,7 +28,7 @@
 {#if !showResults}
   <LessonEnd bind:showResults></LessonEnd>
 {:else}
-  <StandardPage gray>
+  <StandardPage black>
     <div class="top-summary">
       <LessonEndResults {hitRate} {passed}></LessonEndResults>
       <div class="down-marker">

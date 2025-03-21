@@ -7,7 +7,7 @@
   let { showResults = $bindable() } = $props();
 </script>
 
-<StandardPage gray>
+<StandardPage black>
   <!-- <h3>That was fun, wasn't it?</h3> -->
   <div class="outer">
     <DarkSection>
