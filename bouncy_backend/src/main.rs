@@ -7,10 +7,11 @@ use tokio::net::TcpListener;
 use tower::ServiceBuilder;
 use tower_http::cors::AllowOrigin;
 
-mod auth;
-mod client_session;
-mod user;
-mod user_meta;
+pub(crate) mod auth;
+pub(crate) mod client_session;
+pub(crate) mod dance_activity;
+pub(crate) mod user;
+pub(crate) mod user_meta;
 
 /// Immutable shared state, should be cheap to clone.
 #[derive(Clone)]

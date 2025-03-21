@@ -3,7 +3,7 @@
    * Provides access to a user local storage
    */
   import { browser } from '$app/environment';
-  import { requestNewGuestSession, submitStats, apiRequest } from '$lib/stats';
+  import { requestNewGuestSession, apiRequest } from '$lib/stats';
   import { generateRandomUsername } from '$lib/username';
   import { onMount, setContext } from 'svelte';
   import { writable } from 'svelte/store';
@@ -96,6 +96,16 @@
     }
   }
 
+  function authHeader() {
+    // sync changes to API backend
+    // TODO: Switch to OAuth2 for registered users
+    return clientSession.id
+      ? {
+          Authorization: `ClientSession ${clientSession.id}:${clientSession.secret}`,
+        }
+      : {};
+  }
+
   /**
    * @param {string} key
    * @param {string} value
@@ -112,12 +122,7 @@
       clientSession.meta[key] = value;
 
       // sync changes to API backend
-      // TODO: Switch to OAuth2 for registered users
-      let auth = clientSession.id
-        ? {
-            Authorization: `ClientSession ${clientSession.id}:${clientSession.secret}`,
-          }
-        : {};
+      let auth = authHeader();
       const options = {
         method: 'POST',
         headers: {
@@ -136,6 +141,33 @@
 
       return await apiRequest('/user/meta/update', options);
     }
+  }
+
+  /**
+   * @param {string} activityId
+   * @param {DanceSessionResult} sessionResult
+   */
+  async function submitActivityCall(activityId, sessionResult) {
+    let auth = authHeader();
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...auth,
+      },
+      body: JSON.stringify({
+        client_session_id: Number.parseInt(clientSession.id),
+        client_session_secret: clientSession.secret,
+
+        activity_id: activityId,
+        recorded_at: sessionResult.timestamp.toISOString(),
+        hits: sessionResult.hits,
+        misses: sessionResult.misses,
+        steps: sessionResult.numSteps,
+      }),
+    };
+
+    return await apiRequest('/new_guest_activity', options);
   }
 
   /**
@@ -263,13 +295,12 @@
       timestamp: new Date(),
     };
 
-    // TODO: actually submit something
-    // try {
-    //   submitStats($user);sessionResult,limitedId
-    // } catch (err) {
-    //   console.warn('Submitting stats failed', err);
-    // }
-    // TODO: store locally if it failed
+    try {
+      submitActivityCall(limitedId, sessionResult);
+    } catch (err) {
+      console.warn('Submitting activity stats failed', err);
+    }
+    // TODO: store locally
 
     return sessionResult;
   }

@@ -89,7 +89,8 @@ export async function apiRequest(endpoint, options = {}) {
     // }
 
     if (!response.ok) {
-        throw new Error(`API request failed with status ${response.status}`);
+        const body = await response.text();
+        throw new Error(`API request failed with status ${response.status} ${body}`);
     }
 
     return response;

@@ -38,7 +38,6 @@ CREATE TABLE IF NOT EXISTS client_session (
 -- The source-of-truth for this data is on the clients. But the data is
 -- immutable. So any data the API server has is final. It might just not know
 -- all the data, yet.
--- TODO: probably the API server should only accept newer recordings than the latest, per client session
 CREATE TABLE IF NOT EXISTS dance_activity (
     dance_activity_id BIGSERIAL PRIMARY KEY,
     client_session_id BIGINT REFERENCES client_session(id),
@@ -49,6 +48,8 @@ CREATE TABLE IF NOT EXISTS dance_activity (
     -- how many poses were hit
     hits INTEGER NOT NULL CHECK (hits >= 0),
     -- how many poses were missed
-    misses INTEGER NOT NULL CHECK (misses >= 0)
+    misses INTEGER NOT NULL CHECK (misses >= 0),
+    -- how many steps there were in total
+    steps INTEGER NOT NULL CHECK (steps >= 0)
 );
 CREATE INDEX idx_dance_activity_client_session ON dance_activity(client_session_id);
