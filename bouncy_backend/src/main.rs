@@ -9,7 +9,7 @@ use tower_http::cors::AllowOrigin;
 
 mod auth;
 mod client_session;
-mod user2;
+mod user;
 mod user_meta;
 
 /// Immutable shared state, should be cheap to clone.
@@ -64,7 +64,7 @@ async fn main() -> anyhow::Result<()> {
     //     }))
     //     .layer(OidcLoginLayer::<AdditionalClaims>::new());
 
-    let user_service = middleware::from_fn_with_state(state.clone(), user2::user_lookup);
+    let user_service = middleware::from_fn_with_state(state.clone(), user::user_lookup);
 
     // let parsed_api_url = Uri::from_maybe_shared(api_url).expect("valid api url");
     let auth_service = ServiceBuilder::new()
@@ -111,7 +111,7 @@ async fn main() -> anyhow::Result<()> {
         );
 
     let authenticated_app = Router::new()
-        .route("/user", get(user2::user_info))
+        .route("/user", get(user::user_info))
         .route("/user/meta", get(user_meta::metadata))
         .route("/user/meta/update", post(user_meta::update_user_metadata))
         .route(

@@ -5,7 +5,7 @@ use sqlx::PgPool;
 use tracing::{error, info};
 use uuid::Uuid;
 
-use crate::user2::UserId;
+use crate::user::UserId;
 use crate::{internal_error, AppState};
 
 #[derive(serde::Serialize)]

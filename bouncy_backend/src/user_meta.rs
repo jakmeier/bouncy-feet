@@ -1,4 +1,4 @@
-use crate::user2::UserId;
+use crate::user::UserId;
 use crate::{internal_error, AppState};
 use axum::extract::State;
 use axum::http::StatusCode;
