@@ -1,11 +1,11 @@
 <script>
   import { t } from '$lib/i18n';
-  import LessonEnd from '../../../routes/courses/[courseId]/exercise/[lessonIndex]/record/LessonEnd.svelte';
-  import LessonEndResults from '../../../routes/courses/[courseId]/exercise/[lessonIndex]/record/LessonEndResults.svelte';
+  import LessonEnd from './LessonEnd.svelte';
   import VideoReview from '../review/VideoReview.svelte';
   import Arrow from '../ui/Arrow.svelte';
   import Background from '../ui/sections/Background.svelte';
   import StandardPage from '../ui/StandardPage.svelte';
+  import LessonEndResults from './LessonEndResults.svelte';
 
   let { detection, videoUrl, recordingStart, recordingEnd, onRestart, onBack } =
     $props();
