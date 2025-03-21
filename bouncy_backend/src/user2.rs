@@ -26,7 +26,7 @@ pub async fn user_lookup(
     next: Next,
 ) -> Response {
     let auth_headers = &req.headers().get_all("Authorization");
-    match try_get_user(&state, &auth_headers, maybe_claims).await {
+    match try_get_user(&state, auth_headers, maybe_claims).await {
         Ok(user_id) => {
             // Attach user ID for downstream handlers
             req.extensions_mut().insert(user_id);
@@ -47,7 +47,7 @@ async fn try_get_user(
     {
         let maybe_user =
             user_lookup_by_client_secret(state, client_session_id, client_session_secret).await;
-        maybe_user.ok_or_else(|| auth_error_response::<UserId>("User not found"))
+        maybe_user.ok_or_else(|| auth_error_response("User not found"))
     } else if let Some(claims) = maybe_claims {
         // this will lazily create the user if necessary
         Ok(user_lookup_by_oidc(state, claims).await)
@@ -69,7 +69,7 @@ fn client_session_credentials_from_headers(
         };
 
         if !str_auth_value.starts_with(prefix) {
-            return auth_error("Invalid auth scheme");
+            continue;
         }
 
         let rest = &str_auth_value[prefix.len()..];
@@ -158,10 +158,10 @@ pub async fn user_info(
 }
 
 fn auth_error<T>(msg: &'static str) -> Result<T, Response> {
-    Err(auth_error_response::<T>(msg))
+    Err(auth_error_response(msg))
 }
 
-fn auth_error_response<T>(msg: &'static str) -> Response {
+fn auth_error_response(msg: &'static str) -> Response {
     Response::builder()
         .status(StatusCode::UNAUTHORIZED)
         .body(msg.into())

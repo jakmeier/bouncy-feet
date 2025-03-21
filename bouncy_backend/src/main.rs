@@ -1,19 +1,11 @@
-use auth::AdditionalClaims;
-use axum::error_handling::HandleErrorLayer;
 use axum::http::header;
-use axum::http::{HeaderValue, Method, StatusCode, Uri};
-use axum::response::IntoResponse;
+use axum::http::{HeaderValue, Method, StatusCode};
 use axum::routing::{get, post};
 use axum::{middleware, Router};
-use axum_oidc::error::MiddlewareError;
-use axum_oidc::OidcAuthLayer;
 use sqlx::PgPool;
 use tokio::net::TcpListener;
 use tower::ServiceBuilder;
 use tower_http::cors::AllowOrigin;
-use tower_sessions::cookie::time::Duration;
-use tower_sessions::cookie::SameSite;
-use tower_sessions::{Expiry, MemoryStore, SessionManagerLayer};
 
 mod auth;
 mod client_session;
@@ -29,11 +21,11 @@ struct AppState {
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    let api_url = require_env("API_URL");
+    // let api_url = require_env("API_URL");
     let app_url = require_env("CLIENT_URL");
-    let oidc_issuer = require_env("OIDC_ISSUER");
-    let oidc_client_id = require_env("OIDC_CLIENT_ID");
-    let oidc_client_secret = require_env("OIDC_CLIENT_SECRET");
+    // let oidc_issuer = require_env("OIDC_ISSUER");
+    // let oidc_client_id = require_env("OIDC_CLIENT_ID");
+    // let oidc_client_secret = require_env("OIDC_CLIENT_SECRET");
     let db_url = require_env("DATABASE_URL");
 
     let pg_db_pool = PgPool::connect(&db_url).await?;
@@ -74,7 +66,7 @@ async fn main() -> anyhow::Result<()> {
 
     let user_service = middleware::from_fn_with_state(state.clone(), user2::user_lookup);
 
-    let parsed_api_url = Uri::from_maybe_shared(api_url).expect("valid api url");
+    // let parsed_api_url = Uri::from_maybe_shared(api_url).expect("valid api url");
     let auth_service = ServiceBuilder::new()
         // .layer(HandleErrorLayer::new(|e: MiddlewareError| async {
         //     e.into_response()

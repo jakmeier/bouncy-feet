@@ -10,10 +10,10 @@
 //!
 //! Guest users can be authenticated by a client secret included in the body as JSON.
 
-use crate::AppState;
-use axum::response::{IntoResponse, Redirect, Response};
-use axum::{extract::State, http::StatusCode};
-use axum_oidc::{EmptyAdditionalClaims, OidcClaims};
+// use crate::AppState;
+// use axum::response::{IntoResponse, Redirect, Response};
+// use axum::{extract::State, http::StatusCode};
+use axum_oidc::EmptyAdditionalClaims;
 use serde::{Deserialize, Serialize};
 
 pub(crate) type AdditionalClaims = EmptyAdditionalClaims;
@@ -26,19 +26,19 @@ struct TokenResponse {
     token_type: String,
 }
 
-/// Calling this will redirect to Keyloak, have the user log in and then
-/// redirect back to the PWA domain.
-pub async fn oauth_callback(
-    claims: OidcClaims<AdditionalClaims>,
-    State(state): State<AppState>,
-) -> Response {
-    // The main checks are done in the OIDC middleware.
-    // Here we just add additional checks.
-    if !claims.email_verified().unwrap_or_default() {
-        return (StatusCode::FORBIDDEN, "email not verified").into_response();
-    }
+// /// Calling this will redirect to Keyloak, have the user log in and then
+// /// redirect back to the PWA domain.
+// pub async fn oauth_callback(
+//     claims: OidcClaims<AdditionalClaims>,
+//     State(state): State<AppState>,
+// ) -> Response {
+//     // The main checks are done in the OIDC middleware.
+//     // Here we just add additional checks.
+//     if !claims.email_verified().unwrap_or_default() {
+//         return (StatusCode::FORBIDDEN, "email not verified").into_response();
+//     }
 
-    // Redirect to the PWA frontend if login was successful
-    // TODO: redirect to the exact same page the user was on before
-    Redirect::to(&state.app_url).into_response()
-}
+//     // Redirect to the PWA frontend if login was successful
+//     // TODO: redirect to the exact same page the user was on before
+//     Redirect::to(&state.app_url).into_response()
+// }
