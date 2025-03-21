@@ -5,14 +5,13 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0"
-axum = { version = "0.7.2", features = ["macros"] }
-axum-oidc = "0.5.0"
+axum = { version = "0.8", features = ["macros"] }
+axum-oidc = "0.6.0"
 chrono = "0.4"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0.133"
 sqlx = { version = "=0.7.3", features = [
     "runtime-tokio",
-    "sqlite",
     "postgres",
     "time",
     "chrono",

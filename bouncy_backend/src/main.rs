@@ -1,34 +1,29 @@
 use auth::AdditionalClaims;
 use axum::error_handling::HandleErrorLayer;
-use axum::http::header::CONTENT_TYPE;
+use axum::http::header;
 use axum::http::{HeaderValue, Method, StatusCode, Uri};
 use axum::response::IntoResponse;
 use axum::routing::{get, post};
-use axum::{extract, middleware, Router};
+use axum::{middleware, Router};
 use axum_oidc::error::MiddlewareError;
-use axum_oidc::{OidcAuthLayer, OidcClaims, OidcLoginLayer};
-use sqlx::migrate::MigrateDatabase;
-use sqlx::{Executor, PgPool, Sqlite, SqlitePool};
+use axum_oidc::OidcAuthLayer;
+use sqlx::PgPool;
 use tokio::net::TcpListener;
 use tower::ServiceBuilder;
 use tower_http::cors::AllowOrigin;
-use tower_sessions::cookie::{time::Duration, SameSite};
+use tower_sessions::cookie::time::Duration;
+use tower_sessions::cookie::SameSite;
 use tower_sessions::{Expiry, MemoryStore, SessionManagerLayer};
-use user::{get_scores, post_stats};
 
 mod auth;
 mod client_session;
-mod user;
 mod user2;
 mod user_meta;
-
-const DB_PATH: &str = "sqlite:data/db.sqlite";
 
 /// Immutable shared state, should be cheap to clone.
 #[derive(Clone)]
 struct AppState {
     app_url: String,
-    sqlite_db_pool: SqlitePool,
     pg_db_pool: PgPool,
 }
 
@@ -41,7 +36,6 @@ async fn main() -> anyhow::Result<()> {
     let oidc_client_secret = require_env("OIDC_CLIENT_SECRET");
     let db_url = require_env("DATABASE_URL");
 
-    let sqlite_db_pool = create_db_pool().await?;
     let pg_db_pool = PgPool::connect(&db_url).await?;
 
     // TODO: better DB setup
@@ -56,89 +50,91 @@ async fn main() -> anyhow::Result<()> {
 
     let state = AppState {
         app_url,
-        sqlite_db_pool,
         pg_db_pool,
     };
 
-    let session_store = MemoryStore::default();
-    let session_layer = SessionManagerLayer::new(session_store)
-        // absolutely don't leak the session id, authentication relies on it!
-        .with_secure(true)
-        // js access is not needed
-        .with_http_only(true)
-        // we need cross-origin requests from the PWA to the API sub domains
-        .with_same_site(SameSite::None)
-        // .with_domain(domain)
-        .with_expiry(Expiry::OnInactivity(Duration::hours(24)));
+    // let session_store = MemoryStore::default();
+    // let session_layer = SessionManagerLayer::new(session_store)
+    //     // absolutely don't leak the session id, authentication relies on it!
+    //     .with_secure(true)
+    //     // js access is not needed
+    //     .with_http_only(true)
+    //     // we need cross-origin requests from the PWA to the API sub domains
+    //     .with_same_site(SameSite::None)
+    //     // .with_domain(domain)
+    //     .with_expiry(Expiry::OnInactivity(Duration::hours(24)));
 
-    let oidc_login_service = ServiceBuilder::new()
-        .layer(HandleErrorLayer::new(|e: MiddlewareError| async {
-            println!("oidc_login_service {e:?}");
-            e.into_response()
-        }))
-        .layer(OidcLoginLayer::<AdditionalClaims>::new());
+    // axum: ServiceBuilder reverses order of middlewares (yay)
+    // -> so these here run top to bottom, layers affect only routes afterwards
+    // let oidc_login_service = ServiceBuilder::new()
+    //     .layer(HandleErrorLayer::new(|e: MiddlewareError| async {
+    //         e.into_response()
+    //     }))
+    //     .layer(OidcLoginLayer::<AdditionalClaims>::new());
+
+    let user_service = middleware::from_fn_with_state(state.clone(), user2::user_lookup);
 
     let parsed_api_url = Uri::from_maybe_shared(api_url).expect("valid api url");
-    let oidc_auth_service = ServiceBuilder::new()
-        .layer(HandleErrorLayer::new(|e: MiddlewareError| async {
-            println!("oidc_auth_service {e:?}");
-            e.into_response()
-        }))
-        .layer(
-            OidcAuthLayer::<AdditionalClaims>::discover_client(
-                parsed_api_url,
-                oidc_issuer,
-                oidc_client_id,
-                Some(oidc_client_secret),
-                vec![
-                    "openid".to_string(),
-                    "email".to_string(),
-                    "profile".to_string(),
-                ],
-            )
-            .await
-            .unwrap(),
-        );
+    let auth_service = ServiceBuilder::new()
+        // .layer(HandleErrorLayer::new(|e: MiddlewareError| async {
+        //     e.into_response()
+        // }))
+        // .layer(
+        //     OidcAuthLayer::<AdditionalClaims>::discover_client(
+        //         parsed_api_url,
+        //         oidc_issuer,
+        //         oidc_client_id,
+        //         Some(oidc_client_secret),
+        //         vec![
+        //             "openid".to_string(),
+        //             "email".to_string(),
+        //             "profile".to_string(),
+        //         ],
+        //     )
+        //     .await
+        //     .unwrap(),
+        // )
+        .layer(user_service);
 
     let client_origin = HeaderValue::from_str(&state.app_url).expect("url should be valid origin");
     let cors_layer = tower_http::cors::CorsLayer::new()
         .allow_origin(AllowOrigin::exact(client_origin))
         .allow_methods([Method::GET, Method::POST])
-        .allow_headers([CONTENT_TYPE])
+        .allow_headers([
+            header::AUTHORIZATION,
+            header::CONTENT_TYPE,
+            header::ACCEPT_LANGUAGE,
+            header::CONTENT_LANGUAGE,
+            header::COOKIE,
+        ])
         .allow_credentials(true);
 
-    let user_layer = middleware::from_fn_with_state(state.clone(), user2::user_lookup);
-
-    let app = Router::new()
-        .route("/testauth", get(authenticated))
-        // /auth is the endpoint for OICD code exchange
-        .route("/auth", get(auth::oauth_callback))
-        .layer(oidc_login_service) // enforces logging in
-        .route("/user", get(user2::user_info))
-        .route("/user/meta", get(user_meta::metadata))
-        .route("/user/meta/update", post(user_meta::update_user_metadata))
-        .route("/guest/auth", post(client_session::continue_guest_session))
-        // Layer (middlewares) on the router affect routes added BEFORE only.
-        // So all API calls that require user login should be above.
-        .layer(
-            // axum: ServiceBuilder reverses order of middlewares (yay)
-            // -> so these here run top to bottom, layers affect only routes afterwards
-            ServiceBuilder::new()
-                .layer(oidc_auth_service) // provides (optional) oidc claims
-                .layer(user_layer),
-        )
+    let unauthenticated_app = Router::new()
+        //auth is the endpoint for OICD code exchange
         .route("/", get(root))
+        // .route("/auth", get(auth::oauth_callback))
         .route(
             "/new_guest_session",
             get(client_session::create_guest_session),
-        ) // consider rate-limiting
+        );
+
+    let authenticated_app = Router::new()
+        .route("/user", get(user2::user_info))
+        .route("/user/meta", get(user_meta::metadata))
+        .route("/user/meta/update", post(user_meta::update_user_metadata))
         .route(
             "/new_guest_activity",
             post(client_session::record_guest_activity),
-        )
-        .layer(session_layer)
-        .route("/scoreboard", get(get_scores))
-        .route("/user/stats", post(post_stats))
+        );
+
+    // Not used, yet. Only guests possible.
+    // .layer(oidc_login_service) // enforces logging in
+
+    let app = Router::new()
+        .merge(unauthenticated_app)
+        .merge(authenticated_app.layer(auth_service))
+        // .layer(ServiceBuilder::new().layer(session_layer).layer(cors_layer))
+        // .layer(session_layer)
         .layer(cors_layer)
         .with_state(state);
 
@@ -152,39 +148,6 @@ async fn root() -> String {
         "Bouncy Feet stats API server running.\nPackage version: {}",
         env!("CARGO_PKG_VERSION")
     )
-}
-
-async fn create_db_pool() -> anyhow::Result<SqlitePool> {
-    if !Sqlite::database_exists(DB_PATH).await? {
-        Sqlite::create_database(DB_PATH).await?;
-    }
-    let db_pool = SqlitePool::connect(DB_PATH).await?;
-    let mut db = db_pool.acquire().await?;
-    db.execute(
-        "CREATE TABLE IF NOT EXISTS users (
-                id TEXT PRIMARY KEY,
-                name TEXT NOT NULL,
-                steps INTEGER,
-                seconds INTEGER,
-                dances INTEGER
-            );",
-    )
-    .await?;
-
-    Ok(db_pool)
-}
-
-async fn authenticated(
-    extract::State(state): extract::State<AppState>,
-    claims: OidcClaims<AdditionalClaims>,
-) -> impl IntoResponse {
-    let subject = claims.subject().as_str();
-    let rec = sqlx::query!("SELECT id FROM users WHERE oidc_subject = $1", subject)
-        .fetch_one(&state.pg_db_pool)
-        .await
-        .unwrap();
-
-    format!("Hello {}, you are user number {}", subject, rec.id)
 }
 
 /// Utility function for mapping any error into a `500 Internal Server Error`

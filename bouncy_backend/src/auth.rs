@@ -15,7 +15,6 @@ use axum::response::{IntoResponse, Redirect, Response};
 use axum::{extract::State, http::StatusCode};
 use axum_oidc::{EmptyAdditionalClaims, OidcClaims};
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
 pub(crate) type AdditionalClaims = EmptyAdditionalClaims;
 
@@ -25,12 +24,6 @@ struct TokenResponse {
     refresh_token: Option<String>,
     expires_in: u64,
     token_type: String,
-}
-
-#[derive(serde::Deserialize)]
-pub(crate) struct ClientSecretAuthPayload {
-    pub(crate) client_session_id: i64,
-    pub(crate) client_session_secret: Uuid,
 }
 
 /// Calling this will redirect to Keyloak, have the user log in and then

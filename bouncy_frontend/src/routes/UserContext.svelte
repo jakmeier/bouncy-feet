@@ -3,14 +3,10 @@
    * Provides access to a user local storage
    */
   import { browser } from '$app/environment';
-  import {
-    requestNewGuestSession,
-    submitStats,
-    submitUserMetadata,
-  } from '$lib/stats';
+  import { requestNewGuestSession, submitStats, apiRequest } from '$lib/stats';
   import { generateRandomUsername } from '$lib/username';
   import { onMount, setContext } from 'svelte';
-  import { readable, writable } from 'svelte/store';
+  import { writable } from 'svelte/store';
   import { showExperimentalFeatures } from '$lib/stores/FeatureSelection.js';
   import { ONBOARDING_STATE } from '$lib/onboarding';
   /**
@@ -115,7 +111,29 @@
       clientSession.meta[key] = value;
 
       // sync changes to API backend
-      await submitUserMetadata(key, value);
+      // TODO: Switch to OAuth2 for registered users
+      let auth = clientSession.id
+        ? {
+            Authorization: `ClientSession ${clientSession.id}:${clientSession.secret}`,
+          }
+        : {};
+      const options = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...auth,
+        },
+        body: JSON.stringify({
+          key_name: key,
+          key_value: value,
+          // chrono can parse the time including the timezone from this
+          last_modified: new Date().toISOString(),
+          // the only existing version for now
+          version: 0,
+        }),
+      };
+
+      return await apiRequest('/user/meta/update', options);
     }
   }
 

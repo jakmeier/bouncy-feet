@@ -1,4 +1,4 @@
-FROM docker.io/rust:1.74.1-slim-bookworm AS builder
+FROM docker.io/rust:1.83.0-slim-bookworm AS builder
 ARG TARGETARCH=amd64
 
 RUN apt-get update && apt-get install -y curl ca-certificates clang && rm -rf /var/lib/apt/lists/*
