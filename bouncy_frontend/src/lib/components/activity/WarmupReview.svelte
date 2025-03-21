@@ -18,22 +18,24 @@
   // let dailySteps = 77;
   let steps = $derived(detection.steps().length);
 
+  //   TODO: real data lines
   let relativeTemp = $derived(Math.min(energyLevel, 1.0));
   let absoluteTemp = $derived((relativeTemp * 40 + 10).toFixed(0));
+  let line = $t('record.warmup-line-neutral-0');
   //   TODO: add more lines
   //   TODO: translate lines
-  let line = $derived.by(() => {
-    if (relativeTemp > 0.8) {
-      return 'Hot!';
-    }
-    if (relativeTemp > 0.5) {
-      return 'Nice warm-up!';
-    }
-    if (relativeTemp > 0.1) {
-      return "It's a start!";
-    }
-    return 'A bit tired, are we?';
-  });
+  // let line = $derived.by(() => {
+  //   if (relativeTemp > 0.8) {
+  //     return 'Hot!';
+  //   }
+  //   if (relativeTemp > 0.5) {
+  //     return 'Nice warm-up!';
+  //   }
+  //   if (relativeTemp > 0.1) {
+  //     return "It's a start!";
+  //   }
+  //   return 'A bit tired, are we?';
+  // });
 </script>
 
 <StandardPage title={$t('record.warmup-review-title')} white>
@@ -42,7 +44,7 @@
   <div class="stats">
     <!-- <div>{dailySteps} {$t('stats.today')}</div> -->
     <!-- <div>{weeklySteps} {$t('stats.week')}</div> -->
-    <div>{lifetimeSteps} {$t('stats.lifetime')}</div>
+    <!-- <div>{lifetimeSteps} {$t('stats.lifetime')}</div> -->
   </div>
   <h3>{$t('record.energy-level')}</h3>
   <div class="thermo">

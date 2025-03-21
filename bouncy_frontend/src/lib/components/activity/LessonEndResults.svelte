@@ -53,28 +53,13 @@
   bind:clientWidth={outerWidth}
   style="--score-color: {scoreColor}"
 >
-  <div class="explanation">
-    <Explanation
-      text={$t(text)}
-      width={explanationWidth}
-      entryDance={celebrationDance}
-    ></Explanation>
-  </div>
+  <h1>{$t(text)}</h1>
 
   <div
     class="result"
     style="border-color: {scoreColor}; border-width: {borderWidth}"
   >
     <div class="score" style="width: {scoreWidth}%;"></div>
-    {#if passed}
-      <span class="material-symbols-outlined above-bar" translate="no">
-        verified
-      </span>
-    {:else}
-      <span class="material-symbols-outlined above-bar" translate="no">
-        sentiment_dissatisfied
-      </span>
-    {/if}
     <!-- <span class="material-symbols-outlined above-bar" translate="no"> star_half </span> -->
     <div class="above-bar">
       {displayedPercent}%
@@ -94,13 +79,13 @@
     align-items: center;
     justify-content: center;
     font-size: var(--font-large);
-    margin: 5px;
+    margin: 2rem;
     background-color: var(--theme-neutral-dark);
     color: var(--theme-neutral-white);
     /* width and color overwritten by inline style */
     border: solid 3px var(--theme-neutral-gray);
-    /* border-radius: 38px; */
-    /* overflow: hidden; */
+    border-radius: 38px;
+    overflow: hidden;
     transition:
       border-color 0s step-start 1s,
       border-width 0s step-start 1s;
@@ -121,11 +106,7 @@
       width 1s,
       background-color 0s step-start 1s;
   }
-  span {
-    font-size: var(--font-large);
-    margin: 10px;
-  }
-  .explanation {
-    margin: 20px;
+  h1 {
+    color: var(--theme-main);
   }
 </style>

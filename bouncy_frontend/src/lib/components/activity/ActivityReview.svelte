@@ -25,59 +25,60 @@
   color="var(--theme-neutral-white)"
 ></Background>
 
-{#if !showResults}
-  <LessonEnd bind:showResults></LessonEnd>
-{:else}
-  <StandardPage black>
-    <div class="top-summary">
-      <LessonEndResults {hitRate} {passed}></LessonEndResults>
-      <div class="down-marker">
-        <div class="down-marker-text">{$t('record.review-details')}</div>
-        <div class="down-marker-arrow">
-          <Arrow color="var(--theme-neutral-white)" />
+<div
+  style="background-color: var(--theme-neutral-dark); color: var(--theme-neutral-white); --background-color: var(--theme-neutral-dark); --color: var(--theme-neutral-white);"
+>
+  {#if !showResults}
+    <LessonEnd bind:showResults></LessonEnd>
+  {:else}
+    <StandardPage black>
+      <div class="top-summary">
+        <LessonEndResults {hitRate} {passed}></LessonEndResults>
+        <div class="down-marker">
+          <div class="down-marker-text">{$t('record.review-details')}</div>
+          <div class="down-marker-arrow">
+            <Arrow color="var(--theme-neutral-white)" />
+          </div>
         </div>
       </div>
-    </div>
 
-    {#if recordingStart !== undefined && recordingEnd !== undefined}
-      <VideoReview
-        reviewVideoSrc={videoUrl}
-        {detectedSteps}
-        {recordingStart}
-        {recordingEnd}
-      ></VideoReview>
-    {:else}
-      <div class="no-review">
-        {$t('record.no-video-for-review')}
+      {#if recordingStart !== undefined && recordingEnd !== undefined}
+        <VideoReview
+          reviewVideoSrc={videoUrl}
+          {detectedSteps}
+          {recordingStart}
+          {recordingEnd}
+        ></VideoReview>
+      {:else}
+        <div class="no-review">
+          {$t('record.no-video-for-review')}
+        </div>
+      {/if}
+
+      <div class="buttons">
+        <button class="wide" onclick={onRestart}>
+          {$t('courses.end.again-button')}
+        </button>
+        <button class="wide" onclick={onBack}>
+          {$t('courses.end.back-button')}</button
+        >
       </div>
-    {/if}
-
-    <div class="vspace down-marker-arrow">
-      <Arrow></Arrow>
-    </div>
-
-    <div class="buttons">
-      <button class="wide" onclick={onRestart}>
-        {$t('courses.end.again-button')}
-      </button>
-      <button class="wide" onclick={onBack}>
-        {$t('courses.end.back-button')}</button
-      >
-    </div>
-  </StandardPage>
-{/if}
+    </StandardPage>
+  {/if}
+</div>
 
 <style>
   .buttons {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    margin-top: 2rem;
   }
   .no-review {
     margin: 2rem;
   }
   .top-summary {
-    height: 100dvh;
+    height: calc(100dvh - 6rem);
     display: flex;
     flex-direction: column;
     justify-content: space-around;
