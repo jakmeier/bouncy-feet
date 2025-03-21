@@ -1,11 +1,15 @@
 <script>
   import { t, locale, dateLocale } from '$lib/i18n';
   import { formatDistance } from 'date-fns';
+  import { getContext } from 'svelte';
 
-  let steps = 6876;
-  let seconds = 918;
-  let activities = 52;
-  let uniqueSteps = 7;
+  /** @type {UserContextData} */
+  let { store: user } = getContext('user');
+
+  let steps = $derived($user.recordedSteps);
+  let seconds = $derived($user.recordedSeconds);
+  let activities = $derived($user.recordedDances);
+  // let uniqueSteps = 7; // TODO
 
   const formatOpts = $derived(dateLocale($locale));
 
@@ -26,10 +30,10 @@
   </div>
 </div>
 
-<div class="block">
+<!-- <div class="block">
   <div>{$t('stats.learned-stats-title')}</div>
   <div>{num(uniqueSteps)} {$t('stats.unique-steps')}</div>
-</div>
+</div> -->
 
 <div>{$t('stats.fun-stats-title')}</div>
 

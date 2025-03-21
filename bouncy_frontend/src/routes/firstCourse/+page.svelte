@@ -17,7 +17,7 @@
 
   let progress = $state(initProgress());
   // svelte-ignore state_referenced_locally
-  let selectedLesson = $state(Math.max(0, progress - 1));
+  let selectedLesson = $state(Math.max(0, progress));
 
   // svelte-ignore state_referenced_locally
   const initialProgress = progress > 0;
@@ -85,12 +85,15 @@
 
     if (progress === 1 && selectedLesson == 0) {
       setUserMeta('onboarding', ONBOARDING_STATE.STARTED_FIRST_LESSON);
+      selectedLesson = 1;
     }
     if (progress === 2 && selectedLesson == 1) {
       setUserMeta('onboarding', ONBOARDING_STATE.STARTED_SECOND_LESSON);
+      selectedLesson = 2;
     }
     if (progress === 3 && selectedLesson == 2) {
       setUserMeta('onboarding', ONBOARDING_STATE.STARTED_THIRD_LESSON);
+      selectedLesson = 3;
     }
   }
 

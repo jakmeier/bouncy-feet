@@ -19,6 +19,8 @@
   let { courseId, lessonIndex, onDone, onBack } = $props();
 
   const { getCourse } = getContext('courses');
+  /** @type {UserContextData} */
+  const user = getContext('user');
 
   let course = getCourse(courseId);
   let previewDone = $state(false);
@@ -51,8 +53,18 @@
     recordingEnd = newRecordingEnd;
 
     videoUrl = newVideoUrl;
-
     trackingDone = true;
+
+    const fullId = courseId;
+    const limitedId = fullId.slice(0, 128);
+    const sessionResult = user.submitCourseLesson(
+      limitedId,
+      lessonIndex,
+      detection
+    );
+    if (sessionResult) {
+      user.addDanceToStats(sessionResult);
+    }
   }
 
   function onLeaveReview() {

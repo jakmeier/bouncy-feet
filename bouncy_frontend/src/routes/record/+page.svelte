@@ -12,8 +12,6 @@
   import Button from '$lib/components/ui/Button.svelte';
   import LightBackground from '$lib/components/ui/sections/LightBackground.svelte';
 
-  const userCtx = getContext('user');
-
   /** @type {HTMLVideoElement} */
   let reviewVideoElement;
   /** @type {undefined | import("bouncy_instructor").Skeleton} */
@@ -73,12 +71,7 @@
   async function stopCameraAndRecording() {
     stopCamera();
     detectedSteps = tracker.detectDance().steps();
-    const result = userCtx.computeDanceStats(detectedSteps);
-    userCtx.addDanceToStats(result);
-    if (result) {
-      reviewStatsNumSteps = result.numSteps;
-      reviewStatsSeconds = result.duration;
-    }
+
     const videoBlob = await camera.endRecording();
 
     if (videoBlob) {

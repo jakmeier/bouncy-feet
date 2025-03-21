@@ -12,7 +12,7 @@
   import { hideNavigation } from '$lib/stores/UiState';
   import Popup from '$lib/components/ui/Popup.svelte';
   import SessionReward from '$lib/components/SessionReward.svelte';
-  import { registerTracker, setBpm, setHalfSpeed } from '$lib/stores/Beat';
+  import { bpm, registerTracker, setBpm, setHalfSpeed } from '$lib/stores/Beat';
   import Button from '$lib/components/ui/Button.svelte';
   import { DetectionState } from '$lib/instructor/bouncy_instructor';
 
@@ -62,7 +62,6 @@
   /** @type {() => any}*/
   let stopLiveRecording = $state();
 
-
   async function turnOnRecording() {
     await startCamera();
     await startRecording();
@@ -90,7 +89,8 @@
       detectedSteps = tracker.runDetection().steps();
     }
     showSummary = true;
-    sessionResult = userCtx.computeDanceStats(detectedSteps);
+
+    sessionResult = userCtx.submitStepTraining(stepName, $bpm, detectedSteps);
     if (sessionResult) {
       setTimeout(() => {
         userCtx.addDanceToStats(sessionResult);

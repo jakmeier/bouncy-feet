@@ -24,8 +24,9 @@
   let { children } = $props();
 
   const { getCourse } = getContext('courses');
-  const { recordFinishedLesson, computeDanceStats, addDanceToStats } =
-    getContext('user');
+
+  /** @type {UserContextData} */
+  const { addDanceToStats, submitCourseLesson } = getContext('user');
 
   /** @type {string} */
   let id;
@@ -140,15 +141,14 @@
   let passed = $state(false);
   async function trackingDone() {
     await stop();
-    // TODO: use bpm and accuracy stats to give star rating
     const detected = tracker.lastDetection;
     hitRate =
       detected.poseMatches / (detected.poseMisses + detected.poseMatches);
     passed = hitRate >= 0.6;
-    if (passed) {
-      recordFinishedLesson(id, lessonIndex, 1);
-    }
-    const sessionResult = computeDanceStats(detected.steps());
+
+    const fullId = lessonIndex + '-exercise';
+    const limitedId = fullId.slice(0, 128);
+    const sessionResult = submitCourseLesson(limitedId, lessonIndex, detected);
     if (sessionResult) {
       addDanceToStats(sessionResult);
     }

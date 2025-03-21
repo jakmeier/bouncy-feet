@@ -4,11 +4,7 @@
   import { getContext } from 'svelte';
   import DanceStats from './DanceStats.svelte';
   import { t } from '$lib/i18n';
-  import {
-    submitStats,
-    fetchLeaderboard,
-    submitUserMetadata,
-  } from '$lib/stats';
+  import { submitStats, fetchLeaderboard } from '$lib/stats';
   import Leaderboard from './Leaderboard.svelte';
   import Popup from '$lib/components/ui/Popup.svelte';
   import { writable } from 'svelte/store';
@@ -18,7 +14,6 @@
   import { dev, displayedVersion } from '$lib/stores/FeatureSelection';
   import Symbol from '$lib/components/ui/Symbol.svelte';
 
-  
   /**
    * @typedef {Object} Props
    * @property {import('./$types').PageData} data
@@ -27,12 +22,13 @@
   /** @type {Props} */
   let { data } = $props();
 
-  const user = getContext('user').store;
+  /** @type {UserContextData} */
+  const { store: user, setUserMeta } = getContext('user');
   let scoreboardData = $state(data.leaderboard);
   let showStatsSharingPopup = $state(writable(!$user.consentSendingStats));
 
   async function submit() {
-    submitUserMetadata('publicName', $user.publicName);
+    setUserMeta('publicName', $user.publicName);
     await submitStats($user);
     refreshLeaderboard();
   }
@@ -99,9 +95,7 @@
 <h2 class="box">{$t('profile.leaderboard-title')}</h2>
 <Leaderboard users={scoreboardData} />
 <form class="inputs">
-  <button onclick={submit} class="wide"
-    >{$t('profile.submit-stats')}</button
-  >
+  <button onclick={submit} class="wide">{$t('profile.submit-stats')}</button>
 </form>
 <form class="inputs">
   <label for="publicName">{$t('profile.public-name')}</label>

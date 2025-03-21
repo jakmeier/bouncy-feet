@@ -1,17 +1,21 @@
 <script>
   import { t } from '$lib/i18n';
+  import { getContext } from 'svelte';
   import StandardPage from '../ui/StandardPage.svelte';
   import Thermometer from './Thermometer.svelte';
 
   let { detection, onContinue } = $props();
 
+  /** @type {UserContextData} */
+  let { store: user } = getContext('user');
+
   //   TODO: Do something specific to warmup, where the energy level is measured rather than error.
   // let energyLevel = $derived(Math.min(1.0, detection.steps().length / 100));
   let energyLevel = 0.8;
-  // TODO: read/store in user
-  let lifetimeSteps = 17520;
-  let weeklySteps = 873;
-  let dailySteps = 77;
+  let lifetimeSteps = $derived($user.recordedSteps);
+  // TODO
+  // let weeklySteps = 873;
+  // let dailySteps = 77;
   let steps = $derived(detection.steps().length);
 
   let relativeTemp = $derived(Math.min(energyLevel, 1.0));
@@ -36,11 +40,11 @@
   <h3>{$t('record.warmup-result')}</h3>
   <div class="big">{steps} {$t('stats.num-steps')}</div>
   <div class="stats">
-    <div>{dailySteps} {$t('stats.today')}</div>
-    <div>{weeklySteps} {$t('stats.week')}</div>
+    <!-- <div>{dailySteps} {$t('stats.today')}</div> -->
+    <!-- <div>{weeklySteps} {$t('stats.week')}</div> -->
     <div>{lifetimeSteps} {$t('stats.lifetime')}</div>
   </div>
-  <h3>{$t("record.energy-level")}</h3>
+  <h3>{$t('record.energy-level')}</h3>
   <div class="thermo">
     <Thermometer temperature={relativeTemp}></Thermometer>
     <div>

@@ -9,6 +9,7 @@
   import { writable } from 'svelte/store';
   import { showExperimentalFeatures } from '$lib/stores/FeatureSelection.js';
   import { ONBOARDING_STATE } from '$lib/onboarding';
+  import { DetectionResult } from 'bouncy_instructor';
   /**
    * @typedef {Object} Props
    * @property {import('svelte').Snippet} [children]
@@ -148,6 +149,7 @@
     }
   }
 
+  // TODO: user data should be synced with the server
   const stored = browser ? parseOrNull(localStorage.user) : null;
   if (stored && !stored.id) {
     stored.id = crypto.randomUUID();
@@ -164,6 +166,8 @@
   if (stored && stored.experimentalFeatures === undefined) {
     stored.experimentalFeatures = false;
   }
+
+  // TODO: consider making this $state() instead of writable
   /** @type {import('svelte/store').Writable<UserData>} */
   const user = writable(
     stored || {
@@ -174,7 +178,6 @@
       recordedSeconds: 0,
       recordedSteps: 0,
       userSteps: {},
-      userLessonProgress: {},
       consentSendingStats: false,
       experimentalFeatures: false,
     }
@@ -186,63 +189,7 @@
     });
   }
 
-  /**
-   * @param {import("bouncy_instructor").DetectedStep[]} dance
-   * @returns {DanceSessionResult?}
-   */
-  function computeDanceStats(dance) {
-    if (dance.length < 1) {
-      return null;
-    }
-
-    let stats = {};
-    let totalSteps = 0;
-    let totalExp = 0;
-    /**
-     * @type {never[]}
-     */
-    const bpms = [];
-    for (const step of dance) {
-      if (!step.name.includes('Idle')) {
-        totalSteps += 1;
-        if (!stats[step.name]) {
-          stats[step.name] = {
-            slow: 0,
-            mid: 0,
-            fast: 0,
-            veryFast: 0,
-          };
-        }
-        const bpm = step.bpm;
-        if (bpm > 130) {
-          stats[step.name].veryFast += 1;
-        } else if (bpm > 100) {
-          stats[step.name].fast += 1;
-        } else if (bpm > 50) {
-          stats[step.name].mid += 1;
-        } else {
-          stats[step.name].slow += 1;
-        }
-      }
-    }
-
-    const duration = Number(dance[dance.length - 1].end - dance[0].start);
-
-    for (let [key, stat] of Object.entries(stats)) {
-      const stepGainedExp =
-        stat.slow * 10 + stat.mid * 15 + stat.fast * 20 + stat.veryFast * 25;
-      totalExp += stepGainedExp;
-    }
-
-    return {
-      numSteps: totalSteps,
-      experience: totalExp,
-      duration,
-      stats,
-      bpms,
-    };
-  }
-
+  // Update local stats, offline only.
   /**
    * @param {DanceSessionResult} result
    */
@@ -250,47 +197,81 @@
     $user.recordedDances += 1;
     $user.recordedSteps += result.numSteps;
     $user.recordedSeconds += result.duration / 1000;
-    for (let [key, stat] of Object.entries(result.stats)) {
-      if (!$user.userSteps[key]) {
-        $user.userSteps[key] = {
-          experience: 0,
-          count: 0,
-        };
-      }
-      const numSteps = stat.slow + stat.mid + stat.fast + stat.veryFast;
-      $user.userSteps[key].count = $user.userSteps[key].count + numSteps;
-      const stepGainedExp =
-        stat.slow * 10 + stat.mid * 15 + stat.fast * 20 + stat.veryFast * 25;
-      $user.userSteps[key].experience =
-        $user.userSteps[key].count + stepGainedExp;
-    }
 
     // trigger subscribers
     $user = $user;
-
-    try {
-      submitStats($user);
-    } catch (err) {
-      console.warn('Submitting stats failed', err);
-    }
   }
 
   /**
    * @param {string} courseId
    * @param {number} lessonIndex
-   * @param {number} level
+   * @param {DetectionResult} detection
+   *
+   * @returns {DanceSessionResult?}
    */
-  function recordFinishedLesson(courseId, lessonIndex, level) {
-    if (!$user.userLessonProgress[courseId]) {
-      $user.userLessonProgress[courseId] = {
-        lessons: {},
-      };
-    }
-    const before = $user.userLessonProgress[courseId].lessons[lessonIndex] || 0;
-    const newLevel = Math.max(before, level);
-    $user.userLessonProgress[courseId].lessons[lessonIndex] = newLevel;
-    // trigger subscribers
-    $user = $user;
+  function submitCourseLesson(courseId, lessonIndex, detection) {
+    const id = `course/${courseId}[${lessonIndex}]`;
+    return submitActivity(id, detection);
+  }
+
+  /**
+   * @param {string} warmupId
+   * @param {DetectionResult} detection
+   *
+   * @returns {DanceSessionResult?}
+   */
+  function submitWarmup(warmupId, detection) {
+    const id = `warmup/${warmupId}`;
+    return submitActivity(id, detection);
+  }
+
+  /**
+   * @param {string} stepId
+   * @param {number} bpm
+   * @param {DetectionResult} detection
+   *
+   * @returns {DanceSessionResult?}
+   */
+  function submitStepTraining(stepId, bpm, detection) {
+    const id = `step/${stepId}[${bpm}]`;
+    return submitActivity(id, detection);
+  }
+
+  /**
+   * @param {string} activityId
+   * @param {DetectionResult} detection
+   *
+   * @returns {DanceSessionResult?}
+   */
+  function submitActivity(activityId, detection) {
+    const limitedId = activityId.slice(0, 256);
+    const hits = detection.poseMatches;
+    const misses = detection.poseMisses;
+    const steps = detection.steps();
+    const numSteps = steps.length;
+    const duration =
+      steps.length > 0
+        ? Number(steps[steps.length - 1].end - steps[0].start)
+        : 0;
+
+    /** @type {DanceSessionResult} */
+    const sessionResult = {
+      numSteps,
+      hits,
+      misses,
+      duration,
+      timestamp: new Date(),
+    };
+
+    // TODO: actually submit something
+    // try {
+    //   submitStats($user);sessionResult,limitedId
+    // } catch (err) {
+    //   console.warn('Submitting stats failed', err);
+    // }
+    // TODO: store locally if it failed
+
+    return sessionResult;
   }
 
   /** @type {UserContextData} */
@@ -298,9 +279,10 @@
     store: user,
     clientSession,
     setUserMeta,
-    computeDanceStats,
+    submitWarmup,
+    submitCourseLesson,
+    submitStepTraining,
     addDanceToStats,
-    recordFinishedLesson,
   };
   setContext('user', userCtx);
 

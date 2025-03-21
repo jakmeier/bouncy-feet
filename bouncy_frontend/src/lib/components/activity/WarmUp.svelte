@@ -6,7 +6,7 @@
   import { registerTracker } from '$lib/stores/Beat';
   import StandardPage from '../ui/StandardPage.svelte';
   import WarmupReview from './WarmupReview.svelte';
-  import { onDestroy } from 'svelte';
+  import { getContext, onDestroy } from 'svelte';
 
   /**
    * @typedef {Object} Props
@@ -28,6 +28,9 @@
     onBack,
   } = $props();
 
+  /** @type {UserContextData} */
+  let user = getContext('user');
+
   let previewDone = $state(false);
 
   /** @type {Tracker} */
@@ -39,6 +42,7 @@
   const unregisterTracker = registerTracker(tracker);
   let trackingDone = $state(false);
 
+  /** @type {DetectionResult | undefined} */
   let detection = $state();
   /**
    * @param {DetectionResult} newDetection
@@ -55,6 +59,15 @@
     detection = newDetection;
     URL.revokeObjectURL(videoUrl);
     trackingDone = true;
+
+    const fullId = stepNames.join('+');
+    const limitedId = fullId.slice(0, 128);
+    const sessionResult = user.submitWarmup(limitedId, detection);
+    if (sessionResult) {
+      setTimeout(() => {
+        user.addDanceToStats(sessionResult);
+      }, 3000);
+    }
   }
 
   function onContinue() {

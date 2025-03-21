@@ -76,11 +76,6 @@
     }
 
     detectionResult = tracker?.lastDetection;
-    // TODO: consider storing stats here
-    // const sessionResult = computeDanceStats(detected.steps());
-    // if (sessionResult) {
-    //   addDanceToStats(sessionResult);
-    // }
     if (onDone) {
       onDone(detectionResult, recordingStart, recordingEnd, videoUrl);
     }

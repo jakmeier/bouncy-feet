@@ -68,10 +68,10 @@
  *
  * @typedef {Object} DanceSessionResult
  * @property {number} numSteps
- * @property {number} experience
+ * @property {number} hits
+ * @property {number} misses
  * @property {number} duration
- * @property {any} stats
- * @property {number[]} bpms
+ * @property {Date} timestamp
  *
  * @typedef {Object} StepFilter
  * @property {boolean} uniqueNames
@@ -94,9 +94,10 @@
  * @property {import('svelte/store').Writable<UserData>} store,
  * @property {ClientSession} clientSession,
  * @property {any} setUserMeta,
- * @property {any} computeDanceStats,
- * @property {any} addDanceToStats,
- * @property {any} recordFinishedLesson,
+ * @property {(courseId: string, lessonIndex: number, detection: DetectionResult) => DanceSessionResult | null} submitCourseLesson
+ * @property {(warmupId: string, detection: DetectionResult) => DanceSessionResult | null} submitWarmup
+ * @property {(stepId: string, bpm: number, detection: DetectionResult) => DanceSessionResult | null} submitStepTraining
+ * @property {(result: DanceSessionResult) => void} addDanceToStats Update local stats, offline only.
  *
  * @typedef {Object} UserLessonProgress
  * @property {LessonProgress[]} lessons
