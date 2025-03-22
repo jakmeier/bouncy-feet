@@ -25,6 +25,9 @@ pub enum TeacherView {
 pub struct DanceCursor {
     /// Global counter of subbeat within an activity.
     pub subbeat: u32,
+    /// Points to a section within an activity.
+    #[wasm_bindgen(js_name = "sectionIndex")]
+    pub section_index: usize,
     /// Points to a step within an activity.
     #[wasm_bindgen(js_name = "stepIndex")]
     pub step_index: usize,
@@ -39,6 +42,7 @@ impl DanceCursor {
     pub fn new() -> Self {
         Self {
             subbeat: 0,
+            section_index: 0,
             step_index: 0,
             pose_index: 0,
         }
@@ -50,7 +54,7 @@ impl DanceCursor {
     /// duplicated, this function will count them as two different poses.
     #[wasm_bindgen(js_name = "isSamePose")]
     pub fn is_same_pose(&self, other: &DanceCursor) -> bool {
-        self.step_index == other.step_index && self.pose_index == other.pose_index
+        self.section_index == other.section_index && self.pose_index == other.pose_index
     }
 
     #[wasm_bindgen(js_name = "isSameSubbeat")]

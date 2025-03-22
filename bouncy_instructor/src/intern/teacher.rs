@@ -103,8 +103,8 @@ impl Teacher {
     }
 
     pub(crate) fn cursor_at_subbeat(&self, subbeat: u32) -> DanceCursor {
-        let (step_index, remainder) = self.index_at_subbeat(subbeat);
-        let section = self.sections.get(step_index);
+        let (section_index, remainder) = self.index_at_subbeat(subbeat);
+        let section = self.sections.get(section_index);
         let pose_index = section
             .map(|section| match section {
                 Section::Step(step_section)
@@ -116,8 +116,22 @@ impl Teacher {
                 Section::Freestyle { .. } => 0,
             })
             .unwrap_or(0);
+
+        // Also calculate the #step for the frontend to use.
+        let steps_current_section = self
+            .sections
+            .get(section_index)
+            .map(|sec| remainder / sec.single_step_subbeats() as usize)
+            .unwrap_or(0);
+        let steps_before: usize = self.sections[..section_index]
+            .iter()
+            .map(|sec| sec.num_steps() as usize)
+            .sum();
+        let step_index = steps_current_section + steps_before;
+
         DanceCursor {
             subbeat,
+            section_index,
             step_index,
             pose_index,
         }
@@ -135,7 +149,7 @@ impl Teacher {
     }
 
     fn section(&self, cursor: &DanceCursor) -> Option<&Section> {
-        self.sections.get(cursor.step_index)
+        self.sections.get(cursor.section_index)
     }
 
     fn section_at_subbeat(&self, mut subbeat: u32) -> Option<&Section> {
@@ -209,6 +223,24 @@ impl Section {
             }
             Section::Freestyle { subbeats } => *subbeats,
         }
+    }
+
+    fn single_step_subbeats(&self) -> u32 {
+        match self {
+            Section::Step(step_section)
+            | Section::ShowStep(step_section)
+            | Section::Warmup(step_section) => {
+                let StepSection { step, pace, .. } = step_section;
+                pace.subbeats_per_pose() * step.num_poses() as u32
+            }
+            // TODO: This doesn't quite make sense
+            Section::Freestyle { subbeats } => *subbeats,
+        }
+    }
+
+    fn num_steps(&self) -> u32 {
+        let per_step = self.single_step_subbeats();
+        self.subbeats().div_ceil(per_step)
     }
 
     fn body_shift(&self, subbeat: u32) -> Cartesian2d {
