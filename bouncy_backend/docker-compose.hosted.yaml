@@ -8,6 +8,7 @@ services:
       OIDC_ISSUER: https://auth.bouncy-feet.ch/realms/bouncyfeet
       OIDC_CLIENT_SECRET: XXXX
       OIDC_CLIENT_ID: bouncy-backend
+      DATABASE_URL: "postgres://USER:PW@postgres/bouncyfeet"
     volumes:
       - data:/app/db.sqlite
     ports:
