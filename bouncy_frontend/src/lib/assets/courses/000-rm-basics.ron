@@ -13,7 +13,7 @@
       // TODO: should I add an ID for better robustness in progress tracking across updates? 
       names: {"de": "Kick", "en": "Kick"},
       difficulty: 1,
-      energy: 1,
+      energy: 2,
       video: "https://app.bouncy-feet.ch/media/videos/wip/l1.mp4",
       parts: [
         // Starting with the inbalance first requires better explanations / intergration work.
@@ -22,45 +22,45 @@
       ],
     ),
     (
-      names: {"de": "Flacher Schritt 1", "en": "Flat Step 1"},
-      difficulty: 1,
-      energy: 1,
+      names: {"de": "Vorbereitung für RM", "en": "Prep for RM"},
+      difficulty: 2,
+      energy: 2,
       video: "https://app.bouncy-feet.ch/media/videos/wip/l2.mp4",
       parts: [
         (step: "flat-man-3-pause", repeat: 16, subbeats_per_move: 2),
       ],
     ),
     (
-      names: {"de": "Flacher Schritt 2", "en": "Flat Step 2"},
-      difficulty: 1,
-      energy: 1,
+      names: {"de": "Näher am RM", "en": "Closer to RM"},
+      difficulty: 2,
+      energy: 3,
       video: "https://app.bouncy-feet.ch/media/videos/wip/l3.mp4",
       parts: [
         (step: "flat-man-2-2", repeat: 16, subbeats_per_move: 2),
       ],
     ),
     (
-      names: {"de": "Flacher Schritt 3", "en": "Flat Step 3"},
-      difficulty: 1,
-      energy: 1,
+      names: {"de": "Fast der richtige RM", "en": "Almost the real R"},
+      difficulty: 2,
+      energy: 3,
       video: "https://app.bouncy-feet.ch/media/videos/wip/l4.mp4",
       parts: [
         (step: "flat-man", repeat: 16, subbeats_per_move: 2),
       ],
     ),
     (
-      names: {"de": "Running Man mit Pause", "en": "Running Man with pause"},
-      difficulty: 1,
-      energy: 1,
+      names: {"de": "Running Man mit Pause", "en": "Running Man with breaks"},
+      difficulty: 2,
+      energy: 3,
       video: "https://app.bouncy-feet.ch/media/videos/wip/l5.mp4",
       parts: [
         (step: "running-man-3", repeat: 16, subbeats_per_move: 2),
       ],
     ),
     (
-      names: {"de": "Running Man", "en": "Running Man"},
-      difficulty: 1,
-      energy: 1,
+      names: {"de": "The Running Man", "en": "The Running Man"},
+      difficulty: 3,
+      energy: 4,
       video: "https://app.bouncy-feet.ch/media/videos/wip/l6.mp4",
       parts: [
         (step: "running-man", repeat: 16, subbeats_per_move: 2),
