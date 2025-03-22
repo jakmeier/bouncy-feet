@@ -23,9 +23,14 @@ pub enum TeacherView {
 /// Useful also for checking if a pose changed.
 #[wasm_bindgen]
 pub struct DanceCursor {
-    pub(crate) subbeat: u32,
-    pub(crate) step_index: usize,
-    pub(crate) pose_index: usize,
+    /// Global counter of subbeat within an activity.
+    pub subbeat: u32,
+    /// Points to a step within an activity.
+    #[wasm_bindgen(js_name = "stepIndex")]
+    pub step_index: usize,
+    /// Points to a pose within a step.
+    #[wasm_bindgen(js_name = "poseIndex")]
+    pub pose_index: usize,
 }
 
 #[wasm_bindgen]

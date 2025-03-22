@@ -8,6 +8,7 @@
   import BackgroundTask from '$lib/components/BackgroundTask.svelte';
   import PoseReview from './PoseReview.svelte';
   import {
+    DanceCursor,
     LimbError,
     PoseApproximation,
   } from '$lib/instructor/bouncy_instructor';
@@ -54,11 +55,8 @@
   let keypointSkeleton = $state();
   /** @type {LimbError[]} */
   let limbErrors = $state([]);
-  let selectedStep = $state(-1);
-  let selectedBeat = $state(-1);
-  let beatsPerStep = $derived(
-    detectedSteps.length > 0 ? detectedSteps[0].poses.length : 4
-  );
+  let danceCursor = $state(new DanceCursor());
+
   let avatarSizePixels = $derived(videoSrcHeight);
   /** @type {import("bouncy_instructor").RenderableSegment[]} */
   let markedSegments = $state([]);
@@ -67,6 +65,8 @@
       markedSegments = limbErrors.map((limb) => limb.render(keypointSkeleton));
     }
   });
+
+  const numSubbeats = $derived(tracker.trackedSubbeats);
 
   let prevTime = 0;
   function onFrame() {
@@ -87,32 +87,7 @@
         videoSrcHeight
       );
     }
-    const cursor = ms / (recordingEnd - recordingStart);
-    if (setCursor) {
-      setCursor(cursor);
-    }
   }
-
-  /**
-   * Used to communicate a cursor seek on the banner to the video.
-   *
-   * Manually called by child banner. Due to cyclic reactivity, it seems easier
-   * than using reactive statements (but maybe I just don't know how to use them
-   * properly in such cases)
-   * @param {number} cursor
-   */
-  function seekVideoToCursor(cursor) {
-    if (reviewVideoElement.paused) {
-      reviewVideoElement.currentTime =
-        (cursor * (recordingEnd - recordingStart)) / 1000;
-    }
-  }
-
-  // Communicate a cursor seek from the video to the banner.
-  /**
-   * @type {(cursor: number) => void}
-   */
-  let setCursor;
 
   // Set the position in the video and the banner to the specified recording timestamp.
   /** @param {number} timestamp */
@@ -123,29 +98,25 @@
 
   /** @returns {null | PoseApproximation}*/
   function selectedPose() {
-    if (selectedBeat < 0) {
+    const pose = getPoseApproximation(danceCursor);
+    if (!pose) {
+      console.warn(
+        'beat out of range',
+        danceCursor.subbeat,
+        danceCursor.stepIndex,
+        danceCursor.poseIndex
+      );
       return null;
     }
-    if (
-      detectedSteps &&
-      detectedSteps.length > selectedStep &&
-      detectedSteps[selectedStep].poses.length > selectedBeat
-    ) {
-      return detectedSteps[selectedStep].poses[selectedBeat];
-    } else {
-      console.error('beat out of range', selectedStep, selectedBeat);
-      return null;
-    }
+    return pose;
   }
 
   // Load the specified beat to the review cursor.
   /**
-   * @param {number} step
-   * @param {number} beat
+   * @param {DanceCursor} newDanceCursor
    * */
-  function selectBeat(step, beat) {
-    selectedStep = step;
-    selectedBeat = beat;
+  function selectBeat(newDanceCursor) {
+    danceCursor = newDanceCursor;
     const pose = selectedPose();
     if (!pose) {
       return;
@@ -168,30 +139,7 @@
   // select a pose if the video time is right
   /** @param {number} t */
   function checkTimeOnBeat(t) {
-    // find the last step that didn't end before t
-    selectedStep = 0;
-    while (
-      detectedSteps &&
-      detectedSteps.length > selectedStep &&
-      t > detectedSteps[selectedStep].end
-    ) {
-      selectedStep++;
-    }
-    // find the last pose that was before t - maxDt
-    const maxDt = 50;
-    selectedBeat = 0;
-    while (
-      detectedSteps[selectedStep] &&
-      detectedSteps[selectedStep].poses.length > selectedBeat &&
-      t - maxDt > detectedSteps[selectedStep].poses[selectedBeat].timestamp
-    ) {
-      selectedBeat++;
-    }
-    const pose = selectedPose();
-    if (!pose || Math.abs(pose.timestamp - t) > maxDt) {
-      selectedBeat = -1;
-      limbErrors = [];
-    }
+    danceCursor = tracker.cursor(t);
   }
 
   function togglePlay() {
@@ -214,20 +162,33 @@
   }
 
   /**
-   * @param {number} beat
-   * @param {number} step
-   * @param {number} stepLen
+   * @param {number} subbeat
    */
-  function formatBeatLabel(beat, step, stepLen) {
-    if (beat < 0) {
-      return '?';
+  function formatBeatLabel(subbeat) {
+    if (subbeat % 2 === 1) {
+      return '+';
     }
-    const i = step * stepLen + beat;
-    return `${i + 1}`;
+    return String(subbeat / 2 + 1);
+  }
+
+  /**
+   * @param {DanceCursor} danceCursor
+   * @returns {PoseApproximation | undefined}
+   */
+  function getPoseApproximation(danceCursor) {
+    if (danceCursor.stepIndex > detectedSteps.length) {
+      return;
+    }
+    const step = detectedSteps[danceCursor.stepIndex];
+    const poses = step.poses;
+    if (danceCursor.poseIndex > step.poses.length) {
+      return;
+    }
+    return poses[danceCursor.poseIndex];
   }
 
   onMount(() => {
-    selectBeat(0, 0);
+    selectBeat(danceCursor);
   });
 </script>
 
@@ -284,18 +245,29 @@ once per 250ms. -->
   </div>
 
   <div class="poses-details" bind:this={poseCards} onscroll={onScrollPoseCards}>
-    {#each detectedSteps as step, iStep}
-      {#each step.poses as pose, iBeat}
-        <!-- svelte-ignore a11y_click_events_have_key_events -->
-        <!-- svelte-ignore a11y_no_static_element_interactions -->
-        <!-- TODO(performance): step.poses.length allocates a vector and an array every time it is read -->
-        <div onclick={() => selectBeat(iStep, iBeat)}>
-          <PoseReview
-            {pose}
-            beatLabel={formatBeatLabel(iBeat, iStep, step.poses.length)}
-          ></PoseReview>
+    {#each { length: numSubbeats } as _, subbeat}
+      {@const cursor = tracker.cursorAtSubbeat(subbeat)}
+      {@const prevCursor =
+        subbeat > 0 ? tracker.cursorAtSubbeat(subbeat - 1) : null}
+      {@const isNewPose = !prevCursor || !cursor.isSamePose(prevCursor)}
+      {#if isNewPose}
+        {@const pose = getPoseApproximation(cursor)}
+        {#if pose}
+          <!-- svelte-ignore a11y_click_events_have_key_events -->
+          <!-- svelte-ignore a11y_no_static_element_interactions -->
+          <div onclick={() => selectBeat(cursor)}>
+            <PoseReview
+              {pose}
+              beatLabel={formatBeatLabel(subbeat)}
+              skeleton={tracker.poseSkeletonAt(cursor)}
+            ></PoseReview>
+          </div>
+        {/if}
+      {:else}
+        <div class="same-pose-placeholder">
+          <div>·</div>
         </div>
-      {/each}
+      {/if}
     {/each}
   </div>
 
@@ -338,6 +310,25 @@ once per 250ms. -->
     /* Use space all the way to the edge */
     margin-left: -1rem;
     margin-right: -1rem;
+  }
+
+  .same-pose-placeholder {
+    display: inline-block;
+    margin: 1rem 1px;
+  }
+  .same-pose-placeholder div {
+    color: var(--theme-neutral-white);
+    background-color: var(--theme-neutral-black);
+    border-radius: 50%;
+    height: 1rem;
+    width: 1rem;
+    /* padding: 0.125rem; */
+
+    text-align: center;
+    align-content: center;
+    justify-content: center;
+    font-size: 1rem;
+    vertical-align: middle;
   }
 
   .toggle-item {

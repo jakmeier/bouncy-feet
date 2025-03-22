@@ -1,10 +1,8 @@
 <script>
-  // TODO: Make this UI less ugly, ideally come up with a clever idea how to display it nicely
   import {
     PoseApproximation,
-    Tracker,
+    Skeleton,
   } from '$lib/instructor/bouncy_instructor';
-  import { getContext } from 'svelte';
   import InstructorAvatar from '../avatar/InstructorAvatar.svelte';
   import { LEFT_RIGHT_COLORING } from '$lib/constants';
   import { base } from '$app/paths';
@@ -12,20 +10,14 @@
   /**
    * @typedef {Object} Props
    * @property {PoseApproximation} pose
+   * @property {Skeleton} skeleton
    * @property {string} [beatLabel]
    * @property {number} [threshold]
    */
 
   /** @type {Props} */
-  let { pose, beatLabel = '0', threshold = 0.05 } = $props();
+  let { pose, skeleton, beatLabel = '0', threshold = 0.05 } = $props();
   let passed = $derived(pose.error < threshold);
-
-  /** @type {number} bound to client width of bar */
-  let width = $state(10);
-
-  /** @type {{tracker: Tracker}} */
-  let { tracker } = getContext('tracker');
-  let instructorSkeleton = tracker.poseSkeleton(pose.id);
 </script>
 
 <div class="pose" class:failed-pose={pose.error > threshold}>
@@ -35,12 +27,10 @@
 
   <div class="skeleton">
     <div class="avatar-container">
-      {#if instructorSkeleton}
+      {#if skeleton}
         <InstructorAvatar
-          {width}
-          height={width}
           avatarSize={1.0}
-          skeleton={instructorSkeleton}
+          {skeleton}
           instructorStyle={LEFT_RIGHT_COLORING}
         />
       {/if}

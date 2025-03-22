@@ -72,11 +72,6 @@
     gap: 1rem;
     margin-top: 2rem;
   }
-  .buttons button {
-    padding: 0;
-    margin: 0;
-    height: 1rem;
-  }
   .no-review {
     margin: 2rem;
   }

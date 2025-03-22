@@ -11,7 +11,7 @@
 
   /**
    * @typedef {Object} Props
-   * @property {any} skeleton
+   * @property {import("bouncy_instructor").SkeletonV2} skeleton
    * @property {number} [avatarSizePixels]
    * @property {RenderableSegment[]} [markedSegments]
    */

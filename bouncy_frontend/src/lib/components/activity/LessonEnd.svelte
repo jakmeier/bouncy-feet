@@ -3,9 +3,15 @@
   import StandardPage from '$lib/components/ui/StandardPage.svelte';
   import Symbol from '$lib/components/ui/Symbol.svelte';
   import { t } from '$lib/i18n';
+  import Background from '../ui/sections/Background.svelte';
 
   let { showResults = $bindable() } = $props();
 </script>
+
+<Background
+  bgColor="var(--theme-neutral-dark)"
+  color="var(--theme-neutral-white)"
+></Background>
 
 <StandardPage black>
   <!-- <h3>That was fun, wasn't it?</h3> -->

@@ -14,7 +14,7 @@ use super::renderable::RenderableSkeleton;
 use super::wrapper::skeleton_wrapper::SkeletonWrapper;
 use super::TextEffect;
 use crate::intern::dance_detector::{DanceDetector, DetectionState};
-use crate::intern::skeleton_3d::{Direction, Skeleton3d};
+use crate::intern::skeleton_3d::Skeleton3d;
 use crate::intern::step_pace::StepPace;
 use crate::intern::teacher::Teacher;
 use crate::intern::tracker_dance_collection::{ForeignCollectionError, TrackerDanceCollection};
@@ -334,16 +334,6 @@ impl Tracker {
     #[wasm_bindgen(js_name = duration)]
     pub fn duration(&mut self) -> f64 {
         self.time_between_poses() * self.tracked_subbeats() as f64
-    }
-
-    /// Return a skeleton for a pose.
-    #[wasm_bindgen(js_name = poseSkeleton)]
-    pub fn pose_skeleton(&self, id: String) -> Option<Skeleton> {
-        let index = self.db.pose_by_id(&id)?;
-        let pose = &self.db.poses()[index];
-        // TODO: set correct direction
-        let direction = Direction::East;
-        Some(Skeleton::from_pose(pose, &self.db, direction))
     }
 
     /// Return a skeleton that's expected now.
