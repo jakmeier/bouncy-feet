@@ -56,12 +56,10 @@
       {/if}
 
       <div class="buttons">
-        <button class="wide" onclick={onRestart}>
+        <button onclick={onRestart}>
           {$t('courses.end.again-button')}
         </button>
-        <button class="wide" onclick={onBack}>
-          {$t('courses.end.back-button')}</button
-        >
+        <button onclick={onBack}> {$t('courses.end.back-button')}</button>
       </div>
     </StandardPage>
   {/if}
@@ -73,6 +71,11 @@
     flex-direction: column;
     gap: 1rem;
     margin-top: 2rem;
+  }
+  .buttons button {
+    padding: 0;
+    margin: 0;
+    height: 1rem;
   }
   .no-review {
     margin: 2rem;
@@ -93,8 +96,5 @@
     margin: auto;
     max-width: 3rem;
     max-height: 3rem;
-  }
-  .vspace {
-    margin: 1.5rem auto;
   }
 </style>

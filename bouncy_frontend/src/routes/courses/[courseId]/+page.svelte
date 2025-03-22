@@ -26,7 +26,7 @@
 <p>{course.explanation}</p>
 
 <div class="ol">
-  <!-- WIP -->
+  <!-- WIP
   <div class="course">
     Train
 
@@ -37,7 +37,7 @@
         </button>
       </a>
     </div>
-  </div>
+  </div> -->
 
   {#each course.lessons as lesson, index}
     <div class="course">

@@ -1,8 +1,5 @@
-<!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
 <script>
-  import Explanation from '$lib/components/ui/Explanation.svelte';
   import { t } from '$lib/i18n';
-  import { dances } from '$lib/instructor/bouncy_instructor';
   import { onMount } from 'svelte';
 
   /**
@@ -25,12 +22,7 @@
   let borderWidth = '3px';
 
   let outerWidth = $state();
-  let explanationWidth = $derived(outerWidth ? outerWidth / 2 : 200);
   let scoreWidth = $state(0);
-
-  const celebrationDance = passed
-    ? dances().find((dance) => dance.id === 'Celebrate')
-    : null;
 
   onMount(() => {
     // set this after the initial render to trigger the animation

@@ -1,256 +1,37 @@
 <script>
   import { page } from '$app/state';
-  import { t } from '$lib/i18n.js';
-  import { getContext, onDestroy, onMount, tick } from 'svelte';
-  import LiveRecording from '$lib/components/record/LiveRecording.svelte';
-  import { DetectionState, Tracker } from '$lib/instructor/bouncy_instructor';
-  import Popup from '$lib/components/ui/Popup.svelte';
-  import VideoReview from '$lib/components/review/VideoReview.svelte';
-  import Audio from '$lib/components/audio/BeatAudio.svelte';
-  import { registerTracker } from '$lib/stores/Beat';
-  import Button from '$lib/components/ui/Button.svelte';
-  import { writable } from 'svelte/store';
   import { dev } from '$lib/stores/FeatureSelection';
   import DevUtility from '$lib/components/dev/DevUtility.svelte';
-  import LightBackground from '$lib/components/ui/sections/LightBackground.svelte';
-  import LessonEnd from '$lib/components/activity/LessonEnd.svelte';
-  import LessonEndResults from './LessonEndResults.svelte';
-  /**
-   * @typedef {Object} Props
-   * @property {import('svelte').Snippet} [children]
-   */
-
-  /** @type {Props} */
-  let { children } = $props();
-
-  const { getCourse } = getContext('courses');
-
-  /** @type {UserContextData} */
-  const { addDanceToStats, submitCourseLesson } = getContext('user');
+  import CourseLesson from '$lib/components/activity/CourseLesson.svelte';
+  import { browser } from '$app/environment';
 
   /** @type {string} */
-  let id;
-  /** @type {import('bouncy_instructor').Course } */
-  let course;
+  let id = page.params.courseId;
   /** @type {number} */
-  let lessonIndex;
-  /** @type { import('bouncy_instructor').Lesson } */
-  let lesson;
-  /** @type {number | undefined} */
-  let partIndex;
-  /** @type {number | undefined} */
-  let recordingStart = $state(undefined);
-  /** @type {number | undefined} */
-  let recordingEnd = $state(undefined);
+  let lessonIndex = Number.parseInt(page.params.lessonIndex);
 
-  /** @type {number} */
-  let beatStart;
-  let beatDetected = false;
-
-  let detectionResult;
-  /** @type {string} */
-  let videoUrl = $state();
-  /** @type {import("bouncy_instructor").DetectedStep[] | undefined} */
-  let detectedSteps = $state();
-
-  let liveRecording;
-  /** @type {Tracker | undefined} */
-  let tracker = $state();
-  /** @type {import('svelte/store').Readable<DetectionState> | null} */
-  let trackingState = $derived(tracker ? tracker.detectionState : null);
-
-  let useFixedBpm = false;
-  /** @type {import('svelte/store').Writable<boolean>} */
-  let startExercisePopUpIsOpen = writable(false);
-
-  let showHintBeforeStart = true;
-  // wait for a user input before showing stats
-  let showResults = $state(false);
-
-  async function start() {
-    if (showHintBeforeStart) {
-      // only show the hint once per sessions
-      showHintBeforeStart = false;
-      $startExercisePopUpIsOpen = true;
-      return;
-    }
-    if (liveRecording) {
-      await tick();
-      await liveRecording.startCamera();
-      await liveRecording.startRecording();
-    }
+  async function resetScroll() {
+    if (!browser) return;
+    document.querySelector('.background')?.scrollTo(0, 0);
   }
 
-  /**
-   * @param {Blob | undefined} videoBlob
-   */
-  async function onRecordingStopped(videoBlob) {
-    tracker?.finishTracking();
-    if (videoBlob) {
-      if (videoUrl) {
-        URL.revokeObjectURL(videoUrl);
-      }
-      videoUrl = URL.createObjectURL(videoBlob);
-    } else {
-      console.warn('ended recording and did not get video blob', videoBlob);
-    }
-
-    detectionResult = tracker?.lastDetection;
-    detectedSteps = detectionResult?.steps();
-  }
-
-  function restart() {
-    tracker?.clear();
-    beatStart = 0;
-    recordingStart = undefined;
-    recordingEnd = undefined;
-    showResults = false;
-  }
-
-  function goBack() {
-    window.history.back();
+  function backFromLesson() {
     window.history.back();
   }
 
-  function closeStartExercisePopUp() {
-    $startExercisePopUpIsOpen = false;
-    start();
+  function onLessonDone() {
+    resetScroll();
+    window.history.back();
   }
-
-  function loadCourse() {
-    id = page.params.courseId;
-    course = getCourse(id);
-    lessonIndex = Number.parseInt(page.params.lessonIndex);
-    lesson = course.lessons[lessonIndex];
-    partIndex = undefined;
-
-    if (lessonIndex >= 0) {
-      tracker = course.tracker(lessonIndex);
-    } else {
-      tracker = course.trainingTracker();
-    }
-    if (tracker) {
-      registerTracker(tracker);
-    } else {
-      console.error('could not construct tracker for lesson');
-    }
-  }
-  loadCourse();
-
-  let hitRate = $state(0.0);
-  let passed = $state(false);
-  async function trackingDone() {
-    await stop();
-    const detected = tracker.lastDetection;
-    hitRate =
-      detected.poseMatches / (detected.poseMisses + detected.poseMatches);
-    passed = hitRate >= 0.6;
-
-    const fullId = lessonIndex + '-exercise';
-    const limitedId = fullId.slice(0, 128);
-    const sessionResult = submitCourseLesson(limitedId, lessonIndex, detected);
-    if (sessionResult) {
-      addDanceToStats(sessionResult);
-    }
-  }
-  $effect(() => {
-    if ($trackingState === DetectionState.TrackingDone) trackingDone();
-  });
-
-  onMount(start);
-
-  onDestroy(() => {
-    if (videoUrl) {
-      URL.revokeObjectURL(videoUrl);
-    }
-  });
 </script>
 
-<LightBackground />
-
-<div class="outer">
-  {#if $trackingState === DetectionState.TrackingDone}
-    {#if !showResults}
-      <LessonEnd bind:showResults></LessonEnd>
-    {:else}
-      <LessonEndResults {hitRate} {passed}></LessonEndResults>
-
-      {#if recordingStart !== undefined && recordingEnd !== undefined}
-        <VideoReview
-          reviewVideoSrc={videoUrl}
-          {detectedSteps}
-          {recordingStart}
-          {recordingEnd}
-        ></VideoReview>
-      {:else}
-        <div class="no-review">
-          {$t('record.no-video-for-review')}
-        </div>
-      {/if}
-
-      <div class="buttons">
-        <Button
-          class="wide"
-          on:click={restart}
-          symbol=""
-          text="courses.end.again-button"
-        ></Button>
-        <Button
-          class="wide"
-          on:click={goBack}
-          symbol=""
-          text="courses.end.back-button"
-        ></Button>
-      </div>
-    {/if}
-  {:else}
-    <LiveRecording
-      bind:this={liveRecording}
-      bind:recordingStart
-      bind:recordingEnd
-      onStop={onRecordingStopped}
-      videoOpacity={0.5}
-      enableLiveAvatar={true}
-      enableInstructorAvatar={true}
-      forceBeat
-    ></LiveRecording>
-  {/if}
-</div>
-
-<Audio isOn={useFixedBpm && $trackingState !== DetectionState.TrackingDone}
-></Audio>
-
-<Popup showOkButton title={'common.hint-popup-title'}>
-  {$t('record.estimate-bpm-hint')}
-</Popup>
-
-<Popup
-  isOpen={startExercisePopUpIsOpen}
-  title={'courses.lesson.exercise-popup-title'}
->
-  <div>
-    {$t('courses.lesson.exercise-start-description')}
-  </div>
-  <button class="wide" onclick={closeStartExercisePopUp}>OK</button>
-  {@render children?.()}
-</Popup>
+<CourseLesson
+  courseId={id}
+  {lessonIndex}
+  onDone={onLessonDone}
+  onBack={backFromLesson}
+></CourseLesson>
 
 {#if $dev}
   <DevUtility />
 {/if}
-
-<style>
-  .outer {
-    text-align: center;
-    min-height: 100dvh;
-  }
-  .buttons {
-    display: flex;
-    flex-direction: column;
-    margin-top: 10px;
-    gap: 1rem;
-  }
-  .no-review {
-    margin: 2rem;
-  }
-</style>

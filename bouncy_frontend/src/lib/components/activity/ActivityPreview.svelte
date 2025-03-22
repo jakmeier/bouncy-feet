@@ -9,7 +9,7 @@
   import { songs } from '$lib/stores/Songs';
   import DarkSection from '$lib/components/ui/sections/DarkSection.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
-  import { Course, Tracker } from '$lib/instructor/bouncy_instructor';
+  import { Tracker } from '$lib/instructor/bouncy_instructor';
   import LogoHeader from '../ui/LogoHeader.svelte';
   import TrackerPreview from '../avatar/TrackerPreview.svelte';
   import Background from '../ui/sections/Background.svelte';
