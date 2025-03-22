@@ -181,10 +181,10 @@
     }
     const step = detectedSteps[danceCursor.stepIndex];
     const poses = step.poses;
-    if (danceCursor.poseIndex > step.poses.length) {
+    if (poses.length === 0) {
       return;
     }
-    return poses[danceCursor.poseIndex];
+    return poses[danceCursor.poseIndex % poses.length];
   }
 
   onMount(() => {
@@ -262,8 +262,12 @@ once per 250ms. -->
               skeleton={tracker.poseSkeletonAt(cursor)}
             ></PoseReview>
           </div>
+        {:else}
+          <div class="missing-pose-placeholder">
+            <div>·</div>
+          </div>
         {/if}
-      {:else}
+      {:else if subbeat % 2 === 0}
         <div class="same-pose-placeholder">
           <div>·</div>
         </div>
@@ -312,10 +316,12 @@ once per 250ms. -->
     margin-right: -1rem;
   }
 
+  .missing-pose-placeholder,
   .same-pose-placeholder {
     display: inline-block;
     margin: 1rem 1px;
   }
+  .missing-pose-placeholder div,
   .same-pose-placeholder div {
     color: var(--theme-neutral-white);
     background-color: var(--theme-neutral-black);
@@ -329,6 +335,9 @@ once per 250ms. -->
     justify-content: center;
     font-size: 1rem;
     vertical-align: middle;
+  }
+  .missing-pose-placeholder div {
+    background-color: var(--theme-accent);
   }
 
   .toggle-item {
