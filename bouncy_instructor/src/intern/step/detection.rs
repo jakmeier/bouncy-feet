@@ -22,6 +22,7 @@ impl DetectedStep {
 }
 
 impl DetectionResult {
+    /// Note: make sure to restore cursor after calling this
     pub(crate) fn add_pose(&mut self, pose: PoseApproximation) {
         if let Some(partial) = &mut self.partial {
             partial.poses.push(pose);
@@ -32,7 +33,8 @@ impl DetectionResult {
             self.partial = Some(new_partial);
         }
     }
-
+    
+    /// Note: make sure to restore cursor after calling this
     pub(crate) fn match_step(&mut self, target_step: &StepInfo) {
         if let (target, Some(partial)) = (target_step, &mut self.partial) {
             if target.skeletons.len() == partial.poses.len() {

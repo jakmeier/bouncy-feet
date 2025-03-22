@@ -22,6 +22,7 @@ pub enum TeacherView {
 /// Can be used to reference a pose independently of pace.
 /// Useful also for checking if a pose changed.
 #[wasm_bindgen]
+#[derive(Debug, Default, Clone)]
 pub struct DanceCursor {
     /// Global counter of subbeat within an activity.
     pub subbeat: u32,

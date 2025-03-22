@@ -26,9 +26,6 @@ pub(crate) struct DanceDetector {
     pub(crate) beat_zero: Option<Timestamp>,
     /// Enforce that a pose is evaluated on beat, regardless of how well it matches.
     pub(crate) force_beat: bool,
-    /// How much time before or after the actual beat a pose can be to be
-    /// considered on beat
-    pub(crate) beat_tolerance: f64,
     /// How long it takes from a movement of the person on camera to be visible
     /// in an image.
     pub(crate) camera_input_delay: f64,
@@ -81,8 +78,6 @@ impl Default for DanceDetector {
             beat_alignment: None,
             beat_zero: None,
             force_beat: false,
-            // TODO: should this depend on bpm and system info?
-            beat_tolerance: 250.0,
             // This is what I measured on my desktop with my webcam by looking
             // at the timestamps of claps timed on the audio output. Basically,
             // I measured the remaining error in timing after I have considered
@@ -165,9 +160,9 @@ impl DanceDetector {
                 }
             }
             DetectionState::CountDown => {
-                let time_between_poses = self.time_between_poses();
+                let time_between_poses = self.subbeat_time();
                 if now > self.detection_state_start + (time_between_poses * 15.0).floor() {
-                    let beat_zero = self.next_pose_time(now);
+                    let beat_zero = self.next_subbeat_timestamp(now);
                     self.beat_zero = Some(beat_zero);
                     // the change to the next state must happen BEFORE it
                     // actually starts, to give time to the animation
@@ -185,7 +180,7 @@ impl DanceDetector {
 
                 // Finish activity when the teacher is done.
                 self.last_evaluation = now;
-                let subbeat = self.timestamp_to_subbeat(now);
+                let subbeat = self.subbeat(now);
                 if self.teacher.is_done(subbeat) {
                     self.transition_to_state(DetectionState::TrackingDone, now);
                 }
@@ -204,7 +199,7 @@ impl DanceDetector {
                 }
             }
             DetectionState::InstructorDemo => {
-                let subbeat = self.timestamp_to_subbeat(now);
+                let subbeat = self.subbeat(now);
                 if self.teacher.is_tracking_at_subbeat(subbeat) {
                     self.transition_to_state(DetectionState::LiveTracking, now);
                 }
@@ -228,11 +223,11 @@ impl DanceDetector {
             .partial
             .as_ref()
             .or_else(|| prev_detection.steps.last());
-        let start_t = last_step.map_or(0.0, |step| step.end);
+        let prev_t = last_step.map_or(0.0, |step| step.end);
 
         // skip at least a quarter beat
-        let min_delay = self.time_between_poses() / 2.0;
-        if pose_timestamp < start_t + min_delay {
+        let min_delay = self.subbeat_time() / 2.0;
+        if pose_timestamp < prev_t + min_delay {
             return self
                 .detected
                 .clone()
@@ -240,21 +235,24 @@ impl DanceDetector {
         }
 
         // check we are on beat, if aligned to beat
-        let num_detected_poses = self.num_detected_poses();
-        let time_delta = self.time_between_poses();
-        let first_beat = self.next_pose_time(self.detection_state_start + (time_delta / 2.0));
-        let expected_next_pose =
-            first_beat + (num_detected_poses as f64 * time_delta).round() + self.camera_input_delay;
-        if self.force_beat && pose_timestamp < expected_next_pose - self.beat_tolerance {
+        let time_delta = self.subbeat_time();
+        let first_beat =
+            self.next_subbeat_timestamp(self.detection_state_start + (time_delta / 2.0));
+        let next_subbeat = self.recorded_subbeats();
+
+        let expected_next_pose_t =
+            first_beat + (next_subbeat as f64 * time_delta) + self.camera_input_delay;
+        if self.force_beat && pose_timestamp < expected_next_pose_t - self.beat_tolerance() {
             return self
                 .detected
                 .clone()
                 .with_failure_reason(DetectionFailureReason::NotOnBeat);
         }
+        let cursor = self.teacher.cursor_at_subbeat(next_subbeat);
 
-        let beat = num_detected_poses as u32;
-        let (step_id, beat_remainder) = match self.tracked_step_with_remainder(beat) {
-            Some((step, beat_remainder)) => (step.id(), beat_remainder),
+        // look up step data we expect to match
+        let step_id = match self.step(&cursor) {
+            Some(step_info) => step_info.id(),
             None => {
                 // TODO: To support freestyle, this should match against any step
                 return self
@@ -265,7 +263,7 @@ impl DanceDetector {
         };
         let step = db.step(&step_id).expect("tracked step must exist");
 
-        let pose_idx = step.poses[beat_remainder as usize % step.poses.len()];
+        let pose_idx = step.poses[cursor.pose_index % step.poses.len()];
         let pose = &db.poses()[pose_idx];
 
         // If we detected a different direction than the expected one, it
@@ -315,7 +313,7 @@ impl DanceDetector {
             // smallest error in the tolerated range.
             if self.force_beat {
                 self.on_beat_candidates.push(pose_approximation.clone());
-                if pose_timestamp > expected_next_pose + self.beat_tolerance {
+                if pose_timestamp > expected_next_pose_t + self.beat_tolerance() {
                     let closest_fit = self
                         .on_beat_candidates
                         .drain(..)
@@ -346,27 +344,11 @@ impl DanceDetector {
             DetectionState::CountDown
             | DetectionState::LiveTracking
             | DetectionState::InstructorDemo => {
-                let subbeat = self.timestamp_to_subbeat(t);
+                let subbeat = self.subbeat(t);
                 self.teacher.ui_view_at_subbeat(subbeat)
             }
             DetectionState::TrackingDone => TeacherView::Off,
         }
-    }
-
-    /// Return how many poses have been detected so far.
-    pub(crate) fn num_detected_poses(&self) -> usize {
-        let full: usize = self
-            .detected
-            .steps
-            .iter()
-            .map(|step| step.poses.len())
-            .sum();
-        let partial = if let Some(partial_step) = &self.detected.partial {
-            partial_step.poses.len()
-        } else {
-            0
-        };
-        full + partial
     }
 
     /// Returns the tracked step and subbeat for a given subbeat after tracking started.
@@ -374,17 +356,36 @@ impl DanceDetector {
         self.teacher.step_at_subbeat(subbeat)
     }
 
+    /// Calculate the subbeat since the current detection phase
+    pub(crate) fn subbeat(&self, t: f64) -> u32 {
+        self.timestamp_to_subbeat_from_zero(t)
+            .saturating_sub(self.timestamp_to_subbeat_from_zero(self.detection_state_start))
+    }
+
     pub(crate) fn step(&self, cursor: &DanceCursor) -> Option<&StepInfo> {
         self.teacher.step(cursor)
     }
 
     pub(crate) fn add_pose(&mut self, pose: PoseApproximation) {
+        let pose_duration = self
+            .teacher
+            .pose_duration(&self.detected.cursor)
+            .unwrap_or_else(|| {
+                crate::println!("warn: adding more poses than were expected");
+                1
+            });
+        let prev_subbeat = self.detected.cursor.subbeat;
+        let new_subbeat = prev_subbeat + pose_duration;
+
         self.detected.add_pose(pose);
+
         self.on_beat_candidates.clear();
-        let subbeat = self.num_detected_poses() as u32;
-        if let Some((target_step, _beat)) = &self.teacher.step_at_subbeat(subbeat) {
+        if let Some((target_step, _beat)) = &self.teacher.step_at_subbeat(prev_subbeat) {
             self.detected.match_step(target_step);
         }
+
+        let new_cursor = self.teacher.cursor_at_subbeat(new_subbeat);
+        self.detected.cursor = new_cursor;
     }
 
     pub(crate) fn transition_to_state(&mut self, state: DetectionState, t: Timestamp) {
@@ -402,28 +403,41 @@ impl DanceDetector {
         }
     }
 
-    pub(crate) fn time_between_poses(&self) -> f64 {
+    pub(crate) fn subbeat_time(&self) -> f64 {
         30_000.0 / self.bpm as f64
     }
 
-    pub(crate) fn timestamp_to_subbeat(&self, t: Timestamp) -> u32 {
-        let t0 = self
-            .beat_zero
-            .unwrap_or(self.beat_alignment.unwrap_or(self.next_pose_time(0.0)));
-        let pose_duration = self.time_between_poses();
-        ((t - t0) / pose_duration).floor() as u32
+    /// How much time before or after the actual beat a pose can be to be
+    /// considered on beat
+    pub(crate) fn beat_tolerance(&self) -> f64 {
+        // TODO: vary this by current pace
+        self.subbeat_time() * 0.8
     }
 
-    pub(crate) fn next_pose_time(&self, not_before: Timestamp) -> Timestamp {
+    pub(crate) fn recorded_subbeats(&self) -> u32 {
+        self.detected.cursor.subbeat
+    }
+
+    /// Attention: This is not from the start of tracking but from the beat alignment
+    fn timestamp_to_subbeat_from_zero(&self, t: Timestamp) -> u32 {
+        let t0 = self.beat_zero.unwrap_or(
+            self.beat_alignment
+                .unwrap_or(self.next_subbeat_timestamp(0.0)),
+        );
+        let pose_duration = self.subbeat_time();
+        ((t - t0) / pose_duration).floor().max(0.0) as u32
+    }
+
+    pub(crate) fn next_subbeat_timestamp(&self, not_before: Timestamp) -> Timestamp {
         let t0 = self.beat_alignment.unwrap_or(0.0);
-        let pose_duration = self.time_between_poses();
-        let poses = ((not_before - t0) / pose_duration).ceil();
-        t0 + poses * pose_duration
+        let subbeat_duration = self.subbeat_time();
+        let subbeats = ((not_before - t0) / subbeat_duration).ceil();
+        t0 + subbeats * subbeat_duration
     }
 
     pub(crate) fn emit_countdown_audio(&mut self, not_before: Timestamp) {
-        let beat = self.time_between_poses();
-        let next_beat = self.next_pose_time(not_before);
+        let beat = self.subbeat_time();
+        let next_beat = self.next_subbeat_timestamp(not_before);
         // long enough to not clear too early
         let text_dur = 8.0 * beat;
 

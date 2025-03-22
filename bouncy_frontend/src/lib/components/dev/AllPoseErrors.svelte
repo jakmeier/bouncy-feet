@@ -3,9 +3,6 @@
   import PoseError from './PoseError.svelte';
   import Symbol from '../ui/Symbol.svelte';
 
-  
-
-  
   /**
    * @typedef {Object} Props
    * @property {HTMLVideoElement} reviewVideoElement

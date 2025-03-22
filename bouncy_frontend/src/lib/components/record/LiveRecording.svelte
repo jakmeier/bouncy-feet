@@ -91,8 +91,10 @@ it does not match
   let detectionState = tracker.detectionState;
   tracker.enforceBeat(forceBeat);
   let progress = $state(0.0);
-  /** @type {DanceCursor | null} */
-  let tailCursor = null;
+  /** @type {DanceCursor} */
+  let nextTrackedPoseCursor = $state(new DanceCursor());
+  /** @type {DanceCursor | undefined} */
+  let animationCursor = $state();
   let firstPoseIsShown = false;
 
   let lastAudioHint = performance.now() - 2000;
@@ -192,9 +194,10 @@ it does not match
     if (t > 50) console.debug(`trackFrame took ${t}ms`);
     recordTrackSyncDelay(t);
 
-    const before = tracker.numDetectedPoses();
     let detectionResult = tracker.runDetection();
-    if (tracker.numDetectedPoses() > before) {
+    let newDetectionCursor = detectionResult.cursor();
+    if (!nextTrackedPoseCursor.isSamePose(newDetectionCursor)) {
+      nextTrackedPoseCursor = newDetectionCursor;
       onStepDetection(detectionResult);
       if (!forceBeat) {
         updateInstructor();
@@ -209,19 +212,23 @@ it does not match
       $detectionState === DetectionState.InstructorDemo
     ) {
       if (forceBeat) {
+        // Start movement of instructor early
         const future = performance.now() + animationTime;
 
         /** @type {DanceCursor} */
-        let newCursor = tracker.cursor(future, false);
-        if (!tailCursor?.isSamePose(newCursor)) {
-          instructorSkeleton = tracker.poseSkeletonAt(newCursor);
-          instructorSkeletonBodyShift = tracker.poseBodyShift(newCursor);
-          instructorJumpHeight = tracker.jumpHeight(newCursor);
-          tailCursor = newCursor;
+        let futureCursor = tracker.cursor(future, false);
+        if (
+          animationCursor === undefined ||
+          !animationCursor?.isSamePose(futureCursor)
+        ) {
+          instructorSkeleton = tracker.poseSkeletonAt(futureCursor);
+          instructorSkeletonBodyShift = tracker.poseBodyShift(futureCursor);
+          instructorJumpHeight = tracker.jumpHeight(futureCursor);
+          animationCursor = futureCursor;
 
           updateInstructorPosition();
         }
-      } else if (before === 0 && !firstPoseIsShown) {
+      } else if (nextTrackedPoseCursor.subbeat === 0 && !firstPoseIsShown) {
         updateInstructor();
         firstPoseIsShown = true;
       }
@@ -295,7 +302,7 @@ it does not match
     lastSuccessSkeletonOrigin = new Cartesian2d(hip.x - 0.5, hip.y - 0.5);
 
     const target = tracker.trackedSubbeats;
-    progress = Math.min(tracker.numDetectedPoses() / target, 1.0);
+    progress = Math.min(detectionResult.cursor().subbeat / target, 1.0);
   }
 
   /** Display visual clues on the avatar to show what the correct position is. */

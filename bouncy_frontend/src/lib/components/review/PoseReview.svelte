@@ -6,6 +6,7 @@
   import InstructorAvatar from '../avatar/InstructorAvatar.svelte';
   import { LEFT_RIGHT_COLORING } from '$lib/constants';
   import { base } from '$app/paths';
+  import { dev } from '$lib/stores/FeatureSelection';
 
   /**
    * @typedef {Object} Props
@@ -40,8 +41,14 @@
   <div class="result">
     {#if passed}
       <img src="{base}/img/symbols/bf_check.svg" alt="passed" />
+      {#if $dev}
+        {pose.error.toFixed(2)}
+      {/if}
     {:else}
       <img src="{base}/img/symbols/bf_cross.svg" alt="F" />
+      {#if $dev}
+        {pose.error.toFixed(2)}
+      {/if}
     {/if}
   </div>
 </div>

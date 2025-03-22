@@ -1,4 +1,4 @@
-use super::{DetectedStep, PoseApproximation};
+use super::{DanceCursor, DetectedStep, PoseApproximation};
 use wasm_bindgen::prelude::wasm_bindgen;
 
 /// Result of a step or dance detection.
@@ -9,10 +9,13 @@ use wasm_bindgen::prelude::wasm_bindgen;
 #[derive(Debug, Default, Clone)]
 #[wasm_bindgen]
 pub struct DetectionResult {
+    /// Point to next expected step
+    pub(crate) cursor: DanceCursor,
     /// fully detected steps
     pub(crate) steps: Vec<DetectedStep>,
     /// partially detected step
     pub(crate) partial: Option<DetectedStep>,
+
     /// If the newest detection was negative, this fields contains information
     /// about the reason.
     #[wasm_bindgen(js_name = "failureReason")]
@@ -66,6 +69,10 @@ impl DetectionResult {
         self.steps.clone()
     }
 
+    pub fn cursor(&self) -> DanceCursor {
+        self.cursor.clone()
+    }
+
     #[wasm_bindgen(js_name = poseHint)]
     pub fn pose_hint(&self) -> PoseHint {
         match &self.last_error {
@@ -81,8 +88,9 @@ impl DetectionResult {
 }
 
 impl DetectionResult {
-    pub(crate) fn new(steps: Vec<DetectedStep>) -> Self {
+    pub(crate) fn new(steps: Vec<DetectedStep>, cursor: DanceCursor) -> Self {
         Self {
+            cursor,
             steps,
             partial: None,
             failure_reason: None,

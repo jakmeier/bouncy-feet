@@ -102,6 +102,18 @@ impl Teacher {
             })
     }
 
+    pub(crate) fn pose_duration(&self, cursor: &DanceCursor) -> Option<u32> {
+        self.section(cursor).and_then(|section| match &section {
+            Section::Step(step_section)
+            | Section::ShowStep(step_section)
+            | Section::Warmup(step_section) => {
+                let StepSection { pace, .. } = step_section;
+                Some(pace.subbeats_per_pose())
+            }
+            Section::Freestyle { .. } => None,
+        })
+    }
+
     pub(crate) fn cursor_at_subbeat(&self, subbeat: u32) -> DanceCursor {
         let (section_index, remainder) = self.index_at_subbeat(subbeat);
         let section = self.sections.get(section_index);
@@ -199,14 +211,14 @@ impl Teacher {
 
     /// The teacher is done when there is no more to show or track.
     pub(crate) fn is_done(&self, subbeat: u32) -> bool {
-        self.section_at_subbeat(subbeat).is_none()
+        subbeat >= self.tracked_subbeats()
     }
 
     fn update_tracked_subbeats(&mut self) {
         self.total_subbeats = self.sections.iter().map(|section| section.subbeats()).sum();
     }
 
-    /// How many beats to track for
+    /// How many beats to track for in total
     pub(crate) fn tracked_subbeats(&self) -> u32 {
         self.total_subbeats
     }

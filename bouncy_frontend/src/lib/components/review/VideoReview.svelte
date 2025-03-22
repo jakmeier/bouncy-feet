@@ -115,7 +115,7 @@
   /**
    * @param {DanceCursor} newDanceCursor
    * */
-  function selectBeat(newDanceCursor) {
+  function selectPose(newDanceCursor) {
     danceCursor = newDanceCursor;
     const pose = selectedPose();
     if (!pose) {
@@ -188,7 +188,7 @@
   }
 
   onMount(() => {
-    selectBeat(danceCursor);
+    selectPose(danceCursor);
   });
 </script>
 
@@ -255,7 +255,7 @@ once per 250ms. -->
         {#if pose}
           <!-- svelte-ignore a11y_click_events_have_key_events -->
           <!-- svelte-ignore a11y_no_static_element_interactions -->
-          <div onclick={() => selectBeat(cursor)}>
+          <div onclick={() => selectPose(cursor)}>
             <PoseReview
               {pose}
               beatLabel={formatBeatLabel(subbeat)}
@@ -277,6 +277,7 @@ once per 250ms. -->
 
   {#if $dev}
     <AllPoseErrors {reviewVideoElement} {recordingStart}></AllPoseErrors>
+    <div>expected pose: {selectedPose()?.id}</div>
   {/if}
 </LightSection>
 
@@ -312,8 +313,8 @@ once per 250ms. -->
     display: flex;
     overflow-x: auto;
     /* Use space all the way to the edge */
-    margin-left: -1rem;
-    margin-right: -1rem;
+    margin-left: -1.5rem;
+    margin-right: -1.5rem;
   }
 
   .missing-pose-placeholder,
