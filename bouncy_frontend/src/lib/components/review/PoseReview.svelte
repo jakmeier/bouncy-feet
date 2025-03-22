@@ -17,7 +17,7 @@
    */
 
   /** @type {Props} */
-  let { pose, skeleton, beatLabel = '0', threshold = 0.05 } = $props();
+  let { pose, skeleton, beatLabel = '0', threshold = 0.075 } = $props();
   let passed = $derived(pose.error < threshold);
 </script>
 
