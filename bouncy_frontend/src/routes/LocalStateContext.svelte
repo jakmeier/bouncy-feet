@@ -33,6 +33,7 @@
   /** @type {LocalState} */
   const defaultState = {
     avatarStyle: defaultAvatarStyle,
+    selectedCoach: 'chorok',
   };
 
   /**
@@ -57,6 +58,10 @@
     Object.assign(state.avatarStyle.coloring, stored?.avatarStyle?.coloring);
     Object.assign(state.avatarStyle.headStyle, stored?.avatarStyle?.headStyle);
     Object.assign(state.avatarStyle.bodyShape, stored?.avatarStyle?.bodyShape);
+
+    if (stored?.selectedCoach) {
+      state.selectedCoach = stored?.selectedCoach;
+    }
     return state;
   }
 

@@ -180,7 +180,7 @@
       return;
     }
     const step = detectedSteps[danceCursor.stepIndex];
-    const poses = step.poses;
+    const poses = step ? step.poses : [];
     if (poses.length === 0) {
       return;
     }

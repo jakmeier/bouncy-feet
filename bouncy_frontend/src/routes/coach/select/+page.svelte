@@ -21,6 +21,7 @@
     Object.assign(localState.avatarStyle.headStyle, coach.style.headStyle);
     Object.assign(localState.avatarStyle.coloring, coach.style.coloring);
     Object.assign(localState.avatarStyle.bodyShape, coach.style.bodyShape);
+    localState.selectedCoach = coach.name;
 
     goto('/');
   }

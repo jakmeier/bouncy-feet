@@ -1,11 +1,10 @@
 <script>
   import Area from '$lib/components/ui/Area.svelte';
-  import { EXAMPLE_CUSTOM_COLORING, ORANGE_COLORING } from '$lib/constants';
   import { t } from '$lib/i18n';
   import { beatCounter } from '$lib/stores/Beat';
   import { derived } from 'svelte/store';
   import DanceAnimation from './DanceAnimation.svelte';
-  import AvatarStyleContext from '$lib/components/avatar/AvatarStyleContext.svelte';
+  import { getContext } from 'svelte';
 
   /**
    * @typedef {Object} Props
@@ -14,6 +13,9 @@
 
   /** @type {Props} */
   let { dance } = $props();
+
+  /** @type {LocalState}*/
+  const localState = getContext('localState');
 
   /**
    * @type {number | undefined}
@@ -69,8 +71,7 @@
     {/if}
   </div>
   <div class="buttons">
-    <!-- TODO lesson for user picked coach -->
-    <a href="./coach/chorok">
+    <a href="./coach/{localState.selectedCoach}">
       <button>
         {$t('home.continue-learning-button')}
       </button>

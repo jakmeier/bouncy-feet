@@ -119,6 +119,7 @@
  * 
  * @typedef {Object} LocalState
  * @property {AvatarStyleContext} avatarStyle
+ * @property {string} selectedCoach
  * 
  * @typedef {Object} ClientSession
  * @property {string} id

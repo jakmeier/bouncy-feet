@@ -15,7 +15,7 @@
   import Nerds from '$lib/components/info/Nerds.svelte';
   import Background from '$lib/components/ui/sections/Background.svelte';
   import { base } from '$app/paths';
-  import { onMount } from 'svelte';
+  import { getContext, onMount } from 'svelte';
   /**
    * @typedef {Object} Props
    * @property {any} featuredDances
@@ -24,6 +24,9 @@
 
   /** @type {Props} */
   let { featuredDances, featuredSteps } = $props();
+
+  /** @type {LocalState}*/
+  const localState = getContext('localState');
 
   const entryDance = featuredDances.find(
     (dance) => dance.id === 'Home Animation (dev)'
@@ -69,9 +72,8 @@
   <div class="wrapper">
     <LifetimeStats></LifetimeStats>
 
-    <!-- TODO lesson for user picked coach -->
     <div class="section-end-button">
-      <a href="./coach/chorok">
+      <a href="./coach/{localState.selectedCoach}">
         <button>
           {$t('home.continue-learning-button')}
         </button>
