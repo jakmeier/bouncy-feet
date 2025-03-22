@@ -298,7 +298,8 @@
         "skill": "Skill"
     },
     "coach": {
-        "select-coach-button": "Select this coach"
+        "select-coach-button": "Select this coach",
+        "courses-title": "Learn something new"
     },
     "music": {
         "by": "by"

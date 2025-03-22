@@ -298,7 +298,8 @@
         "skill": "Fertigkeit"
     },
     "coach": {
-        "select-coach-button": "Wähle diesen Coach"
+        "select-coach-button": "Wähle diesen Coach",
+        "courses-title": "Lern was Neues"
     },
     "music": {
         "by": "von"

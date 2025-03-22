@@ -11,6 +11,8 @@
   import AvatarStyleContext from '$lib/components/avatar/AvatarStyleContext.svelte';
   import TrackerPreview from '$lib/components/avatar/TrackerPreview.svelte';
   import { goto } from '$app/navigation';
+  import { coachLocale, t } from '$lib/i18n';
+  import { locale } from '$lib/i18n';
 
   const coachId = page.params.coach;
   const { getCourse } = getContext('courses');
@@ -37,22 +39,22 @@
   function onBack() {
     goto('/', { replaceState: true });
   }
+
+  const title = coachId.charAt(0).toUpperCase() + coachId.slice(1);
 </script>
 
 <LightBackground />
 
-<LogoHeader title={coachId} backButton white {onBack} />
+<LogoHeader {title} backButton white {onBack} />
 
 <AvatarStyleContext
   coloring={coach.style.coloring}
   bodyShape={coach.style.bodyShape}
   headStyle={coach.style.headStyle}
 >
-  <!-- TODO: translated texts -->
-  <h3>Master of heel-toe movements</h3>
-  <!-- <h3>Ready for a training session with me?</h3> -->
+  <h3>{coach.title[coachLocale($locale)]}</h3>
   {#if step}
-    <AnimatedStep {step} size={150} backgroundColor="transparent"
+    <AnimatedStep {step} size={350} backgroundColor="transparent"
     ></AnimatedStep>
   {/if}
 
@@ -68,10 +70,9 @@
   </div>
 </div> -->
 
-  <!-- TODO: translated texts -->
   <DarkSection>
-    <h2>Learn something new</h2>
-    <h3>I can show you my tricks</h3>
+    <h2>{$t('coach.courses-title')}</h2>
+    <!-- <h3>I can show you my tricks</h3> -->
 
     <div class="ol">
       {#each course.lessons as lesson, index}
@@ -83,7 +84,7 @@
                   <div class="preview">
                     <TrackerPreview
                       tracker={course.tracker(index)}
-                      size={175}
+                      size={150}
                       backgroundColor="transparent"
                     ></TrackerPreview>
                   </div>
@@ -110,9 +111,10 @@
   }
   .lesson-outer {
     padding: 0.5rem;
-    max-width: 400px;
+    max-width: min(300px, 68vw);
     font-size: var(--font-large);
     margin: 0.5rem;
+    word-wrap: break-word;
   }
   .preview {
     margin: 0 0.5rem;

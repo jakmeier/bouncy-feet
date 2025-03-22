@@ -4,7 +4,7 @@
   import AvatarStyleContext from '$lib/components/avatar/AvatarStyleContext.svelte';
   import AnimatedStep from '$lib/components/AnimatedStep.svelte';
   import StandardPage from '$lib/components/ui/StandardPage.svelte';
-  import { locale, t } from '$lib/i18n';
+  import { coachLocale, locale, t } from '$lib/i18n';
   import { goto } from '$app/navigation';
   import TrackerPreview from '$lib/components/avatar/TrackerPreview.svelte';
 
@@ -46,12 +46,12 @@
           ></TrackerPreview>
         </AvatarStyleContext>
       </div>
-      <div class="title">{coach.title[$locale.substring(0, 2)]}</div>
+      <div class="title">{coach.title[coachLocale($locale)]}</div>
       <div class="name" style="color: {coach.style.coloring.headColor}">
         {coach.name}
       </div>
       <div class="description">
-        {coach.description[$locale.substring(0, 2)]}
+        {coach.description[coachLocale($locale)]}
       </div>
       {#if selected === coach.name}{/if}
       <button onclick={() => selectCoach(coach)}>

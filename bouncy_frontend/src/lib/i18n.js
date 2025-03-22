@@ -52,3 +52,18 @@ function selectDateLocale(locale) {
             return enGB;
     }
 }
+
+/** 
+ * @param {string} locale full locale of the user
+ * @returns {('en'|'de')} 2-character locale for which coach text translations are available 
+*/
+export function coachLocale(locale) {
+    const prefix = locale.substring(0, 2);
+    if (coachLocales.includes(prefix)) {
+
+        return prefix;
+    }
+    return coachLocales[0];
+
+}
+const coachLocales = ["en", "de"];
