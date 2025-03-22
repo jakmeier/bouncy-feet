@@ -73,7 +73,7 @@ impl Default for DanceDetector {
     fn default() -> Self {
         Self {
             bpm: 120.0,
-            error_threshold: 0.05,
+            error_threshold: 0.075,
             detected: DetectionResult::default(),
             beat_alignment: None,
             beat_zero: None,
@@ -153,7 +153,7 @@ impl DanceDetector {
                         };
                         let resting_pose = &db.poses()[resting_pose_idx];
                         let error_details = resting_pose.skeleton_error(skeleton);
-                        if error_details.error_score() < 0.05 {
+                        if error_details.error_score() < 0.075 {
                             self.transition_to_state(DetectionState::CountDown, now);
                         }
                     }
@@ -236,8 +236,9 @@ impl DanceDetector {
 
         // check we are on beat, if aligned to beat
         let time_delta = self.subbeat_time();
-        let first_beat =
-            self.next_subbeat_timestamp(self.detection_state_start + (time_delta / 2.0));
+        // let first_beat =
+        //     self.next_subbeat_timestamp(self.detection_state_start + (time_delta / 2.0));
+        let first_beat = self.next_subbeat_timestamp(self.detection_state_start);
         let next_subbeat = self.recorded_subbeats();
 
         let expected_next_pose_t =
@@ -411,7 +412,8 @@ impl DanceDetector {
     /// considered on beat
     pub(crate) fn beat_tolerance(&self) -> f64 {
         // TODO: vary this by current pace
-        self.subbeat_time() * 0.8
+        // (This is somewhat high to make it easier to get good scores)
+        self.subbeat_time() * 1.5
     }
 
     pub(crate) fn recorded_subbeats(&self) -> u32 {

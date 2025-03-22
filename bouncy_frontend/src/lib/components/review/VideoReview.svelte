@@ -123,7 +123,7 @@
     }
     selectTimestamp(pose.timestamp);
     // TODO: deduplicate threshold definition
-    const threshold = 0.05;
+    const threshold = 0.075;
     if (pose.error >= threshold) {
       limbErrors = pose
         .worstLimbs(6)

@@ -259,7 +259,10 @@ it does not match
     /** @type {{ landmarks: import('@mediapipe/tasks-vision').Landmark[][]; }} */ result,
     /** @type {number} */ timestamp
   ) => {
-    if (recordingStart === 0) {
+    if (
+      recordingStart === 0 &&
+      $detectionState === DetectionState.LiveTracking
+    ) {
       recordingStart = timestamp;
     }
     recordMediaPipeDelay(performance.now() - timestamp);
