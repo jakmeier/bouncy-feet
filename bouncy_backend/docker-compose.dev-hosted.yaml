@@ -1,6 +1,6 @@
 version: "3.6"
 services:
-  bouncy_stats_dev:
+  bouncy_backend_dev:
     image: jakmeier/bouncy-feet:dev-api
     environment:
       CLIENT_URL: https://dev.bouncy-feet.ch
@@ -13,6 +13,25 @@ services:
     ports:
       - 3003:3000
     restart: always
+    networks:
+      - local_dev_network
+  postgres:
+    image: postgres:17.2
+    volumes:
+      - dev-pgdata:/var/lib/postgresql/dev-data
+    environment:
+      POSTGRES_DB: bouncyfeet
+      POSTGRES_USER: XXXX
+      POSTGRES_PASSWORD: XXXX
+    ports:
+      - 65432:5432
+    networks:
+      - local_dev_network
+    restart: always
 volumes:
-    dev-data:
-        external: false
+  dev-data:
+    external: false
+  dev-pgdata:
+networks:
+  local_dev_network:
+    driver: bridge

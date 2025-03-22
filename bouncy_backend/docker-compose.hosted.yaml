@@ -13,6 +13,25 @@ services:
     ports:
       - 3002:3000
     restart: always
+    networks:
+      - local_network
+  postgres:
+    image: postgres:17.2
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: bouncyfeet
+      POSTGRES_USER: XXXX
+      POSTGRES_PASSWORD: XXXX
+    ports:
+      - 65432:5432
+    networks:
+      - local_network
+    restart: always
 volumes:
-    data:
-        external: false
+  data:
+      external: false
+  pgdata:
+networks:
+  local_network:
+    driver: bridge
