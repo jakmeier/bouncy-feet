@@ -101,6 +101,7 @@
 
   export async function endRecording() {
     if (recorder) {
+      // Create promise to wait for the stop event to resolve
       let stopped = new Promise((resolve, reject) => {
         if (recorder) {
           recorder.onstop = resolve;
@@ -110,9 +111,18 @@
         }
       });
       recorder.stop();
+
       await stopped.catch((e) => console.log(`stopping recorder error: ${e}`));
 
+      // Safari likes to get here before data was sent, even when awaiting the stop event.
+      // Not sure what the best way is to make it work but this is one way of doing it.
+      let attempts = 100;
+      while (attempts-- && recordedBlobs.length === 0) {
+        await new Promise((resolve) => setTimeout(resolve, 20));
+      }
+
       if (recordedBlobs.length === 0) {
+        console.warn('failed recording with mime type', videoMimeType);
         return null;
       }
 
