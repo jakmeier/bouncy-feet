@@ -216,8 +216,14 @@ once per 250ms. -->
         <video
           onclick={togglePlay}
           onloadeddata={() => {
-            videoLoaded = true;
-            onSeek();
+            const isPlayable =
+              reviewVideoElement.readyState >=
+                reviewVideoElement.HAVE_FUTURE_DATA &&
+              !reviewVideoElement.error;
+            if (isPlayable) {
+              videoLoaded = true;
+              onSeek();
+            }
           }}
           bind:this={reviewVideoElement}
           bind:videoWidth={videoSrcWidth}
