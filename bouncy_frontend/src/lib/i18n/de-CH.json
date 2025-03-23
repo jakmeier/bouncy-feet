@@ -185,6 +185,7 @@
         "description": "Bring deine eigene Musik und filme dich beim Tanzen.",
         "description1": "Das Video wird lokal auf deinem Gerät ausgewertet. Das Video verlässt dein Gerät nicht.",
         "camera-not-supported": "Leider kann dein Browser keine Videos aufnehmen.",
+        "no-video": "Kein Video aufgezeichnet.",
         "nav": "Aufnehmen",
         "back-button": "Zurück",
         "start-button": "Starten",

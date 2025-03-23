@@ -185,6 +185,7 @@
         "description": "Bring your own music and then record yourself while dancing.",
         "description1": "The video is evaluated locally on your device. It never leaves your device.",
         "camera-not-supported": "Oops, your browser cant record videos.",
+        "no-video": "No video recorded.",
         "nav": "Record",
         "back-button": "Go back",
         "start-button": "start",

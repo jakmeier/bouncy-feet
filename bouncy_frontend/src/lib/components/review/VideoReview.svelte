@@ -68,7 +68,9 @@
   });
 
   let cameraNotSupported = $derived(
-    (!videoLoaded || reviewVideoElement?.duration === 0) &&
+    (reviewVideoSrc === '' ||
+      !videoLoaded ||
+      reviewVideoElement?.duration === 0) &&
       selectMediaMimeType() === null
   );
 
@@ -210,11 +212,13 @@ once per 250ms. -->
   <div class="upper">
     <div class="corner-marked2">
       <div class="video-wrapper corner-marked">
-        {#if cameraNotSupported}
-          <p class="error">
+        <p class="error">
+          {#if cameraNotSupported}
             {$t('record.camera-not-supported')}
-          </p>
-        {/if}
+          {:else if reviewVideoSrc === ''}
+            {$t('record.no-video')}
+          {/if}
+        </p>
 
         <!-- svelte-ignore a11y_media_has_caption -->
         <video
