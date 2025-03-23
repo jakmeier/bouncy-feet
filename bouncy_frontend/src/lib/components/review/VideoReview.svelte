@@ -38,7 +38,6 @@
   let videoSrcHeight = $state(0);
   let videoLoaded = $state(false);
   let displayVideoOverlay = $state(true);
-  let cameraNotSupported = $derived(!videoLoaded && !selectMediaMimeType());
 
   let firstPoseTime = $derived(
     detectedSteps.length > 0 ? detectedSteps[0].start : 0
@@ -67,6 +66,11 @@
       markedSegments = limbErrors.map((limb) => limb.render(keypointSkeleton));
     }
   });
+
+  let cameraNotSupported = $derived(
+    (!videoLoaded || reviewVideoElement?.duration === 0) &&
+      selectMediaMimeType() === null
+  );
 
   const numSubbeats = $derived(tracker.trackedSubbeats);
 
