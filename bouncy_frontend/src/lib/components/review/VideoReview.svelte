@@ -212,13 +212,15 @@ once per 250ms. -->
   <div class="upper">
     <div class="corner-marked2">
       <div class="video-wrapper corner-marked">
-        <p class="error">
-          {#if cameraNotSupported}
+        {#if cameraNotSupported}
+          <p class="error">
             {$t('record.camera-not-supported')}
-          {:else if reviewVideoSrc === ''}
+          </p>
+        {:else if reviewVideoSrc === ''}
+          <p class="error">
             {$t('record.no-video')}
-          {/if}
-        </p>
+          </p>
+        {/if}
 
         <!-- svelte-ignore a11y_media_has_caption -->
         <video
