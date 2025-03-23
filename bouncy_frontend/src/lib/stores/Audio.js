@@ -94,7 +94,9 @@ export function playAudio(id) {
 */
 export function scheduleAudioOnChannel(id, timestamp, channel) {
   const delay = (timestamp - performance.now()) / 1000.0;
-  const start = audioContext.currentTime + delay - audioContext.outputLatency;
+  // outputLatency is not supported in all browsers
+  const outputLatency = audioContext.outputLatency || 0;
+  const start = audioContext.currentTime + delay - outputLatency;
   return scheduleAudioEx(id, start, channel);
 }
 
@@ -113,7 +115,7 @@ export function scheduleAudioEx(id, audioTime, channel) {
   const source = getAudio(id);
   if (source) {
     source.connect(channels[channel]);
-    source.start(Math.max(0, audioTime));
+    source.start(Math.max(audioContext.currentTime, audioTime));
   } else {
     console.warn("no sound buffer for", id);
   }
