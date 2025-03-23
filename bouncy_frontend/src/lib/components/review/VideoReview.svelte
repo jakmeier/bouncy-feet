@@ -38,7 +38,7 @@
   let videoSrcHeight = $state(0);
   let videoLoaded = $state(false);
   let displayVideoOverlay = $state(true);
-  let cameraNotSupported = reviewVideoSrc === '' && !selectMediaMimeType();
+  let cameraNotSupported = $derived(!videoLoaded && !selectMediaMimeType());
 
   let firstPoseTime = $derived(
     detectedSteps.length > 0 ? detectedSteps[0].start : 0
