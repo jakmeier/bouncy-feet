@@ -296,6 +296,7 @@
     };
 
     try {
+      // not awaiting here, it can happen in the background
       submitActivityCall(limitedId, sessionResult);
     } catch (err) {
       console.warn('Submitting activity stats failed', err);

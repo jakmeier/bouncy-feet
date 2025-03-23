@@ -16,6 +16,7 @@
   import Toggle from '../ui/Toggle.svelte';
   import { t } from '$lib/i18n';
   import LightSection from '../ui/sections/LightSection.svelte';
+  import { selectMediaMimeType } from '$lib/media';
 
   /**
    * @typedef {Object} Props
@@ -37,6 +38,7 @@
   let videoSrcHeight = $state(0);
   let videoLoaded = $state(false);
   let displayVideoOverlay = $state(true);
+  let cameraNotSupported = reviewVideoSrc === '' && !selectMediaMimeType();
 
   let firstPoseTime = $derived(
     detectedSteps.length > 0 ? detectedSteps[0].start : 0
@@ -204,6 +206,12 @@ once per 250ms. -->
   <div class="upper">
     <div class="corner-marked2">
       <div class="video-wrapper corner-marked">
+        {#if cameraNotSupported}
+          <p class="error">
+            {$t('record.camera-not-supported')}
+          </p>
+        {/if}
+
         <!-- svelte-ignore a11y_media_has_caption -->
         <video
           onclick={togglePlay}
@@ -348,5 +356,11 @@ once per 250ms. -->
     flex-wrap: wrap;
     margin: 1rem;
     gap: 1rem;
+  }
+
+  .error {
+    /* background-color: var(--theme-neutral-black); */
+    padding: 1rem;
+    color: var(--theme-accent);
   }
 </style>

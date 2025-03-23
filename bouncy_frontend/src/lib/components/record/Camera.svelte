@@ -2,8 +2,7 @@
 <script>
   import { onDestroy } from 'svelte';
   import { waitForVideoMetaLoaded } from '$lib/promise_util';
-  import Symbol from '../ui/Symbol.svelte';
-  import { base } from '$app/paths';
+  import { selectMediaMimeType } from '$lib/media';
 
   /**
    * @typedef {Object} Props
@@ -28,6 +27,7 @@
    * @type {BlobPart[]}
    */
   let recordedBlobs = [];
+  let videoMimeType = selectMediaMimeType();
 
   export async function startCamera() {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -62,10 +62,29 @@
   }
 
   export function startRecording() {
-    recorder = new MediaRecorder(stream);
+    if (videoMimeType) {
+      try {
+        recorder = new MediaRecorder(stream, { mimeType: videoMimeType });
+      } catch (err) {
+        console.warn(
+          'Failed to create MediaRecorder with mimeType',
+          videoMimeType,
+          err
+        );
+      }
+    }
+
+    if (!recorder) {
+      // fallback: probably it wont't work to record but we can try anyway,
+      // letting the browser use whatever codec it wants.
+      recorder = new MediaRecorder(stream);
+    }
+
     recordedBlobs = [];
     recorder.ondataavailable = (event) => {
-      recordedBlobs.push(event.data);
+      if (event.data && event.data.size > 0) {
+        recordedBlobs.push(event.data);
+      }
     };
     recorder.onerror = (e) => console.log(`recorder error: ${e}`);
     recorder.start();
@@ -93,7 +112,15 @@
       recorder.stop();
       await stopped.catch((e) => console.log(`stopping recorder error: ${e}`));
 
-      return new Blob(recordedBlobs, { type: 'video/webm' });
+      if (recordedBlobs.length === 0) {
+        return null;
+      }
+
+      if (videoMimeType) {
+        return new Blob(recordedBlobs, { type: videoMimeType });
+      } else {
+        return new Blob(recordedBlobs);
+      }
     }
   }
 
@@ -123,11 +150,5 @@
     min-height: 100dvh;
     transform: translate(-50%, -50%);
     transition: opacity 0.5s ease-in-out;
-  }
-
-  .symbol {
-    max-width: 500px;
-    min-width: 10rem;
-    padding: 5rem;
   }
 </style>

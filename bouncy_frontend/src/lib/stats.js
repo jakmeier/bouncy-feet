@@ -73,27 +73,33 @@ export async function fetchLeaderboard() {
 /**
  * @param {string} endpoint
  * @param {object} options
- * @returns {Promise<Response>}
+ * @returns {Promise<Response|null>}
  */
 export async function apiRequest(endpoint, options = {}) {
-    const response = await fetch(`${STATS_API_BASE}${endpoint}`, {
-        ...options,
-        credentials: 'include', // Include cookies in the request
-    });
+    try {
 
-    // TODO: add this back in when users are properly implemented
-    // if (response.status === 401 || response.headers.get('WWW-Authenticate')) {
-    //     // If unauthorized, redirect to the login endpoint on the api server
-    //     window.location.href = loginUrl;
-    //     return response;
-    // }
+        const response = await fetch(`${STATS_API_BASE}${endpoint}`, {
+            ...options,
+            credentials: 'include', // Include cookies in the request
+        });
 
-    if (!response.ok) {
-        const body = await response.text();
-        throw new Error(`API request failed with status ${response.status} ${body}`);
+        // TODO: add this back in when users are properly implemented
+        // if (response.status === 401 || response.headers.get('WWW-Authenticate')) {
+        //     // If unauthorized, redirect to the login endpoint on the api server
+        //     window.location.href = loginUrl;
+        //     return response;
+        // }
+
+        if (!response.ok) {
+            const body = await response.text();
+            throw new Error(`failed with status ${response.status} ${body}`);
+        }
+        return response;
+    } catch (err) {
+        console.error('apiRequest failed:', err);
+        return null;
     }
 
-    return response;
 }
 
 // This code is not UI or in any way browser API related, so it shouldn't really

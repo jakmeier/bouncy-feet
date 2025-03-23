@@ -66,13 +66,14 @@
    */
   async function onRecordingStopped(videoBlob, recordingStart, recordingEnd) {
     tracker?.finishTracking();
+    if (videoUrl) {
+      URL.revokeObjectURL(videoUrl);
+    }
     if (videoBlob) {
-      if (videoUrl) {
-        URL.revokeObjectURL(videoUrl);
-      }
       videoUrl = URL.createObjectURL(videoBlob);
     } else {
       console.warn('ended recording and did not get video blob', videoBlob);
+      videoUrl = '';
     }
 
     detectionResult = tracker?.lastDetection;
