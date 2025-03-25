@@ -102,8 +102,7 @@ impl DanceDetector {
         let mut teacher = Teacher::default();
 
         if let Some(step) = target_step {
-            let subbeats = tracked_beats.unwrap_or_else(|| step.num_poses() as u32);
-            teacher.add_step(step, subbeats, StepPace::half_speed());
+            teacher.add_step(step, 1, StepPace::half_speed());
         } else {
             let beats = tracked_beats.unwrap_or(64);
             teacher.add_freestyle(beats);

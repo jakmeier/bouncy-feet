@@ -1,3 +1,4 @@
+use super::body_shift::BodyShift;
 use super::step_pace::StepPace;
 use crate::skeleton::Cartesian2d;
 use crate::tracker::{DanceCursor, TeacherView};
@@ -9,6 +10,7 @@ use crate::StepInfo;
 pub(crate) struct Teacher {
     sections: Vec<Section>,
     total_subbeats: u32,
+    body_shift: BodyShift,
     // TODO: audio hints by the teacher
 }
 
@@ -32,8 +34,13 @@ struct StepSection {
 
 impl Teacher {
     /// A step to dance by the student.
-    pub(crate) fn add_step(&mut self, step: StepInfo, beats: u32, pace: StepPace) {
+    pub(crate) fn add_step(&mut self, step: StepInfo, repeat: u32, pace: StepPace) {
+        let beats = repeat * step.num_poses() as u32 * pace.subbeats_per_pose() / 2;
+
         assert_ne!(beats, 0);
+        for _ in 0..repeat {
+            self.body_shift.add(step.body_shift.clone());
+        }
         self.sections.push(Section::Step(StepSection {
             step,
             subbeats: beats * 2,
@@ -103,15 +110,8 @@ impl Teacher {
     }
 
     pub(crate) fn pose_duration(&self, cursor: &DanceCursor) -> Option<u32> {
-        self.section(cursor).and_then(|section| match &section {
-            Section::Step(step_section)
-            | Section::ShowStep(step_section)
-            | Section::Warmup(step_section) => {
-                let StepSection { pace, .. } = step_section;
-                Some(pace.subbeats_per_pose())
-            }
-            Section::Freestyle { .. } => None,
-        })
+        self.section(cursor)
+            .and_then(|section| section.pose_duration())
     }
 
     pub(crate) fn cursor_at_subbeat(&self, subbeat: u32) -> DanceCursor {
@@ -175,17 +175,25 @@ impl Teacher {
     }
 
     /// How far the body position has moved from the origin at a specific beat.
-    pub(crate) fn pose_body_shift_at_subbeat(&self, mut subbeat: u32) -> Cartesian2d {
-        let mut shift = Cartesian2d::default();
-        for section in &self.sections {
-            let subbeats_on_step = u32::min(section.subbeats() - 1, subbeat);
-            shift = shift + section.body_shift(subbeats_on_step);
-            if subbeat < section.subbeats() {
-                break;
-            }
-            subbeat -= section.subbeats();
+    pub(crate) fn pose_body_shift_at_subbeat(&self, subbeat: u32) -> Cartesian2d {
+        let pose = self.pose_nr_subbeat(subbeat);
+        self.body_shift.after_pose(pose)
+    }
+
+    /// How many poses were done after a number of subbeats
+    pub(crate) fn pose_nr_subbeat(&self, mut subbeat: u32) -> usize {
+        let mut poses = 0;
+        let cursor = self.cursor_at_subbeat(subbeat);
+        for section in &self.sections[0..cursor.section_index] {
+            let section_duration = section.subbeats();
+            poses += section_duration / section.pose_duration().unwrap_or(1);
+            subbeat -= section_duration;
         }
-        shift
+
+        if let Some(section) = self.section(&cursor) {
+            poses += subbeat / section.pose_duration().unwrap_or(1);
+        }
+        poses as usize
     }
 
     /// Whether at the given subbeat, the student should be tracked.
@@ -255,16 +263,15 @@ impl Section {
         self.subbeats().div_ceil(per_step)
     }
 
-    fn body_shift(&self, subbeat: u32) -> Cartesian2d {
-        match self {
+    fn pose_duration(&self) -> Option<u32> {
+        match &self {
             Section::Step(step_section)
             | Section::ShowStep(step_section)
             | Section::Warmup(step_section) => {
-                let StepSection { step, pace, .. } = step_section;
-                let pose = pace.pose_at_subbeat(subbeat);
-                step.body_shift(pose as usize)
+                let StepSection { pace, .. } = step_section;
+                Some(pace.subbeats_per_pose())
             }
-            Section::Freestyle { .. } => Cartesian2d::default(),
+            Section::Freestyle { .. } => None,
         }
     }
 }

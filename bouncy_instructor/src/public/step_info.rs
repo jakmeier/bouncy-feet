@@ -18,7 +18,7 @@ pub struct StepInfo {
     step_variation: Option<String>,
     pub(crate) skeletons: Vec<Skeleton>,
     pub(crate) jump_heights: Vec<Option<f32>>,
-    body_shift: BodyShift,
+    pub(crate) body_shift: BodyShift,
 }
 
 impl StepInfo {

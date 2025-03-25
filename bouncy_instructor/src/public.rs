@@ -16,6 +16,7 @@ use crate::intern::step::StepSource;
 pub use crate::public::course::Course;
 pub use dance_info::DanceInfo;
 pub use keypoints::{Keypoints, Side as KeypointsSide};
+pub use skeleton::Cartesian2d;
 pub use step_info::StepInfo;
 pub use tracker::{DetectionFailureReason, DetectionResult, PoseHint, Tracker};
 pub use ui_event::{AudioEffect, TextEffect};

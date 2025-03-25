@@ -98,12 +98,12 @@ impl Course {
         let mut teacher = Teacher::default();
         for step in steps {
             // WIP: hard coding this for testing
-            teacher.show_step(step.info(&db), 4, StepPace::quarter_speed());
-            teacher.add_step(step.info(&db), 8, StepPace::quarter_speed());
-            teacher.show_step(step.info(&db), 4, StepPace::half_speed());
-            teacher.add_step(step.info(&db), 8, StepPace::half_speed());
-            teacher.show_step(step.info(&db), 4, StepPace::normal());
-            teacher.add_step(step.info(&db), 8, StepPace::normal());
+            teacher.show_step(step.info(&db), 2, StepPace::quarter_speed());
+            teacher.add_step(step.info(&db), 4, StepPace::quarter_speed());
+            teacher.show_step(step.info(&db), 2, StepPace::half_speed());
+            teacher.add_step(step.info(&db), 4, StepPace::half_speed());
+            teacher.show_step(step.info(&db), 2, StepPace::normal());
+            teacher.add_step(step.info(&db), 4, StepPace::normal());
         }
 
         Tracker::new_from_teacher(db, teacher)
@@ -140,11 +140,9 @@ impl Lesson {
 
         for part in &self.parts {
             let step = &part.step_wrapper;
-            let step_info = step.info(&db);
             let pace = part.pace;
-            let beats = part.repeat * step_info.num_poses() as u32 * pace.subbeats_per_pose() / 2;
 
-            teacher.add_step(step.info(&db), beats, pace);
+            teacher.add_step(step.info(&db), part.repeat, pace);
         }
 
         Tracker::new_from_teacher(db, teacher)
