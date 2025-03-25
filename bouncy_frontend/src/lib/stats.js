@@ -85,7 +85,7 @@ export async function apiRequest(endpoint, options = {}) {
 
         // <Temporary code>
         // Some client sessions have been lost. They need to be replaced.
-        if (response.status === 401 || errResponse.status == 403) {
+        if (response.status === 401 || response.status == 403) {
             throw response;
         }
 
