@@ -135,24 +135,7 @@ impl ClientSessionId {
                     "Guest session authentication failed (invalid secret)"
                 );
 
-                let Ok(session_exists) = sqlx::query_scalar!(
-                    "SELECT EXISTS(SELECT 1 FROM client_session WHERE id = $1 OR client_session_secret = $2)",
-                    client_session_id,
-                    secret
-                ).fetch_one(db_pool)
-                .await else {
-                    error!(
-                        client_session_id,
-                        "Database error during guest session lookup"
-                    );
-                    return None;
-                };
-
-                if !session_exists.unwrap_or(true) {
-                    create_client_session_from_external(db_pool, client_session_id, secret).await
-                } else {
-                    None
-                }
+                None
             }
             Ok(None) => {
                 error!(client_session_id, "Database returned None for some reason");
@@ -166,38 +149,6 @@ impl ClientSessionId {
                 );
                 None
             }
-        }
-    }
-}
-
-/// Allows creating a client session that has been created by offline clients,
-/// or previous versions where I lost the data.
-async fn create_client_session_from_external(
-    db_pool: &sqlx::Pool<sqlx::Postgres>,
-    client_session_id: i64,
-    secret: &Uuid,
-) -> Option<ClientSessionId> {
-    match sqlx::query!(
-        "INSERT INTO client_session (id, client_session_secret) 
-                                         VALUES ($1, $2) 
-                                         ON CONFLICT (id) DO NOTHING RETURNING id",
-        client_session_id,
-        secret
-    )
-    .fetch_optional(db_pool)
-    .await
-    {
-        Ok(Some(_)) => Some(ClientSessionId(client_session_id)),
-        Ok(None) => {
-            error!(
-                client_session_id,
-                "Failed to create new guest session (conflict or other issue)"
-            );
-            None
-        }
-        Err(e) => {
-            error!(client_session_id, error = %e, "Database error during guest session creation");
-            None
         }
     }
 }

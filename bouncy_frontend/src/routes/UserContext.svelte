@@ -107,6 +107,62 @@
   }
 
   /**
+   * @param {string} method
+   * @param {string} path
+   * @param {object} headers
+   * @param {string} body
+   */
+  async function authenticatedApiRequest(method, path, headers, body) {
+    let auth = authHeader();
+    const options = {
+      method,
+      headers: {
+        ...headers,
+        ...auth,
+      },
+      body,
+    };
+
+    try {
+      return await apiRequest(path, options);
+    } catch (errResponse) {
+      if (errResponse && errResponse.status === 401 || errResponse.status == 403) {
+        // <Temporary code>
+        // Some client sessions have been lost. They need to be replaced.
+
+        // try to get a new session
+        const newSession = await requestNewGuestSession();
+
+        // replace local session id and secret but keep other fields
+        console.warn('replacing old session with a new');
+        localStorage.clientSessionId = newSession.client_session_id;
+        localStorage.clientSessionSecret = newSession.client_session_secret;
+        clientSession.id = newSession.client_session_id;
+        clientSession.secret = newSession.client_session_secret;
+
+        // now update the server about our local state
+        for (const [key, value] of Object.entries(clientSession.meta)) {
+          if (typeof key === 'string' && typeof value === 'string') {
+            setUserMeta(key, value);
+          }
+        }
+
+        // now we can try to make the unauthorized request again, with new auth headers
+        let auth = authHeader();
+        const options = {
+          method,
+          headers: {
+            ...headers,
+            ...auth,
+          },
+          body,
+        };
+        return await apiRequest(path, options);
+      }
+    }
+  }
+
+  /**
    * @param {string} key
    * @param {string} value
    */
@@ -121,25 +177,24 @@
       // @ts-ignore
       clientSession.meta[key] = value;
 
-      // sync changes to API backend
-      let auth = authHeader();
-      const options = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...auth,
-        },
-        body: JSON.stringify({
-          key_name: key,
-          key_value: value,
-          // chrono can parse the time including the timezone from this
-          last_modified: new Date().toISOString(),
-          // the only existing version for now
-          version: 0,
-        }),
+      const headers = {
+        'Content-Type': 'application/json',
       };
+      const body = JSON.stringify({
+        key_name: key,
+        key_value: value,
+        // chrono can parse the time including the timezone from this
+        last_modified: new Date().toISOString(),
+        // the only existing version for now
+        version: 0,
+      });
 
-      return await apiRequest('/user/meta/update', options);
+      return await authenticatedApiRequest(
+        'POST',
+        '/user/meta/update',
+        headers,
+        body
+      );
     }
   }
 
@@ -148,26 +203,26 @@
    * @param {DanceSessionResult} sessionResult
    */
   async function submitActivityCall(activityId, sessionResult) {
-    let auth = authHeader();
-    const options = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...auth,
-      },
-      body: JSON.stringify({
-        client_session_id: Number.parseInt(clientSession.id),
-        client_session_secret: clientSession.secret,
-
-        activity_id: activityId,
-        recorded_at: sessionResult.timestamp.toISOString(),
-        hits: sessionResult.hits,
-        misses: sessionResult.misses,
-        steps: sessionResult.numSteps,
-      }),
+    const headers = {
+      'Content-Type': 'application/json',
     };
+    const body = JSON.stringify({
+      client_session_id: Number.parseInt(clientSession.id),
+      client_session_secret: clientSession.secret,
 
-    return await apiRequest('/new_guest_activity', options);
+      activity_id: activityId,
+      recorded_at: sessionResult.timestamp.toISOString(),
+      hits: sessionResult.hits,
+      misses: sessionResult.misses,
+      steps: sessionResult.numSteps,
+    });
+
+    return await authenticatedApiRequest(
+      'POST',
+      '/new_guest_activity',
+      headers,
+      body
+    );
   }
 
   /**

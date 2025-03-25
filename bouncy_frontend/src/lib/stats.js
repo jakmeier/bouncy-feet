@@ -83,6 +83,12 @@ export async function apiRequest(endpoint, options = {}) {
             credentials: 'include', // Include cookies in the request
         });
 
+        // <Temporary code>
+        // Some client sessions have been lost. They need to be replaced.
+        if (response.status === 401 || errResponse.status == 403) {
+            throw response;
+        }
+
         // TODO: add this back in when users are properly implemented
         // if (response.status === 401 || response.headers.get('WWW-Authenticate')) {
         //     // If unauthorized, redirect to the login endpoint on the api server
@@ -96,6 +102,13 @@ export async function apiRequest(endpoint, options = {}) {
         }
         return response;
     } catch (err) {
+        // <Temporary code>
+        // Some client sessions have been lost. They need to be replaced.
+
+        if (err && err.status === 401) {
+            throw err;
+        }
+
         console.error('apiRequest failed:', err);
         return null;
     }
