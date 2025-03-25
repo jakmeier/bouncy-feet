@@ -33,6 +33,7 @@
     PoseHint,
   } from '$lib/instructor/bouncy_instructor_bg';
   import { fade } from 'svelte/transition';
+  import WakeLock from '../WakeLock.svelte';
 
   /**
    * @typedef {Object} Props
@@ -203,6 +204,8 @@
     }
   }
 </script>
+
+<WakeLock />
 
 <FullScreenArea backgroundColor="var(--theme-neutral-black)">
   <div class="camera" bind:clientWidth={outerWidth}>
