@@ -8,9 +8,7 @@ services:
       OIDC_ISSUER: https://auth.bouncy-feet.ch/realms/bouncyfeet-dev
       OIDC_CLIENT_SECRET: XXXX
       OIDC_CLIENT_ID: bouncy-dev-backend
-      DATABASE_URL: "postgres://USER:PW@postgres/bouncyfeet"
-    volumes:
-      - dev-data:/app/db.sqlite
+      DATABASE_URL: "postgres://USER:PW@postgres/bouncyfeet-dev"
     ports:
       - 3003:3000
     restart: always
@@ -19,9 +17,9 @@ services:
   postgres:
     image: postgres:17.2
     volumes:
-      - dev-pgdata:/var/lib/postgresql/dev-data
+      - dev-pgdata:/var/lib/postgresql/data
     environment:
-      POSTGRES_DB: bouncyfeet
+      POSTGRES_DB: bouncyfeet-dev
       POSTGRES_USER: XXXX
       POSTGRES_PASSWORD: XXXX
     ports:
@@ -30,8 +28,6 @@ services:
       - local_dev_network
     restart: always
 volumes:
-  dev-data:
-    external: false
   dev-pgdata:
 networks:
   local_dev_network:

@@ -9,8 +9,6 @@ services:
       OIDC_CLIENT_SECRET: XXXX
       OIDC_CLIENT_ID: bouncy-backend
       DATABASE_URL: "postgres://USER:PW@postgres/bouncyfeet"
-    volumes:
-      - data:/app/db.sqlite
     ports:
       - 3002:3000
     restart: always
@@ -19,7 +17,7 @@ services:
   postgres:
     image: postgres:17.2
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - prod-pgdata:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: bouncyfeet
       POSTGRES_USER: XXXX
@@ -30,9 +28,7 @@ services:
       - local_network
     restart: always
 volumes:
-  data:
-      external: false
-  pgdata:
+  prod-pgdata:
 networks:
   local_network:
     driver: bridge
