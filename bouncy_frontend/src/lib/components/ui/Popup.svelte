@@ -8,6 +8,7 @@
    * @property {import("svelte/store").Writable<boolean>} [isOpen]
    * @property {any} [title]
    * @property {boolean} [showOkButton]
+   * @property {function} [onClose]
    * @property {import('svelte').Snippet} [children]
    */
 
@@ -16,11 +17,15 @@
     isOpen = $bindable(writable(false)),
     title = undefined,
     showOkButton = false,
+    onClose,
     children,
   } = $props();
 
   function handleClose() {
     isOpen.set(false);
+    if(onClose) {
+      onClose();
+    }
   }
 
   // Optionally close the popup when clicking outside of it

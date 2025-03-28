@@ -34,6 +34,9 @@
   const defaultState = {
     avatarStyle: defaultAvatarStyle,
     selectedCoach: 'chorok',
+    flags: {
+      seenNoUploadHint: false
+    }
   };
 
   /**
@@ -62,6 +65,9 @@
     if (stored?.selectedCoach) {
       state.selectedCoach = stored?.selectedCoach;
     }
+
+    Object.assign(state.flags, stored?.flags);
+
     return state;
   }
 

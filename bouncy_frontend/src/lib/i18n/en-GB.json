@@ -216,7 +216,7 @@
         "train-hint-title": "Train s Step",
         "train-hint": "Train the selected step while the app checks and counts. We recommend listening to your own music while doing so.",
         "general-hint": "Get ready! Find a spot with enough space to dance and then place the phone such that you can see the screen and the camera can see you.",
-        "no-upload-hint": "Hint: The recording is evaluated on your device and never uploaded or shared with the developers.",
+        "no-upload-hint": "Hint: The recording is evaluated on your device. It is never uploaded. Nobody can see you.",
         "download": "save",
         "bpm-tap-button": "Tap along with your music to match the beat",
         "bpm-fixed-button": "Pick the tempo below.",

@@ -120,6 +120,10 @@
  * @typedef {Object} LocalState
  * @property {AvatarStyleContext} avatarStyle
  * @property {string} selectedCoach
+ * @property {LocalFlags} flags
+ * 
+ * @typedef {Object} LocalFlags
+ * @property {boolean} seenNoUploadHint
  * 
  * @typedef {Object} ClientSession
  * @property {string} id

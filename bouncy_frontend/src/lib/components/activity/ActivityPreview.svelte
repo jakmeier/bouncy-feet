@@ -44,7 +44,11 @@
   const { stopTrack, setTrack, resumeTrack, songTitle, songAuthor } =
     getContext('music');
 
+  /** @type {LocalState}*/
+  const localState = getContext('localState');
+
   let isVideoOpen = $state(writable(false));
+  let showHint = $state(writable(false));
   let fullWidth = $state();
 
   const songList = songs.list();
@@ -56,6 +60,15 @@
       setTrack(track.id);
       resumeTrack();
     }
+  }
+
+  function onStart() {
+    if(!localState.flags.seenNoUploadHint) {
+      localState.flags.seenNoUploadHint = true;
+      $showHint = true;
+      return;
+    }
+    onDone();
   }
 
   onMount(() => {
@@ -89,7 +102,7 @@
 
 <div class="controls">
   <MusicVolumeControl />
-  <button onclick={onDone}>{$t('courses.lesson.start-button')}</button>
+  <button onclick={onStart}>{$t('courses.lesson.start-button')}</button>
 </div>
 
 <DarkSection>
@@ -130,6 +143,14 @@
       <Video path={`${base}${video}`}></Video>
     {/if}
   </div>
+</Popup>
+
+<Popup
+  bind:isOpen={showHint}
+  showOkButton
+  onClose={onDone}
+>
+  <div>{$t('record.no-upload-hint')}</div>
 </Popup>
 
 <style>
