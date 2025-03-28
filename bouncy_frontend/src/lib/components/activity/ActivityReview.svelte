@@ -49,6 +49,9 @@
           {recordingStart}
           {recordingEnd}
         ></VideoReview>
+
+        <div class="hint">{$t('record.no-upload-hint')}</div>
+
       {:else}
         <div class="no-review">
           {$t('record.no-video-for-review')}
@@ -91,5 +94,8 @@
     margin: auto;
     max-width: 3rem;
     max-height: 3rem;
+  }
+  .hint{
+    margin-top: 2rem;
   }
 </style>
