@@ -10,6 +10,7 @@ use tower_http::cors::AllowOrigin;
 pub(crate) mod auth;
 pub(crate) mod client_session;
 pub(crate) mod dance_activity;
+pub(crate) mod stats;
 pub(crate) mod user;
 pub(crate) mod user_meta;
 
@@ -109,7 +110,8 @@ async fn main() -> anyhow::Result<()> {
         .route(
             "/new_guest_session",
             get(client_session::create_guest_session),
-        );
+        )
+        .route("/stats", get(stats::stats));
 
     let authenticated_app = Router::new()
         .route("/user", get(user::user_info))
@@ -118,14 +120,15 @@ async fn main() -> anyhow::Result<()> {
         .route(
             "/new_guest_activity",
             post(client_session::record_guest_activity),
-        );
+        )
+        .layer(auth_service);
 
     // Not used, yet. Only guests possible.
     // .layer(oidc_login_service) // enforces logging in
 
     let app = Router::new()
         .merge(unauthenticated_app)
-        .merge(authenticated_app.layer(auth_service))
+        .merge(authenticated_app)
         // .layer(ServiceBuilder::new().layer(session_layer).layer(cors_layer))
         // .layer(session_layer)
         .layer(cors_layer)
