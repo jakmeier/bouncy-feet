@@ -170,6 +170,7 @@ impl LessonPart {
 }
 
 impl Course {
+    #[allow(clippy::too_many_arguments)]
     pub(crate) fn add_lesson(
         &mut self,
         lesson_name: String,
