@@ -27,8 +27,8 @@
 
   const songList = songs.list();
 
-  // TODO; Decide based on lesson or something
-  const trackId = songList[0].id;
+  const trackId = course.lessons[lessonIndex].song;// || songList[0].id;
+  console.log("trackId", trackId);
 </script>
 
 <ActivityPreview

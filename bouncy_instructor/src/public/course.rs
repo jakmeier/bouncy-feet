@@ -26,6 +26,7 @@ pub struct Lesson {
     pub(crate) name: String,
     pub(crate) explanation: Option<String>,
     pub(crate) video: Option<String>,
+    pub(crate) song: Option<String>,
     pub energy: u8,
     pub difficulty: u8,
     pub(crate) parts: Vec<LessonPart>,
@@ -128,6 +129,11 @@ impl Lesson {
     }
 
     #[wasm_bindgen(getter)]
+    pub fn song(&self) -> Option<String> {
+        self.song.clone()
+    }
+
+    #[wasm_bindgen(getter)]
     pub fn parts(&self) -> Vec<LessonPart> {
         self.parts.clone()
     }
@@ -169,6 +175,7 @@ impl Course {
         lesson_name: String,
         explanation: Option<String>,
         video: Option<String>,
+        song: Option<String>,
         lesson_parts: Vec<parsing::course_file::Part>,
         difficulty: u8,
         energy: u8,
@@ -180,6 +187,7 @@ impl Course {
         let lesson = Lesson {
             explanation,
             video,
+            song,
             name: lesson_name,
             parts,
             difficulty,

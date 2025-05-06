@@ -4,7 +4,7 @@ use bouncy_instructor::Cartesian2d;
 mod common;
 
 // New courses must be added manually here to be checked
-const COURSES: [(&str, &str); 3] = [
+const COURSES: [(&str, &str); 4] = [
     (
         "000-rm-basics",
         include_str!("./data/courses/000-rm-basics.ron"),
@@ -14,6 +14,7 @@ const COURSES: [(&str, &str); 3] = [
         include_str!("./data/courses/002-v-step-basics.ron"),
     ),
     ("003-intro", include_str!("./data/courses/003-intro.ron")),
+    ("004-intro", include_str!("./data/courses/004-rm-speed.ron")),
 ];
 
 #[test]

@@ -23,7 +23,7 @@
    * @property {function} onDone
    * @property {Tracker} tracker
    * @property {string} [video]
-   * @property {string} trackId
+   * @property {string} [trackId]
    * @property {number} difficulty
    * @property {number} energy
    * @property {()=>void} onBack
@@ -36,6 +36,7 @@
     tracker,
     onDone,
     video,
+    trackId,
     difficulty,
     energy,
     onBack,
@@ -63,7 +64,7 @@
   }
 
   function onStart() {
-    if(!localState.flags.seenNoUploadHint) {
+    if (!localState.flags.seenNoUploadHint) {
       localState.flags.seenNoUploadHint = true;
       $showHint = true;
       return;
@@ -72,7 +73,7 @@
   }
 
   onMount(() => {
-    setTrack(songList[0].id);
+    setTrack(trackId || songList[0].id);
     resumeTrack();
   });
   onDestroy(() => {
@@ -145,11 +146,7 @@
   </div>
 </Popup>
 
-<Popup
-  bind:isOpen={showHint}
-  showOkButton
-  onClose={onDone}
->
+<Popup bind:isOpen={showHint} showOkButton onClose={onDone}>
   <div>{$t('record.no-upload-hint')}</div>
 </Popup>
 

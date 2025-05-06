@@ -178,6 +178,54 @@ mod tests {
     )
     "#;
 
+    const COURSE_STR_1: &str = r#"
+    #![enable(implicit_some)]
+    (
+      version: 0,
+      id: "test-meta",
+      names: {"de": "Running Man Anfängerkurs", "en": "Running Man beginner's course"},
+      featured_step: "rm-0",
+      lessons: [
+        (
+          names: {"de": "Micro Bounce", "en": "Micro Bounce"},
+          difficulty: 2,
+          energy: 3,
+          song: "105bpm_tropical_house",
+          video: "https://app.bouncy-feet.ch/media/videos/c3/combo_fast.mp4",
+          parts: [
+            (step: "run-in-place", repeat: 1, subbeats_per_move: 1),
+          ],
+        ),
+      ],
+      poses: [
+        (
+          id: "in-place-right-up",
+          direction: Front,
+          limbs: [
+            (limb: LeftThigh, weight: 1.0, angle: -1, tolerance: 0),
+            (limb: LeftShin, weight: 1.0, angle: 3, tolerance: 0),
+            (limb: LeftFoot, weight: 1.0, angle: -7, tolerance: 0),
+          ],
+          z: (
+            absolute: {(side: Right, part: Knee): -1.0, (side: Left, part: Heel): 1.0},
+          ),
+        ),
+        (id: "in-place-left-up", mirror_of: "in-place-right-up", direction: Front),
+      ],
+      steps: [
+        (
+          name: "Run in place",
+          id: "run-in-place",
+          variation: "left-first",
+          keyframes: [
+            (pose: "in-place-left-up", orientation: ToCamera),
+            (pose: "in-place-right-up", orientation: ToCamera),
+          ],
+        ),
+      ],
+    )
+    "#;
+
     #[test]
     fn test_valid_pose_reference() {
         load_pose_str(POSE_STR).unwrap();
@@ -292,6 +340,7 @@ mod tests {
                         name: "Micro Bounce",
                         explanation: None,
                         video: None,
+                        song: None,
                         energy: 3,
                         difficulty: 2,
                         parts: [
@@ -319,6 +368,51 @@ mod tests {
                     ],
                     dances(len): 0,
                     tracker_view: "DanceCollection { limbs: (10): [\"LeftThigh\", \"LeftShin\", \"LeftFoot\", \"LeftArm\", \"LeftForearm\", \"RightThigh\", \"RightShin\", \"RightFoot\", \"RightArm\", \"RightForearm\"], poses(2): [\"in-place-right-up\", \"in-place-left-up\"], steps(2): [\"Run in place\", \"Another step for testing\"], dances(0): []}",
+                },
+            }
+        "#]]
+        .assert_debug_eq(&en_course);
+    }
+
+    #[test]
+    fn test_basic_course_loading_with_more_meta_data() {
+        let en_course = parse_course_str(COURSE_STR_1, "en").unwrap();
+        expect![[r#"
+            Course {
+                id: "test-meta",
+                name: "Running Man beginner's course",
+                explanation: None,
+                featured_step_id: "rm-0",
+                lessons: [
+                    Lesson {
+                        name: "Micro Bounce",
+                        explanation: None,
+                        video: Some(
+                            "https://app.bouncy-feet.ch/media/videos/c3/combo_fast.mp4",
+                        ),
+                        song: Some(
+                            "105bpm_tropical_house",
+                        ),
+                        energy: 3,
+                        difficulty: 2,
+                        parts: [
+                            LessonPart {
+                                step_name: "run-in-place",
+                                repeat: 1,
+                                pace: StepPace {
+                                    subbeats_per_pose: 1,
+                                },
+                            },
+                        ],
+                    },
+                ],
+                collection: ContentCollection {
+                    poses(len): 2,
+                    steps(len/source): [
+                        "course: 1",
+                    ],
+                    dances(len): 0,
+                    tracker_view: "DanceCollection { limbs: (10): [\"LeftThigh\", \"LeftShin\", \"LeftFoot\", \"LeftArm\", \"LeftForearm\", \"RightThigh\", \"RightShin\", \"RightFoot\", \"RightArm\", \"RightForearm\"], poses(2): [\"in-place-right-up\", \"in-place-left-up\"], steps(1): [\"Run in place\"], dances(0): []}",
                 },
             }
         "#]]

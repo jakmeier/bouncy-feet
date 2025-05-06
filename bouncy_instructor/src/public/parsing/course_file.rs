@@ -30,6 +30,8 @@ pub(crate) struct Lesson {
     explanations: Option<TranslatedString>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     video: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    song: Option<String>,
     parts: Vec<Part>,
     energy: u8,
     difficulty: u8,
@@ -121,6 +123,7 @@ impl CourseFile {
                 name,
                 lesson_explanation,
                 lesson.video,
+                lesson.song,
                 lesson.parts,
                 lesson.difficulty,
                 lesson.energy,
