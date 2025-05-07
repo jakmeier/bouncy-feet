@@ -60,6 +60,7 @@ export const lesson_parts: (a: number, b: number) => void;
 export const lessonpart_step: (a: number) => number;
 export const lessonpart_stepName: (a: number, b: number) => void;
 export const lesson_song: (a: number, b: number) => void;
+export const lesson_songTimestamp: (a: number) => number;
 export const lesson_video: (a: number, b: number) => void;
 export const limberror_name: (a: number, b: number) => void;
 export const limberror_render: (a: number, b: number, c: number) => void;

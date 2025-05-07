@@ -60,6 +60,7 @@ export function dynamicCounter(start, increment, ms) {
   return {
     subscribe: innerStore.subscribe,
     setDelay: (/** @type {number} */ ms) => { delay = ms },
+    set: (/** @type {number} */ value) => { counterValue = value },
     reset: () => { counterValue = -1 },
   };
 }

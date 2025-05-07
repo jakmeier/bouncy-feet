@@ -27,8 +27,8 @@
 
   const songList = songs.list();
 
-  const trackId = course.lessons[lessonIndex].song;// || songList[0].id;
-  console.log("trackId", trackId);
+  const trackId = course.lessons[lessonIndex].song || songList[0].id;
+  const trackTimestamp = course.lessons[lessonIndex].songTimestamp;
 </script>
 
 <ActivityPreview
@@ -38,6 +38,7 @@
   {tracker}
   {video}
   {trackId}
+  {trackTimestamp}
   {difficulty}
   {energy}
   {onBack}

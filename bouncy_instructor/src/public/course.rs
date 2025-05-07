@@ -1,4 +1,3 @@
-use super::parsing;
 use super::parsing::ParseFileError;
 use crate::intern::content_collection::ContentCollection;
 use crate::intern::step_pace::StepPace;
@@ -27,6 +26,7 @@ pub struct Lesson {
     pub(crate) explanation: Option<String>,
     pub(crate) video: Option<String>,
     pub(crate) song: Option<String>,
+    pub(crate) song_timestamp: Option<f64>,
     pub energy: u8,
     pub difficulty: u8,
     pub(crate) parts: Vec<LessonPart>,
@@ -133,6 +133,11 @@ impl Lesson {
         self.song.clone()
     }
 
+    #[wasm_bindgen(getter, js_name = "songTimestamp")]
+    pub fn song_timestamp(&self) -> f64 {
+        self.song_timestamp.unwrap_or(0.0)
+    }
+
     #[wasm_bindgen(getter)]
     pub fn parts(&self) -> Vec<LessonPart> {
         self.parts.clone()
@@ -170,37 +175,13 @@ impl LessonPart {
 }
 
 impl Course {
-    #[allow(clippy::too_many_arguments)]
-    pub(crate) fn add_lesson(
-        &mut self,
-        lesson_name: String,
-        explanation: Option<String>,
-        video: Option<String>,
-        song: Option<String>,
-        lesson_parts: Vec<parsing::course_file::Part>,
-        difficulty: u8,
-        energy: u8,
-    ) -> Result<(), CourseError> {
-        let parts = lesson_parts
-            .into_iter()
-            .map(|p| LessonPart::new(p.step, &self.collection, p.repeat, p.subbeats_per_move))
-            .collect::<Result<_, _>>()?;
-        let lesson = Lesson {
-            explanation,
-            video,
-            song,
-            name: lesson_name,
-            parts,
-            difficulty,
-            energy,
-        };
+    pub(crate) fn add_lesson(&mut self, lesson: Lesson) {
         self.lessons.push(lesson);
-        Ok(())
     }
 }
 
 impl LessonPart {
-    fn new(
+    pub(crate) fn new(
         step_name: String,
         state: &ContentCollection,
         repeat: u32,

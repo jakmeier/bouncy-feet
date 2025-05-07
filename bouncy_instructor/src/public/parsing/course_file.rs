@@ -1,5 +1,6 @@
 use crate::intern::content_collection::ContentCollection;
 use crate::intern::step::StepSource;
+use crate::public::course::LessonPart;
 use crate::public::Course;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -32,6 +33,8 @@ pub(crate) struct Lesson {
     video: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     song: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    song_timestamp: Option<u64>,
     parts: Vec<Part>,
     energy: u8,
     difficulty: u8,
@@ -100,36 +103,57 @@ impl CourseFile {
         };
 
         for lesson in self.lessons {
-            let name =
-                lesson
-                    .names
-                    .take(lang)
-                    .ok_or_else(|| ParseFileError::MissingTranslation {
-                        id: format!("lesson name of {}", self.id.clone()),
-                        lang: lang.to_owned(),
-                    })?;
-            let lesson_explanation = lesson
-                .explanations
-                .map(|translated| {
-                    translated
-                        .take(lang)
-                        .ok_or_else(|| ParseFileError::MissingTranslation {
-                            id: format!("explanation of lesson in {}", self.id.clone()),
-                            lang: lang.to_owned(),
-                        })
-                })
-                .transpose()?;
-            course.add_lesson(
-                name,
-                lesson_explanation,
-                lesson.video,
-                lesson.song,
-                lesson.parts,
-                lesson.difficulty,
-                lesson.energy,
-            )?;
+            let validated_lesson = lesson.unpack(lang, &course.id, &course.collection)?;
+            course.add_lesson(validated_lesson);
         }
         Ok(course)
+    }
+}
+
+impl Lesson {
+    /// Convert from a course file lesson to an internal representation,
+    /// validating fields and packing fields for easier use in the application.
+    pub(crate) fn unpack(
+        self,
+        lang: &str,
+        course_id: &str,
+        collection: &ContentCollection,
+    ) -> Result<crate::public::course::Lesson, ParseFileError> {
+        let name = self
+            .names
+            .take(lang)
+            .ok_or_else(|| ParseFileError::MissingTranslation {
+                id: format!("lesson name of {}", course_id),
+                lang: lang.to_owned(),
+            })?;
+        let explanation = self
+            .explanations
+            .map(|translated| {
+                translated
+                    .take(lang)
+                    .ok_or_else(|| ParseFileError::MissingTranslation {
+                        id: format!("explanation of lesson in {}", course_id),
+                        lang: lang.to_owned(),
+                    })
+            })
+            .transpose()?;
+
+        let parts = self
+            .parts
+            .into_iter()
+            .map(|p| LessonPart::new(p.step, collection, p.repeat, p.subbeats_per_move))
+            .collect::<Result<_, _>>()?;
+
+        Ok(crate::public::course::Lesson {
+            name,
+            explanation,
+            parts,
+            video: self.video,
+            song: self.song,
+            song_timestamp: self.song_timestamp.map(|int| int as f64),
+            difficulty: self.difficulty,
+            energy: self.energy,
+        })
     }
 }
 

@@ -6,7 +6,7 @@
   import Animation from '$lib/components/avatar/Animation.svelte';
   import Svg from '$lib/components/avatar/Svg.svelte';
   import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
-  import { Tracker } from '$lib/instructor/bouncy_instructor';
+  import { DanceCursor, Tracker } from '$lib/instructor/bouncy_instructor';
   import { timeBetweenMoves, beatCounter } from '$lib/stores/Beat';
 
   /**
@@ -30,7 +30,11 @@
 
   // Only update cursor when it changes pose
   let cursor = $derived.by(() => {
-    const next = tracker.cursorAtSubbeat($beatCounter, true);
+    const subbeat = $beatCounter;
+    if (subbeat < 0) {
+      return new DanceCursor();
+    }
+    const next = tracker.cursorAtSubbeat(subbeat, true);
     if (prevCursor && prevCursor.isSamePose(next)) {
       return prevCursor;
     }

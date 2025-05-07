@@ -5,7 +5,7 @@
   import { base } from '$app/paths';
   import Popup from '$lib/components/ui/Popup.svelte';
   import { writable } from 'svelte/store';
-  import { bpm } from '$lib/stores/Beat';
+  import { bpm, setBeatStart } from '$lib/stores/Beat';
   import { songs } from '$lib/stores/Songs';
   import DarkSection from '$lib/components/ui/sections/DarkSection.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
@@ -24,6 +24,7 @@
    * @property {Tracker} tracker
    * @property {string} [video]
    * @property {string} [trackId]
+   * @property {number} [trackTimestamp]
    * @property {number} difficulty
    * @property {number} energy
    * @property {()=>void} onBack
@@ -37,6 +38,7 @@
     onDone,
     video,
     trackId,
+    trackTimestamp = 0,
     difficulty,
     energy,
     onBack,
@@ -74,6 +76,7 @@
 
   onMount(() => {
     setTrack(trackId || songList[0].id);
+    setBeatStart(performance.now() + trackTimestamp);
     resumeTrack();
   });
   onDestroy(() => {

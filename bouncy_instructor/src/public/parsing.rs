@@ -191,6 +191,7 @@ mod tests {
           difficulty: 2,
           energy: 3,
           song: "105bpm_tropical_house",
+          song_timestamp: 1500,
           video: "https://app.bouncy-feet.ch/media/videos/c3/combo_fast.mp4",
           parts: [
             (step: "run-in-place", repeat: 1, subbeats_per_move: 1),
@@ -341,6 +342,7 @@ mod tests {
                         explanation: None,
                         video: None,
                         song: None,
+                        song_timestamp: None,
                         energy: 3,
                         difficulty: 2,
                         parts: [
@@ -392,6 +394,9 @@ mod tests {
                         ),
                         song: Some(
                             "105bpm_tropical_house",
+                        ),
+                        song_timestamp: Some(
+                            1500.0,
                         ),
                         energy: 3,
                         difficulty: 2,
