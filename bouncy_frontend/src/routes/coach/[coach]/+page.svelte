@@ -18,8 +18,8 @@
   const { getCourse } = getContext('courses');
 
   const coach = $derived(coachData(coachId));
-  const course = $derived(getCourse(coach.courseIds[1]));
-  const step = $derived(course.featuredStep());
+  const courses = $derived(coach.courseIds.map(getCourse));
+  const step = $derived(courses[0].featuredStep());
 
   $bpm = 120;
 
@@ -73,29 +73,32 @@
     <h2>{$t('coach.courses-title')}</h2>
     <!-- <h3>I can show you my tricks</h3> -->
 
-    <div class="ol">
-      {#each course.lessons as lesson, index}
-        <div class="lesson-outer">
-          <div class="corner-marked2">
-            <div class="corner-marked">
-              <div class="lesson-inner">
-                <a href="../../courses/{course.id}/exercise/{index}">
-                  <div class="preview">
-                    <TrackerPreview
-                      tracker={course.tracker(index)}
-                      size={150}
-                      backgroundColor="transparent"
-                    ></TrackerPreview>
-                  </div>
-                  <!-- TODO: check lesson names are good -->
-                  <div class="lesson-name">{lesson.name}</div>
-                </a>
+    {#each courses as course}
+      <p>{course.name}</p>
+      <div class="ol">
+        {#each course.lessons as lesson, index}
+          <div class="lesson-outer">
+            <div class="corner-marked2">
+              <div class="corner-marked">
+                <div class="lesson-inner">
+                  <a href="../../courses/{course.id}/exercise/{index}">
+                    <div class="preview">
+                      <TrackerPreview
+                        tracker={course.tracker(index)}
+                        size={150}
+                        backgroundColor="transparent"
+                      ></TrackerPreview>
+                    </div>
+                    <!-- TODO: check lesson names are good -->
+                    <div class="lesson-name">{lesson.name}</div>
+                  </a>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      {/each}
-    </div>
+        {/each}
+      </div>
+    {/each}
     <Footer white />
   </DarkSection>
 </AvatarStyleContext>

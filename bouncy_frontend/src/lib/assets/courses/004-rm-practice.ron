@@ -1,0 +1,192 @@
+#![enable(implicit_some)]
+(
+  version: 0,
+  id: "rm-practice",
+  names: {"de": "Running Man Übungen", "en": "Running Man Practice"},
+  featured_step: "running-man",
+  explanations: {
+    "de": "----",
+    "en": "----",
+  },
+  lessons: [
+    (
+      names: {"de": "RM Tempo Drill", "en": "RM Speed Drill"},
+      explanations: {
+        "de": "Aufgepasst und Beine angespannt! Jetzt üben wir den Running Man mit Tempo.",
+        "en": "Attention! Ready your legs! We practice the Running Man with speed.",
+      },
+      difficulty: 3,
+      energy: 5,
+      // TODO: cut and upload videos
+      // video: "https://app.bouncy-feet.ch/media/videos/c4/todo.mp4",
+      song: "122bpm_you_can_do_this",
+      song_timestamp: 2950,
+      parts: [
+        // start position (4 beats)
+        ( step: "stand", repeat: 4, subbeats_per_move: 2 ),
+        
+        // prep (4 beats)
+        ( step: "side", repeat: 4, subbeats_per_move: 2 ),
+
+        // start 1 slow rm (4 beats)
+        ( step: "running-man", repeat: 1, subbeats_per_move: 2 ),
+
+        // 64 beats: 8 x (4 counts slow, 4 counts fast)
+        ( step: "running-man", repeat: 2, subbeats_per_move: 1 ),
+        ( step: "running-man", repeat: 1, subbeats_per_move: 2 ),
+        ( step: "running-man", repeat: 2, subbeats_per_move: 1 ),
+        ( step: "running-man", repeat: 1, subbeats_per_move: 2 ),
+        ( step: "running-man", repeat: 2, subbeats_per_move: 1 ),
+        ( step: "running-man", repeat: 1, subbeats_per_move: 2 ),
+        ( step: "running-man", repeat: 2, subbeats_per_move: 1 ),
+        ( step: "running-man", repeat: 1, subbeats_per_move: 2 ),
+        ( step: "running-man", repeat: 2, subbeats_per_move: 1 ),
+        ( step: "running-man", repeat: 1, subbeats_per_move: 2 ),
+        ( step: "running-man", repeat: 2, subbeats_per_move: 1 ),
+        ( step: "running-man", repeat: 1, subbeats_per_move: 2 ),
+        ( step: "running-man", repeat: 2, subbeats_per_move: 1 ),
+        ( step: "running-man", repeat: 1, subbeats_per_move: 2 ),
+        ( step: "running-man", repeat: 2, subbeats_per_move: 1 ),
+        ( step: "running-man", repeat: 1, subbeats_per_move: 2 ),
+
+        // break for 32 beats, with hint when to start again
+        ( step: "stand", repeat: 2, subbeats_per_move: 4 ),
+        ( step: "vibe", repeat: 6, subbeats_per_move: 4 ),
+        ( step: "side", repeat: 2, subbeats_per_move: 4 ),
+
+        // slow for 32 beats
+        ( step: "running-man", repeat: 8, subbeats_per_move: 2 ),
+
+        // fast for 2 x 32 beats
+        ( step: "running-man", repeat: 16, subbeats_per_move: 1 ),
+        ( step: "running-man", repeat: 16, subbeats_per_move: 1 ),
+
+        // break to end
+        ( step: "stand", repeat: 4, subbeats_per_move: 2 ),
+      ],
+    ),
+  ],
+  steps: [
+    (
+      name: "Running man",
+      id: "running-man",
+      keyframes: [
+        (pose: "right-forward", orientation: Right),
+        (pose: "left-up", orientation: Right),
+        (pose: "left-forward", orientation: Right),
+        (pose: "right-up", orientation: Right),
+      ],
+    ),
+    (
+      name: "Prepare",
+      id: "stand",
+      keyframes: [
+        (pose: "standing-straight-front", orientation: ToCamera),
+      ],
+    ),
+    (
+      name: "Break",
+      id: "vibe",
+      keyframes: [
+        (pose: "standing-crouched-front", orientation: ToCamera),
+        (pose: "standing-straight-front", orientation: ToCamera),
+      ],
+    ),
+    (
+      name: "Prepare",
+      id: "side",
+      keyframes: [
+        (pose: "standing-straight-side", orientation: Right),
+      ],
+    ),
+  ],
+  poses: [
+    (
+      id: "right-forward",
+      direction: Right,
+      y_shift: -0.0275,
+      limbs: [
+        (limb: LeftThigh, angle: -20, tolerance: 5, weight: 0.5),
+        (limb: LeftShin, angle: -25, tolerance: 5, weight: 0.5),
+        (limb: LeftLeg, angle: -30, tolerance: 5, weight: 1.0),
+        (limb: RightThigh, angle: 40, tolerance: 5, weight: 1.0),
+        (limb: RightShin, angle: 0, tolerance: 5, weight: 0.5),
+        (limb: RightLeg, angle: 10, tolerance: 5, weight: 0.5),
+        (limb: RightFoot, angle: 90, tolerance: 10, weight: 0.0),
+        (limb: LeftFoot, angle: 90, tolerance: 0, weight: 0.0),
+        (limb: LeftArm, angle: 0, tolerance: 0, weight: 0.0),
+        (limb: LeftForearm, angle: 96, tolerance: 0, weight: 0.0),
+        (limb: RightArm, angle: -25, tolerance: 0, weight: 0.0),
+        (limb: RightForearm, angle: -20, tolerance: 0, weight: 0.0),
+      ],
+    ),
+    (id: "left-forward", mirror_of: "right-forward", direction: Right),
+    (
+      id: "right-up",
+      direction: Right,
+      turn_shoulder: 30,
+      turn_hip: 20,
+      limbs: [
+        (limb: LeftLeg, angle: 0, tolerance: 3, weight: 1.0),
+        (limb: RightLeg, angle: 0, tolerance: 5, weight: 0.5),
+        (limb: RightShin, angle: -50, tolerance: 10, weight: 1.0),
+        (limb: RightThigh, angle: 60, tolerance: 5, weight: 1.0),
+        (limb: LeftArm, angle: 6, tolerance: 0, weight: 0.0),
+        (limb: LeftForearm, angle: 18, tolerance: 0, weight: 0.0),
+        (limb: LeftFoot, angle: 90, tolerance: 0, weight: 0.0),
+        (limb: RightFoot, angle: 70, tolerance: 0, weight: 0.0),
+        (limb: RightArm, angle: -12, tolerance: 0, weight: 0.0),
+        (limb: RightForearm, angle: 6, tolerance: 0, weight: 0.0),
+      ],
+    ),
+    (id: "left-up", mirror_of: "right-up", direction: Right),
+
+    (
+      id: "standing-straight-front",
+      direction: Front,
+      limbs: [
+        (limb: LeftShin, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: LeftThigh, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: RightShin, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: LeftFoot, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: RightThigh, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: RightFoot, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: RightArm, angle: 10, tolerance: 0, weight: 0.0),
+        (limb: RightForearm, angle: -5, tolerance: 0, weight: 0.0),
+        (limb: LeftArm, angle: -10, tolerance: 0, weight: 0.0),
+        (limb: LeftForearm, angle: 5, tolerance: 0, weight: 0.0),
+      ]
+    ),
+    (
+      id: "standing-crouched-front",
+      direction: Front,
+      limbs: [
+        (limb: LeftShin, angle: 5, tolerance: 5, weight: 1.0),
+        (limb: LeftThigh, angle: -5, tolerance: 5, weight: 1.0),
+        (limb: LeftFoot, angle: 2, tolerance: 5, weight: 1.0),
+        (limb: RightShin, angle: -5, tolerance: 5, weight: 1.0),
+        (limb: RightThigh, angle: 5, tolerance: 5, weight: 1.0),
+        (limb: RightFoot, angle: -1, tolerance: 5, weight: 1.0),
+        (limb: RightArm, angle: 12, tolerance: 0, weight: 0.0),
+        (limb: RightForearm, angle: -6, tolerance: 0, weight: 0.0),
+        (limb: LeftArm, angle: -13, tolerance: 0, weight: 0.0),
+        (limb: LeftForearm, angle: 8, tolerance: 0, weight: 0.0),
+      ],
+      y_shift: -0.025,
+    ),
+    (
+      id: "standing-straight-side",
+      direction: Right,
+      limbs: [
+        (limb: LeftShin, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: LeftThigh, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: RightShin, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: RightThigh, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: RightArm, angle: 6, tolerance: 0, weight: 0.0),
+        (limb: RightForearm, angle: 18, tolerance: 0, weight: 0.0),
+        (limb: LeftArm, angle: -12, tolerance: 0, weight: 0.0),
+        (limb: LeftForearm, angle: 6, tolerance: 0, weight: 0.0),
+      ]
+    ),
+  ],
+)

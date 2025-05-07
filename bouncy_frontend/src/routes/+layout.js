@@ -40,7 +40,8 @@ export const load = async ({ fetch, data }) => {
     const coursePromises = [
         import('$lib/assets/courses/000-rm-basics.ron?raw'),
         import('$lib/assets/courses/002-v-step-basics.ron?raw'),
-        import('$lib/assets/courses/003-intro.ron?raw')
+        import('$lib/assets/courses/003-intro.ron?raw'),
+        import('$lib/assets/courses/004-rm-practice.ron?raw')
     ].map(promise => promise
         .then(
             (data) => data.default

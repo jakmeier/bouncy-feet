@@ -15,7 +15,7 @@ import { LEFT_RIGHT_COLORING, ORANGE_COLORING } from "./constants";
 export const coaches = [
     {
         name: 'juhwang',
-        courseIds: ['running-man-basics'],
+        courseIds: ['running-man-basics', 'rm-practice'],
         style: {
             coloring: ORANGE_COLORING,
             bodyShape: {

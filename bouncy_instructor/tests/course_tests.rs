@@ -14,7 +14,7 @@ const COURSES: [(&str, &str); 4] = [
         include_str!("./data/courses/002-v-step-basics.ron"),
     ),
     ("003-intro", include_str!("./data/courses/003-intro.ron")),
-    ("004-intro", include_str!("./data/courses/004-rm-speed.ron")),
+    ("004-intro", include_str!("./data/courses/004-rm-practice.ron")),
 ];
 
 #[test]
