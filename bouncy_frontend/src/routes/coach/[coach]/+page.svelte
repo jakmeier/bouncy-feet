@@ -1,7 +1,7 @@
 <script>
   import { page } from '$app/state';
   import AnimatedStep from '$lib/components/AnimatedStep.svelte';
-  import { bpm, halfSpeed } from '$lib/stores/Beat';
+  import { bpm } from '$lib/stores/Beat';
   import { getContext } from 'svelte';
   import LightBackground from '$lib/components/ui/sections/LightBackground.svelte';
   import DarkSection from '$lib/components/ui/sections/DarkSection.svelte';
@@ -18,11 +18,10 @@
   const { getCourse } = getContext('courses');
 
   const coach = $derived(coachData(coachId));
-  const course = $derived(getCourse(coach.courseIds[0]));
+  const course = $derived(getCourse(coach.courseIds[1]));
   const step = $derived(course.featuredStep());
 
   $bpm = 120;
-  $halfSpeed = true;
 
   /**
    * @param {string} coachId

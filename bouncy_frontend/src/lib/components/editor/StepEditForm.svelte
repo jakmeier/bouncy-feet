@@ -14,7 +14,7 @@
   import StepPositionDetails from './StepPositionDetails.svelte';
   import AnimatedStep from '../AnimatedStep.svelte';
   import { beforeNavigate } from '$app/navigation';
-  import { beatCounter, bpm, setHalfSpeed } from '$lib/stores/Beat';
+  import { beatCounter, bpm } from '$lib/stores/Beat';
   import Button from '../ui/Button.svelte';
 
   const localCollectionCtx = getContext('localCollection');
@@ -118,9 +118,6 @@
     }
   });
 
-  onMount(() => {
-    setHalfSpeed(true);
-  });
   let stepPositionBuilders = $derived(step.positions());
   run(() => {
     selectPosition(selectedIndex);
@@ -166,19 +163,14 @@
   {onRemove}
 >
   {#snippet main({ item: position, index })}
-    <div   >
+    <div>
       <div class="pose" class:selected={index === selectedIndex}>
         <Pose pose={position.pose()}></Pose>
       </div>
     </div>
   {/snippet}
   {#snippet name({ item: position, index })}
-    <div
-      
-      
-      
-      class:selected={index === selectedIndex}
-    >
+    <div class:selected={index === selectedIndex}>
       {position.pose().name('en')}
     </div>
   {/snippet}

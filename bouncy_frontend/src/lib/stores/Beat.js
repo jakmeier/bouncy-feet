@@ -6,10 +6,9 @@ import { derived, writable } from 'svelte/store';
 
 export const beatStart = writable(performance.now());
 export const bpm = writable(132);
-export const halfSpeed = writable(false);
 
-export const timeBetweenMoves = derived([bpm, halfSpeed], ([$bpm, $halfSpeed]) => {
-    return ($halfSpeed ? 60_000 : 30_000) / $bpm;
+export const timeBetweenMoves = derived([bpm], ([$bpm]) => {
+    return 30_000 / $bpm;
 })
 
 export const beatDuration = derived([bpm], ([$bpm]) => {
@@ -28,11 +27,6 @@ export function setBpm(value) {
 /** @param {number} value */
 export function setBeatStart(value) {
     beatStart.set(value);
-}
-
-/** @param {boolean} yes */
-export function setHalfSpeed(yes) {
-    halfSpeed.set(yes);
 }
 
 /** 

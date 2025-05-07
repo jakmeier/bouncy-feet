@@ -12,7 +12,7 @@
   import { hideNavigation } from '$lib/stores/UiState';
   import Popup from '$lib/components/ui/Popup.svelte';
   import SessionReward from '$lib/components/SessionReward.svelte';
-  import { bpm, registerTracker, setBpm, setHalfSpeed } from '$lib/stores/Beat';
+  import { bpm, registerTracker, setBpm } from '$lib/stores/Beat';
   import Button from '$lib/components/ui/Button.svelte';
   import { DetectionState } from '$lib/instructor/bouncy_instructor';
 
@@ -27,7 +27,7 @@
   registerTracker(tracker);
   setBpm(120);
   // setHalfSpeed(isLearnMode);
-  setHalfSpeed(true);
+  // setHalfSpeed(true);
 
   const userCtx = getContext('user');
 
