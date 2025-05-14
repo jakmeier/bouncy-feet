@@ -17,8 +17,7 @@
       },
       difficulty: 3,
       energy: 5,
-      // TODO: cut and upload videos
-      // video: "https://app.bouncy-feet.ch/media/videos/c4/todo.mp4",
+      video: "https://app.bouncy-feet.ch/media/videos/c4/rm_speed_intro.mp4",
       song: "122bpm_you_can_do_this",
       song_timestamp: 2950,
       parts: [
