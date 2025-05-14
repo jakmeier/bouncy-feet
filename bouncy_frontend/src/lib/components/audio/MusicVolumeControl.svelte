@@ -4,23 +4,26 @@
 
   let musicContext = getContext('music');
   let { stopTrack, resumeTrack, setVolume } = musicContext;
-
-  let musicEnabled = $state(true);
+  let musicEnabled = $derived(musicContext.gain > 0 && musicContext.trackOn);
 
   function toggleMusic() {
     if (musicEnabled) {
       stopTrack();
     } else {
       resumeTrack();
+      if (musicContext.gain <= 0) {
+        setVolume(0.5);
+      }
     }
-    musicEnabled = !musicEnabled;
   }
 
   function updateVolume(event) {
     const target = event.target;
     const newVol = parseFloat(target.value);
     setVolume(newVol);
-    musicEnabled = newVol > 0;
+    if (newVol > 0) {
+      resumeTrack();
+    }
   }
 </script>
 

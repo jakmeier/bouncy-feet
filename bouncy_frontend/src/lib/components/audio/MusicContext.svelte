@@ -48,6 +48,7 @@
     audio?.resumeMusic();
   }
 
+  /** @param {number} vol */
   function setVolume(vol) {
     gain = vol;
   }
@@ -62,6 +63,9 @@
     songAuthor,
     get gain() {
       return gain;
+    },
+    get trackOn() {
+      return audio?.trackIsOn();
     },
   });
 

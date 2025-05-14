@@ -18,7 +18,7 @@
   let { track } = $props();
 
   let musicContext = getContext('music');
-  let isPlaying = false;
+  let isPlaying = $state(false);
 
   export function resetTrack() {
     resetMusic();
@@ -34,6 +34,10 @@
   export function resumeMusic() {
     setChannelGain('music', musicContext.gain);
     isPlaying = true;
+  }
+
+  export function trackIsOn() {
+    return isPlaying;
   }
 
   /**

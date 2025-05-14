@@ -82,6 +82,11 @@
   onDestroy(() => {
     stopTrack();
   });
+
+  function openVideo() {
+    $isVideoOpen = true;
+    stopTrack();
+  }
 </script>
 
 <Background bgColor="var(--theme-main)" color="var(--theme-neutral-black)" />
@@ -131,7 +136,7 @@
       <div class="row">
         <div>{$t('record.preview-video-title')}</div>
 
-        <button class="action big-col" onclick={() => ($isVideoOpen = true)}
+        <button class="action big-col" onclick={openVideo}
           >{$t('courses.lesson.to-video-button')}</button
         >
       </div>
