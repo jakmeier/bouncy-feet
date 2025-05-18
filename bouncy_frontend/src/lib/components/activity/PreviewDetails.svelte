@@ -16,7 +16,7 @@
 </script>
 
 <div class="overview">
-  <div class="row">
+  <!-- <div class="row">
     <div class="flex">
       <div>
         {beats}
@@ -29,7 +29,7 @@
     <div>
       {formatDuration(trainingDuration, formatOpts)}
     </div>
-  </div>
+  </div> -->
 
   <div class="rated">
     <div>{$t('record.preview-difficulty-title')}</div>

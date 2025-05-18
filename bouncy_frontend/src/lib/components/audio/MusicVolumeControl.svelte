@@ -6,6 +6,9 @@
   let { stopTrack, resumeTrack, setVolume } = musicContext;
   let musicEnabled = $derived(musicContext.gain > 0 && musicContext.trackOn);
 
+  /** @type {Props} */
+  let { color = 'var(--theme-neutral-black)' } = $props();
+
   function toggleMusic() {
     if (musicEnabled) {
       stopTrack();
@@ -27,14 +30,19 @@
   }
 </script>
 
-<div class="music-control">
+<div class="music-control" style="--component-color: {color}">
   <button class="toggle" onclick={toggleMusic}>
     {#if musicEnabled}
-      <img src="{base}/img/symbols/bf_audio_vol.svg" alt="audio_volume" />
+      <img
+        src="{base}/img/symbols/bf_audio_vol.svg"
+        alt="audio_volume"
+        class:inverted={color != 'var(--theme-neutral-black)'}
+      />
     {:else}
       <img
         src="{base}/img/symbols/bf_audio_vol_off.svg"
         alt="audio_volume_off"
+        class:inverted={color != 'var(--theme-neutral-black)'}
       />
     {/if}
   </button>
@@ -106,7 +114,7 @@
     border-radius: 4px;
     appearance: none;
     z-index: 1;
-    background-color: black;
+    background-color: var(--component-color);
   }
 
   input[type='range']::-webkit-slider-thumb {
@@ -147,6 +155,10 @@
     top: -10px;
     width: 6px;
     border-radius: 3px;
-    background: black;
+    background: var(--component-color);
+  }
+
+  .inverted {
+    filter: invert(100%);
   }
 </style>

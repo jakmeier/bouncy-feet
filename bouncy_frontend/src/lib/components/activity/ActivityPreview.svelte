@@ -97,8 +97,10 @@
   {description}
 </div>
 
-<div class="preview" bind:clientWidth={fullWidth}>
-  <TrackerPreview {tracker} size={fullWidth} />
+<div class="video-wrapper">
+  {#if video && video.length > 0}
+    <Video path={`${base}${video}`}></Video>
+  {/if}
 </div>
 
 <PreviewDetails
@@ -110,12 +112,20 @@
 />
 
 <div class="controls">
-  <MusicVolumeControl />
   <button onclick={onStart}>{$t('courses.lesson.start-button')}</button>
 </div>
 
 <DarkSection>
   <h1>{$t('courses.lesson.settings-subtitle')}</h1>
+
+  <div class="preview" bind:clientWidth={fullWidth}>
+    <TrackerPreview {tracker} size={fullWidth / 3} />
+  </div>
+
+  <div class="controls">
+    <MusicVolumeControl color="var(--theme-neutral-white)" />
+  </div>
+
   <div class="about-lesson">
     <div class="row">
       <div class="song">
@@ -132,27 +142,10 @@
         }}>{$t('courses.lesson.next-song-button')}</button
       >
     </div>
-    {#if video && video.length > 0}
-      <div class="row">
-        <div>{$t('record.preview-video-title')}</div>
-
-        <button class="action big-col" onclick={openVideo}
-          >{$t('courses.lesson.to-video-button')}</button
-        >
-      </div>
-    {/if}
   </div>
 
   <Footer white />
 </DarkSection>
-
-<Popup bind:isOpen={isVideoOpen} showOkButton>
-  <div class="video-wrapper">
-    {#if video && video.length > 0}
-      <Video path={`${base}${video}`}></Video>
-    {/if}
-  </div>
-</Popup>
 
 <Popup bind:isOpen={showHint} showOkButton onClose={onDone}>
   <div>{$t('record.no-upload-hint')}</div>
@@ -192,6 +185,6 @@
   }
 
   .video-wrapper {
-    width: 100vw;
+    width: 100%;
   }
 </style>
