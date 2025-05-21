@@ -6,6 +6,7 @@ import { LEFT_RIGHT_COLORING, ORANGE_COLORING } from "./constants";
 /**
  * @typedef {Object} Coach 
  * @property {string} name
+ * @property {string[]} stepIds
  * @property {string[]} courseIds
  * @property {AvatarStyleContext} style
  * @property {TranslatedText} description
@@ -15,6 +16,7 @@ import { LEFT_RIGHT_COLORING, ORANGE_COLORING } from "./constants";
 export const coaches = [
     {
         name: 'juhwang',
+        stepIds: ["rm-0", "reverse-rm-0", "pp-0"],
         courseIds: ['running-man-basics', 'rm-practice'],
         style: {
             coloring: ORANGE_COLORING,
@@ -40,6 +42,7 @@ export const coaches = [
     /** @type {Coach} */
     {
         name: 'chorok',
+        stepIds: ["t-0", "v-0"],
         courseIds: ['v-step-basics'],
         style: {
             coloring: LEFT_RIGHT_COLORING,

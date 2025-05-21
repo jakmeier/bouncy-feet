@@ -6,8 +6,6 @@
   import { Skeleton } from '$lib/instructor/bouncy_instructor';
   import { LEFT_RIGHT_COLORING } from '$lib/constants';
 
-  
-  
   /**
    * @typedef {Object} Props
    * @property {import('bouncy_instructor').StepWrapper} step
@@ -17,6 +15,7 @@
    * @property {number} [borderWidth]
    * @property {number} [animationTime]
    * @property {string} [backgroundColor]
+   * @property {string} [style]
    */
 
   /** @type {Props} */
@@ -27,7 +26,8 @@
     poseIndex = 0,
     borderWidth = 0,
     animationTime = 500,
-    backgroundColor = 'var(--theme-neutral-light)'
+    backgroundColor = 'var(--theme-neutral-light)',
+    style = 'rounded',
   } = $props();
 
   // When the pose index is negative, it should show a resting position
@@ -45,23 +45,36 @@
   // TODO: rotation and flipped orientation does not work
   // $: skeleton =
   //   poseIndex >= 0 ? step.rotatedSkeleton(poseIndex, rotation) : restingStep;
-  let skeleton =
-    $derived(poseIndex >= 0
+  let skeleton = $derived(
+    poseIndex >= 0
       ? rotation === 0
         ? step.skeleton(poseIndex)
         : step.rotatedSkeleton(poseIndex, rotation)
-      : restingStep);
-  let bodyShift =
-    $derived(poseIndex >= 0 ? stepBodyShift(step, poseIndex) : { x: 0, y: 0 });
+      : restingStep
+  );
+  let bodyShift = $derived(
+    poseIndex >= 0 ? stepBodyShift(step, poseIndex) : { x: 0, y: 0 }
+  );
   let maybeJumpHeight = $derived(step.jumpHeight(poseIndex));
-  let jumpHeight =
-    $derived(size * (maybeJumpHeight === undefined ? 1.0 : maybeJumpHeight));
+  let jumpHeight = $derived(
+    size * (maybeJumpHeight === undefined ? 1.0 : maybeJumpHeight)
+  );
+
+  const borderRadius = $derived.by(() => {
+    switch (style) {
+      case 'round':
+        return '50%';
+      case 'rounded':
+      default:
+        return '20px';
+    }
+  });
 </script>
 
 <Area
   width="{size}px"
   height="{size}px"
-  borderRadius="20px"
+  {borderRadius}
   borderWidth="{borderWidth}px"
   {backgroundColor}
 >

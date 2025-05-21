@@ -2,7 +2,7 @@
   import { t } from '$lib/i18n';
   import Popup from './Popup.svelte';
 
-  let { title, text, children } = $props();
+  let { title, text } = $props();
 
   /** @type {import('svelte/store').Writable<boolean>} */
   let isOpen = $state();
@@ -38,7 +38,6 @@
   <div>
     {$t(text)}
   </div>
-  {@render children?.()}
 </Popup>
 
 <style>

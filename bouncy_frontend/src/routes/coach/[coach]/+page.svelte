@@ -9,10 +9,18 @@
   import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
   import { coaches } from '$lib/coach';
   import AvatarStyleContext from '$lib/components/avatar/AvatarStyleContext.svelte';
-  import TrackerPreview from '$lib/components/avatar/TrackerPreview.svelte';
   import { goto } from '$app/navigation';
   import { coachLocale, t } from '$lib/i18n';
   import { locale } from '$lib/i18n';
+  import { stepById, StepWrapper } from '$lib/instructor/bouncy_instructor';
+
+  /**
+   * @typedef {Object} Props
+   * @property {import('./$types').PageData} data
+   */
+
+  /** @type {Props} */
+  let { data } = $props();
 
   const coachId = page.params.coach;
   const { getCourse } = getContext('courses');
@@ -20,6 +28,13 @@
   const coach = $derived(coachData(coachId));
   const courses = $derived(coach.courseIds.map(getCourse));
   const step = $derived(courses[0].featuredStep());
+
+  /** @type {StepWrapper[]} */
+  const steps = $derived(
+    coach.stepIds
+      .map((stepId) => stepById(stepId, false))
+      .filter((maybe) => maybe)
+  );
 
   $bpm = 120;
 
@@ -70,69 +85,40 @@
 </div> -->
 
   <DarkSection>
-    <h2>{$t('coach.courses-title')}</h2>
+    <!-- <h2>{$t('coach.courses-title')}</h2> -->
     <!-- <h3>I can show you my tricks</h3> -->
+    <h2>{$t('collection.steps-subtitle')}</h2>
 
-    {#each courses as course}
-      <p>{course.name}</p>
-      <div class="ol">
-        {#each course.lessons as lesson, index}
-          <div class="lesson-outer">
-            <div class="corner-marked2">
-              <div class="corner-marked">
-                <div class="lesson-inner">
-                  <a href="../../courses/{course.id}/exercise/{index}">
-                    <div class="preview">
-                      <TrackerPreview
-                        tracker={course.tracker(index)}
-                        size={150}
-                        backgroundColor="transparent"
-                      ></TrackerPreview>
-                    </div>
-                    <!-- TODO: check lesson names are good -->
-                    <div class="lesson-name">{lesson.name}</div>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        {/each}
-      </div>
+    {#each steps as step}
+      <a href={`./step/${step.name}`}>
+        <div class="step">
+          <AnimatedStep {step} size={100} style="round"></AnimatedStep>
+          <!-- TODO: translations -->
+          <h3>{step.name}</h3>
+        </div>
+      </a>
+    {:else}
+      <p>{$t('collection.no-steps')}</p>
     {/each}
+
+    <h2>{$t('collection.combos-subtitle')}</h2>
+    <p>{$t('collection.no-combos')}</p>
+
+    <h2>{$t('collection.dances-subtitle')}</h2>
+    <p>{$t('collection.no-choreos')}</p>
+
     <Footer white />
   </DarkSection>
 </AvatarStyleContext>
 
 <style>
-  .ol {
-    display: flex;
-    overflow: scroll;
-    padding-bottom: 1rem;
-    margin-left: -1.5rem;
-    margin-right: -1.5rem;
-  }
-  .lesson-outer {
-    padding: 0.5rem;
-    max-width: min(300px, 68vw);
-    font-size: var(--font-large);
-    margin: 0.5rem;
-    word-wrap: break-word;
-  }
-  .preview {
-    margin: 0 0.5rem;
-    height: 100%;
-  }
-  .lesson-name {
-    text-align: center;
-    padding-bottom: 1rem;
+  .step {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
   }
 
-  button {
-    margin: 10px;
-    height: min-content;
-    min-width: 160px;
-  }
-  .train {
-    margin-bottom: 3rem;
+  .step h3 {
+    margin: 0;
   }
 </style>

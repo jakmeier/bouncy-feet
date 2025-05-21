@@ -8,6 +8,7 @@
    * @property {StepWrapper} step
    * @property {number} [size]
    * @property {string} [backgroundColor]
+   * @property {string} [style]
    */
 
   /** @type {Props} */
@@ -15,6 +16,7 @@
     step,
     size = 100,
     backgroundColor = 'var(--theme-neutral-white)',
+    style = 'rounded',
   } = $props();
 
   const beat = beatCounter;
@@ -26,4 +28,5 @@
   poseIndex={$beat}
   animationTime={$timeBetweenMoves * 0.7}
   {backgroundColor}
+  {style}
 />
