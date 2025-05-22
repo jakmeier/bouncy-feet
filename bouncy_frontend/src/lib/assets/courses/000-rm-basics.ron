@@ -2,7 +2,7 @@
 (
   version: 0,
   id: "running-man-basics",
-  names: {"de": "Running Man Anfängerkurs", "en": "Running Man beginner's course"},
+  names: {"de": "RM Anfängerkurs", "en": "RM beginner's course"},
   featured_step: "rm-0",
   explanations: {
     "de": "Lerne den Basisschritt des Shuffelns, den Running Man.",

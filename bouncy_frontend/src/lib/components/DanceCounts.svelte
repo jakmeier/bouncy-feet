@@ -1,34 +1,44 @@
 <script>
   import { LEFT_RIGHT_COLORING_LIGHT } from '$lib/constants';
-  import { DanceWrapper } from '$lib/instructor/bouncy_instructor';
+  import { Skeleton, StepWrapper } from '$lib/instructor/bouncy_instructor';
   import Svg from './avatar/Svg.svelte';
   import SvgAvatar from './avatar/SvgAvatar.svelte';
 
-  
   /**
    * @typedef {Object} Props
-   * @property {DanceWrapper} dance
+   * @property {StepWrapper[]} steps
    * @property {any} [highlightedStep]
    * @property {any} [markedPoseIndex]
    */
 
   /** @type {Props} */
-  let { dance, highlightedStep = $bindable(-1), markedPoseIndex = -1 } = $props();
+  let {
+    steps,
+    highlightedStep = $bindable(-1),
+    markedPoseIndex = -1,
+  } = $props();
 
   let innerWidth = $state(300);
 
-  let subbeat = $derived(dance.subbeats);
-  let poseWidth = $derived(innerWidth / 8);
+  let totalSubbeats = $derived(steps.reduce((a, b) => a + b.subbeats, 0));
+  const posesPerRow = $derived(Math.min(8, totalSubbeats));
+  let poseWidth = $derived(innerWidth / posesPerRow);
   /** @type {number[]} */
-  let stepTransitions = $derived(dance.steps().reduce(
-    (acc, step) => {
-      const prev = acc.length === 0 ? 0 : acc[acc.length - 1];
-      acc.push(prev + step.subbeats);
-      return acc;
-    },
-    /** @type {number[]} */
-    []
-  ));
+  let stepTransitions = $derived(
+    steps.reduce(
+      (acc, step) => {
+        const prev = acc.length === 0 ? 0 : acc[acc.length - 1];
+        acc.push(prev + step.subbeats);
+        return acc;
+      },
+      /** @type {number[]} */
+      []
+    )
+  );
+  /** @type {Skeleton[]} */
+  let poses = steps.flatMap((step) =>
+    new Array(step.subbeats).fill(0).map((_, beat) => step.skeleton(beat))
+  );
 
   function count(subbeat) {
     if (subbeat % 2 === 1) {
@@ -43,8 +53,12 @@
   }
 </script>
 
-<div class="poses" bind:clientWidth={innerWidth}>
-  {#each { length: subbeat } as _, beat}
+<div
+  class="poses"
+  bind:clientWidth={innerWidth}
+  style="--num-beats: {posesPerRow}"
+>
+  {#each { length: totalSubbeats } as _, beat}
     <!-- <Pose /> -->
     <div
       class="pose"
@@ -58,7 +72,10 @@
         }
       }}
     >
-      <div class="count" class:marked={beat === markedPoseIndex % subbeat}>
+      <div
+        class="count"
+        class:marked={beat === markedPoseIndex % totalSubbeats}
+      >
         {count(beat)}
       </div>
       {#if stepTransitions.includes(beat)}
@@ -69,11 +86,7 @@
       {/if}
       <div class="avatar">
         <Svg width={200} height={200} orderByZ>
-          <SvgAvatar
-            skeleton={dance.skeleton(beat)}
-            width={200}
-            height={200}
-            style={LEFT_RIGHT_COLORING_LIGHT}
+          <SvgAvatar skeleton={poses[beat]} width={200} height={200}
           ></SvgAvatar>
         </Svg>
       </div>
@@ -84,7 +97,7 @@
 <style>
   .poses {
     display: grid;
-    grid-template-columns: repeat(8, 1fr);
+    grid-template-columns: repeat(var(--num-beats), 1fr);
   }
   .pose {
     position: relative;
@@ -98,8 +111,9 @@
   }
   .marked {
     font-weight: 800;
-    color: white;
-    background-color: var(--theme-neutral-light);
+    color: var(--theme-neutral-white);
+    background-color: var(--theme-main-dark);
+    border-radius: 5px;
   }
   .step-transition {
     position: absolute;

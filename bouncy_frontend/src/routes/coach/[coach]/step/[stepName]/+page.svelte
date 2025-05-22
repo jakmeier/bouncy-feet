@@ -2,18 +2,14 @@
   import { page } from '$app/state';
   import { t } from '$lib/i18n.js';
   import Header from '$lib/components/ui/Header.svelte';
-  import Select from 'svelte-select';
-  import { dynamicCounter } from '$lib/timer';
-  import { features } from '$lib/stores/FeatureSelection';
-  import { browser } from '$app/environment';
-  import Info from '$lib/components/ui/Info.svelte';
-  import { getContext } from 'svelte';
-  import Symbol from '$lib/components/ui/Symbol.svelte';
-  import Button from '$lib/components/ui/Button.svelte';
-  import Step from '../../../../collection/Step.svelte';
+  import { getContext, onMount } from 'svelte';
   import AnimatedStep from '$lib/components/AnimatedStep.svelte';
-  import { bpm } from '$lib/stores/Beat';
-  import TrackerPreview from '$lib/components/avatar/TrackerPreview.svelte';
+  import { bpm, beatCounter } from '$lib/stores/Beat';
+  import { coaches } from '$lib/coach';
+  import Video from '$lib/components/ui/Video.svelte';
+  import LightBackground from '$lib/components/ui/sections/LightBackground.svelte';
+  import DarkSection from '$lib/components/ui/sections/DarkSection.svelte';
+  import DanceCounts from '$lib/components/DanceCounts.svelte';
 
   /**
    * @typedef {Object} Props
@@ -23,106 +19,95 @@
   /** @type {Props} */
   let { data } = $props();
 
-  const user = getContext('user').store;
   const name = page.params.stepName;
+  const coachId = page.params.coach;
+
+  const { getCourse } = getContext('courses');
+
   const variations = data.lookupSteps({
     uniqueNames: false,
     stepName: name,
   });
-  const selectItems = variations.map((step) => {
-    return { value: step, label: $t(`step.variation.${step.variation}`) };
-  });
+  let step = variations[0];
 
-  let selected = $state(selectItems[0]);
+  /**
+   * @param {string} coachId
+   */
+  function coachData(coachId) {
+    const coachData = coaches.find((c) => c.name === coachId);
+    if (coachData) {
+      return coachData;
+    } else {
+      return coaches[0];
+    }
+  }
 
-  const { getCourse } = getContext('courses');
-  //   TODO: map courses to steps
-  //   const coach = $derived(coachData(coachId));
-  //   const courses = $derived(coach.courseIds.map(getCourse));
+  const coach = $derived(coachData(coachId));
+  const coachStep = $derived(coach.steps[step.id]);
+  const video = $derived(coachStep.video);
+
   /**
    * @type {import('bouncy_instructor').Course[]}
    */
-  const courses = [];
+  const courses = $derived(coachStep.courses.map(getCourse));
+
+  onMount(() => {
+    $bpm = 45;
+  });
 </script>
+
+<LightBackground />
 
 <Header title={name} />
 
-<AnimatedStep step={selected.value} size={200} backgroundColor="transparent"
-></AnimatedStep>
+<div class="video-wrapper">
+  {#if video && video.length > 0}
+    <Video path={`${video}`}></Video>
+  {/if}
+</div>
 
-<!-- TODO: Video -->
-<!-- TODO: Counts and poses -->
+<DanceCounts steps={[step]} markedPoseIndex={$beatCounter} />
 
-<!-- TODO: style slider -->
+<AnimatedStep {step} size={200} backgroundColor="transparent"></AnimatedStep>
+
+<!-- TODO(Tanja): style slider  -->
 <label>
   {$t('collection.step.speed')}
   <input type="number" bind:value={$bpm} min="15" max="200" class="number" />
   <input type="range" bind:value={$bpm} min="15" max="200" class="range" />
 </label>
 
-{#if selectItems.length > 1}
-  <div class="label">
-    {$t('collection.step.variation')}
-    <Select
-      bind:value={selected}
-      items={selectItems}
-      showChevron={true}
-      clearable={false}
-      searchable={false}
-      --background="var(--theme-neutral-light)"
-      --selected-item-color="var(--theme-neutral-dark)"
-      --item-hover-bg="var(--theme-main)"
-      --item-hover-color="var(--theme-neutral-light)"
-      --item-active-background="var(--theme-accent)"
-      --item-is-active-bg="var(--theme-neutral-white)"
-      --item-is-active-color="var(--theme-neutral-dark)"
-      --border="1px solid var(--theme-neutral-dark)"
-      --border-hover="1.5px solid var(--theme-main)"
-      --border-focused="1.5px solid var(--theme-main)"
-      --margin="10px auto"
-      --padding="10px"
-      --font-size="var(--font-normal)"
-    />
-  </div>
-
+<DarkSection>
   <h2>{$t('collection.courses-subtitle')}</h2>
 
-  <!-- TODO: fix display of courses + link for courses -->
+  <!-- TODO: make course links work (needs implementing courses properly) -->
   {#each courses as course}
-    <p>{course.name}</p>
-    <div class="ol">
-      {#each course.lessons as lesson, index}
-        <div class="lesson-outer">
-          <div class="corner-marked2">
-            <div class="corner-marked">
-              <div class="lesson-inner">
-                <a href="../../courses/{course.id}/exercise/{index}">
-                  <div class="preview">
-                    <TrackerPreview
-                      tracker={course.tracker(index)}
-                      size={150}
-                      backgroundColor="transparent"
-                    ></TrackerPreview>
-                  </div>
-                  <div class="lesson-name">{lesson.name}</div>
-                </a>
-              </div>
-            </div>
+    <div class="course">
+      <button>{course.name}</button>
+      <!-- <a href="../../courses/{course.id}/exercise/{index}"> -->
+      <div class="ol">
+        {#each course.lessons as lesson, index}
+          <!-- TODO: actually show which classes were done -->
+          <div class="lesson-outer" class:done={index < 2}>
+            {index + 1}
           </div>
-        </div>
-      {/each}
+        {/each}
+      </div>
     </div>
   {:else}
     <p>{$t('collection.no-courses')}</p>
   {/each}
-{/if}
+</DarkSection>
 
 <style>
-  label,
-  .label {
+  .video-wrapper {
+    width: 100%;
+    margin: 2rem 0;
+  }
+  label {
     display: grid;
     justify-items: center;
-    margin: 10px auto;
+    margin: 2rem auto;
     max-width: 300px;
     background-color: var(--theme-main);
     color: var(--theme-neutral-black);
@@ -133,21 +118,28 @@
     display: flex;
     overflow: scroll;
     padding-bottom: 1rem;
-    margin-left: -1.5rem;
-    margin-right: -1.5rem;
+    gap: 0.5rem;
   }
   .lesson-outer {
-    padding: 0.5rem;
-    max-width: min(300px, 68vw);
-    margin: 0.5rem;
+    display: grid;
+    align-items: center;
+    justify-items: center;
+    color: var(--theme-neutral-black);
+    background-color: var(--theme-main-light);
+    width: 2rem;
+    height: 2rem;
     word-wrap: break-word;
+    border-radius: 5px;
   }
-  .preview {
-    margin: 0 0.5rem;
-    height: 100%;
+  .lesson-outer.done {
+    background-color: var(--theme-main);
   }
-  .lesson-name {
-    text-align: center;
-    padding-bottom: 1rem;
+  .course {
+    display: grid;
+    gap: 1rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: var(--theme-neutral-white) solid 1px;
+    border-radius: 5px;
   }
 </style>

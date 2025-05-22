@@ -31,7 +31,7 @@
 
   /** @type {StepWrapper[]} */
   const steps = $derived(
-    coach.stepIds
+    Object.keys(coach.steps)
       .map((stepId) => stepById(stepId, false))
       .filter((maybe) => maybe)
   );

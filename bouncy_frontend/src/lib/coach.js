@@ -6,8 +6,8 @@ import { LEFT_RIGHT_COLORING, ORANGE_COLORING } from "./constants";
 /**
  * @typedef {Object} Coach 
  * @property {string} name
- * @property {string[]} stepIds
  * @property {string[]} courseIds
+ * @property {Object} steps
  * @property {AvatarStyleContext} style
  * @property {TranslatedText} description
  * @property {TranslatedText} title
@@ -16,7 +16,22 @@ import { LEFT_RIGHT_COLORING, ORANGE_COLORING } from "./constants";
 export const coaches = [
     {
         name: 'juhwang',
-        stepIds: ["rm-0", "reverse-rm-0", "pp-0"],
+        steps: {
+            "rm-0": {
+                // TODO: use correct video
+                video: "https://app.bouncy-feet.ch/media/videos/steps/reverse-rm.mp4",
+                courses: ['running-man-basics', 'rm-practice']
+            },
+            "reverse-rm-0": {
+                video: "https://app.bouncy-feet.ch/media/videos/steps/reverse-rm.mp4",
+                // TODO add courses
+                courses: []
+            },
+            "pp-0": {
+                video: "",
+                courses: []
+            }
+        },
         courseIds: ['running-man-basics', 'rm-practice'],
         style: {
             coloring: ORANGE_COLORING,
@@ -42,7 +57,15 @@ export const coaches = [
     /** @type {Coach} */
     {
         name: 'chorok',
-        stepIds: ["t-0", "v-0"],
+        steps: {
+            "t-0": {
+                video: "",
+                courses: []
+            }, "v-0": {
+                video: "",
+                courses: []
+            }
+        },
         courseIds: ['v-step-basics'],
         style: {
             coloring: LEFT_RIGHT_COLORING,
