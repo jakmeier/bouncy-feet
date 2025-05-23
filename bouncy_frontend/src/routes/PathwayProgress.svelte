@@ -2,8 +2,6 @@
   import AnimatedStep from '$lib/components/AnimatedStep.svelte';
   import { t } from '$lib/i18n';
 
-  
-  
   /**
    * @typedef {Object} Props
    * @property {string} teacherName
@@ -15,14 +13,7 @@
    */
 
   /** @type {Props} */
-  let {
-    teacherName,
-    step,
-    skill,
-    maxSkill,
-    experience,
-    totalSteps
-  } = $props();
+  let { teacherName, step, skill, maxSkill, experience, totalSteps } = $props();
 </script>
 
 <h3>{teacherName}</h3>

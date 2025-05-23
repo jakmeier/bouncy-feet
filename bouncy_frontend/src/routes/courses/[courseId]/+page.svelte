@@ -7,6 +7,9 @@
   import { counter } from '$lib/timer';
   import { dev } from '$lib/stores/FeatureSelection.js';
   import Symbol from '$lib/components/ui/Symbol.svelte';
+  import Background from '$lib/components/ui/sections/Background.svelte';
+  import Video from '$lib/components/ui/Video.svelte';
+  import Footer from '$lib/components/ui/Footer.svelte';
 
   const { getCourse } = getContext('courses');
   const user = getContext('user').store;
@@ -19,11 +22,23 @@
   const i = counter(-1, 1, stepTime);
 
   let courseProgress = $derived($user.userLessonProgress[id]);
+
+  // TODO: pick from course, this is just a mockup for the design
+  const video = 'https://app.bouncy-feet.ch/media/videos/c5/rrm-overview.mp4';
 </script>
+
+<Background bgColor="var(--theme-main)" color="var(--theme-neutral-black)"
+></Background>
 
 <Header title={course.name} />
 
 <p>{course.explanation}</p>
+
+<div class="video-wrapper">
+  {#if video && video.length > 0}
+    <Video path={`${video}`}></Video>
+  {/if}
+</div>
 
 <div class="ol">
   <!-- WIP
@@ -44,6 +59,9 @@
       <div>
         {$t('courses.lesson.title')}
         {index + 1}
+      </div>
+      <div>
+        {lesson.name}
       </div>
       <div class="step">
         {#if lesson.parts.length > 0}
@@ -83,6 +101,8 @@
   {/each}
 </div>
 
+<Footer></Footer>
+
 <style>
   p {
     text-align: center;
@@ -104,6 +124,7 @@
     max-width: 400px;
     font-size: var(--font-large);
     margin: 10px;
+    border-radius: 5px;
   }
   .step {
     margin: 0 15px;
@@ -119,5 +140,9 @@
   }
   button {
     margin: 10px;
+  }
+  .video-wrapper {
+    width: 100%;
+    margin: 2rem 0;
   }
 </style>

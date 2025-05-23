@@ -10,6 +10,7 @@
   import LightBackground from '$lib/components/ui/sections/LightBackground.svelte';
   import DarkSection from '$lib/components/ui/sections/DarkSection.svelte';
   import DanceCounts from '$lib/components/DanceCounts.svelte';
+  import Footer from '$lib/components/ui/Footer.svelte';
 
   /**
    * @typedef {Object} Props
@@ -97,6 +98,8 @@
   {:else}
     <p>{$t('collection.no-courses')}</p>
   {/each}
+
+  <Footer white />
 </DarkSection>
 
 <style>
