@@ -25,7 +25,7 @@ export const coaches = [
             "reverse-rm-0": {
                 video: "https://app.bouncy-feet.ch/media/videos/steps/reverse-rm.mp4",
                 // TODO add courses
-                courses: []
+                courses: ["rrm-basics"]
             },
             "pp-0": {
                 video: "",

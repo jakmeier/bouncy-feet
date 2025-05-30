@@ -21,6 +21,7 @@ function initSongsLibrary() {
         song("105bpm_tropical_house", "Aeris", "Arise"),
         song("115bpm_house", "Den Elbriggs", "Glen Brides"),
         song("120bpm_tech_house", "Kryne", "Kerny"),
+        song("120bpm_groove", "Iv Eight", "GROOVE"),
         song("122bpm_you_can_do_this", "Alexi Action & Infraction ", "You Can Do This"),
     ];
     // TODO: final song names should be checked with authors

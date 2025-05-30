@@ -1,0 +1,208 @@
+#![enable(implicit_some)]
+(
+  version: 0,
+  id: "rrm-basics",
+  names: {"de": "Rückwärts RM", "en": "Reverse RM Intro"},
+  featured_step: "reverse-running-man",
+  explanations: {
+    "de": "Na, suchst du nach einer Herausforderung? Wenn dir der normale Running Man zu langweilig ist, bist du hier goldrichtig.",
+    "en": "Looking for a challenge, yeah? This course adds spices to the normal Running Man!",
+  },
+  lessons: [
+    (
+      names: {"de": "Übung 1", "en": "Exercise 1"},
+      explanations: {
+        "de": "...",
+        "en": "...",
+      },
+      difficulty: 2,
+      energy: 2,
+      video: "https://app.bouncy-feet.ch/media/videos/c5/lesson_1.mp4",
+      song: "120bpm_groove",
+      song_timestamp: 0,
+      parts: [
+        ( step: "side", repeat: 1, subbeats_per_move: 2 ),
+        ( step: "prepare", repeat: 1, subbeats_per_move: 2 ),
+        ( step: "exercise-1-right", repeat: 4, subbeats_per_move: 2 ),
+
+        ( step: "side", repeat: 3, subbeats_per_move: 2 ),
+        ( step: "prepare-left", repeat: 1, subbeats_per_move: 2 ),
+        ( step: "exercise-1-left", repeat: 4, subbeats_per_move: 2 ),
+      ],
+    ),
+    (
+      names: {"de": "Vorwärts und rückwärts", "en": "Forward and backward"},
+      explanations: {
+        "de": "4 Schritte vor, einer zurück. Los gehts!",
+        "en": "4steps forward, one back. Let's go!",
+      },
+      difficulty: 3,
+      energy: 3,
+      video: "https://app.bouncy-feet.ch/media/videos/c5/lesson_2.mp4",
+      song: "120bpm_groove",
+      song_timestamp: 2000,
+      parts: [
+        ( step: "side", repeat: 1, subbeats_per_move: 2 ),
+        ( step: "prepare", repeat: 3, subbeats_per_move: 2 ),
+        // ( step: "running-man", repeat: 1, subbeats_per_move: 4 ),
+        // ( step: "exercise-2", repeat: 1, subbeats_per_move: 4 ),
+        ( step: "running-man", repeat: 2, subbeats_per_move: 2 ),
+        ( step: "exercise-2", repeat: 14, subbeats_per_move: 2 ),
+      ],
+    ),
+  ],
+  steps: [
+    (
+      name: "Running man",
+      id: "running-man",
+      keyframes: [
+        (pose: "right-forward", orientation: Right),
+        (pose: "left-up", orientation: Right),
+        (pose: "left-forward", orientation: Right),
+        (pose: "right-up", orientation: Right),
+      ],
+    ),
+    (
+      name: "Reverse Running Man",
+      id: "reverse-running-man",
+      keyframes: [
+        (pose: "left-forward", orientation: Right),
+        (pose: "left-up", orientation: Right),
+        (pose: "right-forward", orientation: Right),
+        (pose: "right-up", orientation: Right),
+      ],
+    ),
+    (
+      name: "Exercise 1 (left)",
+      id: "exercise-1-left",
+      keyframes: [
+        (pose: "right-forward", orientation: Right),
+        (pose: "left-up", orientation: Right),
+      ],
+    ),
+    (
+      name: "Exercise 1 (right)",
+      id: "exercise-1-right",
+      keyframes: [
+        (pose: "left-forward", orientation: Right),
+        (pose: "right-up", orientation: Right),
+      ],
+    ),
+    (
+      name: "Exercise 2",
+      id: "exercise-2",
+      keyframes: [
+        (pose: "left-forward", orientation: Right),
+        (pose: "right-up", orientation: Right),
+        (pose: "right-forward", orientation: Right),
+        (pose: "left-up", orientation: Right),
+        (pose: "left-forward", orientation: Right),
+        (pose: "right-up", orientation: Right),
+        (pose: "right-forward", orientation: Right),
+        (pose: "left-up", orientation: Right),
+
+        (pose: "right-forward", orientation: Right),
+        (pose: "left-up", orientation: Right),
+        (pose: "left-forward", orientation: Right),
+        (pose: "right-up", orientation: Right),
+        (pose: "right-forward", orientation: Right),
+        (pose: "left-up", orientation: Right),
+        (pose: "left-forward", orientation: Right),
+        (pose: "right-up", orientation: Right),
+      ],
+    ),
+    (
+      name: "Wait",
+      id: "side",
+      keyframes: [
+        (pose: "standing-straight-side", orientation: Right),
+      ],
+    ),
+    (
+      name: "Prepare",
+      id: "prepare",
+      keyframes: [
+        (pose: "right-up", orientation: Right),
+      ],
+    ),
+    (
+      name: "Prepare",
+      id: "prepare-left",
+      keyframes: [
+        (pose: "left-up", orientation: Right),
+      ],
+    ),
+  ],
+  poses: [
+    (
+      id: "right-forward",
+      direction: Right,
+      y_shift: -0.0275,
+      limbs: [
+        (limb: LeftThigh, angle: -20, tolerance: 5, weight: 0.5),
+        (limb: LeftShin, angle: -25, tolerance: 5, weight: 0.5),
+        (limb: LeftLeg, angle: -30, tolerance: 5, weight: 1.0),
+        (limb: RightThigh, angle: 40, tolerance: 5, weight: 1.0),
+        (limb: RightShin, angle: 0, tolerance: 5, weight: 0.5),
+        (limb: RightLeg, angle: 10, tolerance: 5, weight: 0.5),
+        (limb: RightFoot, angle: 90, tolerance: 10, weight: 0.0),
+        (limb: LeftFoot, angle: 90, tolerance: 0, weight: 0.0),
+        (limb: LeftArm, angle: 0, tolerance: 0, weight: 0.0),
+        (limb: LeftForearm, angle: 96, tolerance: 0, weight: 0.0),
+        (limb: RightArm, angle: -25, tolerance: 0, weight: 0.0),
+        (limb: RightForearm, angle: -20, tolerance: 0, weight: 0.0),
+      ],
+    ),
+    (id: "left-forward", mirror_of: "right-forward", direction: Right),
+    (
+      id: "right-up",
+      direction: Right,
+      turn_shoulder: 30,
+      turn_hip: 20,
+      limbs: [
+        (limb: LeftLeg, angle: 0, tolerance: 3, weight: 1.0),
+        (limb: RightLeg, angle: 0, tolerance: 5, weight: 0.5),
+        (limb: RightShin, angle: -50, tolerance: 10, weight: 1.0),
+        (limb: RightThigh, angle: 60, tolerance: 5, weight: 1.0),
+        (limb: LeftArm, angle: 6, tolerance: 0, weight: 0.0),
+        (limb: LeftForearm, angle: 18, tolerance: 0, weight: 0.0),
+        (limb: LeftFoot, angle: 90, tolerance: 0, weight: 0.0),
+        (limb: RightFoot, angle: 70, tolerance: 0, weight: 0.0),
+        (limb: RightArm, angle: -12, tolerance: 0, weight: 0.0),
+        (limb: RightForearm, angle: 6, tolerance: 0, weight: 0.0),
+      ],
+    ),
+    (id: "left-up", mirror_of: "right-up", direction: Right),
+
+    (
+      id: "standing-straight-front",
+      direction: Front,
+      limbs: [
+        (limb: LeftShin, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: LeftThigh, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: RightShin, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: LeftFoot, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: RightThigh, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: RightFoot, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: RightArm, angle: 10, tolerance: 0, weight: 0.0),
+        (limb: RightForearm, angle: -5, tolerance: 0, weight: 0.0),
+        (limb: LeftArm, angle: -10, tolerance: 0, weight: 0.0),
+        (limb: LeftForearm, angle: 5, tolerance: 0, weight: 0.0),
+      ]
+    ),
+    (
+      id: "standing-straight-side",
+      direction: Right,
+      limbs: [
+        (limb: LeftShin, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: LeftThigh, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: RightShin, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: RightThigh, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: RightArm, angle: 6, tolerance: 0, weight: 0.0),
+        (limb: RightForearm, angle: 18, tolerance: 0, weight: 0.0),
+        (limb: LeftArm, angle: -12, tolerance: 0, weight: 0.0),
+        (limb: LeftForearm, angle: 6, tolerance: 0, weight: 0.0),
+      ]
+    ),
+  ],
+)
