@@ -202,10 +202,7 @@ impl Teacher {
     /// Whether at the given subbeat, the student should be tracked.
     pub(crate) fn is_tracking_at_subbeat(&self, subbeat: u32) -> bool {
         self.section_at_subbeat(subbeat)
-            .map(|section| match &section {
-                Section::Step(_) | Section::Freestyle { .. } | Section::Warmup(_) => true,
-                Section::ShowStep(_) => false,
-            })
+            .map(Section::is_tracked)
             .unwrap_or_default()
     }
 
@@ -238,6 +235,18 @@ impl Teacher {
     /// How many beats to track for in total
     pub(crate) fn tracked_subbeats(&self) -> u32 {
         self.total_subbeats
+    }
+
+    /// number of subbeats to delay
+    pub(crate) fn subbeats_before_tracking(&self) -> u32 {
+        let mut delay = 0;
+        for section in &self.sections {
+            if section.is_tracked() {
+                break;
+            }
+            delay += section.subbeats();
+        }
+        delay
     }
 }
 
@@ -284,5 +293,12 @@ impl Section {
     fn pose_duration(&self) -> Option<u32> {
         self.step()
             .map(|StepSection { pace, .. }| pace.subbeats_per_pose())
+    }
+
+    fn is_tracked(&self) -> bool {
+        match self {
+            Section::Step(_) | Section::Freestyle { .. } | Section::Warmup(_) => true,
+            Section::ShowStep(_) => false,
+        }
     }
 }

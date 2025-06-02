@@ -4,7 +4,7 @@ use crate::intern::step_pace::StepPace;
 use crate::intern::teacher::Teacher;
 use crate::intern::tracker_dance_collection::TrackerDanceCollection;
 use crate::wrapper::step_wrapper::StepWrapper;
-use crate::Tracker;
+use crate::{parsing, Tracker};
 use std::rc::Rc;
 use wasm_bindgen::prelude::wasm_bindgen;
 
@@ -40,10 +40,20 @@ pub struct Lesson {
 pub struct LessonPart {
     pub(crate) step_name: String,
     pub(crate) step_wrapper: StepWrapper,
-    // How many times the step should be repeated.
+    /// How many times the step should be repeated.
     pub(crate) repeat: u32,
-    // At what pace the step should be danced.
+    /// At what pace the step should be danced.
     pub(crate) pace: StepPace,
+    /// Whether and how the step should be danced and tracked, or just shown.
+    pub(crate) tracking: TrackingKind,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum TrackingKind {
+    /// Normal tracking, used when nothing is specified.
+    Tracked,
+    /// Show the step but don't track it.
+    Untracked,
 }
 
 #[derive(Debug)]
@@ -178,7 +188,10 @@ impl Lesson {
             let step = &part.step_wrapper;
             let pace = part.pace;
 
-            teacher.add_step(step.info(&db), part.repeat, pace);
+            match part.tracking {
+                TrackingKind::Tracked => teacher.add_step(step.info(&db), part.repeat, pace),
+                TrackingKind::Untracked => teacher.show_step(step.info(&db), part.repeat, pace),
+            }
         }
 
         Tracker::new_from_teacher(db, teacher)
@@ -211,6 +224,7 @@ impl LessonPart {
         state: &ContentCollection,
         repeat: u32,
         subbeats_per_move: u8,
+        tracking: parsing::course_file::TrackingKind,
     ) -> Result<Self, CourseError> {
         let step_wrapper = state
             .step(&step_name)
@@ -218,12 +232,14 @@ impl LessonPart {
             .ok_or_else(|| CourseError::MissingStep(step_name.clone()))?;
 
         let pace = StepPace::new(subbeats_per_move as u32);
+        let tracking = tracking.into();
 
         Ok(LessonPart {
             step_name,
             step_wrapper,
             repeat,
             pace,
+            tracking,
         })
     }
 }
@@ -244,6 +260,7 @@ impl std::fmt::Debug for LessonPart {
             // .field("step_info", &self.step_info)
             .field("repeat", &self.repeat)
             .field("pace", &self.pace)
+            .field("tracking", &self.tracking)
             .finish()
     }
 }

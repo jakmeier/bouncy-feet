@@ -197,7 +197,7 @@ mod tests {
           front_video: "https://app.bouncy-feet.ch/media/videos/c3/combo_fast_front_view.mp4",
           back_video: "https://app.bouncy-feet.ch/media/videos/c3/combo_fast_back_view.mp4",
           parts: [
-            (step: "run-in-place", repeat: 1, subbeats_per_move: 1),
+            (step: "run-in-place", repeat: 1, subbeats_per_move: 1, tracking: Untracked),
           ],
         ),
       ],
@@ -358,6 +358,7 @@ mod tests {
                                 pace: StepPace {
                                     subbeats_per_pose: 1,
                                 },
+                                tracking: Tracked,
                             },
                             LessonPart {
                                 step_name: "another-step",
@@ -365,6 +366,7 @@ mod tests {
                                 pace: StepPace {
                                     subbeats_per_pose: 4,
                                 },
+                                tracking: Tracked,
                             },
                         ],
                     },
@@ -422,6 +424,7 @@ mod tests {
                                 pace: StepPace {
                                     subbeats_per_pose: 1,
                                 },
+                                tracking: Untracked,
                             },
                         ],
                     },

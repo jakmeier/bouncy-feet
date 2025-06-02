@@ -396,7 +396,9 @@ impl DanceDetector {
         match state {
             DetectionState::Init => (),
             DetectionState::Positioning => (),
-            DetectionState::CountDown => self.emit_countdown_audio(t),
+            DetectionState::CountDown => {
+                self.emit_countdown_audio(t + self.start_countdown_delay())
+            }
             DetectionState::LiveTracking => (),
             DetectionState::InstructorDemo => (),
             DetectionState::TrackingDone => (),
@@ -417,6 +419,10 @@ impl DanceDetector {
 
     pub(crate) fn recorded_subbeats(&self) -> u32 {
         self.detected.cursor.subbeat
+    }
+
+    fn start_countdown_delay(&self) -> Timestamp {
+        self.teacher.subbeats_before_tracking() as f64 * self.subbeat_time()
     }
 
     /// Attention: This is not from the start of tracking but from the beat alignment

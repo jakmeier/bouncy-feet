@@ -23,13 +23,13 @@
       song_timestamp: 2950,
       parts: [
         // start position (4 beats)
-        ( step: "stand", repeat: 4, subbeats_per_move: 2 ),
+        ( step: "stand", repeat: 4, subbeats_per_move: 2, tracking: Untracked ),
         
         // prep (4 beats)
-        ( step: "side", repeat: 4, subbeats_per_move: 2 ),
+        ( step: "side", repeat: 4, subbeats_per_move: 2, tracking: Untracked ),
 
         // start 1 slow rm (4 beats)
-        ( step: "running-man", repeat: 1, subbeats_per_move: 2 ),
+        ( step: "running-man", repeat: 1, subbeats_per_move: 2, tracking: Untracked  ),
 
         // 64 beats: 8 x (4 counts slow, 4 counts fast)
         ( step: "running-man", repeat: 2, subbeats_per_move: 1 ),
@@ -50,9 +50,9 @@
         ( step: "running-man", repeat: 1, subbeats_per_move: 2 ),
 
         // break for 32 beats, with hint when to start again
-        ( step: "stand", repeat: 2, subbeats_per_move: 4 ),
-        ( step: "vibe", repeat: 6, subbeats_per_move: 4 ),
-        ( step: "side", repeat: 2, subbeats_per_move: 4 ),
+        ( step: "stand", repeat: 2, subbeats_per_move: 4, tracking: Untracked ),
+        ( step: "vibe", repeat: 6, subbeats_per_move: 4, tracking: Untracked ),
+        ( step: "side", repeat: 2, subbeats_per_move: 4, tracking: Untracked ),
 
         // slow for 32 beats
         ( step: "running-man", repeat: 8, subbeats_per_move: 2 ),
@@ -62,7 +62,7 @@
         ( step: "running-man", repeat: 16, subbeats_per_move: 1 ),
 
         // break to end
-        ( step: "stand", repeat: 4, subbeats_per_move: 2 ),
+        ( step: "stand", repeat: 4, subbeats_per_move: 2, tracking: Untracked ),
       ],
     ),
   ],

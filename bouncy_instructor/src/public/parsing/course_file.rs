@@ -51,10 +51,22 @@ pub(crate) struct Lesson {
 #[derive(Debug, Serialize, Deserialize)]
 pub(crate) struct Part {
     pub(crate) step: String,
-    // How many times the step should be repeated.
+    /// How many times the step should be repeated.
     pub(crate) repeat: u32,
-    // At what pace the step should be danced.
+    /// At what pace the step should be danced.
     pub(crate) subbeats_per_move: u8,
+    /// Whether and how the step should be danced and tracked, or just shown.
+    #[serde(default, skip_serializing_if = "is_default")]
+    pub(crate) tracking: TrackingKind,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default, Clone, PartialEq)]
+pub(crate) enum TrackingKind {
+    /// Normal tracking, used when nothing is specified.
+    #[default]
+    Tracked,
+    /// Show the step but don't track it.
+    Untracked,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default, Clone, PartialEq)]
@@ -150,7 +162,15 @@ impl Lesson {
         let parts = self
             .parts
             .into_iter()
-            .map(|p| LessonPart::new(p.step, collection, p.repeat, p.subbeats_per_move))
+            .map(|p| {
+                LessonPart::new(
+                    p.step,
+                    collection,
+                    p.repeat,
+                    p.subbeats_per_move,
+                    p.tracking,
+                )
+            })
             .collect::<Result<_, _>>()?;
 
         Ok(crate::public::course::Lesson {
@@ -200,5 +220,19 @@ impl TranslatedString {
 
     pub fn set(&mut self, lang: String, name: String) {
         self.inner.insert(lang, name);
+    }
+}
+
+fn is_default<D: Default + PartialEq>(this: &D) -> bool {
+    *this == D::default()
+}
+
+impl From<TrackingKind> for crate::public::course::TrackingKind {
+    fn from(value: TrackingKind) -> crate::public::course::TrackingKind {
+        use crate::public::course::TrackingKind::*;
+        match value {
+            TrackingKind::Tracked => Tracked,
+            TrackingKind::Untracked => Untracked,
+        }
     }
 }

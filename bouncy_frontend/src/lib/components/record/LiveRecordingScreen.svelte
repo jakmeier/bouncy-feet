@@ -194,7 +194,6 @@
         teacherVideoOpacity = 1.0;
         enableLiveAvatar = false;
         enableInstructorAvatar = false;
-        // TODO: handle starting the video independently, with the right timing
         startVideo();
         break;
 
