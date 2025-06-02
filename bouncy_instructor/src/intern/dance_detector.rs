@@ -340,7 +340,7 @@ impl DanceDetector {
 
     pub(crate) fn current_view(&mut self, t: Timestamp) -> TeacherView {
         match self.detection_state {
-            DetectionState::Init | DetectionState::Positioning => TeacherView::CameraOnly,
+            DetectionState::Init | DetectionState::Positioning => TeacherView::UserCameraOnly,
             DetectionState::CountDown
             | DetectionState::LiveTracking
             | DetectionState::InstructorDemo => {

@@ -22,10 +22,12 @@
   /** @type {UserContextData} */
   const user = getContext('user');
 
+  /** @type {import('$lib/instructor/bouncy_instructor').Course} */
   let course = getCourse(courseId);
   let previewDone = $state(false);
   let trackingDone = $state(false);
   let liveActivity = $state();
+  let teacherVideo = $derived(course.lessons[lessonIndex].frontVideo);
 
   let detection = $state();
   let videoUrl = $state();
@@ -106,7 +108,10 @@
     <StandardPage white><h3>bug: course missing</h3></StandardPage>
   {/if}
 {:else if !trackingDone}
-  <LiveActivity bind:this={liveActivity} onDone={onRecordingStopped}
+  <LiveActivity
+    bind:this={liveActivity}
+    onDone={onRecordingStopped}
+    {teacherVideo}
   ></LiveActivity>
 {:else if detection !== undefined}
   <ActivityReview

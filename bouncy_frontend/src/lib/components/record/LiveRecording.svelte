@@ -69,12 +69,14 @@ button or by a explicit `stop` call from the parent component.
 The recording video blob is passed as as a parameter.
    * @property {boolean} [forceBeat] - always evaluate the pose on beat and move on to the next pose, even when
 it does not match
+   * @property {string} [teacherVideo]
    */
 
   /** @type {Props} */
   let {
     onStop = (/** @type {Blob | undefined} */ _recording) => {},
     forceBeat = false,
+    teacherVideo,
   } = $props();
 
   /** @type {LiveRecordingScreen} */
@@ -355,6 +357,7 @@ it does not match
 <LiveRecordingScreen
   bind:this={screen}
   {effectText}
+  {teacherVideo}
   {instructorJumpHeight}
   {instructorSkeleton}
   {instructorSkeletonBodyShift}

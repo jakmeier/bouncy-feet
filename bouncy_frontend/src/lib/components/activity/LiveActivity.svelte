@@ -18,10 +18,11 @@
   /**
    * @typedef {Object} Props
    * @property {(detection: DetectionResult, recordingStart: number, recordingEnd: number, videoUrl: string)=>void} [onDone]
+   * @property {string} [teacherVideo]
    */
 
   /** @type {Props} */
-  let { onDone } = $props();
+  let { onDone, teacherVideo } = $props();
 
   let detectionResult;
   /** @type {string} */
@@ -97,6 +98,7 @@
     bind:this={liveRecording}
     onStop={onRecordingStopped}
     forceBeat={true}
+    {teacherVideo}
   ></LiveRecording>
 </div>
 

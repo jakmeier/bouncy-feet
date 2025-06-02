@@ -11,6 +11,7 @@ pub(crate) struct Teacher {
     sections: Vec<Section>,
     total_subbeats: u32,
     body_shift: BodyShift,
+    teacher_display_mode: TeacherDisplayMode,
     // TODO: audio hints by the teacher
 }
 
@@ -32,7 +33,26 @@ struct StepSection {
     pace: StepPace,
 }
 
+/// What to display while the user dances.
+#[derive(Default)]
+enum TeacherDisplayMode {
+    /// Show the user themself while they need to dance, maybe with
+    #[default]
+    Mirror,
+    /// Show the teacher video while the user dances
+    Video,
+}
+
 impl Teacher {
+    /// Show a video of the teacher instead of a animation.
+    pub(crate) fn use_video(&mut self, yes: bool) {
+        if yes {
+            self.teacher_display_mode = TeacherDisplayMode::Video;
+        } else {
+            self.teacher_display_mode = TeacherDisplayMode::Mirror;
+        }
+    }
+
     /// A step to dance by the student.
     pub(crate) fn add_step(&mut self, step: StepInfo, repeat: u32, pace: StepPace) {
         let beats = repeat * step.num_poses() as u32 * pace.subbeats_per_pose() / 2;
@@ -81,15 +101,9 @@ impl Teacher {
     }
 
     pub(crate) fn step(&self, cursor: &DanceCursor) -> Option<&StepInfo> {
-        self.section(cursor).and_then(|section| match &section {
-            Section::Step(step_section)
-            | Section::ShowStep(step_section)
-            | Section::Warmup(step_section) => {
-                let StepSection { step, .. } = step_section;
-                Some(step)
-            }
-            Section::Freestyle { .. } => None,
-        })
+        self.section(cursor)
+            .and_then(Section::step)
+            .map(|StepSection { step, .. }| step)
     }
 
     /// After n subbeats of the lesson, get the current step and beat remainder.
@@ -98,15 +112,8 @@ impl Teacher {
     /// Sub beat: also count the "and" between
     pub(crate) fn step_at_subbeat(&self, subbeat: u32) -> Option<(&StepInfo, u32)> {
         self.section_at_subbeat(subbeat)
-            .and_then(|section| match &section {
-                Section::Step(step_section)
-                | Section::ShowStep(step_section)
-                | Section::Warmup(step_section) => {
-                    let StepSection { step, pace, .. } = step_section;
-                    Some((step, pace.pose_at_subbeat(subbeat)))
-                }
-                Section::Freestyle { .. } => None,
-            })
+            .and_then(Section::step)
+            .map(|StepSection { step, pace, .. }| (step, pace.pose_at_subbeat(subbeat)))
     }
 
     pub(crate) fn pose_duration(&self, cursor: &DanceCursor) -> Option<u32> {
@@ -118,14 +125,10 @@ impl Teacher {
         let (section_index, remainder) = self.index_at_subbeat(subbeat);
         let section = self.sections.get(section_index);
         let pose_index = section
-            .map(|section| match section {
-                Section::Step(step_section)
-                | Section::ShowStep(step_section)
-                | Section::Warmup(step_section) => {
-                    let StepSection { pace, .. } = step_section;
-                    pace.pose_at_subbeat(remainder as u32) as usize
-                }
-                Section::Freestyle { .. } => 0,
+            .and_then(|section| {
+                section
+                    .step()
+                    .map(|StepSection { pace, .. }| pace.pose_at_subbeat(remainder as u32) as usize)
             })
             .unwrap_or(0);
 
@@ -210,9 +213,15 @@ impl Teacher {
     pub(crate) fn ui_view_at_subbeat(&self, subbeat: u32) -> TeacherView {
         self.section_at_subbeat(subbeat)
             .map(|section| match &section {
-                Section::Step(_) => TeacherView::InstructorAndCamera,
+                Section::Step(_) => match self.teacher_display_mode {
+                    TeacherDisplayMode::Mirror => TeacherView::InstructorAndCamera,
+                    TeacherDisplayMode::Video => TeacherView::TeacherVideo,
+                },
                 Section::Freestyle { .. } => TeacherView::UserCameraWithTracking,
-                Section::Warmup(_) | Section::ShowStep(_) => TeacherView::InstructorOnly,
+                Section::Warmup(_) | Section::ShowStep(_) => match self.teacher_display_mode {
+                    TeacherDisplayMode::Mirror => TeacherView::InstructorOnly,
+                    TeacherDisplayMode::Video => TeacherView::TeacherVideo,
+                },
             })
             .unwrap_or(TeacherView::Off)
     }
@@ -263,15 +272,17 @@ impl Section {
         self.subbeats().div_ceil(per_step)
     }
 
-    fn pose_duration(&self) -> Option<u32> {
+    fn step(&self) -> Option<&StepSection> {
         match &self {
             Section::Step(step_section)
             | Section::ShowStep(step_section)
-            | Section::Warmup(step_section) => {
-                let StepSection { pace, .. } = step_section;
-                Some(pace.subbeats_per_pose())
-            }
+            | Section::Warmup(step_section) => Some(step_section),
             Section::Freestyle { .. } => None,
         }
+    }
+
+    fn pose_duration(&self) -> Option<u32> {
+        self.step()
+            .map(|StepSection { pace, .. }| pace.subbeats_per_pose())
     }
 }

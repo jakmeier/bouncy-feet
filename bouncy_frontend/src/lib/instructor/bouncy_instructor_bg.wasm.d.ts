@@ -196,6 +196,7 @@ export const tracker_subbeat: (a: number, b: number) => number;
 export const tracker_timeBetweenPoses: (a: number) => number;
 export const tracker_trackedSubbeats: (a: number) => number;
 export const tracker_UniqueStepTracker: (a: number, b: number, c: number) => void;
+export const tracker_useTeacherVideo: (a: number, b: number) => void;
 export const tracker_WarmUp: (a: number, b: number, c: number, d: number) => void;
 export const __wbg_audioeffect_free: (a: number, b: number) => void;
 export const __wbg_cartesian2d_free: (a: number, b: number) => void;

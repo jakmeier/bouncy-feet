@@ -34,11 +34,13 @@
   } from '$lib/instructor/bouncy_instructor_bg';
   import { fade } from 'svelte/transition';
   import WakeLock from '../WakeLock.svelte';
+  import Video from '../ui/Video.svelte';
 
   /**
    * @typedef {Object} Props
    * @property {Skeleton} [instructorSkeleton]
    * @property {string} effectText
+   * @property {string} [teacherVideo]
    * @property {Cartesian2d} userSkeletonOrigin Where the dancer is on camera. Don't update between poses.
    * @property {number} userSkeletonSize How large the dancer is on camera. Don't update between poses.
    * @property {number} progress
@@ -54,6 +56,7 @@
   let {
     instructorSkeleton,
     effectText,
+    teacherVideo,
     userSkeletonOrigin,
     userSkeletonSize,
     markedLimbs,
@@ -73,7 +76,8 @@
   let showOverlay = $state(true);
   let showExplanation = $state(true);
   let recordingOn = $state(false);
-  let videoOpacity = $state(0.0);
+  let userVideoOpacity = $state(0.0);
+  let teacherVideoOpacity = $state(0.0);
   let view = $state(TeacherView.Off);
   let poseHint = $state();
   let userStyle = $state(selectStyle(PoseHint.DontKnow));
@@ -107,6 +111,8 @@
   let camera;
   /** @type {HTMLVideoElement | undefined } */
   let camVideoElement = $state();
+  /** @type { Video | undefined } */
+  let teacherVideoComponent = $state();
   let outerWidth = $state();
   let cameraOn = $state(false);
 
@@ -136,41 +142,60 @@
     camera.stopCamera();
   }
 
+  export function startVideo() {
+    teacherVideoComponent?.startVideo();
+  }
+
   /**
    * @param {TeacherView} newView
    * @param {DetectionState} newDetectionState
    */
   export function updateView(newView, newDetectionState) {
     view = newView;
+    // console.log(TeacherView[view]);
     switch (view) {
       case TeacherView.Off:
-        videoOpacity = 0.0;
+        userVideoOpacity = 0.0;
+        teacherVideoOpacity = 0.0;
         enableLiveAvatar = false;
         enableInstructorAvatar = false;
         break;
 
       case TeacherView.UserCameraWithTracking:
-        videoOpacity = 1.0;
+        userVideoOpacity = 1.0;
+        teacherVideoOpacity = 0.0;
         enableLiveAvatar = true;
         enableInstructorAvatar = false;
         break;
 
       case TeacherView.InstructorOnly:
-        videoOpacity = 0.0;
+        userVideoOpacity = 0.0;
+        teacherVideoOpacity = 0.0;
         enableLiveAvatar = false;
         enableInstructorAvatar = true;
         break;
 
       case TeacherView.InstructorAndCamera:
-        videoOpacity = 1.0;
+        userVideoOpacity = 1.0;
+        teacherVideoOpacity = 0.0;
         enableLiveAvatar = false;
         enableInstructorAvatar = true;
         break;
 
-      case TeacherView.CameraOnly:
-        videoOpacity = 1.0;
+      case TeacherView.UserCameraOnly:
+        userVideoOpacity = 1.0;
+        teacherVideoOpacity = 0.0;
         enableLiveAvatar = false;
         enableInstructorAvatar = false;
+        break;
+
+      case TeacherView.TeacherVideo:
+        userVideoOpacity = 0.0;
+        teacherVideoOpacity = 1.0;
+        enableLiveAvatar = false;
+        enableInstructorAvatar = false;
+        // TODO: handle starting the video independently, with the right timing
+        startVideo();
         break;
 
       default:
@@ -208,9 +233,20 @@
 <WakeLock />
 
 <FullScreenArea backgroundColor="var(--theme-neutral-black)">
+  <div class="video" style="--opacity: {teacherVideoOpacity}">
+    {#if teacherVideo && teacherVideo.length > 0}
+      <Video
+        bind:this={teacherVideoComponent}
+        path={`${teacherVideo}`}
+        controls={false}
+        muted
+      ></Video>
+    {/if}
+  </div>
+
   <div class="camera" bind:clientWidth={outerWidth}>
     <Camera
-      bind:opacity={videoOpacity}
+      bind:opacity={userVideoOpacity}
       bind:videoElement={camVideoElement}
       bind:cameraOn
       bind:this={camera}
@@ -257,31 +293,33 @@
     </div>
   </div>
 
-  <div class="overlay" class:transparent={!showOverlay} transition:fade>
-    <div class="frame">
-      <div class="corner-marked2">
-        <div class="corner-marked">
-          <div class="framed">
-            {#if showExplanation}
-              <div class="overlay-text">
-                <div>
-                  {$t('courses.lesson.exercise-start-description-0')}
+  {#if teacherVideoOpacity == 0.0}
+    <div class="overlay" class:transparent={!showOverlay} transition:fade>
+      <div class="frame">
+        <div class="corner-marked2">
+          <div class="corner-marked">
+            <div class="framed">
+              {#if showExplanation}
+                <div class="overlay-text">
+                  <div>
+                    {$t('courses.lesson.exercise-start-description-0')}
+                  </div>
+                  <div>
+                    {$t('courses.lesson.exercise-start-description-1')}
+                  </div>
                 </div>
-                <div>
-                  {$t('courses.lesson.exercise-start-description-1')}
+              {/if}
+              {#if effectText}
+                <div class="effect-text">
+                  {effectText}
                 </div>
-              </div>
-            {/if}
-            {#if effectText}
-              <div class="effect-text">
-                {effectText}
-              </div>
-            {/if}
+              {/if}
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  {/if}
 
   <div class="ui">
     <!-- TODO: add this dev tooling again (ideally without mirroring it :P) -->
@@ -305,6 +343,17 @@
     transform: scaleX(-1);
 
     position: relative;
+    display: grid;
+    align-items: center;
+    justify-items: center;
+  }
+  .video {
+    opacity: var(--opacity);
+    width: 100%;
+    height: 100%;
+    transform: scaleX(-1);
+
+    position: absolute;
     display: grid;
     align-items: center;
     justify-items: center;

@@ -256,6 +256,11 @@ impl Tracker {
         self.detector.error_threshold = error_threshold;
     }
 
+    #[wasm_bindgen(js_name = useTeacherVideo)]
+    pub fn use_teacher_video(&mut self, yes: bool) {
+        self.detector.teacher.use_video(yes);
+    }
+
     /// Goes over all data and detects the best fitting dance.
     ///
     /// There is no re-use or consistency between calls. It always starts at 0

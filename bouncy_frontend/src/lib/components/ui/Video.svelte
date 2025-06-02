@@ -5,10 +5,11 @@
    * @typedef {Object} Props
    * @property {string} path
    * @property {boolean} [controls=true]
+   * @property {boolean} [muted=false]
    */
 
   /** @type {Props} */
-  let { path, controls = true } = $props();
+  let { path, controls = true, muted = false } = $props();
   let videoExists = $state(false);
   let videoLoading = $state(true);
   /** @type {HTMLVideoElement} */
@@ -34,6 +35,8 @@
         preload="auto"
         playsinline
         webkit-playsinline
+        defaultmuted={muted}
+        muted={muted}
       >
         <source
           src={path}

@@ -84,9 +84,16 @@ impl Course {
     }
 
     pub fn tracker(&self, lesson_index: usize) -> Option<Tracker> {
-        self.lessons
-            .get(lesson_index)
-            .map(|lesson| lesson.tracker(self.collection.tracker_view.clone()))
+        self.lessons.get(lesson_index).map(|lesson| {
+            let has_video = lesson
+                .front_video
+                .as_ref()
+                .map(|s| !s.is_empty())
+                .unwrap_or(false);
+            let mut tracker = lesson.tracker(self.collection.tracker_view.clone());
+            tracker.use_teacher_video(has_video);
+            tracker
+        })
     }
 
     /// WIP: Create a training session for the given course. At the moment, it

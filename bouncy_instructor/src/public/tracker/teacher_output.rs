@@ -14,7 +14,9 @@ pub enum TeacherView {
     /// Show the camera (without tracking) and the instructor.
     InstructorAndCamera = 3,
     /// Show just the plain camera.
-    CameraOnly = 4,
+    UserCameraOnly = 4,
+    /// Show the video of the teacher showing the exercise.
+    TeacherVideo = 5,
 }
 
 /// A pointer to a pose inside a tracked activity or dance.

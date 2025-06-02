@@ -18,6 +18,7 @@
       difficulty: 3,
       energy: 5,
       explainer_video: "https://app.bouncy-feet.ch/media/videos/c4/rm_speed_intro.mp4",
+      front_video: "https://app.bouncy-feet.ch/media/videos/c4/rm_speed_training_session.mp4",
       song: "122bpm_you_can_do_this",
       song_timestamp: 2950,
       parts: [
