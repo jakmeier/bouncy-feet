@@ -81,17 +81,19 @@
 <DarkSection>
   <h2>{$t('collection.courses-subtitle')}</h2>
 
-  <!-- TODO: make course links work (needs implementing courses properly) -->
   {#each courses as course}
     <div class="course">
-      <button>{course.name}</button>
-      <!-- <a href="../../courses/{course.id}/exercise/{index}"> -->
+      <a href="../../../../courses/{course.id}">
+        <button>{course.name}</button>
+      </a>
       <div class="ol">
         {#each course.lessons as lesson, index}
-          <!-- TODO: actually show which classes were done -->
-          <div class="lesson-outer" class:done={index < 2}>
-            {index + 1}
-          </div>
+          <a href="../../../../courses/{course.id}/exercise/{index}">
+            <!-- TODO: actually show which classes were done -->
+            <div class="lesson-outer" class:done={index < 2}>
+              {index + 1}
+            </div>
+          </a>
         {/each}
       </div>
     </div>
