@@ -13,7 +13,7 @@
       names: {"de": "V-Step langsam", "en": "V-Step, slow"},
       difficulty: 1,
       energy: 1,
-      // video: "/video/todo.mp4",
+      // explainer_video: "/video/todo.mp4",
       parts: [
         (step: "open-v-right", repeat: 8, subbeats_per_move: 4),
         (step: "open-v-left", repeat: 8, subbeats_per_move: 4),
@@ -23,7 +23,7 @@
       names: {"de": "V-Step Lektion 2", "en": "V-Step Lesson 2"},
       difficulty: 2,
       energy: 1,
-      // video: "/video/todo.mp4",
+      // explainer_video: "/video/todo.mp4",
       parts: [
         (step: "open-v-left", repeat: 1, subbeats_per_move: 4),
         (step: "open-v-right", repeat: 1, subbeats_per_move: 4),
@@ -47,7 +47,7 @@
       names: {"de": "Happy-Feet", "en": "Happy-Feet"},
       difficulty: 3,
       energy: 2,
-      // video: "/video/todo.mp4",
+      // explainer_video: "/video/todo.mp4",
       parts: [
         (step: "happy-feet-0", repeat: 2, subbeats_per_move: 4),
         (step: "happy-feet-0", repeat: 4, subbeats_per_move: 2),
@@ -58,7 +58,7 @@
       names: {"de": "Fortgeschrittenes Training", "en": "Advanced Training"},
       difficulty: 1,
       energy: 1,
-      // video: "/video/todo.mp4",
+      // explainer_video: "/video/todo.mp4",
       parts: [
         (step: "happy-feet-0", repeat: 4, subbeats_per_move: 2),
         (step: "v-step-back", repeat: 4, subbeats_per_move: 2),

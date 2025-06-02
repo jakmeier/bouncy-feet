@@ -15,16 +15,15 @@
   const user = getContext('user').store;
 
   const id = page.params.courseId;
+  /** @type {import('$lib/instructor/bouncy_instructor').Course} */
   const course = getCourse(id);
+  const video = $derived(course.video);
 
   const stepTime = 300;
   const animationTime = stepTime * 0.7;
   const i = counter(-1, 1, stepTime);
 
   let courseProgress = $derived($user.userLessonProgress[id]);
-
-  // TODO: pick from course, this is just a mockup for the design
-  const video = 'https://app.bouncy-feet.ch/media/videos/c5/rrm-overview.mp4';
 </script>
 
 <Background bgColor="var(--theme-main)" color="var(--theme-neutral-black)"

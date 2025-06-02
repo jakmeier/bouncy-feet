@@ -18,7 +18,7 @@
   const { tracker } = getContext('tracker');
 
   let lesson = course.lessons[lessonIndex];
-  const video = lesson.video;
+  const video = lesson.explainerVideo;
   /** @type {string} */
   let title = course.lessons[lessonIndex].name;
   let description = course.lessons[lessonIndex].explanation;

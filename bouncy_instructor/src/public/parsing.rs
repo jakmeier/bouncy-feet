@@ -185,6 +185,7 @@ mod tests {
       id: "test-meta",
       names: {"de": "Running Man Anfängerkurs", "en": "Running Man beginner's course"},
       featured_step: "rm-0",
+      video: "https://app.bouncy-feet.ch/media/videos/c3/overview.mp4",
       lessons: [
         (
           names: {"de": "Micro Bounce", "en": "Micro Bounce"},
@@ -192,7 +193,9 @@ mod tests {
           energy: 3,
           song: "105bpm_tropical_house",
           song_timestamp: 1500,
-          video: "https://app.bouncy-feet.ch/media/videos/c3/combo_fast.mp4",
+          explainer_video: "https://app.bouncy-feet.ch/media/videos/c3/combo_fast.mp4",
+          front_video: "https://app.bouncy-feet.ch/media/videos/c3/combo_fast_front_view.mp4",
+          back_video: "https://app.bouncy-feet.ch/media/videos/c3/combo_fast_back_view.mp4",
           parts: [
             (step: "run-in-place", repeat: 1, subbeats_per_move: 1),
           ],
@@ -336,11 +339,14 @@ mod tests {
                 name: "Running Man beginner's course",
                 explanation: None,
                 featured_step_id: "rm-0",
+                video: None,
                 lessons: [
                     Lesson {
                         name: "Micro Bounce",
                         explanation: None,
-                        video: None,
+                        explainer_video: None,
+                        front_video: None,
+                        back_video: None,
                         song: None,
                         song_timestamp: None,
                         energy: 3,
@@ -385,12 +391,21 @@ mod tests {
                 name: "Running Man beginner's course",
                 explanation: None,
                 featured_step_id: "rm-0",
+                video: Some(
+                    "https://app.bouncy-feet.ch/media/videos/c3/overview.mp4",
+                ),
                 lessons: [
                     Lesson {
                         name: "Micro Bounce",
                         explanation: None,
-                        video: Some(
+                        explainer_video: Some(
                             "https://app.bouncy-feet.ch/media/videos/c3/combo_fast.mp4",
+                        ),
+                        front_video: Some(
+                            "https://app.bouncy-feet.ch/media/videos/c3/combo_fast_front_view.mp4",
+                        ),
+                        back_video: Some(
+                            "https://app.bouncy-feet.ch/media/videos/c3/combo_fast_back_view.mp4",
                         ),
                         song: Some(
                             "105bpm_tropical_house",

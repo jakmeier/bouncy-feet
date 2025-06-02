@@ -4,9 +4,10 @@
   id: "rrm-basics",
   names: {"de": "Rückwärts RM", "en": "Reverse RM Intro"},
   featured_step: "reverse-running-man",
+  video: "https://app.bouncy-feet.ch/media/videos/c5/rrm-overview.mp4",
   explanations: {
     "de": "Na, suchst du nach einer Herausforderung? Wenn dir der normale Running Man zu langweilig ist, bist du hier goldrichtig.",
-    "en": "Looking for a challenge, yeah? This course adds spices to the normal Running Man!",
+    "en": "Looking for a challenge, yeah? This course spices up the Running Man!",
   },
   lessons: [
     (
@@ -17,7 +18,9 @@
       },
       difficulty: 2,
       energy: 2,
-      video: "https://app.bouncy-feet.ch/media/videos/c5/lesson_1.mp4",
+      explainer_video: "https://app.bouncy-feet.ch/media/videos/c5/lesson_1.mp4",
+      front_video: "",
+      back_video: "",
       song: "120bpm_groove",
       song_timestamp: 0,
       parts: [
@@ -38,7 +41,7 @@
       },
       difficulty: 3,
       energy: 3,
-      video: "https://app.bouncy-feet.ch/media/videos/c5/lesson_2.mp4",
+      explainer_video: "https://app.bouncy-feet.ch/media/videos/c5/lesson_2.mp4",
       song: "120bpm_groove",
       song_timestamp: 2000,
       parts: [

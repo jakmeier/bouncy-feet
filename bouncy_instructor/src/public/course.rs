@@ -15,6 +15,7 @@ pub struct Course {
     pub(crate) name: String,
     pub(crate) explanation: Option<String>,
     pub(crate) featured_step_id: String,
+    pub(crate) video: Option<String>,
     pub(crate) lessons: Vec<Lesson>,
     pub(crate) collection: ContentCollection,
 }
@@ -24,7 +25,9 @@ pub struct Course {
 pub struct Lesson {
     pub(crate) name: String,
     pub(crate) explanation: Option<String>,
-    pub(crate) video: Option<String>,
+    pub(crate) explainer_video: Option<String>,
+    pub(crate) front_video: Option<String>,
+    pub(crate) back_video: Option<String>,
     pub(crate) song: Option<String>,
     pub(crate) song_timestamp: Option<f64>,
     pub energy: u8,
@@ -63,6 +66,11 @@ impl Course {
     #[wasm_bindgen(getter)]
     pub fn explanation(&self) -> Option<String> {
         self.explanation.clone()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn video(&self) -> Option<String> {
+        self.video.clone()
     }
 
     #[wasm_bindgen(getter)]
@@ -123,9 +131,19 @@ impl Lesson {
         self.explanation.clone()
     }
 
-    #[wasm_bindgen(getter)]
-    pub fn video(&self) -> Option<String> {
-        self.video.clone()
+    #[wasm_bindgen(getter, js_name = "explainerVideo")]
+    pub fn explainer_video(&self) -> Option<String> {
+        self.explainer_video.clone()
+    }
+
+    #[wasm_bindgen(getter, js_name = "frontVideo")]
+    pub fn front_video(&self) -> Option<String> {
+        self.front_video.clone()
+    }
+
+    #[wasm_bindgen(getter, js_name = "backVideo")]
+    pub fn back_video(&self) -> Option<String> {
+        self.back_video.clone()
     }
 
     #[wasm_bindgen(getter)]

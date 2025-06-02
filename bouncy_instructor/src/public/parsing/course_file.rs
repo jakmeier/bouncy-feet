@@ -19,6 +19,7 @@ pub struct CourseFile {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     explanations: Option<TranslatedString>,
     featured_step: String,
+    video: Option<String>,
     lessons: Vec<Lesson>,
     poses: Vec<Pose>,
     steps: Vec<Step>,
@@ -29,8 +30,15 @@ pub(crate) struct Lesson {
     names: TranslatedString,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     explanations: Option<TranslatedString>,
+    /// Video to show in the preview, usually with explanations.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    video: Option<String>,
+    explainer_video: Option<String>,
+    /// Video to show during the exercise, to main lessons song, in that song's pace.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    front_video: Option<String>,
+    /// Alternative view from the back to show during the exercise.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    back_video: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     song: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -98,6 +106,7 @@ impl CourseFile {
             explanation,
             id: self.id.clone(),
             featured_step_id: self.featured_step,
+            video: self.video,
             lessons: vec![],
             collection,
         };
@@ -148,7 +157,9 @@ impl Lesson {
             name,
             explanation,
             parts,
-            video: self.video,
+            explainer_video: self.explainer_video,
+            front_video: self.front_video,
+            back_video: self.back_video,
             song: self.song,
             song_timestamp: self.song_timestamp.map(|int| int as f64),
             difficulty: self.difficulty,
