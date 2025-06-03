@@ -154,14 +154,6 @@ button.light {
     background-color: var(--theme-accent-medium);
 }
 
-button:hover {
-    box-shadow: 0 2px 8px #00000082;
-}
-
-button.light:active {
-    box-shadow: 0 0px 0px #00000082;
-}
-
 button.big {
     width: 152px;
     height: 80px;
