@@ -34,7 +34,7 @@
         : accent
           ? 'var(--theme-accent)'
           : mainColor
-            ? 'var(--theme-main)'
+            ? 'var(--theme-main-alt)'
             : 'var(--theme-neutral-black)'
   );
 

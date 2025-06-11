@@ -89,7 +89,7 @@
   }
 </script>
 
-<Background bgColor="var(--theme-main)" color="var(--theme-neutral-black)" />
+<Background bgColor="var(--theme-main-alt)" color="var(--theme-neutral-black)" />
 
 <LogoHeader mainColor {title} backButton {onBack} />
 

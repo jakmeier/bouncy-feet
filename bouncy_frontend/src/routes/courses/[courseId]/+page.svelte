@@ -1,7 +1,6 @@
 <script>
   import { page } from '$app/state';
   import { t } from '$lib/i18n.js';
-  import Header from '$lib/components/ui/Header.svelte';
   import { getContext } from 'svelte';
   import Step from '../../collection/Step.svelte';
   import { counter } from '$lib/timer';
@@ -10,6 +9,7 @@
   import Background from '$lib/components/ui/sections/Background.svelte';
   import Video from '$lib/components/ui/Video.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
+  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
 
   const { getCourse } = getContext('courses');
   const user = getContext('user').store;
@@ -26,10 +26,10 @@
   let courseProgress = $derived($user.userLessonProgress[id]);
 </script>
 
-<Background bgColor="var(--theme-main)" color="var(--theme-neutral-black)"
+<Background bgColor="var(--theme-main-alt)" color="var(--theme-neutral-black)"
 ></Background>
 
-<Header title={course.name} />
+<LogoHeader title={course.name} backButton mainColor />
 
 <p>{course.explanation}</p>
 

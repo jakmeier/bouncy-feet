@@ -21,7 +21,7 @@
 </script>
 
 {#if mainColor}
-  <Background bgColor="var(--theme-main)" color="var(--theme-neutral-black)"
+  <Background bgColor="var(--theme-main-alt)" color="var(--theme-neutral-black)"
   ></Background>
 {:else if white}
   <Background
