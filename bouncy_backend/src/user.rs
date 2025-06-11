@@ -56,6 +56,8 @@ async fn try_get_user(
     }
 }
 
+// TODO: Fix clippy warning
+#[allow(clippy::result_large_err)]
 fn client_session_credentials_from_headers(
     auth_headers: &GetAll<HeaderValue>,
 ) -> Result<Option<(i64, Uuid)>, Response> {
@@ -157,6 +159,8 @@ pub async fn user_info(
     .to_string()
 }
 
+// TODO: Fix clippy warning
+#[allow(clippy::result_large_err)]
 fn auth_error<T>(msg: &'static str) -> Result<T, Response> {
     Err(auth_error_response(msg))
 }
