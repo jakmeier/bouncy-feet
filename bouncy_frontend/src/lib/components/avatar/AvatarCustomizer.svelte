@@ -2,7 +2,7 @@
   import { LEFT_RIGHT_COLORING, ORANGE_COLORING } from '$lib/constants';
   import { Skeleton } from '$lib/instructor/bouncy_instructor';
   import { getContext } from 'svelte';
-  import Arrow from '../ui/Arrow.svelte';
+  import Arrow from '../ui/svg/Arrow.svelte';
   import AvatarStyleContext from './AvatarStyleContext.svelte';
   import Svg from './Svg.svelte';
   import SvgAvatar from './SvgAvatar.svelte';

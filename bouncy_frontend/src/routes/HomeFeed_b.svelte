@@ -3,7 +3,7 @@
   import { versionString } from '$lib/stores/FeatureSelection';
   import { beatCounter } from '$lib/stores/Beat';
   import HomeEntry from './HomeEntry.svelte';
-  import Arrow from '$lib/components/ui/Arrow.svelte';
+  import Arrow from '$lib/components/ui/svg/Arrow.svelte';
   import LightSection from '$lib/components/ui/sections/LightSection.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
   import LogoHeader from '$lib/components/ui/LogoHeader.svelte';

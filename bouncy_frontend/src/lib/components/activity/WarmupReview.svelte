@@ -2,7 +2,7 @@
   import { t } from '$lib/i18n';
   import { getContext } from 'svelte';
   import StandardPage from '../ui/StandardPage.svelte';
-  import Thermometer from './Thermometer.svelte';
+  import Thermometer from '../ui/svg/Thermometer.svelte';
 
   let { detection, onContinue } = $props();
 

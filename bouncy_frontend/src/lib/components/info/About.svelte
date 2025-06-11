@@ -1,7 +1,7 @@
 <script>
   import { base } from '$app/paths';
   import { t } from '$lib/i18n';
-  import FullLogo from '../ui/FullLogo.svelte';
+  import FullLogo from '../ui/svg/FullLogo.svelte';
 </script>
 
 <div class="logo">

@@ -1,5 +1,5 @@
 <script>
-  import Arrow from './Arrow.svelte';
+  import Arrow from './svg/Arrow.svelte';
 
   let { color = undefined } = $props();
 

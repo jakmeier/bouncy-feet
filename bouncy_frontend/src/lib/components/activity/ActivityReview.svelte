@@ -2,7 +2,7 @@
   import { t } from '$lib/i18n';
   import LessonEnd from './LessonEnd.svelte';
   import VideoReview from '../review/VideoReview.svelte';
-  import Arrow from '../ui/Arrow.svelte';
+  import Arrow from '../ui/svg/Arrow.svelte';
   import Background from '../ui/sections/Background.svelte';
   import StandardPage from '../ui/StandardPage.svelte';
   import LessonEndResults from './LessonEndResults.svelte';

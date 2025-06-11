@@ -1,6 +1,6 @@
 <script>
   // An arrow down, centered and sized for consistency.
-  import Arrow from './Arrow.svelte';
+  import Arrow from './svg/Arrow.svelte';
 
   /**
    * @typedef {Object} Props

@@ -1,6 +1,6 @@
 <script>
   import { base } from '$app/paths';
-  import Arrow from './Arrow.svelte';
+  import Arrow from './svg/Arrow.svelte';
 
   /**
    * @typedef {Object} Props
