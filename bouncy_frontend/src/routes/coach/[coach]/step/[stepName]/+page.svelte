@@ -53,6 +53,7 @@
   const courses = $derived(coachStep.courses.map(getCourse));
 
   onMount(() => {
+    document.querySelector('.background')?.scrollTo(0, 0);
     $bpm = 45;
   });
 </script>

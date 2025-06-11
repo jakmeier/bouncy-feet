@@ -31,7 +31,7 @@
           strokeWidth: 1,
         },
     pageColoring = parentCtx
-      ? parentCtx.danceFloorColor
+      ? parentCtx.pageColoring
       : {
           pageColor: 'var(--theme-neutral-white)',
           fontColor: 'var(--theme-neutral-black)',

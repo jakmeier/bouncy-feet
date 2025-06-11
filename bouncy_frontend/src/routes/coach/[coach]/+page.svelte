@@ -94,8 +94,12 @@
 
     {#each steps as step}
       <a href={`./step/${step.name}`}>
-        <div class="step">
-          <AnimatedStep {step} size={100} style="round"></AnimatedStep>
+        <div
+          class="step"
+          style="border-color: {coach.style.pageColoring.secondaryColor};"
+        >
+          <AnimatedStep {step} size={100} backgroundColor="var(--dance-floor)"
+          ></AnimatedStep>
           <!-- TODO: translations -->
           <h3>{step.name}</h3>
         </div>
@@ -124,6 +128,10 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     align-items: center;
+    background-color: var(--dance-floor);
+    margin: 1rem 0;
+    border-radius: 1rem;
+    border: 3px solid;
   }
 
   .step h3 {

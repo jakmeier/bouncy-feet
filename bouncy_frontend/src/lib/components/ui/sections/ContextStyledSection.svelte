@@ -10,6 +10,8 @@
   let { pageColoring, children } = $props();
 </script>
 
-<Section bgColor={pageColoring.pageColor} color={pageColoring.fontColor}
-  >{@render children?.()}</Section
->
+<div style="--dance-floor: {pageColoring.danceFloorColor}">
+  <Section bgColor={pageColoring.pageColor} color={pageColoring.fontColor}
+    >{@render children?.()}</Section
+  >
+</div>

@@ -36,7 +36,7 @@ export const coaches = [
         style: {
             coloring: ORANGE_COLORING,
             bodyShape: {
-                strokeWidth: 2,
+                strokeWidth: 1.75,
             },
             headStyle: {
                 shape: 'disk',
@@ -45,6 +45,7 @@ export const coaches = [
             },
             pageColoring: {
                 pageColor: "var(--theme-accent)",
+                secondaryColor: "var(--theme-accent-medium)",
                 danceFloorColor: "var(--theme-neutral-light)",
                 fontColor: "var(--theme-neutral-black)",
             }
@@ -83,7 +84,8 @@ export const coaches = [
                 strokeWidth: 1.5,
             },
             pageColoring: {
-                pageColor: "var(--theme-main)",
+                pageColor: "var(--theme-main-alt)",
+                secondaryColor: "var(--theme-main)",
                 danceFloorColor: "var(--theme-neutral-light)",
                 fontColor: "var(--theme-neutral-black)",
             }
