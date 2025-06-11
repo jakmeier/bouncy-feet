@@ -117,7 +117,7 @@
     grid-row: 1 / span 3;
   }
   .arrow {
-    max-width: 1rem;
+    max-width: 1.2rem;
     max-height: 2rem;
   }
   .left {

@@ -61,10 +61,16 @@
  * property {number} height
  * property {number} width
  * 
+ * @typedef {Object} PageColoring
+ * @property {string} pageColor
+ * @property {string} fontColor
+ * @property {string} danceFloorColor
+ * 
  * @typedef {Object} AvatarStyleContext
  * @property {AvatarColoring} coloring
  * @property {AvatarHeadStyle} headStyle
  * @property {AvatarBodyShape} bodyShape
+ * @property {PageColoring} pageColoring
  *
  * @typedef {Object} DanceSessionResult
  * @property {number} numSteps

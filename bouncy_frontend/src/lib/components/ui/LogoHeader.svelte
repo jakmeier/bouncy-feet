@@ -69,15 +69,15 @@
   }
 
   .arrow-wrapper {
-    height: 3rem;
+    height: 2rem;
     display: flex;
     align-items: flex-start;
     justify-content: flex-start;
   }
 
   .arrow {
-    max-width: 3rem;
-    max-height: 1.8rem;
+    max-width: 2rem;
+    max-height: 1.2rem;
     transform: rotate(90deg) translateY(-100%);
     transform-origin: top left;
   }

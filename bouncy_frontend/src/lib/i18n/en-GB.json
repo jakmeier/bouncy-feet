@@ -89,9 +89,9 @@
     "collection": {
         "title": "Collection",
         "nav": "Collection",
-        "dances-subtitle": "Choreographies",
-        "steps-subtitle": "Steps",
-        "combos-subtitle": "Combos",
+        "dances-subtitle": "How about a choreography?",
+        "steps-subtitle": "Which step do you want to learn?",
+        "combos-subtitle": "Here are some awesome combos to study!",
         "courses-subtitle": "Courses",
         "no-choreos": "No choreographies available",
         "no-steps": "No steps available",

@@ -9,6 +9,7 @@
    * @property {AvatarColoring} [coloring]
    * @property {AvatarHeadStyle} [headStyle]
    * @property {AvatarBodyShape} [bodyShape]
+   * @property {PageColoring} [pageColoring]
    * @property {import('svelte').Snippet} [children]
    */
 
@@ -29,6 +30,13 @@
           // width: 1,
           strokeWidth: 1,
         },
+    pageColoring = parentCtx
+      ? parentCtx.danceFloorColor
+      : {
+          pageColor: 'var(--theme-neutral-white)',
+          fontColor: 'var(--theme-neutral-black)',
+          danceFloorColor: 'var(--theme-neutral-white)',
+        },
     children,
   } = $props();
 
@@ -42,6 +50,9 @@
     },
     get bodyShape() {
       return bodyShape;
+    },
+    get pageColoring() {
+      return pageColoring;
     },
   });
   setContext('avatarStyle', ctx);

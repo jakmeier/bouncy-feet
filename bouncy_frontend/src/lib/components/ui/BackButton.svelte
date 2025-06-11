@@ -28,7 +28,7 @@
   }
   .arrow {
     max-width: 2rem;
-    max-height: 2rem;
+    max-height: 1.2rem;
     rotate: 90deg;
   }
 </style>

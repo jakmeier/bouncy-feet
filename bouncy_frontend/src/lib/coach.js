@@ -43,6 +43,11 @@ export const coaches = [
                 size: 1,
                 strokeWidth: 1,
             },
+            pageColoring: {
+                pageColor: "var(--theme-accent)",
+                danceFloorColor: "var(--theme-neutral-light)",
+                fontColor: "var(--theme-neutral-black)",
+            }
         },
         title: {
             de: "Trick-Läufer",
@@ -77,6 +82,11 @@ export const coaches = [
                 size: 0.75,
                 strokeWidth: 1.5,
             },
+            pageColoring: {
+                pageColor: "var(--theme-main)",
+                danceFloorColor: "var(--theme-neutral-light)",
+                fontColor: "var(--theme-neutral-black)",
+            }
         },
         title: {
             de: "Heel-Toe Meister",
