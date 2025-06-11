@@ -1,20 +1,30 @@
 <script>
   /**
    * @typedef {Object} Props
+   * @property {string} [color]
    * @property {import('svelte').Snippet} [children]
    */
 
   /** @type {Props} */
-  let { children } = $props();
+  let { children, color = 'var(--theme-main)' } = $props();
 </script>
 
-<div class="corner-marked2">
-  <div class="corner-marked">
-    {@render children?.()}
+<div class="outer" style="--corner-color: {color}">
+  <div class="corner-marked2">
+    <div class="corner-marked">
+      {@render children?.()}
+    </div>
   </div>
 </div>
 
 <style>
+  .outer {
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: 100%;
+  }
+
   .corner-marked {
     position: relative;
     padding: 0.25rem;
@@ -38,7 +48,7 @@
     height: min(3em, 25%);
     padding: 0;
     margin: 0;
-    border: 0.125rem solid var(--theme-main);
+    border: 0.125rem solid var(--corner-color);
     border-radius: 2px;
   }
 

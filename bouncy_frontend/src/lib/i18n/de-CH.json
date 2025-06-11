@@ -92,7 +92,7 @@
         "dances-subtitle": "Wie wärs mit einer Choreografie?",
         "steps-subtitle": "Welchen Schritt willst du lernen?",
         "combos-subtitle": "Hiet sind ein paar geniale Kombos!",
-        "courses-subtitle": "Kurse",
+        "courses-subtitle": "Wähle einen Kurs",
         "no-choreos": "Keine Choreografien vefügbar",
         "no-steps": "Kein Schritte verfügbar",
         "no-combos": "Keine Kombinationen verfügbar",
@@ -103,6 +103,7 @@
         "footwork-steps-subtitle": "Footwork",
         "new-dance-button": "Neuer Tanz",
         "step": {
+            "show-courses": "Starte das Training!",
             "rotation": "Drehen (experimentell)",
             "speed": "Tempo [BPM]",
             "variation": "Variation"

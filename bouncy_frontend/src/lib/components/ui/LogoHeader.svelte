@@ -21,7 +21,9 @@
     mainColor = false,
     title = '',
     backButton = false,
-    onBack = () => {},
+    onBack = () => {
+      window.history.back();
+    },
   } = $props();
 
   let bgColor = $derived(

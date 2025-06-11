@@ -8,6 +8,8 @@
    * @property {string} [name]
    * @property {any} [onChange]
    * @property {string} [thumbColor]
+   * @property {string} [backgroundColor]
+   * @property {string} [unitLabel]
    */
 
   /** @type {Props} */
@@ -19,11 +21,15 @@
     name = '',
     onChange = (angle) => {},
     thumbColor = 'var(--theme-main)',
+    backgroundColor = 'var(--theme-neutral-white)',
+    unitLabel,
   } = $props();
 
   let isDragging = false;
   /** @type {HTMLDivElement} */
   let slider = $state();
+  /** @type {HTMLDivElement} */
+  let thumb = $state();
 
   function handleInput(event) {
     value = event.target.value;
@@ -66,23 +72,43 @@
       value = Math.max(value - 1, min);
     }
   }
+
+  // Requires some juggling to get a computed color I can put inside an inlined SVG
+  let hatchColor = $derived.by(() => {
+    if (!thumb) {
+      return 'white';
+    }
+    const computed = getComputedStyle(thumb);
+    return computed.backgroundColor;
+  });
+
+  let hatchBackground = $derived(
+    encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8">
+        <line x1="0" y1="8" x2="8" y2="0" stroke="${hatchColor}" stroke-width="3" stroke-linecap="round"/>
+      </svg>`)
+  );
 </script>
 
 <div class="slider-container">
   <div class="value-display">
-    <input
-      type="number"
-      {name}
-      bind:value
-      {min}
-      {max}
-      oninput={handleInput}
-      onchange={() => onChange(value)}
-      aria-valuenow={value}
-      aria-valuemin={min}
-      aria-valuemax={max}
-      aria-label="Angle"
-    />
+    {#if unitLabel}
+      {value} {unitLabel}
+    {:else}
+      <input
+        type="number"
+        {name}
+        bind:value
+        {min}
+        {max}
+        oninput={handleInput}
+        onchange={() => onChange(value)}
+        aria-valuenow={value}
+        aria-valuemin={min}
+        aria-valuemax={max}
+        aria-label="Angle"
+      />
+    {/if}
   </div>
   <div
     bind:this={slider}
@@ -96,8 +122,17 @@
     onclick={handleSliderChange}
     onmousedown={startDragging}
     onkeydown={handleKeydown}
+    style="background-color: {backgroundColor}"
   >
     <div
+      class="slider-filled"
+      style="width: calc({((value - min) / (max - min)) * 100}% ); 
+        background-image: url('data:image/svg+xml,{hatchBackground}');
+        "
+      aria-hidden="true"
+    ></div>
+    <div
+      bind:this={thumb}
       class="slider-thumb"
       style="left: calc({((value - min) / (max - min)) *
         100}% - 10px); background-color: {thumbColor};"
@@ -119,10 +154,10 @@
     background: none;
     width: 100%;
   }
+  .slider-filled,
   .slider {
     position: relative;
     height: 8px;
-    background-color: var(--theme-neutral-white);
     border-radius: 4px;
     margin-top: 10px;
     outline: none;
@@ -134,5 +169,10 @@
     height: 20px;
     border-radius: 50%;
     cursor: pointer;
+  }
+
+  .slider-filled {
+    height: 8px;
+    background-repeat: repeat;
   }
 </style>

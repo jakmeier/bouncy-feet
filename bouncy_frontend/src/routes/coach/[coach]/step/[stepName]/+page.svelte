@@ -12,6 +12,8 @@
   import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
   import LightSection from '$lib/components/ui/sections/LightSection.svelte';
   import NightSection from '$lib/components/ui/sections/NightSection.svelte';
+  import CornerMarker from '$lib/components/ui/CornerMarker.svelte';
+  import NumberSlider from '$lib/components/ui/NumberSlider.svelte';
 
   /**
    * @typedef {Object} Props
@@ -69,19 +71,31 @@
   </div>
 </NightSection>
 
-<LightSection>
+<LightSection fillScreen arrow arrowText={$t('collection.step.show-courses')}>
   <div class="counts">
     <DanceCounts steps={[step]} markedPoseIndex={$beatCounter} />
   </div>
 
-  <AnimatedStep {step} size={200} backgroundColor="transparent"></AnimatedStep>
-
-  <!-- TODO(Tanja): style slider  -->
-  <label>
-    {$t('collection.step.speed')}
-    <input type="number" bind:value={$bpm} min="15" max="200" class="number" />
-    <input type="range" bind:value={$bpm} min="15" max="200" class="range" />
-  </label>
+  <div class="animation-outer">
+    <CornerMarker color="var(--theme-neutral-white)">
+      <div class="animation-inner">
+        <AnimatedStep {step} size={200} backgroundColor="transparent"
+        ></AnimatedStep>
+        <div class="slider">
+          <NumberSlider
+            name="bpm-slider"
+            bind:value={$bpm}
+            min={15}
+            max={200}
+            decimals={0}
+            thumbColor={coach.style.pageColoring.pageColor}
+            backgroundColor="var(--theme-neutral-black)"
+            unitLabel="BPM"
+          ></NumberSlider>
+        </div>
+      </div>
+    </CornerMarker>
+  </div>
 </LightSection>
 
 <DarkSection>
@@ -120,16 +134,14 @@
     margin-top: 2rem;
   }
 
-  label {
-    display: grid;
-    justify-items: center;
-    margin: 2rem auto;
-    max-width: 300px;
-    background-color: var(--theme-main);
-    color: var(--theme-neutral-black);
-    border-radius: 10px;
-    padding: 10px;
+  .animation-outer {
+    margin: 1rem auto;
   }
+
+  .slider {
+    padding-bottom: 1rem;
+  }
+
   .ol {
     display: flex;
     overflow: scroll;
