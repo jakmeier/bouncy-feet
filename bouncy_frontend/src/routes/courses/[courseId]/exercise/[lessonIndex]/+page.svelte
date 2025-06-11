@@ -2,6 +2,7 @@
   import { browser } from '$app/environment';
   import { page } from '$app/state';
   import CourseLesson from '$lib/components/activity/CourseLesson.svelte';
+  import { onMount } from 'svelte';
 
   /** @type {string} */
   let id = page.params.courseId;
@@ -21,6 +22,10 @@
     resetScroll();
     window.history.back();
   }
+
+  onMount(() => {
+    document.querySelector('.background')?.scrollTo(0, 0);
+  });
 </script>
 
 <CourseLesson
