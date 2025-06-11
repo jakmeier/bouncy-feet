@@ -63,6 +63,7 @@
  * 
  * @typedef {Object} PageColoring
  * @property {string} pageColor
+ * @property {string} secondaryColor
  * @property {string} fontColor
  * @property {string} danceFloorColor
  * 

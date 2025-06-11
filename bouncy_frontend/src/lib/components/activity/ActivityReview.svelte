@@ -2,10 +2,11 @@
   import { t } from '$lib/i18n';
   import LessonEnd from './LessonEnd.svelte';
   import VideoReview from '../review/VideoReview.svelte';
-  import Arrow from '../ui/svg/Arrow.svelte';
   import Background from '../ui/sections/Background.svelte';
-  import StandardPage from '../ui/StandardPage.svelte';
   import LessonEndResults from './LessonEndResults.svelte';
+  import NextSectionArrow from '../ui/NextSectionArrow.svelte';
+  import DarkSection from '../ui/sections/DarkSection.svelte';
+  import LogoHeader from '../ui/LogoHeader.svelte';
 
   let { detection, videoUrl, recordingStart, recordingEnd, onRestart, onBack } =
     $props();
@@ -31,40 +32,35 @@
   {#if !showResults}
     <LessonEnd bind:showResults></LessonEnd>
   {:else}
-    <StandardPage black>
+    <DarkSection fillScreen arrow arrowText={$t('record.review-details')}>
+      <LogoHeader black />
+
       <div class="top-summary">
         <LessonEndResults {hitRate} {passed}></LessonEndResults>
-        <div class="down-marker">
-          <div class="down-marker-text">{$t('record.review-details')}</div>
-          <div class="down-marker-arrow">
-            <Arrow color="var(--theme-neutral-white)" />
-          </div>
-        </div>
       </div>
+    </DarkSection>
 
-      {#if recordingStart !== undefined && recordingEnd !== undefined}
-        <VideoReview
-          reviewVideoSrc={videoUrl}
-          {detectedSteps}
-          {recordingStart}
-          {recordingEnd}
-        ></VideoReview>
+    {#if recordingStart !== undefined && recordingEnd !== undefined}
+      <VideoReview
+        reviewVideoSrc={videoUrl}
+        {detectedSteps}
+        {recordingStart}
+        {recordingEnd}
+      ></VideoReview>
 
-        <div class="hint">{$t('record.no-upload-hint')}</div>
-
-      {:else}
-        <div class="no-review">
-          {$t('record.no-video-for-review')}
-        </div>
-      {/if}
-
-      <div class="buttons">
-        <button onclick={onRestart}>
-          {$t('courses.end.again-button')}
-        </button>
-        <button onclick={onBack}> {$t('courses.end.back-button')}</button>
+      <div class="hint">{$t('record.no-upload-hint')}</div>
+    {:else}
+      <div class="no-review">
+        {$t('record.no-video-for-review')}
       </div>
-    </StandardPage>
+    {/if}
+
+    <div class="buttons">
+      <button onclick={onRestart}>
+        {$t('courses.end.again-button')}
+      </button>
+      <button onclick={onBack}> {$t('courses.end.back-button')}</button>
+    </div>
   {/if}
 </div>
 
@@ -79,23 +75,11 @@
     margin: 2rem;
   }
   .top-summary {
-    height: calc(100dvh - 6rem);
     display: flex;
     flex-direction: column;
     justify-content: space-around;
   }
-  .down-marker {
-    margin: 5rem auto 0;
-  }
-  .down-marker-text {
-    text-align: center;
-  }
-  .down-marker-arrow {
-    margin: auto;
-    max-width: 3rem;
-    max-height: 3rem;
-  }
-  .hint{
+  .hint {
     margin-top: 2rem;
   }
 </style>

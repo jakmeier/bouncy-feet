@@ -22,10 +22,10 @@
 <style>
   .down-marker {
     height: 3rem;
-    width: 2rem;
+    width: 100%;
     /* requires parent to be flex in column direction */
     margin-top: auto;
-    align-self: center; 
+    margin-bottom: 1rem;
   }
   .down-marker-text {
     text-align: center;

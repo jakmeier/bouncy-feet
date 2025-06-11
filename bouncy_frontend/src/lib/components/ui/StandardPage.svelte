@@ -1,4 +1,8 @@
 <script>
+  // A simple one-view pager with header and footer.
+  //
+  // Pages that need multiple sections should not use this component and rather
+  // add header and footers manually.
   import Footer from '$lib/components/ui/Footer.svelte';
   import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
   import Background from './sections/Background.svelte';
