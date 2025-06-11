@@ -35,6 +35,7 @@
   import { fade } from 'svelte/transition';
   import WakeLock from '../WakeLock.svelte';
   import Video from '../ui/Video.svelte';
+  import CornerMarker from '../ui/CornerMarker.svelte';
 
   /**
    * @typedef {Object} Props
@@ -295,27 +296,25 @@
   {#if teacherVideoOpacity == 0.0}
     <div class="overlay" class:transparent={!showOverlay} transition:fade>
       <div class="frame">
-        <div class="corner-marked2">
-          <div class="corner-marked">
-            <div class="framed">
-              {#if showExplanation}
-                <div class="overlay-text">
-                  <div>
-                    {$t('courses.lesson.exercise-start-description-0')}
-                  </div>
-                  <div>
-                    {$t('courses.lesson.exercise-start-description-1')}
-                  </div>
+        <CornerMarker>
+          <div class="framed">
+            {#if showExplanation}
+              <div class="overlay-text">
+                <div>
+                  {$t('courses.lesson.exercise-start-description-0')}
                 </div>
-              {/if}
-              {#if effectText}
-                <div class="effect-text">
-                  {effectText}
+                <div>
+                  {$t('courses.lesson.exercise-start-description-1')}
                 </div>
-              {/if}
-            </div>
+              </div>
+            {/if}
+            {#if effectText}
+              <div class="effect-text">
+                {effectText}
+              </div>
+            {/if}
           </div>
-        </div>
+        </CornerMarker>
       </div>
     </div>
   {/if}

@@ -1,4 +1,5 @@
 <script>
+  import CornerMarker from './CornerMarker.svelte';
   import Symbol from './Symbol.svelte';
 
   /**
@@ -23,39 +24,37 @@
 </script>
 
 <div class="video-container" class:hide={videoLoading || !videoExists}>
-  <div class="corner-marked2">
-    <div class="corner-marked">
-      <div class="inner-video-container">
-        <video
-          bind:this={videoElement}
-          {controls}
-          onloadedmetadata={() => {
-            videoExists = true;
+  <CornerMarker>
+    <div class="inner-video-container">
+      <video
+        bind:this={videoElement}
+        {controls}
+        onloadedmetadata={() => {
+          videoExists = true;
+          videoLoading = false;
+        }}
+        preload="auto"
+        playsinline
+        webkit-playsinline
+        defaultmuted={muted}
+        {muted}
+      >
+        <source
+          src={path}
+          type="video/mp4"
+          onerror={() => {
             videoLoading = false;
+            videoExists = false;
           }}
-          preload="auto"
-          playsinline
-          webkit-playsinline
-          defaultmuted={muted}
-          {muted}
-        >
-          <source
-            src={path}
-            type="video/mp4"
-            onerror={() => {
-              videoLoading = false;
-              videoExists = false;
-            }}
-            onsuspend={() => {
-              videoLoading = false;
-              videoExists = false;
-            }}
-          />
-          Your browser does not support the video tag.
-        </video>
-      </div>
+          onsuspend={() => {
+            videoLoading = false;
+            videoExists = false;
+          }}
+        />
+        Your browser does not support the video tag.
+      </video>
     </div>
-  </div>
+  </CornerMarker>
 </div>
 
 {#if videoLoading}
@@ -76,7 +75,6 @@
     height: 100%;
   }
 
-  .corner-marked,
   .inner-video-container {
     width: 100%;
     height: 100%;

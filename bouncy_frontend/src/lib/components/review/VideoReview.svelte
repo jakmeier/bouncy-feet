@@ -17,6 +17,7 @@
   import { t } from '$lib/i18n';
   import LightSection from '../ui/sections/LightSection.svelte';
   import { selectMediaMimeType } from '$lib/media';
+  import CornerMarker from '../ui/CornerMarker.svelte';
 
   /**
    * @typedef {Object} Props
@@ -210,8 +211,8 @@ once per 250ms. -->
   <h2>{$t('record.review-title')}</h2>
 
   <div class="upper">
-    <div class="corner-marked2">
-      <div class="video-wrapper corner-marked">
+    <CornerMarker>
+      <div class="video-wrapper">
         {#if cameraNotSupported}
           <p class="error">
             {$t('record.camera-not-supported')}
@@ -260,7 +261,7 @@ once per 250ms. -->
           </div>
         {/if}
       </div>
-    </div>
+    </CornerMarker>
 
     <div class="toggle-item">
       <Toggle bind:isOn={displayVideoOverlay} />
