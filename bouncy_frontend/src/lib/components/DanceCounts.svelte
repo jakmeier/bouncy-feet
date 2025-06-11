@@ -1,8 +1,8 @@
 <script>
-  import { LEFT_RIGHT_COLORING_LIGHT } from '$lib/constants';
   import { Skeleton, StepWrapper } from '$lib/instructor/bouncy_instructor';
   import Svg from './avatar/Svg.svelte';
   import SvgAvatar from './avatar/SvgAvatar.svelte';
+  import BeatLabel from './ui/BeatLabel.svelte';
 
   /**
    * @typedef {Object} Props
@@ -72,11 +72,16 @@
         }
       }}
     >
-      <div
-        class="count"
-        class:marked={beat === markedPoseIndex % totalSubbeats}
-      >
-        {count(beat)}
+      <div class="count">
+        <BeatLabel
+          marked={beat === markedPoseIndex % totalSubbeats}
+          baseBgColor="var(--theme-neutral-gray)"
+          baseColor="var(--theme-neutral-black)"
+          markedBgColor="var(--theme-neutral-black)"
+          markedColor="var(--theme-neutral-white)"
+        >
+          {count(beat)}
+        </BeatLabel>
       </div>
       {#if stepTransitions.includes(beat)}
         <div class="step-transition"></div>
@@ -108,12 +113,6 @@
     position: relative;
     z-index: 4;
     text-align: center;
-  }
-  .marked {
-    font-weight: 800;
-    color: var(--theme-neutral-white);
-    background-color: var(--theme-main-dark);
-    border-radius: 5px;
   }
   .step-transition {
     position: absolute;

@@ -7,6 +7,7 @@
   import { LEFT_RIGHT_COLORING } from '$lib/constants';
   import { base } from '$app/paths';
   import { dev } from '$lib/stores/FeatureSelection';
+  import BeatLabel from '../ui/BeatLabel.svelte';
 
   /**
    * @typedef {Object} Props
@@ -22,9 +23,9 @@
 </script>
 
 <div class="pose" class:failed-pose={pose.error > threshold}>
-  <div class="beat-label">
+  <BeatLabel>
     {beatLabel}
-  </div>
+  </BeatLabel>
 
   <div class="skeleton">
     <div class="avatar-container">
@@ -70,20 +71,6 @@
   }
   .skeleton {
     height: 150px;
-  }
-  .beat-label {
-    display: grid;
-    align-content: center;
-    justify-content: center;
-    margin: auto;
-    padding: 0.5rem;
-    min-width: 1rem;
-    height: 1rem;
-    font-size: var(--font-normal);
-    color: var(--theme-neutral-white);
-    background-color: var(--theme-neutral-dark);
-    border-radius: 2rem;
-    width: fit-content;
   }
   .result {
     width: 1.5rem;

@@ -23,35 +23,37 @@
 </script>
 
 <div class="video-container" class:hide={videoLoading || !videoExists}>
-  <div class="corner-marked">
-    <div class="inner-video-container">
-      <video
-        bind:this={videoElement}
-        {controls}
-        onloadedmetadata={() => {
-          videoExists = true;
-          videoLoading = false;
-        }}
-        preload="auto"
-        playsinline
-        webkit-playsinline
-        defaultmuted={muted}
-        muted={muted}
-      >
-        <source
-          src={path}
-          type="video/mp4"
-          onerror={() => {
+  <div class="corner-marked2">
+    <div class="corner-marked">
+      <div class="inner-video-container">
+        <video
+          bind:this={videoElement}
+          {controls}
+          onloadedmetadata={() => {
+            videoExists = true;
             videoLoading = false;
-            videoExists = false;
           }}
-          onsuspend={() => {
-            videoLoading = false;
-            videoExists = false;
-          }}
-        />
-        Your browser does not support the video tag.
-      </video>
+          preload="auto"
+          playsinline
+          webkit-playsinline
+          defaultmuted={muted}
+          {muted}
+        >
+          <source
+            src={path}
+            type="video/mp4"
+            onerror={() => {
+              videoLoading = false;
+              videoExists = false;
+            }}
+            onsuspend={() => {
+              videoLoading = false;
+              videoExists = false;
+            }}
+          />
+          Your browser does not support the video tag.
+        </video>
+      </div>
     </div>
   </div>
 </div>

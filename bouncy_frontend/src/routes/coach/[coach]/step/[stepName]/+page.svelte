@@ -1,16 +1,17 @@
 <script>
   import { page } from '$app/state';
   import { t } from '$lib/i18n.js';
-  import Header from '$lib/components/ui/Header.svelte';
   import { getContext, onMount } from 'svelte';
   import AnimatedStep from '$lib/components/AnimatedStep.svelte';
   import { bpm, beatCounter } from '$lib/stores/Beat';
   import { coaches } from '$lib/coach';
   import Video from '$lib/components/ui/Video.svelte';
-  import LightBackground from '$lib/components/ui/sections/LightBackground.svelte';
   import DarkSection from '$lib/components/ui/sections/DarkSection.svelte';
   import DanceCounts from '$lib/components/DanceCounts.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
+  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
+  import LightSection from '$lib/components/ui/sections/LightSection.svelte';
+  import NightSection from '$lib/components/ui/sections/NightSection.svelte';
 
   /**
    * @typedef {Object} Props
@@ -58,26 +59,30 @@
   });
 </script>
 
-<LightBackground />
+<NightSection fillScreen arrow>
+  <LogoHeader title={name} backButton />
+  <!-- TODO: could be nice to have square videos here for better screen fitting -->
+  <div class="video-wrapper">
+    {#if video && video.length > 0}
+      <Video path={`${video}`}></Video>
+    {/if}
+  </div>
+</NightSection>
 
-<Header title={name} />
+<LightSection>
+  <div class="counts">
+    <DanceCounts steps={[step]} markedPoseIndex={$beatCounter} />
+  </div>
 
-<div class="video-wrapper">
-  {#if video && video.length > 0}
-    <Video path={`${video}`}></Video>
-  {/if}
-</div>
+  <AnimatedStep {step} size={200} backgroundColor="transparent"></AnimatedStep>
 
-<DanceCounts steps={[step]} markedPoseIndex={$beatCounter} />
-
-<AnimatedStep {step} size={200} backgroundColor="transparent"></AnimatedStep>
-
-<!-- TODO(Tanja): style slider  -->
-<label>
-  {$t('collection.step.speed')}
-  <input type="number" bind:value={$bpm} min="15" max="200" class="number" />
-  <input type="range" bind:value={$bpm} min="15" max="200" class="range" />
-</label>
+  <!-- TODO(Tanja): style slider  -->
+  <label>
+    {$t('collection.step.speed')}
+    <input type="number" bind:value={$bpm} min="15" max="200" class="number" />
+    <input type="range" bind:value={$bpm} min="15" max="200" class="range" />
+  </label>
+</LightSection>
 
 <DarkSection>
   <h2>{$t('collection.courses-subtitle')}</h2>
@@ -107,9 +112,14 @@
 
 <style>
   .video-wrapper {
-    width: 100%;
-    margin: 2rem 0;
+    width: calc(100% - 1rem);
+    margin-bottom: 2rem;
   }
+
+  .counts {
+    margin-top: 2rem;
+  }
+
   label {
     display: grid;
     justify-items: center;

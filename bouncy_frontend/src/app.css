@@ -10,13 +10,21 @@
     --theme-main-medium: #cbf3a3;
     --theme-main-light: #ddf7c2;
     /* This color is probably no longer used */
-    /* --theme-neutral-dark: #1d1d1b; */
     --theme-neutral-dark: #000000;
     --theme-neutral-dark-transparent: #1d1d1b96;
     --theme-neutral-black: #000000;
-    --theme-neutral-gray: #e6f2ef;
-    --theme-neutral-light: #f0f7f5;
-    /* --theme-neutral-white: #f0f7f5; */
+    /* This is "cool gray" from booklet */
+    --theme-neutral-light: #ecf2f1;
+    /* This is "cool gray" but one step darker */
+    --theme-neutral-gray: #d2e0de;
+    /* This is "cool gray" but two steps darker */
+    --theme-neutral-dark-gray: #b3cbc7;
+    /* 
+     * #95b6b1
+     * #77a29b
+     * #5d8881
+     */
+
     --theme-neutral-white: #ffffff;
     --theme-accent: #ff7301;
     --theme-accent-dark: #7d3f06;
@@ -233,14 +241,14 @@ ol {
 
 .corner-marked {
     position: relative;
-    padding: 0.5rem;
+    padding: 0.25rem;
 }
 
 
 .corner-marked2 {
     position: relative;
     margin: 0;
-    padding: 0.625rem;
+    padding: 0.125rem;
 }
 
 
@@ -255,6 +263,7 @@ ol {
     padding: 0;
     margin: 0;
     border: 0.125rem solid var(--theme-main);
+    border-radius: 2px;
 }
 
 .corner-marked::before {
@@ -272,15 +281,15 @@ ol {
 }
 
 .corner-marked2::before {
-    top: 0.75rem;
-    right: 0.75rem;
+    top: 0.25rem;
+    right: -0.25rem;
     border-left: none;
     border-bottom: none;
 }
 
 .corner-marked2::after {
-    bottom: 0.75rem;
-    left: 0.75rem;
+    bottom: -0.25rem;
+    left: 0.25rem;
     border-right: none;
     border-top: none;
 }
