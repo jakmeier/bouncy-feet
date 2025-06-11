@@ -6,7 +6,6 @@
   import { bpm, beatCounter } from '$lib/stores/Beat';
   import { coaches } from '$lib/coach';
   import Video from '$lib/components/ui/Video.svelte';
-  import DarkSection from '$lib/components/ui/sections/DarkSection.svelte';
   import DanceCounts from '$lib/components/DanceCounts.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
   import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
@@ -14,6 +13,7 @@
   import NightSection from '$lib/components/ui/sections/NightSection.svelte';
   import CornerMarker from '$lib/components/ui/CornerMarker.svelte';
   import NumberSlider from '$lib/components/ui/NumberSlider.svelte';
+  import ContextStyledSection from '$lib/components/ui/sections/ContextStyledSection.svelte';
 
   /**
    * @typedef {Object} Props
@@ -98,14 +98,22 @@
   </div>
 </LightSection>
 
-<DarkSection>
+<ContextStyledSection pageColoring={coach.style.pageColoring}>
   <h2>{$t('collection.courses-subtitle')}</h2>
 
   {#each courses as course}
     <div class="course">
+      <div>
+        <div class="course-name">{name}</div>
+        <h2>{course.name}</h2>
+      </div>
+
       <a href="../../../../courses/{course.id}">
-        <button>{course.name}</button>
+        <button>{$t('courses.course-overview.start-lesson')}</button>
       </a>
+      <div class="lessons-subtitle">
+        {$t('courses.course-overview.lessons-subtitle')}
+      </div>
       <div class="ol">
         {#each course.lessons as lesson, index}
           <a href="../../../../courses/{course.id}/exercise/{index}">
@@ -122,7 +130,7 @@
   {/each}
 
   <Footer white />
-</DarkSection>
+</ContextStyledSection>
 
 <style>
   .video-wrapper {
@@ -143,10 +151,13 @@
   }
 
   .ol {
+    grid-column-start: 1;
+    grid-column-end: 3;
     display: flex;
     overflow: scroll;
     padding-bottom: 1rem;
-    gap: 0.5rem;
+    gap: 1rem;
+    flex-wrap: wrap;
   }
   .lesson-outer {
     display: grid;
@@ -164,10 +175,27 @@
   }
   .course {
     display: grid;
-    gap: 1rem;
-    padding: 1rem;
+    grid-template-columns: 2fr 110px;
+    /* padding: 1rem; */
     margin-bottom: 1rem;
-    border: var(--theme-neutral-white) solid 1px;
-    border-radius: 5px;
+    /* background-color: var(--theme-accent-medium); */
+    /* color: var(--theme-neutral-white); */
+    /* border-radius: 1rem; */
+  }
+  .course h2 {
+    margin: 0;
+  }
+  .lessons-subtitle {
+    margin-top: 1rem;
+  }
+  .course > a {
+    align-self: center;
+    justify-self: end;
+    width: 100%;
+  }
+  .course a button {
+    display: block;
+    margin-left: auto;
+    border: 3px solid var(--theme-accent-medium);
   }
 </style>

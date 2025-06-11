@@ -2,7 +2,7 @@
 (
   version: 0,
   id: "running-man-basics",
-  names: {"de": "RM Anfängerkurs", "en": "RM beginner's course"},
+  names: {"de": "Anfängerkurs", "en": "Beginner's course"},
   featured_step: "rm-0",
   explanations: {
     "de": "Lerne den Basisschritt des Shuffelns, den Running Man.",
@@ -16,7 +16,11 @@
       difficulty: 1,
       energy: 2,
       explainer_video: "https://app.bouncy-feet.ch/media/videos/c0/l1.mp4",
-      front_video: "https://app.bouncy-feet.ch/media/videos/c0/l1_exercise.mp4",
+      // TODO: skip time in the end to line it up with course
+      // front_video: (
+      //   url: "https://app.bouncy-feet.ch/media/videos/c0/l1_exercise.mp4",
+      //   start: 1234,
+      // ),
       parts: [
         ( step: "stand", repeat: 8, subbeats_per_move: 2, tracking: Untracked ),
         // Starting with the inbalance first requires better explanations / intergration work.

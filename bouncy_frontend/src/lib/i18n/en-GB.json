@@ -45,8 +45,9 @@
         "more-coming": "More courses coming soon",
         "course-overview": {
             "title": "Course Overview",
-            "start-lesson": "Let's go",
+            "start-lesson": "Go!",
             "lesson": "lesson with",
+            "lessons-subtitle": "Lessons done",
             "part": "part",
             "parts": "parts"
         },

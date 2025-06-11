@@ -2,7 +2,7 @@
 (
   version: 0,
   id: "rrm-basics",
-  names: {"de": "Rückwärts RM", "en": "Reverse RM Intro"},
+  names: {"de": "Rückwärts", "en": "Reverse"},
   featured_step: "reverse-running-man",
   video: "https://app.bouncy-feet.ch/media/videos/c5/rrm-overview.mp4",
   explanations: {

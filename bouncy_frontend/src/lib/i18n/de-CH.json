@@ -45,8 +45,9 @@
         "more-coming": "Mehr Kurse in Entwicklung",
         "course-overview": {
             "title": "Kursüberblick",
-            "start-lesson": "Los gehts!",
+            "start-lesson": "Los!",
             "lesson": "Lektion mit",
+            "lessons-subtitle": "Abgeschlossene Lektionen",
             "part": "Teil",
             "parts": "Teilen"
         },

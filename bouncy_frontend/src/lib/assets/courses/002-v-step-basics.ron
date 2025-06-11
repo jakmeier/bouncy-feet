@@ -2,7 +2,7 @@
 (
   version: 0,
   id: "v-step-basics",
-  names: {"de": "V-Step Anfängerkurs", "en": "V-Step beginner's course"},
+  names: {"de": "Anfängerkurs", "en": "Beginner's course"},
   featured_step: "happy-feet-0",
   explanations: {
     "de": "Lerne die Basis für seitliche Bewegungen mit dem V-Step.",

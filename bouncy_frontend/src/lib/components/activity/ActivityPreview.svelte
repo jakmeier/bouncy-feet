@@ -89,7 +89,10 @@
   }
 </script>
 
-<Background bgColor="var(--theme-main-alt)" color="var(--theme-neutral-black)" />
+<Background
+  bgColor="var(--theme-main-alt)"
+  color="var(--theme-neutral-black)"
+/>
 
 <LogoHeader mainColor {title} backButton {onBack} />
 
@@ -159,6 +162,7 @@
   }
 
   .controls {
+    width: 100%;
     margin: 1.5rem auto 0;
   }
   .controls button {

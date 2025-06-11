@@ -2,7 +2,7 @@
 (
   version: 0,
   id: "rm-practice",
-  names: {"de": "Running Man Übungen", "en": "Running Man Practice"},
+  names: {"de": "Übungen", "en": "Practice"},
   featured_step: "running-man",
   explanations: {
     "de": "----",
