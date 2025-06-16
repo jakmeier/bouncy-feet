@@ -30,7 +30,7 @@
 <NightSection arrow fillScreen>
   <LogoHeader title={course.name} backButton />
 
-  <div>{course.explanation}</div>
+  <div class="explanation">{course.explanation}</div>
 
   <div class="video-wrapper">
     {#if video && video.length > 0}
@@ -58,6 +58,10 @@
 <Footer></Footer>
 
 <style>
+  .explanation {
+    margin-bottom: 1rem;
+  }
+
   .ol {
     display: grid;
     margin: 15px 10px 10px;
@@ -79,6 +83,7 @@
   .lesson-number {
     background-color: var(--theme-main);
     border-radius: 1rem;
+    border: 3px solid var(--theme-main-medium);
     width: min(40vw, 200px);
     height: min(40vw, 200px);
     font-size: min(30vw, 150px);

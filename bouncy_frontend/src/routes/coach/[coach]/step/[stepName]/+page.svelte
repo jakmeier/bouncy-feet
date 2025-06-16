@@ -13,7 +13,7 @@
   import NightSection from '$lib/components/ui/sections/NightSection.svelte';
   import CornerMarker from '$lib/components/ui/CornerMarker.svelte';
   import NumberSlider from '$lib/components/ui/NumberSlider.svelte';
-  import ContextStyledSection from '$lib/components/ui/sections/ContextStyledSection.svelte';
+  import LimeSection from '$lib/components/ui/sections/LimeSection.svelte';
 
   /**
    * @typedef {Object} Props
@@ -98,7 +98,7 @@
   </div>
 </LightSection>
 
-<ContextStyledSection pageColoring={coach.style.pageColoring}>
+<LimeSection>
   <h2>{$t('collection.courses-subtitle')}</h2>
 
   {#each courses as course}
@@ -129,8 +129,8 @@
     <p>{$t('collection.no-courses')}</p>
   {/each}
 
-  <Footer white />
-</ContextStyledSection>
+  <Footer />
+</LimeSection>
 
 <style>
   .video-wrapper {
@@ -196,6 +196,6 @@
   .course a button {
     display: block;
     margin-left: auto;
-    border: 3px solid var(--theme-accent-medium);
+    /* border: 3px solid var(--theme-accent-medium); */
   }
 </style>
