@@ -34,7 +34,7 @@
   } from '$lib/instructor/bouncy_instructor_bg';
   import { fade } from 'svelte/transition';
   import WakeLock from '../WakeLock.svelte';
-  import Video from '../ui/Video.svelte';
+  import Video from '../ui/video/Video.svelte';
   import CornerMarker from '../ui/CornerMarker.svelte';
 
   /**

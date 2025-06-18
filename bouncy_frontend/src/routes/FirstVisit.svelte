@@ -1,7 +1,7 @@
 <script>
   import Footer from '$lib/components/ui/Footer.svelte';
   import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
-  import Video from '$lib/components/ui/Video.svelte';
+  import Video from '$lib/components/ui/video/Video.svelte';
   import { locale, t } from '$lib/i18n';
   import { getContext, onMount } from 'svelte';
   import { fade, slide } from 'svelte/transition';

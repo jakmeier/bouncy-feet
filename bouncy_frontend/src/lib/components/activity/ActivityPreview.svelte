@@ -1,7 +1,7 @@
 <script>
   import { t } from '$lib/i18n';
   import { getContext, onDestroy, onMount } from 'svelte';
-  import Video from '$lib/components/ui/Video.svelte';
+  import Video from '$lib/components/ui/video/Video.svelte';
   import { base } from '$app/paths';
   import Popup from '$lib/components/ui/Popup.svelte';
   import { writable } from 'svelte/store';

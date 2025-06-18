@@ -5,7 +5,7 @@
   import AnimatedStep from '$lib/components/AnimatedStep.svelte';
   import { bpm, beatCounter } from '$lib/stores/Beat';
   import { coaches } from '$lib/coach';
-  import Video from '$lib/components/ui/Video.svelte';
+  import Video from '$lib/components/ui/video/Video.svelte';
   import DanceCounts from '$lib/components/DanceCounts.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
   import LogoHeader from '$lib/components/ui/LogoHeader.svelte';

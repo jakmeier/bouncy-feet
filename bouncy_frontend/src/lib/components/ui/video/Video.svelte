@@ -1,6 +1,6 @@
 <script>
-  import CornerMarker from './CornerMarker.svelte';
-  import Symbol from './Symbol.svelte';
+  import CornerMarker from '../CornerMarker.svelte';
+  import Symbol from '../Symbol.svelte';
 
   /**
    * @typedef {Object} Props
