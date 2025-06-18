@@ -14,11 +14,7 @@
 </script>
 
 {#each coaches as coach}
-  <div
-    class="coach"
-    bind:clientWidth={coachWidth}
-    
-  >
+  <div class="coach" bind:clientWidth={coachWidth}>
     <div class="avatar">
       <AvatarStyleContext
         coloring={coach.style.coloring}
@@ -32,9 +28,7 @@
         ></TrackerPreview>
       </AvatarStyleContext>
     </div>
-    <div class="text"
-    style="min-height: {coachWidth}px"
-    >
+    <div class="text" style="min-height: {coachWidth}px">
       <div class="title" style="color: {coach.style.coloring.headColor}">
         {coach.title[coachLocale($locale)]}
       </div>
@@ -52,7 +46,9 @@
       <!-- <a href="" class="button"> Basic Moves </a>
                 <a href="" class="button"> Video Clips </a>
                 <a href="" class="button"> Courses </a> -->
-      <button> Basic Moves </button>
+      <a href="./coach/{coach.name}">
+        <button> Basic Moves </button>
+      </a>
       <button> Video Clips </button>
       <button> Courses </button>
     </div>

@@ -9,6 +9,7 @@
    * @property {boolean} [black]
    * @property {boolean} [accent]
    * @property {boolean} [mainColor]
+   * @property {boolean} [transparent]
    * @property {boolean} [backButton]
    * @property {()=>void} [onBack]
    */
@@ -19,6 +20,7 @@
     black = false,
     accent = false,
     mainColor = false,
+    transparent,
     title = '',
     backButton = false,
     onBack = () => {
@@ -35,7 +37,9 @@
           ? 'var(--theme-accent)'
           : mainColor
             ? 'var(--theme-main-alt)'
-            : 'var(--theme-neutral-black)'
+            : transparent
+              ? 'transparent'
+              : 'var(--theme-neutral-black)'
   );
 
   let imgUrl = $derived(

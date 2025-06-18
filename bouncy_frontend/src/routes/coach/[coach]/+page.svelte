@@ -63,14 +63,15 @@
   bodyShape={coach.style.bodyShape}
   headStyle={coach.style.headStyle}
 >
-  <LightSection fillScreen arrow arrowText={$t('coach.courses-title')}>
+  <!-- TODO: add this back with images, for now keep it simple -->
+  <!-- <LightSection fillScreen arrow arrowText={$t('coach.courses-title')}>
     <LogoHeader {title} backButton white {onBack} />
     <h3>{coach.title[coachLocale($locale)]}</h3>
     {#if step}
       <AnimatedStep {step} size={350} backgroundColor="transparent"
       ></AnimatedStep>
     {/if}
-  </LightSection>
+  </LightSection> -->
 
   <!-- 
     <div class="train">
@@ -85,7 +86,13 @@
 </div> -->
 
   <ContextStyledSection pageColoring={coach.style.pageColoring}>
-    <h2>{$t('collection.steps-subtitle')}</h2>
+    <LogoHeader
+      transparent
+      backButton
+      {onBack}
+      title={$t('collection.steps-subtitle')}
+    />
+    <!-- <h2>{$t('collection.steps-subtitle')}</h2> -->
 
     {#each steps as step}
       <a href={`./step/${step.name}`}>
@@ -109,7 +116,7 @@
     <h2>{$t('collection.dances-subtitle')}</h2>
     <p>{$t('collection.no-choreos')}</p>
 
-    <Footer white />
+    <Footer />
   </ContextStyledSection>
 </AvatarStyleContext>
 
