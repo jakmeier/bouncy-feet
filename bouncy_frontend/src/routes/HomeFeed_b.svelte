@@ -2,8 +2,6 @@
   import { t } from '$lib/i18n.js';
   import { versionString } from '$lib/stores/FeatureSelection';
   import { beatCounter } from '$lib/stores/Beat';
-  import HomeEntry from './HomeEntry.svelte';
-  import Arrow from '$lib/components/ui/svg/Arrow.svelte';
   import LightSection from '$lib/components/ui/sections/LightSection.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
   import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
@@ -16,6 +14,8 @@
   import Background from '$lib/components/ui/sections/Background.svelte';
   import { base } from '$app/paths';
   import { getContext, onMount } from 'svelte';
+  import Personalities from './Personalities.svelte';
+  import DarkSection from '$lib/components/ui/sections/DarkSection.svelte';
   /**
    * @typedef {Object} Props
    * @property {any} featuredDances
@@ -23,22 +23,10 @@
    */
 
   /** @type {Props} */
-  let { featuredDances, featuredSteps } = $props();
+  let {} = $props();
 
   /** @type {LocalState}*/
   const localState = getContext('localState');
-
-  const entryDance = featuredDances.find(
-    (dance) => dance.id === 'Home Animation (dev)'
-  );
-
-  /**
-   * @param {number} i
-   * @returns {import("bouncy_instructor").DanceWrapper}
-   */
-  function dance(i) {
-    return featuredDances[i % featuredDances.length];
-  }
 
   let animationDelay = 99;
   beatCounter.subscribe((counter) => {
@@ -59,14 +47,21 @@
 ></Background>
 <LogoHeader title={$t('home.slogan-1')} />
 
-<div class="focus-card">
-  <div>
-    <HomeEntry dance={entryDance}></HomeEntry>
-  </div>
-  <div class="down-marker">
-    <Arrow color="var(--theme-neutral-white)" />
-  </div>
+<div>TODO: Continue where you left off / start a course shortlink</div>
+<div>-</div>
+<div>-</div>
+<div>-</div>
+<div>-</div>
+<div>-</div>
+
+<h2>TODO: title</h2>
+<div>
+  {$t('home.slogan-2')}
 </div>
+
+<DarkSection arrow>
+  <Personalities></Personalities>
+</DarkSection>
 
 <Section bgColor={'var(--theme-main)'} color={'var(--theme-neutral-dark)'}>
   <div class="wrapper">

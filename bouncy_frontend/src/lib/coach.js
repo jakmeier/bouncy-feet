@@ -15,7 +15,7 @@ import { LEFT_RIGHT_COLORING, ORANGE_COLORING } from "./constants";
 /** @type {Coach[]} */
 export const coaches = [
     {
-        name: 'juhwang',
+        name: 'rob',
         steps: {
             "rm-0": {
                 // TODO: use correct video
@@ -36,11 +36,11 @@ export const coaches = [
         style: {
             coloring: ORANGE_COLORING,
             bodyShape: {
-                strokeWidth: 1.75,
+                strokeWidth: 1,
             },
             headStyle: {
                 shape: 'disk',
-                size: 1,
+                size: 0.75,
                 strokeWidth: 1,
             },
             pageColoring: {
@@ -51,18 +51,18 @@ export const coaches = [
             }
         },
         title: {
-            de: "Trick-Läufer",
-            en: "Trick-Runner"
+            de: "Rave",
+            en: "Rave"
         },
         description: {
-            de: "Lerne den Running Man mit allen Varianten hier bei mir.",
-            en: "Learn the Running Man and its variations here with me."
+            de: "Tritt ein in das verlassene Warenhaus von Rob und lerne alles über den **Running Man**.",
+            en: "Enter Rob's abandoned warehouse to learn about the **Running Man** and its variations."
         },
     },
 
     /** @type {Coach} */
     {
-        name: 'chorok',
+        name: 'charles',
         steps: {
             "t-0": {
                 video: "",
@@ -79,9 +79,10 @@ export const coaches = [
                 strokeWidth: 1,
             },
             headStyle: {
-                shape: 'circle',
+                // TODO: try tophat
+                shape: 'disk',
                 size: 0.75,
-                strokeWidth: 1.5,
+                strokeWidth: 1,
             },
             pageColoring: {
                 pageColor: "var(--theme-main-alt)",
@@ -91,12 +92,12 @@ export const coaches = [
             }
         },
         title: {
-            de: "Heel-Toe Meister",
-            en: "Heel-Toe Master"
+            de: "Freude",
+            en: "Joyful"
         },
         description: {
-            de: "Von der Ferse auf die Zehen. Hin und her. Immer wieder, Takt für Takt.",
-            en: "From heel to toe. Back and forth. Again and again, beat after beat."
+            de: "Willkommen in den Hallen von Charles. Komm und tanze die **Happy Feets** und den **Charleston** mit uns!",
+            en: "Welcome to Charles' dancing halls, where **Happy Feets** and **Charleston** rule."
         },
     }
 ];

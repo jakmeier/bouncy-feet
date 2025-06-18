@@ -169,9 +169,11 @@
     height: 2rem;
     word-wrap: break-word;
     border-radius: 5px;
+    border: 3px solid var(--theme-main-medium);
   }
   .lesson-outer.done {
     background-color: var(--theme-main);
+    border: 3px solid var(--theme-main-medium);
   }
   .course {
     display: grid;
