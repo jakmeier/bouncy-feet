@@ -3,10 +3,10 @@
   import { getContext, onMount } from 'svelte';
   import { counter } from '$lib/timer';
   import Background from '$lib/components/ui/sections/Background.svelte';
-  import Video from '$lib/components/ui/video/Video.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
   import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
   import NightSection from '$lib/components/ui/sections/NightSection.svelte';
+  import VideoPlayer from '$lib/components/ui/video/VideoPlayer.svelte';
 
   const { getCourse } = getContext('courses');
   const user = getContext('user').store;
@@ -34,7 +34,7 @@
 
   <div class="video-wrapper">
     {#if video && video.length > 0}
-      <Video path={`${video}`}></Video>
+      <VideoPlayer path={`${video}`}></VideoPlayer>
     {/if}
   </div>
 </NightSection>

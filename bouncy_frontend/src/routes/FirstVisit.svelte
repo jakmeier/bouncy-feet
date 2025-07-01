@@ -1,12 +1,12 @@
 <script>
   import Footer from '$lib/components/ui/Footer.svelte';
   import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
-  import Video from '$lib/components/ui/video/Video.svelte';
   import { locale, t } from '$lib/i18n';
   import { getContext, onMount } from 'svelte';
   import { fade, slide } from 'svelte/transition';
   import { goto } from '$app/navigation';
   import { ONBOARDING_STATE } from '$lib/onboarding';
+  import VideoPlayer from '$lib/components/ui/video/VideoPlayer.svelte';
 
   /** @type {UserContextData}*/
   const { setUserMeta } = getContext('user');
@@ -22,7 +22,7 @@
   let showLogo = $state(false);
   let showVideo = $state(false);
 
-  /** @type {Video} */
+  /** @type {VideoPlayer} */
   let video = $state();
   const videoName = $derived(
     $locale.toLowerCase().startsWith('de') ? 'hello_de.mp4' : 'hello_en.mp4'
@@ -100,7 +100,7 @@
       }}
     >
       <div class="video">
-        <Video controls={false} path={videoPath} bind:this={video}></Video>
+        <VideoPlayer path={videoPath} bind:this={video}></VideoPlayer>
       </div>
       <button onclick={goToWarmup}>
         {$t('home.first-visit-button-1')}
@@ -132,10 +132,10 @@
 
   .video {
     height: 50dvh;
-    width: 100%;
+    /* width: 100%; */
     display: flex;
     justify-content: center;
-    align-items: center;
+    /* align-items: center; */
   }
 
   .centered {
