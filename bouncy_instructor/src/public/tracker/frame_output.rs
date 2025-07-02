@@ -16,7 +16,7 @@ impl Tracker {
     #[wasm_bindgen(js_name = exportFrame)]
     pub fn export_frame(&self, timestamp: Timestamp) -> ExportedFrame {
         let mut config = ron::ser::PrettyConfig::default();
-        config.indentor = "  ".to_string();
+        config.indentor = "  ".to_string().into();
         match self
             .timestamps
             .binary_search_by(|probe| f64::total_cmp(probe, &timestamp))
@@ -39,7 +39,7 @@ impl Tracker {
     #[wasm_bindgen(js_name = exportKeypoints)]
     pub fn export_keypoints(&self) -> String {
         let mut config = ron::ser::PrettyConfig::default();
-        config.indentor = "  ".to_string();
+        config.indentor = "  ".to_string().into();
 
         let timestamp_keypoint_tuples: Vec<(Timestamp, &Keypoints)> = self
             .timestamps
