@@ -17,7 +17,13 @@
       },
       difficulty: 1,
       energy: 1,
-      explainer_video: "https://app.bouncy-feet.ch/media/videos/c3/simple_heel.mp4",
+      explainer_video: (
+        path: "https://app.bouncy-feet.ch/media/videos/c3/simple_heel.mp4",
+        beats: [6000],
+        markers: {
+          6000: Start,
+        },
+      ),
       parts: [
         ( step: "heels-starter", repeat: 2, subbeats_per_move: 4 ),
         ( step: "heels-starter", repeat: 4, subbeats_per_move: 2 ),
@@ -34,7 +40,13 @@
       },
       difficulty: 2,
       energy: 4,
-      explainer_video: "https://app.bouncy-feet.ch/media/videos/c3/side_jumps.mp4",
+      explainer_video: (
+        path: "https://app.bouncy-feet.ch/media/videos/c3/side_jumps.mp4",
+        beats: [100],
+        markers: {
+          100: Start,
+        },
+      ),
       parts: [
         ( step: "side-to-side-2", repeat: 2, subbeats_per_move: 4 ),
         ( step: "side-to-side-2", repeat: 4, subbeats_per_move: 2 ),
@@ -52,7 +64,13 @@
       },
       difficulty: 2,
       energy: 2,
-      explainer_video: "https://app.bouncy-feet.ch/media/videos/c3/combo_slow.mp4",
+      explainer_video: (
+        path: "https://app.bouncy-feet.ch/media/videos/c3/combo_slow.mp4",
+        beats: [2000],
+        markers: {
+          2000: Start,
+        },
+      ),
       parts: [
         ( step: "heels-combo", repeat: 2, subbeats_per_move: 4 ),
         ( step: "heels-combo", repeat: 8, subbeats_per_move: 2 ),
@@ -71,7 +89,13 @@
       },
       difficulty: 1,
       energy: 1,
-      explainer_video: "https://app.bouncy-feet.ch/media/videos/c3/combo_fast.mp4",
+      explainer_video: (
+        path: "https://app.bouncy-feet.ch/media/videos/c3/combo_fast.mp4",
+        beats: [1500],
+        markers: {
+          1500: Start,
+        },
+      ),
       parts: [
         ( step: "side-to-side-4", repeat: 16, subbeats_per_move: 2 ),
       ],

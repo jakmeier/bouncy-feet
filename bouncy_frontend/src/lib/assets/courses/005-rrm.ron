@@ -18,7 +18,13 @@
       },
       difficulty: 2,
       energy: 2,
-      explainer_video: "https://app.bouncy-feet.ch/media/videos/c5/lesson_1.mp4",
+      explainer_video: (
+        path: "https://app.bouncy-feet.ch/media/videos/c5/lesson_1.mp4",
+        beats: [3800],
+        markers: {
+          3800: Start,
+        },
+      ),
       front_video: "",
       back_video: "",
       song: "120bpm_groove",
@@ -41,7 +47,13 @@
       },
       difficulty: 3,
       energy: 3,
-      explainer_video: "https://app.bouncy-feet.ch/media/videos/c5/lesson_2.mp4",
+      explainer_video: (
+        path: "https://app.bouncy-feet.ch/media/videos/c5/lesson_2.mp4",
+        beats: [26000],
+        markers: {
+          26000: Start,
+        },
+      ),
       song: "120bpm_groove",
       song_timestamp: 2000,
       parts: [
