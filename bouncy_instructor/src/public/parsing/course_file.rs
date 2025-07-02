@@ -1,5 +1,6 @@
 use crate::intern::content_collection::ContentCollection;
 use crate::intern::step::StepSource;
+use crate::parsing::video_def::VideoDef;
 use crate::public::course::LessonPart;
 use crate::public::Course;
 use serde::{Deserialize, Serialize};
@@ -32,13 +33,13 @@ pub(crate) struct Lesson {
     explanations: Option<TranslatedString>,
     /// Video to show in the preview, usually with explanations.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    explainer_video: Option<String>,
+    explainer_video: Option<VideoDef>,
     /// Video to show during the exercise, to main lessons song, in that song's pace.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    front_video: Option<String>,
+    front_video: Option<VideoDef>,
     /// Alternative view from the back to show during the exercise.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    back_video: Option<String>,
+    back_video: Option<VideoDef>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     song: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -177,9 +178,9 @@ impl Lesson {
             name,
             explanation,
             parts,
-            explainer_video: self.explainer_video,
-            front_video: self.front_video,
-            back_video: self.back_video,
+            explainer_video: self.explainer_video.map(From::from),
+            front_video: self.front_video.map(From::from),
+            back_video: self.back_video.map(From::from),
             song: self.song,
             song_timestamp: self.song_timestamp.map(|int| int as f64),
             difficulty: self.difficulty,

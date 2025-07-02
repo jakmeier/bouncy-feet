@@ -27,7 +27,7 @@
   let previewDone = $state(false);
   let trackingDone = $state(false);
   let liveActivity = $state();
-  let teacherVideo = $derived(course.lessons[lessonIndex].frontVideo);
+  let teacherVideo = $derived(course.lessons[lessonIndex].frontVideo?.path());
 
   let detection = $state();
   let videoUrl = $state();

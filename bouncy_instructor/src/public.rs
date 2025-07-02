@@ -10,6 +10,7 @@ pub(crate) mod skeleton;
 pub(crate) mod step_info;
 pub(crate) mod tracker;
 pub(crate) mod ui_event;
+pub(crate) mod video_def;
 pub(crate) mod wrapper;
 
 use crate::intern::step::StepSource;
@@ -20,6 +21,7 @@ pub use skeleton::Cartesian2d;
 pub use step_info::StepInfo;
 pub use tracker::{DetectionFailureReason, DetectionResult, PoseHint, Tracker};
 pub use ui_event::{AudioEffect, TextEffect};
+pub use video_def::VideoDef;
 
 pub(crate) use parsing::{dance_file, pose_file, step_file};
 use wrapper::pose_wrapper::PoseWrapper;

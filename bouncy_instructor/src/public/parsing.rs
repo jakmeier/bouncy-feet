@@ -9,6 +9,7 @@ pub(crate) mod course_file;
 pub(crate) mod dance_file;
 pub(crate) mod pose_file;
 pub(crate) mod step_file;
+pub(crate) mod video_def;
 
 use thiserror::Error;
 use wasm_bindgen::JsValue;
@@ -195,7 +196,15 @@ mod tests {
           song_timestamp: 1500,
           explainer_video: "https://app.bouncy-feet.ch/media/videos/c3/combo_fast.mp4",
           front_video: "https://app.bouncy-feet.ch/media/videos/c3/combo_fast_front_view.mp4",
-          back_video: "https://app.bouncy-feet.ch/media/videos/c3/combo_fast_back_view.mp4",
+          back_video: (
+            path: "https://app.bouncy-feet.ch/media/videos/c3/combo_fast_back_view.mp4",
+            beats: [10,15,20,25,30],
+            markers: {
+              10: Start,
+              20: Step("a"),
+              30: Step("b"),
+            }
+          ),
           parts: [
             (step: "run-in-place", repeat: 1, subbeats_per_move: 1, tracking: Untracked),
           ],
@@ -401,13 +410,45 @@ mod tests {
                         name: "Micro Bounce",
                         explanation: None,
                         explainer_video: Some(
-                            "https://app.bouncy-feet.ch/media/videos/c3/combo_fast.mp4",
+                            VideoDef {
+                                variant: Simple(
+                                    "https://app.bouncy-feet.ch/media/videos/c3/combo_fast.mp4",
+                                ),
+                            },
                         ),
                         front_video: Some(
-                            "https://app.bouncy-feet.ch/media/videos/c3/combo_fast_front_view.mp4",
+                            VideoDef {
+                                variant: Simple(
+                                    "https://app.bouncy-feet.ch/media/videos/c3/combo_fast_front_view.mp4",
+                                ),
+                            },
                         ),
                         back_video: Some(
-                            "https://app.bouncy-feet.ch/media/videos/c3/combo_fast_back_view.mp4",
+                            VideoDef {
+                                variant: Full {
+                                    path: "https://app.bouncy-feet.ch/media/videos/c3/combo_fast_back_view.mp4",
+                                    beats: [
+                                        10,
+                                        15,
+                                        20,
+                                        25,
+                                        30,
+                                    ],
+                                    start_markers: [
+                                        10,
+                                    ],
+                                    step_markers: [
+                                        StepMarker {
+                                            timestamp: 20.0,
+                                            step: "a",
+                                        },
+                                        StepMarker {
+                                            timestamp: 30.0,
+                                            step: "b",
+                                        },
+                                    ],
+                                },
+                            },
                         ),
                         song: Some(
                             "105bpm_tropical_house",

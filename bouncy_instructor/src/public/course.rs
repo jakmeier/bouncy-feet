@@ -4,7 +4,7 @@ use crate::intern::step_pace::StepPace;
 use crate::intern::teacher::Teacher;
 use crate::intern::tracker_dance_collection::TrackerDanceCollection;
 use crate::wrapper::step_wrapper::StepWrapper;
-use crate::{parsing, Tracker};
+use crate::{parsing, Tracker, VideoDef};
 use std::rc::Rc;
 use wasm_bindgen::prelude::wasm_bindgen;
 
@@ -25,9 +25,9 @@ pub struct Course {
 pub struct Lesson {
     pub(crate) name: String,
     pub(crate) explanation: Option<String>,
-    pub(crate) explainer_video: Option<String>,
-    pub(crate) front_video: Option<String>,
-    pub(crate) back_video: Option<String>,
+    pub(crate) explainer_video: Option<VideoDef>,
+    pub(crate) front_video: Option<VideoDef>,
+    pub(crate) back_video: Option<VideoDef>,
     pub(crate) song: Option<String>,
     pub(crate) song_timestamp: Option<f64>,
     pub energy: u8,
@@ -149,17 +149,17 @@ impl Lesson {
     }
 
     #[wasm_bindgen(getter, js_name = "explainerVideo")]
-    pub fn explainer_video(&self) -> Option<String> {
+    pub fn explainer_video(&self) -> Option<VideoDef> {
         self.explainer_video.clone()
     }
 
     #[wasm_bindgen(getter, js_name = "frontVideo")]
-    pub fn front_video(&self) -> Option<String> {
+    pub fn front_video(&self) -> Option<VideoDef> {
         self.front_video.clone()
     }
 
     #[wasm_bindgen(getter, js_name = "backVideo")]
-    pub fn back_video(&self) -> Option<String> {
+    pub fn back_video(&self) -> Option<VideoDef> {
         self.back_video.clone()
     }
 
