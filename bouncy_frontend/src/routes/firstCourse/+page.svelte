@@ -143,7 +143,6 @@
     {#if selectedLesson === 0}
       <WarmUp
         {stepNames}
-        videoUrl={''}
         description={$t('record.warmup-preview-description')}
         audioControl={false}
         onDone={onWarmupDone}

@@ -1,20 +1,19 @@
 <script>
   import { t } from '$lib/i18n';
   import { getContext, onDestroy, onMount } from 'svelte';
-  import { base } from '$app/paths';
   import Popup from '$lib/components/ui/Popup.svelte';
   import { writable } from 'svelte/store';
   import { bpm, setBeatStart } from '$lib/stores/Beat';
   import { songs } from '$lib/stores/Songs';
   import DarkSection from '$lib/components/ui/sections/DarkSection.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
-  import { Tracker } from '$lib/instructor/bouncy_instructor';
+  import { Tracker, VideoDef } from '$lib/instructor/bouncy_instructor';
   import LogoHeader from '../ui/LogoHeader.svelte';
   import TrackerPreview from '../avatar/TrackerPreview.svelte';
   import Background from '../ui/sections/Background.svelte';
   import PreviewDetails from './PreviewDetails.svelte';
   import MusicVolumeControl from '../audio/MusicVolumeControl.svelte';
-  import VideoPlayer from '../ui/video/VideoPlayer.svelte';
+  import VideoWithMetaData from '../ui/video/VideoWithMetaData.svelte';
 
   /**
    * @typedef {Object} Props
@@ -22,7 +21,7 @@
    * @property {string} description
    * @property {function} onDone
    * @property {Tracker} tracker
-   * @property {string} [video]
+   * @property {VideoDef} [video]
    * @property {string} [trackId]
    * @property {number} [trackTimestamp]
    * @property {number} difficulty
@@ -101,8 +100,8 @@
 </div>
 
 <div class="video-wrapper">
-  {#if video && video.length > 0}
-    <VideoPlayer path={`${base}${video}`}></VideoPlayer>
+  {#if video}
+    <VideoWithMetaData {video}></VideoWithMetaData>
   {/if}
 </div>
 

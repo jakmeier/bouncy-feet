@@ -44,8 +44,13 @@
   }
 
   function seekTo(time) {
+    const maxSnap = 1000;
     const snapped = snapToBeat(time * 1000);
-    videoElement.currentTime = snapped / 1000;
+    if (Math.abs(time * 1000 - snapped) <= maxSnap) {
+      videoElement.currentTime = snapped / 1000;
+    } else {
+      videoElement.currentTime = time;
+    }
   }
 
   function snapToBeat(targetMs) {
@@ -69,6 +74,8 @@
   });
 </script>
 
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div class="video-wrapper">
   <CornerMarker>
     <video
@@ -108,6 +115,8 @@
   {/if}
 </div>
 
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
   class="timeline"
   onclick={(e) => {
@@ -118,21 +127,21 @@
 >
   <div class="progress" style="width: {(currentTime / duration) * 100}%"></div>
 
-  {#each beats as b}
-    <div class="beat-marker" style="left: {(b / 1000 / duration) * 100}%"></div>
+  {#each beats as t}
+    <div class="beat-marker" style="left: {(t / 1000 / duration) * 100}%"></div>
   {/each}
 
-  {#each markers as m}
+  {#each markers as marker}
     <div
       class="custom-marker"
-      title={m.label}
-      style="left: {(m.time / duration) * 100}%"
-      onclick={(e) => {
-        e.stopPropagation();
-        seekTo(m.time);
-      }}
+      title={marker.label}
+      style="left: {(marker.time / 1000 / duration) * 100}%"
     >
-      {m.icon}
+      <img
+        class="icon"
+        src="{base}/icons/{marker.icon}.svg"
+        alt="Bouncy Feet Logo"
+      />
     </div>
   {/each}
 </div>
@@ -194,6 +203,13 @@
     top: 0;
     height: 100%;
     width: 2px;
-    background: var(--theme-neutral-black);
+    background: #1d1d1b20;
+  }
+
+  .icon {
+    position: relative;
+    left: -0.75rem;
+    top: 0.25rem;
+    width: 1.5rem;
   }
 </style>

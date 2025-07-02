@@ -13,8 +13,8 @@ enum VideoDefEnum {
     /// Defined with additional meta data
     Full {
         path: String,
-        beats: Vec<u32>,
-        start_markers: Vec<u32>,
+        beats: Vec<f64>,
+        start_markers: Vec<f64>,
         step_markers: Vec<StepMarker>,
     },
     /// Defined by just the path
@@ -45,14 +45,16 @@ impl VideoDef {
         self.borrow_path().is_empty()
     }
 
-    pub fn beats(&self) -> Vec<u32> {
+    pub fn beats(&self) -> Vec<f64> {
         self.borrow_beats().to_vec()
     }
 
-    pub fn start_markers(&self) -> Vec<u32> {
+    #[wasm_bindgen(js_name = "startMarkers")]
+    pub fn start_markers(&self) -> Vec<f64> {
         self.borrow_start_markers().to_vec()
     }
 
+    #[wasm_bindgen(js_name = "stepMarkers")]
     pub fn step_markers(&self) -> Vec<StepMarker> {
         self.borrow_step_markers().to_vec()
     }
@@ -66,14 +68,14 @@ impl VideoDef {
         }
     }
 
-    fn borrow_beats(&self) -> &[u32] {
+    fn borrow_beats(&self) -> &[f64] {
         match &self.variant {
             VideoDefEnum::Full { beats, .. } => &beats,
             VideoDefEnum::Simple(_) => &[],
         }
     }
 
-    fn borrow_start_markers(&self) -> &[u32] {
+    fn borrow_start_markers(&self) -> &[f64] {
         match &self.variant {
             VideoDefEnum::Full { start_markers, .. } => &start_markers,
             VideoDefEnum::Simple(_) => &[],
@@ -99,7 +101,7 @@ impl From<parsing::video_def::VideoDef> for VideoDef {
                 let start_markers = markers
                     .iter()
                     .filter_map(|(timestamp, marker)| match marker {
-                        parsing::video_def::Marker::Start => Some(*timestamp),
+                        parsing::video_def::Marker::Start => Some(*timestamp as f64),
                         parsing::video_def::Marker::Step(_) => None,
                     })
                     .collect();
@@ -116,7 +118,7 @@ impl From<parsing::video_def::VideoDef> for VideoDef {
 
                 VideoDefEnum::Full {
                     path,
-                    beats,
+                    beats: beats.iter().map(|t| *t as f64).collect(),
                     start_markers,
                     step_markers,
                 }

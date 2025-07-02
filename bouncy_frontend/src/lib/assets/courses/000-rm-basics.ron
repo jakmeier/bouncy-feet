@@ -32,7 +32,17 @@
       names: {"de": "Vorbereitung für RM", "en": "Prep for RM"},
       difficulty: 2,
       energy: 2,
-      explainer_video: "https://app.bouncy-feet.ch/media/videos/c0/l2.mp4",
+      explainer_video: (
+        path: "https://app.bouncy-feet.ch/media/videos/c0/l2.mp4",
+        beats: [36000, 37200, 39000, 40800, 42550],
+        markers: {
+          36000: Start,
+          37000: Step("right-forward"),
+          39000: Step("left-forward"),
+          41000: Step("right-forward"),
+          42000: Step("left-forward"),
+        }
+      ),
       front_video: "https://app.bouncy-feet.ch/media/videos/c0/l2_exercise.mp4",
       parts: [
         (step: "flat-man-3-pause", repeat: 16, subbeats_per_move: 2),

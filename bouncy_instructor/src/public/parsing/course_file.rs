@@ -20,7 +20,7 @@ pub struct CourseFile {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     explanations: Option<TranslatedString>,
     featured_step: String,
-    video: Option<String>,
+    video: Option<VideoDef>,
     lessons: Vec<Lesson>,
     poses: Vec<Pose>,
     steps: Vec<Step>,
@@ -119,7 +119,7 @@ impl CourseFile {
             explanation,
             id: self.id.clone(),
             featured_step_id: self.featured_step,
-            video: self.video,
+            video: self.video.map(From::from),
             lessons: vec![],
             collection,
         };

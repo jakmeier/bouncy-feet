@@ -1,6 +1,10 @@
 <script>
   import LightBackground from '$lib/components/ui/sections/LightBackground.svelte';
-  import { DetectionResult, Tracker } from '$lib/instructor/bouncy_instructor';
+  import {
+    DetectionResult,
+    Tracker,
+    VideoDef,
+  } from '$lib/instructor/bouncy_instructor';
   import LiveActivity from './LiveActivity.svelte';
   import WarmUpPreview from './WarmUpPreview.svelte';
   import { registerTracker } from '$lib/stores/Beat';
@@ -11,7 +15,7 @@
   /**
    * @typedef {Object} Props
    * @property {string[]} stepNames
-   * @property {string} videoUrl
+   * @property {VideoDef} [video]
    * @property {string} description
    * @property {boolean} audioControl
    * @property {function} onDone
@@ -19,14 +23,8 @@
    */
 
   /** @type {Props} */
-  let {
-    stepNames,
-    videoUrl: previewVideoUrl,
-    description,
-    audioControl,
-    onDone,
-    onBack,
-  } = $props();
+  let { stepNames, video, description, audioControl, onDone, onBack } =
+    $props();
 
   /** @type {UserContextData} */
   let user = getContext('user');
@@ -83,7 +81,7 @@
   <WarmUpPreview
     {audioControl}
     {description}
-    videoUrl={previewVideoUrl}
+    {video}
     trackId={'105bpm_tropical_house'}
     onDone={() => (previewDone = true)}
     {onBack}

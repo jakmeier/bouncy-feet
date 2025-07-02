@@ -6,7 +6,7 @@
   import Footer from '$lib/components/ui/Footer.svelte';
   import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
   import NightSection from '$lib/components/ui/sections/NightSection.svelte';
-  import VideoPlayer from '$lib/components/ui/video/VideoPlayer.svelte';
+  import VideoWithMetaData from '$lib/components/ui/video/VideoWithMetaData.svelte';
 
   const { getCourse } = getContext('courses');
   const user = getContext('user').store;
@@ -14,6 +14,7 @@
   const id = page.params.courseId;
   /** @type {import('$lib/instructor/bouncy_instructor').Course} */
   const course = getCourse(id);
+  /** @type {import("bouncy_instructor").VideoDef} */
   const video = $derived(course.video);
 
   const stepTime = 300;
@@ -33,9 +34,7 @@
   <div class="explanation">{course.explanation}</div>
 
   <div class="video-wrapper">
-    {#if video && video.length > 0}
-      <VideoPlayer path={`${video}`}></VideoPlayer>
-    {/if}
+    <VideoWithMetaData {video} />
   </div>
 </NightSection>
 

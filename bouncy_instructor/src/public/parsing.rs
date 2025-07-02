@@ -403,7 +403,11 @@ mod tests {
                 explanation: None,
                 featured_step_id: "rm-0",
                 video: Some(
-                    "https://app.bouncy-feet.ch/media/videos/c3/overview.mp4",
+                    VideoDef {
+                        variant: Simple(
+                            "https://app.bouncy-feet.ch/media/videos/c3/overview.mp4",
+                        ),
+                    },
                 ),
                 lessons: [
                     Lesson {
@@ -428,14 +432,14 @@ mod tests {
                                 variant: Full {
                                     path: "https://app.bouncy-feet.ch/media/videos/c3/combo_fast_back_view.mp4",
                                     beats: [
-                                        10,
-                                        15,
-                                        20,
-                                        25,
-                                        30,
+                                        10.0,
+                                        15.0,
+                                        20.0,
+                                        25.0,
+                                        30.0,
                                     ],
                                     start_markers: [
-                                        10,
+                                        10.0,
                                     ],
                                     step_markers: [
                                         StepMarker {

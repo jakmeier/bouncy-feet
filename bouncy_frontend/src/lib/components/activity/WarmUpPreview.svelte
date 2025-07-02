@@ -1,12 +1,13 @@
 <script>
   import { t } from '$lib/i18n';
-  import { getContext, onDestroy, onMount } from 'svelte';
+  import { getContext } from 'svelte';
 
   import ActivityPreview from './ActivityPreview.svelte';
+  import { VideoDef } from '$lib/instructor/bouncy_instructor';
 
   /**
    * @typedef {Object} Props
-   * @property {string} videoUrl
+   * @property {VideoDef} [video]
    * @property {string} description
    * @property {boolean} audioControl
    * @property {string} trackId
@@ -15,14 +16,7 @@
    */
 
   /** @type {Props} */
-  let {
-    videoUrl: video,
-    description,
-    audioControl,
-    trackId,
-    onDone,
-    onBack,
-  } = $props();
+  let { video, description, audioControl, trackId, onDone, onBack } = $props();
 
   let { tracker } = getContext('tracker');
 

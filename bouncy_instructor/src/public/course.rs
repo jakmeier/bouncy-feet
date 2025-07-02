@@ -15,7 +15,7 @@ pub struct Course {
     pub(crate) name: String,
     pub(crate) explanation: Option<String>,
     pub(crate) featured_step_id: String,
-    pub(crate) video: Option<String>,
+    pub(crate) video: Option<VideoDef>,
     pub(crate) lessons: Vec<Lesson>,
     pub(crate) collection: ContentCollection,
 }
@@ -79,7 +79,7 @@ impl Course {
     }
 
     #[wasm_bindgen(getter)]
-    pub fn video(&self) -> Option<String> {
+    pub fn video(&self) -> Option<VideoDef> {
         self.video.clone()
     }
 
