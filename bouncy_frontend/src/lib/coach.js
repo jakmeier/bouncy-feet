@@ -18,8 +18,7 @@ export const coaches = [
         name: 'rob',
         steps: {
             "rm-0": {
-                // TODO: use correct video
-                video: "https://app.bouncy-feet.ch/media/videos/steps/reverse-rm.mp4",
+                video: "https://app.bouncy-feet.ch/media/videos/steps/running_man.mp4",
                 courses: ['running-man-basics', 'rm-practice']
             },
             "reverse-rm-0": {
@@ -28,7 +27,7 @@ export const coaches = [
                 courses: ["rrm-basics"]
             },
             "pp-0": {
-                video: "",
+                video: "https://app.bouncy-feet.ch/media/videos/steps/drm.mp4",
                 courses: []
             }
         },
@@ -51,8 +50,8 @@ export const coaches = [
             }
         },
         title: {
-            de: "Rave",
-            en: "Rave"
+            de: "Rave Energie",
+            en: "Rave Energy"
         },
         description: {
             de: "Tritt ein in das verlassene Warenhaus von Rob und lerne alles über den **Running Man**.",
@@ -65,9 +64,12 @@ export const coaches = [
         name: 'charles',
         steps: {
             "t-0": {
+                // TODO(July): add video and course
                 video: "",
                 courses: []
-            }, "v-0": {
+            },
+            "v-0": {
+                // TODO(July): add video and course (maybe charleston / happy feet instead)
                 video: "",
                 courses: []
             }
@@ -92,8 +94,8 @@ export const coaches = [
             }
         },
         title: {
-            de: "Freude",
-            en: "Joyful"
+            de: "Pure Freude",
+            en: "Pure Joy"
         },
         description: {
             de: "Willkommen in den Hallen von Charles. Komm und tanze die **Happy Feets** und den **Charleston** mit uns!",
