@@ -70,21 +70,21 @@ impl VideoDef {
 
     fn borrow_beats(&self) -> &[f64] {
         match &self.variant {
-            VideoDefEnum::Full { beats, .. } => &beats,
+            VideoDefEnum::Full { beats, .. } => beats,
             VideoDefEnum::Simple(_) => &[],
         }
     }
 
     fn borrow_start_markers(&self) -> &[f64] {
         match &self.variant {
-            VideoDefEnum::Full { start_markers, .. } => &start_markers,
+            VideoDefEnum::Full { start_markers, .. } => start_markers,
             VideoDefEnum::Simple(_) => &[],
         }
     }
 
     fn borrow_step_markers(&self) -> &[StepMarker] {
         match &self.variant {
-            VideoDefEnum::Full { step_markers, .. } => &step_markers,
+            VideoDefEnum::Full { step_markers, .. } => step_markers,
             VideoDefEnum::Simple(_) => &[],
         }
     }
