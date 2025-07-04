@@ -62,10 +62,8 @@
   }
 
   .ol {
-    display: grid;
     margin: 15px 10px 10px;
     gap: 10px;
-    justify-content: center;
   }
   .lesson {
     display: flex;
@@ -94,6 +92,13 @@
   .lesson-name {
     display: grid;
     align-items: center;
+  }
+
+  .lesson-name {
+    width: calc(100vw - min(40vw, 200px) - 6rem);
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    white-space: normal;
   }
 
   .lesson:nth-of-type(even) {

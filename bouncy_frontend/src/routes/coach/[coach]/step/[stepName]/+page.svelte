@@ -126,6 +126,7 @@
       </div>
     </div>
   {:else}
+    <!-- TODO(July): Add link to help out creating courses -->
     <p>{$t('collection.no-courses')}</p>
   {/each}
 

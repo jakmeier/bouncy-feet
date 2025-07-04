@@ -2,7 +2,6 @@
   import { coaches } from '$lib/coach';
   import { getContext } from 'svelte';
   import AvatarStyleContext from '$lib/components/avatar/AvatarStyleContext.svelte';
-  import StandardPage from '$lib/components/ui/StandardPage.svelte';
   import { coachLocale, locale, t } from '$lib/i18n';
   import TrackerPreview from '$lib/components/avatar/TrackerPreview.svelte';
   import FormattedText from '$lib/components/ui/FormattedText.svelte';
@@ -43,14 +42,9 @@
       </div>
     </div>
     <div class="buttons">
-      <!-- <a href="" class="button"> Basic Moves </a>
-                <a href="" class="button"> Video Clips </a>
-                <a href="" class="button"> Courses </a> -->
       <a href="./coach/{coach.name}">
-        <button> Basic Moves </button>
+        <button> {$t('home.go-button')} </button>
       </a>
-      <button> Video Clips </button>
-      <button> Courses </button>
     </div>
   </div>
 {/each}

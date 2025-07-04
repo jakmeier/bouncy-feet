@@ -13,7 +13,7 @@
   import { locale } from '$lib/i18n';
   import { stepById, StepWrapper } from '$lib/instructor/bouncy_instructor';
   import ContextStyledSection from '$lib/components/ui/sections/ContextStyledSection.svelte';
-  import LightSection from '$lib/components/ui/sections/LightSection.svelte';
+  import VideoFeed from '$lib/components/VideoFeed.svelte';
 
   /**
    * @typedef {Object} Props
@@ -63,36 +63,24 @@
   bodyShape={coach.style.bodyShape}
   headStyle={coach.style.headStyle}
 >
-  <!-- TODO: add this back with images, for now keep it simple -->
-  <!-- <LightSection fillScreen arrow arrowText={$t('coach.courses-title')}>
-    <LogoHeader {title} backButton white {onBack} />
-    <h3>{coach.title[coachLocale($locale)]}</h3>
-    {#if step}
-      <AnimatedStep {step} size={350} backgroundColor="transparent"
-      ></AnimatedStep>
-    {/if}
-  </LightSection> -->
-
-  <!-- 
-    <div class="train">
-      <div class="link">
-        <a href="../../courses/{course.id}/exercise/-1/record">
-        <button>
-        {$t('courses.course-overview.start-lesson')}
-        Train
-      </button>
-    </a>
-  </div>
-</div> -->
-
-  <ContextStyledSection pageColoring={coach.style.pageColoring}>
+  <ContextStyledSection
+    pageColoring={coach.style.pageColoring}
+    fillScreen
+    arrow
+    arrowText={$t('collection.to-steps')}
+  >
     <LogoHeader
       transparent
       backButton
       {onBack}
-      title={$t('collection.steps-subtitle')}
+      title={coach.title[coachLocale($locale)]}
     />
-    <!-- <h2>{$t('collection.steps-subtitle')}</h2> -->
+    <!-- TODO(July): add "upload" button top right -->
+    <VideoFeed />
+  </ContextStyledSection>
+
+  <ContextStyledSection pageColoring={coach.style.pageColoring}>
+    <h2>{$t('collection.steps-subtitle')}</h2>
 
     {#each steps as step}
       <a href={`./step/${step.name}`}>

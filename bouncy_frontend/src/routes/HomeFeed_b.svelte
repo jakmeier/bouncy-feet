@@ -45,16 +45,17 @@
   bgColor="var(--theme-neutral-black)"
   color="var(--theme-neutral-white)"
 ></Background>
-<LogoHeader title={$t('home.slogan-1')} />
+<LogoHeader />
+<!-- <LogoHeader title={$t('home.slogan-1')} /> -->
 
-<div>TODO: Continue where you left off / start a course shortlink</div>
+<div>TODO(July): Show random video, not seen yet would be best</div>
 <div>-</div>
 <div>-</div>
 <div>-</div>
-<div>-</div>
-<div>-</div>
+<div>TODO(July): See more like that button</div>
+<button></button>
 
-<h2>TODO: title</h2>
+<h2>TODO(July): title</h2>
 <div>
   {$t('home.slogan-2')}
 </div>
@@ -104,24 +105,8 @@
 </LightSection>
 
 <style>
-  .focus-card {
-    max-width: 400px;
-    min-height: 93dvh;
-    margin: auto;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-
   .small-space {
     margin: 3rem 0px 1rem;
-  }
-
-  .down-marker {
-    max-width: 80px;
-    max-height: 80px;
-    margin: 100px auto 0;
-    padding: 10px 5px;
   }
 
   .section-end-button {
