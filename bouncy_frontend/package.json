@@ -17,12 +17,12 @@
     "test:unit": "vitest"
   },
   "devDependencies": {
-    "bouncy_instructor": "file:./src/lib/instructor",
     "@playwright/test": "^1.51.0",
     "@sveltejs/adapter-auto": "^3.3.1",
     "@sveltejs/adapter-static": "^3.0.8",
     "@sveltejs/kit": "^2.19.0",
     "@sveltejs/vite-plugin-svelte": "^4.0.4",
+    "bouncy_instructor": "file:./src/lib/instructor",
     "date-fns": "^3.6.0",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
@@ -40,7 +40,9 @@
   "type": "module",
   "dependencies": {
     "@mediapipe/tasks-vision": "^0.10.21",
+    "@peertube/embed-api": "^0.2.0",
     "@sveltejs/adapter-node": "^5.2.12",
+    "jschannel": "^1.0.2",
     "svelte-select": "^5.8.3",
     "sveltekit-i18n": "^2.4.2"
   }

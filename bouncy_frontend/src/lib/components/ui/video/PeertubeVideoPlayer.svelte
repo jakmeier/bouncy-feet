@@ -1,56 +1,63 @@
 <script>
-  // A custom video player for Bouncy Feet, that's aware of music beats and just
-  // generally styled in theme.
-  import { onMount } from 'svelte';
-  import { writable } from 'svelte/store';
-  import CornerMarker from '../CornerMarker.svelte';
   import { base } from '$app/paths';
+  import { onMount } from 'svelte';
+  import CornerMarker from '../CornerMarker.svelte';
 
   /** @typedef {{ time: number, label: string, icon: string }} Marker */
   /**
    * @typedef {Object} Props
-   * @property {string} path
+   * @property {string} videoId
    * @property {number[]} [beats] - Array of beat timestamps in ms
    * @property {Marker[]} [markers] - Array of markers to show on the timeline
    * @property {boolean} [muted]
    */
 
   /** @type Props */
-  let { path, beats = [], markers = [], muted = false } = $props();
+  let { videoId, beats = [], markers = [], muted = false } = $props();
 
-  let videoElement = $state();
   let isPlaying = $state(false);
   let duration = $state(0);
   let currentTime = $state(0);
-  let videoExists = $state(false);
-  let videoLoading = $state(true);
+
+  let iframe = $state();
+  let iframeWrapperWidth = $state(90);
+  let iframeWrapperHeight = $state(160);
+  let player = $state();
 
   export function play() {
-    if (videoElement) {
-      videoElement.play();
+    if (player) {
+      player.play();
+      isPlaying = true;
     }
   }
 
-  const seekTime = writable(0);
-
-  function togglePlay() {
-    if (videoElement.paused) {
-      videoElement.play();
+  async function togglePlay() {
+    if (!(await player.isPlaying())) {
+      // if (!isPlaying) {
+      player.play();
+      isPlaying = true;
     } else {
-      videoElement.pause();
+      player.pause();
+      isPlaying = false;
     }
   }
 
+  /**
+   * @param {number} time in seconds
+   */
   function seekTo(time) {
     const maxSnap = 1000;
     const snapped = snapToBeat(time * 1000);
     if (Math.abs(time * 1000 - snapped) <= maxSnap) {
-      videoElement.currentTime = snapped / 1000;
+      player.seek(snapped / 1000);
     } else {
-      videoElement.currentTime = time;
+      player.seek(time);
     }
   }
 
+  /**
+   * @param {number} targetMs
+   */
   function snapToBeat(targetMs) {
     if (beats.length === 0) {
       return targetMs;
@@ -60,15 +67,34 @@
     );
   }
 
-  onMount(() => {
-    videoElement.addEventListener('loadedmetadata', () => {
-      duration = videoElement.duration;
-    });
-    videoElement.addEventListener('timeupdate', () => {
-      currentTime = videoElement.currentTime;
-    });
-    videoElement.addEventListener('play', () => (isPlaying = true));
-    videoElement.addEventListener('pause', () => (isPlaying = false));
+  /**
+   * @typedef {Object} PeerTubePlayerState
+   * @property {number} position - Current playback position in seconds.
+   * @property {number} volume - Volume level (0.0 to 1.0).
+   * @property {string} duration - Total duration of the video (as stringified float).
+   * @property {"playing" | "paused" | "ended"} playbackState - Current playback state.
+   */
+
+  onMount(async () => {
+    // Importing this normally fails with `window not defined`
+    const { PeerTubePlayer } = await import('@peertube/embed-api');
+
+    player = new PeerTubePlayer(iframe);
+
+    player.addEventListener(
+      'playbackStatusChange',
+      async () => (isPlaying = await player.isPlaying())
+    );
+    player.addEventListener(
+      'playbackStatusUpdate',
+      /**
+       * @param {PeerTubePlayerState} data
+       */
+      (data) => {
+        currentTime = data.position;
+        duration = Number(data.duration);
+      }
+    );
   });
 </script>
 
@@ -76,33 +102,24 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div class="video-wrapper">
   <CornerMarker>
-    <video
-      bind:this={videoElement}
-      controls={false}
-      preload="auto"
-      playsinline
-      webkit-playsinline
-      defaultmuted={muted}
-      {muted}
-      onloadedmetadata={() => {
-        videoExists = true;
-        videoLoading = false;
-      }}
-      onclick={togglePlay}
+    <div
+      class="iframe-wrapper"
+      bind:clientWidth={iframeWrapperWidth}
+      bind:clientHeight={iframeWrapperHeight}
     >
-      <source
-        src={path}
-        type="video/mp4"
-        onerror={() => {
-          videoLoading = false;
-          videoExists = false;
-        }}
-        onsuspend={() => {
-          videoLoading = false;
-          videoExists = false;
-        }}
-      />
-    </video>
+      <!-- svelte-ignore a11y_click_events_have_key_events -->
+      <div class="iframe-overlay" onclick={togglePlay}></div>
+      <!-- TODO: video title -->
+      <iframe
+        title="video"
+        width="{iframeWrapperWidth}px"
+        height="{iframeWrapperHeight}px"
+        src="https://tube.bouncy-feet.ch/videos/embed/{videoId}?api=1&warningTitle=0&controlBar=0&peertubeLink=0&controls=0"
+        frameborder="0"
+        sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+        bind:this={iframe}
+      ></iframe>
+    </div>
   </CornerMarker>
   {#if !isPlaying}
     <div class="overlay-controls">
@@ -150,13 +167,8 @@
     width: 100%;
     max-width: 800px;
     /* left: -0.5rem; */
-  }
 
-  video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
+    aspect-ratio: 9 / 16;
   }
 
   .overlay-controls {
@@ -216,5 +228,31 @@
     left: -0.75rem;
     top: 0.25rem;
     width: 1.5rem;
+  }
+
+  .iframe-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .iframe-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* transparent but clickable */
+    background: rgba(0, 0, 0, 0);
+    z-index: 10;
+    cursor: pointer;
+  }
+
+  iframe {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+    border: 0;
   }
 </style>
