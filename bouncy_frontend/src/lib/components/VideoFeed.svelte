@@ -1,20 +1,17 @@
 <script>
+  import PeertubePlaylistPlayer from './ui/video/PeertubePlaylistPlayer.svelte';
   import PeertubeVideoPlayer from './ui/video/PeertubeVideoPlayer.svelte';
 </script>
 
 <div class="outer">
-  <p>TODO(July): Relevant video feed</p>
-  <p>swipe to show next</p>
-  <p>like button</p>
-  <p>report button</p>
+  <!-- TODO(July): load video feed, circle through playlist -->
+  <!-- TODO(July): like video -->
+  <!-- TODO(July): report video -->
+  <PeertubePlaylistPlayer playlistId="3FWFPJds8qwVJUbzSsjFzH" />
 </div>
-
-<PeertubeVideoPlayer videoId="tYGfMAgPGVc1mSjfTrNVYn"></PeertubeVideoPlayer>
 
 <style>
   .outer {
-    background: var(--theme-neutral-light);
-    border-radius: 1rem;
-    height: 70vh;
+    margin: auto;
   }
 </style>

@@ -4,16 +4,17 @@
   /** @typedef {{ time: number, label: string, icon: string }} Marker */
   /**
    * @typedef {Object} Props
-   * @property {string} videoId
+   * @property {string} playlistId
    * @property {number[]} [beats] - Array of beat timestamps in ms
    * @property {Marker[]} [markers] - Array of markers to show on the timeline
    * @property {boolean} [muted]
    */
 
   /** @type Props */
-  let { videoId, beats = [], markers = [], muted = false } = $props();
+  let { playlistId, beats = [], markers = [], muted = false } = $props();
 
   let player = $state();
+  let playlistPosition = $state(1);
 
   export function play() {
     if (player) {
@@ -25,7 +26,7 @@
 <!-- TODO(July): env url -->
 <PeertubePlayer
   bind:this={player}
-  peertubeUrl="https://tube.bouncy-feet.ch/videos/embed/{videoId}?api=1&warningTitle=0&controlBar=0&peertubeLink=0&controls=0"
+  peertubeUrl="https://dev-tube.bouncy-feet.ch/video-playlists/embed/{playlistId}?api=1&warningTitle=0&controlBar=0&peertubeLink=0&controls=0&playlistPosition={playlistPosition}&autoPlay=0"
   {beats}
   {markers}
   {muted}
