@@ -3,7 +3,6 @@
   import AnimatedStep from '$lib/components/AnimatedStep.svelte';
   import { bpm } from '$lib/stores/Beat';
   import { getContext } from 'svelte';
-  import LightBackground from '$lib/components/ui/sections/LightBackground.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
   import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
   import { coaches } from '$lib/coach';
@@ -14,6 +13,8 @@
   import { stepById, StepWrapper } from '$lib/instructor/bouncy_instructor';
   import ContextStyledSection from '$lib/components/ui/sections/ContextStyledSection.svelte';
   import VideoFeed from '$lib/components/VideoFeed.svelte';
+  import Section from '$lib/components/ui/sections/Section.svelte';
+  import { PUBLIC_ENV } from '$env/static/public';
 
   /**
    * @typedef {Object} Props
@@ -29,6 +30,7 @@
   const coach = $derived(coachData(coachId));
   const courses = $derived(coach.courseIds.map(getCourse));
   const step = $derived(courses[0].featuredStep());
+  const playlistId = $derived(coach.peertubePlaylist[PUBLIC_ENV]);
 
   /** @type {StepWrapper[]} */
   const steps = $derived(
@@ -63,11 +65,12 @@
   bodyShape={coach.style.bodyShape}
   headStyle={coach.style.headStyle}
 >
-  <ContextStyledSection
-    pageColoring={coach.style.pageColoring}
+  <Section
     fillScreen
     arrow
     arrowText={$t('collection.to-steps')}
+    bgColor={'var(--theme-neutral-dark)'}
+    color={coach.style.pageColoring.pageColor}
   >
     <LogoHeader
       transparent
@@ -75,9 +78,14 @@
       {onBack}
       title={coach.title[coachLocale($locale)]}
     />
-    <!-- TODO(July): add "upload" button top right -->
-    <VideoFeed />
-  </ContextStyledSection>
+    <VideoFeed {playlistId} />
+    <!-- TODO(August): translated, styled "upload" button -->
+    <!-- TODO(August): upload to currently selected playlist -->
+    <!-- <a class="upload-button" href="{base}/profile/upload">
+      <button class="upload-button">+ upload</button>
+    </a> -->
+    <p></p>
+  </Section>
 
   <ContextStyledSection pageColoring={coach.style.pageColoring}>
     <h2>{$t('collection.steps-subtitle')}</h2>
@@ -121,5 +129,13 @@
 
   .step h3 {
     margin: 0;
+  }
+
+  a.upload-button {
+    margin: 2rem auto;
+  }
+
+  button.upload-button {
+    min-width: 50%;
   }
 </style>

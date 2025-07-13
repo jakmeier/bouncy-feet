@@ -1,17 +1,26 @@
 <script>
-  import PeertubePlaylistPlayer from './ui/video/PeertubePlaylistPlayer.svelte';
+  import Juggler from './ui/Juggler.svelte';
   import PeertubeVideoPlayer from './ui/video/PeertubeVideoPlayer.svelte';
+
+  let { playlistId } = $props();
 </script>
 
 <div class="outer">
+  <!-- TODO(August): like video -->
+  <!-- TODO(August): report video -->
+
   <!-- TODO(July): load video feed, circle through playlist -->
-  <!-- TODO(July): like video -->
-  <!-- TODO(July): report video -->
-  <PeertubePlaylistPlayer playlistId="3FWFPJds8qwVJUbzSsjFzH" />
+  <Juggler ids={['cKMZN3TBmN6ry2aMZUTbbw', 'sGFG13LpFYV6TZFhrEupSw']}>
+    {#snippet items(id)}
+      <PeertubeVideoPlayer videoId={id} />
+    {/snippet}
+  </Juggler>
 </div>
 
 <style>
   .outer {
     margin: auto;
+    width: 90%;
+    height: 90%;
   }
 </style>
