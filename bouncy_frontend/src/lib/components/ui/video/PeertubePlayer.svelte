@@ -10,10 +10,17 @@
    * @property {number[]} [beats] - Array of beat timestamps in ms
    * @property {Marker[]} [markers] - Array of markers to show on the timeline
    * @property {boolean} [muted]
+   * @property {boolean} [timeline]
    */
 
   /** @type Props */
-  let { peertubeUrl, beats = [], markers = [], muted = false } = $props();
+  let {
+    peertubeUrl,
+    beats = [],
+    markers = [],
+    muted = false,
+    timeline = false,
+  } = $props();
 
   let isPlaying = $state(false);
   let duration = $state(0);
@@ -28,6 +35,13 @@
     if (player) {
       player.play();
       isPlaying = true;
+    }
+  }
+
+  export function pause() {
+    if (player) {
+      player.pause();
+      isPlaying = false;
     }
   }
 
@@ -92,7 +106,6 @@
       (data) => {
         currentTime = data.position;
         duration = Number(data.duration);
-        console.log(data.playbackState);
       }
     );
   });
@@ -101,26 +114,26 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div class="video-wrapper">
-  <CornerMarker>
-    <div
-      class="iframe-wrapper"
-      bind:clientWidth={iframeWrapperWidth}
-      bind:clientHeight={iframeWrapperHeight}
-    >
-      <!-- svelte-ignore a11y_click_events_have_key_events -->
-      <div class="iframe-overlay" onclick={togglePlay}></div>
-      <!-- TODO: video title -->
-      <iframe
-        title="video"
-        width="{iframeWrapperWidth}px"
-        height="{iframeWrapperHeight}px"
-        src={peertubeUrl}
-        frameborder="0"
-        sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-        bind:this={iframe}
-      ></iframe>
-    </div>
-  </CornerMarker>
+  <!-- <CornerMarker> -->
+  <div
+    class="iframe-wrapper"
+    bind:clientWidth={iframeWrapperWidth}
+    bind:clientHeight={iframeWrapperHeight}
+  >
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <div class="iframe-overlay" onclick={togglePlay}></div>
+    <!-- TODO: video title -->
+    <iframe
+      title="video"
+      width="{iframeWrapperWidth}px"
+      height="{iframeWrapperHeight}px"
+      src={peertubeUrl}
+      frameborder="0"
+      sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+      bind:this={iframe}
+    ></iframe>
+  </div>
+  <!-- </CornerMarker> -->
   {#if !isPlaying}
     <div class="overlay-controls">
       <button class="play-button" onclick={togglePlay}>
@@ -130,36 +143,44 @@
   {/if}
 </div>
 
-<!-- svelte-ignore a11y_click_events_have_key_events -->
-<!-- svelte-ignore a11y_no_static_element_interactions -->
-<div
-  class="timeline"
-  onclick={(e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const percent = (e.clientX - rect.left) / rect.width;
-    seekTo(percent * duration);
-  }}
->
-  <div class="progress" style="width: {(currentTime / duration) * 100}%"></div>
-
-  {#each beats as t}
-    <div class="beat-marker" style="left: {(t / 1000 / duration) * 100}%"></div>
-  {/each}
-
-  {#each markers as marker}
+{#if timeline}
+  <!-- svelte-ignore a11y_click_events_have_key_events -->
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
+  <div
+    class="timeline"
+    onclick={(e) => {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const percent = (e.clientX - rect.left) / rect.width;
+      seekTo(percent * duration);
+    }}
+  >
     <div
-      class="custom-marker"
-      title={marker.label}
-      style="left: {(marker.time / 1000 / duration) * 100}%"
-    >
-      <img
-        class="icon"
-        src="{base}/icons/{marker.icon}.svg"
-        alt="Bouncy Feet Logo"
-      />
-    </div>
-  {/each}
-</div>
+      class="progress"
+      style="width: {(currentTime / duration) * 100}%"
+    ></div>
+
+    {#each beats as t}
+      <div
+        class="beat-marker"
+        style="left: {(t / 1000 / duration) * 100}%"
+      ></div>
+    {/each}
+
+    {#each markers as marker}
+      <div
+        class="custom-marker"
+        title={marker.label}
+        style="left: {(marker.time / 1000 / duration) * 100}%"
+      >
+        <img
+          class="icon"
+          src="{base}/icons/{marker.icon}.svg"
+          alt="Bouncy Feet Logo"
+        />
+      </div>
+    {/each}
+  </div>
+{/if}
 
 <style>
   .video-wrapper {

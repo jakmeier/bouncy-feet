@@ -9,16 +9,23 @@
    * @property {number[]} [beats] - Array of beat timestamps in ms
    * @property {Marker[]} [markers] - Array of markers to show on the timeline
    * @property {boolean} [muted]
+   * @property {boolean} [timeline]
    */
 
   /** @type Props */
-  let { videoId, beats = [], markers = [], muted = false } = $props();
+  let { videoId, beats = [], markers = [], muted = false, timeline } = $props();
 
   let player = $state();
 
   export function play() {
     if (player) {
       player.play();
+    }
+  }
+
+  export function pause() {
+    if (player) {
+      player.pause();
     }
   }
 </script>
@@ -29,4 +36,5 @@
   {beats}
   {markers}
   {muted}
+  {timeline}
 />

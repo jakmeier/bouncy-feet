@@ -1,16 +1,31 @@
 <script lang="ts">
   import JuggleElement from './JuggleElement.svelte';
+  import PeertubeVideoPlayer from './video/PeertubeVideoPlayer.svelte';
 
   /**
    * @typedef {Object} Props
    * @property {string[]} ids
-   * @property {import('svelte').Snippet<[any]>} [items]
    */
 
   /** @type {Props} */
-  let { ids, items } = $props();
+  let { ids } = $props();
   let currentIndex = $state(0);
-  $inspect(currentIndex);
+  const videos = $derived(
+    ids.map((id) => {
+      return { id: id, player: undefined };
+    })
+  );
+  $effect(() => {
+    videos[currentIndex].player?.play();
+    const prev = (currentIndex + ids.length - 1) % ids.length;
+    const next = (currentIndex + 1) % ids.length;
+    if (prev !== currentIndex) {
+      videos[prev].player?.pause();
+    }
+    if (next !== currentIndex) {
+      videos[next].player?.pause();
+    }
+  });
 
   function next() {
     currentIndex = (currentIndex + 1) % ids.length;
@@ -28,9 +43,9 @@
 </script>
 
 <div class="container">
-  {#each ids as id, index}
+  {#each videos as video, index}
     <JuggleElement x={pos(index)}>
-      {@render items(id)}
+      <PeertubeVideoPlayer bind:this={video.player} videoId={video.id} />
     </JuggleElement>
   {/each}
 </div>

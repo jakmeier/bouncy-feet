@@ -9,10 +9,17 @@
    * @property {number[]} [beats] - Array of beat timestamps in ms
    * @property {Marker[]} [markers] - Array of markers to show on the timeline
    * @property {boolean} [muted]
+   * @property {boolean} [timeline]
    */
 
   /** @type Props */
-  let { playlistId, beats = [], markers = [], muted = false } = $props();
+  let {
+    playlistId,
+    beats = [],
+    markers = [],
+    muted = false,
+    timeline,
+  } = $props();
 
   let player = $state();
   let playlistPosition = $state(1);
@@ -30,4 +37,5 @@
   {beats}
   {markers}
   {muted}
+  {timeline}
 />

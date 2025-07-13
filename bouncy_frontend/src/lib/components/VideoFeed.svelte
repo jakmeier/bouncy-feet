@@ -10,11 +10,7 @@
   <!-- TODO(August): report video -->
 
   <!-- TODO(July): load video feed, circle through playlist -->
-  <Juggler ids={['cKMZN3TBmN6ry2aMZUTbbw', 'sGFG13LpFYV6TZFhrEupSw']}>
-    {#snippet items(id)}
-      <PeertubeVideoPlayer videoId={id} />
-    {/snippet}
-  </Juggler>
+  <Juggler ids={['cKMZN3TBmN6ry2aMZUTbbw', 'sGFG13LpFYV6TZFhrEupSw']}></Juggler>
 </div>
 
 <style>
