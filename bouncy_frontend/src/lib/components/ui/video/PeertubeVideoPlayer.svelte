@@ -1,4 +1,5 @@
 <script>
+  import { PUBLIC_BF_PEERTUBE_URL } from '$env/static/public';
   import PeertubePlayer from './PeertubePlayer.svelte';
 
   /** @typedef {{ time: number, label: string, icon: string }} Marker */
@@ -22,10 +23,9 @@
   }
 </script>
 
-<!-- TODO(July): env url -->
 <PeertubePlayer
   bind:this={player}
-  peertubeUrl="https://tube.bouncy-feet.ch/videos/embed/{videoId}?api=1&warningTitle=0&controlBar=0&peertubeLink=0&controls=0"
+  peertubeUrl="{PUBLIC_BF_PEERTUBE_URL}/videos/embed/{videoId}?api=1&warningTitle=0&controlBar=0&peertubeLink=0&controls=0"
   {beats}
   {markers}
   {muted}

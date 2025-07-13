@@ -11,6 +11,7 @@ import { LEFT_RIGHT_COLORING, ORANGE_COLORING } from "./constants";
  * @property {AvatarStyleContext} style
  * @property {TranslatedText} description
  * @property {TranslatedText} title
+ * @property {{ [key: string]: string }} peertubePlaylist
 */
 /** @type {Coach[]} */
 export const coaches = [
@@ -57,6 +58,10 @@ export const coaches = [
             de: "Tritt ein in das verlassene Warenhaus von Rob und lerne alles über den **Running Man**.",
             en: "Enter Rob's abandoned warehouse to learn about the **Running Man** and its variations."
         },
+        peertubePlaylist: {
+            dev: "3FWFPJds8qwVJUbzSsjFzH",
+            prod: "",
+        }
     },
 
     /** @type {Coach} */
@@ -101,6 +106,10 @@ export const coaches = [
             de: "Willkommen in den Hallen von Charles. Komm und tanze die **Happy Feets** und den **Charleston** mit uns!",
             en: "Welcome to Charles' dancing halls, where **Happy Feets** and **Charleston** rule."
         },
+        peertubePlaylist: {
+            dev: "nAkAtJ2sdYFN73HZEjDft2",
+            prod: "",
+        }
     }
 ];
 
