@@ -2,16 +2,6 @@
   import Area from '$lib/components/ui/Area.svelte';
   import Symbol from '$lib/components/ui/Symbol.svelte';
 
-  
-
-  
-
-  
-
-  
-
-  
-
   /**
    * @typedef {Object} Props
    * @property {any[]} items
@@ -34,27 +24,22 @@ Returns the new index of the dragged element.
     elementSize = 100,
     borderRadius = '25px',
     onRemove = (_item, index) => {
-    items.splice(index, 1);
-  },
+      items.splice(index, 1);
+    },
     onDragStart = (_item, _index) => {},
-    onDragMove = (
-    _draggedItem,
-    draggedIndex,
-    _swappedItem,
-    swappedIndex
-  ) => {
-    // swap two array elements
-    [items[draggedIndex], items[swappedIndex]] = [
-      items[swappedIndex],
-      items[draggedIndex],
-    ];
-    return swappedIndex;
-  },
+    onDragMove = (_draggedItem, draggedIndex, _swappedItem, swappedIndex) => {
+      // swap two array elements
+      [items[draggedIndex], items[swappedIndex]] = [
+        items[swappedIndex],
+        items[draggedIndex],
+      ];
+      return swappedIndex;
+    },
     onDrop = (_item, _index) => {},
     selectedIndex = $bindable(-1),
     showAddNewItem = $bindable(false),
     main,
-    name
+    name,
   } = $props();
 
   /**
@@ -256,7 +241,7 @@ Returns the new index of the dragged element.
     >
       <div class="fixed-size">
         <div class="center">
-          {@render main?.({ item, index: i, })}
+          {@render main?.({ item, index: i })}
         </div>
       </div>
       <!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -277,7 +262,7 @@ Returns the new index of the dragged element.
         >
       </p>
       <p class="label" style="width: {elementSize}px">
-        {@render name?.({ item, index: i, })}
+        {@render name?.({ item, index: i })}
       </p>
     </div>
   {/each}
