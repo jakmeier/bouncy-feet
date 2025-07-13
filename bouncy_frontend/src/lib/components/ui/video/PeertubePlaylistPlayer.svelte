@@ -29,6 +29,24 @@
       player.play();
     }
   }
+
+  export function pause() {
+    if (player) {
+      player.pause();
+    }
+  }
+
+  export function addEventListener(event, listener) {
+    if (player) {
+      player.addEventListener(event, listener);
+    }
+  }
+
+  export function removeEventListener(event, listener) {
+    if (player) {
+      player.removeEventListener(event, listener);
+    }
+  }
 </script>
 
 <PeertubePlayer

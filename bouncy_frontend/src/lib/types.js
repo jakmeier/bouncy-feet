@@ -143,4 +143,10 @@
  * @typedef {Object} TranslatedText
  * @property {string} de
  * @property {string} en
+ * 
+ * @typedef {Object} PeerTubePlayerState
+ * @property {number} position - Current playback position in seconds.
+ * @property {number} volume - Volume level (0.0 to 1.0).
+ * @property {string} duration - Total duration of the video (as stringified float).
+ * @property {"playing" | "paused" | "ended"} playbackState - Current playback state.
  */

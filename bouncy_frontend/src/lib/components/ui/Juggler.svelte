@@ -17,18 +17,40 @@
   );
   $effect(() => {
     videos[currentIndex].player?.play();
-    const prev = (currentIndex + ids.length - 1) % ids.length;
-    const next = (currentIndex + 1) % ids.length;
-    if (prev !== currentIndex) {
-      videos[prev].player?.pause();
+    videos[currentIndex].player?.addEventListener(
+      'playbackStatusUpdate',
+      nextOnEnded
+    );
+
+    const prevIdx = (currentIndex + ids.length - 1) % ids.length;
+    const nextIdx = (currentIndex + 1) % ids.length;
+    if (prevIdx !== currentIndex) {
+      videos[prevIdx].player?.pause();
+      videos[prevIdx].player?.removeEventListener(
+        'playbackStatusUpdate',
+        nextOnEnded
+      );
     }
-    if (next !== currentIndex) {
-      videos[next].player?.pause();
+    if (nextIdx !== currentIndex) {
+      videos[nextIdx].player?.pause();
+      videos[nextIdx].player?.removeEventListener(
+        'playbackStatusUpdate',
+        nextOnEnded
+      );
     }
   });
 
   function next() {
     currentIndex = (currentIndex + 1) % ids.length;
+  }
+
+  /**
+   * @param {PeerTubePlayerState} playerState
+   */
+  function nextOnEnded(playerState) {
+    if (playerState.playbackState === 'ended') {
+      next();
+    }
   }
 
   function pos(index) {

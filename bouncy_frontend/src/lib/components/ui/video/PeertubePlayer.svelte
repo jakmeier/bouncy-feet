@@ -45,6 +45,18 @@
     }
   }
 
+  export function addEventListener(event, listener) {
+    if (player) {
+      player.addEventListener(event, listener);
+    }
+  }
+
+  export function removeEventListener(event, listener) {
+    if (player) {
+      player.removeEventListener(event, listener);
+    }
+  }
+
   async function togglePlay() {
     if (!(await player.isPlaying())) {
       player.play();
@@ -79,14 +91,6 @@
       Math.abs(curr - targetMs) < Math.abs(prev - targetMs) ? curr : prev
     );
   }
-
-  /**
-   * @typedef {Object} PeerTubePlayerState
-   * @property {number} position - Current playback position in seconds.
-   * @property {number} volume - Volume level (0.0 to 1.0).
-   * @property {string} duration - Total duration of the video (as stringified float).
-   * @property {"playing" | "paused" | "ended"} playbackState - Current playback state.
-   */
 
   onMount(async () => {
     // Importing this normally fails with `window not defined`
