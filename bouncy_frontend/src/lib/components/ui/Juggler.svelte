@@ -55,18 +55,18 @@
 
   function pos(index) {
     if (index < currentIndex) {
-      return -150;
+      return 'left';
     }
     if (index > currentIndex) {
-      return 150;
+      return 'right';
     }
-    return 0;
+    return 'center';
   }
 </script>
 
 <div class="container">
   {#each videos as video, index}
-    <JuggleElement x={pos(index)}>
+    <JuggleElement position={pos(index)}>
       <PeertubeVideoPlayer bind:this={video.player} videoId={video.id} />
     </JuggleElement>
   {/each}

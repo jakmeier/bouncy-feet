@@ -1,12 +1,42 @@
 <script>
-  import { Spring } from 'svelte/motion';
+  import { quadInOut } from 'svelte/easing';
+  import { Spring, Tween } from 'svelte/motion';
 
-  let { children, x } = $props();
+  /**
+   * @typedef {Object} Props
+   * @property {"left" | "center" | "right" } position
+   */
 
-  const spring = Spring.of(() => x);
+  /** @type {Props} */
+  let { children, position } = $props();
+  let x = new Spring(0);
+  let size = new Tween(1, {
+    delay: 0,
+    duration: 500,
+    easing: quadInOut,
+  });
+  $effect(() => {
+    switch (position) {
+      case 'left':
+        x.set(-150);
+        size.set(0.3);
+        break;
+      case 'center':
+        x.set(0);
+        size.set(1);
+        break;
+      case 'right':
+        x.set(150);
+        size.set(0.3);
+        break;
+    }
+  });
 </script>
 
-<div class="box" style="transform: translate({spring.current}%, 0)">
+<div
+  class="box"
+  style="transform: translate({x.current}%, 0) scale({size.current});"
+>
   {@render children?.()}
 </div>
 
