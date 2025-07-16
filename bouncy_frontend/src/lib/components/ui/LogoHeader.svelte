@@ -1,6 +1,8 @@
 <script>
   import { base } from '$app/paths';
+  import { receivePersonalityTitle } from '$lib/stores/Crossfade.svelte';
   import Arrow from './svg/Arrow.svelte';
+  import { fadingOut } from '$lib/stores/UiState.svelte';
 
   /**
    * @typedef {Object} Props
@@ -59,7 +61,16 @@
   {:else}
     <img class="logo" src={imgUrl} alt="Bouncy Feet Logo" />
   {/if}
-  <h1 class="title">{title}</h1>
+  {#if !fadingOut.text}
+    <h1
+      class="title"
+      in:receivePersonalityTitle={{
+        key: 'pageTitle',
+      }}
+    >
+      {title}
+    </h1>
+  {/if}
 </header>
 
 <style>

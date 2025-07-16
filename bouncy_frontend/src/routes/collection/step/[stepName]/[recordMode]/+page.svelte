@@ -9,7 +9,7 @@
   import LiveRecording from '$lib/components/record/LiveRecording.svelte';
   import VideoReview from '$lib/components/review/VideoReview.svelte';
   import Header from '$lib/components/ui/Header.svelte';
-  import { hideNavigation } from '$lib/stores/UiState';
+  import { hideNavigation } from '$lib/stores/UiState.svelte';
   import Popup from '$lib/components/ui/Popup.svelte';
   import SessionReward from '$lib/components/SessionReward.svelte';
   import { bpm, registerTracker, setBpm } from '$lib/stores/Beat';

@@ -9,7 +9,9 @@
     backgroundColor,
     hideNavigation,
     wideView,
-  } from '$lib/stores/UiState.js';
+    fadingOut,
+    floatingTitleRect,
+  } from '$lib/stores/UiState.svelte.js';
   import PoseDetectionContext from './PoseDetectionContext.svelte';
   import UserContext from './UserContext.svelte';
   import LocalCollectionContext from './LocalCollectionContext.svelte';
@@ -19,6 +21,8 @@
   import UserAvatarStyleContext from '$lib/components/avatar/UserAvatarStyleContext.svelte';
   import { setContext } from 'svelte';
   import { readable } from 'svelte/store';
+  import { fade } from 'svelte/transition';
+  import { sendPersonalityTitle } from '$lib/stores/Crossfade.svelte';
   /**
    * @typedef {Object} Props
    * @property {import('svelte').Snippet} [children]
@@ -56,7 +60,28 @@
           <PoseDetectionContext>
             <MusicContext>
               <UserAvatarStyleContext>
-                {@render children?.()}
+                {#if !fadingOut.state}
+                  <div out:fade in:fade={{ delay: 600 }}>
+                    {@render children?.()}
+                  </div>
+                {/if}
+                {#if fadingOut.text}
+                  <h1
+                    class="floating-title"
+                    out:sendPersonalityTitle={{ key: 'pageTitle' }}
+                    style="
+                      position: fixed;
+                      top: {floatingTitleRect.top}px;
+                      left: {floatingTitleRect.left}px;
+                      color: {fadingOut.color};
+                      font-size: {fadingOut.fontSize.current}px;
+                      margin: 0;
+                      z-index: 999;
+                    "
+                  >
+                    {fadingOut.text}
+                  </h1>
+                {/if}
               </UserAvatarStyleContext>
             </MusicContext>
           </PoseDetectionContext>

@@ -9,8 +9,8 @@
 
   /** @type {Props} */
   let { children, position } = $props();
-  let x = new Spring(0);
-  let size = new Tween(1, {
+  let x = new Spring(150);
+  let size = new Tween(0.3, {
     delay: 0,
     duration: 500,
     easing: quadInOut,

@@ -1,6 +1,6 @@
 <script>
   import { onDestroy, onMount } from 'svelte';
-  import { backgroundColor, fontColor } from '$lib/stores/UiState';
+  import { backgroundColor, fontColor } from '$lib/stores/UiState.svelte';
 
   /**
    * @typedef {Object} Props

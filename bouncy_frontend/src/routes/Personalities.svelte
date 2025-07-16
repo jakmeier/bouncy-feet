@@ -5,6 +5,7 @@
   import { coachLocale, locale, t } from '$lib/i18n';
   import TrackerPreview from '$lib/components/avatar/TrackerPreview.svelte';
   import FormattedText from '$lib/components/ui/FormattedText.svelte';
+  import { fadeOutAndNavigate } from '$lib/stores/UiState.svelte';
 
   /** @type {LocalState}*/
   const { getCourse } = getContext('courses');
@@ -28,7 +29,11 @@
       </AvatarStyleContext>
     </div>
     <div class="text" style="min-height: {coachWidth}px">
-      <div class="title" style="color: {coach.style.coloring.headColor}">
+      <div
+        class="title"
+        style="color: {coach.style.coloring.headColor}"
+        bind:this={coach.titleNode}
+      >
         {coach.title[coachLocale($locale)]}
       </div>
       <!-- <div class="name">
@@ -42,7 +47,15 @@
       </div>
     </div>
     <div class="buttons">
-      <a href="./coach/{coach.name}">
+      <a
+        href="./coach/{coach.name}"
+        on:click|preventDefault={() =>
+          fadeOutAndNavigate(
+            `./coach/${coach.name}`,
+            coach.titleNode,
+            coach.title[coachLocale($locale)]
+          )}
+      >
         <button> {$t('home.go-button')} </button>
       </a>
     </div>
@@ -74,6 +87,7 @@
 
   .title {
     font-size: calc(2 * var(--font-large));
+    letter-spacing: 0.02em;
   }
 
   .description {

@@ -2,7 +2,7 @@
   import { page } from '$app/state';
   import AnimatedStep from '$lib/components/AnimatedStep.svelte';
   import { bpm } from '$lib/stores/Beat';
-  import { getContext } from 'svelte';
+  import { getContext, onMount } from 'svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
   import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
   import { coaches } from '$lib/coach';
@@ -58,6 +58,10 @@
   }
 
   const title = coachId.charAt(0).toUpperCase() + coachId.slice(1);
+
+  onMount(() => {
+    document.querySelector('.background')?.scrollTo(0, 0);
+  });
 </script>
 
 <AvatarStyleContext
