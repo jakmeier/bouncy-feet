@@ -14,14 +14,12 @@
   import Symbol from '$lib/components/ui/Symbol.svelte';
   import Button from '$lib/components/ui/Button.svelte';
 
-  
   /**
    * @typedef {Object} Props
    * @property {import('./$types').PageData} data
    */
 
   /** @type {Props} */
-  let { data } = $props();
 
   const user = getContext('user').store;
   const name = page.params.stepName;

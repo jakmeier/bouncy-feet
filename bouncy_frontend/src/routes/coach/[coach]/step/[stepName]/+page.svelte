@@ -117,7 +117,7 @@
       <div class="ol">
         {#each course.lessons as lesson, index}
           <a href="../../../../courses/{course.id}/exercise/{index}">
-            <!-- TODO: actually show which classes were done -->
+            <!-- TODO(July): actually show which classes were done -->
             <div class="lesson-outer" class:done={index < 2}>
               {index + 1}
             </div>

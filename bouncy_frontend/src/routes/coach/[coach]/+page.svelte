@@ -57,6 +57,11 @@
     goto('/', { replaceState: true });
   }
 
+  function onAddVideo() {
+    // TODO(July): upload to currently selected playlist
+    alert('Uploading videos not supported, yet.');
+  }
+
   const title = coachId.charAt(0).toUpperCase() + coachId.slice(1);
 
   onMount(() => {
@@ -81,14 +86,9 @@
       backButton
       {onBack}
       title={coach.title[coachLocale($locale)]}
+      onAction={onAddVideo}
     />
     <VideoFeed {playlistId} />
-    <!-- TODO(August): translated, styled "upload" button -->
-    <!-- TODO(August): upload to currently selected playlist -->
-    <!-- <a class="upload-button" href="{base}/profile/upload">
-      <button class="upload-button">+ upload</button>
-    </a> -->
-    <p></p>
   </Section>
 
   <ContextStyledSection pageColoring={coach.style.pageColoring}>
@@ -133,13 +133,5 @@
 
   .step h3 {
     margin: 0;
-  }
-
-  a.upload-button {
-    margin: 2rem auto;
-  }
-
-  button.upload-button {
-    min-width: 50%;
   }
 </style>

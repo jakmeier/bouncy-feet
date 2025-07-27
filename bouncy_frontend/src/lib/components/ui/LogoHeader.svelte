@@ -3,6 +3,8 @@
   import { receivePersonalityTitle } from '$lib/stores/Crossfade.svelte';
   import Arrow from './svg/Arrow.svelte';
   import { fadingOut } from '$lib/stores/UiState.svelte';
+  import Plus from './svg/Plus.svelte';
+  import UnstyledButton from './UnstyledButton.svelte';
 
   /**
    * @typedef {Object} Props
@@ -14,6 +16,7 @@
    * @property {boolean} [transparent]
    * @property {boolean} [backButton]
    * @property {()=>void} [onBack]
+   * @property {()=>void} [onAction]
    */
 
   /** @type {Props} */
@@ -28,6 +31,7 @@
     onBack = () => {
       window.history.back();
     },
+    onAction,
   } = $props();
 
   let bgColor = $derived(
@@ -52,15 +56,24 @@
 </script>
 
 <header style="background-color: {bgColor};">
-  {#if backButton}
-    <div class="arrow-wrapper" onclick={onBack}>
-      <div class="arrow">
-        <Arrow />
-      </div>
-    </div>
-  {:else}
-    <img class="logo" src={imgUrl} alt="Bouncy Feet Logo" />
-  {/if}
+  <div class="buttons-wrapper">
+    {#if backButton}
+      <UnstyledButton onClick={onBack}>
+        <div class="arrow">
+          <Arrow />
+        </div>
+      </UnstyledButton>
+    {:else}
+      <img class="logo" src={imgUrl} alt="Bouncy Feet Logo" />
+    {/if}
+    {#if onAction}
+      <UnstyledButton onClick={onAction}>
+        <div class="action">
+          <Plus />
+        </div>
+      </UnstyledButton>
+    {/if}
+  </div>
   {#if !fadingOut.text}
     <h1
       class="title"
@@ -85,11 +98,11 @@
     align-self: baseline;
   }
 
-  .arrow-wrapper {
+  .buttons-wrapper {
     height: 2rem;
     display: flex;
     align-items: flex-start;
-    justify-content: flex-start;
+    justify-content: space-between;
   }
 
   .arrow {
@@ -97,5 +110,10 @@
     max-height: 1.2rem;
     transform: rotate(90deg) translateY(-100%);
     transform-origin: top left;
+  }
+
+  .action {
+    max-width: 2rem;
+    max-height: 2rem;
   }
 </style>
