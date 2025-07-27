@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   import JuggleElement from './JuggleElement.svelte';
   import PeertubeVideoPlayer from './video/PeertubeVideoPlayer.svelte';
 
@@ -40,6 +40,10 @@
     }
   });
 
+  function prev() {
+    currentIndex = (currentIndex + ids.length - 1) % ids.length;
+  }
+
   function next() {
     currentIndex = (currentIndex + 1) % ids.length;
   }
@@ -53,6 +57,10 @@
     }
   }
 
+  /**
+   * @param {number} index
+   * @returns {"left"|"right"|"center"}
+   */
   function pos(index) {
     if (index < currentIndex) {
       return 'left';
@@ -65,20 +73,45 @@
 </script>
 
 <div class="container">
-  {#each videos as video, index}
-    <JuggleElement position={pos(index)}>
-      <PeertubeVideoPlayer bind:this={video.player} videoId={video.id} />
-    </JuggleElement>
-  {/each}
+  <button onclick={prev}>&lt;</button>
+  <div class="videos">
+    {#each videos as video, index}
+      <JuggleElement position={pos(index)}>
+        <PeertubeVideoPlayer bind:this={video.player} videoId={video.id} />
+      </JuggleElement>
+    {/each}
+  </div>
+  <button onclick={next}>&gt;</button>
 </div>
-
-<button onclick={next}>Next</button>
 
 <style>
   .container {
     position: relative;
-    width: 100vw;
-    height: 60vh;
+    width: 100%;
+    height: 70vh;
+  }
+
+  .container button {
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    width: 3rem;
+    height: 3rem;
+    padding: 0;
+    margin: 0;
+    border-radius: 50%;
+    min-width: initial;
+    max-width: initial;
+  }
+
+  .container button:first-child {
+    left: -1.5rem;
+  }
+  .container button:last-child {
+    right: -1.5rem;
+  }
+
+  .videos {
     overflow: hidden;
   }
 </style>

@@ -5,6 +5,7 @@
   /**
    * @typedef {Object} Props
    * @property {"left" | "center" | "right" } position
+   * @property {import('svelte').Snippet} [children]
    */
 
   /** @type {Props} */
