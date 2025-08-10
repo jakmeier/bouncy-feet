@@ -34,3 +34,4 @@ expect-test = "1.4.1"
 [lints.clippy]
 new_without_default = "allow"
 manual_range_contains = "allow"
+uninlined_format_args = "allow"
