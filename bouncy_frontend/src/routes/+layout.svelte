@@ -23,6 +23,8 @@
   import { readable } from 'svelte/store';
   import { fade } from 'svelte/transition';
   import { sendPersonalityTitle } from '$lib/stores/Crossfade.svelte';
+  import { initKeycloakAuth } from '$lib/keycloak';
+  import { browser } from '$app/environment';
   /**
    * @typedef {Object} Props
    * @property {import('svelte').Snippet} [children]
@@ -41,6 +43,10 @@
   const getCourse = (/** @type {string} */ id) =>
     courses.find((course) => course.id === id);
   setContext('courses', { courses: readable(courses), getCourse });
+
+  if (browser) {
+    initKeycloakAuth();
+  }
 </script>
 
 <svelte:head>
