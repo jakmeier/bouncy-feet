@@ -24,6 +24,15 @@ const peerTubeUrl = PUBLIC_BF_PEERTUBE_URL;
  * https://docs.joinpeertube.org/api-rest-reference.html#tag/Video-Playlists/operation/getVideoPlaylistVideos
  */
 
+
+// Default should work for prod but will be dynamically updated if it fails.
+const peerTubeAuthClientConfig = {
+    clientId: 'uy47nbv6ikmg0m7c8y1rr6gvtq3dytqp',
+    // Not actually secret, this can be queried from a public endpoint.
+    // This has no security purpose, just getting through the given API for external auth plugins.
+    clientSecret: 'W0ezWGF4ZS6rJW0hRM91Atht3W2E7BdD'
+};
+
 /**
  * @param {string} playlistId
  * 
@@ -83,7 +92,6 @@ export async function loginToPeertube() {
         console.warn('got no keycloak token');
         return;
     }
-    console.log('keycloak token is', token);
 
     const options = {
         method: 'POST',
@@ -123,7 +131,6 @@ async function bypassTokenToBearer(tokenExchangeResponse) {
     }
 
     const body = await tokenExchangeResponse.json();
-    const url = new URL(`${peerTubeUrl}/api/v1/users/token`);
     const externalAuthToken = body.externalAuthToken;
     const username = body.username;
     if (!externalAuthToken || !username) {
@@ -131,20 +138,19 @@ async function bypassTokenToBearer(tokenExchangeResponse) {
         return;
     }
 
-    const params = new URLSearchParams();
-    params.set('username', username);
-    params.set('externalAuthToken', externalAuthToken);
-    // TODO: read client id / secret dynamically
-    params.set('client_id', 'yt4mum4a90rd5me7m0kzewv7eb5m2xk8');
-    params.set('client_secret', 'KEJkeBDRKBg4wmE1kdLjftP2fGHJ0Quk');
-    params.set('grant_type', 'password');
-    const tokenResponse = await fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: params,
-    });
+    let tokenResponse = await sendTokenRequest(username, externalAuthToken);
+
+    // error details are reported with content type "application/problem+json; charset=utf-8"
+    // checking just for "json" for robustness to changes in how the content header is set by the server
+    if (tokenResponse.status === 400 && tokenResponse.headers.get("Content-Type")?.includes("json")) {
+        const error = await tokenResponse.json();
+        if (error.code && error.code === "invalid_client") {
+            console.info("got an invalid_client response, fetching the latest client config and trying again");
+            await updateOauthClientConfig();
+            tokenResponse = await sendTokenRequest(username, externalAuthToken);
+        }
+    }
+
     if (tokenResponse.status !== 200) {
         console.error(
             'request getting PeerTube OAuth token failed',
@@ -163,4 +169,45 @@ async function bypassTokenToBearer(tokenExchangeResponse) {
         return;
     }
     return token;
+
+    /**
+     * @param {string} username
+     * @param {string} externalAuthToken
+     */
+    async function sendTokenRequest(username, externalAuthToken) {
+        const url = new URL(`${peerTubeUrl}/api/v1/users/token`);
+        const params = new URLSearchParams();
+        params.set('username', username);
+        params.set('externalAuthToken', externalAuthToken);
+        params.set('client_id', peerTubeAuthClientConfig.clientId);
+        params.set('client_secret', peerTubeAuthClientConfig.clientSecret);
+        params.set('grant_type', 'password');
+        const tokenResponse = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: params,
+        });
+        return tokenResponse;
+    }
+}
+
+async function updateOauthClientConfig() {
+    const response = await fetch(`${peerTubeUrl}/api/v1/oauth-clients/local`);
+    if (response.status !== 200) {
+        console.error('request getting PeerTube OAuth client config failed', response.status, response);
+        return false;
+    }
+
+    const config = await response.json();
+    if (!config.client_id || !config.client_secret) {
+        console.error('PeerTube OAuth client config misses fields', config);
+        return false;
+    }
+
+    peerTubeAuthClientConfig.clientId = config.client_id;
+    peerTubeAuthClientConfig.clientSecret = config.client_secret;
+
+    return true;
 }

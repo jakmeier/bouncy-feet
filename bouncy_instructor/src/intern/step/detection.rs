@@ -33,7 +33,7 @@ impl DetectionResult {
             self.partial = Some(new_partial);
         }
     }
-    
+
     /// Note: make sure to restore cursor after calling this
     pub(crate) fn match_step(&mut self, target_step: &StepInfo) {
         if let (target, Some(partial)) = (target_step, &mut self.partial) {
