@@ -278,6 +278,11 @@
         "public-name": "Mein Anzeigename",
         "submit-stats": "Rangliste aktualisieren",
         "nav": "Profil",
+        "button-login": "Einloggen",
+        "button-register": "Registrieren",
+        "button-cancel": "Geh zurück",
+        "requires-login-title": "Wer bist du?",
+        "requires-login-text": "Logg dich ein oder erstelle jetzt ein gratis Konto.",
         "consent": {
             "title": "Rangliste beitreten",
             "text0": "Um auf der Rangliste zu erschienen, müssen wir deine tanzstatisken übermitteln. Videos werden nie hochgeladen.",
@@ -289,6 +294,10 @@
             "title": "Einstellungen",
             "consent-title": "Zeige mein Fortschritt in der öffentlichen Rangliste",
             "experimental-title": "Experimentelle Funktionen"
+        },
+        "upload": {
+            "title": "Video hochladen zu",
+            "requires-login-description": "Ich muss wissen wer du bist, bevor du ein Video hochladen kannst."
         }
     },
     "step": {

@@ -1,10 +1,9 @@
 <script>
-  import { writable } from 'svelte/store';
   import UiBox from '$lib/components/ui/UiBox.svelte';
 
   /**
    * @typedef {Object} Props
-   * @property {import("svelte/store").Writable<boolean>} [isOpen]
+   * @property {boolean} [isOpen]
    * @property {any} [title]
    * @property {boolean} [showOkButton]
    * @property {function} [onClose]
@@ -13,7 +12,7 @@
 
   /** @type {Props} */
   let {
-    isOpen = $bindable(writable(false)),
+    isOpen = $bindable(false),
     title = undefined,
     showOkButton = false,
     onClose,
@@ -21,7 +20,7 @@
   } = $props();
 
   function handleClose() {
-    isOpen.set(false);
+    isOpen = false;
     if (onClose) {
       onClose();
     }
@@ -35,7 +34,7 @@
   }
 </script>
 
-{#if $isOpen}
+{#if isOpen}
   <div class="overlay" onclick={handleClickOutside}>
     <div class="popup-content">
       <UiBox {title}>

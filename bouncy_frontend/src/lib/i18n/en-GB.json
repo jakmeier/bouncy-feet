@@ -278,6 +278,11 @@
         "public-name": "My display name",
         "submit-stats": "Refresh leaderboard",
         "nav": "Profile",
+        "button-login": "Login",
+        "button-register": "Register",
+        "button-cancel": "Go back",
+        "requires-login-title": "Who are you?",
+        "requires-login-text": "Log in or create your free account now.",
         "consent": {
             "title": "Enter leaderboard",
             "text0": "To be shown on the leaderboard, we need to submit your personal dance statistics to the server. Videos are never uploaded.",
@@ -289,6 +294,10 @@
             "title": "Settings",
             "consent-title": "Show my progress in public leaderboard",
             "experimental-title": "Experimental Features"
+        },
+        "upload": {
+            "title": "Upload video to",
+            "requires-login-description": "I gotta know who you are before you can upload videos."
         }
     },
     "step": {

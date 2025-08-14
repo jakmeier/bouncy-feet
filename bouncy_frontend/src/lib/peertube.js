@@ -87,7 +87,7 @@ export async function uploadVideoToPeerTube(
 }
 
 export async function loginToPeertube() {
-    const token = getToken();
+    const token = await getToken();
     if (!token) {
         console.warn('got no keycloak token');
         return;

@@ -23,8 +23,8 @@
 
 <style>
   p {
-    background-color: var(--theme-neutral-black);
-    color: var(--theme-neutral-gray);
+    background-color: var(--theme-neutral-dark-gray);
+    color: var(--theme-neutral-dark);
     margin: 0;
   }
   #container {
