@@ -58,8 +58,7 @@
   }
 
   function onAddVideo() {
-    // TODO(July): upload to currently selected playlist
-    alert('Uploading videos not supported, yet.');
+    goto('/profile/upload');
   }
 
   const title = coachId.charAt(0).toUpperCase() + coachId.slice(1);
