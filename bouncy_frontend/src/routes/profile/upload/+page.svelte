@@ -4,19 +4,19 @@
   import { loginToPeertube, uploadVideoToPeerTube } from '$lib/peertube';
   import { pwaAuth } from '$lib/stores/Auth.svelte';
   import { getContext } from 'svelte';
-  import { t } from '$lib/i18n';
+  import { t, locale, coachLocale } from '$lib/i18n';
   import RequiresLoginPopup from '$lib/components/profile/RequiresLoginPopup.svelte';
   import { page } from '$app/state';
+  import { coachData } from '$lib/coach';
 
   /** @type {UserContextData} */
   const { store: user, setUserMeta } = getContext('user');
 
-  // async function testPeerTube() {
-  //   return await loginToPeertube();
-  // }
-
-  const flavor = $derived(page.url.searchParams.get('flavor'));
-  const title = $derived($t('profile.upload.title') + ' ' + (flavor || '??'));
+  const coachId = $derived(page.url.searchParams.get('coach'));
+  const coach = $derived(coachData(coachId || ''));
+  const title = $derived(
+    $t('profile.upload.title') + ' ' + coach.title[coachLocale($locale)]
+  );
 
   let file = $state(null);
   let isUploading = $state(false);
@@ -41,7 +41,8 @@
     if (!accessToken) {
       console.error('No PeerTube access token');
       // TODO: translate error to user
-      error = 'Uhm, failed authentication with video hosting service, sorry about that :(';
+      error =
+        'Uhm, failed authentication with video hosting service, sorry about that :(';
       return;
     }
 
@@ -55,7 +56,7 @@
     } catch (err) {
       console.error(err);
       // TODO: translate error to user
-      error = 'Oops, I couldn\'t upload that :(';
+      error = "Oops, I couldn't upload that :(";
     } finally {
       isUploading = false;
     }

@@ -21,3 +21,10 @@ export const pwaAuth = $state({
     userProfile: null,
     peerTubeToken: null,
 });
+
+/** Logged in to keycloak */
+const isLoggedIn = $derived(pwaAuth.keycloakInstance?.authenticated || false);
+
+export function loggedInToKeycloak() {
+    return isLoggedIn;
+}

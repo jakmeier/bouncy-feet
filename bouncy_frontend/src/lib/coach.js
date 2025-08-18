@@ -113,3 +113,14 @@ export const coaches = [
     }
 ];
 
+/**
+ * @param {string} coachId
+ */
+export function coachData(coachId) {
+    const coachData = coaches.find((c) => c.name === coachId);
+    if (coachData) {
+        return coachData;
+    } else {
+        return coaches[0];
+    }
+}

@@ -5,7 +5,7 @@
   import { getContext, onMount } from 'svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
   import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
-  import { coaches } from '$lib/coach';
+  import { coachData } from '$lib/coach';
   import AvatarStyleContext from '$lib/components/avatar/AvatarStyleContext.svelte';
   import { goto } from '$app/navigation';
   import { coachLocale, t } from '$lib/i18n';
@@ -41,24 +41,12 @@
 
   $bpm = 120;
 
-  /**
-   * @param {string} coachId
-   */
-  function coachData(coachId) {
-    const coachData = coaches.find((c) => c.name === coachId);
-    if (coachData) {
-      return coachData;
-    } else {
-      return coaches[0];
-    }
-  }
-
   function onBack() {
     goto('/', { replaceState: true });
   }
 
   function onAddVideo() {
-    goto('/profile/upload');
+    goto('/profile/upload?coach=' + coachId);
   }
 
   const title = coachId.charAt(0).toUpperCase() + coachId.slice(1);
