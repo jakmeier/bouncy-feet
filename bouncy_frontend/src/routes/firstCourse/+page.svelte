@@ -6,12 +6,13 @@
   import AvatarStyleContext from '$lib/components/avatar/AvatarStyleContext.svelte';
   import ClassProgress from '$lib/components/class/ClassProgress.svelte';
   import StandardPage from '$lib/components/ui/StandardPage.svelte';
+  import { getUserContext } from '$lib/context';
   import { t } from '$lib/i18n';
   import { ONBOARDING_STATE } from '$lib/onboarding';
-  import { getContext, onMount } from 'svelte';
+  import { onMount } from 'svelte';
 
   /** @type {UserContextData}*/
-  const { setUserMeta, clientSession } = getContext('user');
+  const { setUserMeta, clientSession } = getUserContext();
 
   const stepNames = ['Pendulum', 'Knee Up'];
 

@@ -10,6 +10,7 @@
   import { showExperimentalFeatures } from '$lib/stores/FeatureSelection.js';
   import { ONBOARDING_STATE } from '$lib/onboarding';
   import { DetectionResult } from 'bouncy_instructor';
+  import { initKeycloakAuth } from '$lib/keycloak';
   /**
    * @typedef {Object} Props
    * @property {import('svelte').Snippet} [children]
@@ -35,6 +36,20 @@
   // Actually initialized in onMount
   /** @type {ClientSession} */
   const clientSession = $state({});
+
+  // Pwa auth works independent of the api server, generating a token to be used
+  // for PeerTube only (for now).
+  /** @type {PwaAuth} */
+  const pwaAuth = $state({
+    isAuthenticated: false,
+    keycloakInstance: null,
+    userProfile: null,
+    peerTubeToken: null,
+  });
+
+  if (browser) {
+    initKeycloakAuth(pwaAuth);
+  }
 
   /**
    * Load from localStorage or create a new client session through the API.
@@ -97,7 +112,6 @@
   }
 
   function authHeader() {
-    // sync changes to API backend
     // TODO: Switch to OAuth2 for registered users
     return clientSession.id
       ? {
@@ -126,7 +140,10 @@
     try {
       return await apiRequest(path, options);
     } catch (errResponse) {
-      if (errResponse && errResponse.status === 401 || errResponse.status == 403) {
+      if (
+        (errResponse && errResponse.status === 401) ||
+        errResponse.status == 403
+      ) {
         // <Temporary code>
         // Some client sessions have been lost. They need to be replaced.
 
@@ -361,10 +378,16 @@
     return sessionResult;
   }
 
+  function loggedInToKeycloak() {
+    return pwaAuth.keycloakInstance?.authenticated || false;
+  }
+
   /** @type {UserContextData} */
   const userCtx = {
     store: user,
     clientSession,
+    pwaAuth,
+    loggedInToKeycloak,
     setUserMeta,
     submitWarmup,
     submitCourseLesson,

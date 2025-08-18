@@ -2,14 +2,15 @@
   import Footer from '$lib/components/ui/Footer.svelte';
   import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
   import { locale, t } from '$lib/i18n';
-  import { getContext, onMount } from 'svelte';
+  import { onMount } from 'svelte';
   import { fade, slide } from 'svelte/transition';
   import { goto } from '$app/navigation';
   import { ONBOARDING_STATE } from '$lib/onboarding';
   import VideoPlayer from '$lib/components/ui/video/VideoPlayer.svelte';
+  import { getUserContext } from '$lib/context';
 
   /** @type {UserContextData}*/
-  const { setUserMeta } = getContext('user');
+  const { setUserMeta } = getUserContext();
 
   function goToWarmup() {
     setUserMeta('onboarding', ONBOARDING_STATE.STARTED_FIRST_WARMUP);

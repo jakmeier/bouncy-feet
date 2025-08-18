@@ -6,6 +6,7 @@
   import { DetectionResult } from '$lib/instructor/bouncy_instructor';
   import ActivityReview from './ActivityReview.svelte';
   import { registerTracker } from '$lib/stores/Beat';
+  import { getUserContext } from '$lib/context';
 
   /**
    * @typedef {Object} Props
@@ -20,7 +21,7 @@
 
   const { getCourse } = getContext('courses');
   /** @type {UserContextData} */
-  const user = getContext('user');
+  const user = getUserContext();
 
   /** @type {import('$lib/instructor/bouncy_instructor').Course} */
   let course = getCourse(courseId);

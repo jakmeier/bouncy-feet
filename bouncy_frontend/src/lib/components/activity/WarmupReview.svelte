@@ -1,13 +1,13 @@
 <script>
   import { t } from '$lib/i18n';
-  import { getContext } from 'svelte';
   import StandardPage from '../ui/StandardPage.svelte';
   import Thermometer from '../ui/svg/Thermometer.svelte';
+  import { getUserContext } from '$lib/context';
 
   let { detection, onContinue } = $props();
 
   /** @type {UserContextData} */
-  let { store: user } = getContext('user');
+  let { store: user } = getUserContext();
 
   //   TODO: Do something specific to warmup, where the energy level is measured rather than error.
   // let energyLevel = $derived(Math.min(1.0, detection.steps().length / 100));

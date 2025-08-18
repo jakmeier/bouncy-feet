@@ -1,11 +1,10 @@
 <script>
   import { run } from 'svelte/legacy';
-
   import { counter } from '$lib/timer';
-  import { getContext, onDestroy, onMount } from 'svelte';
   import Experience from './Experience.svelte';
   import DanceStats from '../../routes/profile/DanceStats.svelte';
   import Step from '../../routes/collection/Step.svelte';
+  import { getUserContext } from '$lib/context';
 
   /**
    * @typedef {Object} Props
@@ -16,7 +15,7 @@
   /** @type {Props} */
   let { data, step } = $props();
 
-  const user = getContext('user').store;
+  const user = getUserContext().store;
 
   const stepTime = 300;
   const animationTime = stepTime * 0.7;

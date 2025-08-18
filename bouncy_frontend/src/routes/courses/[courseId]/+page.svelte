@@ -7,9 +7,10 @@
   import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
   import NightSection from '$lib/components/ui/sections/NightSection.svelte';
   import VideoWithMetaData from '$lib/components/ui/video/VideoWithMetaData.svelte';
+  import { getUserContext } from '$lib/context';
 
   const { getCourse } = getContext('courses');
-  const user = getContext('user').store;
+  const user = getUserContext().store;
 
   const id = page.params.courseId;
   /** @type {import('$lib/instructor/bouncy_instructor').Course} */

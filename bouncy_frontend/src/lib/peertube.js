@@ -1,5 +1,4 @@
 import { getToken } from '$lib/keycloak';
-import { pwaAuth } from '$lib/stores/Auth.svelte';
 import { PUBLIC_BF_PEERTUBE_URL } from '$env/static/public';
 
 const peerTubeUrl = PUBLIC_BF_PEERTUBE_URL;
@@ -86,7 +85,10 @@ export async function uploadVideoToPeerTube(
     return result;
 }
 
-export async function loginToPeertube() {
+/**
+ * @param {PwaAuth} pwaAuth
+ */
+export async function loginToPeertube(pwaAuth) {
     const token = await getToken();
     if (!token) {
         console.warn('got no keycloak token');

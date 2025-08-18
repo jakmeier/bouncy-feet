@@ -1,12 +1,12 @@
 <script>
   import { ONBOARDING_STATE } from '$lib/onboarding';
-  import { getContext } from 'svelte';
   import FirstVisit from './FirstVisit.svelte';
   import HomeFeedB from './HomeFeed_b.svelte';
   import ContinueFirstCourse from './ContinueFirstCourse.svelte';
+  import { getUserContext } from '$lib/context';
 
   /** @type {UserContextData}*/
-  const user = getContext('user');
+  const user = getUserContext();
 
   /**
    * @typedef {Object} Props

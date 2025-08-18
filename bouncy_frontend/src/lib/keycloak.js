@@ -1,5 +1,4 @@
 import Keycloak from 'keycloak-js';
-import { pwaAuth } from '$lib/stores/Auth.svelte';
 
 // TODO(July): env specific realm / clientId
 const pwaKeycloak = new Keycloak({
@@ -8,19 +7,22 @@ const pwaKeycloak = new Keycloak({
     clientId: 'dev-pwa'
 });
 
-export async function initKeycloakAuth() {
+/**
+ * @param {PwaAuth} pwaAuth
+ */
+export async function initKeycloakAuth(pwaAuth) {
     const authenticated = await pwaKeycloak.init({ pkceMethod: 'S256' });
 
     pwaAuth.isAuthenticated = authenticated;
     pwaAuth.keycloakInstance = pwaKeycloak;
 
     if (authenticated) {
-        await afterLogin();
+        await afterLogin(pwaAuth);
     }
 
-    pwaKeycloak.onAuthSuccess = afterLogin;
-    pwaKeycloak.onAuthError = afterLogout;
-    pwaKeycloak.onAuthRefreshError = afterLogout;
+    pwaKeycloak.onAuthSuccess = () => afterLogin(pwaAuth);
+    pwaKeycloak.onAuthError = () => afterLogout(pwaAuth);
+    pwaKeycloak.onAuthRefreshError = () => afterLogout(pwaAuth);
 
     // Optional: auto-refresh token
     // Note: this triggers reload on every failed attempt
@@ -34,12 +36,18 @@ export async function initKeycloakAuth() {
     return authenticated;
 }
 
-async function afterLogin() {
+/**
+ * @param {PwaAuth} pwaAuth
+ */
+async function afterLogin(pwaAuth) {
     pwaAuth.userProfile = await pwaKeycloak.loadUserProfile();
     pwaAuth.isAuthenticated = pwaKeycloak.authenticated || false;
 }
 
-async function afterLogout() {
+/**
+ * @param {PwaAuth} pwaAuth
+ */
+async function afterLogout(pwaAuth) {
     pwaAuth.userProfile = null;
 }
 

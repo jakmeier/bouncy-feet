@@ -1,7 +1,6 @@
 <script>
   import { run } from 'svelte/legacy';
 
-  import { getContext } from 'svelte';
   import DanceStats from './DanceStats.svelte';
   import { t } from '$lib/i18n';
   import { submitStats, fetchLeaderboard } from '$lib/stats';
@@ -13,6 +12,7 @@
   import Toggle from '$lib/components/ui/Toggle.svelte';
   import { dev, displayedVersion } from '$lib/stores/FeatureSelection';
   import Symbol from '$lib/components/ui/Symbol.svelte';
+  import { getUserContext } from '$lib/context';
 
   /**
    * @typedef {Object} Props
@@ -23,7 +23,7 @@
   let { data } = $props();
 
   /** @type {UserContextData} */
-  const { store: user, setUserMeta } = getContext('user');
+  const { store: user, setUserMeta } = getUserContext();
   let scoreboardData = $state(data.leaderboard);
   let showStatsSharingPopup = $state(writable(!$user.consentSendingStats));
 

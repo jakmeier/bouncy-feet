@@ -8,8 +8,8 @@
   import { features } from '$lib/stores/FeatureSelection';
   import { browser, dev } from '$app/environment';
   import Experience from '$lib/components/Experience.svelte';
+  import { getUserContext } from '$lib/context';
 
-  
   /**
    * @typedef {Object} Props
    * @property {import('./$types').PageData} data
@@ -20,7 +20,7 @@
 
   const localCollection = getContext('localCollection');
   const localDances = localCollection.dances;
-  const user = getContext('user').store;
+  const user = getUserContext().store;
 
   const stepTime = 300;
   // animationTime < stepTime will freeze the position for a moment, which makes
@@ -78,7 +78,9 @@
   {/each}
 </div>
 
-<h2 class="box"><div class="gradient-text">{$t('collection.footwork-steps-subtitle')}</div></h2>
+<h2 class="box">
+  <div class="gradient-text">{$t('collection.footwork-steps-subtitle')}</div>
+</h2>
 
 <div class="step-table">
   {#each data.lookupSteps({ uniqueNames: true, sources: ['footwork'] }) as step}
@@ -97,7 +99,9 @@
   {/each}
 </div>
 
-<h2 class="box"><div class="gradient-text">{$t('collection.rm-steps-subtitle')}</div></h2>
+<h2 class="box">
+  <div class="gradient-text">{$t('collection.rm-steps-subtitle')}</div>
+</h2>
 <div class="step-table">
   {#each data.lookupSteps( { uniqueNames: true, sources: ['rm_variations'] } ) as step}
     <div class="step">

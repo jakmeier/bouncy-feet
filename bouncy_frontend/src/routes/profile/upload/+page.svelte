@@ -2,15 +2,14 @@
   import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
   import LimeSection from '$lib/components/ui/sections/LimeSection.svelte';
   import { loginToPeertube, uploadVideoToPeerTube } from '$lib/peertube';
-  import { pwaAuth } from '$lib/stores/Auth.svelte';
-  import { getContext } from 'svelte';
   import { t, locale, coachLocale } from '$lib/i18n';
   import RequiresLoginPopup from '$lib/components/profile/RequiresLoginPopup.svelte';
   import { page } from '$app/state';
   import { coachData } from '$lib/coach';
+  import { getUserContext } from '$lib/context';
 
   /** @type {UserContextData} */
-  const { store: user, setUserMeta } = getContext('user');
+  const { store: user, pwaAuth } = getUserContext();
 
   const coachId = $derived(page.url.searchParams.get('coach'));
   const coach = $derived(coachData(coachId || ''));
@@ -34,7 +33,7 @@
 
     let accessToken = pwaAuth.peerTubeToken?.access_token;
     if (!accessToken) {
-      await loginToPeertube();
+      await loginToPeertube(pwaAuth);
       accessToken = pwaAuth.peerTubeToken?.access_token;
     }
 

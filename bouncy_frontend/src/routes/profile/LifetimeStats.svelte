@@ -1,10 +1,10 @@
 <script>
+  import { getUserContext } from '$lib/context';
   import { t, locale, dateLocale } from '$lib/i18n';
   import { formatDistance } from 'date-fns';
-  import { getContext } from 'svelte';
 
   /** @type {UserContextData} */
-  let { store: user } = getContext('user');
+  let { store: user } = getUserContext();
 
   let steps = $derived($user.recordedSteps);
   let seconds = $derived($user.recordedSeconds);

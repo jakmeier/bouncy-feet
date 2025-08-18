@@ -1,7 +1,7 @@
 <script>
   import { run } from 'svelte/legacy';
 
-  import { getContext, onMount, tick } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import { t } from '$lib/i18n';
   import { Tracker } from '$lib/instructor/bouncy_instructor';
   import { stepsByName } from '$lib/instructor/bouncy_instructor';
@@ -15,6 +15,7 @@
   import { bpm, registerTracker, setBpm } from '$lib/stores/Beat';
   import Button from '$lib/components/ui/Button.svelte';
   import { DetectionState } from '$lib/instructor/bouncy_instructor';
+  import { getUserContext } from '$lib/context';
 
   const stepName = page.params.stepName;
   const instructorStep = stepsByName(stepName)[0];
@@ -29,7 +30,7 @@
   // setHalfSpeed(isLearnMode);
   // setHalfSpeed(true);
 
-  const userCtx = getContext('user');
+  const userCtx = getUserContext();
 
   /** @type {undefined | string} */
   let reviewVideoSrc = $state();

@@ -1,13 +1,15 @@
 <script>
   import { triggerLogin, triggerRegister } from '$lib/keycloak';
-  import { loggedInToKeycloak } from '$lib/stores/Auth.svelte';
   import { t } from '$lib/i18n';
   import PopupWithRunes from '../ui/PopupWithRunes.svelte';
+  import { getUserContext } from '$lib/context';
 
   let { reason } = $props();
 
+  const userContext = getUserContext();
+
   /** @type {boolean} */
-  let notLoggedIn = $derived(!loggedInToKeycloak());
+  let notLoggedIn = $derived(!userContext.loggedInToKeycloak());
 
   function login() {
     triggerLogin();

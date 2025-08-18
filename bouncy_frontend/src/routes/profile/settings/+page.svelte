@@ -4,7 +4,6 @@
   import Symbol from '$lib/components/ui/Symbol.svelte';
   import Toggle from '$lib/components/ui/Toggle.svelte';
   import { locale, t } from '$lib/i18n';
-  import { getContext } from 'svelte';
   import {
     audioDelay,
     mediapipeDelayLastValue,
@@ -19,8 +18,9 @@
     detectionDelayTotal,
   } from '$lib/stores/System';
   import { apiRequest } from '$lib/stats';
+  import { getUserContext } from '$lib/context';
 
-  const user = getContext('user').store;
+  const user = getUserContext().store;
 
   // format number
   function fnum(num) {

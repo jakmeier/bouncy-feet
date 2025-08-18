@@ -10,7 +10,8 @@
   import { registerTracker } from '$lib/stores/Beat';
   import StandardPage from '../ui/StandardPage.svelte';
   import WarmupReview from './WarmupReview.svelte';
-  import { getContext, onDestroy } from 'svelte';
+  import { onDestroy } from 'svelte';
+  import { getUserContext } from '$lib/context';
 
   /**
    * @typedef {Object} Props
@@ -27,7 +28,7 @@
     $props();
 
   /** @type {UserContextData} */
-  let user = getContext('user');
+  let user = getUserContext();
 
   let previewDone = $state(false);
 

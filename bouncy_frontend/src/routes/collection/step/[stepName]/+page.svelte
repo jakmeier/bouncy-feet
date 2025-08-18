@@ -10,18 +10,11 @@
   import { features } from '$lib/stores/FeatureSelection';
   import { browser } from '$app/environment';
   import Info from '$lib/components/ui/Info.svelte';
-  import { getContext } from 'svelte';
   import Symbol from '$lib/components/ui/Symbol.svelte';
   import Button from '$lib/components/ui/Button.svelte';
+  import { getUserContext } from '$lib/context';
 
-  /**
-   * @typedef {Object} Props
-   * @property {import('./$types').PageData} data
-   */
-
-  /** @type {Props} */
-
-  const user = getContext('user').store;
+  const user = getUserContext().store;
   const name = page.params.stepName;
   const variations = data.lookupSteps({
     uniqueNames: false,
