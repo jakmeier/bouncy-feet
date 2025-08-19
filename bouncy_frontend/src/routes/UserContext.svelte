@@ -275,7 +275,9 @@
   /** @type {import('svelte/store').Writable<UserData>} */
   const user = writable(
     stored || {
-      id: crypto.randomUUID(),
+      // TODO: get this from Keycloak after the user is created
+      // TODO: set this from the API server if it has it (and compare on login )
+      openid: undefined,
       publicName: generateRandomUsername(),
       score: 0,
       recordedDances: 0,

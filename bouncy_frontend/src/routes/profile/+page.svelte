@@ -3,8 +3,6 @@
 
   import DanceStats from './DanceStats.svelte';
   import { t } from '$lib/i18n';
-  import { submitStats, fetchLeaderboard } from '$lib/stats';
-  import Leaderboard from './Leaderboard.svelte';
   import Popup from '$lib/components/ui/Popup.svelte';
   import { writable } from 'svelte/store';
   import Header from '$lib/components/ui/Header.svelte';
@@ -14,23 +12,12 @@
   import Symbol from '$lib/components/ui/Symbol.svelte';
   import { getUserContext } from '$lib/context';
 
-  /**
-   * @typedef {Object} Props
-   * @property {import('./$types').PageData} data
-   */
-
-  /** @type {Props} */
-  let { data } = $props();
-
   /** @type {UserContextData} */
   const { store: user, setUserMeta } = getUserContext();
-  let scoreboardData = $state(data.leaderboard);
   let showStatsSharingPopup = $state(writable(!$user.consentSendingStats));
 
   async function submit() {
     setUserMeta('publicName', $user.publicName);
-    await submitStats($user);
-    refreshLeaderboard();
   }
 
   function consent(yes) {
@@ -38,13 +25,6 @@
       $user.consentSendingStats = true;
     }
     $showStatsSharingPopup = false;
-  }
-
-  async function refreshLeaderboard() {
-    let result = await fetchLeaderboard();
-    if (result) {
-      scoreboardData = result;
-    }
   }
 
   function openSettings() {
@@ -93,7 +73,7 @@
 />
 
 <h2 class="box">{$t('profile.leaderboard-title')}</h2>
-<Leaderboard users={scoreboardData} />
+
 <form class="inputs">
   <button onclick={submit} class="wide">{$t('profile.submit-stats')}</button>
 </form>

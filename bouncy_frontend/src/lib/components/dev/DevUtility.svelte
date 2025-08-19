@@ -16,7 +16,7 @@
   function registerTracker(t) {
     window.nextTrackerState = () =>
       t.devSetState(
-        Math.min(DetectionState.TrackingDone, $state + 1),
+        Math.min(DetectionState.TrackingDone, state + 1),
         performance.now()
       );
   }

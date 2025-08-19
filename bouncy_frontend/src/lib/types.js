@@ -86,7 +86,7 @@
  * @property {string} [stepName]
  *
  * @typedef {Object} UserData
- * @property {string} id 
+ * @property {string} openid 
  * @property {string} publicName 
  * @property {number} recordedSteps 
  * @property {number} recordedSeconds 

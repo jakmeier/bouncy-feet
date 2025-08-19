@@ -1,52 +1,10 @@
-import { dev } from "$app/environment";
 import { PUBLIC_API_BASE } from '$env/static/public';
 
-let STATS_API_BASE = PUBLIC_API_BASE;
-
-if (dev) {
-    STATS_API_BASE = "http://localhost:3000";
-}
-
-const loginUrl = STATS_API_BASE + "/auth";
-
-/**
- * @param {UserData} user
- */
-export async function submitStats(user) {
-    if (!user.consentSendingStats) {
-        return;
-    }
-    const apiUrl = STATS_API_BASE + '/user/stats';
-
-    const payload = {
-        id: user.id,
-        name: user.publicName,
-        steps: user.recordedSteps,
-        seconds: Math.round(user.recordedSeconds),
-        dances: user.recordedDances,
-    };
-
-    try {
-        const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(payload),
-        });
-
-        if (response.ok) {
-        } else {
-            console.error(`Post request to ${apiUrl} failed`);
-        }
-    } catch (error) {
-        console.error(`Error during post request to ${apiUrl}:`, error);
-    }
-}
+const loginUrl = PUBLIC_API_BASE + "/auth";
 
 /** @param {string} path */
 async function apiGetRequest(path) {
-    const apiUrl = STATS_API_BASE + path;
+    const apiUrl = PUBLIC_API_BASE + path;
 
     try {
         const response = await fetch(apiUrl);
@@ -66,10 +24,6 @@ export async function requestNewGuestSession() {
     return await apiGetRequest('/new_guest_session');
 }
 
-export async function fetchLeaderboard() {
-    return await apiGetRequest('/scoreboard') || [];
-}
-
 /**
  * @param {string} endpoint
  * @param {object} options
@@ -78,7 +32,7 @@ export async function fetchLeaderboard() {
 export async function apiRequest(endpoint, options = {}) {
     try {
 
-        const response = await fetch(`${STATS_API_BASE}${endpoint}`, {
+        const response = await fetch(`${PUBLIC_API_BASE}${endpoint}`, {
             ...options,
             credentials: 'include', // Include cookies in the request
         });
