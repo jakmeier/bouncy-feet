@@ -151,13 +151,20 @@ pub(crate) async fn user_lookup_by_client_secret(
 }
 
 pub async fn user_info(
-    claims: OidcClaims<AdditionalClaims>,
+    claims: Option<OidcClaims<AdditionalClaims>>,
     Extension(UserId(user_id)): Extension<UserId>,
 ) -> String {
-    json!({
-        "id": user_id,
-        "sub": claims.subject().as_str()
-    })
+    if let Some(claims) = claims {
+        json!({
+            "id": user_id,
+            "sub": claims.subject().as_str()
+        })
+    } else {
+        json!({
+            "id": user_id,
+            "sub": null
+        })
+    }
     .to_string()
 }
 
