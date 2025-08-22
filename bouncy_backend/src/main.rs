@@ -6,6 +6,7 @@ use sqlx::PgPool;
 use tokio::net::TcpListener;
 use tower::ServiceBuilder;
 use tower_http::cors::AllowOrigin;
+use tracing::Level;
 
 pub(crate) mod auth;
 pub(crate) mod client_session;
@@ -23,6 +24,8 @@ struct AppState {
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+    tracing_subscriber::fmt().init();
+
     // let api_url = require_env("API_URL");
     let app_url = require_env("CLIENT_URL");
     // let oidc_issuer = require_env("OIDC_ISSUER");
@@ -132,6 +135,10 @@ async fn main() -> anyhow::Result<()> {
         // .layer(ServiceBuilder::new().layer(session_layer).layer(cors_layer))
         // .layer(session_layer)
         .layer(cors_layer)
+        .layer(
+            tower_http::trace::TraceLayer::new_for_http()
+                .make_span_with(tower_http::trace::DefaultMakeSpan::new().level(Level::INFO)),
+        )
         .with_state(state);
 
     let listener = TcpListener::bind("0.0.0.0:3000").await.unwrap();

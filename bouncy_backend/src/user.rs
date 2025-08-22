@@ -28,6 +28,8 @@ pub async fn user_lookup(
     let auth_headers = &req.headers().get_all("Authorization");
     match try_get_user(&state, auth_headers, maybe_claims).await {
         Ok(user_id) => {
+            // Add user info to logs
+            tracing::Span::current().record("user_id", &tracing::field::display(&user_id.0));
             // Attach user ID for downstream handlers
             req.extensions_mut().insert(user_id);
         }
