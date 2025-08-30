@@ -205,7 +205,6 @@ deny = [
 skip = [
     #"ansi_term@0.11.0",
     #{ crate = "ansi_term@0.11.0", reason = "you can specify a reason why it can't be updated/removed" },
-    "axum-core",
     "base64",
     "bitflags",
     "getrandom",
@@ -228,8 +227,6 @@ skip = [
     "windows_x86_64_gnullvm",
     "windows_x86_64_msvc",
     "zerocopy",
-    "tower-sessions",
-    "tower-sessions-core",
 ]
 # Similarly to `skip` allows you to skip certain crates during duplicate
 # detection. Unlike skip, it also includes the entire tree of transitive
