@@ -45,7 +45,7 @@ impl SkeletonWrapper {
         }
     }
 
-    pub(crate) fn skeleton_3d(&self) -> Ref<Skeleton3d> {
+    pub(crate) fn skeleton_3d(&self) -> Ref<'_, Skeleton3d> {
         STATE.with_borrow(|state| {
             let db: &TrackerDanceCollection = &state.global_db.tracker_view;
 
@@ -56,7 +56,7 @@ impl SkeletonWrapper {
         })
     }
 
-    pub(crate) fn skeleton_2d(&self) -> Ref<Skeleton> {
+    pub(crate) fn skeleton_2d(&self) -> Ref<'_, Skeleton> {
         if self.skeleton2d_cache.borrow().is_none() {
             *self.skeleton2d_cache.borrow_mut() = Some(self.skeleton_3d().to_skeleton(0.0));
         }

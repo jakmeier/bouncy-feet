@@ -2,6 +2,7 @@
 name = "bouncy_backend"
 version = "0.1.0"
 edition = "2021"
+license= "LGPL-3.0-or-later"
 
 [dependencies]
 anyhow = "1.0"
@@ -24,6 +25,7 @@ tower-sessions = { version = "0.13" }
 tracing = "0.1.41"
 tracing-subscriber = "0.3.19"
 uuid = { version = "1.13.1", features = ["serde", "v4"] }
+url = "2.5.4"
 
 [dev-dependencies]
 reqwest = { version = "0.11", features = ["json"] }

@@ -1,5 +1,8 @@
 //! Replaces sqlite based users.
 
+use crate::auth::AdditionalClaims;
+use crate::client_session::ClientSessionId;
+use crate::AppState;
 use axum::extract::{Request, State};
 use axum::http::header::GetAll;
 use axum::http::{HeaderValue, StatusCode};
@@ -10,10 +13,6 @@ use axum_oidc::OidcClaims;
 use serde_json::json;
 use sqlx::PgPool;
 use uuid::Uuid;
-
-use crate::auth::AdditionalClaims;
-use crate::client_session::ClientSessionId;
-use crate::AppState;
 
 #[derive(Clone)]
 pub struct UserId(i64);
@@ -29,7 +28,7 @@ pub async fn user_lookup(
     match try_get_user(&state, auth_headers, maybe_claims).await {
         Ok(user_id) => {
             // Add user info to logs
-            tracing::Span::current().record("user_id", &tracing::field::display(&user_id.0));
+            tracing::Span::current().record("user_id", tracing::field::display(&user_id.0));
             // Attach user ID for downstream handlers
             req.extensions_mut().insert(user_id);
         }

@@ -21,6 +21,7 @@ enum VideoDefEnum {
     Simple(String),
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 enum Marker {
     Start,

@@ -286,6 +286,7 @@ dependencies = [
  "tower-sessions 0.13.0",
  "tracing",
  "tracing-subscriber",
+ "url",
  "uuid",
 ]
 

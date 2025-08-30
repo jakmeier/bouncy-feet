@@ -4,12 +4,12 @@ use crate::Keypoints;
 
 impl Keypoints {
     #[allow(dead_code)]
-    pub(crate) fn iter(&self) -> KeypointsIter {
+    pub(crate) fn iter(&self) -> KeypointsIter<'_> {
         KeypointsIter { i: 0, kp: self }
     }
 
     #[allow(dead_code)]
-    pub(crate) fn iter_mut(&mut self) -> KeypointsIterMut {
+    pub(crate) fn iter_mut(&mut self) -> KeypointsIterMut<'_> {
         // note: It would be nice to avoid extra allocations but it's not that
         // easy to avoid shared &mut. Best I can think of is
         // [Option<Cartesian>;16] but I don't like the extra code complexity.
@@ -35,7 +35,7 @@ impl Keypoints {
         }
     }
 
-    pub(crate) fn body_points(&self) -> BodyPointsIter {
+    pub(crate) fn body_points(&self) -> BodyPointsIter<'_> {
         BodyPointsIter {
             kp: self,
             bp: Box::new(BodyPoint::iter()),
