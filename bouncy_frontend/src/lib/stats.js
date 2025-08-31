@@ -7,7 +7,13 @@ async function apiGetRequest(path) {
     const apiUrl = PUBLIC_API_BASE + path;
 
     try {
-        const response = await fetch(apiUrl);
+        const response = await fetch(apiUrl,
+            {
+                // Include cookies in the request to allow setting a session id
+                // from the backend
+                credentials: 'include',
+            }
+        );
 
         if (response.ok) {
             return await response.json();

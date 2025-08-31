@@ -1,7 +1,7 @@
 //! Replaces sqlite based users.
 
-use crate::auth::AdditionalClaims;
 use crate::client_session::ClientSessionId;
+use crate::layers::oidc::AdditionalClaims;
 use crate::AppState;
 use axum::extract::{Request, State};
 use axum::http::header::GetAll;
@@ -32,7 +32,13 @@ pub async fn user_lookup(
             // Attach user ID for downstream handlers
             req.extensions_mut().insert(user_id);
         }
-        Err(response) => return response,
+        Err(response) => {
+            // Continue without user info.
+            // Routes that require it will fail.
+            // But the login route must work without user info.
+            tracing::Span::current().record("user_id", tracing::field::display("?"));
+            tracing::debug!(err = ?response);
+        }
     }
 
     next.run(req).await
@@ -53,7 +59,7 @@ async fn try_get_user(
         // this will lazily create the user if necessary
         Ok(user_lookup_by_oidc(state, claims).await)
     } else {
-        auth_error("Auth failed")
+        auth_error("No user found")
     }
 }
 

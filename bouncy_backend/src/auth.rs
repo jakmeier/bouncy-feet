@@ -10,35 +10,58 @@
 //!
 //! Guest users can be authenticated by a client secret included in the body as JSON.
 
-// use crate::AppState;
-// use axum::response::{IntoResponse, Redirect, Response};
-// use axum::{extract::State, http::StatusCode};
-use axum_oidc::EmptyAdditionalClaims;
-use serde::{Deserialize, Serialize};
+use axum::extract::{Query, State};
+use axum::http::StatusCode;
+use axum::response::{IntoResponse, Redirect, Response};
+use axum_oidc::{EmptyAdditionalClaims, OidcClaims};
+use url::Url;
 
-pub(crate) type AdditionalClaims = EmptyAdditionalClaims;
+use crate::AppState;
 
-#[derive(Deserialize, Serialize)]
-struct TokenResponse {
-    access_token: String,
-    refresh_token: Option<String>,
-    expires_in: u64,
-    token_type: String,
+#[derive(serde::Deserialize)]
+pub struct QueryParams {
+    redirect_back_to: Option<Url>,
 }
 
-// /// Calling this will redirect to Keyloak, have the user log in and then
-// /// redirect back to the PWA domain.
-// pub async fn oauth_callback(
-//     claims: OidcClaims<AdditionalClaims>,
-//     State(state): State<AppState>,
-// ) -> Response {
-//     // The main checks are done in the OIDC middleware.
-//     // Here we just add additional checks.
-//     if !claims.email_verified().unwrap_or_default() {
-//         return (StatusCode::FORBIDDEN, "email not verified").into_response();
-//     }
+/// Calling this will redirect to Keyloak, have the user log in and then
+/// redirect back to the PWA domain.
+#[axum::debug_handler]
+pub async fn login(
+    claims: OidcClaims<EmptyAdditionalClaims>,
+    State(state): State<AppState>,
+    query: Query<QueryParams>,
+) -> Response {
+    // The main checks are done in the OIDC middleware.
+    // Here we just add additional checks.
+    if !claims.email_verified().unwrap_or_default() {
+        return (StatusCode::FORBIDDEN, "email not verified").into_response();
+    }
 
-//     // Redirect to the PWA frontend if login was successful
-//     // TODO: redirect to the exact same page the user was on before
-//     Redirect::to(&state.app_url).into_response()
-// }
+    // Redirect to the PWA frontend if login was successful and redirect parameter was provided
+    if let Some(redirect_back_to) = query.0.redirect_back_to {
+        if redirect_back_to.origin() == state.app_url.origin() {
+            return Redirect::to(redirect_back_to.as_str()).into_response();
+        } else {
+            tracing::warn!("Refusing to redirect to {}", redirect_back_to);
+            return Redirect::to(state.app_url.as_str()).into_response();
+        }
+    }
+
+    let name = claims
+        .preferred_username()
+        .map(|name| name.to_string())
+        .unwrap_or_else(|| {
+            claims
+                .name()
+                .and_then(|localized_name| localized_name.get(claims.locale()))
+                .map(|name| name.to_string())
+                .unwrap_or_default()
+        });
+
+    format!(
+        "Hello {}\nBouncy Feet stats API server running.\nPackage version: {}",
+        name,
+        env!("CARGO_PKG_VERSION")
+    )
+    .into_response()
+}

@@ -121,13 +121,25 @@
   }
 
   /**
+   * @param {string} path
+   * @returns {Promise<Response | null | undefined>}
+   */
+  async function authenticatedGet(path) {
+    return await authenticatedApiRequest('GET', path, {}, undefined);
+  }
+
+  /**
    * @param {string} method
    * @param {string} path
    * @param {object} headers
-   * @param {string} body
+   * @param {string|undefined} body
    */
   async function authenticatedApiRequest(method, path, headers, body) {
     let auth = authHeader();
+    if (!auth.Authorization) {
+      // This can happen when code calls this before clientSession is loaded
+      throw new Error('Authenticated API call without auth header');
+    }
     const options = {
       method,
       headers: {
@@ -384,6 +396,27 @@
     return pwaAuth.keycloakInstance?.authenticated || false;
   }
 
+  async function refreshUserId() {
+    try {
+      const response = await authenticatedGet('/user');
+      const userInfo = await response?.json();
+      if (!userInfo || userInfo.sub === undefined) {
+        throw new Error(`missing sub in response: ${JSON.stringify(userInfo)}`);
+      }
+
+      // note: Sub may be null, this just means this is a guest user OR the user is not logged in.
+      // Eitherway, if there is already a known user.openid, it should not be overwritten.
+      if (userInfo.sub) {
+        $user.openid = userInfo.sub;
+      }
+
+      // trigger subscribers?
+      $user = $user;
+    } catch (errResponse) {
+      console.warn('Failed reading user info');
+    }
+  }
+
   /** @type {UserContextData} */
   const userCtx = {
     store: user,
@@ -407,6 +440,10 @@
 
     if (!clientSession.id) {
       console.warn('No client session');
+    } else {
+      if (!$user.openid) {
+        await refreshUserId();
+      }
     }
     has.mounted = true;
   });
