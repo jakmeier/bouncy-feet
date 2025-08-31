@@ -97,6 +97,8 @@ allow = [
     "BSD-3-Clause",
     "ISC",
     "LGPL-3.0-or-later",
+    "AGPL-3.0-or-later",
+    "Zlib",
 ]
 # The confidence threshold for detecting a license from license text.
 # The higher the value, the more closely the license text must be to the
