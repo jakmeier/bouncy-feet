@@ -104,15 +104,12 @@
  *
  * @typedef {Object} PwaAuth
  * @property {boolean} isAuthenticated
- * @property {null|import('keycloak-js').default} keycloakInstance
- * @property {null|import('keycloak-js').KeycloakProfile} userProfile
  * @property {null|AccessToken} peerTubeToken
  *
  * @typedef {Object} UserContextData
  * @property {import('svelte/store').Writable<UserData>} store,
  * @property {ClientSession} clientSession,
  * @property {PwaAuth} pwaAuth,
- * @property {any} loggedInToKeycloak,
  * @property {any} setUserMeta,
  * @property {(courseId: string, lessonIndex: number, detection: DetectionResult) => DanceSessionResult | null} submitCourseLesson
  * @property {(warmupId: string, detection: DetectionResult) => DanceSessionResult | null} submitWarmup

@@ -1,4 +1,3 @@
-import { getToken } from '$lib/keycloak';
 import { PUBLIC_BF_PEERTUBE_URL } from '$env/static/public';
 
 const peerTubeUrl = PUBLIC_BF_PEERTUBE_URL;
@@ -89,6 +88,8 @@ export async function uploadVideoToPeerTube(
  * @param {PwaAuth} pwaAuth
  */
 export async function loginToPeertube(pwaAuth) {
+    alert("todo: login to peertube needs to go thorugh backend")
+    return;
     const token = await getToken();
     if (!token) {
         console.warn('got no keycloak token');

@@ -10,7 +10,6 @@
   import { showExperimentalFeatures } from '$lib/stores/FeatureSelection.js';
   import { ONBOARDING_STATE } from '$lib/onboarding';
   import { DetectionResult } from 'bouncy_instructor';
-  import { initKeycloakAuth } from '$lib/keycloak';
   /**
    * @typedef {Object} Props
    * @property {import('svelte').Snippet} [children]
@@ -42,14 +41,8 @@
   /** @type {PwaAuth} */
   const pwaAuth = $state({
     isAuthenticated: false,
-    keycloakInstance: null,
-    userProfile: null,
     peerTubeToken: null,
   });
-
-  if (browser) {
-    initKeycloakAuth(pwaAuth);
-  }
 
   /**
    * Load from localStorage or create a new client session through the API.
@@ -392,10 +385,6 @@
     return sessionResult;
   }
 
-  function loggedInToKeycloak() {
-    return pwaAuth.keycloakInstance?.authenticated || false;
-  }
-
   async function refreshUserId() {
     try {
       const response = await authenticatedGet('/user');
@@ -422,7 +411,6 @@
     store: user,
     clientSession,
     pwaAuth,
-    loggedInToKeycloak,
     setUserMeta,
     submitWarmup,
     submitCourseLesson,

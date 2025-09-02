@@ -18,9 +18,9 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.51.0",
+    "@sveltejs/adapter-node": "^5.2.14",
     "@sveltejs/kit": "^2.29.1",
     "@sveltejs/vite-plugin-svelte": "^6.1.2",
-    "@sveltejs/adapter-node": "^5.2.14",
     "bouncy_instructor": "file:./src/lib/instructor",
     "date-fns": "^3.6.0",
     "eslint": "^8.57.1",
@@ -41,7 +41,6 @@
     "@mediapipe/tasks-vision": "^0.10.21",
     "@peertube/embed-api": "^0.2.0",
     "jschannel": "^1.0.2",
-    "keycloak-js": "^26.2.0",
     "svelte-select": "^5.8.3",
     "sveltekit-i18n": "^2.4.2"
   }
