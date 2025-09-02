@@ -1,35 +1,15 @@
 <script>
-  import { triggerLogin, triggerRegister } from '$lib/keycloak';
-  import { t } from '$lib/i18n';
   import PopupWithRunes from '../ui/PopupWithRunes.svelte';
   import { getUserContext } from '$lib/context';
-  import { PUBLIC_API_BASE } from '$env/static/public';
+  import RequiresLogin from './RequiresLogin.svelte';
 
   let { reason } = $props();
 
   const userContext = getUserContext();
+  const user = userContext.store;
 
   /** @type {boolean} */
-  let notLoggedIn = $derived(!userContext.loggedInToKeycloak());
-
-  const opendId = $derived(userContext.pwaAuth.userProfile?.id);
-  const user = userContext.store;
-  // const hasKeycloakAccountLinked = ???;
-
-  function login() {
-    // redirect to backend login
-    const currentUrl = window.location.href;
-    window.location.assign(
-      PUBLIC_API_BASE +
-        '/login?redirect_back_to=' +
-        encodeURIComponent(currentUrl)
-    );
-  }
-
-  function register() {
-    // TODO: replace with backend register
-    triggerRegister();
-  }
+  let notLoggedIn = $derived(!$user.openid);
 
   function goBack() {
     history.back();
@@ -41,19 +21,5 @@
   title={'profile.requires-login-title'}
   onClose={goBack}
 >
-  <div>
-    {reason}
-  </div>
-  <div>
-    {$t('profile.requires-login-text')}
-  </div>
-  <button class="wide" onclick={login}>
-    {$t('profile.button-login')}
-  </button>
-  <button class="wide" onclick={register}>
-    {$t('profile.button-register')}
-  </button>
-  <button class="wide" onclick={goBack}>
-    {$t('profile.button-cancel')}
-  </button>
+  <RequiresLogin {reason} />
 </PopupWithRunes>

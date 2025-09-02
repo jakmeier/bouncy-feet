@@ -7,6 +7,7 @@
   import { page } from '$app/state';
   import { coachData } from '$lib/coach';
   import { getUserContext } from '$lib/context';
+  import LoginRequiredContent from '$lib/components/profile/LoginRequiredContent.svelte';
 
   /** @type {UserContextData} */
   const { store: user, pwaAuth } = getUserContext();
@@ -62,28 +63,29 @@
   }
 </script>
 
-<RequiresLoginPopup reason={$t('profile.upload.requires-login-description')} />
-
 <LimeSection fillScreen>
   <LogoHeader mainColor {title} />
+  <LoginRequiredContent
+    reason={$t('profile.upload.requires-login-description')}
+  >
+    <!-- WIP / TODO: These two should be the same (July) -->
+    <p>
+      BouncyFeet public name: {$user.publicName}
+    </p>
+    <p>
+      PeerTube user name: {pwaAuth.userProfile?.username}
+    </p>
 
-  <!-- WIP / TODO: These two should be the same (July) -->
-  <p>
-    BouncyFeet public name: {$user.publicName}
-  </p>
-  <p>
-    PeerTube user name: {pwaAuth.userProfile?.username}
-  </p>
+    <input type="file" accept="video/*" onchange={handleFileSelect} />
 
-  <input type="file" accept="video/*" onchange={handleFileSelect} />
+    {#if isUploading}
+      <p>Uploading… {uploadProgress}%</p>
+    {/if}
 
-  {#if isUploading}
-    <p>Uploading… {uploadProgress}%</p>
-  {/if}
-
-  {#if error}
-    <p style="color: red">{error}</p>
-  {/if}
+    {#if error}
+      <p style="color: red">{error}</p>
+    {/if}
+  </LoginRequiredContent>
 </LimeSection>
 
 <style>
