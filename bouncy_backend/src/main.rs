@@ -60,7 +60,7 @@ async fn main() -> anyhow::Result<()> {
     }
 
     let state = AppState {
-        app_url: parsed_app_url,
+        app_url: parsed_app_url.clone(),
         pg_db_pool,
     };
 
@@ -75,8 +75,9 @@ async fn main() -> anyhow::Result<()> {
     )
     .await;
 
-    let client_origin =
-        HeaderValue::from_str(state.app_url.as_str()).expect("url should be valid origin");
+    // must use origin without trailing slash
+    let client_origin = HeaderValue::from_str(&parsed_app_url.origin().ascii_serialization())
+        .expect("url should be valid origin");
     let cors_layer = tower_http::cors::CorsLayer::new()
         .allow_origin(AllowOrigin::exact(client_origin))
         .allow_methods([Method::GET, Method::POST])
