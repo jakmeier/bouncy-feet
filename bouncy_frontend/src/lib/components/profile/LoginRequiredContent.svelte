@@ -22,7 +22,11 @@
 {:else if mounted}
   <div class="overlay" transition:fade={{ delay: 400, duration: 200 }}>
     <div class="wrapper" transition:scaleY={{ delay: 800 }}>
-      <RequiresLogin {reason} username={$user.publicName} />
+      <RequiresLogin
+        {reason}
+        username={$user.publicName}
+        openid={$user.openid}
+      />
     </div>
   </div>
 {/if}

@@ -5,6 +5,7 @@ services:
     environment:
       CLIENT_URL: http://localhost:5173
       API_URL: http://localhost:3000
+      PEERTUBE_URL: http://host.docker.internal:9000
       OIDC_ISSUER: https://auth.bouncy-feet.ch/realms/bouncyfeet-dev
       OIDC_CLIENT_SECRET: XXXX
       OIDC_CLIENT_ID: bouncy-dev-backend
@@ -19,6 +20,8 @@ services:
       - 3000:3000
     networks:
       - local_network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
   postgres:
     image: postgres:17.2
     volumes:

@@ -103,8 +103,8 @@
  * @property {string} refresh_token
  *
  * @typedef {Object} PwaAuth
- * @property {boolean} isAuthenticated
  * @property {null|AccessToken} peerTubeToken
+ * @property {*} refreshPeerTubeToken
  *
  * @typedef {Object} UserContextData
  * @property {import('svelte/store').Writable<UserData>} store,

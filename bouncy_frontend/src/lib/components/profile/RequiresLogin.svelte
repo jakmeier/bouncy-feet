@@ -6,12 +6,13 @@
    * @typedef {Object} Props
    * @property {string} reason
    * @property {string} [username]
+   * @property {string} [openid]
    */
 
   /** @type {Props} */
-  let { reason, username } = $props();
+  let { reason, username, openid } = $props();
 
-  const guestMode = $derived(!username);
+  const guestMode = $derived(!openid);
 
   function login() {
     // redirect to backend login
@@ -35,13 +36,13 @@
 
 {#if guestMode}
   <div>
-    {$t('profile.guest-mode')}
+    {$t('profile.guest-mode-text')}
   </div>
   <div>
     {$t('profile.requires-login-text')}
   </div>
 {:else}
-  {username}
+  Hi {username}!
   <div>
     {$t('profile.login-expired-text')}
   </div>

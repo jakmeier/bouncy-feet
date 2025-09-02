@@ -1,3 +1,4 @@
+use crate::api_endoints::peertube_token::{self, peertube_token_exchange};
 use crate::auth::login;
 use crate::layers::oidc::{oidc_auth_layer, oidc_login_layer};
 use crate::layers::session::in_memory_cookie_session_layer;
@@ -9,12 +10,14 @@ use axum::routing::{get, post};
 use axum::{middleware, Router};
 use axum_oidc::error::MiddlewareError;
 use sqlx::PgPool;
+use std::sync::Arc;
 use tokio::net::TcpListener;
 use tower::ServiceBuilder;
 use tower_http::cors::AllowOrigin;
 use tracing::Level;
 use url::Url;
 
+pub(crate) mod api_endoints;
 pub(crate) mod auth;
 pub(crate) mod client_session;
 pub(crate) mod dance_activity;
@@ -27,7 +30,10 @@ pub(crate) mod user_meta;
 #[derive(Clone)]
 struct AppState {
     app_url: Url,
+    peertube_url: Url,
     pg_db_pool: PgPool,
+    http_client: reqwest::Client,
+    client_config: Arc<tokio::sync::RwLock<Option<peertube_token::OAuthClientConfig>>>,
 }
 
 #[tokio::main]
@@ -36,6 +42,7 @@ async fn main() -> anyhow::Result<()> {
 
     let api_url = require_env("API_URL");
     let app_url = require_env("CLIENT_URL");
+    let peertube_url = Url::parse(&require_env("PEERTUBE_URL"))?;
     let oidc_issuer = require_env("OIDC_ISSUER");
     let oidc_client_id = require_env("OIDC_CLIENT_ID");
     let oidc_client_secret = require_env("OIDC_CLIENT_SECRET");
@@ -59,9 +66,14 @@ async fn main() -> anyhow::Result<()> {
         println!("...DB migrations done");
     }
 
+    let http_client = reqwest::Client::new();
+
     let state = AppState {
         app_url: parsed_app_url.clone(),
+        peertube_url,
         pg_db_pool,
+        http_client,
+        client_config: Arc::default(),
     };
 
     let user_service = middleware::from_fn_with_state(state.clone(), user::user_lookup);
@@ -122,6 +134,7 @@ async fn main() -> anyhow::Result<()> {
         // will return an UNAUTHORIZED response.
         .route("/login", get(login))
         .layer(login_service)
+        .route("/peertube/token", post(peertube_token_exchange))
         .route("/user", get(user::user_info))
         .route("/user/meta", get(user_meta::metadata))
         .route("/user/meta/update", post(user_meta::update_user_metadata))

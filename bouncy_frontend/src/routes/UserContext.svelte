@@ -40,9 +40,29 @@
   // for PeerTube only (for now).
   /** @type {PwaAuth} */
   const pwaAuth = $state({
-    isAuthenticated: false,
     peerTubeToken: null,
+    refreshPeerTubeToken,
   });
+
+  async function refreshPeerTubeToken() {
+    const headers = {
+      // Set a head even when it's an empty POST.
+      // Triggers CORS pre-flight check to reduce CSRF risks.
+      'Content-Type': 'application/json',
+    };
+    const body = '';
+
+    const peerTubeToken = await authenticatedApiRequest(
+      'POST',
+      '/peertube/token',
+      headers,
+      body
+    );
+
+    if (peerTubeToken) {
+      pwaAuth.peerTubeToken = await peerTubeToken.json();
+    }
+  }
 
   /**
    * Load from localStorage or create a new client session through the API.

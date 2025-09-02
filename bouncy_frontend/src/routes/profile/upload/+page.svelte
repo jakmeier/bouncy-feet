@@ -1,7 +1,7 @@
 <script>
   import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
   import LimeSection from '$lib/components/ui/sections/LimeSection.svelte';
-  import { loginToPeertube, uploadVideoToPeerTube } from '$lib/peertube';
+  import { uploadVideoToPeerTube } from '$lib/peertube';
   import { t, locale, coachLocale } from '$lib/i18n';
   import RequiresLoginPopup from '$lib/components/profile/RequiresLoginPopup.svelte';
   import { page } from '$app/state';
@@ -34,7 +34,7 @@
 
     let accessToken = pwaAuth.peerTubeToken?.access_token;
     if (!accessToken) {
-      await loginToPeertube(pwaAuth);
+      await pwaAuth.refreshPeerTubeToken();
       accessToken = pwaAuth.peerTubeToken?.access_token;
     }
 
@@ -68,12 +68,11 @@
   <LoginRequiredContent
     reason={$t('profile.upload.requires-login-description')}
   >
-    <!-- WIP / TODO: These two should be the same (July) -->
     <p>
       BouncyFeet public name: {$user.publicName}
     </p>
     <p>
-      PeerTube user name: {pwaAuth.userProfile?.username}
+      User id: {$user.openid}
     </p>
 
     <input type="file" accept="video/*" onchange={handleFileSelect} />
@@ -85,6 +84,8 @@
     {#if error}
       <p style="color: red">{error}</p>
     {/if}
+
+    <button onclick={pwaAuth.refreshPeerTubeToken}>test login</button>
   </LoginRequiredContent>
 </LimeSection>
 

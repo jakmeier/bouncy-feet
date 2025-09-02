@@ -5,6 +5,7 @@ services:
     environment:
       CLIENT_URL: https://dev.bouncy-feet.ch
       API_URL: https://dev-api.bouncy-feet.ch
+      PEERTUBE_URL: https://dev-tube.bouncy-feet.ch
       OIDC_ISSUER: https://auth.bouncy-feet.ch/realms/bouncyfeet-dev
       OIDC_CLIENT_SECRET: XXXX
       OIDC_CLIENT_ID: bouncy-dev-backend
