@@ -1,0 +1,7 @@
+[submodule "bouncy_tube"]
+	path = bouncy_tube/PeerTube
+	url = https://github.com/jakmeier/PeerTube.git
+[submodule "official-plugins"]
+	path = bouncy_tube/official-plugins
+	url = https://framagit.org/jakmeier/official-plugins.git
+	branch = oidc-api-access
