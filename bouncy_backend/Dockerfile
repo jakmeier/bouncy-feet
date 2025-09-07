@@ -1,4 +1,4 @@
-FROM docker.io/rust:1.83.0-slim-bookworm AS builder
+FROM docker.io/rust:1.89.0-slim AS builder
 ARG TARGETARCH=amd64
 
 RUN apt-get update && apt-get install -y curl ca-certificates clang && rm -rf /var/lib/apt/lists/*
@@ -11,7 +11,7 @@ COPY ./Cargo.toml ./
 COPY ./Cargo.lock ./
 RUN cargo build --release
 
-FROM docker.io/debian:bookworm-slim AS runtime
+FROM docker.io/debian:trixie-slim AS runtime
 WORKDIR /app
 RUN mkdir /app/data
 COPY --from=builder /app/target/release/bouncy_backend /usr/local/bin

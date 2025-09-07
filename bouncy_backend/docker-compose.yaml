@@ -5,7 +5,7 @@ services:
     environment:
       CLIENT_URL: http://localhost:5173
       API_URL: http://localhost:3000
-      PEERTUBE_URL: http://host.docker.internal:9000
+      PEERTUBE_URL: http://peertube.localhost:9000
       OIDC_ISSUER: https://auth.bouncy-feet.ch/realms/bouncyfeet-dev
       OIDC_CLIENT_SECRET: XXXX
       OIDC_CLIENT_ID: bouncy-dev-backend
@@ -20,8 +20,6 @@ services:
       - 3000:3000
     networks:
       - local_network
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
   postgres:
     image: postgres:17.2
     volumes:
@@ -35,10 +33,80 @@ services:
     networks:
       - local_network
     restart: always
+
+  peertube:
+    # own build
+    build:
+      context: ../bouncy_tube/PeerTube
+      dockerfile: support/docker/production/Dockerfile.bookworm
+    # official image
+    # image: chocobozzz/peertube:production-bookworm
+
+    environment:
+      PEERTUBE_SECRET: 'my super dev secret'
+      PEERTUBE_DB_HOSTNAME: peertube-postgres
+      PEERTUBE_DB_USERNAME: peertube
+      PEERTUBE_DB_PASSWORD: peertube_password
+      PEERTUBE_DB_NAME: peertube_local_dev
+      PEERTUBE_WEBSERVER_HOSTNAME: peertube.localhost
+      PEERTUBE_ADMIN_EMAIL: admin@admin.ch
+      PEERTUBE_WEBSERVER_PORT: 9000
+      PEERTUBE_WEBSERVER_HTTPS: false
+
+    ports:
+    #  - "1935:1935" # Comment if you don't want to use the live feature
+     - "9000:9000" # Uncomment if you use another webserver/proxy or test PeerTube in local, otherwise not suitable for production
+    networks:
+      local_network:
+        aliases:
+          - peertube.localhost
+      peertube_network:
+    volumes:
+      # Remove the following line if you want to use another webserver/proxy or test PeerTube in local
+      # - assets:/app/client/dist
+      - ../bouncy_tube/PeerTube/data:/data
+      - ../bouncy_tube/PeerTube/config:/config
+      # Also requires: 
+      # cd /app
+      # npm run plugin:install -- --plugin-path /data/plugins/peertube-plugin-auth-openid-connect
+      - ../bouncy_tube/official-plugins/peertube-plugin-auth-openid-connect:/data/plugins/peertube-plugin-auth-openid-connect
+
+    depends_on:
+      - peertube-postgres
+      - redis
+    #   - postfix
+    restart: "always"
+  peertube-postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: peertube
+      POSTGRES_PASSWORD: peertube_password
+      POSTGRES_DB: peertube_local_dev
+    networks:
+      - peertube_network
+    ports:
+      - 55432:5432
+    volumes:
+      - peertube-postgres-data:/var/lib/postgresql/data
+    restart: always
+
+  redis:
+    image: redis:6-alpine
+    volumes:
+      - peertube-redis:/data
+    networks:
+      - peertube_network
+    restart: "always"
+
 volumes:
   data:
+    external: false
+  peertube-postgres-data:
+  peertube-redis:
     external: false
   pgdata:
 networks:
   local_network:
+    driver: bridge
+  peertube_network:
     driver: bridge
