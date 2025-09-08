@@ -1,3 +1,4 @@
+use crate::user::UserId;
 use sqlx::PgPool;
 use tracing::{error, info};
 use uuid::Uuid;
@@ -48,6 +49,31 @@ impl ClientSessionId {
                 None
             }
         }
+    }
+
+    pub async fn transfer_client_sessions(
+        pool: &PgPool,
+        from: UserId,
+        to: UserId,
+    ) -> sqlx::Result<()> {
+        let result = sqlx::query!(
+            r#"
+                UPDATE client_session
+                SET user_id = $1
+                WHERE user_id = $2
+            "#,
+            to.num(),
+            from.num()
+        )
+        .execute(pool)
+        .await?;
+
+        let rows_affected = result.rows_affected();
+        info!(
+            "Transferred {} client sessions from {} to {}",
+            rows_affected, from, to,
+        );
+        Ok(())
     }
 }
 

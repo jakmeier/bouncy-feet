@@ -1,3 +1,26 @@
+//! User middleware
+//!
+//! User creation flows:
+//!
+//! A) Guest into new full user
+//!     -> Guest session from /new_guest_activity creates UserId
+//!     -> /login adds OIDC sub to existing user, converting to full user
+//!     -> client sessions remain unchanged
+//! B) Keycloak user is created without client session
+//!     -> /login creates a new UserId
+//!     -> following calls always use this UserId
+//! C) Guest into existing user
+//!     -> User has keycloak linked UserID but uses the app without login
+//!     -> /new_guest_activity creates UserId
+//!     -> /login links client sessions of the guest user with the old user
+//!     -> guest session user is marked as deleted
+//! D) Log in to wrong account
+//!     -> User has keycloak linked UserID and an active client session
+//!     -> User login expires
+//!     -> User logs in but with a different account
+//!     -> TODO: Deal with this gracefully. (E.g. ask user in frontend if switch was intended)
+
+use crate::client_session::ClientSessionId;
 use crate::layers::oidc::AdditionalClaims;
 use crate::user::User;
 use crate::AppState;
@@ -50,18 +73,76 @@ async fn try_get_user(
         let maybe_user =
             User::lookup_by_client_secret(state, client_session_id, client_session_secret).await;
         let user = maybe_user.ok_or_else(|| auth_error_response("User not found"))?;
-        if user.oidc_subject.is_some() && maybe_claims.is_none() {
-            // The user has a Keycloak user but is currently trying to log in with the guest credentials.
-            // This is not allowed, the user must be forced to log in.
-            Err(force_login_response())
+        // Need to check consistency between user based on client_session and based on claims
+        if let Some(user_oidc_sub) = user.oidc_subject {
+            validate_existing_oidc_user_matches_claims(
+                &maybe_claims,
+                user,
+                user_oidc_sub.to_string(),
+            )
         } else {
-            Ok(user)
+            validate_guest_user_matches_claims(state, &maybe_claims, user).await
         }
     } else if let Some(claims) = maybe_claims {
+        // Flow B: Keycloak user is created without client session (if necessary)
         // this will lazily create the user if necessary
-        Ok(User::lookup_by_oidc(state, claims).await)
+        Ok(User::lookup_by_oidc_or_create(state, claims).await)
     } else {
         auth_error("No user found")
+    }
+}
+
+async fn validate_guest_user_matches_claims(
+    state: &AppState,
+    maybe_claims: &Option<OidcClaims<axum_oidc::EmptyAdditionalClaims>>,
+    mut user: User,
+) -> Result<User, Response> {
+    if let Some(claims) = maybe_claims {
+        if let Some(existing_user) = User::try_lookup_by_oidc(state, claims).await {
+            // Flow C: Guest into existing user
+            let res = ClientSessionId::transfer_client_sessions(
+                &state.pg_db_pool,
+                user.id,
+                existing_user.id.clone(),
+            )
+            .await;
+            res.map_err(|err| internal_error_response(err, "transferring client session failed"))?;
+            Ok(existing_user)
+        } else {
+            // Flow A: Guest into new full user
+            let sub = Uuid::parse_str(claims.subject().as_str()).map_err(|err| {
+                internal_error_response(err, "encountered invalids sub, must be uuid")
+            })?;
+            let db_result = user.add_oidc(state, sub).await;
+            db_result.map_err(|err| internal_error_response(err, "adding oidc to user failed"))?;
+            Ok(user)
+        }
+    } else {
+        // this is a normal guest user without OIDC user
+        Ok(user)
+    }
+}
+
+// TODO: Fix clippy warning
+#[allow(clippy::result_large_err)]
+fn validate_existing_oidc_user_matches_claims(
+    maybe_claims: &Option<OidcClaims<axum_oidc::EmptyAdditionalClaims>>,
+    user: User,
+    existing_user_oidc_sub: String,
+) -> Result<User, Response> {
+    if let Some(claims) = maybe_claims {
+        if claims.subject().as_str() == existing_user_oidc_sub {
+            // This user has a OIDC user and is logged in with the same OIDC user.
+            Ok(user)
+        } else {
+            // Flow D: Log in to wrong account
+            // TODO: How to handle this case where an owned session by user A then logs in to user B?
+            auth_error("Invalid user for this client session")
+        }
+    } else {
+        // The user has a Keycloak user but is currently trying to log in with the guest credentials.
+        // This is not allowed, the user must be forced to log in.
+        Err(force_login_response())
     }
 }
 
@@ -138,6 +219,14 @@ fn auth_error<T>(msg: &'static str) -> Result<T, Response> {
 fn auth_error_response(msg: &'static str) -> Response {
     Response::builder()
         .status(StatusCode::UNAUTHORIZED)
+        .body(msg.into())
+        .expect("response builder should succeed")
+}
+
+fn internal_error_response<E: std::fmt::Display>(err: E, msg: &'static str) -> Response {
+    tracing::error!(%err, "internal error");
+    Response::builder()
+        .status(StatusCode::INTERNAL_SERVER_ERROR)
         .body(msg.into())
         .expect("response builder should succeed")
 }

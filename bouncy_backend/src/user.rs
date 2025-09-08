@@ -86,10 +86,10 @@ impl User {
         User::lookup(state, user_id).await
     }
 
-    pub(crate) async fn lookup_by_oidc(
+    pub(crate) async fn try_lookup_by_oidc(
         state: &AppState,
-        claims: OidcClaims<AdditionalClaims>,
-    ) -> User {
+        claims: &OidcClaims<axum_oidc::EmptyAdditionalClaims>,
+    ) -> Option<User> {
         let subject = claims.subject().as_str();
 
         let maybe_user = sqlx::query!(
@@ -98,27 +98,59 @@ impl User {
         )
         .fetch_optional(&state.pg_db_pool)
         .await
-        .expect("DB query failed");
+        .expect("DB query failed")?;
+
+        Some(Self::new(maybe_user.id, Some(subject)))
+    }
+
+    pub(crate) async fn lookup_by_oidc_or_create(
+        state: &AppState,
+        claims: OidcClaims<AdditionalClaims>,
+    ) -> User {
+        if let Some(maybe_user) = Self::try_lookup_by_oidc(state, &claims).await {
+            return maybe_user;
+        }
 
         // Lazy user row creation in DB
-        let id = match maybe_user {
-            Some(user) => user.id,
-            None => {
-                sqlx::query!(
-                    r#"
-                INSERT INTO users (oidc_subject) 
-                VALUES ($1)
-                RETURNING id
-                "#,
-                    subject
-                )
-                .fetch_one(&state.pg_db_pool)
-                .await
-                .expect("Failed to insert new user")
-                .id
-            }
-        };
+        let subject = claims.subject().as_str();
+
+        let id = sqlx::query!(
+            r#"
+        INSERT INTO users (oidc_subject) 
+        VALUES ($1)
+        RETURNING id
+        "#,
+            subject
+        )
+        .fetch_one(&state.pg_db_pool)
+        .await
+        .expect("Failed to insert new user")
+        .id;
+
         Self::new(id, Some(subject))
+    }
+
+    pub(crate) async fn add_oidc(&mut self, state: &AppState, sub: Uuid) -> sqlx::Result<()> {
+        assert!(
+            self.oidc_subject.is_none(),
+            "can't overwrite existing OIDC: {:?}",
+            self.oidc_subject
+        );
+
+        let result = sqlx::query!(
+            r#"UPDATE users SET oidc_subject = $1 WHERE id = $2"#,
+            sub.to_string(),
+            self.id.num()
+        )
+        .execute(&state.pg_db_pool)
+        .await?;
+
+        if result.rows_affected() != 1 {
+            tracing::error!("add_oidc affected {} rows", result.rows_affected());
+        }
+
+        self.oidc_subject = Some(sub);
+        Ok(())
     }
 
     fn new(id: i64, subject: Option<&str>) -> User {
@@ -126,7 +158,7 @@ impl User {
             subject.map(|sub| Uuid::parse_str(sub).expect("sub must be a valid UUID"));
         User {
             id: UserId(id),
-            oidc_subject: oidc_subject,
+            oidc_subject,
         }
     }
 }

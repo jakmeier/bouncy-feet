@@ -87,7 +87,7 @@ pub async fn peertube_token_exchange(
 async fn fetch_bypass_token(
     state: &AppState,
     token: &OidcAccessToken,
-) -> Result<TokenExchangeResponse, reqwest::Error> {
+) -> Result<TokenExchangeResponse, anyhow::Error> {
     let exchange_url = state
         .peertube_url
         .join("plugins/auth-openid-connect/router/token-exchange")
@@ -104,7 +104,17 @@ async fn fetch_bypass_token(
         .await?;
 
     let ok_res = res.error_for_status()?;
-    ok_res.json().await
+    if ok_res
+        .headers()
+        .get("Content-Type")
+        .and_then(|hv| HeaderValue::to_str(hv).ok())
+        .is_some_and(|hv| hv.contains("json"))
+    {
+        let json = ok_res.json().await?;
+        Ok(json)
+    } else {
+        anyhow::bail!("PeerTube did not return a JSON response")
+    }
 }
 
 async fn fetch_api_token(
