@@ -1,5 +1,4 @@
 use crate::api_endoints::peertube_token::{self, peertube_token_exchange};
-use crate::auth::login;
 use crate::layers::oidc::{oidc_auth_layer, oidc_login_layer};
 use crate::layers::session::in_memory_cookie_session_layer;
 use axum::error_handling::HandleErrorLayer;
@@ -18,13 +17,10 @@ use tracing::Level;
 use url::Url;
 
 pub(crate) mod api_endoints;
-pub(crate) mod auth;
 pub(crate) mod client_session;
 pub(crate) mod dance_activity;
 pub(crate) mod layers;
-pub(crate) mod stats;
 pub(crate) mod user;
-pub(crate) mod user_meta;
 
 /// Immutable shared state, should be cheap to clone.
 #[derive(Clone)]
@@ -76,7 +72,7 @@ async fn main() -> anyhow::Result<()> {
         client_config: Arc::default(),
     };
 
-    let user_service = middleware::from_fn_with_state(state.clone(), user::user_lookup);
+    let user_service = middleware::from_fn_with_state(state.clone(), layers::user::user_lookup);
     let session_layer = in_memory_cookie_session_layer(&state.app_url);
     let login_layer = oidc_login_layer();
     let auth_layer = oidc_auth_layer(
@@ -123,24 +119,27 @@ async fn main() -> anyhow::Result<()> {
         .route("/", get(root))
         .route(
             "/new_guest_session",
-            get(client_session::create_guest_session),
+            get(api_endoints::client_session::create_guest_session),
         )
-        .route("/stats", get(stats::stats));
+        .route("/stats", get(api_endoints::stats::stats));
 
     // bottom-to-top order for router
     let authenticated_app = Router::new()
         // The login server only apples on this specific route.
         // This forwards to Keycloak, while all other routes
         // will return an UNAUTHORIZED response.
-        .route("/login", get(login))
+        .route("/login", get(api_endoints::auth::login))
         .layer(login_service)
         .route("/peertube/token", post(peertube_token_exchange))
-        .route("/user", get(user::user_info))
-        .route("/user/meta", get(user_meta::metadata))
-        .route("/user/meta/update", post(user_meta::update_user_metadata))
+        .route("/user", get(api_endoints::user::user_info))
+        .route("/user/meta", get(api_endoints::user_meta::metadata))
+        .route(
+            "/user/meta/update",
+            post(api_endoints::user_meta::update_user_metadata),
+        )
         .route(
             "/new_guest_activity",
-            post(client_session::record_guest_activity),
+            post(api_endoints::client_session::record_guest_activity),
         )
         .layer(auth_service);
 
