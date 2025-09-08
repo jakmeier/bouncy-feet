@@ -1,4 +1,4 @@
-use crate::user::UserId;
+use crate::user::User;
 use crate::{internal_error, AppState};
 use axum::extract::State;
 use axum::http::StatusCode;
@@ -37,10 +37,7 @@ pub struct UserMeta {
 }
 #[axum::debug_handler]
 /// Read all the user metadata for the authenticated user
-pub async fn metadata(
-    Extension(user_id): Extension<UserId>,
-    State(state): State<AppState>,
-) -> Response {
+pub async fn metadata(Extension(user): Extension<User>, State(state): State<AppState>) -> Response {
     let result = sqlx::query_as!(
         UserMeta,
         r#"
@@ -48,7 +45,7 @@ pub async fn metadata(
         FROM user_meta
         WHERE user_id = $1
         "#,
-        user_id.num()
+        user.id.num()
     )
     .fetch_all(&state.pg_db_pool)
     .await;
@@ -61,7 +58,7 @@ pub async fn metadata(
 #[axum::debug_handler]
 /// Update the user metadata for the authenticated user
 pub async fn update_user_metadata(
-    Extension(user_id): Extension<UserId>,
+    Extension(user): Extension<User>,
     State(state): State<AppState>,
     Json(payload): Json<UpdateMetaDataRequest>,
 ) -> Response {
@@ -118,7 +115,7 @@ pub async fn update_user_metadata(
         WHERE
             user_meta.last_modified < EXCLUDED.last_modified
         "#,
-        user_id.num(),
+        user.id.num(),
         key_name,
         key_value,
         new_last_modified,

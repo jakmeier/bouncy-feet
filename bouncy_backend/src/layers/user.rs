@@ -1,12 +1,14 @@
 use crate::layers::oidc::AdditionalClaims;
-use crate::user::UserId;
+use crate::user::User;
 use crate::AppState;
 use axum::extract::{Request, State};
 use axum::http::header::GetAll;
 use axum::http::{HeaderValue, StatusCode};
 use axum::middleware::Next;
-use axum::response::Response;
+use axum::response::{IntoResponse, Response};
+use axum::Json;
 use axum_oidc::OidcClaims;
+use serde_json::json;
 use uuid::Uuid;
 
 // Middleware to lookup user or create it lazily from an OIDC claim.
@@ -18,11 +20,12 @@ pub async fn user_lookup(
 ) -> Response {
     let auth_headers = &req.headers().get_all("Authorization");
     match try_get_user(&state, auth_headers, maybe_claims).await {
-        Ok(user_id) => {
+        Ok(user) => {
+            let user_id = &user.id;
             // Add user info to logs
-            tracing::Span::current().record("user_id", tracing::field::display(&user_id));
-            // Attach user ID for downstream handlers
-            req.extensions_mut().insert(user_id);
+            tracing::Span::current().record("user_id", tracing::field::display(user_id));
+            // Attach user for downstream handlers
+            req.extensions_mut().insert(user);
         }
         Err(response) => {
             // Continue without user info.
@@ -40,20 +43,50 @@ async fn try_get_user(
     state: &AppState,
     auth_headers: &GetAll<'_, HeaderValue>,
     maybe_claims: Option<OidcClaims<AdditionalClaims>>,
-) -> Result<UserId, Response> {
+) -> Result<User, Response> {
     if let Some((client_session_id, client_session_secret)) =
         client_session_credentials_from_headers(auth_headers)?
     {
         let maybe_user =
-            UserId::user_lookup_by_client_secret(state, client_session_id, client_session_secret)
-                .await;
-        maybe_user.ok_or_else(|| auth_error_response("User not found"))
+            User::lookup_by_client_secret(state, client_session_id, client_session_secret).await;
+        let user = maybe_user.ok_or_else(|| auth_error_response("User not found"))?;
+        if user.oidc_subject.is_some() && maybe_claims.is_none() {
+            // The user has a Keycloak user but is currently trying to log in with the guest credentials.
+            // This is not allowed, the user must be forced to log in.
+            Err(force_login_response())
+        } else {
+            Ok(user)
+        }
     } else if let Some(claims) = maybe_claims {
         // this will lazily create the user if necessary
-        Ok(UserId::user_lookup_by_oidc(state, claims).await)
+        Ok(User::lookup_by_oidc(state, claims).await)
     } else {
         auth_error("No user found")
     }
+}
+
+/// Let's the client know that the user was found but authentication through Keycloak is required.
+///
+/// The client side JS code, when making API requests, will detect these errors. Usually, it will
+/// redirect the user to the login page. But it may decide to persist some data first or ask the
+/// user before leaving the current page.
+///
+/// The login always has to go through a browser redirect to `/login` on this server.
+fn force_login_response() -> Response {
+    (
+        StatusCode::UNAUTHORIZED,
+        [(
+            axum::http::header::WWW_AUTHENTICATE,
+            // Custom scheme, the client authenticates through an active session, not through a
+            // Bearer token as it would be the case with OAuth 2.0.
+            HeaderValue::from_static(r#"Session realm="BouncyFeet API", error="login_required""#),
+        )],
+        Json(json!({
+            "error": "login_required",
+            "redirect": "/login",
+        })),
+    )
+        .into_response()
 }
 
 // TODO: Fix clippy warning

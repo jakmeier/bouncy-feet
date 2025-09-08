@@ -9,6 +9,12 @@ use crate::AppState;
 #[derive(Clone)]
 pub struct UserId(i64);
 
+#[derive(Clone)]
+pub struct User {
+    pub id: UserId,
+    pub oidc_subject: Option<Uuid>,
+}
+
 impl UserId {
     pub fn num(&self) -> i64 {
         self.0
@@ -31,7 +37,7 @@ impl UserId {
 }
 
 impl UserId {
-    pub(crate) async fn user_lookup_by_client_secret(
+    pub(crate) async fn lookup_by_client_secret(
         state: &AppState,
         client_session_id: i64,
         client_session_secret: Uuid,
@@ -53,20 +59,49 @@ impl UserId {
 
         user_id.map(|record| UserId(record.user_id))
     }
+}
 
-    pub(crate) async fn user_lookup_by_oidc(
+impl User {
+    pub(crate) async fn lookup(state: &AppState, user_id: UserId) -> Option<User> {
+        let maybe_user = sqlx::query!(
+            "SELECT id, oidc_subject FROM users WHERE id = $1",
+            user_id.num()
+        )
+        .fetch_optional(&state.pg_db_pool)
+        .await
+        .expect("DB query failed");
+
+        maybe_user.map(|record| User::new(record.id, record.oidc_subject.as_deref()))
+    }
+
+    pub(crate) async fn lookup_by_client_secret(
+        state: &AppState,
+        client_session_id: i64,
+        client_session_secret: Uuid,
+    ) -> Option<User> {
+        let user_id =
+            UserId::lookup_by_client_secret(state, client_session_id, client_session_secret)
+                .await?;
+
+        User::lookup(state, user_id).await
+    }
+
+    pub(crate) async fn lookup_by_oidc(
         state: &AppState,
         claims: OidcClaims<AdditionalClaims>,
-    ) -> UserId {
+    ) -> User {
         let subject = claims.subject().as_str();
 
-        let maybe_user = sqlx::query!("SELECT id FROM users WHERE oidc_subject = $1", subject)
-            .fetch_optional(&state.pg_db_pool)
-            .await
-            .expect("DB query failed");
+        let maybe_user = sqlx::query!(
+            "SELECT id, oidc_subject FROM users WHERE oidc_subject = $1",
+            subject
+        )
+        .fetch_optional(&state.pg_db_pool)
+        .await
+        .expect("DB query failed");
 
         // Lazy user row creation in DB
-        let user_id = match maybe_user {
+        let id = match maybe_user {
             Some(user) => user.id,
             None => {
                 sqlx::query!(
@@ -83,7 +118,16 @@ impl UserId {
                 .id
             }
         };
-        UserId(user_id)
+        Self::new(id, Some(subject))
+    }
+
+    fn new(id: i64, subject: Option<&str>) -> User {
+        let oidc_subject =
+            subject.map(|sub| Uuid::parse_str(sub).expect("sub must be a valid UUID"));
+        User {
+            id: UserId(id),
+            oidc_subject: oidc_subject,
+        }
     }
 }
 
