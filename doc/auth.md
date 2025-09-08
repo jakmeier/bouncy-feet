@@ -48,24 +48,13 @@ Client must be authenticated (using client_id + client_secret).
 
 ## BouncyFeet JWT in the frontend
 
-When the app makes authenticated requests directly from JavaScript, for example to BouncyFeet's PeerTube instance, it uses a JWT that it can obtain from Keycloak without a backend server.
+**Discussion**: It would be possible to retrieve a JWT right in the frontend, by using, for example, keycloak.js and using a public client on the Keycloak side. The benefit: No backend session management required to access PeerTube (and other services). The backend Bouncy Feet API server could potentially be decoupled from the video hosting platform.
 
-Login:
-The frontend JS code directly connects to Keycloak and completes a [Authorization Code Flow with Proof Key for Code Exchange (PKCE)](https://datatracker.ietf.org/doc/html/rfc7636).
-The JWT is stored in the user client in JS memory.
+However, a user will be logged in to Keycloak on the backend service anyway. Maintaining two different user sessions is hard to hide from the use experience and makes login flow more complex to implement. It is much easier to keep the Keycloak token on the backend only. This allows to never expose a JWT to the user.
 
-Authorization:
-The JWT lists audiences for which the token can be used for access, which other services can check for authorization. 
+But the user must still be able to upload videos directly from the frontend, without going through the backend. This happens through a separate API access token, which unfortunately adds complexity. But that is the minimal amount of added complexity necessary to avoid the overhead through the backend. See [BouncyFeet's PeerTube API access](#bouncyfeets-peertube-api-access) for more.
 
-
-Keycloak configuration:
-Only the standard flow enabled.
-Client authentication disable.
-
-![Keycloak client configuration screenshot matching the description in text](./img/auth/pwa-frontend-client.png)
-
-Additionally, an audience-mapper needs to be installed for each service that can be accessed with this JWT. (See configuration section in those services)
-
+**Current Design**: The frontend never sees the JWT. It stays on the backend service.
 
 ## BouncyFeet's PeerTube instance
 
@@ -97,7 +86,7 @@ PeerTube configuration:
 This is for direct access from JS code in the BouncyFeet app to the PeerTube API, for example to upload a video.
 
 Login:
-Use a JWT as described in [BouncyFeet JWT in the frontend](#bouncyfeet-jwt-in-the-frontend) and send it to the token-exchange endpoint from the OpendID connect plugin. This yields a token usable on PeerTube's API.
+The frontend makes a call to the backend API route `/peertube/token`. The backend uses a JWT access token from the already-logged-in user and sends it to the token-exchange endpoint from the OpendID connect plugin on the PeerTube instance. This yields a token usable on PeerTube's API.
 
 Authorization:
 Keycloak puts the PeerTube token exchange endpoint in the JWT audience.

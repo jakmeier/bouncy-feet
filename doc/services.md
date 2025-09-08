@@ -11,6 +11,7 @@ Architecture decisions:
 - Hosted with [bun](https://bun.com/) using [@sveltejs/adapter-node](https://www.npmjs.com/package/@sveltejs/adapter-node) to build
 - No database
 - Not a static website (server-side rendering and dynamic routes are too useful)
+- JS has direct access to the PeerTube API, through the identity of the logged in user
 
 
 ## BouncyFeet API server
@@ -24,7 +25,8 @@ Architecture decisions:
 
 - Built with [axum](https://github.com/tokio-rs/axum)
 - [PostgreSQL](https://www.postgresql.org/) database
-- Decoupled from video hosting
+- Only handles video meta data, never touches videos themselves
+- Manages video meta data through the PeerTube REST API, using a system user.
 - An anonymous user could access all public content without ever connecting to this server
 - Ideally, most functionalities in the app work without active connection to the API server. While offline, changes can be buffered and synced on the next connection to the API server.
 
@@ -36,10 +38,10 @@ DEV: https://dev-tube.bouncy-feet.ch/
 
 Architecture decisions:
 
-- Out-of-the-box [PeerTube](https://github.com/Chocobozzz/PeerTube) with custom themes and plugins
-- Decoupled from the API server
+- Out-of-the-box [PeerTube](https://github.com/Chocobozzz/PeerTube) with custom themes and plugins. (Necessary changes to the core should be upstreamed.)
+- (tentative) All video-related state should be reflected in PeerTube's database as the source of truth.
 - To show videos in the BouncyFeet app, they are embedded directly from the PeerTube instance
-- BouncyFeet manages videos through PeerTube0s REST API
+- BouncyFeet manages video meta data through PeerTube's REST API, with a system user
 - Uploading videos puts them in a channel of the user
 - Users have access to the standard PeerTube frontend and can use it to manage permissions on videos or entirely delete them from the platform
 - Moderators also use the standard PeerTube frontend
