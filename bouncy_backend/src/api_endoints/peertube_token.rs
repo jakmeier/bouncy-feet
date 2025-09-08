@@ -104,7 +104,7 @@ async fn fetch_bypass_token(
         .await?;
 
     let ok_res = res.error_for_status()?;
-    Ok(ok_res.json().await?)
+    ok_res.json().await
 }
 
 async fn fetch_api_token(
