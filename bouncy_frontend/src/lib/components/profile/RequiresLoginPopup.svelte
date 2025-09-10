@@ -9,7 +9,7 @@
   const user = userContext.store;
 
   /** @type {boolean} */
-  let notLoggedIn = $derived(!$user.openid);
+  let notLoggedIn = $state(userContext.isLoggedInToApi());
 
   function goBack() {
     history.back();

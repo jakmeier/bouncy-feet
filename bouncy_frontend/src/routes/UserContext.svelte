@@ -300,8 +300,6 @@
   /** @type {import('svelte/store').Writable<UserData>} */
   const user = writable(
     stored || {
-      // TODO: get this from Keycloak after the user is created
-      // TODO: set this from the API server if it has it (and compare on login )
       openid: undefined,
       publicName: generateRandomUsername(),
       score: 0,
@@ -413,11 +411,13 @@
         throw new Error(`missing sub in response: ${JSON.stringify(userInfo)}`);
       }
 
-      // note: Sub may be null, this just means this is a guest user OR the user is not logged in.
-      // Eitherway, if there is already a known user.openid, it should not be overwritten.
-      if (userInfo.sub) {
-        $user.openid = userInfo.sub;
+      // note: Sub may be null, this means the user is a guest.
+      if (!userInfo.sub && $user.openid) {
+        console.warn(
+          'Client has a oidc subject but the server thinks this is a guest. Dropping previously known oidc subject.'
+        );
       }
+      $user.openid = userInfo.sub;
 
       // trigger subscribers?
       $user = $user;
@@ -425,6 +425,9 @@
       console.warn('Failed reading user info');
     }
   }
+
+  const loggedInToApi = $derived(!!pwaAuth.peerTubeToken);
+  const isLoggedInToApi = () => loggedInToApi;
 
   /** @type {UserContextData} */
   const userCtx = {
@@ -436,6 +439,7 @@
     submitCourseLesson,
     submitStepTraining,
     addDanceToStats,
+    isLoggedInToApi,
   };
   setContext('user', userCtx);
 

@@ -1,4 +1,5 @@
 <script>
+  import { t } from '$lib/i18n';
   import { getUserContext } from '$lib/context';
   import RequiresLogin from './RequiresLogin.svelte';
   import { onMount } from 'svelte';
@@ -12,12 +13,20 @@
 
   let mounted = $state(false);
 
-  onMount(() => {
+  onMount(async () => {
+    if (!userContext.isLoggedInToApi()) {
+      try {
+        await userContext.pwaAuth.refreshPeerTubeToken();
+      } catch (e) {
+        console.debug('failed to refresh PeerTube token', e);
+      }
+    }
+
     mounted = true;
   });
 </script>
 
-{#if $user.openid}
+{#if userContext.isLoggedInToApi()}
   {@render children?.()}
 {:else if mounted}
   <div class="overlay" transition:fade={{ delay: 400, duration: 200 }}>
@@ -29,6 +38,8 @@
       />
     </div>
   </div>
+{:else}
+  {$t('waiting-for-login-info')}
 {/if}
 
 <style>

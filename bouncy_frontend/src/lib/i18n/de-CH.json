@@ -285,6 +285,7 @@
         "requires-login-text": "Logg dich ein oder erstelle jetzt ein gratis Konto.",
         "guest-mode-text": "Du bist im Gastmodus.",
         "login-expired-text": "Dein Login ist abgelaufen.",
+        "waiting-for-login-info": "Prüfe deine Logindaten...",
         "consent": {
             "title": "Rangliste beitreten",
             "text0": "Um auf der Rangliste zu erschienen, müssen wir deine tanzstatisken übermitteln. Videos werden nie hochgeladen.",

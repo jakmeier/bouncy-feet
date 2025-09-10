@@ -27,11 +27,6 @@
     return num.toFixed(2);
   }
 
-  async function testLogin() {
-    const response = await apiRequest('/testauth');
-    console.log(response);
-    console.log(await response.text());
-  }
 </script>
 
 <Header title={$t('profile.settings.title')} />
@@ -107,13 +102,6 @@
       </div>
     </div>
   </div>
-
-  <Button
-    class="full-width"
-    text="test login"
-    symbol="login"
-    on:click={testLogin}
-  ></Button>
 {/if}
 
 <style>

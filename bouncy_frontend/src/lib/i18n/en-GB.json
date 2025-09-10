@@ -285,6 +285,7 @@
         "requires-login-text": "Log in or create your free account now.",
         "guest-mode-text": "You are in guest mode.",
         "login-expired-text": "You login has expired.",
+        "waiting-for-login-info": "Checking your login info...",
         "consent": {
             "title": "Enter leaderboard",
             "text0": "To be shown on the leaderboard, we need to submit your personal dance statistics to the server. Videos are never uploaded.",

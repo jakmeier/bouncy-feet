@@ -84,8 +84,6 @@
     {#if error}
       <p style="color: red">{error}</p>
     {/if}
-
-    <button onclick={pwaAuth.refreshPeerTubeToken}>test login</button>
   </LoginRequiredContent>
 </LimeSection>
 
