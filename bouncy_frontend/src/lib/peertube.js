@@ -1,45 +1,50 @@
+/*
+ * JS functions to access PeerTube API.
+ *
+ * API reference: https://docs.joinpeertube.org/api-rest-reference.html
+ * 
+ * Open API generator tool: https://github.com/hey-api/openapi-ts
+ * (with this client): https://heyapi.dev/openapi-ts/clients/fetch
+ */
+
 import { PUBLIC_API_BASE, PUBLIC_BF_PEERTUBE_URL } from '$env/static/public';
+import { client } from '$lib/peertube-openapi/client.gen';
+import { getVideoPlaylistVideos } from './peertube-openapi';
 
 const peerTubeUrl = PUBLIC_BF_PEERTUBE_URL;
-// const peerTubeUrl = 'http://localhost:9000';
+
+client.setConfig({
+    baseUrl: PUBLIC_BF_PEERTUBE_URL,
+});
 
 /**
- * @typedef {Object} PlaylistVideos
- * 
- * @property {number} total
- * @property {PlaylistVideo[]} data
- *
- * @typedef {Object} PlaylistVideo 
- * @property {number} id
- * @property {number} position
- * @property {Video} video
- *
- * @typedef {Object} Video
- * @property {number} id
- * @property {string} uuid
- * 
- * More properties:
- * https://docs.joinpeertube.org/api-rest-reference.html#tag/Video-Playlists/operation/getVideoPlaylistVideos
- */
-
-/**
- * @param {string} playlistId
- * 
- * @returns {Promise<PlaylistVideos>}
+ * @param {number} playlistId
+ * @returns {Promise<import('./peertube-openapi').GetVideoPlaylistVideosResponse>}
  */
 export async function fetchVideosOfPlaylist(playlistId, start = 0, count = 20) {
+    /** @type {import('./peertube-openapi/client').Options<import('./peertube-openapi').GetVideoPlaylistVideosData>} */
+    const options = {
+        path: {
+            playlistId
+        },
+        query: {
+            start,
+            count
+        },
+    };
+    const { response, data } = await getVideoPlaylistVideos(options);
 
-    const res = await fetch(`${peerTubeUrl}/api/v1/video-playlists/${playlistId}/videos`);
-
-    if (!res.ok) {
-        const error = await res.text();
-        throw new Error(`Fetch videos failed: ${res.status} ${error}`);
+    if (!response.ok) {
+        const error = await response.text();
+        throw new Error(`Fetch videos failed: ${response.status} ${error}`);
     }
 
-    /** @type {PlaylistVideos} */
-    const result = await res.json();
+    if (!data) {
+        const error = await response.text();
+        throw new Error(`No data returned`);
+    }
 
-    return result;
+    return data;
 }
 
 /** 

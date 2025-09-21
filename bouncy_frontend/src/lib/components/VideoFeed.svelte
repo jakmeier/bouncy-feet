@@ -7,7 +7,7 @@
 
   async function fetchVideoIds() {
     const videos = await fetchVideosOfPlaylist(playlistId);
-    return videos.data.map((v) => v.video.uuid);
+    return videos.data?.map((v) => v.video?.uuid);
   }
 </script>
 
