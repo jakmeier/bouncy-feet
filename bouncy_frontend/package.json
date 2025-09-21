@@ -14,9 +14,13 @@
     "lint": "prettier --check . && eslint .",
     "format": "prettier --write .",
     "test:integration": "playwright test",
-    "test:unit": "vitest"
+    "test:unit": "vitest",
+    "openapi-generate": "openapi-ts -i peertube-openapi.yaml -o src/lib/peertube-openapi",
+    "openapi-download": "wget -O peertube-openapi.yaml https://raw.githubusercontent.com/Chocobozzz/PeerTube/refs/heads/develop/support/doc/api/openapi.yaml"
+
   },
   "devDependencies": {
+    "@hey-api/openapi-ts": "0.83.1",
     "@playwright/test": "^1.51.0",
     "@sveltejs/adapter-node": "^5.2.14",
     "@sveltejs/kit": "^2.29.1",
