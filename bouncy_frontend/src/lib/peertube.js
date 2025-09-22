@@ -9,7 +9,7 @@
 
 import { PUBLIC_BF_PEERTUBE_URL } from '$env/static/public';
 import * as api from '$lib/peertube-openapi';
-import { getVideoPlaylistVideos, getUserInfo, uploadLegacy, uploadResumable, uploadResumableInit, uploadResumableCancel } from './peertube-openapi';
+import { getVideoPlaylistVideos, getUserInfo, uploadLegacy, uploadResumable, uploadResumableInit, uploadResumableCancel, getApiV1UsersMeVideos } from './peertube-openapi';
 
 const peerTubeUrl = PUBLIC_BF_PEERTUBE_URL;
 
@@ -186,4 +186,31 @@ export async function uploadVideoToPeerTubeResumable(file, channelId, onProgress
         offset = Number.parseInt(serverProgress || end.toString());
         onProgress(offset / totalSize);
     }
+}
+
+/**
+ * @param {number} start -- pagination offset
+ * @param {number} count -- pagination size
+ * @returns {Promise<Array<api.Video>>}
+ */
+export async function fetchMyVideos(start = 0, count = 20) {
+    const options = {
+        query: {
+            start,
+            count
+        }
+    };
+    const { response, data, error } = await getApiV1UsersMeVideos(options);
+
+    if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`Upload failed: ${response.status} ${errText} ${error}`);
+    }
+
+    if (!data || !data.data) {
+        const error = await response.text();
+        throw new Error(`No data returned ${error}`);
+    }
+
+    return data.data;
 }

@@ -1,16 +1,14 @@
 <script>
   import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
   import LimeSection from '$lib/components/ui/sections/LimeSection.svelte';
-  import {
-    uploadVideoToPeerTube,
-    uploadVideoToPeerTubeResumable,
-  } from '$lib/peertube';
+  import { uploadVideoToPeerTubeResumable, fetchMyVideos } from '$lib/peertube';
   import { t, locale, coachLocale } from '$lib/i18n';
   import RequiresLoginPopup from '$lib/components/profile/RequiresLoginPopup.svelte';
   import { page } from '$app/state';
   import { coachData } from '$lib/coach';
   import { getUserContext } from '$lib/context';
   import LoginRequiredContent from '$lib/components/profile/LoginRequiredContent.svelte';
+  import PeertubeVideoPlayer from '$lib/components/ui/video/PeertubeVideoPlayer.svelte';
 
   /** @type {UserContextData} */
   const userCtx = getUserContext();
@@ -111,6 +109,24 @@
     {#if error}
       <p style="color: red">{error}</p>
     {/if}
+
+    <!-- TODO: pagination, general display etc -->
+    <!-- TODO: display private videos -->
+    {#await fetchMyVideos()}
+      waiting for videos
+    {:then videos}
+      {#each videos as video}
+        <p>
+          {video.id} <br />
+          {video.createdAt}
+          {video.name} <br />
+          {video.uuid} <br />
+          {#if video.shortUUID}
+            <PeertubeVideoPlayer videoId={video.uuid} />
+          {/if}
+        </p>
+      {/each}
+    {/await}
   </LoginRequiredContent>
 </LimeSection>
 
