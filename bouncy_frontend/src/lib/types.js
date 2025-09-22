@@ -116,6 +116,9 @@
  * @property {(stepId: string, bpm: number, detection: DetectionResult) => DanceSessionResult | null} submitStepTraining
  * @property {(result: DanceSessionResult) => void} addDanceToStats Update local stats, offline only.
  * @property {()=>boolean} isLoggedInToApi -- Has an active, non-expired API session. (Reactive $derived state)
+ * @property {()=>{}} refreshPeerTubeUser
+ * @property {Promise<import("$lib/peertube-openapi").User | undefined>} peerTubeUser
+ * 
  *
  * @typedef {Object} UserLessonProgress
  * @property {LessonProgress[]} lessons

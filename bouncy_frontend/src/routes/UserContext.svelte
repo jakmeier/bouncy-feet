@@ -10,6 +10,10 @@
   import { showExperimentalFeatures } from '$lib/stores/FeatureSelection.js';
   import { ONBOARDING_STATE } from '$lib/onboarding';
   import { DetectionResult } from 'bouncy_instructor';
+  import { client as peerTubeApi } from '$lib/peertube-openapi/client.gen';
+  import { PUBLIC_BF_PEERTUBE_URL } from '$env/static/public';
+  import { fetchPeerTubeUser } from '$lib/peertube';
+
   /**
    * @typedef {Object} Props
    * @property {import('svelte').Snippet} [children]
@@ -44,6 +48,9 @@
     refreshPeerTubeToken,
   });
 
+  /** @type {import("$lib/peertube-openapi").User | {}} */
+  const peerTubeUser = $state({});
+
   async function refreshPeerTubeToken() {
     const headers = {
       // Set a head even when it's an empty POST.
@@ -51,6 +58,11 @@
       'Content-Type': 'application/json',
     };
     const body = '';
+
+    peerTubeApi.setConfig({
+      baseUrl: PUBLIC_BF_PEERTUBE_URL,
+      auth: () => pwaAuth.peerTubeToken?.access_token,
+    });
 
     const peerTubeToken = await authenticatedApiRequest(
       'POST',
@@ -426,6 +438,10 @@
     }
   }
 
+  async function refreshPeerTubeUser() {
+    Object.assign(peerTubeUser, await fetchPeerTubeUser());
+  }
+
   const loggedInToApi = $derived(!!pwaAuth.peerTubeToken);
   const isLoggedInToApi = () => loggedInToApi;
 
@@ -440,6 +456,15 @@
     submitStepTraining,
     addDanceToStats,
     isLoggedInToApi,
+    refreshPeerTubeUser,
+    get peerTubeUser() {
+      return (async () => {
+        if (Object.keys(peerTubeUser).length === 0) {
+          await refreshPeerTubeUser();
+        }
+        return peerTubeUser;
+      })();
+    },
   };
   setContext('user', userCtx);
 

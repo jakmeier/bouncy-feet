@@ -39,7 +39,7 @@
     </div>
   </div>
 {:else}
-  {$t('waiting-for-login-info')}
+  {$t('profile.waiting-for-login-info')}
 {/if}
 
 <style>

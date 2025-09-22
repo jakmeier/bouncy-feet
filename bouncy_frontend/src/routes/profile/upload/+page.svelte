@@ -10,7 +10,9 @@
   import LoginRequiredContent from '$lib/components/profile/LoginRequiredContent.svelte';
 
   /** @type {UserContextData} */
-  const { store: user, pwaAuth } = getUserContext();
+  const userCtx = getUserContext();
+  const user = userCtx.store;
+  const pwaAuth = userCtx.pwaAuth;
 
   const coachId = $derived(page.url.searchParams.get('coach'));
   const coach = $derived(coachData(coachId || ''));
@@ -51,7 +53,15 @@
 
     try {
       // TODO: Can I track uploading progress somehow?
-      await uploadVideoToPeerTube(file, accessToken);
+      const ptu = await userCtx.peerTubeUser;
+      const channels = ptu?.videoChannels;
+      // @ts-ignore
+      const channelId = channels[0]?.id;
+      if (channelId === undefined) {
+        // TODO: create it!
+        throw new Error('No video channel found');
+      }
+      await uploadVideoToPeerTube(file, channelId);
       uploadProgress = 100;
     } catch (err) {
       console.error(err);
