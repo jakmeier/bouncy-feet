@@ -1,7 +1,10 @@
 <script>
   import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
   import LimeSection from '$lib/components/ui/sections/LimeSection.svelte';
-  import { uploadVideoToPeerTube } from '$lib/peertube';
+  import {
+    uploadVideoToPeerTube,
+    uploadVideoToPeerTubeResumable,
+  } from '$lib/peertube';
   import { t, locale, coachLocale } from '$lib/i18n';
   import RequiresLoginPopup from '$lib/components/profile/RequiresLoginPopup.svelte';
   import { page } from '$app/state';
@@ -61,13 +64,27 @@
         // TODO: create it!
         throw new Error('No video channel found');
       }
-      await uploadVideoToPeerTube(file, channelId);
-      uploadProgress = 100;
+      // upload in background
+      uploadVideoToPeerTubeResumable(
+        file,
+        channelId,
+        (ratio) => (uploadProgress = Math.floor(ratio * 100))
+      )
+        .then(() => {
+          uploadProgress = 100;
+        })
+        .catch((err) => {
+          console.error(err);
+          // TODO: translate error to user
+          error = "Oops, I couldn't upload that :(";
+        })
+        .finally(() => {
+          isUploading = false;
+        });
     } catch (err) {
       console.error(err);
       // TODO: translate error to user
       error = "Oops, I couldn't upload that :(";
-    } finally {
       isUploading = false;
     }
   }
