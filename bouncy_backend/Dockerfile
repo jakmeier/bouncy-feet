@@ -8,7 +8,7 @@ COPY ./src ./src
 COPY ./db_migrations ./db_migrations
 COPY ./.sqlx ./.sqlx
 COPY ./Cargo.toml ./
-COPY ./Cargo.lock ./
+COPY --from=parent ./Cargo.lock ./
 RUN cargo build --release
 
 FROM docker.io/debian:trixie-slim AS runtime

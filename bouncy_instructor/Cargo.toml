@@ -37,3 +37,6 @@ expect-test = "1.4.1"
 new_without_default = "allow"
 manual_range_contains = "allow"
 uninlined_format_args = "allow"
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = ["--enable-bulk-memory", "--enable-nontrapping-float-to-int"]

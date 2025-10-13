@@ -12,6 +12,8 @@ services:
       DATABASE_URL: "postgres://api_user:local_password@postgres/bouncyfeet"
     build:
       context: ./
+      additional_contexts:
+        parent: ../
       dockerfile: Dockerfile
       target: runtime
     volumes:
