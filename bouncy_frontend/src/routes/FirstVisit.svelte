@@ -10,7 +10,7 @@
   import { getUserContext } from '$lib/context';
 
   /** @type {UserContextData}*/
-  const { setUserMeta } = getUserContext();
+  const { setUserMeta, setSkippedIntro } = getUserContext();
 
   function goToWarmup() {
     setUserMeta('onboarding', ONBOARDING_STATE.STARTED_FIRST_WARMUP);
@@ -48,7 +48,7 @@
 
     setTimeout(() => {
       showButton = true;
-    }, 4000);
+    }, 2900);
   }
 
   function toVideo() {
@@ -97,7 +97,7 @@
       in:slide={{ duration: 500, axis: 'x' }}
       out:fade
       onintroend={() => {
-        video.startVideo();
+        video.play();
       }}
     >
       <div class="video">
@@ -105,6 +105,9 @@
       </div>
       <button onclick={goToWarmup}>
         {$t('home.first-visit-button-1')}
+      </button>
+      <button onclick={() => setSkippedIntro(true)}>
+        {$t('home.first-visit-button-2')}
       </button>
     </div>
   {/if}

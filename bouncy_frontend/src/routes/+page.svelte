@@ -27,11 +27,22 @@
 </script>
 
 {#await user.clientSession then clientSession}
-  {#if clientSession.meta.onboarding === ONBOARDING_STATE.FIRST_VISIT}
+  <!-- stop formatting for the array in one of the conditions -->
+  <!-- prettier-ignore -->
+  {#if clientSession.meta.onboarding === ONBOARDING_STATE.FIRST_VISIT && !user.skippedIntro()}
     <FirstVisit />
-  {:else if clientSession.meta.onboarding === ONBOARDING_STATE.STARTED_FIRST_WARMUP}
+  {:else if clientSession.meta.onboarding === ONBOARDING_STATE.STARTED_FIRST_WARMUP && !user.skippedIntro()}
     <ContinueFirstCourse />
-  {:else if [ONBOARDING_STATE.FINISHED_FIRST_WARMUP, ONBOARDING_STATE.STARTED_FIRST_LESSON, ONBOARDING_STATE.FINISHED_FIRST_LESSON, ONBOARDING_STATE.STARTED_SECOND_LESSON, ONBOARDING_STATE.FINISHED_SECOND_LESSON, ONBOARDING_STATE.STARTED_THIRD_LESSON].includes(clientSession.meta.onboarding)}
+    {:else if [
+      ONBOARDING_STATE.FINISHED_FIRST_WARMUP,
+      ONBOARDING_STATE.STARTED_FIRST_LESSON,
+      ONBOARDING_STATE.FINISHED_FIRST_LESSON,
+      ONBOARDING_STATE.STARTED_SECOND_LESSON,
+      ONBOARDING_STATE.FINISHED_SECOND_LESSON,
+      ONBOARDING_STATE.STARTED_THIRD_LESSON
+    ].includes(clientSession.meta.onboarding) 
+    && !user.skippedIntro()
+  }
     <!-- Maybe show a different continuation screen? -->
     <ContinueFirstCourse />
   {:else}

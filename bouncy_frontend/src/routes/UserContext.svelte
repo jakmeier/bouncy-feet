@@ -444,6 +444,7 @@
 
   const loggedInToApi = $derived(!!pwaAuth.peerTubeToken);
   const isLoggedInToApi = () => loggedInToApi;
+  let hasSkippedIntro = $state(false);
 
   /** @type {UserContextData} */
   const userCtx = {
@@ -465,6 +466,8 @@
         return peerTubeUser;
       })();
     },
+    skippedIntro: () => hasSkippedIntro,
+    setSkippedIntro: (/** @type {boolean} */ yes) => (hasSkippedIntro = yes),
   };
   setContext('user', userCtx);
 
