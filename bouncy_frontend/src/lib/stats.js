@@ -33,9 +33,10 @@ export async function requestNewGuestSession() {
 /**
  * @param {string} endpoint
  * @param {object} options
+ * @param {boolean} [throwError]
  * @returns {Promise<Response|null>}
  */
-export async function apiRequest(endpoint, options = {}) {
+export async function apiRequest(endpoint, options = {}, throwError = false) {
     try {
 
         const response = await fetch(`${PUBLIC_API_BASE}${endpoint}`, {
@@ -57,6 +58,9 @@ export async function apiRequest(endpoint, options = {}) {
         // }
 
         if (!response.ok) {
+            if (throwError) {
+                throw response;
+            }
             const body = await response.text();
             throw new Error(`failed with status ${response.status} ${body}`);
         }
@@ -64,12 +68,15 @@ export async function apiRequest(endpoint, options = {}) {
     } catch (err) {
         // <Temporary code>
         // Some client sessions have been lost. They need to be replaced.
-
         if (err && err.status === 401) {
             throw err;
         }
 
         console.error('apiRequest failed:', err);
+
+        if (throwError) {
+            throw err;
+        }
         return null;
     }
 

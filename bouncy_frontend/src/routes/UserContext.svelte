@@ -48,10 +48,20 @@
     refreshPeerTubeToken,
   });
 
+  function clearErrors() {
+    loginError.title = '';
+    loginError.description = '';
+  }
+
   /** @type {import("$lib/peertube-openapi").User | {}} */
   const peerTubeUser = $state({});
 
   async function refreshPeerTubeToken() {
+    if (loginError.title !== '') {
+      // already has an error, probably doesn't have a session with the API server
+      return;
+    }
+
     const headers = {
       // Set a head even when it's an empty POST.
       // Triggers CORS pre-flight check to reduce CSRF risks.
@@ -64,15 +74,28 @@
       auth: () => pwaAuth.peerTubeToken?.access_token,
     });
 
-    const peerTubeToken = await authenticatedApiRequest(
-      'POST',
-      '/peertube/token',
-      headers,
-      body
-    );
+    try {
+      const peerTubeToken = await authenticatedApiRequest(
+        'POST',
+        '/peertube/token',
+        headers,
+        body
+      );
 
-    if (peerTubeToken) {
-      pwaAuth.peerTubeToken = await peerTubeToken.json();
+      if (peerTubeToken) {
+        pwaAuth.peerTubeToken = await peerTubeToken.json();
+      }
+    } catch (errResponse) {
+      if (errResponse.status == 401) {
+        // unauthorized, probably means we need a login, no reason to show an error
+        return;
+      }
+      loginError.title = 'profile.login-failed';
+      loginError.description = '';
+      console.error(errResponse);
+      if (errResponse.status == 502) {
+        loginError.description = 'profile.login-failed-peertube-down';
+      }
     }
   }
 
@@ -125,6 +148,8 @@
         })
         .catch((err) => {
           console.error('Failed to create a guest session. Error:', err);
+          loginError.title = 'profile.guest-login-failed';
+          loginError.description = 'profile.guest-login-failed-description';
           return {
             id: localStorage.clientSessionId,
             secret: localStorage.clientSessionSecret,
@@ -175,7 +200,7 @@
     };
 
     try {
-      return await apiRequest(path, options);
+      return await apiRequest(path, options, true);
     } catch (errResponse) {
       if (
         (errResponse && errResponse.status === 401) ||
@@ -212,6 +237,8 @@
           body,
         };
         return await apiRequest(path, options);
+      } else {
+        throw errResponse;
       }
     }
   }
@@ -445,6 +472,7 @@
   const loggedInToApi = $derived(!!pwaAuth.peerTubeToken);
   const isLoggedInToApi = () => loggedInToApi;
   let hasSkippedIntro = $state(false);
+  let loginError = $state({ title: '', description: '' });
 
   /** @type {UserContextData} */
   const userCtx = {
@@ -468,6 +496,8 @@
     },
     skippedIntro: () => hasSkippedIntro,
     setSkippedIntro: (/** @type {boolean} */ yes) => (hasSkippedIntro = yes),
+    loginError,
+    clearErrors,
   };
   setContext('user', userCtx);
 

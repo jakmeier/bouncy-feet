@@ -287,6 +287,10 @@
         "requires-login-text": "Logg dich ein oder erstelle jetzt ein gratis Konto.",
         "guest-mode-text": "Du bist im Gastmodus.",
         "login-expired-text": "Dein Login ist abgelaufen.",
+        "login-failed": "Login kaputt :(",
+        "guest-login-failed": "Gastlogin fehlgeschlagen",
+        "guest-login-failed-description": "Der Server will wohl gerade nicht.",
+        "login-failed-peertube-down": "Bouncy Tube reagiert nicht, vielleicht ist die Videoplattform aus.",
         "waiting-for-login-info": "Prüfe deine Logindaten...",
         "consent": {
             "title": "Rangliste beitreten",
@@ -331,6 +335,10 @@
         "by": "von"
     },
     "common": {
-        "hint-popup-title": "Hinweis"
+        "hint-popup-title": "Hinweis",
+        "sorry-error": "Entschuldige bitte die Umstände.",
+        "report-error": "Falls das Problem weiterhin besteht, gib doch bitte Jakob Bescheid. Per Mail an jakob@bouncy-feet.ch.",
+        "go-home-button": "Zur Startseit",
+        "go-to-prev-page-button": "Gehe zurück"
     }
 }

@@ -118,8 +118,16 @@
  * @property {()=>boolean} isLoggedInToApi -- Has an active, non-expired API session. (Reactive $derived state)
  * @property {()=>{}} refreshPeerTubeUser
  * @property {Promise<import("$lib/peertube-openapi").User | undefined>} peerTubeUser
+ * @property {()=>boolean} skippedIntro
+ * @property {(yes: boolean)=>void} setSkippedIntro
+ * @property {BfError} loginError -- only set if login is impossible, otherwise just trigger a login
+ * @property {()=>void} clearErrors
  * 
  *
+ * @typedef {Object} BfError
+ * @property {string} title
+ * @property {string} description
+ * 
  * @typedef {Object} UserLessonProgress
  * @property {LessonProgress[]} lessons
  * 

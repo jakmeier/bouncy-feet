@@ -286,7 +286,11 @@
         "requires-login-title": "Who are you?",
         "requires-login-text": "Log in or create your free account now.",
         "guest-mode-text": "You are in guest mode.",
-        "login-expired-text": "You login has expired.",
+        "login-expired-text": "Your login has expired.",
+        "login-failed": "Login failed :(",
+        "guest-login-failed": "Guest login failed",
+        "guest-login-failed-description": "The server is not responding.",
+        "login-failed-peertube-down": "Bouncy Tube doesn't repond, maybe the video platform is down.",
         "waiting-for-login-info": "Checking your login info...",
         "consent": {
             "title": "Enter leaderboard",
@@ -331,6 +335,10 @@
         "by": "by"
     },
     "common": {
-        "hint-popup-title": "Hint"
+        "hint-popup-title": "Hint",
+        "sorry-error": "Please excuse the trouble.",
+        "report-error": "If the problem persists, please tell Jakob. Write a mail to jakob@bouncy-feet.ch.",
+        "go-home-button": "Back to home",
+        "go-to-prev-page-button": "Back to previous page"
     }
 }

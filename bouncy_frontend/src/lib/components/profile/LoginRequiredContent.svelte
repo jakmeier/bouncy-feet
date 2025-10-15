@@ -5,6 +5,8 @@
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
   import { scaleY } from '$lib/sveltex/xtransition';
+  import { base } from '$app/paths';
+  import { goto } from '$app/navigation';
 
   let { reason, children } = $props();
 
@@ -14,6 +16,8 @@
   let mounted = $state(false);
 
   onMount(async () => {
+    userContext.clearErrors();
+    // TODO: prevent this from firing too often
     if (!userContext.isLoggedInToApi()) {
       try {
         await userContext.pwaAuth.refreshPeerTubeToken();
@@ -31,11 +35,33 @@
 {:else if mounted}
   <div class="overlay" transition:fade={{ delay: 400, duration: 200 }}>
     <div class="wrapper" transition:scaleY={{ delay: 800 }}>
-      <RequiresLogin
-        {reason}
-        username={$user.publicName}
-        openid={$user.openid}
-      />
+      {#if userContext.loginError.title !== ''}
+        <h2>{$t(userContext.loginError.title)}</h2>
+        <div class="error-symbol">
+          <img src="{base}/img/symbols/bf_error.svg" alt="bf_error" />
+        </div>
+        <div class="block">
+          {#if userContext.loginError.description}
+            <div>{$t(userContext.loginError.description)}</div>
+          {/if}
+          <div>{$t('common.sorry-error')}</div>
+        </div>
+        <button onclick={() => history.back()}>
+          {$t('common.go-to-prev-page-button')}
+        </button>
+        <button onclick={() => goto('/')}>
+          {$t('common.go-home-button')}
+        </button>
+        <div class="block">
+          <div>{$t('common.report-error')}</div>
+        </div>
+      {:else}
+        <RequiresLogin
+          {reason}
+          username={$user.publicName}
+          openid={$user.openid}
+        />
+      {/if}
     </div>
   </div>
 {:else}
@@ -66,5 +92,13 @@
     align-items: center;
     text-align: center;
     gap: 10px;
+  }
+
+  .error-symbol img {
+    max-width: 6rem;
+  }
+
+  .block {
+    padding: 1rem 0;
   }
 </style>
