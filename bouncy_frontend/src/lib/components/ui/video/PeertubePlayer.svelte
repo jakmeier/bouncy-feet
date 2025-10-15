@@ -1,7 +1,7 @@
 <script>
   import { base } from '$app/paths';
   import { onMount } from 'svelte';
-  import CornerMarker from '../CornerMarker.svelte';
+  import { getUserContext } from '$lib/context';
 
   /** @typedef {{ time: number, label: string, icon: string }} Marker */
   /**
@@ -21,6 +21,9 @@
     muted = false,
     timeline = false,
   } = $props();
+
+  /** @type {UserContextData} */
+  const userCtx = getUserContext();
 
   let isPlaying = $state(false);
   let duration = $state(0);
@@ -97,6 +100,7 @@
     const { PeerTubePlayer } = await import('@peertube/embed-api');
 
     player = new PeerTubePlayer(iframe);
+    await player.setAuthToken(userCtx.pwaAuth.peerTubeToken?.access_token);
 
     player.addEventListener(
       'playbackStatusChange',

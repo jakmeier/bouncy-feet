@@ -17,7 +17,6 @@
     "test:unit": "vitest",
     "openapi-generate": "openapi-ts -i peertube-openapi.yaml -o src/lib/peertube-openapi",
     "openapi-download": "wget -O peertube-openapi.yaml https://raw.githubusercontent.com/Chocobozzz/PeerTube/refs/heads/develop/support/doc/api/openapi.yaml"
-
   },
   "devDependencies": {
     "@hey-api/openapi-ts": "0.83.1",
@@ -43,7 +42,7 @@
   "type": "module",
   "dependencies": {
     "@mediapipe/tasks-vision": "^0.10.21",
-    "@peertube/embed-api": "^0.2.0",
+    "@peertube/embed-api": "file:../bouncy_tube/PeerTube/client/src/standalone/embed-player-api",
     "jschannel": "^1.0.2",
     "svelte-select": "^5.8.3",
     "sveltekit-i18n": "^2.4.2"
