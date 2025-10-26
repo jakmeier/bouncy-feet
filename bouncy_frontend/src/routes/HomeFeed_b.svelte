@@ -18,6 +18,7 @@
   import DarkSection from '$lib/components/ui/sections/DarkSection.svelte';
   import Clubs from './Clubs.svelte';
   import ClubsContext from '$lib/stores/ClubsContext.svelte';
+  import HomeNote from './HomeNote.svelte';
   /**
    * @typedef {Object} Props
    * @property {any} featuredDances
@@ -48,6 +49,9 @@
   color="var(--theme-neutral-white)"
 ></Background>
 <LogoHeader />
+
+<HomeNote />
+
 <!-- <LogoHeader title={$t('home.slogan-1')} /> -->
 
 <!-- TODO: maybe showcase something here -->

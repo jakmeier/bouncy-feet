@@ -67,7 +67,7 @@
   }
 
   .stats {
-    color: #858585;
+    color: var(--theme-neutral-darker-gray);
     font-size: small;
     display: flex;
     flex-wrap: wrap;

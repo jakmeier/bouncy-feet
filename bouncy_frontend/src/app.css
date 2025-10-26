@@ -20,6 +20,8 @@
     /* This is "cool gray" but two steps darker */
     --theme-neutral-dark-gray: #b3cbc7;
     /* TODO: check if this fits the theme */
+    --theme-neutral-darker-gray: #858585;
+    /* TODO: check if this fits the theme */
     --theme-neutral-almost-black: #1c1c1c;
     /* 
      * #95b6b1
