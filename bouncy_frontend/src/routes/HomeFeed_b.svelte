@@ -16,6 +16,8 @@
   import { getContext, onMount } from 'svelte';
   import Personalities from './Personalities.svelte';
   import DarkSection from '$lib/components/ui/sections/DarkSection.svelte';
+  import Clubs from './Clubs.svelte';
+  import ClubsContext from '$lib/stores/ClubsContext.svelte';
   /**
    * @typedef {Object} Props
    * @property {any} featuredDances
@@ -48,17 +50,17 @@
 <LogoHeader />
 <!-- <LogoHeader title={$t('home.slogan-1')} /> -->
 
-<div>TODO(July): Show random video, not seen yet would be best</div>
-<div>-</div>
-<div>-</div>
-<div>-</div>
-<div>TODO(July): See more like that button</div>
-<button></button>
+<!-- TODO: maybe showcase something here -->
 
-<h2>TODO(July): title</h2>
-<div>
-  {$t('home.slogan-2')}
-</div>
+<DarkSection>
+  <div class="private">
+    <!-- <h2>Psssst...</h2> -->
+    <!-- ...your private places, shared only with your friends. Or just for yourself! -->
+    <ClubsContext>
+      <Clubs />
+    </ClubsContext>
+  </div>
+</DarkSection>
 
 <DarkSection arrow>
   <Personalities></Personalities>
@@ -132,5 +134,9 @@
   .lowered {
     margin-top: 5rem;
     transform: translate(15%, 50%);
+  }
+
+  .private {
+    margin-bottom: 2rem;
   }
 </style>

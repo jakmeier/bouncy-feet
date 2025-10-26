@@ -56,7 +56,7 @@
             coach.title[coachLocale($locale)]
           )}
       >
-        <button> {$t('home.go-button')} </button>
+        <button> {$t('home.more-button')} </button>
       </a>
     </div>
   </div>
