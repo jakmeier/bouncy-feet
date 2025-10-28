@@ -117,6 +117,7 @@ async fn main() -> anyhow::Result<()> {
     // bottom-to-top order for router
     let unauthenticated_app = Router::new()
         .route("/", get(root))
+        .route("/clubs", get(api_endoints::club::clubs))
         .route(
             "/new_guest_session",
             get(api_endoints::client_session::create_guest_session),
@@ -131,6 +132,7 @@ async fn main() -> anyhow::Result<()> {
         .route("/login", get(api_endoints::auth::login))
         .layer(login_service)
         .route("/peertube/token", post(peertube_token_exchange))
+        .route("/clubs/joined", get(api_endoints::club::my_clubs))
         .route("/user", get(api_endoints::user::user_info))
         .route("/user/meta", get(api_endoints::user_meta::metadata))
         .route(

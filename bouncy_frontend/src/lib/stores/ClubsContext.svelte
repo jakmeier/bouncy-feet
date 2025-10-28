@@ -1,6 +1,7 @@
 <script>
   import { onMount, setContext } from 'svelte';
   import { clubsData, loadMyClubs } from './Clubs.svelte';
+  import { getUserContext } from '$lib/context';
 
   /**
    * @typedef {Object} Props
@@ -14,8 +15,10 @@
     clubsData,
   });
 
+  const userCtx = getUserContext();
+
   onMount(async () => {
-    await loadMyClubs();
+    await loadMyClubs(userCtx);
   });
 </script>
 

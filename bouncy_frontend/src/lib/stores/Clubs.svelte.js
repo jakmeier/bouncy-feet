@@ -15,11 +15,21 @@ export const clubsData = $state({
     // lastUpdated: 
 })
 
-export async function loadMyClubs() {
-    // TODO: load from API
-    // Idee: EA Shufflers zuerst, später ev SG Shuffler, oder direkt Swiss Shufflers?
+/**
+ * @param {UserContextData} userCtx
+ */
+export async function loadMyClubs(userCtx) {
+    const response = await userCtx.authenticatedGet("/clubs/joined");
+    /** @type { {clubs: Club[]} } */
+    const data = await response?.json();
     clubsData.mine = [];
-    clubsData.mine.push(...mockData());
+    // clubsData.mine.push(...data.clubs);
+    for (let club of data.clubs) {
+        const defaultValues = mockCourseBase("Default");
+        const completeClub = Object.assign(defaultValues, club)
+        clubsData.mine.push(completeClub);
+    }
+    // clubsData.mine.push(...mockData());
 }
 
 /** @returns {Club[]} */
@@ -65,7 +75,7 @@ function mockCourseBase(name, mainColor, secondaryColor) {
             }
         },
         stats: {
-            members: 77,
+            members: 0,
         },
         peertubePlaylist: {}
     };

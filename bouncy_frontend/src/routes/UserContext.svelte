@@ -494,6 +494,7 @@
         return peerTubeUser;
       })();
     },
+    authenticatedGet,
     skippedIntro: () => hasSkippedIntro,
     setSkippedIntro: (/** @type {boolean} */ yes) => (hasSkippedIntro = yes),
     loginError,
