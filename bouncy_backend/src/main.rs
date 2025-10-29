@@ -1,6 +1,6 @@
 use crate::api_endoints::peertube_token::{self, peertube_token_exchange};
 use crate::layers::oidc::{oidc_auth_layer, oidc_login_layer};
-use crate::layers::session::in_memory_cookie_session_layer;
+use crate::layers::session::pg_backed_cookie_session_layer;
 use axum::error_handling::HandleErrorLayer;
 use axum::http::header;
 use axum::http::{HeaderValue, Method, StatusCode};
@@ -73,7 +73,7 @@ async fn main() -> anyhow::Result<()> {
     };
 
     let user_service = middleware::from_fn_with_state(state.clone(), layers::user::user_lookup);
-    let session_layer = in_memory_cookie_session_layer(&state.app_url);
+    let session_layer = pg_backed_cookie_session_layer(&state.app_url, state.pg_db_pool.clone());
     let login_layer = oidc_login_layer();
     let auth_layer = oidc_auth_layer(
         &parsed_api_url,

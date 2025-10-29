@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO http_sessions (id, expiry_date, session_data) \n            VALUES($1, $2, $3);\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Timestamp",
+        "Jsonb"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "ce111c124d1d1bc015f399292c22ba071de0c4c97fbf326c3f8e6c9f6a98f2ae"
+}

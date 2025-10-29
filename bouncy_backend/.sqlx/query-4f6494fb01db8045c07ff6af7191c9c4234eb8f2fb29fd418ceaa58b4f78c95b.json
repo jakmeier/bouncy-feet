@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE http_sessions\n            SET (expiry_date, session_data) = ($2, $3)\n            WHERE id = $1;\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Timestamp",
+        "Jsonb"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "4f6494fb01db8045c07ff6af7191c9c4234eb8f2fb29fd418ceaa58b4f78c95b"
+}
