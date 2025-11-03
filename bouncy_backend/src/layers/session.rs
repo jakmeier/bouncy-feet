@@ -65,7 +65,7 @@ fn cookie_session_layer<STORE: SessionStore>(
 #[async_trait]
 impl SessionStore for PgSessionStore {
     async fn create(&self, record: &mut Record) -> Result<()> {
-        let (id, expiry_date, data) = extract_column_values(&record)?;
+        let (id, expiry_date, data) = extract_column_values(record)?;
         // TODO: consider retrying on collision
         sqlx::query!(
             r#"
@@ -84,7 +84,7 @@ impl SessionStore for PgSessionStore {
     }
 
     async fn save(&self, record: &Record) -> Result<()> {
-        let (id, expiry_date, data) = extract_column_values(&record)?;
+        let (id, expiry_date, data) = extract_column_values(record)?;
         sqlx::query!(
             r#"
             UPDATE http_sessions
@@ -116,14 +116,15 @@ impl SessionStore for PgSessionStore {
         .map_err(to_tower_session_error)?;
 
         if let Some(row) = row {
-            let data: HashMap<String, serde_json::Value> = if let Some(raw_data) = row.session_data {
+            let data: HashMap<String, serde_json::Value> = if let Some(raw_data) = row.session_data
+            {
                 serde_json::from_value(raw_data).map_err(|e| Error::Decode(e.to_string()))?
             } else {
                 HashMap::new()
             };
 
             Ok(Some(Record {
-                id: session_id.clone(),
+                id: *session_id,
                 data,
                 expiry_date: OffsetDateTime::from_unix_timestamp(
                     row.expiry_date.and_utc().timestamp(),
