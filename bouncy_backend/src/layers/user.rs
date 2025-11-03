@@ -34,10 +34,32 @@ use axum_oidc::OidcClaims;
 use serde_json::json;
 use uuid::Uuid;
 
-// Wrapper to differentiate between User handlers that optionally want a User, a
-// those that want an explicit MaybeUser returned by user_lookup.
+#[derive(thiserror::Error, Debug, Clone)]
+enum UserAuthError {
+    #[error("must provide auth information")]
+    NoAuthProvided,
+    #[error("auth header must be a string")]
+    BadAuthHeader,
+    #[error("only guests can use client session login")]
+    ClientSessionLoginNotAllow,
+    #[error("client session belongs to a different user")]
+    ClientSessionOfDifferentUser,
+    #[error("client session header is not formatted correctly")]
+    ClientSessionHeaderMalformed,
+    #[error("secret is not a valid Uuid, {0}")]
+    ClientSessionSecretMalformed(uuid::Error),
+    #[error("user not found")]
+    UserNotFound,
+    #[error("failed parsing sub UUID, {0}")]
+    SubjectParsingFailed(uuid::Error),
+    #[error("DB query encountered an error, {0}")]
+    DbError(String, &'static str),
+}
+
+// Wrapper to differentiate between User handlers that optionally want a User,
+// and those that want an explicit MaybeUser returned by user_lookup.
 #[derive(Clone, Debug)]
-struct MaybeUser(Option<User>);
+struct MaybeUser(Result<User, UserAuthError>);
 
 /// Middleware to lookup user or create it lazily from an OIDC claim.
 ///
@@ -49,25 +71,24 @@ pub async fn user_lookup(
     next: Next,
 ) -> Response {
     let auth_headers = &req.headers().get_all("Authorization");
-    let maybe_user = match try_get_user(&state, auth_headers, maybe_claims).await {
+    let maybe_user = try_get_user(&state, auth_headers, maybe_claims).await;
+
+    // Add user info to logs
+    match &maybe_user {
         Ok(user) => {
             let user_id = &user.id;
-            // Add user info to logs
             tracing::Span::current().record("user_id", tracing::field::display(user_id));
-            // Attach user for downstream handlers
-            Some(user)
         }
-        Err(response) => {
-            // Continue without user info.
-            // `require_user_service` will catch it as an error later for protecetd routes.
-            // But the login route must work without user info.
+        Err(err) => {
             tracing::Span::current().record("user_id", tracing::field::display("?"));
-            tracing::debug!(err = ?response);
-            None
+            tracing::debug!(user_err = ?err);
         }
-    };
-    req.extensions_mut().insert(MaybeUser(maybe_user));
+    }
 
+    // Continue with or without user info.
+    // `require_user_service` will catch it as an error later for protecetd routes.
+    // But the login route must work without user info.
+    req.extensions_mut().insert(MaybeUser(maybe_user));
     next.run(req).await
 }
 
@@ -75,30 +96,30 @@ pub async fn user_lookup(
 pub async fn require_user_service(mut req: Request, next: Next) -> Response {
     let extensions = req.extensions_mut();
     let Some(MaybeUser(optional_user)) = extensions.get::<MaybeUser>() else {
-        return internal_error_response(
-            "Route requires user but user_lookup didn't run",
-            "user lookup failed",
-        );
+        tracing::error!("Route requires user but user_lookup didn't run",);
+        return internal_error_response("user lookup failed");
     };
-    let Some(user) = optional_user else {
-        return StatusCode::UNAUTHORIZED.into_response();
-    };
-    extensions.insert(user.clone());
 
-    next.run(req).await
+    match optional_user {
+        Ok(user) => {
+            extensions.insert(user.clone());
+            next.run(req).await
+        }
+        Err(e) => e.to_response(),
+    }
 }
 
 async fn try_get_user(
     state: &AppState,
     auth_headers: &GetAll<'_, HeaderValue>,
     maybe_claims: Option<OidcClaims<AdditionalClaims>>,
-) -> Result<User, Response> {
+) -> Result<User, UserAuthError> {
     if let Some((client_session_id, client_session_secret)) =
         client_session_credentials_from_headers(auth_headers)?
     {
         let maybe_user =
             User::lookup_by_client_secret(state, client_session_id, client_session_secret).await;
-        let user = maybe_user.ok_or_else(|| auth_error_response("User not found"))?;
+        let user = maybe_user.ok_or(UserAuthError::UserNotFound)?;
         // Need to check consistency between user based on client_session and based on claims
         if let Some(user_oidc_sub) = user.oidc_subject {
             validate_existing_oidc_user_matches_claims(
@@ -114,7 +135,7 @@ async fn try_get_user(
         // this will lazily create the user if necessary
         Ok(User::lookup_by_oidc_or_create(state, claims).await)
     } else {
-        auth_error("No user found")
+        Err(UserAuthError::NoAuthProvided)
     }
 }
 
@@ -122,7 +143,7 @@ async fn validate_guest_user_matches_claims(
     state: &AppState,
     maybe_claims: &Option<OidcClaims<axum_oidc::EmptyAdditionalClaims>>,
     mut user: User,
-) -> Result<User, Response> {
+) -> Result<User, UserAuthError> {
     if let Some(claims) = maybe_claims {
         if let Some(existing_user) = User::try_lookup_by_oidc(state, claims).await {
             // Flow C: Guest into existing user
@@ -132,15 +153,14 @@ async fn validate_guest_user_matches_claims(
                 existing_user.id.clone(),
             )
             .await;
-            res.map_err(|err| internal_error_response(err, "transferring client session failed"))?;
+            res.map_err(|err| UserAuthError::db_error(err, "transferring client session failed"))?;
             Ok(existing_user)
         } else {
             // Flow A: Guest into new full user
-            let sub = Uuid::parse_str(claims.subject().as_str()).map_err(|err| {
-                internal_error_response(err, "encountered invalids sub, must be uuid")
-            })?;
+            let sub = Uuid::parse_str(claims.subject().as_str())
+                .map_err(UserAuthError::SubjectParsingFailed)?;
             let db_result = user.add_oidc(state, sub).await;
-            db_result.map_err(|err| internal_error_response(err, "adding oidc to user failed"))?;
+            db_result.map_err(|err| UserAuthError::db_error(err, "adding oidc to user failed"))?;
             Ok(user)
         }
     } else {
@@ -155,7 +175,7 @@ fn validate_existing_oidc_user_matches_claims(
     maybe_claims: &Option<OidcClaims<axum_oidc::EmptyAdditionalClaims>>,
     user: User,
     existing_user_oidc_sub: String,
-) -> Result<User, Response> {
+) -> Result<User, UserAuthError> {
     if let Some(claims) = maybe_claims {
         if claims.subject().as_str() == existing_user_oidc_sub {
             // This user has a OIDC user and is logged in with the same OIDC user.
@@ -163,13 +183,13 @@ fn validate_existing_oidc_user_matches_claims(
         } else {
             // Flow D: Log in to wrong account
             // TODO: How to handle this case where an owned session by user A then logs in to user B?
-            auth_error("Invalid user for this client session")
+            Err(UserAuthError::ClientSessionOfDifferentUser)
         }
     } else {
         // The user has a Keycloak user but is currently trying to log in with the guest credentials.
         // This is not allowed, the user must be forced to log in.
         tracing::warn!(?user, "Full user tried logging in with guest credentials");
-        Err(force_login_response())
+        Err(UserAuthError::ClientSessionLoginNotAllow)
     }
 }
 
@@ -197,18 +217,16 @@ fn force_login_response() -> Response {
         .into_response()
 }
 
-// TODO: Fix clippy warning
-#[allow(clippy::result_large_err)]
 fn client_session_credentials_from_headers(
     auth_headers: &GetAll<HeaderValue>,
-) -> Result<Option<(i64, Uuid)>, Response> {
+) -> Result<Option<(i64, Uuid)>, UserAuthError> {
     // let headers = req.headers().get_all("Authorization");
     for auth_value in auth_headers {
         // Expected format: "ClientSession 1234:550e8400-e29b-41d4-a716-446655440000"
         let prefix = "ClientSession ";
 
         let Ok(str_auth_value) = auth_value.to_str() else {
-            return auth_error("Authorization header is no string");
+            return Err(UserAuthError::BadAuthHeader);
         };
 
         if !str_auth_value.starts_with(prefix) {
@@ -218,29 +236,22 @@ fn client_session_credentials_from_headers(
         let rest = &str_auth_value[prefix.len()..];
         let mut parts = rest.splitn(2, ':');
         let Some(id_str) = parts.next() else {
-            return auth_error("Invalid auth format");
+            return Err(UserAuthError::ClientSessionHeaderMalformed);
         };
         let Some(secret_str) = parts.next() else {
-            return auth_error("Invalid auth format");
+            return Err(UserAuthError::ClientSessionHeaderMalformed);
         };
 
         let Ok(client_session_id) = id_str.parse::<i64>() else {
-            return auth_error("Invalid auth format");
+            return Err(UserAuthError::ClientSessionHeaderMalformed);
         };
 
-        let Ok(client_session_secret) = Uuid::parse_str(secret_str) else {
-            return auth_error("Invalid auth secret format");
-        };
+        let client_session_secret =
+            Uuid::parse_str(secret_str).map_err(UserAuthError::ClientSessionSecretMalformed)?;
 
         return Ok(Some((client_session_id, client_session_secret)));
     }
     Ok(None)
-}
-
-// TODO: Fix clippy warning
-#[allow(clippy::result_large_err)]
-fn auth_error<T>(msg: &'static str) -> Result<T, Response> {
-    Err(auth_error_response(msg))
 }
 
 fn auth_error_response(msg: &'static str) -> Response {
@@ -250,10 +261,46 @@ fn auth_error_response(msg: &'static str) -> Response {
         .expect("response builder should succeed")
 }
 
-fn internal_error_response<E: std::fmt::Display>(err: E, msg: &'static str) -> Response {
-    tracing::error!(%err, "internal error");
+fn internal_error_response(msg: &'static str) -> Response {
     Response::builder()
         .status(StatusCode::INTERNAL_SERVER_ERROR)
         .body(msg.into())
         .expect("response builder should succeed")
+}
+
+fn bad_request_response(msg: &'static str) -> Response {
+    Response::builder()
+        .status(StatusCode::BAD_REQUEST)
+        .body(msg.into())
+        .expect("response builder should succeed")
+}
+
+impl UserAuthError {
+    fn db_error(err: sqlx::Error, msg: &'static str) -> Self {
+        UserAuthError::DbError(format!("{err:?}"), msg)
+    }
+
+    fn to_response(&self) -> axum::http::Response<axum::body::Body> {
+        use UserAuthError::*;
+        match self {
+            NoAuthProvided => force_login_response(),
+            ClientSessionLoginNotAllow => auth_error_response("ClientSessionLoginNotAllow"),
+            ClientSessionOfDifferentUser => auth_error_response("ClientSessionOfDifferentUser"),
+            BadAuthHeader => bad_request_response("BadAuthHeader"),
+            ClientSessionHeaderMalformed => bad_request_response("ClientSessionHeaderMalformed"),
+            ClientSessionSecretMalformed(error) => {
+                tracing::warn!("ClientSessionSecretMalformed: {error}");
+                bad_request_response("ClientSessionSecretMalformed")
+            }
+            SubjectParsingFailed(error) => {
+                tracing::warn!("SubjectParsingFailed: {error}");
+                bad_request_response("SubjectParsingFailed")
+            }
+            UserNotFound => auth_error_response("UserNotFound"),
+            DbError(err, msg) => {
+                tracing::warn!("{msg}, DbError: {err}");
+                internal_error_response("InternalDbError")
+            }
+        }
+    }
 }
