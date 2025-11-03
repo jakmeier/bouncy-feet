@@ -102,6 +102,7 @@ async fn main() -> anyhow::Result<()> {
     let auth_service = ServiceBuilder::new()
         .layer(session_layer)
         .layer(HandleErrorLayer::new(|e: MiddlewareError| async {
+            tracing::warn!("Auth layer: {:?}", e);
             e.into_response()
         }))
         .layer(auth_layer)
@@ -110,6 +111,7 @@ async fn main() -> anyhow::Result<()> {
     // top-to-bottom order for service builder
     let login_service = ServiceBuilder::new()
         .layer(HandleErrorLayer::new(|e: MiddlewareError| async {
+            tracing::warn!("Login layer: {:?}", e);
             e.into_response()
         }))
         .layer(login_layer);
@@ -125,12 +127,16 @@ async fn main() -> anyhow::Result<()> {
         .route("/stats", get(api_endoints::stats::stats));
 
     // bottom-to-top order for router
-    let authenticated_app = Router::new()
-        // The login server only apples on this specific route.
-        // This forwards to Keycloak, while all other routes
-        // will return an UNAUTHORIZED response.
+    let login_route = Router::new()
+        // The login service only applies on this specific route.
+        // It forwards to Keycloak.
         .route("/login", get(api_endoints::auth::login))
-        .layer(login_service)
+        .layer(login_service);
+
+    // bottom-to-top order for router
+    // All protected routes will return an UNAUTHORIZED response if
+    // authentication fails.
+    let protected_app = Router::new()
         .route("/peertube/token", post(peertube_token_exchange))
         .route("/clubs/joined", get(api_endoints::club::my_clubs))
         .route("/user", get(api_endoints::user::user_info))
@@ -143,6 +149,14 @@ async fn main() -> anyhow::Result<()> {
             "/new_guest_activity",
             post(api_endoints::client_session::record_guest_activity),
         )
+        .layer(axum::middleware::from_fn(
+            layers::user::require_user_service,
+        ));
+
+    // auth_service must run before protected routes as well as login
+    let authenticated_app = Router::new()
+        .merge(login_route)
+        .merge(protected_app)
         .layer(auth_service);
 
     // bottom-to-top order for router
@@ -174,7 +188,7 @@ fn internal_error<E>(err: E) -> (StatusCode, String)
 where
     E: std::error::Error,
 {
-    eprintln!("Internal error: {:?}", err);
+    tracing::error!("Internal error: {:?}", err);
     (StatusCode::INTERNAL_SERVER_ERROR, err.to_string())
 }
 

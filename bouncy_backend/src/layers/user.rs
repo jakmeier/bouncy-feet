@@ -34,7 +34,14 @@ use axum_oidc::OidcClaims;
 use serde_json::json;
 use uuid::Uuid;
 
-// Middleware to lookup user or create it lazily from an OIDC claim.
+// Wrapper to differentiate between User handlers that optionally want a User, a
+// those that want an explicit MaybeUser returned by user_lookup.
+#[derive(Clone, Debug)]
+struct MaybeUser(Option<User>);
+
+/// Middleware to lookup user or create it lazily from an OIDC claim.
+///
+/// Sets `MaybeUser`.
 pub async fn user_lookup(
     State(state): State<AppState>,
     maybe_claims: Option<OidcClaims<AdditionalClaims>>,
@@ -42,22 +49,41 @@ pub async fn user_lookup(
     next: Next,
 ) -> Response {
     let auth_headers = &req.headers().get_all("Authorization");
-    match try_get_user(&state, auth_headers, maybe_claims).await {
+    let maybe_user = match try_get_user(&state, auth_headers, maybe_claims).await {
         Ok(user) => {
             let user_id = &user.id;
             // Add user info to logs
             tracing::Span::current().record("user_id", tracing::field::display(user_id));
             // Attach user for downstream handlers
-            req.extensions_mut().insert(user);
+            Some(user)
         }
         Err(response) => {
             // Continue without user info.
-            // Routes that require it will fail.
+            // `require_user_service` will catch it as an error later for protecetd routes.
             // But the login route must work without user info.
             tracing::Span::current().record("user_id", tracing::field::display("?"));
             tracing::debug!(err = ?response);
+            None
         }
-    }
+    };
+    req.extensions_mut().insert(MaybeUser(maybe_user));
+
+    next.run(req).await
+}
+
+/// Middleware to enforce a user has been authenticated.
+pub async fn require_user_service(mut req: Request, next: Next) -> Response {
+    let extensions = req.extensions_mut();
+    let Some(MaybeUser(optional_user)) = extensions.get::<MaybeUser>() else {
+        return internal_error_response(
+            "Route requires user but user_lookup didn't run",
+            "user lookup failed",
+        );
+    };
+    let Some(user) = optional_user else {
+        return StatusCode::UNAUTHORIZED.into_response();
+    };
+    extensions.insert(user.clone());
 
     next.run(req).await
 }
@@ -142,6 +168,7 @@ fn validate_existing_oidc_user_matches_claims(
     } else {
         // The user has a Keycloak user but is currently trying to log in with the guest credentials.
         // This is not allowed, the user must be forced to log in.
+        tracing::warn!(?user, "Full user tried logging in with guest credentials");
         Err(force_login_response())
     }
 }

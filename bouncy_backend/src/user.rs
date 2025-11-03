@@ -6,10 +6,10 @@ use crate::client_session::ClientSessionId;
 use crate::layers::oidc::AdditionalClaims;
 use crate::AppState;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct UserId(i64);
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct User {
     pub id: UserId,
     pub oidc_subject: Option<Uuid>,
