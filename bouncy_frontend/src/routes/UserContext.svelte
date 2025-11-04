@@ -3,7 +3,7 @@
    * Provides access to a user local storage
    */
   import { browser } from '$app/environment';
-  import { requestNewGuestSession, apiRequest } from '$lib/stats';
+  import { requestNewGuestSession, apiRequest, API_ERROR } from '$lib/stats';
   import { generateRandomUsername } from '$lib/username';
   import { onMount, setContext } from 'svelte';
   import { writable } from 'svelte/store';
@@ -200,45 +200,58 @@
     };
 
     try {
-      return await apiRequest(path, options, true);
-    } catch (errResponse) {
-      if (
-        (errResponse && errResponse.status === 401) ||
-        errResponse.status == 403
-      ) {
-        // <Temporary code>
-        // Some client sessions have been lost. They need to be replaced.
+      return await apiRequest(path, options);
+    } catch (e) {
+      // @ts-ignore
+      const errName = e?.name;
+      switch (errName) {
+        case API_ERROR.UserNotFound: {
+          // An older version may have lost the client session server-side. Use
+          // local client state to recreate it with a new client session.
+          // TODO: Remove this after a few updates, as this shouldn't be necessary
+          // with the new code working.
 
-        // try to get a new session
-        const newSession = await requestNewGuestSession();
+          // try to get a new session
+          const newSession = await requestNewGuestSession();
 
-        // replace local session id and secret but keep other fields
-        console.warn('replacing old session with a new');
-        localStorage.clientSessionId = newSession.client_session_id;
-        localStorage.clientSessionSecret = newSession.client_session_secret;
-        clientSession.id = newSession.client_session_id;
-        clientSession.secret = newSession.client_session_secret;
+          // replace local session id and secret but keep other fields
+          console.warn('replacing old session with a new');
+          localStorage.clientSessionId = newSession.client_session_id;
+          localStorage.clientSessionSecret = newSession.client_session_secret;
+          clientSession.id = newSession.client_session_id;
+          clientSession.secret = newSession.client_session_secret;
 
-        // now update the server about our local state
-        for (const [key, value] of Object.entries(clientSession.meta)) {
-          if (typeof key === 'string' && typeof value === 'string') {
-            setUserMeta(key, value);
+          // now update the server about our local state
+          for (const [key, value] of Object.entries(clientSession.meta)) {
+            if (typeof key === 'string' && typeof value === 'string') {
+              setUserMeta(key, value);
+            }
           }
-        }
 
-        // now we can try to make the unauthorized request again, with new auth headers
-        let auth = authHeader();
-        const options = {
-          method,
-          headers: {
-            ...headers,
-            ...auth,
-          },
-          body,
-        };
-        return await apiRequest(path, options);
-      } else {
-        throw errResponse;
+          // now we can try to make the unauthorized request again, with new auth headers
+          let auth = authHeader();
+          const options = {
+            method,
+            headers: {
+              ...headers,
+              ...auth,
+            },
+            body,
+          };
+          return await apiRequest(path, options);
+        }
+        case API_ERROR.ClientSessionLoginNotAllow: {
+          // Must use keycloak login.
+          // TODO: update auth header in general, then check if I can mark it as "always use oauth" when this error is returned
+        }
+        case API_ERROR.ClientSessionOfDifferentUser: {
+          // TODO: Need user input to resolve.
+          // Did the user mean to login to a different account?
+          // What happens to locally stored data?
+          break;
+        }
+        default:
+          throw e;
       }
     }
   }

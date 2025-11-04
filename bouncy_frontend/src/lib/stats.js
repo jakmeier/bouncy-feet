@@ -33,48 +33,43 @@ export async function requestNewGuestSession() {
 /**
  * @param {string} endpoint
  * @param {object} options
- * @param {boolean} [throwError]
  * @returns {Promise<Response|null>}
  */
-export async function apiRequest(endpoint, options = {}, throwError = false) {
+export async function apiRequest(endpoint, options = {}) {
     try {
-
         const response = await fetch(`${PUBLIC_API_BASE}${endpoint}`, {
             ...options,
             credentials: 'include', // Include cookies in the request
         });
 
-        // <Temporary code>
-        // Some client sessions have been lost. They need to be replaced.
-        if (response.status === 401 || response.status == 403) {
-            throw response;
-        }
-
-        // TODO: add this back in when users are properly implemented
-        // if (response.status === 401 || response.headers.get('WWW-Authenticate')) {
-        //     // If unauthorized, redirect to the login endpoint on the api server
-        //     window.location.href = loginUrl;
-        //     return response;
-        // }
-
         if (!response.ok) {
-            if (throwError) {
-                throw response;
-            }
             const body = await response.text();
-            throw new Error(`failed with status ${response.status} ${body}`);
+
+            switch (body) {
+                case API_ERROR.UserNotFound: {
+                    // Some client sessions have been lost. They need to be replaced. Bubbling up.
+                    throw { name: body };
+                }
+                case API_ERROR.ClientSessionLoginNotAllow: {
+                    // Must use keycloak login. Bubbling up.
+                    throw { name: body };
+                }
+                case API_ERROR.ClientSessionOfDifferentUser: {
+                    // The locally stored data is for a different user. Bubbling up.
+                    throw { name: body };
+                }
+                default: {
+                    throw new Error(`failed with status ${response.status} ${body}`);
+                }
+            }
         }
         return response;
     } catch (err) {
-        // <Temporary code>
-        // Some client sessions have been lost. They need to be replaced.
-        if (err && err.status === 401) {
-            throw err;
-        }
-
         console.error('apiRequest failed:', err);
 
-        if (throwError) {
+        // bubble up named errors
+        // @ts-ignore
+        if (err.name) {
             throw err;
         }
         return null;
@@ -153,4 +148,20 @@ export function totalExperienceForLevel(level) {
         const cubed = squared * level;
         return 225 + 2.5 * (2 * cubed + 3 * squared + level);
     }
+}
+
+/**
+ * @typedef {string} ApiError
+ * @enum {ApiError}
+ */
+export const API_ERROR = {
+    NoAuthProvided: "NoAuthProvided",
+    BadAuthHeader: "BadAuthHeader",
+    ClientSessionLoginNotAllow: "ClientSessionLoginNotAllow",
+    ClientSessionOfDifferentUser: "ClientSessionOfDifferentUser",
+    ClientSessionHeaderMalformed: "ClientSessionHeaderMalformed",
+    ClientSessionSecretMalformed: "ClientSessionSecretMalformed",
+    UserNotFound: "UserNotFound",
+    SubjectParsingFailed: "SubjectParsingFailed",
+    DbError: "DbError",
 }
