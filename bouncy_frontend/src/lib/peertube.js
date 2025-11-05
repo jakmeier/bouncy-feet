@@ -31,8 +31,9 @@ export async function fetchVideosOfPlaylist(playlistId, start = 0, count = 20) {
     const { response, data } = await getVideoPlaylistVideos(options);
 
     if (!response.ok) {
-        const error = await response.text();
-        throw new Error(`Fetch videos failed: ${response.status} ${error}`);
+        //  Body has already been consumed...
+        // const error = await response.text();
+        throw new Error(`Fetch videos failed: ${response.status}`);
     }
 
     if (!data) {

@@ -1,7 +1,5 @@
 import { PUBLIC_API_BASE } from '$env/static/public';
 
-const loginUrl = PUBLIC_API_BASE + "/auth";
-
 /** @param {string} path */
 async function apiGetRequest(path) {
     const apiUrl = PUBLIC_API_BASE + path;
@@ -33,48 +31,75 @@ export async function requestNewGuestSession() {
 /**
  * @param {string} endpoint
  * @param {object} options
- * @returns {Promise<Response|null>}
+ * @returns {Promise<ApiResponse>}
  */
 export async function apiRequest(endpoint, options = {}) {
+    let response;
     try {
-        const response = await fetch(`${PUBLIC_API_BASE}${endpoint}`, {
+        response = await fetch(`${PUBLIC_API_BASE}${endpoint}`, {
             ...options,
             credentials: 'include', // Include cookies in the request
         });
-
-        if (!response.ok) {
-            const body = await response.text();
-
-            switch (body) {
-                case API_ERROR.UserNotFound: {
-                    // Some client sessions have been lost. They need to be replaced. Bubbling up.
-                    throw { name: body };
-                }
-                case API_ERROR.ClientSessionLoginNotAllow: {
-                    // Must use keycloak login. Bubbling up.
-                    throw { name: body };
-                }
-                case API_ERROR.ClientSessionOfDifferentUser: {
-                    // The locally stored data is for a different user. Bubbling up.
-                    throw { name: body };
-                }
-                default: {
-                    throw new Error(`failed with status ${response.status} ${body}`);
-                }
-            }
-        }
-        return response;
-    } catch (err) {
-        console.error('apiRequest failed:', err);
-
-        // bubble up named errors
-        // @ts-ignore
-        if (err.name) {
-            throw err;
-        }
-        return null;
+    }
+    catch (err) {
+        console.error('apiRequest fetch failed:', err);
+        return {
+            error: `Unknown fetch error ${err}`,
+        };
     }
 
+    if (response.ok) {
+        return {
+            okResponse: response
+        };
+    } else {
+        const body = await response.text();
+
+        switch (body) {
+            case API_ERROR.UserNotFound: {
+                // Some client sessions have been lost. They need to be replaced. Bubbling up.
+                return {
+                    error: body,
+                    errorBody: body
+                };
+            }
+            case API_ERROR.ClientSessionLoginNotAllow: {
+                // Must use keycloak login. Bubbling up.
+                return {
+                    error: body,
+                    errorBody: body
+                };
+            }
+            case API_ERROR.ClientSessionOfDifferentUser: {
+                // The locally stored data is for a different user. Bubbling up.
+                return {
+                    error: body,
+                    errorBody: body
+                };
+            }
+        }
+
+        if (response.status === 401 || response.headers.get('WWW-Authenticate')) {
+            // If unauthorized, need to redirect to the login endpoint on the api server.
+            // Let the caller know to handle the redirect there.
+            return {
+                error: API_ERROR.NeedLogin,
+            };
+        }
+
+        if (response.status === 502) {
+            // Keycloak or Peertube or some other gateway is down.
+            return {
+                error: API_ERROR.BadGateway,
+            };
+        }
+
+        return {
+            error: `Unknown ${response.status} error`,
+            errorBody: body
+        };
+
+    }
 }
 
 // This code is not UI or in any way browser API related, so it shouldn't really
@@ -151,10 +176,16 @@ export function totalExperienceForLevel(level) {
 }
 
 /**
+ * @typedef {Object} ApiResponse
+ * @property {API_ERROR} [error]
+ * @property {string} [errorBody]
+ * @property {Response} [okResponse]
+ * 
  * @typedef {string} ApiError
  * @enum {ApiError}
  */
 export const API_ERROR = {
+    // directly from server
     NoAuthProvided: "NoAuthProvided",
     BadAuthHeader: "BadAuthHeader",
     ClientSessionLoginNotAllow: "ClientSessionLoginNotAllow",
@@ -164,4 +195,8 @@ export const API_ERROR = {
     UserNotFound: "UserNotFound",
     SubjectParsingFailed: "SubjectParsingFailed",
     DbError: "DbError",
+    // not directly from server
+    NeedLogin: "NeedLogin",
+    BadGateway: "BadGateway",
+    UnknownClientError: "UnknownClientError",
 }

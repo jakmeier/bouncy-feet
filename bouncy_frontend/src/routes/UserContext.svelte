@@ -75,27 +75,26 @@
     });
 
     try {
-      const peerTubeToken = await authenticatedApiRequest(
+      const response = await authenticatedApiRequest(
         'POST',
         '/peertube/token',
         headers,
         body
       );
 
-      if (peerTubeToken) {
-        pwaAuth.peerTubeToken = await peerTubeToken.json();
-      }
-    } catch (errResponse) {
-      if (errResponse.status == 401) {
-        // unauthorized, probably means we need a login, no reason to show an error
+      if (response.okResponse) {
+        pwaAuth.peerTubeToken = await response.okResponse.json();
+      } else if (response.error !== API_ERROR.NeedLogin) {
+        loginError.title = 'profile.login-failed';
+        loginError.description = '';
+        console.error(response.error);
+        if (response.error === API_ERROR.BadGateway) {
+          loginError.description = 'profile.login-failed-peertube-down';
+        }
         return;
       }
-      loginError.title = 'profile.login-failed';
-      loginError.description = '';
-      console.error(errResponse);
-      if (errResponse.status == 502) {
-        loginError.description = 'profile.login-failed-peertube-down';
-      }
+    } catch (err) {
+      console.error('unexpected error calling authenticatedApiRequest', err);
     }
   }
 
@@ -175,7 +174,11 @@
    * @returns {Promise<Response | null | undefined>}
    */
   async function authenticatedGet(path) {
-    return await authenticatedApiRequest('GET', path, {}, undefined);
+    const result = await authenticatedApiRequest('GET', path, {}, undefined);
+    if (result?.okResponse) {
+      return result.okResponse;
+    }
+    console.warn('get failed', result);
   }
 
   /**
@@ -183,6 +186,7 @@
    * @param {string} path
    * @param {object} headers
    * @param {string|undefined} body
+   * @returns {Promise<import('$lib/stats').ApiResponse>}
    */
   async function authenticatedApiRequest(method, path, headers, body) {
     let auth = authHeader();
@@ -199,12 +203,15 @@
       body,
     };
 
-    try {
-      return await apiRequest(path, options);
-    } catch (e) {
-      // @ts-ignore
-      const errName = e?.name;
-      switch (errName) {
+    const result = await apiRequest(path, options);
+
+    if (result.error || result.errorBody) {
+      console.error('result', result);
+      switch (result.error) {
+        case API_ERROR.NeedLogin: {
+          // bubble up, RequiresLogin should handle this
+          break;
+        }
         case API_ERROR.UserNotFound: {
           // An older version may have lost the client session server-side. Use
           // local client state to recreate it with a new client session.
@@ -251,45 +258,52 @@
           break;
         }
         default:
-          throw e;
+          throw result;
       }
     }
+
+    return result;
   }
 
   /**
    * @param {string} key
    * @param {string} value
+   * @returns {Promise<import("$lib/stats").ApiResponse>}
    */
   async function setUserMeta(key, value) {
-    if (key) {
-      // First persist in localStorage
-      const meta = JSON.parse(localStorage.getItem('userMeta') || '{}');
-      meta[key] = value;
-      localStorage.setItem('userMeta', JSON.stringify(meta));
-
-      // Now also update client state
-      // @ts-ignore
-      clientSession.meta[key] = value;
-
-      const headers = {
-        'Content-Type': 'application/json',
+    if (!key) {
+      return {
+        error: API_ERROR.UnknownClientError,
+        errorBody: 'need key in setUserMeta',
       };
-      const body = JSON.stringify({
-        key_name: key,
-        key_value: value,
-        // chrono can parse the time including the timezone from this
-        last_modified: new Date().toISOString(),
-        // the only existing version for now
-        version: 0,
-      });
-
-      return await authenticatedApiRequest(
-        'POST',
-        '/user/meta/update',
-        headers,
-        body
-      );
     }
+    // First persist in localStorage
+    const meta = JSON.parse(localStorage.getItem('userMeta') || '{}');
+    meta[key] = value;
+    localStorage.setItem('userMeta', JSON.stringify(meta));
+
+    // Now also update client state
+    // @ts-ignore
+    clientSession.meta[key] = value;
+
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+    const body = JSON.stringify({
+      key_name: key,
+      key_value: value,
+      // chrono can parse the time including the timezone from this
+      last_modified: new Date().toISOString(),
+      // the only existing version for now
+      version: 0,
+    });
+
+    return await authenticatedApiRequest(
+      'POST',
+      '/user/meta/update',
+      headers,
+      body
+    );
   }
 
   /**
