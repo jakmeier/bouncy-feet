@@ -161,12 +161,22 @@
   }
 
   function authHeader() {
-    // TODO: Switch to OAuth2 for registered users
-    return clientSession.id
-      ? {
-          Authorization: `ClientSession ${clientSession.id}:${clientSession.secret}`,
-        }
-      : {};
+    if ($user.openid) {
+      // The user is not a guest, so shouldn't use client session login.
+      // Instead, use cookie session.
+      return {};
+    }
+    if (clientSession.id) {
+      return {
+        Authorization: `ClientSession ${clientSession.id}:${clientSession.secret}`,
+      };
+    }
+    // This can happen when code calls this before clientSession is loaded.
+    // Generally a programming error.
+    console.warn(
+      'Auth header could not be constructed,, missing client session'
+    );
+    return {};
   }
 
   /**
@@ -190,10 +200,6 @@
    */
   async function authenticatedApiRequest(method, path, headers, body) {
     let auth = authHeader();
-    if (!auth.Authorization) {
-      // This can happen when code calls this before clientSession is loaded
-      throw new Error('Authenticated API call without auth header');
-    }
     const options = {
       method,
       headers: {
@@ -249,12 +255,20 @@
         }
         case API_ERROR.ClientSessionLoginNotAllow: {
           // Must use keycloak login.
-          // TODO: update auth header in general, then check if I can mark it as "always use oauth" when this error is returned
+          // This shouldn't happen but if it does, we could trigger a refresh of user info.
+          console.warn('Tried logging in as guest while being a full user.');
         }
         case API_ERROR.ClientSessionOfDifferentUser: {
           // TODO: Need user input to resolve.
           // Did the user mean to login to a different account?
           // What happens to locally stored data?
+          // => Show $user.publicName and ask: log out and change user?
+          // => About deleting:
+          // - just user data and userMeta needs deleting, which should be
+          //   synced to the sever. If a sync is pending, tell the user before
+          //   they log out!
+          // - steps / poses don't need to be deleted, can be kept locally
+          // - localState can probably be kept, too
           break;
         }
         default:
