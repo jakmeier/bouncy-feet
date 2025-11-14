@@ -3,7 +3,7 @@
 //! This module contains types for `Keypoints`, which are the main input for the
 //! instructor.
 
-use serde::{Deserialize, Serialize};
+use serde_derive::{Deserialize, Serialize};
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, Default)]
 pub struct Keypoints {

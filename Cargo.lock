@@ -305,7 +305,7 @@ version = "0.1.0"
 dependencies = [
  "console_error_panic_hook",
  "expect-test",
- "ron 0.10.1",
+ "ron",
  "serde",
  "serde_with",
  "strum",
@@ -324,7 +324,7 @@ dependencies = [
  "clap",
  "plotters",
  "plotters-backend",
- "ron 0.6.6",
+ "ron",
  "serde",
  "serde_derive",
 ]
@@ -2262,17 +2262,6 @@ dependencies = [
  "libc",
  "untrusted",
  "windows-sys 0.52.0",
-]
-
-[[package]]
-name = "ron"
-version = "0.6.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "86018df177b1beef6c7c8ef949969c4f7cb9a9344181b92486b23c79995bdaa4"
-dependencies = [
- "base64 0.13.1",
- "bitflags 1.3.2",
- "serde",
 ]
 
 [[package]]
