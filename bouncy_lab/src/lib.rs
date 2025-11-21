@@ -3,7 +3,20 @@ use plotters::prelude::*;
 use std::fs::File;
 use std::io::Read;
 
+use crate::ffmpeg::VideoInput;
+use crate::mediapipe::detect_pose;
+
+pub(crate) mod generated;
+
+mod ffmpeg;
 mod keypoints;
+mod mediapipe;
+
+pub fn video_pose_detection(file_path: &str) -> anyhow::Result<()> {
+    let video_input = VideoInput::by_path(file_path)?;
+    detect_pose(video_input)?;
+    Ok(())
+}
 
 pub fn plot_body_part_time_series(file_path: &str) -> anyhow::Result<()> {
     let mut file = File::open(file_path)?;

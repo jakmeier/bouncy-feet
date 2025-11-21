@@ -14,3 +14,8 @@ serde_derive = "1.0"
 ron = "0.10"
 anyhow = "1.0"
 clap = "4.5"
+libc = "0.2.177"
+ffmpeg-next = "8.0.0"
+
+[build-dependencies]
+bindgen = "0.72"
