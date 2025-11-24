@@ -63,7 +63,7 @@ pub(crate) struct StepPosition {
 }
 
 /// Define in which direction a pose should be oriented.
-#[derive(Serialize, Deserialize, Debug, PartialEq, Clone, Copy)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone, Copy, Default)]
 #[wasm_bindgen]
 pub enum Orientation {
     ToCamera,
@@ -71,6 +71,7 @@ pub enum Orientation {
     Away,
     Left,
     /// It doesn't matter in which direction the pose is done.
+    #[default]
     Any,
 }
 
@@ -108,11 +109,5 @@ impl Step {
 impl Orientation {
     fn any(&self) -> bool {
         matches!(self, Orientation::Any)
-    }
-}
-
-impl Default for Orientation {
-    fn default() -> Self {
-        Self::Any
     }
 }
