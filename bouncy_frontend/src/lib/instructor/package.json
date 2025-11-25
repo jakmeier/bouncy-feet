@@ -2,6 +2,7 @@
   "name": "bouncy_instructor",
   "type": "module",
   "version": "0.1.0",
+  "license": "AGPL-3.0-or-later",
   "files": [
     "bouncy_instructor_bg.wasm",
     "bouncy_instructor.js",

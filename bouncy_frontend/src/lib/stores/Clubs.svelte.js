@@ -1,18 +1,35 @@
 /**
  * @typedef {Object} Club
+ * @property {number} id
  * @property {string} name
  * @property {string} description
  * @property {AvatarStyleContext} style
  * @property {{ [key: string]: string }} peertubePlaylist
  * @property {object} stats
+ *
+ * @typedef {Object} ClubsContextData
+ * @property {ClubsData} clubsData
+ *
+ * @typedef {Object} ClubsData
+ * @property {Club[]} mine
 */
 
-export const clubsData = $state({
-    /** @type {Club[]} */
-    mine: []
+import { getContext } from "svelte";
 
+/** @returns {ClubsContextData} */
+export function getClubsContext() {
+    const ctx = getContext('clubs');
+    if (!ctx) {
+        console.warn("missing clubs context");
+    }
+    return ctx;
+}
+
+/** @type {ClubsData} */
+export const clubsData = $state({
+    mine: []
     // TODO: consider adding
-    // lastUpdated: 
+    // lastUpdated:
 })
 
 /**
@@ -45,11 +62,12 @@ function mockData() {
  * @param {string | undefined} name
  * @param {string | undefined} [mainColor]
  * @param {string | undefined} [secondaryColor]
- * 
+ *
  * @returns {Club}
  */
 function mockCourseBase(name, mainColor, secondaryColor) {
     return {
+        id: 0,
         name: name || "Mock Club",
         description: "This is a Mock Club",
         // courseIds: ['running-man-basics', 'rm-practice'],

@@ -17,7 +17,6 @@
     detectionDelayNum,
     detectionDelayTotal,
   } from '$lib/stores/System';
-  import { apiRequest } from '$lib/stats';
   import { getUserContext } from '$lib/context';
 
   const user = getUserContext().store;

@@ -1,46 +1,33 @@
 <script>
-  import { getContext } from 'svelte';
+  import { getClubsContext } from '$lib/stores/Clubs.svelte';
 
-  const { clubsData } = getContext('clubs');
+  const { clubsData } = getClubsContext();
 </script>
 
 {#each clubsData.mine as club}
-  <div class="club card">
-    <div class="logo">
-      <div
-        class="title"
-        style="color: {club.style.coloring.headColor}"
-        bind:this={club.titleNode}
-      >
-        {club.name}
+  <a href="./club/{club.id}">
+    <div class="club card">
+      <div class="logo">
+        <div class="title" style="color: {club.style.coloring.headColor}">
+          {club.name}
+        </div>
       </div>
-    </div>
-    <div class="text">
-      <div class="description">
-        <!-- <FormattedText
+      <div class="text">
+        <div class="description">
+          <!-- <FormattedText
           text={club.description}
           color={club.style.coloring.headColor}
         ></FormattedText> -->
-        <div class="stats">
-          <div>
-            {club.stats.members} members
+          <div class="stats">
+            <div>
+              {club.stats.members} members
+            </div>
+            <div>5 new videos</div>
           </div>
-          <div>5 new videos</div>
         </div>
       </div>
     </div>
-    <!-- <a
-        href="./club/{club.name}"
-        on:click|preventDefault={() =>
-          fadeOutAndNavigate(
-            `./club/${club.name}`,
-            club.titleNode,
-            club.title
-          )}
-      >
-        <button> {$t('home.go-button')} </button>
-      </a> -->
-  </div>
+  </a>
 {/each}
 
 <style>

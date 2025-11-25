@@ -11,9 +11,9 @@
   /** @type {Props} */
   let { children } = $props();
 
-  setContext('clubs', {
-    clubsData,
-  });
+  /** @type {ClubsContextData} */
+  const ctx = { clubsData };
+  setContext('clubs', ctx);
 
   const userCtx = getUserContext();
 

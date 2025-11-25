@@ -23,6 +23,7 @@
   import { readable } from 'svelte/store';
   import { fade } from 'svelte/transition';
   import { sendPersonalityTitle } from '$lib/stores/Crossfade.svelte';
+  import ClubsContext from '$lib/stores/ClubsContext.svelte';
   /**
    * @typedef {Object} Props
    * @property {import('svelte').Snippet} [children]
@@ -60,16 +61,17 @@
           <PoseDetectionContext>
             <MusicContext>
               <UserAvatarStyleContext>
-                {#if !fadingOut.state}
-                  <div out:fade in:fade={{ delay: 600 }}>
-                    {@render children?.()}
-                  </div>
-                {/if}
-                {#if fadingOut.text}
-                  <h1
-                    class="floating-title"
-                    out:sendPersonalityTitle={{ key: 'pageTitle' }}
-                    style="
+                <ClubsContext>
+                  {#if !fadingOut.state}
+                    <div out:fade in:fade={{ delay: 600 }}>
+                      {@render children?.()}
+                    </div>
+                  {/if}
+                  {#if fadingOut.text}
+                    <h1
+                      class="floating-title"
+                      out:sendPersonalityTitle={{ key: 'pageTitle' }}
+                      style="
                       position: fixed;
                       top: {floatingTitleRect.top}px;
                       left: {floatingTitleRect.left}px;
@@ -78,10 +80,11 @@
                       margin: 0;
                       z-index: 999;
                     "
-                  >
-                    {fadingOut.text}
-                  </h1>
-                {/if}
+                    >
+                      {fadingOut.text}
+                    </h1>
+                  {/if}
+                </ClubsContext>
               </UserAvatarStyleContext>
             </MusicContext>
           </PoseDetectionContext>

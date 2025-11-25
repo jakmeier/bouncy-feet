@@ -17,7 +17,6 @@
   import Personalities from './Personalities.svelte';
   import DarkSection from '$lib/components/ui/sections/DarkSection.svelte';
   import Clubs from './Clubs.svelte';
-  import ClubsContext from '$lib/stores/ClubsContext.svelte';
   import HomeNote from './HomeNote.svelte';
   /**
    * @typedef {Object} Props
@@ -60,9 +59,7 @@
   <div class="private">
     <!-- <h2>Psssst...</h2> -->
     <!-- ...your private places, shared only with your friends. Or just for yourself! -->
-    <ClubsContext>
-      <Clubs />
-    </ClubsContext>
+    <Clubs />
   </div>
 </DarkSection>
 

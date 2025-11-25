@@ -10,10 +10,18 @@
    * @property {Marker[]} [markers] - Array of markers to show on the timeline
    * @property {boolean} [muted]
    * @property {boolean} [timeline]
+   * @property {boolean} [isPrivate]
    */
 
   /** @type Props */
-  let { videoId, beats = [], markers = [], muted = false, timeline } = $props();
+  let {
+    videoId,
+    beats = [],
+    markers = [],
+    muted = false,
+    timeline,
+    isPrivate = false,
+  } = $props();
 
   let player = $state();
 
@@ -40,11 +48,19 @@
       player.removeEventListener(event, listener);
     }
   }
+
+  const peertubeUrl = $derived(
+    PUBLIC_BF_PEERTUBE_URL +
+      '/videos/embed/' +
+      videoId +
+      '?api=1&warningTitle=0&controlBar=0&peertubeLink=0&controls=0&requiresAuth=' +
+      (isPrivate ? '1' : '0')
+  );
 </script>
 
 <PeertubePlayer
   bind:this={player}
-  peertubeUrl="{PUBLIC_BF_PEERTUBE_URL}/videos/embed/{videoId}?api=1&warningTitle=0&controlBar=0&peertubeLink=0&controls=0"
+  {peertubeUrl}
   {beats}
   {markers}
   {muted}
