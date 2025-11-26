@@ -3,6 +3,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::client_session::ClientSessionId;
+use crate::db::club::UserClubRow;
 use crate::layers::oidc::AdditionalClaims;
 use crate::AppState;
 
@@ -166,5 +167,11 @@ impl User {
 impl std::fmt::Display for UserId {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.0)
+    }
+}
+
+impl UserClubRow {
+    pub fn user_id(&self) -> UserId {
+        UserId(self.user_id)
     }
 }

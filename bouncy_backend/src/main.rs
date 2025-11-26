@@ -19,6 +19,7 @@ use url::Url;
 pub(crate) mod api_endoints;
 pub(crate) mod client_session;
 pub(crate) mod dance_activity;
+pub(crate) mod db;
 pub(crate) mod layers;
 pub(crate) mod user;
 
