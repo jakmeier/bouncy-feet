@@ -121,6 +121,7 @@ async fn main() -> anyhow::Result<()> {
     let unauthenticated_app = Router::new()
         .route("/", get(root))
         .route("/clubs", get(api_endoints::club::clubs))
+        .route("/clubs/create", get(api_endoints::club::create_club))
         .route(
             "/new_guest_session",
             get(api_endoints::client_session::create_guest_session),

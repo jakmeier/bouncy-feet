@@ -6,6 +6,12 @@ use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::{Extension, Json};
 
+#[derive(serde::Deserialize)]
+pub struct CreateClubsRequest {
+    title: String,
+    description: String,
+}
+
 #[derive(serde::Serialize)]
 struct ClubsResponse {
     clubs: Vec<ClubInfo>,
@@ -78,3 +84,49 @@ pub async fn clubs(State(state): State<AppState>) -> Response {
     let resonse = ClubsResponse { clubs };
     (StatusCode::OK, Json(resonse)).into_response()
 }
+
+#[axum::debug_handler]
+pub async fn create_club(
+    State(state): State<AppState>,
+    Json(payload): Json<CreateClubsRequest>,
+) -> Response {
+    if payload.title.len() > 64 {
+        return (StatusCode::BAD_REQUEST, "Title must be at most 64 chars").into_response();
+    }
+    if payload.description.len() > 1024 {
+        return (
+            StatusCode::BAD_REQUEST,
+            "Description must be at most 1024 chars",
+        )
+            .into_response();
+    }
+    // Check unique name? (not enforced on db right)
+    // Limit clubs per user?
+
+    // TODO: Generate playlists
+
+    let public_playlist = "TODO".to_owned();
+    let private_playlist = "TODO".to_owned();
+
+    let res = Club::create(
+        &state,
+        &payload.title,
+        &payload.description,
+        &public_playlist,
+        &private_playlist,
+    )
+    .await;
+
+    if let Err(err) = res {
+        tracing::error!(?err, "DB error on create_club");
+        return (StatusCode::BAD_REQUEST, "Could not create club").into_response();
+    }
+
+    (StatusCode::CREATED, "CREATED").into_response()
+}
+
+// TODO
+// #[axum(debug_handler)]
+// pub async fn add_club_member(State(state): State<AppState>) -> Response {
+//     // Check permissions: Must be admin
+// }

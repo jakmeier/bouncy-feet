@@ -38,6 +38,31 @@ pub(crate) struct UserClubRow {
 }
 
 impl Club {
+    pub(crate) async fn create(
+        state: &AppState,
+        title: &str,
+        description: &str,
+        public_playlist: &str,
+        private_playlist: &str,
+    ) -> Result<Club, sqlx::Error> {
+        let rec = sqlx::query_as!(
+            ClubRow,
+            r#"
+            INSERT INTO clubs (title, description, public_playlist, private_playlist)
+            VALUES ($1, $2, $3, $4)
+            RETURNING id, title, description, public_playlist, private_playlist
+            "#,
+            title,
+            description,
+            public_playlist,
+            private_playlist
+        )
+        .fetch_one(&state.pg_db_pool)
+        .await?;
+
+        Ok(Club::from(rec))
+    }
+
     #[allow(dead_code)]
     pub(crate) async fn lookup(state: &AppState, id: ClubId) -> Option<Club> {
         let maybe_club = sqlx::query_as!(
