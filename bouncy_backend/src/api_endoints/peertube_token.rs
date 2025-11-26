@@ -5,6 +5,7 @@ use axum_oidc::OidcAccessToken;
 use reqwest::header::HeaderValue;
 use serde::{Deserialize, Serialize};
 
+use crate::peertube::{check_peertube_response, PeerTubeError};
 use crate::AppState;
 
 #[derive(Deserialize)]
@@ -15,7 +16,7 @@ struct TokenExchangeResponse {
 }
 
 #[derive(Deserialize, Serialize, Debug)]
-struct OAuthToken {
+pub(crate) struct OAuthToken {
     access_token: String,
     token_type: String,
     expires_in: i64,
@@ -26,11 +27,6 @@ struct OAuthToken {
 pub(crate) struct OAuthClientConfig {
     client_id: String,
     client_secret: String,
-}
-
-#[derive(Deserialize, Clone, Debug)]
-pub(crate) struct PeertubeApiError {
-    code: String,
 }
 
 #[axum::debug_handler]
@@ -54,6 +50,8 @@ pub async fn peertube_token_exchange(
         }
     }
 
+    // TODO: use caching and refreshing
+
     // Exchange JWT for bypass token
     let bypass_token_result = fetch_bypass_token(&state, &token).await;
     let bypass_token = match bypass_token_result {
@@ -69,7 +67,7 @@ pub async fn peertube_token_exchange(
     };
 
     // Request PeerTube OAuth token
-    let peertube_token = match fetch_api_token(&state, bypass_token).await {
+    let peertube_token = match fetch_api_token_from_bypass_token(&state, bypass_token).await {
         Ok(r) => r,
         Err(err) => {
             tracing::warn!(?err, "error exchanging bypass for OAuth token");
@@ -117,15 +115,44 @@ async fn fetch_bypass_token(
     }
 }
 
-async fn fetch_api_token(
+async fn fetch_api_token_from_bypass_token(
     state: &AppState,
     bypass_token: TokenExchangeResponse,
-) -> Result<OAuthToken, anyhow::Error> {
+) -> Result<OAuthToken, PeerTubeError> {
+    fetch_api_token(
+        state,
+        bypass_token.username.as_str(),
+        "externalAuthToken",
+        bypass_token.externalAuthToken.as_str(),
+    )
+    .await
+}
+
+/// For local PeerTube users.
+///
+/// This should only be used for system users. Real users have an external
+/// account managed through Keycloak.
+pub(crate) async fn fetch_api_token_from_native_user(
+    state: &AppState,
+    user_name: &str,
+    password: &str,
+) -> Result<OAuthToken, PeerTubeError> {
+    fetch_api_token(state, user_name, "password", password).await
+}
+
+async fn fetch_api_token(
+    state: &AppState,
+    username: &str,
+    auth_method: &str,
+    auth_secret: &str,
+) -> Result<OAuthToken, PeerTubeError> {
     // Fetch an OAuth token for the user that's usable by the API
     async fn send_token_request(
         state: &AppState,
         client_config: OAuthClientConfig,
-        bypass_token: &TokenExchangeResponse,
+        username: &str,
+        auth_method: &str,
+        auth_secret: &str,
     ) -> Result<reqwest::Response, reqwest::Error> {
         let token_url = state
             .peertube_url
@@ -135,8 +162,8 @@ async fn fetch_api_token(
             .http_client
             .post(token_url.as_str())
             .form(&[
-                ("username", bypass_token.username.as_str()),
-                ("externalAuthToken", bypass_token.externalAuthToken.as_str()),
+                ("username", username),
+                (auth_method, auth_secret),
                 ("client_id", client_config.client_id.as_str()),
                 ("client_secret", client_config.client_secret.as_str()),
                 ("grant_type", "password"),
@@ -145,31 +172,39 @@ async fn fetch_api_token(
             .await
     }
 
-    let client_config = read_or_fetch_client_config(state).await?;
-    let mut token_res = send_token_request(state, client_config, &bypass_token).await?;
+    let client_config = read_or_fetch_client_config(state)
+        .await
+        .map_err(PeerTubeError::ClientError)?;
+    let token_res =
+        send_token_request(state, client_config, username, auth_method, auth_secret).await;
 
-    // error details are reported with content type "application/problem+json; charset=utf-8"
-    // checking just for "json" for robustness to changes in how the content header is set by the server
-    if token_res.status() == reqwest::StatusCode::BAD_REQUEST
-        && token_res
-            .headers()
-            .get("Content-Type")
-            .and_then(|hv| HeaderValue::to_str(hv).ok())
-            .is_some_and(|hv| hv.contains("json"))
-    {
-        let error: PeertubeApiError = token_res.json().await?;
-        if error.code == "invalid_client" {
-            tracing::info!("got an invalid_client response, fetching the latest client config and trying again");
-            clear_client_config(state).await;
-            let client_config = read_or_fetch_client_config(state).await?;
-            token_res = send_token_request(state, client_config, &bypass_token).await?;
-        } else {
-            anyhow::bail!("failed fetching oauth token {error:?}");
+    let ok_res = match check_peertube_response(token_res).await {
+        Ok(ok_result) => ok_result,
+        Err(PeerTubeError::ApiError(error, status)) => {
+            if error.code == "invalid_client" {
+                tracing::info!("got an invalid_client response, fetching the latest client config and trying again");
+                clear_client_config(state).await;
+                let client_config = read_or_fetch_client_config(state)
+                    .await
+                    .map_err(PeerTubeError::ClientError)?;
+
+                let second_result =
+                    send_token_request(state, client_config, username, auth_method, auth_secret)
+                        .await;
+                check_peertube_response(second_result).await?
+            } else {
+                tracing::error!(?error, "failed fetching oauth token");
+                return Err(PeerTubeError::ApiError(error, status));
+            }
         }
-    }
-    let token_res = token_res.error_for_status()?;
+        Err(other) => return Err(other),
+    };
 
-    let token: OAuthToken = token_res.json().await?;
+    let status = ok_res.status();
+    let token: OAuthToken = ok_res
+        .json()
+        .await
+        .map_err(|err| PeerTubeError::JsonParsingFailed(status, err))?;
     Ok(token)
 }
 
@@ -199,4 +234,10 @@ async fn read_or_fetch_client_config(
 async fn clear_client_config(state: &AppState) {
     let mut cfg_guard = state.client_config.write().await;
     *cfg_guard = None;
+}
+
+impl OAuthToken {
+    pub fn bearer_string(&self) -> String {
+        format!("Bearer {}", self.access_token)
+    }
 }

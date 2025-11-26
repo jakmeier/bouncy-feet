@@ -49,6 +49,31 @@ export async function loadMyClubs(userCtx) {
     // clubsData.mine.push(...mockData());
 }
 
+/**
+ * @param {UserContextData} userCtx
+ * @param {string} title
+ * @param {string} description
+ */
+export async function createNewClub(userCtx, title, description) {
+    if (title.length > 64 || description.length > 1024) {
+        // UI should catch this!
+        throw new Error("club title or description too long");
+    }
+
+    const response = await userCtx.authenticatedPost("/clubs/create", { title, description });
+
+    if (response?.status !== 201) {
+        console.error("Failed to create club", response);
+        return;
+    }
+
+    /** @type { Club } */
+    const club = await response?.json();
+    const defaultValues = mockCourseBase("Default");
+    const completeClub = Object.assign(defaultValues, club)
+    clubsData.mine.push(completeClub);
+}
+
 /** @returns {Club[]} */
 function mockData() {
     return [

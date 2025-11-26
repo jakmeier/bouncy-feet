@@ -1,7 +1,7 @@
 use crate::{user::UserId, AppState};
 use sqlx::FromRow;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct ClubId(i64);
 
 #[derive(Debug, Clone)]
@@ -101,7 +101,6 @@ impl Club {
     }
 
     /// Add a member to a club. If the membership already exists, updates is_admin.
-    #[allow(dead_code)]
     pub async fn add_or_update_member(
         state: &AppState,
         user_id: UserId,

@@ -1,6 +1,7 @@
 use crate::api_endoints::peertube_token::{self, peertube_token_exchange};
 use crate::layers::oidc::{oidc_auth_layer, oidc_login_layer};
 use crate::layers::session::pg_backed_cookie_session_layer;
+use crate::peertube::system_user::PeerTubeSystemUser;
 use axum::error_handling::HandleErrorLayer;
 use axum::http::header;
 use axum::http::{HeaderValue, Method, StatusCode};
@@ -19,6 +20,7 @@ use url::Url;
 pub(crate) mod api_endoints;
 pub(crate) mod db;
 pub(crate) mod layers;
+pub(crate) mod peertube;
 
 // re-export
 pub(crate) use db::*;
@@ -31,6 +33,7 @@ struct AppState {
     pg_db_pool: PgPool,
     http_client: reqwest::Client,
     client_config: Arc<tokio::sync::RwLock<Option<peertube_token::OAuthClientConfig>>>,
+    system_user: PeerTubeSystemUser,
 }
 
 #[tokio::main]
@@ -44,6 +47,8 @@ async fn main() -> anyhow::Result<()> {
     let oidc_client_id = require_env("OIDC_CLIENT_ID");
     let oidc_client_secret = require_env("OIDC_CLIENT_SECRET");
     let db_url = require_env("DATABASE_URL");
+    let system_user = require_env("PEERTUBE_SYSTEM_USER");
+    let system_user_pw = require_env("PEERTUBE_SYSTEM_USER_PASSWORD");
 
     tracing::info!("My domain:  {}", api_url);
     tracing::info!("App domain: {}", app_url);
@@ -65,12 +70,15 @@ async fn main() -> anyhow::Result<()> {
 
     let http_client = reqwest::Client::new();
 
+    let system_user = PeerTubeSystemUser::new(system_user, system_user_pw);
+
     let state = AppState {
         app_url: parsed_app_url.clone(),
         peertube_url,
         pg_db_pool,
         http_client,
         client_config: Arc::default(),
+        system_user,
     };
 
     let user_service = middleware::from_fn_with_state(state.clone(), layers::user::user_lookup);
@@ -121,7 +129,6 @@ async fn main() -> anyhow::Result<()> {
     let unauthenticated_app = Router::new()
         .route("/", get(root))
         .route("/clubs", get(api_endoints::club::clubs))
-        .route("/clubs/create", get(api_endoints::club::create_club))
         .route(
             "/new_guest_session",
             get(api_endoints::client_session::create_guest_session),
@@ -140,6 +147,7 @@ async fn main() -> anyhow::Result<()> {
     // authentication fails.
     let protected_app = Router::new()
         .route("/peertube/token", post(peertube_token_exchange))
+        .route("/clubs/create", post(api_endoints::club::create_club))
         .route("/clubs/joined", get(api_endoints::club::my_clubs))
         .route("/user", get(api_endoints::user::user_info))
         .route("/user/meta", get(api_endoints::user_meta::metadata))

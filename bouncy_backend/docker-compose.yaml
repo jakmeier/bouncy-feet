@@ -9,6 +9,9 @@ services:
       OIDC_CLIENT_SECRET: XXXX
       OIDC_CLIENT_ID: bouncy-dev-backend
       DATABASE_URL: "postgres://api_user:local_password@postgres/bouncyfeet"
+      RUST_LOG: debug
+      PEERTUBE_SYSTEM_USER: system
+      PEERTUBE_SYSTEM_USER_PASSWORD: local_system_password
     build:
       context: ./
       additional_contexts:

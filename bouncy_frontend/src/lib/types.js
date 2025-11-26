@@ -119,6 +119,7 @@
  * @property {()=>{}} refreshPeerTubeUser
  * @property {Promise<import("$lib/peertube-openapi").User | undefined>} peerTubeUser
  * @property {(path: string)=>Promise<Response | null | undefined>} authenticatedGet
+ * @property {(path: string, jsonBody: object)=>Promise<Response | null | undefined>} authenticatedPost
  * @property {()=>boolean} skippedIntro
  * @property {(yes: boolean)=>void} setSkippedIntro
  * @property {BfError} loginError -- only set if login is impossible, otherwise just trigger a login

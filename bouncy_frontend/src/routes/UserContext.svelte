@@ -192,6 +192,27 @@
   }
 
   /**
+   * @param {string} path
+   * @param {object} body
+   * @returns {Promise<Response | null | undefined>}
+   */
+  async function authenticatedPost(path, body) {
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+    const result = await authenticatedApiRequest(
+      'POST',
+      path,
+      headers,
+      JSON.stringify(body)
+    );
+    if (result?.okResponse) {
+      return result.okResponse;
+    }
+    console.warn('post failed', result);
+  }
+
+  /**
    * @param {string} method
    * @param {string} path
    * @param {object} headers
@@ -536,6 +557,7 @@
       })();
     },
     authenticatedGet,
+    authenticatedPost,
     skippedIntro: () => hasSkippedIntro,
     setSkippedIntro: (/** @type {boolean} */ yes) => (hasSkippedIntro = yes),
     loginError,
