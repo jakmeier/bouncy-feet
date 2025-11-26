@@ -1,6 +1,8 @@
 use crate::{
-    api_endoints::peertube_token::{fetch_api_token_from_native_user, OAuthToken},
-    peertube::PeerTubeError,
+    peertube::{
+        token::{fetch_api_token_from_native_user, OAuthToken},
+        PeerTubeError,
+    },
     AppState,
 };
 use std::sync::Arc;

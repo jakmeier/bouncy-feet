@@ -6,6 +6,7 @@ use reqwest::header::HeaderValue;
 
 pub(crate) mod playlist;
 pub(crate) mod system_user;
+pub(crate) mod token;
 
 #[derive(serde::Deserialize, Clone, Debug)]
 pub(crate) struct PeertubeApiErrorResponse {
@@ -62,7 +63,6 @@ pub(crate) async fn check_peertube_response(
     if is_json {
         let text = response.text().await.unwrap_or_default();
         let result: Result<PeertubeApiErrorResponse, _> = serde_json::from_str(&text);
-        let result = result;
         let typed_error = result.map_err(|_err| PeerTubeError::UnknownJsonError(status, text))?;
         Err(PeerTubeError::ApiError(typed_error, status))
     } else {
