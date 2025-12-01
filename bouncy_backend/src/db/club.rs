@@ -1,4 +1,4 @@
-use crate::{user::UserId, AppState};
+use crate::{api_endoints::club::AddClubMemberRequest, user::UserId, AppState};
 use sqlx::FromRow;
 
 #[derive(Clone, Copy, Debug)]
@@ -145,7 +145,6 @@ impl Club {
     }
 
     /// Check if a user is a member (and get the membership row)
-    #[allow(dead_code)]
     pub async fn membership(
         state: &AppState,
         user_id: UserId,
@@ -242,5 +241,11 @@ impl From<Option<UserClubRow>> for ClubMembership {
             Some(record) if record.is_admin => ClubMembership::Admin,
             Some(_) => ClubMembership::Member,
         }
+    }
+}
+
+impl AddClubMemberRequest {
+    pub(crate) fn club_id(&self) -> ClubId {
+        ClubId(self.club_id)
     }
 }

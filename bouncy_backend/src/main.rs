@@ -149,8 +149,13 @@ async fn main() -> anyhow::Result<()> {
         .route("/peertube/token", post(peertube_token_exchange))
         .route("/clubs/create", post(api_endoints::club::create_club))
         .route("/clubs/joined", get(api_endoints::club::my_clubs))
+        .route(
+            "/clubs/add_member",
+            post(api_endoints::club::add_club_member),
+        )
         .route("/user", get(api_endoints::user::user_info))
         .route("/user/meta", get(api_endoints::user_meta::metadata))
+        .route("/users", post(api_endoints::user::list_users))
         .route(
             "/user/meta/update",
             post(api_endoints::user_meta::update_user_metadata),

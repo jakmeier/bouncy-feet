@@ -13,7 +13,7 @@
         "first-visit-button-1": "Show me your moves",
         "first-visit-button-2": "Skip intro",
         "continue-first-warmup": "There you are! Common, the training isn't done, yet.",
-        "skip-button": "Now now",
+        "skip-button": "Not now",
         "first-visit-done-title": "Well done!",
         "first-visit-done-0": "Congrats on finishing your first class with Bouncy Feet!",
         "first-visit-done-1": "You can now select a coach to develop your skill in the direction of your choice.",
@@ -42,6 +42,15 @@
         "change-teacher-button": "Other teachers",
         "tutorial-button": "Intro course",
         "nav": "Home"
+    },
+    "club": {
+        "add-user-button": "Add dancer to club",
+        "select-user-title": "Select dancer",
+        "confirm-add-user-p0": "Add ",
+        "confirm-add-user-p1": " to ",
+        "confirm-add-user-p2": "?",
+        "add-user-success": "Done!",
+        "add-user-failed": "Sorry something went wrong:("
     },
     "courses": {
         "nav": "Learn",

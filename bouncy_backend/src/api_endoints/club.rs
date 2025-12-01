@@ -1,3 +1,4 @@
+use crate::club::ClubMembership;
 use crate::db::club::Club;
 use crate::peertube::playlist::{
     create_public_system_playlist, create_unlisted_system_playlist, Playlist,
@@ -42,6 +43,13 @@ struct ClubInfo {
     // But for playlists, this isn't currently available
     // /api/v1/video-playlists
     // does not have `excludeAlreadyWatched`
+}
+
+#[derive(serde::Deserialize)]
+pub struct AddClubMemberRequest {
+    // Backend / DB user id
+    pub user_id: i64,
+    pub club_id: i64,
 }
 
 /// Retrieve clubs of the user that made the request.
@@ -191,8 +199,37 @@ async fn create_club_playlist_pair(
     Ok((public_playlist, private_playlist))
 }
 
-// TODO
-// #[axum(debug_handler)]
-// pub async fn add_club_member(State(state): State<AppState>) -> Response {
-//     // Check permissions: Must be admin
-// }
+#[axum::debug_handler]
+pub async fn add_club_member(
+    Extension(me): Extension<User>,
+    State(state): State<AppState>,
+    Json(params): Json<AddClubMemberRequest>,
+) -> Response {
+    // Check permissions: Must be admin
+    let result = Club::membership(&state, me.id, params.club_id()).await;
+
+    if let Err(err) = result {
+        tracing::error!(?err, "DB error on add_club_member");
+        return (StatusCode::INTERNAL_SERVER_ERROR, "Internal error").into_response();
+    }
+    let my_membership = result.expect("just checked");
+    if !matches!(my_membership, ClubMembership::Admin) {
+        return (StatusCode::FORBIDDEN, "no permission to add club member").into_response();
+    }
+
+    // Check user exist to avoid accidentally overriding is_admin
+    let result = Club::membership(&state, params.user_id(), params.club_id()).await;
+    let their_membership = result.expect("just checked");
+    if !matches!(their_membership, ClubMembership::None) {
+        return (StatusCode::OK, "already a member").into_response();
+    }
+
+    let is_admin = false;
+    let result =
+        Club::add_or_update_member(&state, params.user_id(), params.club_id(), is_admin).await;
+    if let Err(err) = result {
+        tracing::error!(?err, "DB error on add_club_member -> add_or_update_member");
+        return (StatusCode::INTERNAL_SERVER_ERROR, "Internal error").into_response();
+    }
+    (StatusCode::CREATED, "member added").into_response()
+}

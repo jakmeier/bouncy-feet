@@ -2,6 +2,7 @@ use axum_oidc::OidcClaims;
 use sqlx::PgPool;
 use uuid::Uuid;
 
+use crate::api_endoints::club::AddClubMemberRequest;
 use crate::client_session::ClientSessionId;
 use crate::db::club::UserClubRow;
 use crate::layers::oidc::AdditionalClaims;
@@ -14,6 +15,20 @@ pub struct UserId(i64);
 pub struct User {
     pub id: UserId,
     pub oidc_subject: Option<Uuid>,
+}
+
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct UserRow {
+    id: i64,
+    oidc_subject: Option<String>,
+}
+
+#[derive(Clone, Debug)]
+pub struct UserSearchFilter {
+    pub include_guests: bool,
+    pub offset: i64,
+    pub limit: u16,
+    // pub name_fragment: Option<String>,
 }
 
 impl UserId {
@@ -154,6 +169,43 @@ impl User {
         Ok(())
     }
 
+    pub(crate) async fn list(
+        state: &AppState,
+        filter: &UserSearchFilter,
+    ) -> sqlx::Result<Vec<User>> {
+        let rows = if filter.include_guests {
+            sqlx::query_as!(
+                UserRow,
+                r#"
+                SELECT id, oidc_subject
+                FROM users
+                ORDER BY id LIMIT $1 OFFSET $2
+                "#,
+                filter.limit as i32,
+                filter.offset,
+            )
+            .fetch_all(&state.pg_db_pool)
+            .await?
+        } else {
+            sqlx::query_as!(
+                UserRow,
+                r#"
+                SELECT id, oidc_subject
+                FROM users
+                WHERE oidc_subject IS NOT NULL
+                ORDER BY id LIMIT $1 OFFSET $2
+                "#,
+                filter.limit as i32,
+                filter.offset,
+            )
+            .fetch_all(&state.pg_db_pool)
+            .await?
+        };
+
+        let users = rows.into_iter().map(User::from).collect();
+        Ok(users)
+    }
+
     fn new(id: i64, subject: Option<&str>) -> User {
         let oidc_subject =
             subject.map(|sub| Uuid::parse_str(sub).expect("sub must be a valid UUID"));
@@ -172,6 +224,18 @@ impl std::fmt::Display for UserId {
 
 impl UserClubRow {
     pub fn user_id(&self) -> UserId {
+        UserId(self.user_id)
+    }
+}
+
+impl From<UserRow> for User {
+    fn from(row: UserRow) -> Self {
+        User::new(row.id, row.oidc_subject.as_deref())
+    }
+}
+
+impl AddClubMemberRequest {
+    pub(crate) fn user_id(&self) -> UserId {
         UserId(self.user_id)
     }
 }
