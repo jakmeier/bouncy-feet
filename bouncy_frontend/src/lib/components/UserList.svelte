@@ -4,10 +4,8 @@
   import UnstyledButton from './ui/UnstyledButton.svelte';
 
   /**
-   * @typedef {string} UserResponse
-   *
    * @typedef {Object} Props
-   * @property {(user: UserResponse)=>void} [onSelect]
+   * @property {(user: PublicUserResponse)=>void} [onSelect]
    */
 
   /** @type {Props} */
@@ -19,7 +17,7 @@
   async function load() {
     const res = await userCtx.authenticatedPost('/users', {});
     let result = await res?.json();
-    return result?.names;
+    return result?.users;
   }
 
   onMount(load);
@@ -32,27 +30,7 @@
     {#each users as user}
       <li>
         <UnstyledButton onClick={() => onSelect(user)}>
-          <div>{user}</div>
-        </UnstyledButton>
-      </li>
-      <li>
-        <UnstyledButton onClick={() => onSelect(user)}>
-          <div>{user}</div>
-        </UnstyledButton>
-      </li>
-      <li>
-        <UnstyledButton onClick={() => onSelect(user)}>
-          <div>{user}</div>
-        </UnstyledButton>
-      </li>
-      <li>
-        <UnstyledButton onClick={() => onSelect(user)}>
-          <div>{user}</div>
-        </UnstyledButton>
-      </li>
-      <li>
-        <UnstyledButton onClick={() => onSelect(user)}>
-          <div>{user}</div>
+          <div>{user.display_name}</div>
         </UnstyledButton>
       </li>
     {/each}

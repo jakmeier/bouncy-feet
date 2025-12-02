@@ -6,13 +6,20 @@ use axum::response::{IntoResponse, Response};
 use axum::{Extension, Json};
 
 #[derive(serde::Serialize)]
-pub struct UserInfoResponse {
+pub struct PrivateUserInfoResponse {
     /// BF API user id
     id: i64,
     /// Open ID connect ID
     ///
     /// Returns null for guest accounts, that have not been linked to a Keycloak user, yet.
     sub: Option<String>,
+}
+
+#[derive(serde::Serialize)]
+pub struct PublicUserInfoResponse {
+    /// BF API user id
+    id: i64,
+    display_name: String,
 }
 
 #[derive(serde::Deserialize)]
@@ -25,7 +32,7 @@ pub struct UserSearchParams {
 
 #[derive(serde::Serialize)]
 pub struct UsersResponse {
-    names: Vec<String>,
+    users: Vec<PublicUserInfoResponse>,
 }
 
 /// Retrieve information of the user that made the request.
@@ -33,7 +40,7 @@ pub struct UsersResponse {
 /// Note: We must not use the OidcClaims here for retrieving the OIDC subject, as the user might be
 /// logged in with guest credentials. Or maybe the login expired and claims are not available.
 pub async fn user_info(Extension(user): Extension<User>) -> Response {
-    let user_info: UserInfoResponse = UserInfoResponse {
+    let user_info: PrivateUserInfoResponse = PrivateUserInfoResponse {
         id: user.id.num(),
         sub: user.oidc_subject.map(|sub| sub.to_string()),
     };
@@ -58,9 +65,13 @@ pub async fn list_users(
         return (StatusCode::INTERNAL_SERVER_ERROR, "Failed fetching users").into_response();
     };
 
-    // TODO: include display names, evaluate how user model should be on backend
-    let ids = users.into_iter().map(|u| u.id.to_string()).collect();
+    let users = users
+        .into_iter()
+        .map(|u| PublicUserInfoResponse {
+            id: u.id.num(),
+            display_name: u.public_name,
+        })
+        .collect();
 
-    // TODO: better response type
-    Json(UsersResponse { names: ids }).into_response()
+    Json(UsersResponse { users }).into_response()
 }

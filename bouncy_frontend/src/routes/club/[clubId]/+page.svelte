@@ -17,17 +17,20 @@
   let showPopup = $state(false);
   let message = $state('');
 
+  /**
+   * @param {PublicUserResponse} user
+   */
   async function onSelectUser(user) {
     const p0 = $t('club.confirm-add-user-p0');
     const p1 = $t('club.confirm-add-user-p1');
     const p2 = $t('club.confirm-add-user-p2');
-    const msg = `${p0}${user}${p1}${club?.name}${p2}`;
+    const msg = `${p0}${user.display_name}${p1}${club?.name}${p2}`;
     if (confirm(msg)) {
       /** @type {boolean} */
       let ok = false;
       try {
         const result = await userCtx.authenticatedPost('/clubs/add_member', {
-          user_id: Number(user),
+          user_id: Number(user.id),
           club_id: club?.id,
         });
         ok = result?.ok || false;

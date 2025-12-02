@@ -17,10 +17,22 @@ pub struct User {
     pub oidc_subject: Option<Uuid>,
 }
 
+#[derive(Clone, Debug)]
+pub struct PublicUserData {
+    pub id: UserId,
+    pub public_name: String,
+}
+
 #[derive(Clone, Debug, sqlx::FromRow)]
 pub struct UserRow {
     id: i64,
     oidc_subject: Option<String>,
+}
+
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct ExtendedUserRow {
+    id: i64,
+    public_name: String,
 }
 
 #[derive(Clone, Debug)]
@@ -172,14 +184,15 @@ impl User {
     pub(crate) async fn list(
         state: &AppState,
         filter: &UserSearchFilter,
-    ) -> sqlx::Result<Vec<User>> {
+    ) -> sqlx::Result<Vec<PublicUserData>> {
         let rows = if filter.include_guests {
             sqlx::query_as!(
-                UserRow,
+                ExtendedUserRow,
                 r#"
-                SELECT id, oidc_subject
-                FROM users
-                ORDER BY id LIMIT $1 OFFSET $2
+                SELECT um.user_id as id, um.key_value AS public_name
+                FROM user_meta um
+                WHERE um.key_name = 's:publicName'
+                ORDER BY um.user_id LIMIT $1 OFFSET $2
                 "#,
                 filter.limit as i32,
                 filter.offset,
@@ -188,12 +201,14 @@ impl User {
             .await?
         } else {
             sqlx::query_as!(
-                UserRow,
+                ExtendedUserRow,
                 r#"
-                SELECT id, oidc_subject
-                FROM users
-                WHERE oidc_subject IS NOT NULL
-                ORDER BY id LIMIT $1 OFFSET $2
+                SELECT u.id, um.key_value AS public_name
+                FROM users u
+                JOIN user_meta um on um.user_id = u.id
+                WHERE um.key_name = 's:publicName'
+                    AND oidc_subject IS NOT NULL
+                ORDER BY u.id LIMIT $1 OFFSET $2
                 "#,
                 filter.limit as i32,
                 filter.offset,
@@ -202,7 +217,7 @@ impl User {
             .await?
         };
 
-        let users = rows.into_iter().map(User::from).collect();
+        let users = rows.into_iter().map(PublicUserData::from).collect();
         Ok(users)
     }
 
@@ -231,6 +246,15 @@ impl UserClubRow {
 impl From<UserRow> for User {
     fn from(row: UserRow) -> Self {
         User::new(row.id, row.oidc_subject.as_deref())
+    }
+}
+
+impl From<ExtendedUserRow> for PublicUserData {
+    fn from(row: ExtendedUserRow) -> Self {
+        PublicUserData {
+            id: UserId(row.id),
+            public_name: row.public_name,
+        }
     }
 }
 

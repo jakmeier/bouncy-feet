@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                SELECT u.id, um.key_value AS public_name\n                FROM users u\n                JOIN user_meta um on um.user_id = u.id\n                WHERE um.key_name = 's:publicName'\n                    AND oidc_subject IS NOT NULL\n                ORDER BY u.id LIMIT $1 OFFSET $2\n                ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "public_name",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "eef1f45acbb4bafe1533f600f8acc6ad48937ccdf4613a0d2e66c092e7631fb9"
+}

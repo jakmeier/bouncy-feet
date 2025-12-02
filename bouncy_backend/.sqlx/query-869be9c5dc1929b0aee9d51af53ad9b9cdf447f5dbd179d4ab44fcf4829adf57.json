@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                SELECT um.user_id as id, um.key_value AS public_name\n                FROM user_meta um\n                WHERE um.key_name = 's:publicName'\n                ORDER BY um.user_id LIMIT $1 OFFSET $2\n                ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "public_name",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "869be9c5dc1929b0aee9d51af53ad9b9cdf447f5dbd179d4ab44fcf4829adf57"
+}
