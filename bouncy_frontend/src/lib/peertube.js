@@ -131,7 +131,7 @@ export async function uploadVideoToPeerTubeResumable(file, channelId, onProgress
 
 
     const uploadId = response.headers.get('Location')?.split('upload_id=')[1];
-    if (!uploadId) throw new Error(`No upload_id returned, ${error}`);
+    if (!uploadId) throw new Error(`No upload_id returned, ${JSON.stringify(error)}`);
     let offset = Number.parseInt(response.headers.get('Content-Length') || '0');
 
     // expecting 201 responses

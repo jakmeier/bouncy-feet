@@ -1,6 +1,8 @@
 <script>
   import { page } from '$app/state';
+  import LoginRequiredContent from '$lib/components/profile/LoginRequiredContent.svelte';
   import PopupWithRunes from '$lib/components/ui/PopupWithRunes.svelte';
+  import VideoUpload from '$lib/components/ui/video/VideoUpload.svelte';
   import UserList from '$lib/components/UserList.svelte';
   import { getUserContext } from '$lib/context';
   import { t } from '$lib/i18n';
@@ -12,7 +14,9 @@
   const userCtx = getUserContext();
   const { clubsData } = getClubsContext();
 
+  /** @type {Club} */
   const club = $derived(clubsData.mine.find((c) => c.id === clubId));
+  const playlistId = $derived(club.private_playlist?.id);
 
   let showPopup = $state(false);
   let message = $state('');
@@ -48,13 +52,35 @@
 
     showPopup = false;
   }
+
+  /**
+   * @param {import('$lib/peertube-openapi').VideoUploadResponse} video
+   */
+  function onVideoUploaded(video) {
+    if (!video.video) {
+      console.error('Got no video to add');
+      return;
+    }
+    let videoId = video.video.id;
+    userCtx.authenticatedPost('/clubs/video/add', {
+      video_id: videoId,
+      club_id: clubId,
+      private: true,
+    });
+  }
 </script>
 
-<h2>{club?.name}</h2>
-<p>{club?.description}</p>
+<h2>{club.name}</h2>
+<p>{club.description}</p>
 
 <!-- TODO: Clean up design etc -->
 <button onclick={() => (showPopup = true)}>{$t('club.add-user-button')}</button>
+
+<!-- TODO: clean up, maybe put in components etc -->
+<LoginRequiredContent reason={$t('profile.upload.requires-login-description')}>
+  <p>Add club video</p>
+  <VideoUpload {onVideoUploaded}></VideoUpload>
+</LoginRequiredContent>
 
 <PopupWithRunes bind:isOpen={showPopup}>
   <div class="popup">

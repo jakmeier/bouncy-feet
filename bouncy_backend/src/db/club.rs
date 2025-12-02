@@ -1,4 +1,8 @@
-use crate::{api_endoints::club::AddClubMemberRequest, user::UserId, AppState};
+use crate::{
+    api_endoints::club::{AddClubMemberRequest, AddClubVideoRequest},
+    user::UserId,
+    AppState,
+};
 use sqlx::FromRow;
 
 #[derive(Clone, Copy, Debug)]
@@ -9,8 +13,14 @@ pub struct Club {
     pub id: ClubId,
     pub title: String,
     pub description: String,
-    pub public_playlist: String,
-    pub private_playlist: String,
+    pub public_playlist: PlaylistInfo,
+    pub private_playlist: PlaylistInfo,
+}
+
+#[derive(serde::Serialize, Debug, Clone)]
+pub struct PlaylistInfo {
+    pub id: i64,
+    pub short_uuid: String,
 }
 
 #[derive(Debug, Clone)]
@@ -25,8 +35,10 @@ struct ClubRow {
     pub id: i64,
     pub title: String,
     pub description: String,
-    pub public_playlist: String,
-    pub private_playlist: String,
+    pub public_playlist_id: i64,
+    pub public_playlist_short_uuid: String,
+    pub private_playlist_id: i64,
+    pub private_playlist_short_uuid: String,
 }
 
 #[derive(Debug, Clone, FromRow)]
@@ -42,20 +54,24 @@ impl Club {
         state: &AppState,
         title: &str,
         description: &str,
-        public_playlist: &str,
-        private_playlist: &str,
+        public_playlist_id: i64,
+        public_playlist_short_uuid: &str,
+        private_playlist_id: i64,
+        private_playlist_short_uuid: &str,
     ) -> Result<Club, sqlx::Error> {
         let rec = sqlx::query_as!(
             ClubRow,
             r#"
-            INSERT INTO clubs (title, description, public_playlist, private_playlist)
-            VALUES ($1, $2, $3, $4)
-            RETURNING id, title, description, public_playlist, private_playlist
+            INSERT INTO clubs (title, description, public_playlist_id, public_playlist_short_uuid, private_playlist_id, private_playlist_short_uuid)
+            VALUES ($1, $2, $3, $4, $5, $6)
+            RETURNING id, title, description, public_playlist_id, public_playlist_short_uuid, private_playlist_id, private_playlist_short_uuid
             "#,
             title,
             description,
-            public_playlist,
-            private_playlist
+            public_playlist_id,
+            public_playlist_short_uuid,
+            private_playlist_id,
+            private_playlist_short_uuid
         )
         .fetch_one(&state.pg_db_pool)
         .await?;
@@ -63,11 +79,10 @@ impl Club {
         Ok(Club::from(rec))
     }
 
-    #[allow(dead_code)]
     pub(crate) async fn lookup(state: &AppState, id: ClubId) -> Option<Club> {
         let maybe_club = sqlx::query_as!(
             ClubRow,
-            r#"SELECT id, title, description, public_playlist, private_playlist
+            r#"SELECT id, title, description, public_playlist_id, public_playlist_short_uuid, private_playlist_id, private_playlist_short_uuid
             FROM clubs
             WHERE id = $1"#,
             id.num()
@@ -84,7 +99,7 @@ impl Club {
         let rows = sqlx::query_as!(
             ClubRow,
             r#"
-            SELECT id, title, description, public_playlist, private_playlist
+            SELECT id, title, description, public_playlist_id, public_playlist_short_uuid, private_playlist_id, private_playlist_short_uuid
             FROM clubs
             ORDER BY id
             LIMIT $1 OFFSET $2
@@ -199,7 +214,7 @@ impl Club {
         let rows = sqlx::query_as!(
             ClubRow,
             r#"
-            SELECT c.id, c.title, c.description, c.public_playlist, c.private_playlist
+            SELECT c.id, c.title, c.description, c.public_playlist_id, c.public_playlist_short_uuid, c.private_playlist_id, c.private_playlist_short_uuid
             FROM clubs c
             JOIN user_club uc ON uc.club_id = c.id
             WHERE uc.user_id = $1
@@ -228,8 +243,14 @@ impl From<ClubRow> for Club {
             id: ClubId(record.id),
             title: record.title,
             description: record.description,
-            public_playlist: record.public_playlist,
-            private_playlist: record.private_playlist,
+            public_playlist: PlaylistInfo {
+                id: record.public_playlist_id,
+                short_uuid: record.public_playlist_short_uuid,
+            },
+            private_playlist: PlaylistInfo {
+                id: record.private_playlist_id,
+                short_uuid: record.private_playlist_short_uuid,
+            },
         }
     }
 }
@@ -245,6 +266,12 @@ impl From<Option<UserClubRow>> for ClubMembership {
 }
 
 impl AddClubMemberRequest {
+    pub(crate) fn club_id(&self) -> ClubId {
+        ClubId(self.club_id)
+    }
+}
+
+impl AddClubVideoRequest {
     pub(crate) fn club_id(&self) -> ClubId {
         ClubId(self.club_id)
     }

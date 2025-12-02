@@ -185,4 +185,24 @@
  * @property {number} volume - Volume level (0.0 to 1.0).
  * @property {string} duration - Total duration of the video (as stringified float).
  * @property {"playing" | "paused" | "ended"} playbackState - Current playback state.
+ *
+ * @typedef {Object} ClubsContextData
+ * @property {ClubsData} clubsData
+ * 
+ * @typedef {Object} Club
+ * @property {number} id
+ * @property {string} name
+ * @property {string} description
+ * @property {AvatarStyleContext} style
+ * @property {PlaylistInfo} [public_playlist]
+ * @property {PlaylistInfo} [private_playlist]
+ * @property {object} stats
+ *
+ * @typedef {Object} ClubsData
+ * @property {Club[]} mine
+ * 
+ * @typedef {Object} PlaylistInfo
+ * @property {number} id
+ * @property {string} short_uuid
+ * 
  */

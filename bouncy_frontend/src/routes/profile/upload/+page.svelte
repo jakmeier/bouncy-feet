@@ -1,14 +1,14 @@
 <script>
   import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
   import LimeSection from '$lib/components/ui/sections/LimeSection.svelte';
-  import { uploadVideoToPeerTubeResumable, fetchMyVideos } from '$lib/peertube';
+  import { fetchMyVideos } from '$lib/peertube';
   import { t, locale, coachLocale } from '$lib/i18n';
-  import RequiresLoginPopup from '$lib/components/profile/RequiresLoginPopup.svelte';
   import { page } from '$app/state';
   import { coachData } from '$lib/coach';
   import { getUserContext } from '$lib/context';
   import LoginRequiredContent from '$lib/components/profile/LoginRequiredContent.svelte';
   import PeertubeVideoPlayer from '$lib/components/ui/video/PeertubeVideoPlayer.svelte';
+  import VideoUpload from '$lib/components/ui/video/VideoUpload.svelte';
 
   /** @type {UserContextData} */
   const userCtx = getUserContext();
@@ -20,72 +20,6 @@
   const title = $derived(
     $t('profile.upload.title') + ' ' + coach.title[coachLocale($locale)]
   );
-
-  let file = $state(null);
-  let isUploading = $state(false);
-  let uploadProgress = $state(0);
-  let error = $state('');
-
-  async function handleFileSelect(event) {
-    file = event.target.files?.[0] ?? null;
-    error = '';
-
-    if (!file) {
-      console.info('no file selected');
-      return;
-    }
-
-    let accessToken = pwaAuth.peerTubeToken?.access_token;
-    if (!accessToken) {
-      await pwaAuth.refreshPeerTubeToken();
-      accessToken = pwaAuth.peerTubeToken?.access_token;
-    }
-
-    if (!accessToken) {
-      console.error('No PeerTube access token');
-      // TODO: translate error to user
-      error =
-        'Uhm, failed authentication with video hosting service, sorry about that :(';
-      return;
-    }
-
-    isUploading = true;
-    uploadProgress = 0;
-
-    try {
-      // TODO: Can I track uploading progress somehow?
-      const ptu = await userCtx.peerTubeUser;
-      const channels = ptu?.videoChannels;
-      // @ts-ignore
-      const channelId = channels[0]?.id;
-      if (channelId === undefined) {
-        // TODO: create it!
-        throw new Error('No video channel found');
-      }
-      // upload in background
-      uploadVideoToPeerTubeResumable(
-        file,
-        channelId,
-        (ratio) => (uploadProgress = Math.floor(ratio * 100))
-      )
-        .then(() => {
-          uploadProgress = 100;
-        })
-        .catch((err) => {
-          console.error(err);
-          // TODO: translate error to user
-          error = "Oops, I couldn't upload that :(";
-        })
-        .finally(() => {
-          isUploading = false;
-        });
-    } catch (err) {
-      console.error(err);
-      // TODO: translate error to user
-      error = "Oops, I couldn't upload that :(";
-      isUploading = false;
-    }
-  }
 </script>
 
 <LimeSection fillScreen>
@@ -100,15 +34,7 @@
       User id: {$user.openid}
     </p>
 
-    <input type="file" accept="video/*" onchange={handleFileSelect} />
-
-    {#if isUploading}
-      <p>Uploading… {uploadProgress}%</p>
-    {/if}
-
-    {#if error}
-      <p style="color: red">{error}</p>
-    {/if}
+    <VideoUpload></VideoUpload>
 
     <!-- TODO: pagination, general display etc -->
     <!-- TODO: display private videos -->
@@ -129,9 +55,3 @@
     {/await}
   </LoginRequiredContent>
 </LimeSection>
-
-<style>
-  input[type='file'] {
-    margin: 1rem 0;
-  }
-</style>

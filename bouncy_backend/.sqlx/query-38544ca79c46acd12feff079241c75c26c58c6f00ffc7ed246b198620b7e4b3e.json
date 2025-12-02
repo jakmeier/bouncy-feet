@@ -1,0 +1,58 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, title, description, public_playlist_id, public_playlist_short_uuid, private_playlist_id, private_playlist_short_uuid\n            FROM clubs\n            WHERE id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "description",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "public_playlist_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 4,
+        "name": "public_playlist_short_uuid",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "private_playlist_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 6,
+        "name": "private_playlist_short_uuid",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "38544ca79c46acd12feff079241c75c26c58c6f00ffc7ed246b198620b7e4b3e"
+}

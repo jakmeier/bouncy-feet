@@ -1,19 +1,3 @@
-/**
- * @typedef {Object} Club
- * @property {number} id
- * @property {string} name
- * @property {string} description
- * @property {AvatarStyleContext} style
- * @property {{ [key: string]: string }} peertubePlaylist
- * @property {object} stats
- *
- * @typedef {Object} ClubsContextData
- * @property {ClubsData} clubsData
- *
- * @typedef {Object} ClubsData
- * @property {Club[]} mine
-*/
-
 import { getContext } from "svelte";
 
 /** @returns {ClubsContextData} */

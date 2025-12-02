@@ -153,6 +153,7 @@ async fn main() -> anyhow::Result<()> {
             "/clubs/add_member",
             post(api_endoints::club::add_club_member),
         )
+        .route("/clubs/video/add", post(api_endoints::club::add_video))
         .route("/user", get(api_endoints::user::user_info))
         .route("/user/meta", get(api_endoints::user_meta::metadata))
         .route("/users", post(api_endoints::user::list_users))

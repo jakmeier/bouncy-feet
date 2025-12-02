@@ -28,6 +28,17 @@ enum PlaylistPrivacy {
     Private = 3,
 }
 
+#[derive(Debug, Clone, serde::Deserialize)]
+pub(crate) struct VideoAddedResponse {
+    #[serde(alias = "videoPlaylistElement")]
+    video_playlist_element: PlaylistElement,
+}
+
+#[derive(Debug, Clone, serde::Deserialize)]
+pub(crate) struct PlaylistElement {
+    pub id: i64,
+}
+
 /// Creates an impersonal (system) playlist on PeerTube that's unlisted.
 pub(crate) async fn create_unlisted_system_playlist(
     state: &AppState,
@@ -84,6 +95,33 @@ async fn create_system_playlist<T: serde::Serialize + ?Sized>(
     let playlist: Result<PlaylistCreatedResponse, _> = ok_response.json().await;
     let playlist = playlist.map_err(|err| PeerTubeError::JsonParsingFailed(status, err))?;
     Ok(playlist.video_playlist)
+}
+
+pub(crate) async fn add_video_to_playlist(
+    state: &AppState,
+    video_id: i64,
+    playlist_id: i64,
+) -> Result<PlaylistElement, PeerTubeError> {
+    let url = state
+        .peertube_url
+        .join(&format!("api/v1/video-playlists/{}/videos", playlist_id))
+        .expect("must be valid url");
+
+    let auth_header = state.system_user.authorization_header(state).await?;
+
+    let response = state
+        .http_client
+        .post(url.as_str())
+        .form(&[("videoId", video_id)])
+        .header(reqwest::header::AUTHORIZATION, &auth_header)
+        .send()
+        .await;
+
+    let ok_response = check_peertube_system_user_response(response, auth_header).await?;
+    let status = ok_response.status();
+    let msg: Result<VideoAddedResponse, _> = ok_response.json().await;
+    let msg = msg.map_err(|err| PeerTubeError::JsonParsingFailed(status, err))?;
+    Ok(msg.video_playlist_element)
 }
 
 impl PlaylistPrivacy {

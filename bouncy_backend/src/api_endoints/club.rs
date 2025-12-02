@@ -1,10 +1,10 @@
-use crate::club::ClubMembership;
+use crate::club::{ClubId, ClubMembership, PlaylistInfo};
 use crate::db::club::Club;
 use crate::peertube::playlist::{
     create_public_system_playlist, create_unlisted_system_playlist, Playlist,
 };
 use crate::peertube::{handle_peertube_error, PeerTubeError};
-use crate::user::User;
+use crate::user::{User, UserId};
 use crate::AppState;
 use axum::extract::State;
 use axum::http::StatusCode;
@@ -29,9 +29,9 @@ struct ClubInfo {
     name: String,
     // lang: String, needed ?? -> not yet, maybe at some point
     description: String,
-    public_playlist: String,
+    public_playlist: PlaylistInfo,
     // Only set for authenticated members
-    private_playlist: Option<String>,
+    private_playlist: Option<PlaylistInfo>,
     // TODO
     // style
 
@@ -50,6 +50,13 @@ pub struct AddClubMemberRequest {
     // Backend / DB user id
     pub user_id: i64,
     pub club_id: i64,
+}
+
+#[derive(serde::Deserialize)]
+pub struct AddClubVideoRequest {
+    pub video_id: i64,
+    pub club_id: i64,
+    pub private: bool,
 }
 
 /// Retrieve clubs of the user that made the request.
@@ -143,7 +150,9 @@ pub async fn create_club(
         &state,
         &payload.title,
         &payload.description,
+        public_playlist.id,
         &public_playlist.short_uuid,
+        private_playlist.id,
         &private_playlist.short_uuid,
     )
     .await;
@@ -206,14 +215,11 @@ pub async fn add_club_member(
     Json(params): Json<AddClubMemberRequest>,
 ) -> Response {
     // Check permissions: Must be admin
-    let result = Club::membership(&state, me.id, params.club_id()).await;
-
-    if let Err(err) = result {
-        tracing::error!(?err, "DB error on add_club_member");
-        return (StatusCode::INTERNAL_SERVER_ERROR, "Internal error").into_response();
-    }
-    let my_membership = result.expect("just checked");
-    if !matches!(my_membership, ClubMembership::Admin) {
+    let membership = match get_membership(&state, me.id, params.club_id()).await {
+        Ok(it) => it,
+        Err(response) => return response,
+    };
+    if !matches!(membership, ClubMembership::Admin) {
         return (StatusCode::FORBIDDEN, "no permission to add club member").into_response();
     }
 
@@ -232,4 +238,63 @@ pub async fn add_club_member(
         return (StatusCode::INTERNAL_SERVER_ERROR, "Internal error").into_response();
     }
     (StatusCode::CREATED, "member added").into_response()
+}
+
+#[axum::debug_handler]
+pub async fn add_video(
+    Extension(me): Extension<User>,
+    State(state): State<AppState>,
+    Json(params): Json<AddClubVideoRequest>,
+) -> Response {
+    // Check permissions: Must be member
+    // Side-note: maybe should be admin for public videos?
+    let membership = match get_membership(&state, me.id, params.club_id()).await {
+        Ok(it) => it,
+        Err(response) => return response,
+    };
+    if !matches!(membership, ClubMembership::Admin | ClubMembership::Member) {
+        return (StatusCode::FORBIDDEN, "not a club member").into_response();
+    }
+
+    // Check the playlist that belongs to the club.
+    // The user would know it and could provide it but we need to check for permissions anyway.
+    let Some(club) = Club::lookup(&state, params.club_id()).await else {
+        return (StatusCode::NOT_FOUND, "no such club").into_response();
+    };
+
+    let playlist = if params.private {
+        club.private_playlist
+    } else {
+        club.public_playlist
+    };
+
+    let result =
+        crate::peertube::playlist::add_video_to_playlist(&state, params.video_id, playlist.id)
+            .await;
+
+    if let Err(err) = result {
+        tracing::error!(?err, "Adding video to playlist failed");
+        return (
+            StatusCode::BAD_GATEWAY,
+            "Could not add video to PeerTube playlist",
+        )
+            .into_response();
+    }
+    let element = result.expect("just checked");
+
+    (StatusCode::CREATED, element.id.to_string()).into_response()
+}
+
+async fn get_membership(
+    state: &AppState,
+    user_id: UserId,
+    club_id: ClubId,
+) -> Result<ClubMembership, Response> {
+    let result = Club::membership(state, user_id, club_id).await;
+    if let Err(err) = result {
+        tracing::error!(?err, "DB error on reading club membership");
+        return Err((StatusCode::INTERNAL_SERVER_ERROR, "Internal error").into_response());
+    }
+
+    Ok(result.expect("just checked"))
 }

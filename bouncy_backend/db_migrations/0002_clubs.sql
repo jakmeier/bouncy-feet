@@ -6,9 +6,11 @@ CREATE TABLE IF NOT EXISTS clubs (
     -- displayed description (language agnostic)
     description VARCHAR(1024) NOT NULL,
     -- peertube playlist id for videos shown on the public profile of this club
-    public_playlist VARCHAR(32) NOT NULL,
+    public_playlist_id BIGINT NOT NULL,
+    public_playlist_short_uuid VARCHAR(32) NOT NULL,
     -- peertube playlist id for videos only visible by members
-    private_playlist VARCHAR(32) NOT NULL
+    private_playlist_id BIGINT NOT NULL,
+    private_playlist_short_uuid VARCHAR(32) NOT NULL
 );
 
 -- club membership
