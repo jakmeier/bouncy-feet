@@ -13,6 +13,7 @@
   import { client as peerTubeApi } from '$lib/peertube-openapi/client.gen';
   import { PUBLIC_BF_PEERTUBE_URL } from '$env/static/public';
   import { fetchPeerTubeUser } from '$lib/peertube';
+  import { KvSync } from '$lib/sync';
 
   /**
    * @typedef {Object} Props
@@ -30,8 +31,6 @@
    *
    * To create a new guest session, the client has to make a request to the API server.
    * This could be changed in the future, to allow offline initialization.
-   *
-   * TODO: registered user client sessions
    */
 
   // This state is read-only. Updates must go through setters. Otherwise, they
@@ -39,6 +38,7 @@
   // Actually initialized in onMount
   /** @type {ClientSession} */
   const clientSession = $state({});
+  const kvSync = new KvSync('bfkv_', updateMetaOnRemote, updateMetaInMemory);
 
   // Pwa auth works independent of the api server, generating a token to be used
   // for PeerTube only (for now).
@@ -112,10 +112,14 @@
       };
     }
     if (localStorage.clientSessionId) {
+      // migration from old to new way of storing user meta in local storage
+      await migrateFromFirstMetaStorage();
+      await syncKvWithServer();
+
       return {
         id: localStorage.clientSessionId,
         secret: localStorage.clientSessionSecret,
-        meta: parseOrNull(localStorage.userMeta) || {},
+        meta: kvSync.load(),
       };
     } else {
       return await requestNewGuestSession()
@@ -131,7 +135,11 @@
             };
             localStorage.clientSessionId = newClientSession.id;
             localStorage.clientSessionSecret = newClientSession.secret;
-            localStorage.userMeta = JSON.stringify(newClientSession.meta);
+            kvSync.setStringValue(
+              'onboarding',
+              ONBOARDING_STATE.FIRST_VISIT,
+              new Date()
+            );
             return newClientSession;
           } else {
             console.error(
@@ -152,12 +160,43 @@
           return {
             id: localStorage.clientSessionId,
             secret: localStorage.clientSessionSecret,
-            meta: parseOrNull(localStorage.userMeta) || {
+            meta: {
               onboarding: ONBOARDING_STATE.FIRST_VISIT,
             },
           };
         });
     }
+  }
+
+  async function syncKvWithServer() {
+    const remoteData = await userCtx.authenticatedGet('/user/meta');
+    if (remoteData && remoteData.ok) {
+      const remoteMods = await remoteData.json();
+      if (Array.isArray(remoteMods)) {
+        await kvSync.sync(remoteMods);
+      } else {
+        console.error('Unexpected response from meta query', remoteMods);
+      }
+    } else {
+      console.error('Meta query failed', remoteData);
+    }
+  }
+
+  async function migrateFromFirstMetaStorage() {
+    const oldMetaStr = localStorage.getItem('userMeta');
+    if (oldMetaStr) {
+      const oldMeta = parseOrNull(oldMetaStr);
+      if (oldMeta) {
+        // select an old date
+        const date = new Date(2000, 0, 0, 0, 0);
+        for (const [key, value] of Object.entries(oldMeta)) {
+          // Only string values existed in the old version, so use that.
+          // This also updates the remote.
+          await kvSync.setStringValue(key, value, date);
+        }
+      }
+    }
+    localStorage.removeItem('userMeta');
   }
 
   function authHeader() {
@@ -256,11 +295,7 @@
           clientSession.secret = newSession.client_session_secret;
 
           // now update the server about our local state
-          for (const [key, value] of Object.entries(clientSession.meta)) {
-            if (typeof key === 'string' && typeof value === 'string') {
-              setUserMeta(key, value);
-            }
-          }
+          syncKvWithServer();
 
           // now we can try to make the unauthorized request again, with new auth headers
           let auth = authHeader();
@@ -303,42 +338,80 @@
   /**
    * @param {string} key
    * @param {string} value
-   * @returns {Promise<import("$lib/stats").ApiResponse>}
+   * @param {Date} lastModified
+   * @param {number} version
+   * @returns {Promise<void>}
    */
-  async function setUserMeta(key, value) {
-    if (!key) {
-      return {
-        error: API_ERROR.UnknownClientError,
-        errorBody: 'need key in setUserMeta',
-      };
-    }
-    // First persist in localStorage
-    const meta = JSON.parse(localStorage.getItem('userMeta') || '{}');
-    meta[key] = value;
-    localStorage.setItem('userMeta', JSON.stringify(meta));
-
-    // Now also update client state
-    // @ts-ignore
-    clientSession.meta[key] = value;
-
+  async function updateMetaOnRemote(key, value, lastModified, version) {
     const headers = {
       'Content-Type': 'application/json',
     };
     const body = JSON.stringify({
       key_name: key,
       key_value: value,
-      // chrono can parse the time including the timezone from this
-      last_modified: new Date().toISOString(),
-      // the only existing version for now
-      version: 0,
+      last_modified: lastModified,
+      version,
     });
 
-    return await authenticatedApiRequest(
+    const result = await authenticatedApiRequest(
       'POST',
       '/user/meta/update',
       headers,
       body
     );
+
+    if (result.error || result.errorBody) {
+      // TODO: handle login etc
+      console.warn('meta update failed', result.errorBody);
+    }
+
+    return;
+  }
+
+  /**
+   * @param {string} key
+   * @param {string} value
+   * @param {string} type
+   * @param {Date} _lastModified
+   * @param {number} _version
+   */
+  async function updateMetaInMemory(key, value, type, _lastModified, _version) {
+    // for now, only handle strings here and avoid type conflicts
+    // (the design might require some more iterations)
+    if (type === 's:') {
+      clientSession.meta[key] = value;
+    }
+  }
+
+  /**
+   * @param {string} key
+   * @param {string} value
+   * @returns {Promise<void>}
+   */
+  async function setUserMeta(key, value) {
+    if (!key) {
+      console.warn('Tried setting user meta with empty key');
+      return;
+    }
+
+    // All updates go through sync object which first persists in local storage
+    // and then updates in-memory and remote states.
+    await kvSync.setStringValue(key, value, new Date());
+
+    return;
+  }
+
+  /**
+   * Read all user meta from the backend server.
+   *
+   * @returns {Promise<UserMetaResponse[] | undefined>}
+   */
+  async function getAllUserMeta() {
+    const response = await authenticatedGet('/user/meta');
+
+    if (response?.ok) {
+      return response.json();
+    }
   }
 
   /**
@@ -380,6 +453,7 @@
   }
 
   // TODO: user data should be synced with the server
+  // => Migrate this to user meta data and local data, as appropriate
   const stored = browser ? parseOrNull(localStorage.user) : null;
   if (stored && !stored.id) {
     stored.id = crypto.randomUUID();

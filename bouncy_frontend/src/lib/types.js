@@ -96,6 +96,10 @@
  * @property {UserLessonProgress} userLessonProgress 
  * @property {boolean} consentSendingStats
  * @property {boolean} experimentalFeatures
+ * 
+ * @typedef {Object} PublicUserResponse
+ * @property {number} id
+ * @property {string} display_name
  *
  * @typedef {Object} AccessToken
  * @property {string} token_type
@@ -110,7 +114,7 @@
  * @property {import('svelte/store').Writable<UserData>} store,
  * @property {ClientSession} clientSession,
  * @property {PwaAuth} pwaAuth,
- * @property {any} setUserMeta,
+ * @property {(key: string, value: string)=>Promise<void>} setUserMeta,
  * @property {(courseId: string, lessonIndex: number, detection: DetectionResult) => DanceSessionResult | null} submitCourseLesson
  * @property {(warmupId: string, detection: DetectionResult) => DanceSessionResult | null} submitWarmup
  * @property {(stepId: string, bpm: number, detection: DetectionResult) => DanceSessionResult | null} submitStepTraining
@@ -124,7 +128,12 @@
  * @property {(yes: boolean)=>void} setSkippedIntro
  * @property {BfError} loginError -- only set if login is impossible, otherwise just trigger a login
  * @property {()=>void} clearErrors
- * 
+ *
+ * @typedef {Object} UserMetaResponse
+ * @property {String} key_name
+ * @property {String} key_value
+ * @property {String} [last_modified] -- Option<chrono::NaiveDateTime>
+ * @property {number} version_nr -- i16
  *
  * @typedef {Object} BfError
  * @property {string} title
@@ -159,10 +168,13 @@
  * @typedef {Object} ClientSession
  * @property {string} id
  * @property {string} secret
- * @property {UserMeta} meta
+ * @property {DynUserMeta} meta
  * 
- * @typedef {Object} UserMeta
+ * @typedef {Object} UserMeta -- old in-memory meta values
  * @property {OnboardingState} [onboarding]
+ * 
+ * @typedef {Object.<string, string>} DynUserMeta -- new in-memory meta values,
+ * mapping (untyped) keys to stringified values for quick in-memory access
  * 
  * @typedef {Object} TranslatedText
  * @property {string} de

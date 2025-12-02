@@ -72,7 +72,7 @@ To avoid major data inconsistency issues, every piece of the user's state follow
 1. For each data point, one single point of authority serializes all
    modifications to it. It can be one single server or one single client.
 2. When modifying remote data, keep the last synchronized state separate from
-   the modifications. Synchronize by sending the modifications the the point of
+   the modifications. Synchronize by sending the modifications to the point of
    data authority, get the new state, then delete the locally buffered modifications.
 3. Every modification needs an associated timestamp, to resolve conflicts.
 4. Modifications should be semantically accurate. Example: "Increase score by
