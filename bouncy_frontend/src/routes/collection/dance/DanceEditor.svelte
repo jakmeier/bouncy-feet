@@ -10,8 +10,6 @@
   import { goto } from '$app/navigation';
   import { dynamicCounter } from '$lib/timer';
 
-  
-  
   /**
    * @typedef {Object} Props
    * @property {import("bouncy_instructor").StepWrapper[]} availableSteps

@@ -1,7 +1,6 @@
 <script>
   import { createParagraphs } from '$lib/text_utils';
 
-  
   /**
    * @typedef {Object} Props
    * @property {string} text
@@ -21,7 +20,7 @@
     position = 'top',
     right = '50%',
     width = '300px',
-    tailSize = 10
+    tailSize = 10,
   } = $props();
 
   let textLines = $derived(createParagraphs(text));

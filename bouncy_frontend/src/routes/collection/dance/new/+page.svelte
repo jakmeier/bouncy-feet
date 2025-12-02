@@ -3,7 +3,6 @@
   import { DanceBuilder } from '$lib/instructor/bouncy_instructor';
   import DanceEditor from '../DanceEditor.svelte';
 
-  
   /**
    * @typedef {Object} Props
    * @property {import('./$types').PageData} data

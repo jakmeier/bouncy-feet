@@ -1,5 +1,4 @@
 <script>
-  
   /**
    * @typedef {Object} Props
    * @property {import("bouncy_instructor").PoseApproximation} data

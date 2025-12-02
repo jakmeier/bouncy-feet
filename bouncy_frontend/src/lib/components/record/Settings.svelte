@@ -3,7 +3,6 @@
 
   import { t } from '$lib/i18n';
 
-  
   /**
    * @typedef {Object} Props
    * @property {import("bouncy_instructor").Tracker} tracker

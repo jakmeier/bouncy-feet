@@ -6,10 +6,6 @@
   import DraggableList from '$lib/components/ui/DraggableList.svelte';
   import { StepWrapper } from '$lib/instructor/bouncy_instructor';
 
-  
-  
-
-
   const stepSize = 100;
 
   /**
@@ -27,7 +23,7 @@
     danceBuilder = $bindable(),
     animationTime,
     stepTime,
-    beatCounter = counter(-1, 1, stepTime)
+    beatCounter = counter(-1, 1, stepTime),
   } = $props();
 
   /**
@@ -97,9 +93,12 @@
     return swappedIndex;
   }
   /** @type {import("bouncy_instructor").StepWrapper[]} */
-  let uniqueSteps = $derived(availableSteps.filter(
-    (step, index, self) => index === self.findIndex((t) => t.name === step.name)
-  ));
+  let uniqueSteps = $derived(
+    availableSteps.filter(
+      (step, index, self) =>
+        index === self.findIndex((t) => t.name === step.name)
+    )
+  );
 </script>
 
 <div class="outer">
@@ -112,7 +111,7 @@
     {onRemove}
   >
     {#snippet main({ item: step, index })}
-        <div   >
+      <div>
         <Step
           {step}
           poseIndex={$beatCounter}
@@ -121,12 +120,12 @@
           borderWidth={selectedStepIndex === index ? 5 : 2}
         />
       </div>
-      {/snippet}
+    {/snippet}
     {#snippet name({ item: step })}
-        <div  >
+      <div>
         {step.name}
       </div>
-      {/snippet}
+    {/snippet}
   </DraggableList>
 
   {#if selectedStepIndex !== -1}

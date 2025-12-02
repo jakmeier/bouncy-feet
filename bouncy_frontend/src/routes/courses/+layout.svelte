@@ -2,7 +2,6 @@
   import { setContext } from 'svelte';
   import { readable } from 'svelte/store';
 
-  
   /**
    * @typedef {Object} Props
    * @property {import('./$types').LayoutData} data

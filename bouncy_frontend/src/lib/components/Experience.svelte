@@ -6,8 +6,7 @@
   } from '$lib/stats';
 
   // A component to show the level and experience of a step or dance.
-  
-  
+
   /**
    * @typedef {Object} Props
    * @property {number} xp
@@ -17,12 +16,7 @@
    */
 
   /** @type {Props} */
-  let {
-    xp,
-    height = 20,
-    lvlSize = 35,
-    twoRows = false
-  } = $props();
+  let { xp, height = 20, lvlSize = 35, twoRows = false } = $props();
 
   let level = $derived(experienceToLevel(xp));
   let xpRequired = $derived(incrementalExperienceForLevel(level + 1));
@@ -35,7 +29,8 @@
 >
   <div
     class="level"
-    style="width: {lvlSize}px; height: {lvlSize}px; line-height: {lvlSize}px; font-size: {lvlSize/2}px;"
+    style="width: {lvlSize}px; height: {lvlSize}px; line-height: {lvlSize}px; font-size: {lvlSize /
+      2}px;"
   >
     {level}
   </div>
@@ -66,7 +61,7 @@
     background-color: var(--theme-main);
     border-radius: 5px;
     width: 0;
-    transition: width 1.0s;
+    transition: width 1s;
   }
 
   .level {

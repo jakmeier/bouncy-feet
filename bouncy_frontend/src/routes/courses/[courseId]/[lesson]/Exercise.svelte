@@ -8,7 +8,6 @@
   import Step from '../../../collection/Step.svelte';
   import Symbol from '$lib/components/ui/Symbol.svelte';
 
-  
   /**
    * @typedef {Object} Props
    * @property {import("bouncy_instructor").LessonPart} lessonPart
@@ -108,8 +107,7 @@
     <div>
       {$t('courses.lesson.exercise-start-description')}
     </div>
-    <button onclick={closePopUp}
-      >{$t('courses.lesson.own-music-button')}</button
+    <button onclick={closePopUp}>{$t('courses.lesson.own-music-button')}</button
     >
     <button
       onclick={() => {

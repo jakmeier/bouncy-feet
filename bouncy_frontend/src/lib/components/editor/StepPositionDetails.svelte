@@ -25,7 +25,6 @@
     pose = position?.pose();
   }
 
-  
   /**
    * @typedef {Object} Props
    * @property {any} [onChange]

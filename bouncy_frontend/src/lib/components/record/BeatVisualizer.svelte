@@ -3,8 +3,6 @@
 
   import { onMount } from 'svelte';
 
-  
-  
   /**
    * @typedef {Object} Props
    * @property {number} [size]
@@ -20,7 +18,7 @@
     accentColor = true,
     start,
     timeBetweenBeats,
-    children
+    children,
   } = $props();
 
   /** @type {Element} */
@@ -69,7 +67,9 @@
   let bigInnerSize = $derived(size * 0.95);
   let padding = $derived((bigInnerSize - innerSize) * 2 + 10);
   let slotSize = $derived(size - 2 * padding);
-  let innerColor = $derived(accentColor ? '--theme-main' : '--theme-neutral-gray');
+  let innerColor = $derived(
+    accentColor ? '--theme-main' : '--theme-neutral-gray'
+  );
   run(() => {
     timeBetweenBeats, start, replaceAnimation(timeBetweenBeats);
   });

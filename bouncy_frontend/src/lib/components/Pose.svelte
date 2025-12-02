@@ -4,7 +4,6 @@
   import Svg from './avatar/Svg.svelte';
   import SvgAvatar from './avatar/SvgAvatar.svelte';
 
-  
   /**
    * @typedef {Object} Props
    * @property {PoseWrapper} pose

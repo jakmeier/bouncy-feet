@@ -1,7 +1,6 @@
 <script>
   import { t } from '$lib/i18n.js';
 
-  
   /**
    * @typedef {Object} Props
    * @property {any} [title]

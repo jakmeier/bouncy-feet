@@ -4,14 +4,8 @@
   import { stepById } from '$lib/instructor/bouncy_instructor';
   import Step from '../Step.svelte';
 
-  
-  
-  
-  
   const stepSize = 100;
-  
-  
-  
+
   /**
    * @typedef {Object} Props
    * @property {import("bouncy_instructor").StepWrapper[]} allSteps
@@ -31,7 +25,7 @@
     animationTime,
     selectedVariationCallback,
     setFlippedCallback,
-    flipped
+    flipped,
   } = $props();
 
   const sideway =
@@ -39,7 +33,9 @@
   const baseStep = stepById(selectedStep.id, false) || selectedStep;
   const flippedStep = stepById(selectedStep.id, true) || selectedStep;
   /** @type {import("bouncy_instructor").StepWrapper[]} */
-  let variations = $derived(allSteps.filter((step) => step.name == selectedStep.name));
+  let variations = $derived(
+    allSteps.filter((step) => step.name == selectedStep.name)
+  );
 </script>
 
 {#if sideway}

@@ -8,7 +8,6 @@
     danceBuilderFromDance,
   } from '$lib/instructor/bouncy_instructor';
 
-  
   /**
    * @typedef {Object} Props
    * @property {import('./$types').PageData} data

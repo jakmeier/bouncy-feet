@@ -3,7 +3,6 @@
   import Symbol from '../ui/Symbol.svelte';
   import Toggle from '../ui/Toggle.svelte';
 
-  
   /**
    * @typedef {Object} Props
    * @property {boolean} [enableLiveAvatar]
@@ -12,7 +11,11 @@
    */
 
   /** @type {Props} */
-  let { enableLiveAvatar = $bindable(false), enableInstructorAvatar = $bindable(false), videoOpacity = $bindable(0.5) } = $props();
+  let {
+    enableLiveAvatar = $bindable(false),
+    enableInstructorAvatar = $bindable(false),
+    videoOpacity = $bindable(0.5),
+  } = $props();
 </script>
 
 <div id="control-panel">

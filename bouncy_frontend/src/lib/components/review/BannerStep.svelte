@@ -3,13 +3,6 @@
   import SvgAvatar from '$lib/components/avatar/SvgAvatar.svelte';
   import Svg from '$lib/components/avatar/Svg.svelte';
 
-  
-
-  
-  
-  
-  
-  
   /**
    * @typedef {Object} Props
    * @property {any} step
@@ -27,7 +20,7 @@
     scrollOffset,
     reviewStart,
     reviewEnd,
-    avatarSize = 60
+    avatarSize = 60,
   } = $props();
 
   const trackerCtx = getContext('tracker');

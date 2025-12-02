@@ -7,10 +7,6 @@
 
   const avatarSize = 60;
 
-  
-  
-  
-
   /**
    * @type {number}
    * Between 0.0 and 1.0, depending on where in the scrollable range the center should be.
@@ -27,7 +23,7 @@
     cursor = newCursorValue;
     adjustScroll(scrollableWidth, cursor);
   }
-  
+
   /**
    * @typedef {Object} Props
    * @property {any} [steps]
@@ -37,12 +33,7 @@
    */
 
   /** @type {Props} */
-  let {
-    steps = [],
-    reviewStart,
-    reviewEnd,
-    onScroll = undefined
-  } = $props();
+  let { steps = [], reviewStart, reviewEnd, onScroll = undefined } = $props();
 
   /**
    * @type {HTMLDivElement}

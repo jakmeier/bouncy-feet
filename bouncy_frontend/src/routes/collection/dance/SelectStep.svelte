@@ -2,12 +2,6 @@
   import Step from '../Step.svelte';
   import UiBox from '$lib/components/ui/UiBox.svelte';
 
-  
-
-  
-  
-
-  
   /**
    * @typedef {Object} Props
    * @property {import('bouncy_instructor').StepWrapper[]} steps
@@ -23,7 +17,7 @@
     show = $bindable(false),
     poseIndex = 0,
     animationTime = 500,
-    selectedCallback
+    selectedCallback,
   } = $props();
 
   /**
