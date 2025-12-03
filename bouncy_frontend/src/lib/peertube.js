@@ -122,9 +122,8 @@ export const VIDEO_PRIVACY = {
  * @returns {Promise<api.VideoUploadResponse>}
 */
 export async function uploadVideoToPeerTubeResumable(file, channelId, onProgress, privacy = VIDEO_PRIVACY.PRIVATE) {
-    // 1 MB seems fine but could be optimized and made dynamic
-    const chunkSize = 1024 * 1024;
     const totalSize = file.size;
+    let chunkSize = initialChunkSize(totalSize);
 
     const { response, error } = await uploadResumableInit({
         body: {
@@ -173,6 +172,7 @@ export async function uploadVideoToPeerTubeResumable(file, channelId, onProgress
         const chunk = file.slice(offset, end);
         const contentRange = `bytes ${offset}-${end - 1}/${totalSize}`;
 
+        const chunkStartT = performance.now();
         const { response, data, error } = await uploadResumable({
             body: chunk,
             query: { upload_id: uploadId },
@@ -181,6 +181,7 @@ export async function uploadVideoToPeerTubeResumable(file, channelId, onProgress
                 'Content-Length': chunk.size,
             },
         });
+        const chunkTimeMs = performance.now() - chunkStartT;
 
         if (response.status === 200) {
             if (!data) {
@@ -193,12 +194,62 @@ export async function uploadVideoToPeerTubeResumable(file, channelId, onProgress
         // https://github.com/kukhariev/node-uploadx/blob/master/proto.md
         // 308 in this context means 'Resume Incomplete' and not the standard '308 Permanent Redirect'
         if (response.status !== 308) {
+            const retryAfter = response.headers.get('Retry-After');
+            if (retryAfter) {
+                // We hit the rate-limit.
+                // "Retry-After" header should always be available, while
+                // "X-RateLimit-Remaining" and "X-RateLimit-Reset" are not
+                // available to scrips by default, as they are not listed as
+                // "Access-Control-Expose-Headers" by PeerTube.
+                const waitSeconds = Number.parseInt(retryAfter) || 10;
+                console.debug(`Rate-limited, delaying upload for ${waitSeconds}s`);
+                await new Promise((r) => setTimeout(r, waitSeconds * 1000));
+                continue;
+            }
             throw new Error(`Video uploading failed. ${error}`);
         }
         // Range header should return the progress, e.g. bytes=0-1024 means the server already has the first 1024 bytes.
         const serverProgress = response.headers.get('Range')?.split('-')[1];
         offset = Number.parseInt(serverProgress || end.toString());
         onProgress(offset / totalSize);
+
+        // don't spam the server too much, use large chunks on god internet
+        chunkSize = updatedChunkSize(chunkTimeMs, chunkSize);
+    }
+}
+
+/**
+ * @param {number} totalSize
+ * @returns {number} chunkSize
+ */
+function initialChunkSize(totalSize) {
+    const REQUEST_LIMIT = 40; // Rate-limit is at 50 requests / 10 seconds. Keep it well under.
+    const MIN_CHUNK_SIZE = 1024 * 1024; // 1 MB seems like a good minimum.
+    const MAX_CHUNK_SIZE = 1024 * 1024 * 512; // 512 MB
+
+    // Keep it under the limit but make it a power of 2;
+    const exponent = Math.ceil(Math.log2(totalSize / REQUEST_LIMIT));
+    const chunkSize = Math.pow(2, exponent);
+
+    if (chunkSize > MAX_CHUNK_SIZE) {
+        throw new Error("Upload too big");
+    }
+
+    return Math.max(chunkSize, MIN_CHUNK_SIZE);
+}
+
+/**
+ * @param {number} chunkTimeMs
+ * @param {number} chunkSize
+ * @returns {number} chunkSize
+ */
+function updatedChunkSize(chunkTimeMs, chunkSize) {
+    const tooFast = 200;
+    const maxChunkSize = 1024 * 1024 * 128;
+    if (chunkTimeMs < tooFast && chunkSize * 2 <= maxChunkSize) {
+        return chunkSize * 2;
+    } else {
+        return chunkSize;
     }
 }
 
