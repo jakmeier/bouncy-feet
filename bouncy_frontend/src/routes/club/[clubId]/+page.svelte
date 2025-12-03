@@ -2,8 +2,10 @@
   import { page } from '$app/state';
   import LoginRequiredContent from '$lib/components/profile/LoginRequiredContent.svelte';
   import PopupWithRunes from '$lib/components/ui/PopupWithRunes.svelte';
+  import Symbol from '$lib/components/ui/Symbol.svelte';
   import VideoUpload from '$lib/components/ui/video/VideoUpload.svelte';
   import UserList from '$lib/components/UserList.svelte';
+  import VideoFeed from '$lib/components/VideoFeed.svelte';
   import { getUserContext } from '$lib/context';
   import { t } from '$lib/i18n';
   import { getClubsContext } from '$lib/stores/Clubs.svelte';
@@ -14,9 +16,13 @@
   const userCtx = getUserContext();
   const { clubsData } = getClubsContext();
 
-  /** @type {Club} */
-  const club = $derived(clubsData.mine.find((c) => c.id === clubId));
-  const playlistId = $derived(club.private_playlist?.id);
+  // May be undefined while clubs are still loading.
+  /** @type {Club | undefined} */
+  const club = $derived.by(
+    () =>
+      clubsData.mine.find((c) => c.id === clubId) ||
+      clubsData.public.find((c) => c.id === clubId)
+  );
 
   let showPopup = $state(false);
   let message = $state('');
@@ -70,28 +76,46 @@
   }
 </script>
 
-<h2>{club.name}</h2>
-<p>{club.description}</p>
-
-<!-- TODO: Clean up design etc -->
-<button onclick={() => (showPopup = true)}>{$t('club.add-user-button')}</button>
-
-<!-- TODO: clean up, maybe put in components etc -->
-<LoginRequiredContent reason={$t('profile.upload.requires-login-description')}>
-  <p>Add club video</p>
-  <VideoUpload {onVideoUploaded}></VideoUpload>
-</LoginRequiredContent>
-
-<PopupWithRunes bind:isOpen={showPopup}>
-  <div class="popup">
-    {#if message}
-      <div>{message}</div>
-    {:else}
-      <div>{$t('club.select-user-title')}</div>
-      <UserList onSelect={onSelectUser}></UserList>
-    {/if}
+{#if !club}
+  <div class="loading">
+    <Symbol size={100} class="rotating">refresh</Symbol>
   </div>
-</PopupWithRunes>
+{:else}
+  <h2>{club.name}</h2>
+  <p>{club.description}</p>
+
+  <!-- TODO: Clean up design etc -->
+  <button onclick={() => (showPopup = true)}
+    >{$t('club.add-user-button')}</button
+  >
+
+  {#if userCtx.isLoggedInToApi()}
+    <!-- TODO: must make video unlisted, rather than private -->
+    <p>Add club video</p>
+    <VideoUpload {onVideoUploaded}></VideoUpload>
+  {/if}
+
+  <h2>Public Club Videos</h2>
+  <VideoFeed playlistId={club.public_playlist.short_uuid}></VideoFeed>
+
+  {#if club.private_playlist}
+    <LoginRequiredContent reason={$t('club.requires-login-description')}>
+      <h2>Private Club Videos</h2>
+      <VideoFeed playlistId={club.private_playlist.short_uuid}></VideoFeed>
+    </LoginRequiredContent>
+  {/if}
+
+  <PopupWithRunes bind:isOpen={showPopup}>
+    <div class="popup">
+      {#if message}
+        <div>{message}</div>
+      {:else}
+        <div>{$t('club.select-user-title')}</div>
+        <UserList onSelect={onSelectUser}></UserList>
+      {/if}
+    </div>
+  </PopupWithRunes>
+{/if}
 
 <style>
   .popup {
@@ -99,5 +123,10 @@
     color: var(--theme-neutral-dark);
     padding: 1rem;
     border-radius: 1rem;
+  }
+
+  .loading {
+    text-align: center;
+    margin: 2rem 0;
   }
 </style>

@@ -1,3 +1,4 @@
+import { apiRequest } from "$lib/stats";
 import { getContext } from "svelte";
 
 /** @returns {ClubsContextData} */
@@ -11,26 +12,36 @@ export function getClubsContext() {
 
 /** @type {ClubsData} */
 export const clubsData = $state({
-    mine: []
+    mine: [],
+    public: [],
     // TODO: consider adding
     // lastUpdated:
 })
 
 /**
  * @param {UserContextData} userCtx
+ * @returns {Promise<Club[]>}
  */
 export async function loadMyClubs(userCtx) {
     const response = await userCtx.authenticatedGet("/clubs/joined");
     /** @type { {clubs: Club[]} } */
     const data = await response?.json();
-    clubsData.mine = [];
-    // clubsData.mine.push(...data.clubs);
-    for (let club of data.clubs) {
-        const defaultValues = mockCourseBase("Default");
-        const completeClub = Object.assign(defaultValues, club)
-        clubsData.mine.push(completeClub);
+    return data.clubs;
+}
+
+/**
+ * @returns {Promise<Club[]>}
+ */
+export async function loadPublicClubs() {
+    const response = await apiRequest("/clubs");
+    if (response.okResponse) {
+        /** @type { {clubs: Club[]} } */
+        const data = await response.okResponse.json();
+        return data.clubs;
+    } else {
+        console.warn("loading public clubs failed", response.error, response.errorBody);
+        return [];
     }
-    // clubsData.mine.push(...mockData());
 }
 
 /**
@@ -53,57 +64,5 @@ export async function createNewClub(userCtx, title, description) {
 
     /** @type { Club } */
     const club = await response?.json();
-    const defaultValues = mockCourseBase("Default");
-    const completeClub = Object.assign(defaultValues, club)
-    clubsData.mine.push(completeClub);
-}
-
-/** @returns {Club[]} */
-function mockData() {
-    return [
-        mockCourseBase("East Attitude Shufflers"),
-        mockCourseBase("SG Shufflers", '#019934', '#ffffff'),
-        mockCourseBase("SWISS Shufflers", '#FF0000', '#ffffff') // alt: #DA291C
-    ];
-}
-
-/**
- * @param {string | undefined} name
- * @param {string | undefined} [mainColor]
- * @param {string | undefined} [secondaryColor]
- *
- * @returns {Club}
- */
-function mockCourseBase(name, mainColor, secondaryColor) {
-    return {
-        id: 0,
-        name: name || "Mock Club",
-        description: "This is a Mock Club",
-        // courseIds: ['running-man-basics', 'rm-practice'],
-        style: {
-            coloring: {
-                leftColor: mainColor || 'var(--avatar-left)',
-                rightColor: secondaryColor || 'var(--avatar-right)',
-                headColor: mainColor || 'var(--avatar-head)',
-            },
-            bodyShape: {
-                strokeWidth: 1,
-            },
-            headStyle: {
-                shape: 'disk',
-                size: 0.75,
-                strokeWidth: 1,
-            },
-            pageColoring: {
-                pageColor: "var(--theme-accent)",
-                secondaryColor: "var(--theme-accent-medium)",
-                danceFloorColor: "var(--theme-neutral-light)",
-                fontColor: "var(--theme-neutral-black)",
-            }
-        },
-        stats: {
-            members: 0,
-        },
-        peertubePlaylist: {}
-    };
+    clubsData.mine.push(club);
 }

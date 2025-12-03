@@ -43,7 +43,8 @@
   <a href="./club/{club.id}">
     <div class="club card">
       <div class="logo">
-        <div class="title" style="color: {club.style.coloring.headColor}">
+        <!-- style="color: {club.style.coloring.headColor}" -->
+        <div class="title">
           {club.name}
         </div>
       </div>
@@ -55,7 +56,7 @@
         ></FormattedText> -->
           <div class="stats">
             <div>
-              {club.stats.members} members
+              {club.stats?.members || '?'} members
             </div>
             <div>5 new videos</div>
           </div>

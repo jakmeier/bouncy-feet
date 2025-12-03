@@ -50,7 +50,8 @@
         "confirm-add-user-p1": " to ",
         "confirm-add-user-p2": "?",
         "add-user-success": "Done!",
-        "add-user-failed": "Sorry something went wrong:("
+        "add-user-failed": "Sorry something went wrong:(",
+        "requires-login-description": "This part of the club is private."
     },
     "courses": {
         "nav": "Learn",
@@ -343,6 +344,9 @@
     },
     "music": {
         "by": "by"
+    },
+    "video": {
+        "empty-playlist": "No videos available"
     },
     "common": {
         "hint-popup-title": "Hint",

@@ -69,12 +69,14 @@ pub async fn my_clubs(Extension(user): Extension<User>, State(state): State<AppS
         return (StatusCode::INTERNAL_SERVER_ERROR, "DB ERROR").into_response();
     };
 
-    let clubs = db_clubs_to_club_infos(db_clubs);
+    // Listing own clubs -> access granted
+    let private_access = true;
+    let clubs = db_clubs_to_club_infos(db_clubs, private_access);
     let response = ClubsResponse { clubs };
     (StatusCode::OK, Json(response)).into_response()
 }
 
-fn db_clubs_to_club_infos(db_clubs: Vec<Club>) -> Vec<ClubInfo> {
+fn db_clubs_to_club_infos(db_clubs: Vec<Club>, has_private_access: bool) -> Vec<ClubInfo> {
     db_clubs
         .into_iter()
         .map(|club| ClubInfo {
@@ -82,8 +84,7 @@ fn db_clubs_to_club_infos(db_clubs: Vec<Club>) -> Vec<ClubInfo> {
             name: club.title,
             description: club.description,
             public_playlist: club.public_playlist,
-            // Listing own clubs -> access granted
-            private_playlist: Some(club.private_playlist),
+            private_playlist: has_private_access.then_some(club.private_playlist),
         })
         .collect()
 }
@@ -99,7 +100,8 @@ pub async fn clubs(State(state): State<AppState>) -> Response {
         return (StatusCode::INTERNAL_SERVER_ERROR, "DB ERROR").into_response();
     };
 
-    let clubs = db_clubs_to_club_infos(db_clubs);
+    let private_access = false;
+    let clubs = db_clubs_to_club_infos(db_clubs, private_access);
     let resonse = ClubsResponse { clubs };
     (StatusCode::OK, Json(resonse)).into_response()
 }

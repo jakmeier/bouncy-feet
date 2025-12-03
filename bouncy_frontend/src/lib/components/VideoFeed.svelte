@@ -1,4 +1,5 @@
 <script>
+  import { t } from '$lib/i18n';
   import { fetchVideosOfPlaylist } from '$lib/peertube';
   import Juggler from './ui/Juggler.svelte';
 
@@ -16,7 +17,11 @@
   <!-- TODO(August): report video -->
 
   {#await videoIds then ids}
-    <Juggler {ids}></Juggler>
+    {#if ids?.length > 0}
+      <Juggler {ids}></Juggler>
+    {:else}
+      {$t('video.empty-playlist')}
+    {/if}
   {/await}
 </div>
 

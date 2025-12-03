@@ -61,7 +61,7 @@
           <PoseDetectionContext>
             <MusicContext>
               <UserAvatarStyleContext>
-                <ClubsContext>
+                <ClubsContext publicClubs={data.publicClubs}>
                   {#if !fadingOut.state}
                     <div out:fade in:fade={{ delay: 600 }}>
                       {@render children?.()}

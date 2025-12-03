@@ -23,6 +23,12 @@
   /** @type {Props} */
   let { children } = $props();
 
+  // Set base url as early as possible, or some components will accidentally use
+  // the default url on a page reload.
+  peerTubeApi.setConfig({
+    baseUrl: PUBLIC_BF_PEERTUBE_URL,
+  });
+
   /**
    * Client sessions are available for registered users and guests.
    *
@@ -112,10 +118,6 @@
       };
     }
     if (localStorage.clientSessionId) {
-      // migration from old to new way of storing user meta in local storage
-      await migrateFromFirstMetaStorage();
-      await syncKvWithServer();
-
       return {
         id: localStorage.clientSessionId,
         secret: localStorage.clientSessionSecret,
@@ -639,6 +641,7 @@
   };
   setContext('user', userCtx);
 
+  // TODO: Anti-pattern of waiting for onMount to render.
   const has = $state({ mounted: false });
   onMount(async () => {
     // ensure the store is initialized
@@ -654,6 +657,10 @@
       }
     }
     has.mounted = true;
+
+    // migration from old to new way of storing user meta in local storage
+    await migrateFromFirstMetaStorage();
+    await syncKvWithServer();
   });
 </script>
 

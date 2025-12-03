@@ -14,6 +14,7 @@ import {
     stepsBySource,
     StepWrapper,
 } from '$lib/instructor/bouncy_instructor';
+import { loadPublicClubs } from '$lib/stores/Clubs.svelte';
 
 // This is the root layout, hence it defines prerendering for the entire app default.
 // Translations act weird with prerender on, so I'm disabling it.
@@ -56,12 +57,14 @@ export const load = async ({ fetch, data }) => {
     /** @type {Course[]} */
     // @ts-ignore
     const courses = coursesResults.filter((c) => c);
+    const publicClubs = await loadPublicClubs();
 
     return {
         i18n,
         translations,
         officialDances,
         courses,
+        publicClubs,
         lookupSteps,
         lookupPoses,
     };
