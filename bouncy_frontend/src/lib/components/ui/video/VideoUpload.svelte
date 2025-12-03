@@ -1,5 +1,5 @@
 <script>
-  import { uploadVideoToPeerTubeResumable } from '$lib/peertube';
+  import { uploadVideoToPeerTubeResumable, VIDEO_PRIVACY } from '$lib/peertube';
   import { t } from '$lib/i18n';
   import { getUserContext } from '$lib/context';
   import LoginRequiredContent from '$lib/components/profile/LoginRequiredContent.svelte';
@@ -7,10 +7,12 @@
   /**
    * @typedef {Object} Props
    * @prop {(video: import('$lib/peertube-openapi').VideoUploadResponse)=>void} [onVideoUploaded]
+   * @prop {import('$lib/peertube-openapi').VideoPrivacySet} [privacy]
    */
 
   /** @type {Props}*/
-  let { onVideoUploaded = () => {} } = $props();
+  let { onVideoUploaded = () => {}, privacy = VIDEO_PRIVACY.PRIVATE } =
+    $props();
 
   /** @type {UserContextData} */
   const userCtx = getUserContext();
@@ -69,7 +71,8 @@
       uploadVideoToPeerTubeResumable(
         file,
         channelId,
-        (ratio) => (uploadProgress = Math.floor(ratio * 100))
+        (ratio) => (uploadProgress = Math.floor(ratio * 100)),
+        privacy
       )
         .then((videoResponse) => {
           uploadProgress = 100;

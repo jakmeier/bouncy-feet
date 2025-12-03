@@ -8,6 +8,7 @@
   import VideoFeed from '$lib/components/VideoFeed.svelte';
   import { getUserContext } from '$lib/context';
   import { t } from '$lib/i18n';
+  import { VIDEO_PRIVACY } from '$lib/peertube';
   import { getClubsContext } from '$lib/stores/Clubs.svelte';
 
   const clubId = Number.parseInt(page.params.clubId || '0');
@@ -90,9 +91,9 @@
   >
 
   {#if userCtx.isLoggedInToApi()}
-    <!-- TODO: must make video unlisted, rather than private -->
     <p>Add club video</p>
-    <VideoUpload {onVideoUploaded}></VideoUpload>
+    <VideoUpload {onVideoUploaded} privacy={VIDEO_PRIVACY.UNLISTED}
+    ></VideoUpload>
   {/if}
 
   <h2>Public Club Videos</h2>

@@ -101,13 +101,27 @@ export async function uploadVideoToPeerTube(
     return data;
 }
 
-/** 
- *  @param {File} file
- *  @param {number} channelId
- *  @param {(ratio: number) => void} onProgress
- *  @returns {Promise<api.VideoUploadResponse>}
+/**
+ * @readonly
+ * @enum {api.VideoPrivacySet} 
+ */
+export const VIDEO_PRIVACY = {
+    /** @type {api.VideoPrivacySet} */
+    PUBLIC: 1,
+    /** @type {api.VideoPrivacySet} */
+    UNLISTED: 2,
+    /** @type {api.VideoPrivacySet} */
+    PRIVATE: 3,
+}
+
+/**
+ * @param {File} file
+ * @param {number} channelId
+ * @param {(ratio: number) => void} onProgress
+ * @param {api.VideoPrivacySet} [privacy]
+ * @returns {Promise<api.VideoUploadResponse>}
 */
-export async function uploadVideoToPeerTubeResumable(file, channelId, onProgress) {
+export async function uploadVideoToPeerTubeResumable(file, channelId, onProgress, privacy = VIDEO_PRIVACY.PRIVATE) {
     // 1 MB seems fine but could be optimized and made dynamic
     const chunkSize = 1024 * 1024;
     const totalSize = file.size;
@@ -119,8 +133,7 @@ export async function uploadVideoToPeerTubeResumable(file, channelId, onProgress
             // file name with extension
             filename: file.name,
             channelId,
-            // 1 = Public, 2 = Unlisted, 3 = Private
-            privacy: 3,
+            privacy,
             description: 'Uploaded from Bouncy Feet',
         },
         headers: {
