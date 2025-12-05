@@ -3,7 +3,14 @@
   import { fetchVideosOfPlaylist } from '$lib/peertube';
   import Juggler from './ui/Juggler.svelte';
 
-  let { playlistId } = $props();
+  /**
+   * @typedef {Object} Props
+   * @property {number} playlistId
+   * @property {boolean} autoplay
+   */
+
+  /** @type {Props} */
+  let { playlistId, autoplay = false } = $props();
   let videoIds = $derived(fetchVideoIds());
 
   async function fetchVideoIds() {
@@ -18,7 +25,7 @@
 
   {#await videoIds then ids}
     {#if ids?.length > 0}
-      <Juggler {ids}></Juggler>
+      <Juggler {ids} {autoplay}></Juggler>
     {:else}
       {$t('video.empty-playlist')}
     {/if}

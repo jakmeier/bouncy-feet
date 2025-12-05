@@ -100,7 +100,16 @@
     const { PeerTubePlayer } = await import('@peertube/embed-api');
 
     player = new PeerTubePlayer(iframe);
-    await player.setAuthToken(userCtx.pwaAuth.peerTubeToken?.access_token);
+    // set up refreshed token forwarding
+    player.addEventListener(
+      'authFailed',
+      async () => {
+        console.log("authFailed event listener triggered");
+        await player.setAuthToken(userCtx.pwaAuth.peerTubeToken?.access_token);
+      }
+    );
+    // set current token once to resolve 
+    // await player.setAuthToken(userCtx.pwaAuth.peerTubeToken?.access_token);
 
     player.addEventListener(
       'playbackStatusChange',

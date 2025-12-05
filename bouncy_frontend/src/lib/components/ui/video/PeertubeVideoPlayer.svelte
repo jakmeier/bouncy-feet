@@ -1,5 +1,7 @@
 <script>
   import { PUBLIC_BF_PEERTUBE_URL } from '$env/static/public';
+  import { onMount } from 'svelte';
+  import Symbol from '../Symbol.svelte';
   import PeertubePlayer from './PeertubePlayer.svelte';
 
   /** @typedef {{ time: number, label: string, icon: string }} Marker */
@@ -11,6 +13,7 @@
    * @property {boolean} [muted]
    * @property {boolean} [timeline]
    * @property {boolean} [isPrivate]
+   * @property {number} [delayLoadingMs]
    */
 
   /** @type Props */
@@ -21,9 +24,13 @@
     muted = false,
     timeline,
     isPrivate = false,
+    delayLoadingMs = 0,
   } = $props();
 
+  /** @type {PeertubePlayer | undefined} */
   let player = $state();
+
+  let deferred = $state(delayLoadingMs > 0);
 
   export function play() {
     if (player) {
@@ -49,6 +56,10 @@
     }
   }
 
+  export function forceLoad() {
+    deferred = false;
+  }
+
   const peertubeUrl = $derived(
     PUBLIC_BF_PEERTUBE_URL +
       '/videos/embed/' +
@@ -56,13 +67,34 @@
       '?api=1&warningTitle=0&controlBar=0&peertubeLink=0&controls=0&requiresAuth=' +
       (isPrivate ? '1' : '0')
   );
+
+  onMount(() => {
+    if (deferred) {
+      setTimeout(() => (deferred = false), delayLoadingMs);
+    }
+  });
 </script>
 
-<PeertubePlayer
-  bind:this={player}
-  {peertubeUrl}
-  {beats}
-  {markers}
-  {muted}
-  {timeline}
-/>
+{#if deferred}
+  <div class="wrapper">
+    <Symbol size={100} class="rotating">refresh</Symbol>
+  </div>
+{:else}
+  <PeertubePlayer
+    bind:this={player}
+    {peertubeUrl}
+    {beats}
+    {markers}
+    {muted}
+    {timeline}
+  />
+{/if}
+
+<style>
+  .wrapper {
+    width: 300px;
+    aspect-ratio: 9 / 16;
+    display: grid;
+    place-items: center;
+  }
+</style>
