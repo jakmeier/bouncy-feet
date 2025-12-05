@@ -77,7 +77,7 @@
 
 {#if deferred}
   <div class="wrapper">
-    <Symbol size={100} class="rotating">refresh</Symbol>
+    <Symbol size={100} styleClass="rotating">refresh</Symbol>
   </div>
 {:else}
   <PeertubePlayer

@@ -1,11 +1,11 @@
 <script>
   import { page } from '$app/state';
   import LoginRequiredContent from '$lib/components/profile/LoginRequiredContent.svelte';
+  import ThumbnailFeed from '$lib/components/ThumbnailFeed.svelte';
   import PopupWithRunes from '$lib/components/ui/PopupWithRunes.svelte';
   import Symbol from '$lib/components/ui/Symbol.svelte';
   import VideoUpload from '$lib/components/ui/video/VideoUpload.svelte';
   import UserList from '$lib/components/UserList.svelte';
-  import VideoFeed from '$lib/components/VideoFeed.svelte';
   import { getUserContext } from '$lib/context';
   import { t } from '$lib/i18n';
   import { VIDEO_PRIVACY } from '$lib/peertube';
@@ -79,7 +79,7 @@
 
 {#if !club}
   <div class="loading">
-    <Symbol size={100} class="rotating">refresh</Symbol>
+    <Symbol size={100} styleClass="rotating">refresh</Symbol>
   </div>
 {:else}
   <h2>{club.name}</h2>
@@ -97,12 +97,17 @@
   {/if}
 
   <h2>Public Club Videos</h2>
-  <VideoFeed playlistId={club.public_playlist.short_uuid}></VideoFeed>
+  <div class="small-feed">
+    <ThumbnailFeed playlistId={club.public_playlist.short_uuid}></ThumbnailFeed>
+  </div>
 
   {#if club.private_playlist}
     <LoginRequiredContent reason={$t('club.requires-login-description')}>
       <h2>Private Club Videos</h2>
-      <VideoFeed playlistId={club.private_playlist.short_uuid}></VideoFeed>
+      <div class="small-feed">
+        <ThumbnailFeed playlistId={club.private_playlist.short_uuid}
+        ></ThumbnailFeed>
+      </div>
     </LoginRequiredContent>
   {/if}
 
@@ -129,5 +134,9 @@
   .loading {
     text-align: center;
     margin: 2rem 0;
+  }
+
+  .small-feed {
+    height: 200px;
   }
 </style>

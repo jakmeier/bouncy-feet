@@ -1,7 +1,7 @@
 <script>
   import { t } from '$lib/i18n';
   import { fetchVideosOfPlaylist } from '$lib/peertube';
-  import Juggler from './ui/Juggler.svelte';
+  import VideoJuggler from './ui/VideoJuggler.svelte';
 
   /**
    * @typedef {Object} Props
@@ -11,9 +11,9 @@
 
   /** @type {Props} */
   let { playlistId, autoplay = false } = $props();
-  let videoIds = $derived(fetchVideoIds());
+  let videoUuids = $derived(fetchVideoUuids());
 
-  async function fetchVideoIds() {
+  async function fetchVideoUuids() {
     const videos = await fetchVideosOfPlaylist(playlistId);
     return videos.data?.map((v) => v.video?.uuid);
   }
@@ -23,9 +23,9 @@
   <!-- TODO(August): like video -->
   <!-- TODO(August): report video -->
 
-  {#await videoIds then ids}
+  {#await videoUuids then ids}
     {#if ids?.length > 0}
-      <Juggler {ids} {autoplay}></Juggler>
+      <VideoJuggler {ids} {autoplay}></VideoJuggler>
     {:else}
       {$t('video.empty-playlist')}
     {/if}

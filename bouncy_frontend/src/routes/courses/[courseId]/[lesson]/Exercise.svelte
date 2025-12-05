@@ -94,9 +94,9 @@
     <div class="audio-selector">
       <Toggle bind:isOn={audioOn} border></Toggle>
       {#if audioOn}
-        <Symbol class="blue margin15" size={40}>volume_up</Symbol>
+        <Symbol styleClass="blue margin15" size={40}>volume_up</Symbol>
       {:else}
-        <Symbol class="blue margin15" size={40}>volume_off</Symbol>
+        <Symbol styleClass="blue margin15" size={40}>volume_off</Symbol>
       {/if}
     </div>
   </div>

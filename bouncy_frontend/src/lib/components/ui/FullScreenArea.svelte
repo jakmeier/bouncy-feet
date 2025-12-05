@@ -1,7 +1,6 @@
 <script>
   //! Show content on the full available screen, or, if it would exceed that
   //! maximum configured area, on a limited area on top of the other content.
-  
 
   /**
    * @typedef {Object} Props
@@ -18,7 +17,7 @@
     maxHeight = 900,
     backgroundColor = 'none',
     overlayColor = 'none',
-    children
+    children,
   } = $props();
 </script>
 

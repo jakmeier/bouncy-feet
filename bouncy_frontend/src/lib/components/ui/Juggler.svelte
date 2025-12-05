@@ -4,65 +4,23 @@
 
   /**
    * @typedef {Object} Props
-   * @property {string[]} ids
-   * @property {boolean} autoplay
+   * @property {(index: number)=>void} [onIndexChanged]
+   * @property {any[]} items
+   * @property {import('svelte').Snippet<[any]>} element
    */
 
   /** @type {Props} */
-  let { ids, autoplay } = $props();
+  let { onIndexChanged = () => {}, items, element } = $props();
   let currentIndex = $state(0);
-  const videos = $derived(
-    // reverse for z-ordering
-    [...ids].reverse().map((id) => {
-      return {
-        id: id,
-        /** @type {PeertubeVideoPlayer | undefined} */
-        player: undefined,
-      };
-    })
-  );
-  $effect(() => {
-    const currentVideo = videos[currentIndex];
-    if (autoplay && currentVideo.player) {
-      currentVideo.player.play();
-      currentVideo.player.addEventListener('playbackStatusUpdate', nextOnEnded);
-    }
 
-    const prevIdx = (currentIndex + ids.length - 1) % ids.length;
-    const nextIdx = (currentIndex + 1) % ids.length;
-    if (prevIdx !== currentIndex && videos[prevIdx].player) {
-      videos[prevIdx].player.pause();
-      videos[prevIdx].player.removeEventListener(
-        'playbackStatusUpdate',
-        nextOnEnded
-      );
-    }
-    if (nextIdx !== currentIndex && videos[nextIdx].player) {
-      videos[nextIdx].player.pause();
-      videos[nextIdx].player.removeEventListener(
-        'playbackStatusUpdate',
-        nextOnEnded
-      );
-    }
-  });
-
-  function prev() {
-    currentIndex = (currentIndex + ids.length - 1) % ids.length;
-    videos[currentIndex].player?.forceLoad();
+  export function prev() {
+    currentIndex = (currentIndex + items.length - 1) % items.length;
+    onIndexChanged(currentIndex);
   }
 
-  function next() {
-    currentIndex = (currentIndex + 1) % ids.length;
-    videos[currentIndex].player?.forceLoad();
-  }
-
-  /**
-   * @param {PeerTubePlayerState} playerState
-   */
-  function nextOnEnded(playerState) {
-    if (playerState.playbackState === 'ended') {
-      next();
-    }
+  export function next() {
+    currentIndex = (currentIndex + 1) % items.length;
+    onIndexChanged(currentIndex);
   }
 
   /**
@@ -99,14 +57,10 @@
 <div class="container">
   <button onclick={prev}>&lt;</button>
   <div class="videos">
-    {#each videos as video, reverseIndex}
-      {@const index = videos.length - 1 - reverseIndex}
+    {#each items as item, reverseIndex}
+      {@const index = items.length - 1 - reverseIndex}
       <JuggleElement position={pos(index)}>
-        <PeertubeVideoPlayer
-          bind:this={video.player}
-          videoId={video.id}
-          delayLoadingMs={delayMs(index)}
-        />
+        {@render element({ item, index })}
       </JuggleElement>
     {/each}
   </div>
@@ -117,7 +71,7 @@
   .container {
     position: relative;
     width: 100%;
-    height: 70vh;
+    height: min(70vh, 100%);
   }
 
   .container button {

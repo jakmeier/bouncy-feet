@@ -1,9 +1,13 @@
-<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
 <script>
-  /** @type {number|undefined} */
-  export let size = undefined;
+  /** @typedef {object} Props
+   * @prop {number} [size]
+   * @prop {string} [styleClass]
+   * @property {import('svelte').Snippet} [children]
+   */
 
-  let styleClass = $$props.class || '';
+  /** @type {Props}
+   */
+  let { size, styleClass = '', children } = $props();
 </script>
 
 <span
@@ -11,7 +15,7 @@
   translate="no"
   style={size ? `font-size: ${size}px` : ''}
 >
-  <slot />
+  {@render children?.()}
 </span>
 
 <style>

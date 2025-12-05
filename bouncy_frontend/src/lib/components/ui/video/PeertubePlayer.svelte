@@ -101,14 +101,11 @@
 
     player = new PeerTubePlayer(iframe);
     // set up refreshed token forwarding
-    player.addEventListener(
-      'authFailed',
-      async () => {
-        console.log("authFailed event listener triggered");
-        await player.setAuthToken(userCtx.pwaAuth.peerTubeToken?.access_token);
-      }
-    );
-    // set current token once to resolve 
+    player.addEventListener('authFailed', async () => {
+      console.log('authFailed event listener triggered');
+      await player.setAuthToken(userCtx.pwaAuth.peerTubeToken?.access_token);
+    });
+    // set current token once to resolve
     // await player.setAuthToken(userCtx.pwaAuth.peerTubeToken?.access_token);
 
     player.addEventListener(
@@ -289,8 +286,8 @@
   iframe {
     display: block;
 
-    width: 100%;
-    height: 100%;
+    /* width: 100%;
+    height: 100%; */
     border: 0;
   }
 </style>

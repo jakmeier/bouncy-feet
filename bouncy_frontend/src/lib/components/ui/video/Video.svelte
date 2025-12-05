@@ -59,7 +59,7 @@
 
 {#if videoLoading}
   <div class="video-unavailable">
-    <Symbol size={100} class="rotating">refresh</Symbol>
+    <Symbol size={100} styleClass="rotating">refresh</Symbol>
   </div>
 {:else if !videoExists}
   <div class="video-unavailable">

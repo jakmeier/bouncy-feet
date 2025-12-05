@@ -12,7 +12,7 @@
 
 <button class={$$props.class} on:click>
   {#if hasSymbol}
-    <Symbol size={symbolSize} class={symbolClass || ''}>{symbol}</Symbol>
+    <Symbol size={symbolSize} styleClass={symbolClass || ''}>{symbol}</Symbol>
   {/if}
   <p class:smallText={hasSymbol}>
     {#if text !== ''}
