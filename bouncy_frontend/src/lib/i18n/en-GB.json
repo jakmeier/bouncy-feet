@@ -44,13 +44,15 @@
         "nav": "Home"
     },
     "club": {
-        "add-user-button": "Add dancer to club",
+        "add-user-button": "Add club member",
+        "upload-video-button": "Upload video",
         "select-user-title": "Select dancer",
         "confirm-add-user-p0": "Add ",
         "confirm-add-user-p1": " to ",
         "confirm-add-user-p2": "?",
         "add-user-success": "Done!",
         "add-user-failed": "Sorry something went wrong:(",
+        "members-title": "Members",
         "requires-login-description": "This part of the club is private."
     },
     "courses": {

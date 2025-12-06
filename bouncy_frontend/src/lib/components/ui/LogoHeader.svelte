@@ -16,7 +16,7 @@
    * @property {boolean} [transparent]
    * @property {boolean} [backButton]
    * @property {()=>void} [onBack]
-   * @property {()=>void} [onAction]
+   * @property {()=>void} [onAction] -- create a plus icon on the top right and trigger this function when selected
    */
 
   /** @type {Props} */

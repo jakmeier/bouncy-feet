@@ -45,12 +45,14 @@
     },
     "club": {
         "add-user-button": "Mitglied hinzufügen",
+        "upload-video-button": "Video hochladen",
         "select-user-title": "Wähle Tänzer/in",
         "confirm-add-user-p0": "Füge ",
         "confirm-add-user-p1": " zu ",
         "confirm-add-user-p2": " hinzu?",
         "add-user-success": "Hinzugefügt!",
         "add-user-failed": "Das hat leider nicht geklappt :(",
+        "members-title": "Mitglieder",
         "requires-login-description": "Dieser Bereich vom Club ist privat."
     },
     "courses": {

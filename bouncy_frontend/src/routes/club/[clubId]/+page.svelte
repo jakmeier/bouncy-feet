@@ -2,7 +2,12 @@
   import { page } from '$app/state';
   import LoginRequiredContent from '$lib/components/profile/LoginRequiredContent.svelte';
   import ThumbnailFeed from '$lib/components/ThumbnailFeed.svelte';
+  import Button from '$lib/components/ui/Button.svelte';
+  import Footer from '$lib/components/ui/Footer.svelte';
+  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
   import PopupWithRunes from '$lib/components/ui/PopupWithRunes.svelte';
+  import LightSection from '$lib/components/ui/sections/LightSection.svelte';
+  import LimeSection from '$lib/components/ui/sections/LimeSection.svelte';
   import Symbol from '$lib/components/ui/Symbol.svelte';
   import VideoUpload from '$lib/components/ui/video/VideoUpload.svelte';
   import UserList from '$lib/components/UserList.svelte';
@@ -25,7 +30,9 @@
       clubsData.public.find((c) => c.id === clubId)
   );
 
-  let showPopup = $state(false);
+  let showUsersPopup = $state(false);
+  let showAddMorePopup = $state(false);
+  let showAddVideoPopup = $state(false);
   let message = $state('');
 
   /**
@@ -57,7 +64,7 @@
       await new Promise((r) => setTimeout(r, 1200));
     }
 
-    showPopup = false;
+    showUsersPopup = false;
   }
 
   /**
@@ -75,53 +82,89 @@
       private: true,
     });
   }
+
+  function onAddMore() {
+    showAddMorePopup = true;
+  }
 </script>
 
-{#if !club}
-  <div class="loading">
-    <Symbol size={100} styleClass="rotating">refresh</Symbol>
-  </div>
-{:else}
-  <h2>{club.name}</h2>
-  <p>{club.description}</p>
+<LimeSection>
+  <LogoHeader title={club?.name} backButton onAction={onAddMore} mainColor
+  ></LogoHeader>
 
-  <!-- TODO: Clean up design etc -->
-  <button onclick={() => (showPopup = true)}
-    >{$t('club.add-user-button')}</button
-  >
+  {#if !club}
+    <div class="loading">
+      <Symbol size={100} styleClass="rotating">refresh</Symbol>
+    </div>
+  {:else}
+    <p>{club.description}</p>
 
+    {#if club.private_playlist}
+      <LoginRequiredContent reason={$t('club.requires-login-description')}>
+        <h2>Private Club Videos</h2>
+        <div class="small-feed">
+          <ThumbnailFeed playlistId={club.private_playlist.short_uuid}
+          ></ThumbnailFeed>
+        </div>
+      </LoginRequiredContent>
+    {/if}
+
+    <h2>Public Club Videos</h2>
+    <div class="small-feed">
+      <ThumbnailFeed playlistId={club.public_playlist.short_uuid}
+      ></ThumbnailFeed>
+    </div>
+
+    <PopupWithRunes bind:isOpen={showUsersPopup}>
+      <div class="popup">
+        {#if message}
+          <div>{message}</div>
+        {:else}
+          <div>{$t('club.select-user-title')}</div>
+          <UserList onSelect={onSelectUser}></UserList>
+        {/if}
+      </div>
+    </PopupWithRunes>
+  {/if}
+</LimeSection>
+
+<LightSection>
+  <h2>{$t('club.members-title')}</h2>
+  <ul>
+    <li>TODO</li>
+    <li>TODO</li>
+  </ul>
+  <Footer />
+</LightSection>
+
+<PopupWithRunes bind:isOpen={showAddMorePopup}>
+  {#if userCtx.isLoggedInToApi()}
+    <Button
+      symbol="boy"
+      text="club.add-user-button"
+      on:click={() => {
+        showAddMorePopup = false;
+        showUsersPopup = true;
+      }}
+    />
+    <Button
+      symbol="upload"
+      text={'club.upload-video-button'}
+      on:click={() => {
+        showAddMorePopup = false;
+        showAddVideoPopup = true;
+      }}
+    />
+  {/if}
+</PopupWithRunes>
+
+<PopupWithRunes bind:isOpen={showAddVideoPopup}>
   {#if userCtx.isLoggedInToApi()}
     <p>Add club video</p>
     <VideoUpload {onVideoUploaded} privacy={VIDEO_PRIVACY.UNLISTED}
     ></VideoUpload>
   {/if}
-
-  <h2>Public Club Videos</h2>
-  <div class="small-feed">
-    <ThumbnailFeed playlistId={club.public_playlist.short_uuid}></ThumbnailFeed>
-  </div>
-
-  {#if club.private_playlist}
-    <LoginRequiredContent reason={$t('club.requires-login-description')}>
-      <h2>Private Club Videos</h2>
-      <div class="small-feed">
-        <ThumbnailFeed playlistId={club.private_playlist.short_uuid}
-        ></ThumbnailFeed>
-      </div>
-    </LoginRequiredContent>
-  {/if}
-
-  <PopupWithRunes bind:isOpen={showPopup}>
-    <div class="popup">
-      {#if message}
-        <div>{message}</div>
-      {:else}
-        <div>{$t('club.select-user-title')}</div>
-        <UserList onSelect={onSelectUser}></UserList>
-      {/if}
-    </div>
-  </PopupWithRunes>
-{/if}
+</PopupWithRunes>
 
 <style>
   .popup {
