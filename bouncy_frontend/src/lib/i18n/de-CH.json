@@ -52,6 +52,7 @@
         "confirm-add-user-p2": " hinzu?",
         "add-user-success": "Hinzugefügt!",
         "add-user-failed": "Das hat leider nicht geklappt :(",
+        "admins-title": "Admins",
         "members-title": "Mitglieder",
         "requires-login-description": "Dieser Bereich vom Club ist privat."
     },

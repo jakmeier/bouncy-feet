@@ -1,4 +1,5 @@
-use crate::club::{ClubId, ClubMembership, PlaylistInfo};
+use crate::api_endoints::user::PublicUserInfoResponse;
+use crate::club::{ClubId, ClubMembership, PlaylistInfo, PublicClubMemberInfo};
 use crate::db::club::Club;
 use crate::peertube::playlist::{
     create_public_system_playlist, create_unlisted_system_playlist, Playlist,
@@ -22,6 +23,7 @@ struct ClubsResponse {
     clubs: Vec<ClubInfo>,
 }
 
+/// Club summary, contains information for displaying a list of clubs.
 #[derive(serde::Serialize)]
 struct ClubInfo {
     /// BF API club id = DB id
@@ -43,6 +45,15 @@ struct ClubInfo {
     // But for playlists, this isn't currently available
     // /api/v1/video-playlists
     // does not have `excludeAlreadyWatched`
+}
+
+/// Additional details about a club, retrieved by /clubs/{club_id}.
+///
+/// Conatains information to show a detailed club view.
+#[derive(serde::Serialize)]
+pub(crate) struct ClubDetails {
+    admins: Vec<PublicUserInfoResponse>,
+    members: Vec<PublicUserInfoResponse>,
 }
 
 #[derive(serde::Deserialize)]
@@ -104,6 +115,37 @@ pub async fn clubs(State(state): State<AppState>) -> Response {
     let clubs = db_clubs_to_club_infos(db_clubs, private_access);
     let resonse = ClubsResponse { clubs };
     (StatusCode::OK, Json(resonse)).into_response()
+}
+
+/// Retrieve extended info about a club, public info only.
+#[axum::debug_handler]
+pub async fn club(
+    State(state): State<AppState>,
+    axum::extract::Path(club_id): axum::extract::Path<ClubId>,
+) -> axum::response::Result<Json<ClubDetails>> {
+    let res = Club::list_members_with_info(&state, club_id, 100, 0).await;
+
+    let Ok(mut db_members) = res else {
+        let err = res.unwrap_err();
+        tracing::error!(?err, "DB error on listing club members");
+        return Err((StatusCode::INTERNAL_SERVER_ERROR, "DB ERROR"))?;
+    };
+
+    fn row_to_user_info(row: PublicClubMemberInfo) -> PublicUserInfoResponse {
+        PublicUserInfoResponse {
+            id: row.user_id.num(),
+            display_name: row.public_name,
+        }
+    }
+
+    let admins = db_members
+        .extract_if(.., |row| matches!(row.membership, ClubMembership::Admin))
+        .map(row_to_user_info)
+        .collect();
+    let members = db_members.into_iter().map(row_to_user_info).collect();
+
+    let details = ClubDetails { admins, members };
+    Ok(Json(details))
 }
 
 #[axum::debug_handler]

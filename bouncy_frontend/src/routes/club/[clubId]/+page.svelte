@@ -16,6 +16,9 @@
   import { VIDEO_PRIVACY } from '$lib/peertube';
   import { getClubsContext } from '$lib/stores/Clubs.svelte';
 
+  /** @type {import('./$types').PageProps} */
+  let { data } = $props();
+
   const clubId = Number.parseInt(page.params.clubId || '0');
 
   /** @type {UserContextData} */
@@ -129,10 +132,17 @@
 </LimeSection>
 
 <LightSection>
+  <h2>{$t('club.admins-title')}</h2>
+  <ul>
+    {#each data.admins as user}
+      <li>{user.display_name}</li>
+    {/each}
+  </ul>
   <h2>{$t('club.members-title')}</h2>
   <ul>
-    <li>TODO</li>
-    <li>TODO</li>
+    {#each data.members as user}
+      <li>{user.display_name}</li>
+    {/each}
   </ul>
   <Footer />
 </LightSection>

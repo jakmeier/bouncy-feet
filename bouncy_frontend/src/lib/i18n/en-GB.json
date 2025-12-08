@@ -52,6 +52,7 @@
         "confirm-add-user-p2": "?",
         "add-user-success": "Done!",
         "add-user-failed": "Sorry something went wrong:(",
+        "admins-title": "Admins",
         "members-title": "Members",
         "requires-login-description": "This part of the club is private."
     },

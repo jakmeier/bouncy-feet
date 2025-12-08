@@ -5,7 +5,8 @@ use crate::{
 };
 use sqlx::FromRow;
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, serde::Deserialize)]
+#[serde(transparent)]
 pub struct ClubId(i64);
 
 #[derive(Debug, Clone)]
@@ -44,9 +45,23 @@ struct ClubRow {
 #[derive(Debug, Clone, FromRow)]
 pub(crate) struct UserClubRow {
     pub user_id: i64,
-    #[allow(dead_code)]
-    club_id: i64,
+    // #[allow(dead_code)]
+    // club_id: i64,
     is_admin: bool,
+}
+
+#[derive(Debug, Clone, FromRow)]
+pub(crate) struct UserJoinedClubRow {
+    pub user_id: i64,
+    pub is_admin: bool,
+    pub public_name: String,
+}
+
+#[derive(Debug, Clone)]
+pub(crate) struct PublicClubMemberInfo {
+    pub user_id: UserId,
+    pub public_name: String,
+    pub membership: ClubMembership,
 }
 
 impl Club {
@@ -168,7 +183,7 @@ impl Club {
         let record = sqlx::query_as!(
             UserClubRow,
             r#"
-            SELECT user_id, club_id, is_admin FROM user_club
+            SELECT user_id, is_admin FROM user_club
             WHERE user_id = $1 AND club_id = $2
             "#,
             user_id.num(),
@@ -189,7 +204,7 @@ impl Club {
         let rows = sqlx::query_as!(
             UserClubRow,
             r#"
-            SELECT user_id, club_id, is_admin FROM user_club
+            SELECT user_id, is_admin FROM user_club
             WHERE club_id = $1
             ORDER BY user_id
             "#,
@@ -201,6 +216,43 @@ impl Club {
         let members = rows
             .into_iter()
             .map(|record| (record.user_id(), Some(record).into()))
+            .collect();
+
+        Ok(members)
+    }
+
+    /// List members of a club with their user info
+    pub async fn list_members_with_info(
+        state: &AppState,
+        club_id: ClubId,
+        limit: i64,
+        offset: i64,
+    ) -> Result<Vec<PublicClubMemberInfo>, sqlx::Error> {
+        let rows = sqlx::query_as!(
+            UserJoinedClubRow,
+            r#"
+            SELECT uc.user_id, uc.is_admin, um.key_value AS public_name
+            FROM user_club uc
+            JOIN user_meta um ON uc.user_id = um.user_id
+            WHERE uc.club_id = $1
+                AND um.key_name = 's:publicName'
+            ORDER BY um.user_id
+            LIMIT $2 OFFSET $3
+            "#,
+            club_id.num(),
+            limit,
+            offset
+        )
+        .fetch_all(&state.pg_db_pool)
+        .await?;
+
+        let members = rows
+            .into_iter()
+            .map(|record| PublicClubMemberInfo {
+                user_id: record.user_id(),
+                public_name: record.public_name,
+                membership: ClubMembership::for_member(record.is_admin),
+            })
             .collect();
 
         Ok(members)
@@ -255,12 +307,21 @@ impl From<ClubRow> for Club {
     }
 }
 
+impl ClubMembership {
+    fn for_member(is_admin: bool) -> Self {
+        if is_admin {
+            ClubMembership::Admin
+        } else {
+            ClubMembership::Member
+        }
+    }
+}
+
 impl From<Option<UserClubRow>> for ClubMembership {
     fn from(maybe_record: Option<UserClubRow>) -> Self {
         match maybe_record {
             None => ClubMembership::None,
-            Some(record) if record.is_admin => ClubMembership::Admin,
-            Some(_) => ClubMembership::Member,
+            Some(record) => ClubMembership::for_member(record.is_admin),
         }
     }
 }

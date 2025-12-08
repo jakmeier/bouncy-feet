@@ -18,8 +18,8 @@ pub struct PrivateUserInfoResponse {
 #[derive(serde::Serialize)]
 pub struct PublicUserInfoResponse {
     /// BF API user id
-    id: i64,
-    display_name: String,
+    pub id: i64,
+    pub display_name: String,
 }
 
 #[derive(serde::Deserialize)]

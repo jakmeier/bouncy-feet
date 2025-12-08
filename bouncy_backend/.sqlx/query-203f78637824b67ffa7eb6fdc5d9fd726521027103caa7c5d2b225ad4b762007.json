@@ -1,0 +1,36 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT uc.user_id, uc.is_admin, um.key_value AS public_name\n            FROM user_club uc\n            JOIN user_meta um ON uc.user_id = um.user_id\n            WHERE uc.club_id = $1\n                AND um.key_name = 's:publicName'\n            ORDER BY um.user_id\n            LIMIT $2 OFFSET $3\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "user_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "is_admin",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 2,
+        "name": "public_name",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "203f78637824b67ffa7eb6fdc5d9fd726521027103caa7c5d2b225ad4b762007"
+}
