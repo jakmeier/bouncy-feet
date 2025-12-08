@@ -3,11 +3,11 @@
 
   import { page } from '$app/state';
   import { t } from '$lib/i18n.js';
-  import Header from '$lib/components/ui/Header.svelte';
   import { getContext } from 'svelte';
   import Exercise from './Exercise.svelte';
   import Explanation from '$lib/components/ui/Explanation.svelte';
   import { goto } from '$app/navigation';
+  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
 
   const { getCourse } = getContext('courses');
 
@@ -46,8 +46,9 @@
 
   /** @type {number} */
   let outerWidth = $state(320);
-  let explanationWidth =
-    $derived(outerWidth >= 320 ? 300 : Math.max(outerWidth - 20, 100));
+  let explanationWidth = $derived(
+    outerWidth >= 320 ? 300 : Math.max(outerWidth - 20, 100)
+  );
 
   function next() {
     if (done) {
@@ -76,7 +77,7 @@
   }
 </script>
 
-<Header {title} />
+<LogoHeader {title} backButton />
 
 <div bind:clientWidth={outerWidth}>
   <div class="subtitle">
@@ -99,8 +100,7 @@
       >
     {/if}
     {#if exercise}
-      <button onclick={stopExercise}>{$t('courses.lesson.stop-button')}</button
-      >
+      <button onclick={stopExercise}>{$t('courses.lesson.stop-button')}</button>
     {/if}
     {#if partIndex === undefined}
       <button onclick={next}>{$t('courses.lesson.next-button')}</button>

@@ -4,7 +4,6 @@
   import { page } from '$app/state';
   import { t } from '$lib/i18n.js';
   import Step from '../../Step.svelte';
-  import Header from '$lib/components/ui/Header.svelte';
   import Select from 'svelte-select';
   import { dynamicCounter } from '$lib/timer';
   import { features } from '$lib/stores/FeatureSelection';
@@ -13,6 +12,7 @@
   import Symbol from '$lib/components/ui/Symbol.svelte';
   import Button from '$lib/components/ui/Button.svelte';
   import { getUserContext } from '$lib/context';
+  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
 
   const user = getUserContext().store;
   const name = page.params.stepName;
@@ -38,7 +38,7 @@
   let selected = $state(selectItems[0]);
 </script>
 
-<Header title={name} />
+<LogoHeader title={name} backButton />
 
 <Step
   step={selected.value}

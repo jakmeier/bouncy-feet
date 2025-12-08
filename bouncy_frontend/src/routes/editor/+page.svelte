@@ -1,9 +1,9 @@
 <script>
-  import Header from '$lib/components/ui/Header.svelte';
+  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
   import { t } from '$lib/i18n';
 </script>
 
-<Header title={$t('editor.title')}></Header>
+<LogoHeader title={$t('editor.title')} backButton />
 
 <div class="centered">
   <p>

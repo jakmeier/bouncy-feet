@@ -15,6 +15,7 @@
    * @property {boolean} [mainColor]
    * @property {boolean} [transparent]
    * @property {boolean} [backButton]
+   * @property {null|string} [button]
    * @property {()=>void} [onBack]
    * @property {()=>void} [onAction] -- create a plus icon on the top right and trigger this function when selected
    */
@@ -28,6 +29,7 @@
     transparent,
     title = '',
     backButton = false,
+    button = null,
     onBack = () => {
       window.history.back();
     },
@@ -69,7 +71,13 @@
     {#if onAction}
       <UnstyledButton onClick={onAction}>
         <div class="action">
-          <Plus />
+          {#if button}
+            <span class="material-symbols-outlined button" translate="no">
+              {button}
+            </span>
+          {:else}
+            <Plus />
+          {/if}
         </div>
       </UnstyledButton>
     {/if}
@@ -115,5 +123,9 @@
   .action {
     max-width: 2rem;
     max-height: 2rem;
+  }
+
+  .action span {
+    font-size: 2rem;
   }
 </style>

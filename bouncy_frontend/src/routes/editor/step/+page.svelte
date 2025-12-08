@@ -1,5 +1,4 @@
 <script>
-  import Header from '$lib/components/ui/Header.svelte';
   import { t } from '$lib/i18n';
   import { counter } from '$lib/timer';
   import { getContext } from 'svelte';
@@ -14,6 +13,7 @@
   import { writable } from 'svelte/store';
   import Button from '$lib/components/ui/Button.svelte';
   import { downloadTextFile } from '$lib/text_utils';
+  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
 
   const localCollectionCtx = getContext('localCollection');
 
@@ -78,7 +78,12 @@
   }
 </script>
 
-<Header title={$t('editor.step.title')} button="menu" on:click={openSettings} />
+<LogoHeader
+  title={$t('editor.step.title')}
+  button="menu"
+  onAction={openSettings}
+  backButton
+/>
 
 <div class="centered">
   <a href="./new">

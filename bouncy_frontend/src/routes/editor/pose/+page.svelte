@@ -1,6 +1,5 @@
 <script>
   import { getContext } from 'svelte';
-  import Header from '$lib/components/ui/Header.svelte';
   import { t } from '$lib/i18n';
   import Pose from '$lib/components/Pose.svelte';
   import EditOrDeleteList from '$lib/components/ui/EditOrDeleteList.svelte';
@@ -10,6 +9,7 @@
   import { PoseFileWrapper } from '$lib/instructor/bouncy_instructor';
   import { downloadTextFile } from '$lib/text_utils';
   import { goto } from '$app/navigation';
+  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
 
   /**
    * @typedef {Object} Props
@@ -75,7 +75,12 @@
   }
 </script>
 
-<Header title={$t('editor.pose.title')} button="menu" on:click={openSettings} />
+<LogoHeader
+  title={$t('editor.pose.title')}
+  button="menu"
+  onAction={openSettings}
+  backButton
+/>
 
 <div class="centered">
   <a href="./new">

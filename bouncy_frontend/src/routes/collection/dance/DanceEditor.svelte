@@ -2,13 +2,13 @@
   import { run } from 'svelte/legacy';
 
   import { t } from '$lib/i18n.js';
-  import Header from '$lib/components/ui/Header.svelte';
   import DanceAnimation from '../../DanceAnimation.svelte';
   import { getContext } from 'svelte';
   import Popup from '$lib/components/ui/Popup.svelte';
   import DanceEditorSteps from './DanceEditorSteps.svelte';
   import { goto } from '$app/navigation';
   import { dynamicCounter } from '$lib/timer';
+  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
 
   /**
    * @typedef {Object} Props
@@ -90,7 +90,12 @@
   }
 </script>
 
-<Header title={danceName} button="save" on:click={openSavePopup} />
+<LogoHeader
+  title={danceName}
+  button="save"
+  onAction={openSavePopup}
+  backButton
+/>
 
 <div class="page">
   <div

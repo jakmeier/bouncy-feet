@@ -5,12 +5,12 @@
   import { t } from '$lib/i18n';
   import Popup from '$lib/components/ui/Popup.svelte';
   import { writable } from 'svelte/store';
-  import Header from '$lib/components/ui/Header.svelte';
   import { goto } from '$app/navigation';
   import Toggle from '$lib/components/ui/Toggle.svelte';
   import { dev, displayedVersion } from '$lib/stores/FeatureSelection';
   import Symbol from '$lib/components/ui/Symbol.svelte';
   import { getUserContext } from '$lib/context';
+  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
 
   /** @type {UserContextData} */
   const { store: user, setUserMeta } = getUserContext();
@@ -52,11 +52,11 @@
   });
 </script>
 
-<Header
+<LogoHeader
   title={$t('profile.title')}
   backButton={false}
   button="menu"
-  on:click={openSettings}
+  onAction={openSettings}
 />
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->

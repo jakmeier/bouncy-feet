@@ -1,6 +1,5 @@
 <script>
   import Button from '$lib/components/ui/Button.svelte';
-  import Header from '$lib/components/ui/Header.svelte';
   import Symbol from '$lib/components/ui/Symbol.svelte';
   import Toggle from '$lib/components/ui/Toggle.svelte';
   import { locale, t } from '$lib/i18n';
@@ -18,6 +17,7 @@
     detectionDelayTotal,
   } from '$lib/stores/System';
   import { getUserContext } from '$lib/context';
+  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
 
   const user = getUserContext().store;
 
@@ -25,10 +25,9 @@
   function fnum(num) {
     return num.toFixed(2);
   }
-
 </script>
 
-<Header title={$t('profile.settings.title')} />
+<LogoHeader title={$t('profile.settings.title')} backButton />
 
 <div id="control-panel">
   <div class="toggle-item">

@@ -4,9 +4,9 @@
   import PoseAnglesForm from '$lib/components/editor/PoseAnglesForm.svelte';
   import { PoseWrapper } from '$lib/instructor/bouncy_instructor';
   import { getContext, onMount } from 'svelte';
-  import Header from '$lib/components/ui/Header.svelte';
   import { t } from '$lib/i18n';
   import { beforeNavigate } from '$app/navigation';
+  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
 
   const poseId = page.params.poseId;
 
@@ -54,8 +54,12 @@
   });
 </script>
 
-<Header title={$t('editor.pose.edit')} button="save" on:click={savePose}
-></Header>
+<LogoHeader
+  title={$t('editor.pose.edit')}
+  button="save"
+  onAction={savePose}
+  backButton
+/>
 
 <h2 class="box">{$t('editor.pose.angles-subtitle')}</h2>
 

@@ -1,18 +1,17 @@
 <script>
   import { t } from '$lib/i18n';
   import { getContext, onDestroy, onMount } from 'svelte';
-  import Header from '$lib/components/ui/Header.svelte';
   import { WHITE_COLORING } from '$lib/constants';
   import Step from '../collection/Step.svelte';
   import { counter } from '$lib/timer';
   import { timeBetweenMoves } from '$lib/stores/Beat';
+  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
 
   const { courses } = getContext('courses');
   const beat = counter(-1, 1, $timeBetweenMoves);
-
 </script>
 
-<Header title={$t('courses.title')} backButton={false} />
+<LogoHeader title={$t('courses.title')} />
 
 {#each $courses as course}
   <a class="course" href={course.id}>

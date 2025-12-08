@@ -4,7 +4,6 @@
 <script>
   import { page } from '$app/stores';
   import { t } from '$lib/i18n.js';
-  import Header from '$lib/components/ui/Header.svelte';
   import DanceAnimation from '../../../DanceAnimation.svelte';
   import Step from '../../Step.svelte';
   import { getContext, onMount } from 'svelte';
@@ -14,6 +13,7 @@
   import DanceCounts from '$lib/components/DanceCounts.svelte';
   import { bpm, setBpm, beatCounter, timeBetweenMoves } from '$lib/stores/Beat';
   import Collapse from '$lib/components/ui/Collapse.svelte';
+  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
 
   /** @type {import('./$types').PageData} */
   export let data;
@@ -68,10 +68,11 @@
 </script>
 
 <!-- TODO: translate -->
-<Header
+<LogoHeader
   title={$id}
   button="edit"
-  on:click={() => optionsPopupActive.set(true)}
+  onAction={() => optionsPopupActive.set(true)}
+  backButton
 />
 
 <div class="page">

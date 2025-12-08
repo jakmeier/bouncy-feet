@@ -8,7 +8,6 @@
   import { page } from '$app/state';
   import LiveRecording from '$lib/components/record/LiveRecording.svelte';
   import VideoReview from '$lib/components/review/VideoReview.svelte';
-  import Header from '$lib/components/ui/Header.svelte';
   import { hideNavigation } from '$lib/stores/UiState.svelte';
   import Popup from '$lib/components/ui/Popup.svelte';
   import SessionReward from '$lib/components/SessionReward.svelte';
@@ -16,6 +15,7 @@
   import Button from '$lib/components/ui/Button.svelte';
   import { DetectionState } from '$lib/instructor/bouncy_instructor';
   import { getUserContext } from '$lib/context';
+  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
 
   const stepName = page.params.stepName;
   const instructorStep = stepsByName(stepName)[0];
@@ -174,9 +174,9 @@
 {#if $hideNavigation}
   <div class="title">{stepName}</div>
 {:else if isLearnMode}
-  <Header title="{$t('record.learn-dance-prefix')} {stepName}" />
+  <LogoHeader title="{$t('record.learn-dance-prefix')} {stepName}" backButton />
 {:else}
-  <Header title="{$t('record.train-dance-prefix')} {stepName}" />
+  <LogoHeader title="{$t('record.train-dance-prefix')} {stepName}" backButton />
 {/if}
 
 <div id="outer">
