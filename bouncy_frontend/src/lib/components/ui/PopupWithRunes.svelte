@@ -19,6 +19,15 @@
     children,
   } = $props();
 
+  let overlay = $state();
+
+  // Set focus for a11y and proper Escape handling
+  $effect(() => {
+    if (isOpen) {
+      overlay.focus();
+    }
+  });
+
   function handleClose() {
     isOpen = false;
     if (onClose) {
@@ -32,11 +41,34 @@
       handleClose();
     }
   }
+
+  /**
+   * @param {KeyboardEvent} event
+   */
+  function onKeyOutside(event) {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      handleClose();
+    }
+  }
 </script>
 
 {#if isOpen}
-  <div class="overlay" onclick={handleClickOutside}>
-    <div class="popup-content">
+  <!-- svelte-ignore a11y_no_static_element_interactions
+   background interactivity should not be user in screen readers -->
+  <div
+    class="overlay"
+    onclick={handleClickOutside}
+    onkeydown={onKeyOutside}
+    tabindex="-1"
+    bind:this={overlay}
+  >
+    <div
+      class="popup-content"
+      role="dialog"
+      aria-modal="true"
+      aria-label="pop up"
+    >
       <UiBox {title}>
         {@render children?.()}
         {#if showOkButton}

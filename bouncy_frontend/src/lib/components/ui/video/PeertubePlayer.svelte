@@ -29,6 +29,7 @@
   let duration = $state(0);
   let currentTime = $state(0);
 
+  let iframeOverlay = $state();
   let iframe = $state();
   let iframeWrapperWidth = $state(90);
   let iframeWrapperHeight = $state(160);
@@ -38,6 +39,7 @@
     if (player) {
       player.play();
       isPlaying = true;
+      iframeOverlay.focus();
     }
   }
 
@@ -67,6 +69,16 @@
     } else {
       player.pause();
       isPlaying = false;
+    }
+  }
+
+  /**
+   * @param {KeyboardEvent} event
+   */
+  async function iframeOverlayKeyDown(event) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      // event.preventDefault();
+      await togglePlay();
     }
   }
 
@@ -125,8 +137,6 @@
   });
 </script>
 
-<!-- svelte-ignore a11y_no_static_element_interactions -->
-<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div class="video-wrapper">
   <!-- <CornerMarker> -->
   <div
@@ -134,9 +144,15 @@
     bind:clientWidth={iframeWrapperWidth}
     bind:clientHeight={iframeWrapperHeight}
   >
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <div class="iframe-overlay" onclick={togglePlay}></div>
-    <!-- TODO: video title -->
+    <div
+      class="iframe-overlay"
+      onclick={togglePlay}
+      onkeydown={iframeOverlayKeyDown}
+      bind:this={iframeOverlay}
+      role="switch"
+      aria-checked={isPlaying}
+      tabindex="0"
+    ></div>
     <iframe
       title="video"
       width="{iframeWrapperWidth}px"
