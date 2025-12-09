@@ -1,16 +1,25 @@
 <script>
   import JuggleElement from './JuggleElement.svelte';
-  import PeertubeVideoPlayer from './video/PeertubeVideoPlayer.svelte';
 
   /**
    * @typedef {Object} Props
    * @property {(index: number)=>void} [onIndexChanged]
    * @property {any[]} items
    * @property {import('svelte').Snippet<[any]>} element
+   * @property {string} [height]
+   * @property {string} [width]
+   * @property {string} [buttonHeight]
    */
 
   /** @type {Props} */
-  let { onIndexChanged = () => {}, items, element } = $props();
+  let {
+    onIndexChanged = () => {},
+    items,
+    element,
+    width = '100%',
+    height = '100%',
+    buttonHeight = '50%',
+  } = $props();
   let currentIndex = $state(0);
 
   export function prev() {
@@ -36,25 +45,12 @@
     }
     return 'center';
   }
-
-  /**
-   * Loading all at once may hit rate limits, so delay loading
-   * @param {number} index
-   * @return {number} ms
-   */
-  function delayMs(index) {
-    const delta = Math.abs(index - currentIndex);
-    if (delta < 3) {
-      // Load the first few fairly quickly
-      return delta * 500;
-    } else {
-      // delay the rest for much longer
-      return (delta - 2) * 5000;
-    }
-  }
 </script>
 
-<div class="container">
+<div
+  class="container"
+  style="--component-width: {width}; --component-height: {height}; --button-height: {buttonHeight};"
+>
   <button onclick={prev}>&lt;</button>
   <div class="videos">
     {#each items as item, reverseIndex}
@@ -70,14 +66,14 @@
 <style>
   .container {
     position: relative;
-    width: 100%;
-    height: min(70vh, 100%);
+    width: var(--component-width);
+    height: var(--component-height);
   }
 
   .container button {
     position: absolute;
     z-index: 1;
-    top: 50%;
+    top: var(--button-height);
     width: 3rem;
     height: 3rem;
     padding: 0;

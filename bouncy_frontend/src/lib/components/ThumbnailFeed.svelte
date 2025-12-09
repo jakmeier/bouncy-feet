@@ -30,7 +30,5 @@
 <style>
   .outer {
     margin: auto;
-    width: 90%;
-    height: 90%;
   }
 </style>

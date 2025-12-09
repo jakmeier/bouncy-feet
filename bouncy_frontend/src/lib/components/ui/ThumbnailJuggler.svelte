@@ -1,7 +1,6 @@
 <script>
   import { PUBLIC_BF_PEERTUBE_URL } from '$env/static/public';
   import * as api from '$lib/peertube-openapi';
-  import FullScreenArea from './FullScreenArea.svelte';
   import Juggler from './Juggler.svelte';
   import PopupWithRunes from './PopupWithRunes.svelte';
   import Symbol from './Symbol.svelte';
@@ -16,9 +15,15 @@
   /** @type {Props} */
   let { videos } = $props();
   let juggler = $state();
+  /** @type {number[]} */
+  let imageHeight = $state([]);
   let currentIndex = $state(0);
   let videoId = $state();
   let showPopup = $state(false);
+
+  let buttonHeight = $derived(
+    `calc(${imageHeight[currentIndex] / 2}px - 1.5rem)`
+  );
 
   /** @param {number} index */
   function onIndexChanged(index) {
@@ -32,7 +37,6 @@
   }
 
   function onClose() {
-    console.log('onCLose fired');
     videoId = undefined;
   }
 
@@ -61,7 +65,7 @@
   {/if}
 </PopupWithRunes>
 
-<Juggler bind:this={juggler} {onIndexChanged} items={videos}>
+<Juggler bind:this={juggler} {onIndexChanged} items={videos} {buttonHeight}>
   {#snippet element({ item: video, index })}
     <UnstyledButton onClick={() => playVideo(video)}>
       <div class="preview">
@@ -69,6 +73,7 @@
           <img
             src="{PUBLIC_BF_PEERTUBE_URL}{video.thumbnailPath}"
             alt="thumbnail"
+            bind:clientHeight={imageHeight[index]}
           />
           <div class="duration">
             {formatDuration(video.duration)}
@@ -110,8 +115,7 @@
 
   .preview {
     display: inline-block;
-    width: min-content;
-    width: 280px; /* PeerTube thumbnail width */
+    width: min(280px, calc(100vw - 3rem)); /* PeerTube thumbnail width */
   }
 
   .thumbnail {
@@ -121,7 +125,7 @@
   .thumbnail img {
     display: block; /* Remove extra space from display: inline; */
     border-radius: 0.5rem;
-    width: 280px; /* PeerTube thumbnail width */
+    width: min(280px, calc(100vw - 3rem)); /* PeerTube thumbnail width */
   }
 
   .duration {
