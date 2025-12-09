@@ -5,6 +5,7 @@
   import { fadingOut } from '$lib/stores/UiState.svelte';
   import Plus from './svg/Plus.svelte';
   import UnstyledButton from './UnstyledButton.svelte';
+  import { goto } from '$app/navigation';
 
   /**
    * @typedef {Object} Props
@@ -15,6 +16,7 @@
    * @property {boolean} [mainColor]
    * @property {boolean} [transparent]
    * @property {boolean} [backButton]
+   * @property {boolean} [homeLink]
    * @property {null|string} [button]
    * @property {()=>void} [onBack]
    * @property {()=>void} [onAction] -- create a plus icon on the top right and trigger this function when selected
@@ -29,6 +31,7 @@
     transparent,
     title = '',
     backButton = false,
+    homeLink = false,
     button = null,
     onBack = () => {
       window.history.back();
@@ -64,6 +67,14 @@
         <div class="arrow">
           <Arrow />
         </div>
+      </UnstyledButton>
+    {:else if homeLink}
+      <UnstyledButton
+        onClick={() => {
+          goto('/');
+        }}
+      >
+        <img class="logo" src={imgUrl} alt="Bouncy Feet Logo" />
       </UnstyledButton>
     {:else}
       <img class="logo" src={imgUrl} alt="Bouncy Feet Logo" />
@@ -121,11 +132,11 @@
   }
 
   .action {
-    max-width: 2rem;
-    max-height: 2rem;
+    max-width: 3rem;
+    max-height: 3rem;
   }
 
   .action span {
-    font-size: 2rem;
+    font-size: 3rem;
   }
 </style>

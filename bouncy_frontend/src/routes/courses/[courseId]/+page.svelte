@@ -8,6 +8,7 @@
   import NightSection from '$lib/components/ui/sections/NightSection.svelte';
   import VideoWithMetaData from '$lib/components/ui/video/VideoWithMetaData.svelte';
   import { getUserContext } from '$lib/context';
+  import ScrollToTop from '$lib/components/ScrollToTop.svelte';
 
   const { getCourse } = getContext('courses');
   const user = getUserContext().store;
@@ -23,11 +24,9 @@
   const i = counter(-1, 1, stepTime);
 
   let courseProgress = $derived($user.userLessonProgress[id]);
-
-  onMount(() => {
-    document.querySelector('.background')?.scrollTo(0, 0);
-  });
 </script>
+
+<ScrollToTop />
 
 <NightSection arrow fillScreen>
   <LogoHeader title={course.name} backButton />

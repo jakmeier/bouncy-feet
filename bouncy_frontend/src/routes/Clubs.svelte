@@ -1,46 +1,11 @@
 <script>
-  import LoginRequiredContent from '$lib/components/profile/LoginRequiredContent.svelte';
-  import { getUserContext } from '$lib/context';
-  import { createNewClub, getClubsContext } from '$lib/stores/Clubs.svelte';
+  import { getClubsContext } from '$lib/stores/Clubs.svelte';
 
   const { clubsData } = getClubsContext();
-  const userCtx = getUserContext();
-
-  async function submitForm(event) {
-    event.preventDefault();
-
-    const form = event.target;
-    const title = form.title.value;
-    const description = form.description.value;
-
-    try {
-      await createNewClub(userCtx, title, description);
-      form.reset();
-    } catch (err) {
-      console.error(err);
-    }
-  }
 </script>
 
-<!-- WIP -->
-<LoginRequiredContent reason="testing">
-  <form on:submit={submitForm}>
-    <label>
-      Title:
-      <input type="text" name="title" required maxlength="64" />
-    </label>
-
-    <label>
-      Description:
-      <textarea name="description" maxlength="1024" required></textarea>
-    </label>
-
-    <button type="submit">Create club</button>
-  </form>
-</LoginRequiredContent>
-
 {#each clubsData.mine as club}
-  <a href="./club/{club.id}">
+  <a href="/club/{club.id}">
     <div class="club card">
       <div class="logo">
         <!-- style="color: {club.style.coloring.headColor}" -->
@@ -54,6 +19,7 @@
           text={club.description}
           color={club.style.coloring.headColor}
         ></FormattedText> -->
+          <!-- TODO: show real data -->
           <div class="stats">
             <div>
               {club.stats?.members || '?'} members

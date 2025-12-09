@@ -1,7 +1,7 @@
 <script>
   import { ONBOARDING_STATE } from '$lib/onboarding';
   import FirstVisit from './FirstVisit.svelte';
-  import HomeFeedB from './HomeFeed_b.svelte';
+  import HomeFeed from './HomeFeed.svelte';
   import ContinueFirstCourse from './ContinueFirstCourse.svelte';
   import { getUserContext } from '$lib/context';
 
@@ -46,6 +46,6 @@
     <!-- Maybe show a different continuation screen? -->
     <ContinueFirstCourse />
   {:else}
-    <HomeFeedB featuredDances={data.officialDances} {featuredSteps} />
+    <HomeFeed featuredDances={data.officialDances} {featuredSteps} />
   {/if}
 {/await}

@@ -18,6 +18,8 @@
   import DarkSection from '$lib/components/ui/sections/DarkSection.svelte';
   import Clubs from './Clubs.svelte';
   import HomeNote from './HomeNote.svelte';
+  import { goto } from '$app/navigation';
+    import ScrollToTop from '$lib/components/ScrollToTop.svelte';
   /**
    * @typedef {Object} Props
    * @property {any} featuredDances
@@ -37,31 +39,21 @@
     }
   });
   let imageHeight = $state(100);
-
-  onMount(() => {
-    document.querySelector('.background')?.scrollTo(0, 0);
-  });
 </script>
+
+<ScrollToTop />
 
 <Background
   bgColor="var(--theme-neutral-black)"
   color="var(--theme-neutral-white)"
 ></Background>
-<LogoHeader />
+<LogoHeader button="account_circle" onAction={() => goto('/profile')} />
 
 <HomeNote />
 
 <!-- <LogoHeader title={$t('home.slogan-1')} /> -->
 
 <!-- TODO: maybe showcase something here -->
-
-<DarkSection>
-  <div class="private">
-    <!-- <h2>Psssst...</h2> -->
-    <!-- ...your private places, shared only with your friends. Or just for yourself! -->
-    <Clubs />
-  </div>
-</DarkSection>
 
 <DarkSection arrow>
   <Personalities></Personalities>
@@ -135,9 +127,5 @@
   .lowered {
     margin-top: 5rem;
     transform: translate(15%, 50%);
-  }
-
-  .private {
-    margin-bottom: 2rem;
   }
 </style>

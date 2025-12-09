@@ -1,5 +1,7 @@
 <script>
   import { PUBLIC_BF_PEERTUBE_URL } from '$env/static/public';
+  import { t } from '$lib/i18n';
+  import { VIDEO_PRIVACY } from '$lib/peertube';
   import * as api from '$lib/peertube-openapi';
   import Juggler from './Juggler.svelte';
   import PopupWithRunes from './PopupWithRunes.svelte';
@@ -10,10 +12,11 @@
   /**
    * @typedef {Object} Props
    * @property {api.Video[]} videos
+   * @property {boolean} [extraInfo]
    */
 
   /** @type {Props} */
-  let { videos } = $props();
+  let { videos, extraInfo = false } = $props();
   let juggler = $state();
   /** @type {number[]} */
   let imageHeight = $state([]);
@@ -48,6 +51,40 @@
       return full;
     }
   }
+
+  /**
+   * @param {api.VideoPrivacySet} privacy
+   * @returns {string}
+   */
+  function privacySymbol(privacy) {
+    switch (privacy) {
+      case VIDEO_PRIVACY.PRIVATE:
+        return 'public_off';
+      case VIDEO_PRIVACY.UNLISTED:
+        return 'group';
+      case VIDEO_PRIVACY.PUBLIC:
+        return 'public';
+      default:
+        return 'question_mark';
+    }
+  }
+
+  /**
+   * @param {api.VideoPrivacySet} privacy
+   * @returns {string}
+   */
+  function privacyText(privacy) {
+    switch (privacy) {
+      case VIDEO_PRIVACY.PRIVATE:
+        return 'video.private-description';
+      case VIDEO_PRIVACY.UNLISTED:
+        return 'video.unlisted-description';
+      case VIDEO_PRIVACY.PUBLIC:
+        return 'video.public-description';
+      default:
+        return 'video.unknown-privacy';
+    }
+  }
 </script>
 
 <PopupWithRunes bind:isOpen={showPopup} {onClose}>
@@ -80,9 +117,17 @@
           </div>
         </div>
         {#if index === currentIndex}
-          <div class="name">
+          <p class="name">
             {video.name}
-          </div>
+          </p>
+          {#if extraInfo}
+            <div class="extra-info">
+              <Symbol size={32}>{privacySymbol(video.privacy.id)}</Symbol>
+              <p>
+                {$t(privacyText(video.privacy.id))}
+              </p>
+            </div>
+          {/if}
         {/if}
       </div>
     </UnstyledButton>
@@ -153,5 +198,16 @@
     border-radius: 0.5rem;
     overflow: visible;
     height: auto;
+    min-height: calc(3 * var(--font-normal));
+  }
+
+  p {
+    margin: 0;
+  }
+
+  .extra-info {
+    display: grid;
+    grid-template-columns: 4rem auto;
+    align-items: center;
   }
 </style>

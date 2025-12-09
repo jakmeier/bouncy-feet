@@ -23,7 +23,7 @@
     fast = 0,
     mid = 0,
     slow = 0,
-    averageBpm = 0
+    averageBpm = 0,
   } = $props();
 </script>
 
@@ -74,7 +74,6 @@
   #container {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    margin: 10px;
   }
   .right {
     text-align: right;

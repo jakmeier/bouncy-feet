@@ -44,8 +44,15 @@
         "nav": "Home"
     },
     "club": {
+        "my-clubs-title": "My Clubs",
+        "description-0": "Psssst...",
+        "description-1": "...these are groups to share your videos with friends.",
+        "description-2": "Videos are private by default.",
         "add-user-button": "Add club member",
+        "create-new-title": "Found a new Club",
+        "create-new-button": "Create club",
         "upload-video-button": "Upload video",
+        "upload-video-description": "Save a video in your private Bouncy Feet cloud",
         "select-user-title": "Select dancer",
         "confirm-add-user-p0": "Add ",
         "confirm-add-user-p1": " to ",
@@ -290,9 +297,9 @@
     "profile": {
         "title": "Profile",
         "stats-title": "My Progress",
-        "leaderboard-title": "Leaderboard",
+        "my-videos-title": "My Videos",
         "public-name": "My display name",
-        "submit-stats": "Refresh leaderboard",
+        "update-name-button": "Save",
         "nav": "Profile",
         "button-login": "Login",
         "button-register": "Register",
@@ -349,7 +356,11 @@
         "by": "by"
     },
     "video": {
-        "empty-playlist": "No videos available"
+        "empty-playlist": "No videos available",
+        "private-description": "Private, only I can see this video",
+        "unlisted-description": "Shared with club members",
+        "public-description": "Publicly shared",
+        "unknown-privacy": "Unknown status"
     },
     "common": {
         "hint-popup-title": "Hint",

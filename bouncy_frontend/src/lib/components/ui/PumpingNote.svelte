@@ -31,12 +31,16 @@
   .outer {
     position: absolute;
     top: 2rem;
-    right: 1rem;
+    left: 0;
+    right: 0;
+    margin-inline: auto;
+    width: fit-content;
   }
 
   .pump {
     --pump-scale: 1.2;
     --rotation: 10deg;
+    text-align: center;
   }
 
   @keyframes pump {

@@ -9,6 +9,7 @@
   import LoginRequiredContent from '$lib/components/profile/LoginRequiredContent.svelte';
   import PeertubeVideoPlayer from '$lib/components/ui/video/PeertubeVideoPlayer.svelte';
   import VideoUpload from '$lib/components/ui/video/VideoUpload.svelte';
+  import ScrollToTop from '$lib/components/ScrollToTop.svelte';
 
   /** @type {UserContextData} */
   const userCtx = getUserContext();
@@ -21,6 +22,8 @@
     $t('profile.upload.title') + ' ' + coach.title[coachLocale($locale)]
   );
 </script>
+
+<ScrollToTop />
 
 <LimeSection fillScreen>
   <LogoHeader mainColor {title} />

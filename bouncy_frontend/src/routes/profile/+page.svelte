@@ -11,25 +11,37 @@
   import Symbol from '$lib/components/ui/Symbol.svelte';
   import { getUserContext } from '$lib/context';
   import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
+  import DarkSection from '$lib/components/ui/sections/DarkSection.svelte';
+  import Clubs from '../Clubs.svelte';
+  import Footer from '$lib/components/ui/Footer.svelte';
+  import LimeSection from '$lib/components/ui/sections/LimeSection.svelte';
+  import LoginRequiredContent from '$lib/components/profile/LoginRequiredContent.svelte';
+  import VideoUpload from '$lib/components/ui/video/VideoUpload.svelte';
+  import { fetchMyVideos } from '$lib/peertube';
+  import LightSection from '$lib/components/ui/sections/LightSection.svelte';
+  import NightSection from '$lib/components/ui/sections/NightSection.svelte';
+  import CreateClub from '../CreateClub.svelte';
+  import ThumbnailJuggler from '$lib/components/ui/ThumbnailJuggler.svelte';
+  import ScrollToTop from '$lib/components/ScrollToTop.svelte';
 
   /** @type {UserContextData} */
   const { store: user, setUserMeta } = getUserContext();
-  let showStatsSharingPopup = $state(writable(!$user.consentSendingStats));
+  // let showStatsSharingPopup = $state(writable(!$user.consentSendingStats));
 
   async function submit() {
     setUserMeta('publicName', $user.publicName);
   }
 
-  function consent(yes) {
-    if (yes === true) {
-      $user.consentSendingStats = true;
-    }
-    $showStatsSharingPopup = false;
-  }
+  // function consent(yes) {
+  //   if (yes === true) {
+  //     $user.consentSendingStats = true;
+  //   }
+  //   $showStatsSharingPopup = false;
+  // }
 
-  function openSettings() {
-    goto('./settings');
-  }
+  // function openSettings() {
+  //   goto('./settings');
+  // }
 
   let unlockHiddenFeatures = $state(0);
   let lastIncrease = performance.now();
@@ -52,12 +64,9 @@
   });
 </script>
 
-<LogoHeader
-  title={$t('profile.title')}
-  backButton={false}
-  button="menu"
-  onAction={openSettings}
-/>
+<ScrollToTop />
+
+<LogoHeader title={$t('profile.title')} backButton={false} homeLink />
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -72,17 +81,54 @@
   numDances={$user.recordedDances}
 />
 
-<h2 class="box">{$t('profile.leaderboard-title')}</h2>
-
-<form class="inputs">
-  <button onclick={submit} class="wide">{$t('profile.submit-stats')}</button>
-</form>
 <form class="inputs">
   <label for="publicName">{$t('profile.public-name')}</label>
   <input id="publicName" type="text" bind:value={$user.publicName} />
+  <button onclick={submit} class="wide"
+    >{$t('profile.update-name-button')}</button
+  >
 </form>
 
-<Popup title={'profile.consent.title'} bind:isOpen={showStatsSharingPopup}>
+<LimeSection arrow fillScreen>
+  <LoginRequiredContent
+    reason={$t('profile.upload.requires-login-description')}
+  >
+    <h2>{$t('profile.my-videos-title')}</h2>
+    {#await fetchMyVideos()}
+      waiting for videos
+    {:then videos}
+      <div class="videos">
+        {#if videos.length === 0}
+          <p>{$t('video.empty-playlist')}</p>
+        {:else}
+          <ThumbnailJuggler {videos} extraInfo />
+        {/if}
+      </div>
+    {/await}
+  </LoginRequiredContent>
+</LimeSection>
+
+<LightSection arrow>
+  <h2>{$t('club.upload-video-button')}</h2>
+  <p>{$t('club.upload-video-description')}</p>
+  <VideoUpload></VideoUpload>
+</LightSection>
+
+<NightSection>
+  <div class="private">
+    <h2>{$t('club.my-clubs-title')}</h2>
+    <p>{$t('club.description-0')}</p>
+    <p>{$t('club.description-1')}</p>
+    <p>{$t('club.description-2')}</p>
+    <Clubs />
+  </div>
+
+  <h2>{$t('club.create-new-title')}</h2>
+  <CreateClub></CreateClub>
+  <Footer white />
+</NightSection>
+
+<!-- <Popup title={'profile.consent.title'} bind:isOpen={showStatsSharingPopup}>
   <div>{$t('profile.consent.text0')}</div>
   <div>{$t('profile.consent.question')}</div>
 
@@ -95,7 +141,7 @@
       <p>{$t('profile.consent.no')}</p>
     </button>
   </div>
-</Popup>
+</Popup> -->
 
 {#if unlockHiddenFeatures > 6}
   <div class="hidden-features">
@@ -118,14 +164,14 @@
   .inputs {
     /* display grid allows to fit input field to width */
     display: grid;
-    gap: 5px;
-    margin: 25px 5px;
+    gap: 1rem;
+    margin: 2rem 0;
   }
 
   .buttons {
     display: grid;
     grid-template-columns: auto auto;
-    gap: 30px;
+    gap: 2rem;
   }
 
   .hidden-features {
@@ -139,5 +185,15 @@
     align-items: center;
     gap: 10px;
     margin: 5px;
+  }
+
+  .private {
+    margin-bottom: 2rem;
+  }
+
+  .videos {
+    margin: auto;
+    height: 240px;
+    width: min(280px, calc(100vw - 3rem)); /* PeerTube thumbnail width */
   }
 </style>

@@ -1,6 +1,7 @@
 <script>
   import { page } from '$app/state';
   import LoginRequiredContent from '$lib/components/profile/LoginRequiredContent.svelte';
+    import ScrollToTop from '$lib/components/ScrollToTop.svelte';
   import ThumbnailFeed from '$lib/components/ThumbnailFeed.svelte';
   import Button from '$lib/components/ui/Button.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
@@ -90,6 +91,8 @@
     showAddMorePopup = true;
   }
 </script>
+
+<ScrollToTop />
 
 <LimeSection>
   <LogoHeader title={club?.name} backButton onAction={onAddMore} mainColor

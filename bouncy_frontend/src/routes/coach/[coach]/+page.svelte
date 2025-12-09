@@ -15,6 +15,7 @@
   import VideoFeed from '$lib/components/VideoFeed.svelte';
   import Section from '$lib/components/ui/sections/Section.svelte';
   import { PUBLIC_ENV } from '$env/static/public';
+  import ScrollToTop from '$lib/components/ScrollToTop.svelte';
 
   /**
    * @typedef {Object} Props
@@ -50,11 +51,9 @@
   }
 
   const title = coachId.charAt(0).toUpperCase() + coachId.slice(1);
-
-  onMount(() => {
-    document.querySelector('.background')?.scrollTo(0, 0);
-  });
 </script>
+
+<ScrollToTop />
 
 <AvatarStyleContext
   coloring={coach.style.coloring}
