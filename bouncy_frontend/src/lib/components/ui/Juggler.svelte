@@ -1,5 +1,6 @@
 <script>
   import JuggleElement from './JuggleElement.svelte';
+  import { useSwipe } from 'svelte-gestures';
 
   /**
    * @typedef {Object} Props
@@ -45,6 +46,16 @@
     }
     return 'center';
   }
+
+  /**@param {import('svelte-gestures').SwipeCustomEvent} event */
+  function handler(event) {
+    if (event.detail.direction === 'right') {
+      prev();
+    }
+    if (event.detail.direction === 'left') {
+      next();
+    }
+  }
 </script>
 
 <div
@@ -52,7 +63,14 @@
   style="--component-width: {width}; --component-height: {height}; --button-height: {buttonHeight};"
 >
   <button onclick={prev}>&lt;</button>
-  <div class="videos">
+  <div
+    class="videos"
+    {...useSwipe(handler, () => ({
+      timeframe: 300,
+      minSwipeDistance: 50,
+      touchAction: 'none',
+    }))}
+  >
     {#each items as item, index}
       <JuggleElement position={pos(index)} {index}>
         {@render element({ item, index })}
