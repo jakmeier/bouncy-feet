@@ -53,9 +53,8 @@
 >
   <button onclick={prev}>&lt;</button>
   <div class="videos">
-    {#each items as item, reverseIndex}
-      {@const index = items.length - 1 - reverseIndex}
-      <JuggleElement position={pos(index)}>
+    {#each items as item, index}
+      <JuggleElement position={pos(index)} {index}>
         {@render element({ item, index })}
       </JuggleElement>
     {/each}
@@ -72,7 +71,7 @@
 
   .container button {
     position: absolute;
-    z-index: 1;
+    z-index: 10001;
     top: var(--button-height);
     width: 3rem;
     height: 3rem;

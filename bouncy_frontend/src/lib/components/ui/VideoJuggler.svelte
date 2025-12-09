@@ -13,8 +13,7 @@
   let juggler = $state();
   let currentIndex = $state(0);
   const videos = $derived(
-    // reverse for z-ordering
-    [...ids].reverse().map((id) => {
+    ids.map((id) => {
       return {
         id: id,
         /** @type {PeertubeVideoPlayer | undefined} */

@@ -30,5 +30,7 @@
 <style>
   .outer {
     margin: auto;
+    height: 240px;
+    width: min(280px, calc(100vw - 3rem)); /* PeerTube thumbnail width */
   }
 </style>
