@@ -7,6 +7,7 @@
   import Juggler from './Juggler.svelte';
   import PopupWithRunes from './PopupWithRunes.svelte';
   import PrivacySelector from './PrivacySelector.svelte';
+  import StringEditor from './StringEditor.svelte';
   import Symbol from './Symbol.svelte';
   import UnstyledButton from './UnstyledButton.svelte';
   import PeertubeVideoPlayer from './video/PeertubeVideoPlayer.svelte';
@@ -24,8 +25,9 @@
   let imageHeight = $state([]);
   let currentIndex = $state(0);
   let videoId = $state();
-  let showPopup = $state(false);
+  let showVideoPopup = $state(false);
   let showPrivacyPopUp = $state(false);
+  let showEditPopUp = $state(false);
   /** @param {api.VideoPrivacySet} id */
   let selectedPrivacy = $state(VIDEO_PRIVACY.PRIVATE);
 
@@ -37,6 +39,7 @@
   );
   const reactivePrivacySymbol = $derived(privacySymbol(currentPrivacy));
   const reactivePrivacyText = $derived(privacyText(currentPrivacy));
+  let reactiveName = $derived(videos[currentIndex].name);
 
   /** @param {number} index */
   function onIndexChanged(index) {
@@ -46,7 +49,7 @@
   /** @param {api.Video} video */
   function playVideo(video) {
     videoId = video.uuid;
-    showPopup = true;
+    showVideoPopup = true;
   }
 
   function onClose() {
@@ -87,13 +90,38 @@
     }
     showPrivacyPopUp = false;
   }
+
+  function openNameEdit() {
+    showEditPopUp = true;
+  }
+
+  /**
+   * @param {string} value
+   */
+  async function onNameChanged(value) {
+    if (value.length > 0) {
+      const video = videos[currentIndex];
+      const id = video.id || video.uuid || video.shortUUID;
+      if (id) {
+        // update PeerTube through api
+        const updated = await updateVideo(id, { name: value });
+        // update UI
+        if (updated) {
+          video.name = value;
+          // write to $derived to trigger the update that gets missed otherwise
+          reactiveName = video.name;
+        }
+      }
+    }
+    showEditPopUp = false;
+  }
 </script>
 
-<PopupWithRunes bind:isOpen={showPopup} {onClose}>
+<PopupWithRunes bind:isOpen={showVideoPopup} {onClose}>
   {#if videoId}
     <div class="popup">
       <div class="close">
-        <UnstyledButton onClick={() => (showPopup = false)}>
+        <UnstyledButton onClick={() => (showVideoPopup = false)}>
           <Symbol styleClass="white" size={32}>close</Symbol>
         </UnstyledButton>
       </div>
@@ -105,9 +133,17 @@
 </PopupWithRunes>
 
 <PopupWithRunes bind:isOpen={showPrivacyPopUp}>
-  <div class="privacy-pop-up">
-    <PrivacySelector selected={selectedPrivacy} onSelected={updatePrivacy}
-    ></PrivacySelector>
+  <PrivacySelector selected={selectedPrivacy} onSelected={updatePrivacy}
+  ></PrivacySelector>
+</PopupWithRunes>
+
+<PopupWithRunes bind:isOpen={showEditPopUp}>
+  <div class="edit-pop-up">
+    <StringEditor
+      initValue={reactiveName}
+      label="video.name"
+      onSelected={onNameChanged}
+    ></StringEditor>
   </div>
 </PopupWithRunes>
 
@@ -125,7 +161,7 @@
             {formatDuration(video.duration)}
           </div>
         </div>
-        {#if index === currentIndex}
+        {#if index === currentIndex && !extraInfo}
           <p class="name">
             {video.name}
           </p>
@@ -134,6 +170,15 @@
     </UnstyledButton>
     {#if extraInfo && index === currentIndex}
       <div class="extra-info">
+        <UnstyledButton onClick={() => openNameEdit()}>
+          <Symbol size={32}>edit</Symbol>
+        </UnstyledButton>
+        <UnstyledButton onClick={() => openNameEdit()}>
+          <p>
+            {reactiveName}
+          </p>
+        </UnstyledButton>
+
         <UnstyledButton onClick={() => openPrivacySettings(video)}>
           <Symbol size={32}>{reactivePrivacySymbol}</Symbol>
         </UnstyledButton>
@@ -152,6 +197,10 @@
     background-color: var(--theme-neutral-black);
     width: 100vw;
     height: 100vh;
+  }
+
+  .edit-pop-up {
+    color: var(--theme-main);
   }
 
   .close {
@@ -215,11 +264,15 @@
 
   p {
     margin: 0;
+    overflow: hidden;
+    overflow-wrap: break-word;
   }
 
   .extra-info {
     display: grid;
     grid-template-columns: 4rem auto;
     align-items: center;
+    margin-top: 1rem;
+    gap: 1rem 0;
   }
 </style>

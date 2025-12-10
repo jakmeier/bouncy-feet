@@ -358,6 +358,7 @@
     "video": {
         "privacy-selection-title": "Video Zugriff",
         "empty-playlist": "Keine Videos verfügbar",
+        "name": "Video Titel",
         "private-description": "Privat, nur ich sehe das Video",
         "unlisted-description": "Geteilt mit Clubmitgliedern",
         "public-description": "Öffentlich geteilt",

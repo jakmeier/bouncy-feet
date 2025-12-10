@@ -357,6 +357,7 @@
     },
     "video": {
         "privacy-selection-title": "Video access",
+        "name": "Video name",
         "empty-playlist": "No videos available",
         "private-description": "Private, only I can see this video",
         "unlisted-description": "Shared with club members",

@@ -31,3 +31,9 @@
 >
   {@render children?.()}
 </div>
+
+<style>
+  div {
+    display: contents;
+  }
+</style>
