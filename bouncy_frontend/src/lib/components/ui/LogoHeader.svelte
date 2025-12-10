@@ -132,8 +132,8 @@
   }
 
   .action {
-    max-width: 3rem;
-    max-height: 3rem;
+    max-width: 2rem;
+    max-height: 2rem;
   }
 
   .action span {

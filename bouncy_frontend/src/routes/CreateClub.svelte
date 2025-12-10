@@ -22,18 +22,20 @@
   }
 </script>
 
-<LoginRequiredContent reason="testing">
-  <form on:submit={submitForm}>
-    <label for="title"> Title: </label>
-    <input type="text" name="title" required maxlength="64" />
+{#if userCtx.isLoggedInToApi()}
+  <LoginRequiredContent reason="">
+    <form on:submit={submitForm}>
+      <label for="title"> {$t('club.form-title')}: </label>
+      <input type="text" name="title" required maxlength="64" />
 
-    <label for="description"> Description: </label>
-    <textarea name="description" maxlength="1024" rows="5" cols="36" required
-    ></textarea>
+      <label for="description"> {$t('club.form-description')}: </label>
+      <textarea name="description" maxlength="1024" rows="5" cols="36" required
+      ></textarea>
 
-    <button type="submit">{$t('club.create-new-button')}</button>
-  </form>
-</LoginRequiredContent>
+      <button type="submit">{$t('club.create-new-button')}</button>
+    </form>
+  </LoginRequiredContent>
+{/if}
 
 <style>
   form {

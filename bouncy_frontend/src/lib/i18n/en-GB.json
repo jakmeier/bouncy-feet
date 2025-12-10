@@ -61,7 +61,9 @@
         "add-user-failed": "Sorry something went wrong:(",
         "admins-title": "Admins",
         "members-title": "Members",
-        "requires-login-description": "This part of the club is private."
+        "requires-login-description": "This part of the club is private.",
+        "form-title": "Name",
+        "form-description": "Description"
     },
     "courses": {
         "nav": "Learn",

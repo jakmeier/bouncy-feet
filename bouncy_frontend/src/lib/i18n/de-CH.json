@@ -61,7 +61,9 @@
         "add-user-failed": "Das hat leider nicht geklappt :(",
         "admins-title": "Admins",
         "members-title": "Mitglieder",
-        "requires-login-description": "Dieser Bereich vom Club ist privat."
+        "requires-login-description": "Dieser Bereich vom Club ist privat.",
+        "form-title": "Name",
+        "form-description": "Beschreibung"
     },
     "courses": {
         "nav": "Lernen",
