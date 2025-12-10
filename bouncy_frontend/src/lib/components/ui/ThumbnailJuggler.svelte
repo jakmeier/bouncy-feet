@@ -1,10 +1,12 @@
 <script>
   import { PUBLIC_BF_PEERTUBE_URL } from '$env/static/public';
   import { t } from '$lib/i18n';
-  import { VIDEO_PRIVACY } from '$lib/peertube';
+  import { updateVideo, VIDEO_PRIVACY } from '$lib/peertube';
   import * as api from '$lib/peertube-openapi';
+  import { privacySymbol, privacyText } from '$lib/peertube_utils';
   import Juggler from './Juggler.svelte';
   import PopupWithRunes from './PopupWithRunes.svelte';
+  import PrivacySelector from './PrivacySelector.svelte';
   import Symbol from './Symbol.svelte';
   import UnstyledButton from './UnstyledButton.svelte';
   import PeertubeVideoPlayer from './video/PeertubeVideoPlayer.svelte';
@@ -16,17 +18,25 @@
    */
 
   /** @type {Props} */
-  let { videos, extraInfo = false } = $props();
+  let { videos = $bindable(), extraInfo = false } = $props();
   let juggler = $state();
   /** @type {number[]} */
   let imageHeight = $state([]);
   let currentIndex = $state(0);
   let videoId = $state();
   let showPopup = $state(false);
+  let showPrivacyPopUp = $state(false);
+  /** @param {api.VideoPrivacySet} id */
+  let selectedPrivacy = $state(VIDEO_PRIVACY.PRIVATE);
 
   let buttonHeight = $derived(
     `calc(${imageHeight[currentIndex] / 2}px - 1.5rem)`
   );
+  let currentPrivacy = $derived(
+    videos[currentIndex].privacy?.id || VIDEO_PRIVACY.PUBLIC
+  );
+  const reactivePrivacySymbol = $derived(privacySymbol(currentPrivacy));
+  const reactivePrivacyText = $derived(privacyText(currentPrivacy));
 
   /** @param {number} index */
   function onIndexChanged(index) {
@@ -52,38 +62,30 @@
     }
   }
 
-  /**
-   * @param {api.VideoPrivacySet} privacy
-   * @returns {string}
-   */
-  function privacySymbol(privacy) {
-    switch (privacy) {
-      case VIDEO_PRIVACY.PRIVATE:
-        return 'public_off';
-      case VIDEO_PRIVACY.UNLISTED:
-        return 'group';
-      case VIDEO_PRIVACY.PUBLIC:
-        return 'public';
-      default:
-        return 'question_mark';
-    }
+  /** @param {api.Video} video */
+  function openPrivacySettings(video) {
+    selectedPrivacy = video.privacy?.id || VIDEO_PRIVACY.PUBLIC;
+    showPrivacyPopUp = true;
   }
 
   /**
    * @param {api.VideoPrivacySet} privacy
-   * @returns {string}
    */
-  function privacyText(privacy) {
-    switch (privacy) {
-      case VIDEO_PRIVACY.PRIVATE:
-        return 'video.private-description';
-      case VIDEO_PRIVACY.UNLISTED:
-        return 'video.unlisted-description';
-      case VIDEO_PRIVACY.PUBLIC:
-        return 'video.public-description';
-      default:
-        return 'video.unknown-privacy';
+  async function updatePrivacy(privacy) {
+    const video = videos[currentIndex];
+    const id = video.id || video.uuid || video.shortUUID;
+    if (id) {
+      // update PeerTube through api
+      const updated = await updateVideo(id, { privacy });
+      // update UI
+      if (updated && video.privacy) {
+        video.privacy.id = privacy;
+        // write to $derived to trigger the update that gets missed otherwise
+        currentPrivacy =
+          videos[currentIndex].privacy?.id || VIDEO_PRIVACY.PUBLIC;
+      }
     }
+    showPrivacyPopUp = false;
   }
 </script>
 
@@ -100,6 +102,13 @@
       </div>
     </div>
   {/if}
+</PopupWithRunes>
+
+<PopupWithRunes bind:isOpen={showPrivacyPopUp}>
+  <div class="privacy-pop-up">
+    <PrivacySelector selected={selectedPrivacy} onSelected={updatePrivacy}
+    ></PrivacySelector>
+  </div>
 </PopupWithRunes>
 
 <Juggler bind:this={juggler} {onIndexChanged} items={videos} {buttonHeight}>
@@ -120,17 +129,21 @@
           <p class="name">
             {video.name}
           </p>
-          {#if extraInfo}
-            <div class="extra-info">
-              <Symbol size={32}>{privacySymbol(video.privacy.id)}</Symbol>
-              <p>
-                {$t(privacyText(video.privacy.id))}
-              </p>
-            </div>
-          {/if}
         {/if}
       </div>
     </UnstyledButton>
+    {#if extraInfo && index === currentIndex}
+      <div class="extra-info">
+        <UnstyledButton onClick={() => openPrivacySettings(video)}>
+          <Symbol size={32}>{reactivePrivacySymbol}</Symbol>
+        </UnstyledButton>
+        <UnstyledButton onClick={() => openPrivacySettings(video)}>
+          <p>
+            {$t(reactivePrivacyText)}
+          </p>
+        </UnstyledButton>
+      </div>
+    {/if}
   {/snippet}
 </Juggler>
 
@@ -189,16 +202,15 @@
     word-wrap: break-word;
     overflow: hidden;
     text-overflow: ellipsis;
-    height: calc(3 * var(--font-normal));
+    height: calc(2.5 * var(--font-normal));
     padding: 0.5rem;
   }
 
   .name:hover {
     background-color: var(--theme-neutral-light);
     border-radius: 0.5rem;
-    overflow: visible;
     height: auto;
-    min-height: calc(3 * var(--font-normal));
+    min-height: calc(2.5 * var(--font-normal));
   }
 
   p {

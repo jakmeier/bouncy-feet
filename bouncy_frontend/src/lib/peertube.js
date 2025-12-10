@@ -279,3 +279,50 @@ export async function fetchMyVideos(start = 0, count = 20) {
 
     return data.data;
 }
+
+/**
+ * @typedef {object} UpdateVideoArgs
+ * @prop {number} [channelId] -- only works for channels of the same account
+ * @prop {Blob | File} [thumbnailfile]
+ * @prop {Blob | File} [previewfile]
+ * @prop {api.VideoCategorySet} [category]
+ * @prop {api.VideoLicenceSet} [licence]
+ * @prop {api.VideoLanguageSet} [language]
+ * @prop {api.VideoPrivacySet} [privacy]
+ * @prop {string} [description]
+ * @prop {string} [waitTranscoding]
+ * @prop {string} [support]
+ * @prop {boolean} [nsfw]
+ * @prop {unknown} [nsfwSummary]
+ * @prop {api.NsfwFlag} [nsfwFlags]
+ * @prop {string} [name]
+ * @prop {Array<string>} [tags]
+ * @prop {api.VideoCommentsPolicySet} [commentsPolicy]
+ * @prop {boolean} [downloadEnabled]
+ * @prop {string | null} [originallyPublishedAt]
+ * @prop {api.VideoScheduledUpdate} [scheduleUpdate]
+ * @prop {api.AddVideoPasswords} [videoPasswords]
+ */
+
+/**
+ * @param {number | string} id -- id (integer) or UUIDv4 (string) or shortUUID (string)
+ * @param {UpdateVideoArgs} args -- fields to update
+ * @returns {Promise<boolean>} -- true if successful
+ */
+export async function updateVideo(id, args) {
+    try {
+        const options = {
+            path: {
+                id
+            },
+            body: {
+                ...args
+            }
+        };
+        await api.putVideo(options);
+        return true;
+    } catch (err) {
+        console.error("Failed updating video", err);
+    }
+    return false;
+}

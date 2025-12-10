@@ -356,6 +356,7 @@
         "by": "von"
     },
     "video": {
+        "privacy-selection-title": "Video Zugriff",
         "empty-playlist": "Keine Videos verfügbar",
         "private-description": "Privat, nur ich sehe das Video",
         "unlisted-description": "Geteilt mit Clubmitgliedern",

@@ -66,28 +66,30 @@
 
 <ScrollToTop />
 
-<LogoHeader title={$t('profile.title')} backButton={false} homeLink />
+<DarkSection fillScreen arrow>
+  <LogoHeader title={$t('profile.title')} backButton={false} homeLink />
 
-<!-- svelte-ignore a11y_click_events_have_key_events -->
-<!-- svelte-ignore a11y_no_static_element_interactions -->
-<div class="profile-pic" onclick={clickProfile}>
-  <Symbol size={100}>person</Symbol>
-  {$user.publicName}
-</div>
-<h2 class="box">{$t('profile.stats-title')}</h2>
-<DanceStats
-  seconds={$user.recordedSeconds}
-  numSteps={$user.recordedSteps}
-  numDances={$user.recordedDances}
-/>
+  <!-- svelte-ignore a11y_click_events_have_key_events -->
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
+  <div class="profile-pic" onclick={clickProfile}>
+    <Symbol size={100}>person</Symbol>
+    {$user.publicName}
+  </div>
+  <h2 class="box">{$t('profile.stats-title')}</h2>
+  <DanceStats
+    seconds={$user.recordedSeconds}
+    numSteps={$user.recordedSteps}
+    numDances={$user.recordedDances}
+  />
 
-<form class="inputs">
-  <label for="publicName">{$t('profile.public-name')}</label>
-  <input id="publicName" type="text" bind:value={$user.publicName} />
-  <button onclick={submit} class="wide"
-    >{$t('profile.update-name-button')}</button
-  >
-</form>
+  <form class="inputs">
+    <label for="publicName">{$t('profile.public-name')}</label>
+    <input id="publicName" type="text" bind:value={$user.publicName} />
+    <button onclick={submit} class="wide"
+      >{$t('profile.update-name-button')}</button
+    >
+  </form>
+</DarkSection>
 
 <LimeSection arrow fillScreen>
   <LoginRequiredContent
