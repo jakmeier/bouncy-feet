@@ -10,6 +10,8 @@ services:
       OIDC_CLIENT_SECRET: XXXX
       OIDC_CLIENT_ID: bouncy-dev-backend
       DATABASE_URL: "postgres://USER:PW@postgres/bouncyfeet-dev"
+      PEERTUBE_SYSTEM_USER: system
+      PEERTUBE_SYSTEM_USER_PASSWORD: XXX
     ports:
       - 3003:3000
     restart: always
@@ -29,74 +31,11 @@ services:
       - local_dev_network
     restart: always
 
-  peertube:
-    # own build
-    build:
-      context: ../bouncy_tube/PeerTube
-      dockerfile: support/docker/production/Dockerfile.bookworm
-    # official image
-    # image: chocobozzz/peertube:production-bookworm
-
-    environment:
-      PEERTUBE_SECRET: 'XXX'
-      PEERTUBE_DB_HOSTNAME: peertube-postgres
-      PEERTUBE_DB_USERNAME: dev-tube-db-user
-      PEERTUBE_DB_PASSWORD: XXX
-      PEERTUBE_DB_NAME: peertube-dev
-      PEERTUBE_WEBSERVER_HOSTNAME: dev-tube.bouncy-feet.ch
-      PEERTUBE_ADMIN_EMAIL: admin@admin.ch
-      PEERTUBE_WEBSERVER_PORT: 9000
-      PEERTUBE_WEBSERVER_HTTPS: false
-
-    ports:
-    #  - "1935:1935" # Comment if you don't want to use the live feature
-     - "9000:9000" # Uncomment if you use another webserver/proxy or test PeerTube in local, otherwise not suitable for production
-    networks:
-      local_network:
-      peertube_dev_network:
-    volumes:
-      # Remove the following line if you want to use another webserver/proxy or test PeerTube in local
-      # - assets:/app/client/dist
-      - ../bouncy_tube/PeerTube/data:/data
-      - ../bouncy_tube/PeerTube/config:/config
-      # Also requires: 
-      # cd /app
-      # npm run plugin:install -- --plugin-path /data/plugins/peertube-plugin-auth-openid-connect
-      - ../bouncy_tube/official-plugins/peertube-plugin-auth-openid-connect:/data/plugins/peertube-plugin-auth-openid-connect
-
-    depends_on:
-      - peertube-postgres
-      - redis
-    #   - postfix
-    restart: "always"
-  peertube-postgres:
-    image: postgres:15
-    environment:
-      POSTGRES_USER: dev-tube-db-user
-      POSTGRES_PASSWORD: peertube_password
-      POSTGRES_DB: peertube-dev
-    networks:
-      - peertube_dev_network
-    ports:
-      - 55432:5432
-    volumes:
-      - peertube-postgres-data:/var/lib/postgresql/data
-    networks:
-      - peertube_dev_network
-    restart: always
-  redis:
-    image: redis:6-alpine
-    volumes:
-      - dev-tube-redis:/data
-    networks:
-      - peertube_dev_network
-    restart: "always"
+  # Note: PeerTube uses the compose files from upstream with slight
+  # modifications for the machine it is running on.
 
 volumes:
   dev-pgdata:
-  peertube-postgres-data:
 networks:
   local_dev_network:
-    driver: bridge
-  peertube_dev_network:
     driver: bridge

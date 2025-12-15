@@ -10,6 +10,8 @@ services:
       OIDC_CLIENT_SECRET: XXXX
       OIDC_CLIENT_ID: bouncy-backend
       DATABASE_URL: "postgres://USER:PW@postgres/bouncyfeet"
+      PEERTUBE_SYSTEM_USER: system
+      PEERTUBE_SYSTEM_USER_PASSWORD: XXX
     ports:
       - 3002:3000
     restart: always
