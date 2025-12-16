@@ -25,8 +25,13 @@
   }
 
   function register() {
-    // TODO: replace with backend register
-    alert('NIY');
+    // redirect to backend register -> login
+    const currentUrl = window.location.href;
+    window.location.assign(
+      PUBLIC_API_BASE +
+        '/register?redirect_back_to=' +
+        encodeURIComponent(currentUrl)
+    );
   }
 
   function goBack() {

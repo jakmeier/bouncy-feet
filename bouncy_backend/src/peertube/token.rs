@@ -112,7 +112,7 @@ async fn fetch_api_token(
 async fn read_or_fetch_client_config(
     state: &AppState,
 ) -> Result<OAuthClientConfig, reqwest::Error> {
-    let mut cfg_guard = state.client_config.write().await;
+    let mut cfg_guard = state.peertube_client_config.write().await;
     if cfg_guard.is_none() {
         let client_res = state
             .http_client
@@ -133,6 +133,6 @@ async fn read_or_fetch_client_config(
 }
 
 async fn clear_client_config(state: &AppState) {
-    let mut cfg_guard = state.client_config.write().await;
+    let mut cfg_guard = state.peertube_client_config.write().await;
     *cfg_guard = None;
 }

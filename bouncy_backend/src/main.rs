@@ -1,3 +1,4 @@
+use crate::api_endoints::auth::KeycloakClientConfig;
 use crate::api_endoints::peertube_token::{self, peertube_token_exchange};
 use crate::layers::oidc::{oidc_auth_layer, oidc_login_layer};
 use crate::layers::session::pg_backed_cookie_session_layer;
@@ -29,10 +30,12 @@ pub(crate) use db::*;
 #[derive(Clone)]
 struct AppState {
     app_url: Url,
+    api_url: Url,
     peertube_url: Url,
     pg_db_pool: PgPool,
     http_client: reqwest::Client,
-    client_config: Arc<tokio::sync::RwLock<Option<peertube_token::OAuthClientConfig>>>,
+    peertube_client_config: Arc<tokio::sync::RwLock<Option<peertube_token::OAuthClientConfig>>>,
+    kc_config: KeycloakClientConfig,
     system_user: PeerTubeSystemUser,
 }
 
@@ -56,6 +59,13 @@ async fn main() -> anyhow::Result<()> {
     let parsed_api_url = Url::parse(&api_url).unwrap();
     let parsed_app_url = Url::parse(&app_url).unwrap();
 
+    // `prompt=create` is the recommended way to open the registration page.
+    // Requires Keycloak 26.1.0 or newer.
+    let kc_registration_url = Url::parse(&format!(
+        "{oidc_issuer}/protocol/openid-connect/auth?prompt=create&client_id={oidc_client_id}&response_type=code&scope=openid"
+    ))
+    .unwrap();
+
     let pg_db_pool = PgPool::connect(&db_url).await?;
 
     // TODO: better DB setup
@@ -74,10 +84,16 @@ async fn main() -> anyhow::Result<()> {
 
     let state = AppState {
         app_url: parsed_app_url.clone(),
+        api_url: parsed_api_url.clone(),
         peertube_url,
         pg_db_pool,
         http_client,
-        client_config: Arc::default(),
+        peertube_client_config: Arc::default(),
+        kc_config: KeycloakClientConfig {
+            client_id: oidc_client_id.clone(),
+            client_secret: oidc_client_secret.clone(),
+            registration_url: kc_registration_url,
+        },
         system_user,
     };
 
@@ -131,6 +147,7 @@ async fn main() -> anyhow::Result<()> {
         .route("/", get(root))
         .route("/clubs", get(api_endoints::club::clubs))
         .route("/clubs/{club_id}", get(api_endoints::club::club))
+        .route("/register", get(api_endoints::auth::register))
         .route(
             "/new_guest_session",
             get(api_endoints::client_session::create_guest_session),

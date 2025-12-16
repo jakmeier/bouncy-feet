@@ -10,9 +10,9 @@
     beatDuration,
   } from '$lib/stores/Beat';
   import Button from '../ui/Button.svelte';
-  import Header from '../ui/Header.svelte';
   import Toggle from '../ui/Toggle.svelte';
   import BeatVisualizer from './BeatVisualizer.svelte';
+  import LogoHeader from '../ui/LogoHeader.svelte';
 
   /**
    * @typedef {Object} Props
@@ -22,7 +22,11 @@
    */
 
   /** @type {Props} */
-  let { counter = $bindable(-1), bpmSelected = $bindable(false), useFixedBpm = $bindable(false) } = $props();
+  let {
+    counter = $bindable(-1),
+    bpmSelected = $bindable(false),
+    useFixedBpm = $bindable(false),
+  } = $props();
 
   let start = performance.now();
   let lastTap = performance.now();
@@ -71,7 +75,7 @@
   }
 </script>
 
-<Header title={$t('record.prepare-title')} backButton></Header>
+<LogoHeader title={$t('record.prepare-title')} backButton />
 
 <div class="outer">
   <div class="visualizer" onpointerdown={tap}>
