@@ -12,6 +12,7 @@
   /** @type {Props} */
   let { children, position, index } = $props();
   const animationTime = 400;
+  let width = $state(400);
 
   let z = $state(index);
   let x = new Tween(0, {
@@ -56,7 +57,9 @@
 
 <div
   class="box"
-  style="transform: translate({x.current}%, {y.current}%) scale({size.current}); z-index: {z}"
+  bind:clientWidth={width}
+  style="transform: translate(calc({x.current}% - {width /
+    2}px), {y.current}%) scale({size.current}); z-index: {z}"
 >
   {@render children?.()}
 </div>
@@ -65,6 +68,9 @@
   .box {
     position: absolute;
     top: 0;
-    left: 0;
+    left: 50%;
+    width: 100%;
+    max-width: 400px;
+    overflow: hidden;
   }
 </style>

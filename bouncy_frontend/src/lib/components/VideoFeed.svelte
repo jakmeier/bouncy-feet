@@ -20,8 +20,8 @@
 </script>
 
 <div class="outer">
-  <!-- TODO(August): like video -->
-  <!-- TODO(August): report video -->
+  <!-- TODO(publish): like video -->
+  <!-- TODO(publish): report video -->
 
   {#await videoUuids then ids}
     {#if ids?.length > 0}
@@ -34,8 +34,7 @@
 
 <style>
   .outer {
-    margin: auto;
-    width: 90%;
-    height: 90%;
+    margin: 0 auto;
+    width: calc(100% - 1rem);
   }
 </style>

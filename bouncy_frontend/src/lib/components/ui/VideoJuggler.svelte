@@ -22,6 +22,12 @@
     })
   );
 
+  /** @type {number[]} */
+  let videoHeight = $state([]);
+  let buttonHeight = $derived(
+    `calc(${videoHeight[currentIndex] / 2}px - 1.5rem)`
+  );
+
   $effect(() => {
     const currentVideo = videos[currentIndex];
     if (autoplay && currentVideo.player) {
@@ -79,12 +85,14 @@
   }
 </script>
 
-<Juggler bind:this={juggler} {onIndexChanged} items={videos}>
+<Juggler bind:this={juggler} {onIndexChanged} items={videos} {buttonHeight}>
   {#snippet element({ item: video, index })}
-    <PeertubeVideoPlayer
-      bind:this={video.player}
-      videoId={video.id}
-      delayLoadingMs={delayMs(index)}
-    />
+    <div bind:clientHeight={videoHeight[index]}>
+      <PeertubeVideoPlayer
+        bind:this={video.player}
+        videoId={video.id}
+        delayLoadingMs={delayMs(index)}
+      />
+    </div>
   {/snippet}
 </Juggler>

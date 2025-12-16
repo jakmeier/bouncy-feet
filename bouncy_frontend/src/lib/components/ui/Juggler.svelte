@@ -64,7 +64,7 @@
 >
   <button onclick={prev}>&lt;</button>
   <div
-    class="videos"
+    class="elements"
     {...useSwipe(handler, () => ({
       timeframe: 300,
       minSwipeDistance: 50,
@@ -107,7 +107,7 @@
     right: -1.5rem;
   }
 
-  .videos {
+  .elements {
     overflow: hidden;
   }
 </style>

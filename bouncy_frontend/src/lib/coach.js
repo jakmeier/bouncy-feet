@@ -59,6 +59,7 @@ export const coaches = [
             en: "Enter Rob's abandoned warehouse to learn about the **Running Man** and its variations."
         },
         peertubePlaylist: {
+            localDev: "9aBHGBL88zSb6u1esWzDgD",
             dev: "3FWFPJds8qwVJUbzSsjFzH",
             prod: "",
         }
@@ -107,6 +108,7 @@ export const coaches = [
             en: "Welcome to Charles' dancing halls, where **Happy Feets** and **Charleston** rule."
         },
         peertubePlaylist: {
+            localDev: "9aBHGBL88zSb6u1esWzDgD",
             dev: "nAkAtJ2sdYFN73HZEjDft2",
             prod: "",
         }

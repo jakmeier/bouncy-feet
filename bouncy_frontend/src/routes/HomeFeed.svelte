@@ -16,7 +16,6 @@
   import { getContext, onMount } from 'svelte';
   import Personalities from './Personalities.svelte';
   import DarkSection from '$lib/components/ui/sections/DarkSection.svelte';
-  import Clubs from './Clubs.svelte';
   import HomeNote from './HomeNote.svelte';
   import { goto } from '$app/navigation';
     import ScrollToTop from '$lib/components/ScrollToTop.svelte';
