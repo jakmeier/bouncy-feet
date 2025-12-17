@@ -18,7 +18,7 @@
   import DarkSection from '$lib/components/ui/sections/DarkSection.svelte';
   import HomeNote from './HomeNote.svelte';
   import { goto } from '$app/navigation';
-    import ScrollToTop from '$lib/components/ScrollToTop.svelte';
+  import ScrollToTop from '$lib/components/ScrollToTop.svelte';
   /**
    * @typedef {Object} Props
    * @property {any} featuredDances

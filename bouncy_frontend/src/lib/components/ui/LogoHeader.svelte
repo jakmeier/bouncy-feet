@@ -6,6 +6,8 @@
   import Plus from './svg/Plus.svelte';
   import UnstyledButton from './UnstyledButton.svelte';
   import { goto } from '$app/navigation';
+  import { onDestroy, onMount } from 'svelte';
+  import { fade, fly } from 'svelte/transition';
 
   /**
    * @typedef {Object} Props
@@ -58,6 +60,19 @@
       ? `${base}/icons/logo.svg`
       : `${base}/icons/icon_tight_on_transparent.png`
   );
+
+  let oddAnimation = $state(true);
+  /** @type {number | undefined} */
+  let interval;
+
+  onMount(() => {
+    interval = setInterval(() => (oddAnimation = !oddAnimation), 5000);
+  });
+  onDestroy(() => {
+    if (interval) {
+      clearInterval(interval);
+    }
+  });
 </script>
 
 <header style="background-color: {bgColor};">
@@ -74,7 +89,25 @@
           goto('/');
         }}
       >
-        <img class="logo" src={imgUrl} alt="Bouncy Feet Logo" />
+        <div class="animated-logo">
+          {#if oddAnimation}
+            <img
+              class="logo"
+              src={imgUrl}
+              alt="Bouncy Feet Logo"
+              in:fly={{ x: -120 }}
+              out:fade={{ delay: 2000 }}
+            />
+          {:else}
+            <div
+              class="arrow"
+              in:fade={{ duration: 1000, delay: 2000 }}
+              out:fade
+            >
+              <Arrow />
+            </div>
+          {/if}
+        </div>
       </UnstyledButton>
     {:else}
       <img class="logo" src={imgUrl} alt="Bouncy Feet Logo" />
@@ -138,5 +171,12 @@
 
   .action span {
     font-size: 3rem;
+  }
+
+  .animated-logo {
+    position: relative;
+  }
+  .animated-logo * {
+    position: absolute;
   }
 </style>
