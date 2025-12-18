@@ -301,6 +301,7 @@ impl pose_file::Pose {
             id: format!("pose-{}", lfsr::random_id()),
             names: None,
             mirror_of: String::new(),
+            no_mirror_x: false,
             z: Default::default(),
             x_shift: 0.0,
             y_shift: 0.0,

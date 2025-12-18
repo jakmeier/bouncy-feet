@@ -66,6 +66,7 @@
  * @property {string} secondaryColor
  * @property {string} fontColor
  * @property {string} danceFloorColor
+ * @property {string} fontOnDanceFloorColor
  * 
  * @typedef {Object} AvatarStyleContext
  * @property {AvatarColoring} coloring

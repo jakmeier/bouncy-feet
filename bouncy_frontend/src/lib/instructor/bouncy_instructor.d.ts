@@ -1,22 +1,22 @@
 /* tslint:disable */
 /* eslint-disable */
-export function init(random_seed: number, lang: string): void;
 export function loadPoseFile(url: string): Promise<void>;
-export function loadPoseString(data: string): void;
-export function loadDanceString(data: string): void;
-export function loadStepFile(url: string, source: string): Promise<void>;
-export function loadDanceFile(url: string): Promise<void>;
-export function loadStepString(data: string, source: string): void;
-export function parseCourseString(data: string, lang: string): Course;
-export function poses(): PoseWrapper[];
-export function steps(): StepWrapper[];
-export function stepsBySource(source: string): StepWrapper[];
-export function stepById(id: string, flipped: boolean): StepWrapper | undefined;
 export function stepsByName(step_name: string): StepWrapper[];
+export function stepById(id: string, flipped: boolean): StepWrapper | undefined;
 export function dances(): DanceWrapper[];
+export function loadDanceString(data: string): void;
+export function parseCourseString(data: string, lang: string): Course;
+export function loadStepFile(url: string, source: string): Promise<void>;
+export function poses(): PoseWrapper[];
 export function danceBuilderFromDance(dance_id: string): DanceBuilder;
 export function addLocalPoses(poses: PoseWrapper[]): void;
+export function loadStepString(data: string, source: string): void;
+export function steps(): StepWrapper[];
+export function stepsBySource(source: string): StepWrapper[];
 export function loadLocalSteps(steps: StepWrapper[]): void;
+export function loadPoseString(data: string): void;
+export function init(random_seed: number, lang: string): void;
+export function loadDanceFile(url: string): Promise<void>;
 export enum DetectionFailureReason {
   /**
    * The last match was too recent to have another match.
@@ -175,11 +175,11 @@ type ReadableDetectionState = Readable<DetectionState>;
 export class AudioEffect {
   private constructor();
   free(): void;
+  readonly soundId: string;
   /**
    * When the sound should be played, could be in the future.
    */
   timestamp: number;
-  readonly soundId: string;
 }
 export class Cartesian2d {
   free(): void;
@@ -217,29 +217,29 @@ export class Course {
   private constructor();
   free(): void;
   featuredStep(): StepWrapper | undefined;
-  tracker(lesson_index: number): Tracker | undefined;
   /**
    * WIP: Create a training session for the given course. At the moment, it
    * is hard coded to give something for testing.
    */
   trainingTracker(): Tracker;
+  tracker(lesson_index: number): Tracker | undefined;
+  readonly explanation: string;
   readonly id: string;
   readonly name: string;
-  readonly explanation: string;
   readonly video: VideoDef | undefined;
   readonly lessons: Lesson[];
 }
 export class DanceBuilder {
   free(): void;
+  isFlipped(pos: number): boolean;
+  insertStep(pos: number, step_id: string): void;
+  removeStep(pos: number): string;
+  setOrientation(pos: number, flipped: boolean): void;
   constructor(id: string);
+  clear(): void;
   length(): number;
   setId(id: string): void;
   addStep(step_id: string): void;
-  removeStep(pos: number): string;
-  insertStep(pos: number, step_id: string): void;
-  setOrientation(pos: number, flipped: boolean): void;
-  isFlipped(pos: number): boolean;
-  clear(): void;
   danceInfo(): DanceWrapper;
 }
 /**
@@ -250,7 +250,6 @@ export class DanceBuilder {
  */
 export class DanceCursor {
   free(): void;
-  constructor();
   /**
    * Whether both cursors show to the same pose slot.
    *
@@ -259,6 +258,7 @@ export class DanceCursor {
    */
   isSamePose(other: DanceCursor): boolean;
   isSameSubbeat(other: DanceCursor): boolean;
+  constructor();
   /**
    * Global counter of subbeat within an activity.
    */
@@ -286,26 +286,26 @@ export class DanceDetector {
 }
 export class DanceFileBuilder {
   free(): void;
+  removeDance(id: string): void;
+  danceBuilder(dance_id: string): DanceBuilder;
+  overwriteDance(dance_builder: DanceBuilder): void;
+  buildPrettyRon(): string;
   constructor();
+  dances(): DanceWrapper[];
   static fromRon(text: string): DanceFileBuilder;
   addDance(dance_builder: DanceBuilder): void;
-  overwriteDance(dance_builder: DanceBuilder): void;
-  removeDance(id: string): void;
   buildRon(): string;
-  buildPrettyRon(): string;
-  dances(): DanceWrapper[];
-  danceBuilder(dance_id: string): DanceBuilder;
 }
 export class DanceWrapper {
   private constructor();
   free(): void;
-  length(): number;
-  steps(): StepWrapper[];
-  skeleton(beat: number): Skeleton | undefined;
   /**
    * How much the body position deviates from the origin.
    */
   bodyShift(beat: number): Cartesian2d;
+  steps(): StepWrapper[];
+  length(): number;
+  skeleton(beat: number): Skeleton | undefined;
   /**
    * The unique identifier for the dance.
    */
@@ -321,12 +321,12 @@ export class DanceWrapper {
 export class DetectedStep {
   private constructor();
   free(): void;
+  readonly bpm: number;
+  readonly name: string;
+  readonly poses: PoseApproximation[];
   start: number;
   end: number;
   error: number;
-  readonly name: string;
-  readonly poses: PoseApproximation[];
-  readonly bpm: number;
 }
 /**
  * Result of a step or dance detection.
@@ -337,11 +337,11 @@ export class DetectedStep {
  */
 export class DetectionResult {
   free(): void;
+  poseError(): PoseApproximation | undefined;
   constructor();
   steps(): DetectedStep[];
   cursor(): DanceCursor;
   poseHint(): PoseHint;
-  poseError(): PoseApproximation | undefined;
   /**
    * If the newest detection was negative, this fields contains information
    * about the reason.
@@ -391,20 +391,20 @@ export class Lesson {
   free(): void;
   energy: number;
   difficulty: number;
-  readonly name: string;
-  readonly explanation: string;
-  readonly explainerVideo: VideoDef | undefined;
-  readonly frontVideo: VideoDef | undefined;
   readonly backVideo: VideoDef | undefined;
-  readonly song: string;
+  readonly explanation: string;
+  readonly frontVideo: VideoDef | undefined;
   readonly songTimestamp: number;
+  readonly explainerVideo: VideoDef | undefined;
+  readonly name: string;
+  readonly song: string;
   readonly parts: LessonPart[];
 }
 export class LessonPart {
   private constructor();
   free(): void;
-  readonly stepName: string;
   readonly step: StepWrapper;
+  readonly stepName: string;
 }
 /**
  * Self-describing error score for a specific limb
@@ -427,13 +427,15 @@ export class PoseApproximation {
    * List all limbs, order by how well they fit, best fit first.
    */
   limbErrors(): LimbError[];
-  zErrors(): ZError[];
-  zOrderErrors(): ZWrongOrderError[];
   /**
    * List the `n` limbs with the highest error contribution to the pose error.
    */
   worstLimbs(n: number): LimbError[];
   debugString(): string;
+  zOrderErrors(): ZWrongOrderError[];
+  zErrors(): ZError[];
+  readonly id: string;
+  readonly name: string;
   /**
    * Total error between 0.0 and 1.0.
    */
@@ -442,46 +444,44 @@ export class PoseApproximation {
    * Timestamp for which Keypoints were added
    */
   timestamp: number;
-  readonly id: string;
-  readonly name: string;
 }
 export class PoseFileWrapper {
   free(): void;
-  constructor();
-  static fromRon(text: string): PoseFileWrapper;
+  removePose(id: string): void;
+  overwritePose(new_pose: PoseWrapper): void;
+  buildPrettyRon(): string;
   poses(): PoseWrapper[];
   addPose(new_pose: PoseWrapper): void;
-  overwritePose(new_pose: PoseWrapper): void;
-  removePose(id: string): void;
+  static fromRon(text: string): PoseFileWrapper;
   buildRon(): string;
-  buildPrettyRon(): string;
+  constructor();
 }
 export class PoseWrapper {
   private constructor();
   free(): void;
-  skeleton(): Skeleton;
+  setWeight(field: SkeletonLimb, weight: number): void;
+  setDirection(direction: PoseDirection): void;
   sideSkeleton(): Skeleton;
   id(): string;
   name(lang: string): string;
-  setName(name: string, lang: string): void;
-  setAngle(field: SkeletonLimb, degree: number): void;
   /**
    * Angle in degree
    */
   getAngle(field: SkeletonLimb): number;
-  setZ(field: SkeletonPoint, z: number): void;
   getZ(field: SkeletonPoint): number;
-  setWeight(field: SkeletonLimb, weight: number): void;
+  setZ(field: SkeletonPoint, z: number): void;
   /**
    * Weight of limb in pose detection
    */
   getWeight(field: SkeletonLimb): number;
-  setDirection(direction: PoseDirection): void;
-  readonly direction: PoseDirection;
-  xShift: number;
+  setName(name: string, lang: string): void;
+  skeleton(): Skeleton;
+  setAngle(field: SkeletonLimb, degree: number): void;
   yShift: number;
-  turnShoulder: number;
+  xShift: number;
   turnHip: number;
+  turnShoulder: number;
+  readonly direction: PoseDirection;
 }
 /**
  * Projected line segment with two coordinates and a Z index.
@@ -556,9 +556,9 @@ export class Skeleton {
    * segment will have its center at the given position.
    */
   render(hip_center: Cartesian2d, size: number): SkeletonV2;
-  static resting(sideway: boolean): Skeleton;
-  restingPose(): Skeleton;
   debugString(): string;
+  restingPose(): Skeleton;
+  static resting(sideway: boolean): Skeleton;
   left: SkeletonSide;
   right: SkeletonSide;
   hip: Segment;
@@ -619,9 +619,9 @@ export class SkeletonV2 {
 export class SkeletonWrapper {
   private constructor();
   free(): void;
+  set(): Skeleton;
   pose(): PoseWrapper;
   skeleton(): Skeleton;
-  set(): Skeleton;
 }
 export class Skeletons {
   private constructor();
@@ -631,14 +631,14 @@ export class Skeletons {
 }
 export class StepFileWrapper {
   free(): void;
-  constructor();
-  static fromRon(text: string): StepFileWrapper;
+  removeStep(id: string): void;
+  overwriteStep(new_step: StepWrapper): void;
+  buildPrettyRon(): string;
   steps(): StepWrapper[];
   addStep(new_step: StepWrapper): void;
-  overwriteStep(new_step: StepWrapper): void;
-  removeStep(id: string): void;
+  static fromRon(text: string): StepFileWrapper;
   buildRon(): string;
-  buildPrettyRon(): string;
+  constructor();
 }
 export class StepMarker {
   private constructor();
@@ -650,43 +650,43 @@ export class StepMarker {
  */
 export class StepPositionBuilder {
   free(): void;
-  constructor(pose: PoseWrapper);
-  pose(): PoseWrapper;
   setJumpHeight(height: number): void;
   setOrientation(orientation: Orientation): void;
+  constructor(pose: PoseWrapper);
+  pose(): PoseWrapper;
   readonly jumpHeight: number | undefined;
   readonly orientation: Orientation;
 }
 export class StepWrapper {
   free(): void;
-  constructor(id: string, name: string, source: string);
-  skeleton(beat: number): Skeleton;
   /**
    * How much the body position deviates from the origin.
    */
   bodyShift(beat: number): Cartesian2d;
-  /**
-   * Applies a rotation (in degree) and returns the resulting skelton.
-   */
-  rotatedSkeleton(beat: number, rotation: number): Skeleton;
   jumpHeight(beat: number): number | undefined;
-  /**
-   * Look up poses from the global collection, do not use for courses that
-   * require a custom collection.
-   */
-  poses(): PoseWrapper[];
-  /**
-   * Positions with poses from the global collection, do not use for courses
-   * that require a custom collection.
-   */
-  positions(): StepPositionBuilder[];
   /**
    * Add poses from the global collection, do not use for courses that
    * require a custom collection.
    */
   addPosition(position: StepPositionBuilder): void;
-  removePosition(index: number): void;
   insertPosition(index: number, position: StepPositionBuilder): void;
+  removePosition(index: number): void;
+  /**
+   * Applies a rotation (in degree) and returns the resulting skelton.
+   */
+  rotatedSkeleton(beat: number, rotation: number): Skeleton;
+  /**
+   * Look up poses from the global collection, do not use for courses that
+   * require a custom collection.
+   */
+  poses(): PoseWrapper[];
+  skeleton(beat: number): Skeleton;
+  constructor(id: string, name: string, source: string);
+  /**
+   * Positions with poses from the global collection, do not use for courses
+   * that require a custom collection.
+   */
+  positions(): StepPositionBuilder[];
   /**
    * The unique identifier for the step.
    */
@@ -697,6 +697,10 @@ export class StepWrapper {
    */
   name: string;
   /**
+   * The number of subbeats the step takes for one repetition.
+   */
+  readonly subbeats: number;
+  /**
    * Description identifier for the translated text which describes how the
    * variation is different from the original.
    *
@@ -705,14 +709,11 @@ export class StepWrapper {
    * with the left foot first. The app shows a translated text like "Left Leg First".
    */
   readonly variation: string;
-  /**
-   * The number of subbeats the step takes for one repetition.
-   */
-  readonly subbeats: number;
 }
 export class TextEffect {
   private constructor();
   free(): void;
+  readonly text: string;
   /**
    * When the text should be displayed, could be in the future.
    */
@@ -721,7 +722,6 @@ export class TextEffect {
    * How long to show the text, in ms
    */
   duration: number;
-  readonly text: string;
 }
 /**
  * A Tracker gathers skeletons over time and passes it on to a DanceDetector.
@@ -730,39 +730,15 @@ export class Tracker {
   free(): void;
   exportFrame(timestamp: number): ExportedFrame;
   exportKeypoints(): string;
-  /**
-   * Create a tracker for all known steps.
-   */
-  constructor();
-  /**
-   * Track one specific step, by name, including its variations (with the same name).
-   */
-  static StepTracker(step_name: string): Tracker;
-  /**
-   * Track one specific step, by ID, excluding its variations (with the same name).
-   *
-   * This is not intended for general dance detection but rather for a
-   * specific training session without much regard for timing etc.
-   */
-  static UniqueStepTracker(step_id: string): Tracker;
+  alignBeat(first_beat: number): void;
+  jumpHeight(cursor: DanceCursor): number;
   /**
    * Mix a warmup with the given steps, by name.
    *
    */
   static WarmUp(step_names: string[], num_beats: number): Tracker;
-  finishTracking(): void;
-  clear(): void;
-  /**
-   * Insert keypoints of a new frame for tracking.
-   *
-   * This is the main method to insert data into the tracker.
-   */
-  addKeypoints(keypoints: Keypoints, timestamp: number): Skeletons;
-  setBpm(bpm: number): void;
-  alignBeat(first_beat: number): void;
-  enforceBeat(yes: boolean): void;
-  setErrorThreshold(error_threshold: number): void;
-  useTeacherVideo(yes: boolean): void;
+  skeletonAt(timestamp: number): Skeleton | undefined;
+  currentView(t: number): TeacherView;
   /**
    * Goes over all data and detects the best fitting dance.
    *
@@ -772,17 +748,52 @@ export class Tracker {
    * Use [`Tracker::run_detection`] for incremental detection.
    */
   detectDance(): DetectionResult;
-  runDetection(): DetectionResult;
-  poseHint(): PoseHint;
-  currentPoseError(): PoseApproximation | undefined;
-  currentView(t: number): TeacherView;
-  nextSubbeat(now?: number | null): number;
-  nextAudioEffect(): AudioEffect | undefined;
-  nextTextEffect(after: number): TextEffect | undefined;
+  enforceBeat(yes: boolean): void;
+  hipPosition(timestamp: number): Cartesian3d;
   /**
-   * How long the tracked activity is in total, measured in milliseconds.
+   * Insert keypoints of a new frame for tracking.
+   *
+   * This is the main method to insert data into the tracker.
    */
-  duration(): number;
+  addKeypoints(keypoints: Keypoints, timestamp: number): Skeletons;
+  /**
+   * Fit frames in a time interval against all poses and return the best fit.
+   *
+   * This API is exported mostly for debugging. To extract fitted dances, use
+   * `detect_dance` instead.
+   */
+  bestFitPose(start: number, end: number): PoseApproximation | undefined;
+  devSetState(state: DetectionState, timestamp: number): void;
+  nextSubbeat(now?: number | null): number;
+  runDetection(): DetectionResult;
+  /**
+   * Fit a single frame against all poses and return all errors
+   */
+  allPoseErrors(timestamp: number): PoseApproximation[];
+  finishTracking(): void;
+  poseBodyShift(cursor: DanceCursor): Cartesian2d;
+  /**
+   * Track one specific step, by name, including its variations (with the same name).
+   */
+  static StepTracker(step_name: string): Tracker;
+  nextTextEffect(after: number): TextEffect | undefined;
+  poseSkeletonAt(cursor: DanceCursor): Skeleton;
+  /**
+   * Return a cursor to a pose inside the tracker by beat count.
+   *
+   * If `looped` is true, the subbeat wraps around when exceeding the tracked range.
+   */
+  cursorAtSubbeat(subbeat: number, looped: boolean): DanceCursor;
+  nextAudioEffect(): AudioEffect | undefined;
+  useTeacherVideo(yes: boolean): void;
+  currentPoseError(): PoseApproximation | undefined;
+  setErrorThreshold(error_threshold: number): void;
+  skeletonWrapperAt(timestamp: number): SkeletonWrapper | undefined;
+  expectedJumpHeight(): number;
+  /**
+   * The original keypoints rendered as skeleton, at the given time frame.
+   */
+  renderedKeypointsAt(timestamp: number, width: number, height: number): SkeletonV2 | undefined;
   /**
    * Return a skeleton that's expected now.
    *
@@ -791,56 +802,45 @@ export class Tracker {
    * (experimenting with live instructor, I probably want to change this when cleaning up the impl)
    */
   expectedPoseSkeleton(): Skeleton;
-  expectedJumpHeight(): number;
-  subbeat(t: number): number;
+  /**
+   * Track one specific step, by ID, excluding its variations (with the same name).
+   *
+   * This is not intended for general dance detection but rather for a
+   * specific training session without much regard for timing etc.
+   */
+  static UniqueStepTracker(step_id: string): Tracker;
+  expectedPoseBodyShift(): Cartesian2d;
+  /**
+   * Create a tracker for all known steps.
+   */
+  constructor();
+  clear(): void;
   /**
    * Return a cursor to a pose inside the tracker by timestamp.
    *
    * If `looped` is true, the subbeat wraps around when exceeding the tracked range.
    */
   cursor(t: number, looped: boolean): DanceCursor;
+  setBpm(bpm: number): void;
+  subbeat(t: number): number;
   /**
-   * Return a cursor to a pose inside the tracker by beat count.
-   *
-   * If `looped` is true, the subbeat wraps around when exceeding the tracked range.
+   * How long the tracked activity is in total, measured in milliseconds.
    */
-  cursorAtSubbeat(subbeat: number, looped: boolean): DanceCursor;
-  poseSkeletonAt(cursor: DanceCursor): Skeleton;
-  jumpHeight(cursor: DanceCursor): number;
-  expectedPoseBodyShift(): Cartesian2d;
-  poseBodyShift(cursor: DanceCursor): Cartesian2d;
-  hipPosition(timestamp: number): Cartesian3d;
-  /**
-   * Fit frames in a time interval against all poses and return the best fit.
-   *
-   * This API is exported mostly for debugging. To extract fitted dances, use
-   * `detect_dance` instead.
-   */
-  bestFitPose(start: number, end: number): PoseApproximation | undefined;
-  /**
-   * Fit a single frame against all poses and return all errors
-   */
-  allPoseErrors(timestamp: number): PoseApproximation[];
-  skeletonAt(timestamp: number): Skeleton | undefined;
-  skeletonWrapperAt(timestamp: number): SkeletonWrapper | undefined;
-  /**
-   * The original keypoints rendered as skeleton, at the given time frame.
-   */
-  renderedKeypointsAt(timestamp: number, width: number, height: number): SkeletonV2 | undefined;
-  devSetState(state: DetectionState, timestamp: number): void;
+  duration(): number;
+  poseHint(): PoseHint;
+  readonly lastDetection: DetectionResult;
   readonly detectionState: ReadableDetectionState;
   readonly trackedSubbeats: number;
   readonly timeBetweenPoses: number;
-  readonly lastDetection: DetectionResult;
 }
 export class VideoDef {
   private constructor();
   free(): void;
-  path(): string;
-  isEmpty(): boolean;
-  beats(): Float64Array;
-  startMarkers(): Float64Array;
   stepMarkers(): StepMarker[];
+  startMarkers(): Float64Array;
+  path(): string;
+  beats(): Float64Array;
+  isEmpty(): boolean;
 }
 export class ZError {
   private constructor();
@@ -859,384 +859,384 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly __wbg_dancedetector_free: (a: number, b: number) => void;
-  readonly __wbg_dancebuilder_free: (a: number, b: number) => void;
-  readonly dancebuilder_new: (a: number, b: number) => number;
-  readonly dancebuilder_length: (a: number) => number;
-  readonly dancebuilder_setId: (a: number, b: number, c: number) => void;
-  readonly dancebuilder_addStep: (a: number, b: number, c: number) => void;
-  readonly dancebuilder_removeStep: (a: number, b: number, c: number) => void;
-  readonly dancebuilder_insertStep: (a: number, b: number, c: number, d: number, e: number) => void;
-  readonly dancebuilder_setOrientation: (a: number, b: number, c: number, d: number) => void;
-  readonly dancebuilder_isFlipped: (a: number, b: number, c: number) => void;
-  readonly dancebuilder_clear: (a: number) => void;
-  readonly dancebuilder_danceInfo: (a: number) => number;
-  readonly __wbg_exportedframe_free: (a: number, b: number) => void;
-  readonly tracker_exportFrame: (a: number, b: number) => number;
-  readonly tracker_exportKeypoints: (a: number, b: number) => void;
-  readonly exportedframe_pose: (a: number, b: number) => void;
-  readonly exportedframe_keypoints: (a: number, b: number) => void;
-  readonly __wbg_dancecursor_free: (a: number, b: number) => void;
-  readonly __wbg_get_dancecursor_subbeat: (a: number) => number;
-  readonly __wbg_set_dancecursor_subbeat: (a: number, b: number) => void;
-  readonly __wbg_get_dancecursor_sectionIndex: (a: number) => number;
-  readonly __wbg_set_dancecursor_sectionIndex: (a: number, b: number) => void;
-  readonly __wbg_get_dancecursor_stepIndex: (a: number) => number;
-  readonly __wbg_set_dancecursor_stepIndex: (a: number, b: number) => void;
-  readonly __wbg_get_dancecursor_poseIndex: (a: number) => number;
-  readonly __wbg_set_dancecursor_poseIndex: (a: number, b: number) => void;
-  readonly dancecursor_new: () => number;
-  readonly dancecursor_isSamePose: (a: number, b: number) => number;
-  readonly dancecursor_isSameSubbeat: (a: number, b: number) => number;
-  readonly __wbg_tracker_free: (a: number, b: number) => void;
-  readonly __wbg_skeletons_free: (a: number, b: number) => void;
-  readonly __wbg_get_skeletons_front: (a: number) => number;
-  readonly __wbg_set_skeletons_front: (a: number, b: number) => void;
-  readonly __wbg_get_skeletons_side: (a: number) => number;
-  readonly __wbg_set_skeletons_side: (a: number, b: number) => void;
-  readonly tracker_new_from_global_collection: () => number;
-  readonly tracker_StepTracker: (a: number, b: number, c: number) => void;
-  readonly tracker_UniqueStepTracker: (a: number, b: number, c: number) => void;
-  readonly tracker_WarmUp: (a: number, b: number, c: number, d: number) => void;
-  readonly tracker_finishTracking: (a: number) => void;
-  readonly tracker_clear: (a: number) => void;
-  readonly tracker_addKeypoints: (a: number, b: number, c: number) => number;
-  readonly tracker_setBpm: (a: number, b: number) => void;
-  readonly tracker_alignBeat: (a: number, b: number) => void;
-  readonly tracker_enforceBeat: (a: number, b: number) => void;
-  readonly tracker_setErrorThreshold: (a: number, b: number) => void;
-  readonly tracker_useTeacherVideo: (a: number, b: number) => void;
-  readonly tracker_detectDance: (a: number) => number;
-  readonly tracker_runDetection: (a: number) => number;
-  readonly tracker_poseHint: (a: number) => number;
-  readonly tracker_currentPoseError: (a: number) => number;
-  readonly tracker_currentView: (a: number, b: number) => number;
-  readonly tracker_detectionState: (a: number) => number;
-  readonly tracker_trackedSubbeats: (a: number) => number;
-  readonly tracker_nextSubbeat: (a: number, b: number, c: number) => number;
-  readonly tracker_timeBetweenPoses: (a: number) => number;
-  readonly tracker_nextAudioEffect: (a: number) => number;
-  readonly tracker_nextTextEffect: (a: number, b: number) => number;
-  readonly tracker_duration: (a: number) => number;
-  readonly tracker_expectedPoseSkeleton: (a: number) => number;
-  readonly tracker_expectedJumpHeight: (a: number) => number;
-  readonly tracker_subbeat: (a: number, b: number) => number;
-  readonly tracker_cursor: (a: number, b: number, c: number) => number;
-  readonly tracker_cursorAtSubbeat: (a: number, b: number, c: number) => number;
-  readonly tracker_poseSkeletonAt: (a: number, b: number) => number;
-  readonly tracker_jumpHeight: (a: number, b: number) => number;
-  readonly tracker_expectedPoseBodyShift: (a: number) => number;
-  readonly tracker_poseBodyShift: (a: number, b: number) => number;
-  readonly tracker_lastDetection: (a: number) => number;
-  readonly tracker_hipPosition: (a: number, b: number) => number;
-  readonly tracker_bestFitPose: (a: number, b: number, c: number) => number;
-  readonly tracker_allPoseErrors: (a: number, b: number, c: number) => void;
-  readonly tracker_skeletonAt: (a: number, b: number) => number;
-  readonly tracker_skeletonWrapperAt: (a: number, b: number) => number;
-  readonly tracker_renderedKeypointsAt: (a: number, b: number, c: number, d: number) => number;
-  readonly tracker_devSetState: (a: number, b: number, c: number) => void;
-  readonly __wbg_dancewrapper_free: (a: number, b: number) => void;
-  readonly dancewrapper_id: (a: number, b: number) => void;
-  readonly dancewrapper_length: (a: number) => number;
-  readonly dancewrapper_steps: (a: number, b: number) => void;
-  readonly dancewrapper_skeleton: (a: number, b: number) => number;
-  readonly dancewrapper_subbeats: (a: number) => number;
-  readonly dancewrapper_bodyShift: (a: number, b: number) => number;
-  readonly __wbg_skeletonv2_free: (a: number, b: number) => void;
-  readonly __wbg_get_skeletonv2_left: (a: number) => number;
-  readonly __wbg_set_skeletonv2_left: (a: number, b: number) => void;
-  readonly __wbg_get_skeletonv2_right: (a: number) => number;
-  readonly __wbg_set_skeletonv2_right: (a: number, b: number) => void;
-  readonly __wbg_get_skeletonv2_hip: (a: number) => number;
-  readonly __wbg_set_skeletonv2_hip: (a: number, b: number) => void;
-  readonly __wbg_get_skeletonv2_shoulder: (a: number) => number;
-  readonly __wbg_set_skeletonv2_shoulder: (a: number, b: number) => void;
-  readonly __wbg_get_skeletonv2_sideway: (a: number) => number;
-  readonly __wbg_set_skeletonv2_sideway: (a: number, b: number) => void;
-  readonly __wbg_get_skeletonv2_backwards: (a: number) => number;
-  readonly __wbg_set_skeletonv2_backwards: (a: number, b: number) => void;
-  readonly __wbg_skeletonsidev2_free: (a: number, b: number) => void;
-  readonly __wbg_get_skeletonsidev2_thigh: (a: number) => number;
-  readonly __wbg_set_skeletonsidev2_thigh: (a: number, b: number) => void;
-  readonly __wbg_get_skeletonsidev2_shin: (a: number) => number;
-  readonly __wbg_set_skeletonsidev2_shin: (a: number, b: number) => void;
-  readonly __wbg_get_skeletonsidev2_arm: (a: number) => number;
-  readonly __wbg_set_skeletonsidev2_arm: (a: number, b: number) => void;
-  readonly __wbg_get_skeletonsidev2_forearm: (a: number) => number;
-  readonly __wbg_set_skeletonsidev2_forearm: (a: number, b: number) => void;
-  readonly __wbg_get_skeletonsidev2_foot: (a: number) => number;
-  readonly __wbg_set_skeletonsidev2_foot: (a: number, b: number) => void;
-  readonly __wbg_renderablesegment_free: (a: number, b: number) => void;
-  readonly __wbg_get_renderablesegment_start: (a: number) => number;
-  readonly __wbg_set_renderablesegment_start: (a: number, b: number) => void;
-  readonly __wbg_get_renderablesegment_end: (a: number) => number;
-  readonly __wbg_set_renderablesegment_end: (a: number, b: number) => void;
-  readonly __wbg_get_renderablesegment_z: (a: number) => number;
-  readonly __wbg_set_renderablesegment_z: (a: number, b: number) => void;
-  readonly skeletonv2_segment: (a: number, b: number) => number;
-  readonly skeleton_render: (a: number, b: number, c: number) => number;
-  readonly __wbg_keypoints_free: (a: number, b: number) => void;
-  readonly __wbg_get_keypoints_left: (a: number) => number;
-  readonly __wbg_set_keypoints_left: (a: number, b: number) => void;
-  readonly __wbg_get_keypoints_right: (a: number) => number;
-  readonly __wbg_set_keypoints_right: (a: number, b: number) => void;
-  readonly __wbg_get_keypoints_fullyVisible: (a: number) => number;
-  readonly __wbg_set_keypoints_fullyVisible: (a: number, b: number) => void;
-  readonly __wbg_keypointsside_free: (a: number, b: number) => void;
-  readonly __wbg_get_keypointsside_shoulder: (a: number) => number;
-  readonly __wbg_set_keypointsside_shoulder: (a: number, b: number) => void;
-  readonly __wbg_get_keypointsside_hip: (a: number) => number;
-  readonly __wbg_set_keypointsside_hip: (a: number, b: number) => void;
-  readonly __wbg_get_keypointsside_knee: (a: number) => number;
-  readonly __wbg_set_keypointsside_knee: (a: number, b: number) => void;
-  readonly __wbg_get_keypointsside_ankle: (a: number) => number;
-  readonly __wbg_set_keypointsside_ankle: (a: number, b: number) => void;
-  readonly __wbg_get_keypointsside_heel: (a: number) => number;
-  readonly __wbg_set_keypointsside_heel: (a: number, b: number) => void;
-  readonly __wbg_get_keypointsside_toes: (a: number) => number;
-  readonly __wbg_set_keypointsside_toes: (a: number, b: number) => void;
-  readonly __wbg_get_keypointsside_elbow: (a: number) => number;
-  readonly __wbg_set_keypointsside_elbow: (a: number, b: number) => void;
-  readonly __wbg_get_keypointsside_wrist: (a: number) => number;
-  readonly __wbg_set_keypointsside_wrist: (a: number, b: number) => void;
-  readonly __wbg_cartesian3d_free: (a: number, b: number) => void;
-  readonly __wbg_get_cartesian3d_x: (a: number) => number;
-  readonly __wbg_set_cartesian3d_x: (a: number, b: number) => void;
-  readonly __wbg_get_cartesian3d_y: (a: number) => number;
-  readonly __wbg_set_cartesian3d_y: (a: number, b: number) => void;
-  readonly __wbg_get_cartesian3d_z: (a: number) => number;
-  readonly __wbg_set_cartesian3d_z: (a: number, b: number) => void;
-  readonly keypoints_new: (a: number, b: number, c: number) => number;
-  readonly keypointsside_new: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => number;
-  readonly cartesian3d_new: (a: number, b: number, c: number) => number;
   readonly __wbg_posefilewrapper_free: (a: number, b: number) => void;
-  readonly posefilewrapper_new_empty: () => number;
-  readonly posefilewrapper_fromRon: (a: number, b: number, c: number) => void;
-  readonly posefilewrapper_poses: (a: number, b: number) => void;
-  readonly posefilewrapper_addPose: (a: number, b: number, c: number) => void;
-  readonly posefilewrapper_overwritePose: (a: number, b: number, c: number) => void;
-  readonly posefilewrapper_removePose: (a: number, b: number, c: number, d: number) => void;
-  readonly posefilewrapper_buildRon: (a: number, b: number) => void;
-  readonly posefilewrapper_buildPrettyRon: (a: number, b: number) => void;
   readonly __wbg_posewrapper_free: (a: number, b: number) => void;
-  readonly posewrapper_skeleton: (a: number) => number;
-  readonly posewrapper_sideSkeleton: (a: number) => number;
+  readonly posefilewrapper_addPose: (a: number, b: number, c: number) => void;
+  readonly posefilewrapper_buildPrettyRon: (a: number, b: number) => void;
+  readonly posefilewrapper_buildRon: (a: number, b: number) => void;
+  readonly posefilewrapper_fromRon: (a: number, b: number, c: number) => void;
+  readonly posefilewrapper_new_empty: () => number;
+  readonly posefilewrapper_overwritePose: (a: number, b: number, c: number) => void;
+  readonly posefilewrapper_poses: (a: number, b: number) => void;
+  readonly posefilewrapper_removePose: (a: number, b: number, c: number, d: number) => void;
+  readonly posewrapper_direction: (a: number) => number;
+  readonly posewrapper_getAngle: (a: number, b: number) => number;
+  readonly posewrapper_getWeight: (a: number, b: number) => number;
+  readonly posewrapper_getZ: (a: number, b: number) => number;
   readonly posewrapper_id: (a: number, b: number) => void;
   readonly posewrapper_name: (a: number, b: number, c: number, d: number) => void;
-  readonly posewrapper_setName: (a: number, b: number, c: number, d: number, e: number) => void;
   readonly posewrapper_setAngle: (a: number, b: number, c: number) => void;
-  readonly posewrapper_getAngle: (a: number, b: number) => number;
-  readonly posewrapper_setZ: (a: number, b: number, c: number) => void;
-  readonly posewrapper_getZ: (a: number, b: number) => number;
-  readonly posewrapper_setWeight: (a: number, b: number, c: number) => void;
-  readonly posewrapper_getWeight: (a: number, b: number) => number;
-  readonly posewrapper_direction: (a: number) => number;
   readonly posewrapper_setDirection: (a: number, b: number) => void;
-  readonly posewrapper_xShift: (a: number) => number;
-  readonly posewrapper_set_xShift: (a: number, b: number) => void;
-  readonly posewrapper_yShift: (a: number) => number;
-  readonly posewrapper_set_yShift: (a: number, b: number) => void;
-  readonly posewrapper_turnShoulder: (a: number) => number;
-  readonly posewrapper_set_turnShoulder: (a: number, b: number) => void;
-  readonly posewrapper_turnHip: (a: number) => number;
+  readonly posewrapper_setName: (a: number, b: number, c: number, d: number, e: number) => void;
+  readonly posewrapper_setWeight: (a: number, b: number, c: number) => void;
+  readonly posewrapper_setZ: (a: number, b: number, c: number) => void;
   readonly posewrapper_set_turnHip: (a: number, b: number) => void;
+  readonly posewrapper_set_turnShoulder: (a: number, b: number) => void;
+  readonly posewrapper_set_xShift: (a: number, b: number) => void;
+  readonly posewrapper_set_yShift: (a: number, b: number) => void;
+  readonly posewrapper_sideSkeleton: (a: number) => number;
+  readonly posewrapper_skeleton: (a: number) => number;
+  readonly posewrapper_turnHip: (a: number) => number;
+  readonly posewrapper_turnShoulder: (a: number) => number;
+  readonly posewrapper_xShift: (a: number) => number;
+  readonly posewrapper_yShift: (a: number) => number;
   readonly __wbg_course_free: (a: number, b: number) => void;
-  readonly __wbg_lesson_free: (a: number, b: number) => void;
-  readonly __wbg_get_lesson_energy: (a: number) => number;
-  readonly __wbg_set_lesson_energy: (a: number, b: number) => void;
+  readonly __wbg_detectedstep_free: (a: number, b: number) => void;
+  readonly __wbg_get_detectedstep_end: (a: number) => number;
+  readonly __wbg_get_detectedstep_error: (a: number) => number;
+  readonly __wbg_get_detectedstep_start: (a: number) => number;
   readonly __wbg_get_lesson_difficulty: (a: number) => number;
-  readonly __wbg_set_lesson_difficulty: (a: number, b: number) => void;
+  readonly __wbg_get_lesson_energy: (a: number) => number;
+  readonly __wbg_lesson_free: (a: number, b: number) => void;
   readonly __wbg_lessonpart_free: (a: number, b: number) => void;
-  readonly course_id: (a: number, b: number) => void;
-  readonly course_name: (a: number, b: number) => void;
+  readonly __wbg_set_detectedstep_end: (a: number, b: number) => void;
+  readonly __wbg_set_detectedstep_error: (a: number, b: number) => void;
+  readonly __wbg_set_detectedstep_start: (a: number, b: number) => void;
+  readonly __wbg_set_lesson_difficulty: (a: number, b: number) => void;
+  readonly __wbg_set_lesson_energy: (a: number, b: number) => void;
   readonly course_explanation: (a: number, b: number) => void;
-  readonly course_video: (a: number) => number;
-  readonly course_lessons: (a: number, b: number) => void;
   readonly course_featuredStep: (a: number) => number;
+  readonly course_id: (a: number, b: number) => void;
+  readonly course_lessons: (a: number, b: number) => void;
+  readonly course_name: (a: number, b: number) => void;
   readonly course_tracker: (a: number, b: number) => number;
   readonly course_trainingTracker: (a: number) => number;
-  readonly lesson_name: (a: number, b: number) => void;
-  readonly lesson_explanation: (a: number, b: number) => void;
-  readonly lesson_explainerVideo: (a: number) => number;
-  readonly lesson_frontVideo: (a: number) => number;
+  readonly course_video: (a: number) => number;
+  readonly detectedstep_bpm: (a: number) => number;
+  readonly detectedstep_name: (a: number, b: number) => void;
+  readonly detectedstep_poses: (a: number, b: number) => void;
   readonly lesson_backVideo: (a: number) => number;
+  readonly lesson_explainerVideo: (a: number) => number;
+  readonly lesson_explanation: (a: number, b: number) => void;
+  readonly lesson_frontVideo: (a: number) => number;
+  readonly lesson_name: (a: number, b: number) => void;
+  readonly lesson_parts: (a: number, b: number) => void;
   readonly lesson_song: (a: number, b: number) => void;
   readonly lesson_songTimestamp: (a: number) => number;
-  readonly lesson_parts: (a: number, b: number) => void;
-  readonly lessonpart_stepName: (a: number, b: number) => void;
   readonly lessonpart_step: (a: number) => number;
-  readonly __wbg_dancefilebuilder_free: (a: number, b: number) => void;
-  readonly dancefilebuilder_new: () => number;
-  readonly dancefilebuilder_fromRon: (a: number, b: number, c: number) => void;
-  readonly dancefilebuilder_addDance: (a: number, b: number, c: number) => void;
-  readonly dancefilebuilder_overwriteDance: (a: number, b: number, c: number) => void;
-  readonly dancefilebuilder_removeDance: (a: number, b: number, c: number, d: number) => void;
-  readonly dancefilebuilder_buildRon: (a: number, b: number) => void;
-  readonly dancefilebuilder_buildPrettyRon: (a: number, b: number) => void;
-  readonly dancefilebuilder_dances: (a: number, b: number) => void;
-  readonly dancefilebuilder_danceBuilder: (a: number, b: number, c: number, d: number) => void;
-  readonly __wbg_stepfilewrapper_free: (a: number, b: number) => void;
-  readonly stepfilewrapper_new_empty: () => number;
-  readonly stepfilewrapper_fromRon: (a: number, b: number, c: number) => void;
-  readonly stepfilewrapper_steps: (a: number, b: number) => void;
-  readonly stepfilewrapper_addStep: (a: number, b: number, c: number) => void;
-  readonly stepfilewrapper_overwriteStep: (a: number, b: number, c: number) => void;
-  readonly stepfilewrapper_removeStep: (a: number, b: number, c: number, d: number) => void;
-  readonly stepfilewrapper_buildRon: (a: number, b: number) => void;
-  readonly stepfilewrapper_buildPrettyRon: (a: number, b: number) => void;
-  readonly init: (a: number, b: number, c: number, d: number) => void;
-  readonly loadPoseFile: (a: number, b: number) => number;
-  readonly loadPoseString: (a: number, b: number, c: number) => void;
-  readonly loadDanceString: (a: number, b: number, c: number) => void;
-  readonly loadStepFile: (a: number, b: number, c: number, d: number) => number;
-  readonly loadDanceFile: (a: number, b: number) => number;
-  readonly loadStepString: (a: number, b: number, c: number, d: number, e: number) => void;
-  readonly parseCourseString: (a: number, b: number, c: number, d: number, e: number) => void;
-  readonly poses: (a: number) => void;
-  readonly steps: (a: number) => void;
-  readonly stepsBySource: (a: number, b: number, c: number) => void;
-  readonly stepById: (a: number, b: number, c: number) => number;
-  readonly stepsByName: (a: number, b: number, c: number) => void;
-  readonly dances: (a: number) => void;
-  readonly danceBuilderFromDance: (a: number, b: number, c: number) => void;
-  readonly addLocalPoses: (a: number, b: number) => void;
-  readonly loadLocalSteps: (a: number, b: number) => void;
+  readonly lessonpart_stepName: (a: number, b: number) => void;
+  readonly __wbg_cartesian3d_free: (a: number, b: number) => void;
+  readonly __wbg_get_cartesian3d_x: (a: number) => number;
+  readonly __wbg_get_cartesian3d_y: (a: number) => number;
+  readonly __wbg_get_cartesian3d_z: (a: number) => number;
+  readonly __wbg_get_keypoints_fullyVisible: (a: number) => number;
+  readonly __wbg_get_keypoints_left: (a: number) => number;
+  readonly __wbg_get_keypoints_right: (a: number) => number;
+  readonly __wbg_get_keypointsside_ankle: (a: number) => number;
+  readonly __wbg_get_keypointsside_elbow: (a: number) => number;
+  readonly __wbg_get_keypointsside_heel: (a: number) => number;
+  readonly __wbg_get_keypointsside_hip: (a: number) => number;
+  readonly __wbg_get_keypointsside_knee: (a: number) => number;
+  readonly __wbg_get_keypointsside_shoulder: (a: number) => number;
+  readonly __wbg_get_keypointsside_toes: (a: number) => number;
+  readonly __wbg_get_keypointsside_wrist: (a: number) => number;
+  readonly __wbg_keypoints_free: (a: number, b: number) => void;
+  readonly __wbg_keypointsside_free: (a: number, b: number) => void;
+  readonly __wbg_set_cartesian3d_x: (a: number, b: number) => void;
+  readonly __wbg_set_cartesian3d_y: (a: number, b: number) => void;
+  readonly __wbg_set_cartesian3d_z: (a: number, b: number) => void;
+  readonly __wbg_set_keypoints_fullyVisible: (a: number, b: number) => void;
+  readonly __wbg_set_keypoints_left: (a: number, b: number) => void;
+  readonly __wbg_set_keypoints_right: (a: number, b: number) => void;
+  readonly __wbg_set_keypointsside_ankle: (a: number, b: number) => void;
+  readonly __wbg_set_keypointsside_elbow: (a: number, b: number) => void;
+  readonly __wbg_set_keypointsside_heel: (a: number, b: number) => void;
+  readonly __wbg_set_keypointsside_hip: (a: number, b: number) => void;
+  readonly __wbg_set_keypointsside_knee: (a: number, b: number) => void;
+  readonly __wbg_set_keypointsside_shoulder: (a: number, b: number) => void;
+  readonly __wbg_set_keypointsside_toes: (a: number, b: number) => void;
+  readonly __wbg_set_keypointsside_wrist: (a: number, b: number) => void;
+  readonly cartesian3d_new: (a: number, b: number, c: number) => number;
+  readonly keypoints_new: (a: number, b: number, c: number) => number;
+  readonly keypointsside_new: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => number;
+  readonly __wbg_dancecursor_free: (a: number, b: number) => void;
+  readonly __wbg_get_dancecursor_poseIndex: (a: number) => number;
+  readonly __wbg_get_dancecursor_sectionIndex: (a: number) => number;
+  readonly __wbg_get_dancecursor_stepIndex: (a: number) => number;
+  readonly __wbg_get_dancecursor_subbeat: (a: number) => number;
+  readonly __wbg_set_dancecursor_poseIndex: (a: number, b: number) => void;
+  readonly __wbg_set_dancecursor_sectionIndex: (a: number, b: number) => void;
+  readonly __wbg_set_dancecursor_stepIndex: (a: number, b: number) => void;
+  readonly __wbg_set_dancecursor_subbeat: (a: number, b: number) => void;
   readonly __wbg_skeletonwrapper_free: (a: number, b: number) => void;
+  readonly dancecursor_isSamePose: (a: number, b: number) => number;
+  readonly dancecursor_isSameSubbeat: (a: number, b: number) => number;
+  readonly dancecursor_new: () => number;
   readonly skeletonwrapper_pose: (a: number) => number;
   readonly skeletonwrapper_set: (a: number) => number;
   readonly skeletonwrapper_skeleton: (a: number) => number;
-  readonly __wbg_poseapproximation_free: (a: number, b: number) => void;
-  readonly __wbg_get_poseapproximation_error: (a: number) => number;
-  readonly __wbg_set_poseapproximation_error: (a: number, b: number) => void;
-  readonly __wbg_get_poseapproximation_timestamp: (a: number) => number;
-  readonly __wbg_set_poseapproximation_timestamp: (a: number, b: number) => void;
-  readonly __wbg_limberror_free: (a: number, b: number) => void;
-  readonly __wbg_get_limberror_error: (a: number) => number;
-  readonly __wbg_set_limberror_error: (a: number, b: number) => void;
-  readonly __wbg_get_limberror_weight: (a: number) => number;
-  readonly __wbg_set_limberror_weight: (a: number, b: number) => void;
-  readonly __wbg_zerror_free: (a: number, b: number) => void;
-  readonly __wbg_get_zerror_error: (a: number) => number;
-  readonly __wbg_set_zerror_error: (a: number, b: number) => void;
-  readonly __wbg_get_zerror_quadrant_error: (a: number) => number;
-  readonly __wbg_set_zerror_quadrant_error: (a: number, b: number) => void;
-  readonly __wbg_zwrongordererror_free: (a: number, b: number) => void;
-  readonly poseapproximation_id: (a: number, b: number) => void;
-  readonly poseapproximation_name: (a: number, b: number) => void;
-  readonly poseapproximation_limbErrors: (a: number, b: number) => void;
-  readonly poseapproximation_zErrors: (a: number, b: number) => void;
-  readonly poseapproximation_zOrderErrors: (a: number, b: number) => void;
-  readonly poseapproximation_worstLimbs: (a: number, b: number, c: number) => void;
-  readonly poseapproximation_debugString: (a: number, b: number) => void;
-  readonly limberror_name: (a: number, b: number) => void;
-  readonly limberror_render: (a: number, b: number, c: number) => void;
-  readonly zerror_name: (a: number, b: number) => void;
-  readonly zwrongordererror_expected: (a: number, b: number) => void;
-  readonly cartesian2d_add: (a: number, b: number) => number;
-  readonly __wbg_skeleton_free: (a: number, b: number) => void;
-  readonly __wbg_get_skeleton_left: (a: number) => number;
-  readonly __wbg_set_skeleton_left: (a: number, b: number) => void;
-  readonly __wbg_get_skeleton_right: (a: number) => number;
-  readonly __wbg_set_skeleton_right: (a: number, b: number) => void;
-  readonly __wbg_get_skeleton_hip: (a: number) => number;
-  readonly __wbg_set_skeleton_hip: (a: number, b: number) => void;
-  readonly __wbg_get_skeleton_shoulder: (a: number) => number;
-  readonly __wbg_set_skeleton_shoulder: (a: number, b: number) => void;
-  readonly __wbg_get_skeleton_sideway: (a: number) => number;
-  readonly __wbg_set_skeleton_sideway: (a: number, b: number) => void;
-  readonly __wbg_get_skeleton_backwards: (a: number) => number;
-  readonly __wbg_set_skeleton_backwards: (a: number, b: number) => void;
-  readonly __wbg_skeletonside_free: (a: number, b: number) => void;
-  readonly __wbg_get_skeletonside_thigh: (a: number) => number;
-  readonly __wbg_set_skeletonside_thigh: (a: number, b: number) => void;
-  readonly __wbg_get_skeletonside_shin: (a: number) => number;
-  readonly __wbg_set_skeletonside_shin: (a: number, b: number) => void;
-  readonly __wbg_get_skeletonside_arm: (a: number) => number;
-  readonly __wbg_set_skeletonside_arm: (a: number, b: number) => void;
-  readonly __wbg_get_skeletonside_forearm: (a: number) => number;
-  readonly __wbg_set_skeletonside_forearm: (a: number, b: number) => void;
-  readonly __wbg_get_skeletonside_foot: (a: number) => number;
-  readonly __wbg_set_skeletonside_foot: (a: number, b: number) => void;
-  readonly __wbg_segment_free: (a: number, b: number) => void;
-  readonly __wbg_get_segment_z: (a: number) => number;
-  readonly __wbg_set_segment_z: (a: number, b: number) => void;
+  readonly __wbg_dancewrapper_free: (a: number, b: number) => void;
+  readonly __wbg_stepfilewrapper_free: (a: number, b: number) => void;
+  readonly __wbg_stepwrapper_free: (a: number, b: number) => void;
+  readonly dancewrapper_bodyShift: (a: number, b: number) => number;
+  readonly dancewrapper_id: (a: number, b: number) => void;
+  readonly dancewrapper_length: (a: number) => number;
+  readonly dancewrapper_skeleton: (a: number, b: number) => number;
+  readonly dancewrapper_steps: (a: number, b: number) => void;
+  readonly dancewrapper_subbeats: (a: number) => number;
+  readonly stepfilewrapper_addStep: (a: number, b: number, c: number) => void;
+  readonly stepfilewrapper_buildPrettyRon: (a: number, b: number) => void;
+  readonly stepfilewrapper_buildRon: (a: number, b: number) => void;
+  readonly stepfilewrapper_fromRon: (a: number, b: number, c: number) => void;
+  readonly stepfilewrapper_new_empty: () => number;
+  readonly stepfilewrapper_overwriteStep: (a: number, b: number, c: number) => void;
+  readonly stepfilewrapper_removeStep: (a: number, b: number, c: number, d: number) => void;
+  readonly stepfilewrapper_steps: (a: number, b: number) => void;
+  readonly stepwrapper_addPosition: (a: number, b: number) => void;
+  readonly stepwrapper_bodyShift: (a: number, b: number) => number;
+  readonly stepwrapper_id: (a: number, b: number) => void;
+  readonly stepwrapper_insertPosition: (a: number, b: number, c: number, d: number) => void;
+  readonly stepwrapper_jumpHeight: (a: number, b: number) => number;
+  readonly stepwrapper_name: (a: number, b: number) => void;
+  readonly stepwrapper_new_empty: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
+  readonly stepwrapper_poses: (a: number, b: number) => void;
+  readonly stepwrapper_positions: (a: number, b: number) => void;
+  readonly stepwrapper_removePosition: (a: number, b: number, c: number) => void;
+  readonly stepwrapper_rotatedSkeleton: (a: number, b: number, c: number) => number;
+  readonly stepwrapper_set_name: (a: number, b: number, c: number) => void;
+  readonly stepwrapper_skeleton: (a: number, b: number) => number;
+  readonly stepwrapper_subbeats: (a: number) => number;
+  readonly stepwrapper_variation: (a: number, b: number) => void;
+  readonly __wbg_dancebuilder_free: (a: number, b: number) => void;
+  readonly __wbg_dancefilebuilder_free: (a: number, b: number) => void;
+  readonly addLocalPoses: (a: number, b: number) => void;
+  readonly danceBuilderFromDance: (a: number, b: number, c: number) => void;
+  readonly dancebuilder_addStep: (a: number, b: number, c: number) => void;
+  readonly dancebuilder_clear: (a: number) => void;
+  readonly dancebuilder_danceInfo: (a: number) => number;
+  readonly dancebuilder_insertStep: (a: number, b: number, c: number, d: number, e: number) => void;
+  readonly dancebuilder_isFlipped: (a: number, b: number, c: number) => void;
+  readonly dancebuilder_length: (a: number) => number;
+  readonly dancebuilder_new: (a: number, b: number) => number;
+  readonly dancebuilder_removeStep: (a: number, b: number, c: number) => void;
+  readonly dancebuilder_setId: (a: number, b: number, c: number) => void;
+  readonly dancebuilder_setOrientation: (a: number, b: number, c: number, d: number) => void;
+  readonly dancefilebuilder_addDance: (a: number, b: number, c: number) => void;
+  readonly dancefilebuilder_buildPrettyRon: (a: number, b: number) => void;
+  readonly dancefilebuilder_buildRon: (a: number, b: number) => void;
+  readonly dancefilebuilder_danceBuilder: (a: number, b: number, c: number, d: number) => void;
+  readonly dancefilebuilder_dances: (a: number, b: number) => void;
+  readonly dancefilebuilder_fromRon: (a: number, b: number, c: number) => void;
+  readonly dancefilebuilder_new: () => number;
+  readonly dancefilebuilder_overwriteDance: (a: number, b: number, c: number) => void;
+  readonly dancefilebuilder_removeDance: (a: number, b: number, c: number, d: number) => void;
+  readonly dances: (a: number) => void;
+  readonly init: (a: number, b: number, c: number, d: number) => void;
+  readonly loadDanceFile: (a: number, b: number) => number;
+  readonly loadDanceString: (a: number, b: number, c: number) => void;
+  readonly loadLocalSteps: (a: number, b: number) => void;
+  readonly loadPoseFile: (a: number, b: number) => number;
+  readonly loadPoseString: (a: number, b: number, c: number) => void;
+  readonly loadStepFile: (a: number, b: number, c: number, d: number) => number;
+  readonly loadStepString: (a: number, b: number, c: number, d: number, e: number) => void;
+  readonly parseCourseString: (a: number, b: number, c: number, d: number, e: number) => void;
+  readonly poses: (a: number) => void;
+  readonly stepById: (a: number, b: number, c: number) => number;
+  readonly steps: (a: number) => void;
+  readonly stepsByName: (a: number, b: number, c: number) => void;
+  readonly stepsBySource: (a: number, b: number, c: number) => void;
+  readonly __wbg_exportedframe_free: (a: number, b: number) => void;
+  readonly __wbg_get_renderablesegment_end: (a: number) => number;
+  readonly __wbg_get_renderablesegment_start: (a: number) => number;
+  readonly __wbg_get_renderablesegment_z: (a: number) => number;
+  readonly __wbg_get_skeletonsidev2_arm: (a: number) => number;
+  readonly __wbg_get_skeletonsidev2_foot: (a: number) => number;
+  readonly __wbg_get_skeletonsidev2_forearm: (a: number) => number;
+  readonly __wbg_get_skeletonsidev2_shin: (a: number) => number;
+  readonly __wbg_get_skeletonsidev2_thigh: (a: number) => number;
+  readonly __wbg_get_skeletonv2_backwards: (a: number) => number;
+  readonly __wbg_get_skeletonv2_hip: (a: number) => number;
+  readonly __wbg_get_skeletonv2_left: (a: number) => number;
+  readonly __wbg_get_skeletonv2_right: (a: number) => number;
+  readonly __wbg_get_skeletonv2_shoulder: (a: number) => number;
+  readonly __wbg_get_skeletonv2_sideway: (a: number) => number;
+  readonly __wbg_renderablesegment_free: (a: number, b: number) => void;
+  readonly __wbg_set_renderablesegment_end: (a: number, b: number) => void;
+  readonly __wbg_set_renderablesegment_start: (a: number, b: number) => void;
+  readonly __wbg_set_renderablesegment_z: (a: number, b: number) => void;
+  readonly __wbg_set_skeletonsidev2_arm: (a: number, b: number) => void;
+  readonly __wbg_set_skeletonsidev2_foot: (a: number, b: number) => void;
+  readonly __wbg_set_skeletonsidev2_forearm: (a: number, b: number) => void;
+  readonly __wbg_set_skeletonsidev2_shin: (a: number, b: number) => void;
+  readonly __wbg_set_skeletonsidev2_thigh: (a: number, b: number) => void;
+  readonly __wbg_set_skeletonv2_backwards: (a: number, b: number) => void;
+  readonly __wbg_set_skeletonv2_hip: (a: number, b: number) => void;
+  readonly __wbg_set_skeletonv2_left: (a: number, b: number) => void;
+  readonly __wbg_set_skeletonv2_right: (a: number, b: number) => void;
+  readonly __wbg_set_skeletonv2_shoulder: (a: number, b: number) => void;
+  readonly __wbg_set_skeletonv2_sideway: (a: number, b: number) => void;
+  readonly __wbg_skeletonsidev2_free: (a: number, b: number) => void;
+  readonly __wbg_skeletonv2_free: (a: number, b: number) => void;
+  readonly exportedframe_keypoints: (a: number, b: number) => void;
+  readonly exportedframe_pose: (a: number, b: number) => void;
+  readonly skeleton_render: (a: number, b: number, c: number) => number;
+  readonly skeletonv2_segment: (a: number, b: number) => number;
+  readonly tracker_exportFrame: (a: number, b: number) => number;
+  readonly tracker_exportKeypoints: (a: number, b: number) => void;
+  readonly __wbg_audioeffect_free: (a: number, b: number) => void;
   readonly __wbg_cartesian2d_free: (a: number, b: number) => void;
+  readonly __wbg_get_audioeffect_timestamp: (a: number) => number;
   readonly __wbg_get_cartesian2d_x: (a: number) => number;
-  readonly __wbg_set_cartesian2d_x: (a: number, b: number) => void;
   readonly __wbg_get_cartesian2d_y: (a: number) => number;
+  readonly __wbg_get_segment_z: (a: number) => number;
+  readonly __wbg_get_skeleton_backwards: (a: number) => number;
+  readonly __wbg_get_skeleton_hip: (a: number) => number;
+  readonly __wbg_get_skeleton_left: (a: number) => number;
+  readonly __wbg_get_skeleton_right: (a: number) => number;
+  readonly __wbg_get_skeleton_shoulder: (a: number) => number;
+  readonly __wbg_get_skeleton_sideway: (a: number) => number;
+  readonly __wbg_get_skeletonside_arm: (a: number) => number;
+  readonly __wbg_get_skeletonside_foot: (a: number) => number;
+  readonly __wbg_get_skeletonside_forearm: (a: number) => number;
+  readonly __wbg_get_skeletonside_shin: (a: number) => number;
+  readonly __wbg_get_skeletonside_thigh: (a: number) => number;
+  readonly __wbg_get_texteffect_duration: (a: number) => number;
+  readonly __wbg_segment_free: (a: number, b: number) => void;
+  readonly __wbg_set_audioeffect_timestamp: (a: number, b: number) => void;
+  readonly __wbg_set_cartesian2d_x: (a: number, b: number) => void;
   readonly __wbg_set_cartesian2d_y: (a: number, b: number) => void;
+  readonly __wbg_set_segment_z: (a: number, b: number) => void;
+  readonly __wbg_set_skeleton_backwards: (a: number, b: number) => void;
+  readonly __wbg_set_skeleton_hip: (a: number, b: number) => void;
+  readonly __wbg_set_skeleton_left: (a: number, b: number) => void;
+  readonly __wbg_set_skeleton_right: (a: number, b: number) => void;
+  readonly __wbg_set_skeleton_shoulder: (a: number, b: number) => void;
+  readonly __wbg_set_skeleton_sideway: (a: number, b: number) => void;
+  readonly __wbg_set_skeletonside_arm: (a: number, b: number) => void;
+  readonly __wbg_set_skeletonside_foot: (a: number, b: number) => void;
+  readonly __wbg_set_skeletonside_forearm: (a: number, b: number) => void;
+  readonly __wbg_set_skeletonside_shin: (a: number, b: number) => void;
+  readonly __wbg_set_skeletonside_thigh: (a: number, b: number) => void;
+  readonly __wbg_set_texteffect_duration: (a: number, b: number) => void;
+  readonly __wbg_skeleton_free: (a: number, b: number) => void;
+  readonly __wbg_skeletonside_free: (a: number, b: number) => void;
+  readonly __wbg_stepmarker_free: (a: number, b: number) => void;
+  readonly __wbg_texteffect_free: (a: number, b: number) => void;
+  readonly __wbg_videodef_free: (a: number, b: number) => void;
+  readonly audioeffect_soundId: (a: number, b: number) => void;
+  readonly cartesian2d_add: (a: number, b: number) => number;
+  readonly skeleton_debugString: (a: number, b: number) => void;
   readonly skeleton_resting: (a: number) => number;
   readonly skeleton_restingPose: (a: number) => number;
-  readonly skeleton_debugString: (a: number, b: number) => void;
-  readonly __wbg_detectedstep_free: (a: number, b: number) => void;
-  readonly __wbg_get_detectedstep_end: (a: number) => number;
-  readonly __wbg_set_detectedstep_end: (a: number, b: number) => void;
-  readonly __wbg_get_detectedstep_error: (a: number) => number;
-  readonly __wbg_set_detectedstep_error: (a: number, b: number) => void;
-  readonly detectedstep_name: (a: number, b: number) => void;
-  readonly detectedstep_poses: (a: number, b: number) => void;
-  readonly detectedstep_bpm: (a: number) => number;
-  readonly __wbg_audioeffect_free: (a: number, b: number) => void;
-  readonly __wbg_get_audioeffect_timestamp: (a: number) => number;
-  readonly __wbg_set_audioeffect_timestamp: (a: number, b: number) => void;
-  readonly __wbg_texteffect_free: (a: number, b: number) => void;
-  readonly audioeffect_soundId: (a: number, b: number) => void;
   readonly texteffect_text: (a: number, b: number) => void;
-  readonly __wbg_videodef_free: (a: number, b: number) => void;
-  readonly __wbg_stepmarker_free: (a: number, b: number) => void;
-  readonly videodef_path: (a: number, b: number) => void;
-  readonly videodef_isEmpty: (a: number) => number;
   readonly videodef_beats: (a: number, b: number) => void;
+  readonly videodef_isEmpty: (a: number) => number;
+  readonly videodef_path: (a: number, b: number) => void;
   readonly videodef_startMarkers: (a: number, b: number) => void;
   readonly videodef_stepMarkers: (a: number, b: number) => void;
   readonly __wbg_set_segment_angle: (a: number, b: number) => void;
   readonly __wbg_set_segment_r: (a: number, b: number) => void;
-  readonly __wbg_set_detectedstep_start: (a: number, b: number) => void;
-  readonly __wbg_set_texteffect_timestamp: (a: number, b: number) => void;
-  readonly __wbg_set_texteffect_duration: (a: number, b: number) => void;
   readonly __wbg_set_stepmarker_timestamp: (a: number, b: number) => void;
+  readonly __wbg_set_texteffect_timestamp: (a: number, b: number) => void;
   readonly cartesian2d_new: (a: number, b: number) => number;
   readonly __wbg_get_segment_angle: (a: number) => number;
   readonly __wbg_get_segment_r: (a: number) => number;
-  readonly __wbg_get_detectedstep_start: (a: number) => number;
-  readonly __wbg_get_texteffect_timestamp: (a: number) => number;
-  readonly __wbg_get_texteffect_duration: (a: number) => number;
   readonly __wbg_get_stepmarker_timestamp: (a: number) => number;
-  readonly __wbg_steppositionbuilder_free: (a: number, b: number) => void;
-  readonly steppositionbuilder_new: (a: number) => number;
-  readonly steppositionbuilder_pose: (a: number) => number;
-  readonly steppositionbuilder_jumpHeight: (a: number) => number;
-  readonly steppositionbuilder_setJumpHeight: (a: number, b: number) => void;
-  readonly steppositionbuilder_orientation: (a: number) => number;
-  readonly steppositionbuilder_setOrientation: (a: number, b: number) => void;
+  readonly __wbg_get_texteffect_timestamp: (a: number) => number;
+  readonly __wbg_dancedetector_free: (a: number, b: number) => void;
   readonly __wbg_detectionresult_free: (a: number, b: number) => void;
   readonly __wbg_get_detectionresult_failureReason: (a: number) => number;
-  readonly __wbg_set_detectionresult_failureReason: (a: number, b: number) => void;
   readonly __wbg_get_detectionresult_poseMatches: (a: number) => number;
-  readonly __wbg_set_detectionresult_poseMatches: (a: number, b: number) => void;
   readonly __wbg_get_detectionresult_poseMisses: (a: number) => number;
+  readonly __wbg_get_skeletons_front: (a: number) => number;
+  readonly __wbg_get_skeletons_side: (a: number) => number;
+  readonly __wbg_set_detectionresult_failureReason: (a: number, b: number) => void;
+  readonly __wbg_set_detectionresult_poseMatches: (a: number, b: number) => void;
   readonly __wbg_set_detectionresult_poseMisses: (a: number, b: number) => void;
-  readonly detectionresult_new_default: () => number;
-  readonly detectionresult_steps: (a: number, b: number) => void;
+  readonly __wbg_set_skeletons_front: (a: number, b: number) => void;
+  readonly __wbg_set_skeletons_side: (a: number, b: number) => void;
+  readonly __wbg_skeletons_free: (a: number, b: number) => void;
+  readonly __wbg_tracker_free: (a: number, b: number) => void;
   readonly detectionresult_cursor: (a: number) => number;
-  readonly detectionresult_poseHint: (a: number) => number;
+  readonly detectionresult_new_default: () => number;
   readonly detectionresult_poseError: (a: number) => number;
-  readonly __wbg_stepwrapper_free: (a: number, b: number) => void;
-  readonly stepwrapper_new_empty: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
-  readonly stepwrapper_id: (a: number, b: number) => void;
-  readonly stepwrapper_name: (a: number, b: number) => void;
-  readonly stepwrapper_set_name: (a: number, b: number, c: number) => void;
-  readonly stepwrapper_skeleton: (a: number, b: number) => number;
-  readonly stepwrapper_bodyShift: (a: number, b: number) => number;
-  readonly stepwrapper_rotatedSkeleton: (a: number, b: number, c: number) => number;
-  readonly stepwrapper_jumpHeight: (a: number, b: number) => number;
-  readonly stepwrapper_variation: (a: number, b: number) => void;
-  readonly stepwrapper_subbeats: (a: number) => number;
-  readonly stepwrapper_poses: (a: number, b: number) => void;
-  readonly stepwrapper_positions: (a: number, b: number) => void;
-  readonly stepwrapper_addPosition: (a: number, b: number) => void;
-  readonly stepwrapper_removePosition: (a: number, b: number, c: number) => void;
-  readonly stepwrapper_insertPosition: (a: number, b: number, c: number, d: number) => void;
+  readonly detectionresult_poseHint: (a: number) => number;
+  readonly detectionresult_steps: (a: number, b: number) => void;
+  readonly tracker_StepTracker: (a: number, b: number, c: number) => void;
+  readonly tracker_UniqueStepTracker: (a: number, b: number, c: number) => void;
+  readonly tracker_WarmUp: (a: number, b: number, c: number, d: number) => void;
+  readonly tracker_addKeypoints: (a: number, b: number, c: number) => number;
+  readonly tracker_alignBeat: (a: number, b: number) => void;
+  readonly tracker_allPoseErrors: (a: number, b: number, c: number) => void;
+  readonly tracker_bestFitPose: (a: number, b: number, c: number) => number;
+  readonly tracker_clear: (a: number) => void;
+  readonly tracker_currentPoseError: (a: number) => number;
+  readonly tracker_currentView: (a: number, b: number) => number;
+  readonly tracker_cursor: (a: number, b: number, c: number) => number;
+  readonly tracker_cursorAtSubbeat: (a: number, b: number, c: number) => number;
+  readonly tracker_detectDance: (a: number) => number;
+  readonly tracker_detectionState: (a: number) => number;
+  readonly tracker_devSetState: (a: number, b: number, c: number) => void;
+  readonly tracker_duration: (a: number) => number;
+  readonly tracker_enforceBeat: (a: number, b: number) => void;
+  readonly tracker_expectedJumpHeight: (a: number) => number;
+  readonly tracker_expectedPoseBodyShift: (a: number) => number;
+  readonly tracker_expectedPoseSkeleton: (a: number) => number;
+  readonly tracker_finishTracking: (a: number) => void;
+  readonly tracker_hipPosition: (a: number, b: number) => number;
+  readonly tracker_jumpHeight: (a: number, b: number) => number;
+  readonly tracker_lastDetection: (a: number) => number;
+  readonly tracker_new_from_global_collection: () => number;
+  readonly tracker_nextAudioEffect: (a: number) => number;
+  readonly tracker_nextSubbeat: (a: number, b: number, c: number) => number;
+  readonly tracker_nextTextEffect: (a: number, b: number) => number;
+  readonly tracker_poseBodyShift: (a: number, b: number) => number;
+  readonly tracker_poseHint: (a: number) => number;
+  readonly tracker_poseSkeletonAt: (a: number, b: number) => number;
+  readonly tracker_renderedKeypointsAt: (a: number, b: number, c: number, d: number) => number;
+  readonly tracker_runDetection: (a: number) => number;
+  readonly tracker_setBpm: (a: number, b: number) => void;
+  readonly tracker_setErrorThreshold: (a: number, b: number) => void;
+  readonly tracker_skeletonAt: (a: number, b: number) => number;
+  readonly tracker_skeletonWrapperAt: (a: number, b: number) => number;
+  readonly tracker_subbeat: (a: number, b: number) => number;
+  readonly tracker_timeBetweenPoses: (a: number) => number;
+  readonly tracker_trackedSubbeats: (a: number) => number;
+  readonly tracker_useTeacherVideo: (a: number, b: number) => void;
+  readonly __wbg_get_limberror_error: (a: number) => number;
+  readonly __wbg_get_limberror_weight: (a: number) => number;
+  readonly __wbg_get_poseapproximation_error: (a: number) => number;
+  readonly __wbg_get_poseapproximation_timestamp: (a: number) => number;
+  readonly __wbg_get_zerror_error: (a: number) => number;
+  readonly __wbg_get_zerror_quadrant_error: (a: number) => number;
+  readonly __wbg_limberror_free: (a: number, b: number) => void;
+  readonly __wbg_poseapproximation_free: (a: number, b: number) => void;
+  readonly __wbg_set_limberror_error: (a: number, b: number) => void;
+  readonly __wbg_set_limberror_weight: (a: number, b: number) => void;
+  readonly __wbg_set_poseapproximation_error: (a: number, b: number) => void;
+  readonly __wbg_set_poseapproximation_timestamp: (a: number, b: number) => void;
+  readonly __wbg_set_zerror_error: (a: number, b: number) => void;
+  readonly __wbg_set_zerror_quadrant_error: (a: number, b: number) => void;
+  readonly __wbg_steppositionbuilder_free: (a: number, b: number) => void;
+  readonly __wbg_zerror_free: (a: number, b: number) => void;
+  readonly __wbg_zwrongordererror_free: (a: number, b: number) => void;
+  readonly limberror_name: (a: number, b: number) => void;
+  readonly limberror_render: (a: number, b: number, c: number) => void;
+  readonly poseapproximation_debugString: (a: number, b: number) => void;
+  readonly poseapproximation_id: (a: number, b: number) => void;
+  readonly poseapproximation_limbErrors: (a: number, b: number) => void;
+  readonly poseapproximation_name: (a: number, b: number) => void;
+  readonly poseapproximation_worstLimbs: (a: number, b: number, c: number) => void;
+  readonly poseapproximation_zErrors: (a: number, b: number) => void;
+  readonly poseapproximation_zOrderErrors: (a: number, b: number) => void;
+  readonly steppositionbuilder_jumpHeight: (a: number) => number;
+  readonly steppositionbuilder_new: (a: number) => number;
+  readonly steppositionbuilder_orientation: (a: number) => number;
+  readonly steppositionbuilder_pose: (a: number) => number;
+  readonly steppositionbuilder_setJumpHeight: (a: number, b: number) => void;
+  readonly steppositionbuilder_setOrientation: (a: number, b: number) => void;
+  readonly zerror_name: (a: number, b: number) => void;
+  readonly zwrongordererror_expected: (a: number, b: number) => void;
   readonly __wbindgen_export_0: (a: number) => void;
   readonly __wbindgen_export_1: (a: number, b: number, c: number) => void;
   readonly __wbindgen_export_2: (a: number, b: number) => number;

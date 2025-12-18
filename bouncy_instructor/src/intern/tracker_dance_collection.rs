@@ -90,7 +90,7 @@ impl TrackerDanceCollection {
         for pose in poses {
             let new_pose = if !pose.mirror_of.is_empty() {
                 if let Some(i) = self.pose_by_id(&pose.mirror_of) {
-                    self.pose_mirror(i)
+                    self.pose_mirror(i, pose.no_mirror_x)
                 } else {
                     return Err(AddPoseError::MissingMirror(pose.mirror_of.clone()));
                 }
@@ -194,7 +194,7 @@ impl TrackerDanceCollection {
     }
 
     /// Take an existing pose and produce a mirror pose of it.
-    fn pose_mirror(&mut self, i: usize) -> Pose {
+    fn pose_mirror(&mut self, i: usize, no_mirror_x: bool) -> Pose {
         let direction = self.poses[i].direction;
         let limbs = self.poses[i]
             .limbs
@@ -224,10 +224,15 @@ impl TrackerDanceCollection {
             .map(BodyPartOrdering::mirror)
             .collect();
         let other = &self.poses[i];
+        let shift = if no_mirror_x {
+            other.shift
+        } else {
+            other.shift.mirror()
+        };
         Pose::new(
             direction,
             limbs,
-            other.shift.mirror(),
+            shift,
             other.turn_shoulder.mirror(),
             other.turn_hip.mirror(),
             z_absolute,

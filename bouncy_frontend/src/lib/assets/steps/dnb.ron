@@ -1,0 +1,36 @@
+#![enable(implicit_some)]
+(
+  version: 0,
+  steps: [
+    (
+      name: "X-Outing",
+      id: "xout",
+      variation: "right-first",
+      // TODO: real poses
+      keyframes: [
+        (pose: "left-forward", orientation: Right),
+        (pose: "standing-straight-side", orientation: Right),
+        (pose: "right-forward", orientation: Right),
+        (pose: "standing-straight-side", orientation: Right),
+      ]
+    ),
+    (
+      name: "Back-and-Forth",
+      id: "back-and-forth-right",
+      variation: "right-out",
+      keyframes: [
+        (pose: "right-high", orientation: Right, jump_height: 1.0),
+        (pose: "right-forward-high", orientation: Right, jump_height: 1.0),
+      ],
+    ),
+    (
+      name: "Back-and-Forth",
+      id: "back-and-forth-left",
+      variation: "left-out",
+      keyframes: [
+        (pose: "right-high", orientation: Right, jump_height: 1.0),
+        (pose: "right-forward-high", orientation: Right, jump_height: 1.0),
+      ],
+    ),
+  ]
+)

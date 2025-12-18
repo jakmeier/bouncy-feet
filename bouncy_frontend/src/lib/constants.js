@@ -75,3 +75,9 @@ export const WHITE_COLORING = {
     rightColor: 'var(--theme-neutral-white)',
     headColor: 'var(--theme-neutral-white)',
 };
+
+export const TEAL_COLORING = {
+    leftColor: 'var(--theme-teal)',
+    rightColor: 'var(--theme-teal-dark)',
+    headColor: 'var(--theme-teal)',
+};

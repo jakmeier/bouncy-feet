@@ -85,6 +85,7 @@
         <div
           class="step"
           style="border-color: {coach.style.pageColoring.secondaryColor};"
+          style:color={coach.style.pageColoring.fontOnDanceFloorColor}
         >
           <AnimatedStep {step} size={100} backgroundColor="var(--dance-floor)"
           ></AnimatedStep>

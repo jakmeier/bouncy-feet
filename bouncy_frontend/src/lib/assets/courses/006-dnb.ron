@@ -1,0 +1,189 @@
+#![enable(implicit_some)]
+(
+  version: 0,
+  id: "dnb-basics",
+  names: {"de": "Einstieg", "en": "Intro"},
+  featured_step: "dnb-toe-heel",
+  video: "https://app.bouncy-feet.ch/media/videos/c6/tutorial.mp4",
+  explanations: {
+    "de": "Diese Lektion ist noch in Arbeit... (TODO)",
+    "en": "This lesson is still work in progress (TODO)",
+  },
+  lessons: [
+    (
+      names: {"de": "Übung 1", "en": "Exercise 1"},
+      explanations: {
+        "de": "...",
+        "en": "...",
+      },
+      difficulty: 2,
+      energy: 2,
+      explainer_video: (
+        path: "https://app.bouncy-feet.ch/media/videos/c6/lesson_1.mp4",
+        beats: [3800],
+        markers: {
+          3800: Start,
+        },
+      ),
+      front_video: "https://app.bouncy-feet.ch/media/videos/c6/lesson_1.mp4",
+      back_video: "",
+      song: "120bpm_groove",
+      song_timestamp: 0,
+      parts: [
+        ( step: "side", repeat: 1, subbeats_per_move: 2 ),
+        ( step: "dnb-toe-heel", repeat: 8, subbeats_per_move: 2 ),
+      ],
+    ),
+    (
+      names: {"de": "Übung 2", "en": "Exercise 2"},
+      explanations: {
+        "de": "...",
+        "en": "...",
+      },
+      difficulty: 2,
+      energy: 3,
+      explainer_video: (
+        path: "https://app.bouncy-feet.ch/media/videos/c6/lesson_2.mp4",
+        beats: [3800],
+        markers: {
+          3800: Start,
+        },
+      ),
+      front_video: "https://app.bouncy-feet.ch/media/videos/c6/lesson_2.mp4",
+      back_video: "",
+      song: "120bpm_groove",
+      song_timestamp: 0,
+      parts: [
+        ( step: "side", repeat: 1, subbeats_per_move: 2 ),
+        ( step: "back-and-forth-right", repeat: 4, subbeats_per_move: 2 ),
+        ( step: "back-and-forth-left", repeat: 4, subbeats_per_move: 2 ),
+        ( step: "back-and-forth-right", repeat: 4, subbeats_per_move: 2 ),
+        ( step: "back-and-forth-left", repeat: 4, subbeats_per_move: 2 ),
+      ],
+    ),
+  ],
+  steps: [
+    (
+      name: "Toe-Heel",
+      id: "dnb-toe-heel",
+      keyframes: [
+        (pose: "right-forward", orientation: Right, jump_height: 2.0),
+        (pose: "right-forward-heel", orientation: Right, jump_height: 1.0),
+        (pose: "left-forward", orientation: Right, jump_height: 2.0),
+        (pose: "left-forward-heel", orientation: Right, jump_height: 1.0),
+      ],
+    ),
+    (
+      name: "Back-and-Forth (right)",
+      id: "back-and-forth-right",
+      keyframes: [
+        (pose: "right-high", orientation: Right, jump_height: 1.0),
+        (pose: "right-forward-high", orientation: Right, jump_height: 1.0),
+      ],
+    ),
+    (
+      name: "Back-and-Forth (left)",
+      id: "back-and-forth-left",
+      keyframes: [
+        (pose: "left-high", orientation: Right, jump_height: 1.0),
+        (pose: "left-forward-high", orientation: Right, jump_height: 1.0),
+      ],
+    ),
+    (
+      name: "Wait",
+      id: "side",
+      keyframes: [
+        (pose: "standing-straight-side", orientation: Right),
+      ],
+    ),
+  ],
+  poses: [
+    (
+      id: "right-forward",
+      direction: Right,
+      y_shift: 0.015,
+      limbs: [
+        (limb: LeftThigh, angle: 5, tolerance: 5, weight: 0.5),
+        (limb: LeftShin, angle: -10, tolerance: 5, weight: 0.5),
+        (limb: LeftLeg, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: RightThigh, angle: 40, tolerance: 5, weight: 1.0),
+        (limb: RightShin, angle: 0, tolerance: 5, weight: 0.5),
+        (limb: RightLeg, angle: 10, tolerance: 5, weight: 0.5),
+        (limb: RightFoot, angle: 60, tolerance: 10, weight: 0.0),
+        (limb: LeftFoot, angle: 90, tolerance: 0, weight: 0.0),
+        (limb: LeftArm, angle: 0, tolerance: 0, weight: 0.0),
+        (limb: LeftForearm, angle: 96, tolerance: 0, weight: 0.0),
+        (limb: RightArm, angle: -25, tolerance: 0, weight: 0.0),
+        (limb: RightForearm, angle: -20, tolerance: 0, weight: 0.0),
+      ],
+    ),
+    (id: "left-forward", mirror_of: "right-forward", direction: Right),
+    (
+      id: "right-forward-heel",
+      direction: Right,
+      limbs: [
+        (limb: LeftThigh, angle: -20, tolerance: 5, weight: 0.5),
+        (limb: LeftShin, angle: -25, tolerance: 5, weight: 0.5),
+        (limb: LeftLeg, angle: -30, tolerance: 5, weight: 1.0),
+        (limb: RightThigh, angle: 25, tolerance: 5, weight: 1.0),
+        (limb: RightShin, angle: 25, tolerance: 5, weight: 0.5),
+        (limb: RightFoot, angle: 120, tolerance: 10, weight: 1.0),
+        (limb: LeftFoot, angle: 90, tolerance: 0, weight: 0.0),
+        (limb: LeftArm, angle: 0, tolerance: 0, weight: 0.0),
+        (limb: LeftForearm, angle: 96, tolerance: 0, weight: 0.0),
+        (limb: RightArm, angle: -25, tolerance: 0, weight: 0.0),
+        (limb: RightForearm, angle: -20, tolerance: 0, weight: 0.0),
+      ]
+    ),
+    ( id: "left-forward-heel", mirror_of: "right-forward-heel", direction: Right ),
+    (
+      id: "right-forward-high",
+      direction: Right,
+      x_shift: 0.1,
+      limbs: [
+        (limb: LeftThigh, angle: 5, tolerance: 5, weight: 0.5),
+        (limb: LeftShin, angle: -5, tolerance: 5, weight: 0.5),
+        (limb: RightThigh, angle: 50, tolerance: 5, weight: 1.0),
+        (limb: RightShin, angle: 45, tolerance: 5, weight: 0.5),
+        (limb: RightFoot, angle: 110, tolerance: 10, weight: 0.0),
+        (limb: LeftFoot, angle: 90, tolerance: 0, weight: 0.0),
+        (limb: LeftArm, angle: 0, tolerance: 0, weight: 0.0),
+        (limb: LeftForearm, angle: 96, tolerance: 0, weight: 0.0),
+        (limb: RightArm, angle: -25, tolerance: 0, weight: 0.0),
+        (limb: RightForearm, angle: -20, tolerance: 0, weight: 0.0),
+      ],
+    ),
+    (id: "left-forward-high", mirror_of: "right-forward-high", direction: Right, no_mirror_x: true),
+    (
+      id: "right-high",
+      direction: Right,
+      limbs: [
+        (limb: LeftThigh, angle: -0, tolerance: 5, weight: 0.5),
+        (limb: LeftShin, angle: -15, tolerance: 5, weight: 0.5),
+        (limb: RightThigh, angle: 20, tolerance: 5, weight: 1.0),
+        (limb: RightShin, angle: 20, tolerance: 5, weight: 0.5),
+        (limb: RightFoot, angle: 100, tolerance: 10, weight: 0.0),
+        (limb: LeftFoot, angle: 90, tolerance: 0, weight: 0.0),
+        (limb: LeftArm, angle: 0, tolerance: 0, weight: 0.0),
+        (limb: LeftForearm, angle: 96, tolerance: 0, weight: 0.0),
+        (limb: RightArm, angle: -25, tolerance: 0, weight: 0.0),
+        (limb: RightForearm, angle: -20, tolerance: 0, weight: 0.0),
+      ],
+    ),
+    (id: "left-high", mirror_of: "right-high", direction: Right),
+    (
+      id: "standing-straight-side",
+      direction: Right,
+      limbs: [
+        (limb: LeftShin, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: LeftThigh, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: RightShin, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: RightThigh, angle: 0, tolerance: 5, weight: 1.0),
+        (limb: RightArm, angle: 6, tolerance: 0, weight: 0.0),
+        (limb: RightForearm, angle: 18, tolerance: 0, weight: 0.0),
+        (limb: LeftArm, angle: -12, tolerance: 0, weight: 0.0),
+        (limb: LeftForearm, angle: 6, tolerance: 0, weight: 0.0),
+      ]
+    ),
+  ],
+)

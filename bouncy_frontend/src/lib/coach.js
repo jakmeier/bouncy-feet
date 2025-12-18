@@ -1,7 +1,7 @@
 // For now, hardcode all coach settings.
 // Longterm, it should probably be loaded from RON files.
 
-import { LEFT_RIGHT_COLORING, ORANGE_COLORING } from "./constants";
+import { LEFT_RIGHT_COLORING, ORANGE_COLORING, TEAL_COLORING } from "./constants";
 
 /**
  * @typedef {Object} Coach 
@@ -47,6 +47,7 @@ export const coaches = [
                 pageColor: "var(--theme-accent)",
                 secondaryColor: "var(--theme-accent-medium)",
                 danceFloorColor: "var(--theme-neutral-light)",
+                fontOnDanceFloorColor: "var(--theme-neutral-black)",
                 fontColor: "var(--theme-neutral-black)",
             }
         },
@@ -96,6 +97,7 @@ export const coaches = [
                 pageColor: "var(--theme-main-alt)",
                 secondaryColor: "var(--theme-main)",
                 danceFloorColor: "var(--theme-neutral-light)",
+                fontOnDanceFloorColor: "var(--theme-neutral-black)",
                 fontColor: "var(--theme-neutral-black)",
             }
         },
@@ -105,7 +107,54 @@ export const coaches = [
         },
         description: {
             de: "Willkommen in den Hallen von Charles. Komm und tanze die **Happy Feets** und den **Charleston** mit uns!",
-            en: "Welcome to Charles' dancing halls, where **Happy Feets** and **Charleston** rule."
+            en: "Welcome to Charles' dancing halls, where **Happy Feets** and the **Charleston** rule."
+        },
+        peertubePlaylist: {
+            localDev: "9aBHGBL88zSb6u1esWzDgD",
+            dev: "nAkAtJ2sdYFN73HZEjDft2",
+            prod: "",
+        }
+    },
+
+    /** @type {Coach} */
+    {
+        name: 'frank',
+        steps: {
+            // TODO: add dnb steps
+            "back-and-forth-right": {
+                // TODO: add video and course
+                video: "",
+                courses: ['dnb-basics']
+            },
+        },
+        // TODO: add courses
+        courseIds: ['dnb-basics'],
+        style: {
+            coloring: TEAL_COLORING,
+            bodyShape: {
+                strokeWidth: 1,
+            },
+            headStyle: {
+                // TODO: try tophat
+                shape: 'disk',
+                size: 0.75,
+                strokeWidth: 1,
+            },
+            pageColoring: {
+                pageColor: "var(--theme-teal)",
+                secondaryColor: "var(--theme-teal-dark)",
+                danceFloorColor: "var(--theme-neutral-almost-black)",
+                fontOnDanceFloorColor: "var(--theme-teal)",
+                fontColor: "var(--theme-neutral-black)",
+            }
+        },
+        title: {
+            de: "Schnelle Rhythmen",
+            en: "Fast Rhythms"
+        },
+        description: {
+            de: "Bum-bum Tz! Hier wird zu Break-Beats auf über 170 bpm getanzt.",
+            en: "Boom-boom Tss! Here we dance to break-beats above 170 bpm."
         },
         peertubePlaylist: {
             localDev: "9aBHGBL88zSb6u1esWzDgD",

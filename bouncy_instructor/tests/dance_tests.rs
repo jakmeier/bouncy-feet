@@ -152,7 +152,7 @@ fn test_running_man_0() {
 #[test]
 fn test_gangsta_hop() {
     let keypoints = include_str!("./data/test_steps/gangsta-hop-mid.ron");
-    check_single_step_in_keypoints(keypoints, "Gangsta Hop", &[3, 4], 95);
+    check_single_step_in_keypoints(keypoints, "Gangsta Hop", &[3], 95);
 }
 
 #[test]

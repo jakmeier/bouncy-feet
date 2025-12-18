@@ -51,6 +51,8 @@ pub(crate) struct Pose {
     pub z: PoseZ,
     #[serde(default, skip_serializing_if = "String::is_empty")]
     pub mirror_of: String,
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub no_mirror_x: bool,
 }
 
 /// Describes a desired angle of a limb defined by start and end point.
@@ -245,6 +247,8 @@ mod v0 {
         pub z: PoseZ,
         #[serde(default, skip_serializing_if = "String::is_empty")]
         pub mirror_of: String,
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        pub no_mirror_x: bool,
     }
 
     impl From<PoseFile> for super::PoseFile {
@@ -265,6 +269,7 @@ mod v0 {
                         turn_hip: pose_v0.turn_hip,
                         z: pose_v0.z,
                         mirror_of: pose_v0.mirror_of,
+                        no_mirror_x: pose_v0.no_mirror_x,
                     })
                     .collect(),
             }

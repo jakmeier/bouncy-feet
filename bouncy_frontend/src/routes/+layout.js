@@ -43,7 +43,8 @@ export const load = async ({ fetch, data }) => {
         import('$lib/assets/courses/002-v-step-basics.ron?raw'),
         import('$lib/assets/courses/003-intro.ron?raw'),
         import('$lib/assets/courses/004-rm-practice.ron?raw'),
-        import('$lib/assets/courses/005-rrm.ron?raw')
+        import('$lib/assets/courses/005-rrm.ron?raw'),
+        import('$lib/assets/courses/006-dnb.ron?raw')
     ].map(promise => promise
         .then(
             (data) => data.default
@@ -83,7 +84,8 @@ async function loadCollectionAssets() {
         import('$lib/assets/steps/misc.ron?raw'),
         import('$lib/assets/steps/rm_variations.ron?raw'),
         import('$lib/assets/steps/shapes.ron?raw'),
-        import('$lib/assets/steps/animation.ron?raw')
+        import('$lib/assets/steps/animation.ron?raw'),
+        import('$lib/assets/steps/dnb.ron?raw')
     ].map((promise) => promise.catch((e) => console.error(e)));
 
     const [
@@ -110,7 +112,8 @@ async function loadCollectionAssets() {
             misc: stepFileStrings[3],
             rm_variations: stepFileStrings[4],
             shapes: stepFileStrings[5],
-            animation: stepFileStrings[6]
+            animation: stepFileStrings[6],
+            dnb: stepFileStrings[7],
         }
     };
 
@@ -128,6 +131,7 @@ async function loadCollectionAssets() {
             rm_variations: stepsBySource('rm_variations'),
             shapes: stepsBySource('shapes'),
             animation: stepsBySource('animation'),
+            dnb: stepsBySource('dnb'),
         }
     }
 
@@ -219,6 +223,7 @@ function loadOnce(data, lang) {
         loadStepString(data.stepFileStrings.misc, 'misc');
         loadStepString(data.stepFileStrings.rm_variations, 'rm_variations');
         loadStepString(data.stepFileStrings.shapes, 'shapes');
+        loadStepString(data.stepFileStrings.dnb, 'dnb');
         if (data.animationPoseFileString) {
             loadPoseString(data.animationPoseFileString);
             loadStepString(data.stepFileStrings.animation, 'animation');

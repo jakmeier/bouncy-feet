@@ -13,6 +13,7 @@ pub(crate) fn load_static_files() {
     const SHAPES_STEP_STR: &str = include_str!("../data/steps/shapes.ron");
     const MISC_STEP_STR: &str = include_str!("../data/steps/misc.ron");
     const ANIMATION_STEP_STR: &str = include_str!("../data/steps/animation.ron");
+    const DNB_STEP_STR: &str = include_str!("../data/steps/dnb.ron");
     const DANCE_STR: &str = include_str!("../data/dance.ron");
     load_pose_str(POSE_STR).expect("loading static poses should work");
     load_pose_str(ANIMATION_POSE_STR).expect("loading static poses should work");
@@ -24,6 +25,7 @@ pub(crate) fn load_static_files() {
         (SHAPES_STEP_STR, "shapes"),
         (MISC_STEP_STR, "misc"),
         (ANIMATION_STEP_STR, "animation"),
+        (DNB_STEP_STR, "dnb"),
     ]
     .iter()
     .enumerate()
