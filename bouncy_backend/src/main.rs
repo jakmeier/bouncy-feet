@@ -66,6 +66,9 @@ async fn main() -> anyhow::Result<()> {
     ))
     .unwrap();
 
+    let kc_logout_url =
+        Url::parse(&format!("{oidc_issuer}/protocol/openid-connect/logout?client_id={oidc_client_id}")).unwrap();
+
     let pg_db_pool = PgPool::connect(&db_url).await?;
 
     // TODO: better DB setup
@@ -93,6 +96,7 @@ async fn main() -> anyhow::Result<()> {
             client_id: oidc_client_id.clone(),
             client_secret: oidc_client_secret.clone(),
             registration_url: kc_registration_url,
+            logout_url: kc_logout_url,
         },
         system_user,
     };
@@ -148,6 +152,7 @@ async fn main() -> anyhow::Result<()> {
         .route("/clubs", get(api_endoints::club::clubs))
         .route("/clubs/{club_id}", get(api_endoints::club::club))
         .route("/register", get(api_endoints::auth::register))
+        .route("/logout", get(api_endoints::auth::logout))
         .route(
             "/new_guest_session",
             get(api_endoints::client_session::create_guest_session),

@@ -30,6 +30,7 @@ pub struct KeycloakClientConfig {
     #[allow(unused)]
     pub client_secret: String,
     pub registration_url: Url,
+    pub logout_url: Url,
 }
 
 /// Calling this will redirect to Keycloak, have the user log in and then
@@ -107,6 +108,20 @@ pub async fn register(State(state): State<AppState>, query: Query<QueryParams>) 
     url.query_pairs_mut()
         .append_pair("redirect_uri", redirect_after_register.as_str());
 
+    Redirect::to(url.as_str()).into_response()
+}
+
+#[axum::debug_handler]
+pub async fn logout(
+    query: Query<QueryParams>,
+    // _claims: OidcClaims<EmptyAdditionalClaims>,
+    State(state): State<AppState>,
+) -> Response {
+    let mut url = state.kc_config.logout_url.clone();
+    if let Some(redirect_back_to) = &query.redirect_back_to {
+        url.query_pairs_mut()
+            .append_pair("redirect_uri", redirect_back_to.as_str());
+    }
     Redirect::to(url.as_str()).into_response()
 }
 

@@ -1,7 +1,7 @@
 <script>
   import { page } from '$app/state';
   import LoginRequiredContent from '$lib/components/profile/LoginRequiredContent.svelte';
-    import ScrollToTop from '$lib/components/ScrollToTop.svelte';
+  import ScrollToTop from '$lib/components/ScrollToTop.svelte';
   import ThumbnailFeed from '$lib/components/ThumbnailFeed.svelte';
   import Button from '$lib/components/ui/Button.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
@@ -103,7 +103,17 @@
       <Symbol size={100} styleClass="rotating">refresh</Symbol>
     </div>
   {:else}
+    <!-- TODO: image of club: where to upload and store? 
+        user profile pics could be on PeerTube
+        maybe each club should get a system channel, under which playlists (but not videos) are stored
+        then the chanel pic can be the club pic
+     -->
+    <!-- <img src={}/> -->
     <p>{club.description}</p>
+    <!-- TODO: link associated with club -->
+    <!-- <a class="link" href="https://www.east-attitude.com/shuffle-dance"
+      >https://www.east-attitude.com/shuffle-dance</a
+    > -->
 
     {#if club.private_playlist}
       <LoginRequiredContent reason={$t('club.requires-login-description')}>
@@ -185,5 +195,12 @@
   .loading {
     text-align: center;
     margin: 2rem 0;
+  }
+
+  .link {
+    text-decoration: underline;
+  }
+  .link:hover {
+    color: var(--theme-accent-dark);
   }
 </style>

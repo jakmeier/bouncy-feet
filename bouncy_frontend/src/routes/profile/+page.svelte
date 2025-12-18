@@ -3,9 +3,6 @@
 
   import DanceStats from './DanceStats.svelte';
   import { t } from '$lib/i18n';
-  import Popup from '$lib/components/ui/Popup.svelte';
-  import { writable } from 'svelte/store';
-  import { goto } from '$app/navigation';
   import Toggle from '$lib/components/ui/Toggle.svelte';
   import { dev, displayedVersion } from '$lib/stores/FeatureSelection';
   import Symbol from '$lib/components/ui/Symbol.svelte';
@@ -25,7 +22,7 @@
   import ScrollToTop from '$lib/components/ScrollToTop.svelte';
 
   /** @type {UserContextData} */
-  const { store: user, setUserMeta } = getUserContext();
+  const { store: user, setUserMeta, logout } = getUserContext();
   // let showStatsSharingPopup = $state(writable(!$user.consentSendingStats));
 
   async function submit() {
@@ -68,6 +65,8 @@
 
 <DarkSection fillScreen arrow>
   <LogoHeader title={$t('profile.title')} backButton={false} homeLink />
+  <!-- onAction={logout}
+    button="logout" -->
 
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <!-- svelte-ignore a11y_no_static_element_interactions -->

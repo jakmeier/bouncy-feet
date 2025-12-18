@@ -11,7 +11,7 @@
   import { ONBOARDING_STATE } from '$lib/onboarding';
   import { DetectionResult } from 'bouncy_instructor';
   import { client as peerTubeApi } from '$lib/peertube-openapi/client.gen';
-  import { PUBLIC_BF_PEERTUBE_URL } from '$env/static/public';
+  import { PUBLIC_API_BASE, PUBLIC_BF_PEERTUBE_URL } from '$env/static/public';
   import { fetchPeerTubeUser } from '$lib/peertube';
   import { KvSync } from '$lib/sync';
 
@@ -100,6 +100,10 @@
         return;
       }
     } catch (err) {
+      if (err.error === API_ERROR.BadGateway) {
+        loginError.description = 'profile.login-failed-peertube-down';
+        return;
+      }
       console.error('unexpected error calling authenticatedApiRequest', err);
     }
   }
@@ -607,6 +611,21 @@
     Object.assign(peerTubeUser, await fetchPeerTubeUser());
   }
 
+  async function logout() {
+    // TODO: also log out on backend / keycloak
+    // TODO: handle local state without someone being logged in (without
+    // creating a guest session -> be more explicit about guest sessions)
+    pwaAuth.peerTubeToken = null;
+    pwaAuth.refreshPeerTubeToken = null;
+
+    const currentUrl = window.location.href;
+    window.location.assign(
+      PUBLIC_API_BASE +
+        '/logout?redirect_back_to=' +
+        encodeURIComponent(currentUrl)
+    );
+  }
+
   const loggedInToApi = $derived(!!pwaAuth.peerTubeToken);
   const isLoggedInToApi = () => loggedInToApi;
   let hasSkippedIntro = $state(false);
@@ -624,6 +643,7 @@
     addDanceToStats,
     isLoggedInToApi,
     refreshPeerTubeUser,
+    logout,
     get peerTubeUser() {
       return (async () => {
         if (Object.keys(peerTubeUser).length === 0) {
