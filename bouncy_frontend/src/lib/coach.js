@@ -123,7 +123,7 @@ export const coaches = [
             // TODO: add dnb steps
             "back-and-forth-right": {
                 // TODO: add better video and course
-                video: "https://app.bouncy-feet.ch/media/videos/c6/tutorial.mp4",
+                video: "https://app.bouncy-feet.ch/media/videos/c6/lesson_2.mp4",
                 courses: ['dnb-basics']
             },
         },

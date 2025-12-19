@@ -122,6 +122,7 @@
  * @property {(result: DanceSessionResult) => void} addDanceToStats Update local stats, offline only.
  * @property {()=>boolean} isLoggedInToApi -- Has an active, non-expired API session. (Reactive $derived state)
  * @property {()=>{}} refreshPeerTubeUser
+ * @property {()=>void} logout
  * @property {Promise<import("$lib/peertube-openapi").User | undefined>} peerTubeUser
  * @property {(path: string)=>Promise<Response | null | undefined>} authenticatedGet
  * @property {(path: string, jsonBody: object)=>Promise<Response | null | undefined>} authenticatedPost
