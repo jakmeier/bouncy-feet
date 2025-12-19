@@ -158,7 +158,7 @@ export const coaches = [
         },
         peertubePlaylist: {
             localDev: "9aBHGBL88zSb6u1esWzDgD",
-            dev: "nAkAtJ2sdYFN73HZEjDft2",
+            dev: "hLhCbsRyaTBgQYcJFW2XbQ",
             prod: "",
         }
     }
