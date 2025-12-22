@@ -1,5 +1,7 @@
 # Bouncy Feet
 
+## Screenshots from December 2025
+
 <p align="center">
   <img src="./bouncy_frontend/static/screenshots/home.gif" width="200px">
   <img src="./bouncy_frontend/static/screenshots/steps.gif" width="200px">
@@ -12,15 +14,13 @@
 Try it: [app.bouncy-feet.ch](https://app.bouncy-feet.ch)
 
 A web app that assists you in learning to shuffle dance. Bouncy Feet shows you
-new moves and checks if you are doing it right.
+new moves and helps you review your progress.
 
-The app can be installed as a Progressive Web App or just used directly like a
-web page. It should work in all major browsers, on the phone or on laptops and
-workstations. You only need a camera which you can position in a way where your
-full body is clearly visible while you dance. Listings in common app stores are
-in the working.
+The app can be installed as a Progressive Web App or used directly in the
+browser like any other web page. It should work in all major browsers, on the
+phone, on a laptop, and on desktop computers.
 
-Check out the video below to see it in action.
+Check out the video below to see it in action. (Prototype version from 2024)
 
 https://github.com/user-attachments/assets/e327061d-69b1-40e4-9731-6cb322f77109
 
@@ -30,14 +30,19 @@ Let's be honest, dancing is best without interacting with your phone or laptop.
 Just play some music and go. The app is designed with this principle in mind and
 tries to support you without getting in your way.
 
+**Video Platform**: Tired of sharing private dance videos through chats and
+losing them becaus of a lack of organization? Bouncy Feet want to become the
+best place to upload videos and share them privately.
+
 **Easy Review**: After a dance, you can review your video recording. Bouncy Feet
 enhances the recording with timestamps and body positions it detects on the
 beat. If you like the video, save and share it. Otherwise, delete the video and
-it is gone forever. (BouncyFeet is perfectly private and never uploads the
-video, everything is done on your device only.)
+it is gone forever. (BouncyFeet is perfectly private and doesn't upload the
+video without your permission. By default, everything is processed on your
+device only.)
 
 **Browse a Collection of Moves**: An ever-growing list of shuffle moves are
-available in the app to inspire you.
+available in the app to inspire you. Other dance styles are also being added.
 
 **Stay Motivated**: Incremental statistics counting how many steps you danced in
 your lifetime using the app motivates you to stay fit and active.
@@ -61,16 +66,19 @@ minimizing the screen time of you using it.
 At its core, Bouncy Feet is an attempt of myself to create a product which
 people actually want to use. Including myself, as the user number one.
 
-In October 2023, I quit my fulltime job to "work on my own terms" without much
-of a plan. After a few weeks, this idea of a dance app came to me and I decided
-to start working on it for the majority of my time, while doing other gigs on the
-side to keep my personal finances in balance.
+In October 2023, I quit my fulltime job to become a freelancer and also work on
+creative projects on the side. After a few weeks, this idea of a dance app came
+to me and I decided to start working on it.
 
 In August 2024, Bouncy Feet GmbH was founded in Switzerland as a private limited
 company, with the purpose to promote (shuffle) dance by means of software
 assistance. Practically speaking, it's still just me running the show. But it
 opens the door to commercial partnerships and brings legal clarity for an upcoming
 release to the Play Store and the App Store.
+
+Throughout the year of 2025 I have started organizing in-person dance events.
+Now I am working together with the community to what features in Bouncy Feet
+would be most loved.
 
 It is still a bit unclear where this project will end up exactly. I am pretty
 certain that to reach as many people as possible, the app should always be
@@ -80,82 +88,20 @@ Paid premium features are also a possibility but let's see how things turn out.
 
 Regarding tech, the project uses [SvelteKit](https://kit.svelte.dev/) for
 everything UI, [MediaPipe](https://developers.google.com/mediapipe) with
-pre-trained models for basic pose detection, and Rust (in the browser) for the
-core business logic (dance detection).
+pre-trained models for basic pose detection, and Rust (in the browser using WASM)
+for the core business logic (dance detection).
 
 ## Progress Status
 
-- 5 Nov 2024: Release version  v0.6.0
-    - Step & pose editor (experimental feature): It is now possible to create
-      completely custom poses from a video or camera input. Then decide which
-      body parts are how important to get right for live-tracking, combine the
-      poses to steps, and lastly combine the steps to a dance / choreography.
-      Custom steps and dances can be used for everything the pre-bundled steps
-      are used for, including leveling up steps with live-tracking.
-    - Importing and exporting steps and poses to share them with friends.
-    - More details on a choreography: Show all poses with corresponding count
-      and visually link poses with the corresponding step.
-- 25 Sep 2024: Release version v0.5.2
-    - The course lesson review page now shows which body parts are wrong for missed poses.
-    - Add several prompt and in-between screen to make it easier to follow what is happening in the app.
-    - Use a smaller model for the detection of the dance in the video.
-      This should make tracking smoother, especially on less powerful devices, such as old phones.
-      On the flip side, it will make detection less accurate in some circumstances.
-    - Enabling experimental features now also shows systems statistics that can be useful to debug performance issues.
-    - Various UI styling fixes and changes.
-- 18 Sep 2024: Release version v0.5.1
-    - Fix language selection based on locale configured on the client device.
-    - Fix: Preserve icons in automated translation.
-    - Server infrastructure changes. (Scoreboard is now hosted on stats.bouncy-feet.ch)
--  9 Sep 2024: Release version v0.5.0
-    - Introduce courses, with a running man course as a first example.
-      - Note: This is a poorly made example course for demonstration purposes. Actual courses will have better quality videos and better tracking.
-      - A course has several lessons, each with an explanation video and a tracked exercise.
-      - Hitting 60% on the traced exercise will grant the "absolved" mark on the course lesson.
-      - The last lesson can be a step or choreography that's learned incrementally throughout the course.
-    - Changed the style of the home screen quite a bit.
-    - Many bug fixes, probably many new bugs.
-- 30 Aug 2024: Overhaul README and change license
-    - Describe the latest project goals, such as potential monetization ideas
-      and take a clear stance on free and open-source software.
-    - Relicense from permissive MIT / Apache 2.0 dual license to single a license, AGPL version 3.
-- 28 Aug 2024: Released v0.4.1.
-    - Improved dance animations: They now make a little jump between poses.
-    - Change to live step detection:
-        - Wait for proper positioning before detecting steps.
-        - Voice countdown once the initial position has been reached.
-        - Ignore frames where the dancer is not in the frame with legs and arms.
-        - Count looking 90° in the wrong direction as an error, even if all angles match.
-    - UI fixes:
-      - Proper centering on wide screens.
-- 30 July 2024: Released v0.4.0.
-    - Live camera detection for a selected set of steps. (Running Man, Reverse Running Man, Kicking Reverse Running Man, Happy Feet.)
-      - Learn mode: Learn each position without timing.
-      - Train mode: Dance the move at your own speed with your own music.
-    - Per step experience and levels that increase the more you dance it.
-    - Steps are now categorized in groups: Melbourne Shuffle Basics, Cutting Shapes, Footwork, and Running Man variations.
-    - A few more steps were added while some of the most basic steps are now hidden in the collection. (But still available in the choreography editor.)
-    - A global leaderboard to compare how many steps you have recorded with other dancers. (Opt-in, by default zero data is transmitted.)
-    - A profile settings page. Currently only allows to to opt-in to experimental features and manage the leaderboard participation settings.
-    - Shared a quick promo video [on Reddit](https://www.reddit.com/r/shuffle/comments/1eglao3/bouncy_feet_app_update/) that shows the idea of dancing and leveling up each move in the app.
--  7 May 2024: Released v0.3.0 to the live demo.
-    - Collection now shows *dances*, which are choreographies that consist of
-      multiple steps in a row.
-    - 4 demo dances for a start.
-    - Create new dances and edit existing ones.
--  3 Apr 2024: Released v0.2.1 to the live demo.
-    - More steps to the collection, now there are 13 steps.
-    - Many improvements to drawing, such as z-perspective for limbs, the torso
-      no longer being fixed to the center, and smooth shoulder/hip angles.
-- 20 Mar 2024: Teaser Video on [Reddit](https://www.reddit.com/r/shuffle/comments/1bjdl1y/teaser_video_for_my_little_sideproject/)
-- 19 Mar 2024: Created live demo with more stable features to https://app.bouncy-feet.ch.
-- 26 Dec 2023: Started hosting a live demo on https://demos.jakobmeier.ch/bouncy-feet.
-- 23 Dec 2023: Update README to better describe the project ambitions. The
-  techstack with SvelteKit + Rust to create a PWA is mostly locked in now.
-- 20 Nov 2023: Started using [SvelteKit](https://kit.svelte.dev/).
-- 18 Nov 2023: Initialized repository under the name `bouncy-feet`.
-- Oct - Nov 2023: Tried out the core concepts in a
-  [prototype](https://github.com/jakmeier/dance-app-poc-playground).
+*Last update 22th of December 2025*
+
+- There is a huge backlog of features not yet deployed on app.bouncy-feet.ch that needs more testing before the next big release. Including:
+  - User account management
+  - Video upload
+  - Clubs of users to share videos in private groups
+  - More courses
+
+Stay tuned for an updated version coming soon.
 
 # Free and Open-Source Commitment
 
