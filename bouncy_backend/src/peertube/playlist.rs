@@ -80,17 +80,17 @@ async fn create_system_playlist<T: serde::Serialize + ?Sized>(
         .join("api/v1/video-playlists")
         .expect("must be valid url");
 
-    let auth_header = state.system_user.authorization_header(state).await?;
+    let token = state.system_user.access_token(state).await?;
 
     let response = state
         .http_client
         .post(url.as_str())
         .form(body)
-        .header(reqwest::header::AUTHORIZATION, &auth_header)
+        .bearer_auth(&token)
         .send()
         .await;
 
-    let ok_response = check_peertube_system_user_response(response, auth_header).await?;
+    let ok_response = check_peertube_system_user_response(response, token).await?;
     let status = ok_response.status();
     let playlist: Result<PlaylistCreatedResponse, _> = ok_response.json().await;
     let playlist = playlist.map_err(|err| PeerTubeError::JsonParsingFailed(status, err))?;
@@ -107,17 +107,17 @@ pub(crate) async fn add_video_to_playlist(
         .join(&format!("api/v1/video-playlists/{}/videos", playlist_id))
         .expect("must be valid url");
 
-    let auth_header = state.system_user.authorization_header(state).await?;
+    let token = state.system_user.access_token(state).await?;
 
     let response = state
         .http_client
         .post(url.as_str())
         .form(&[("videoId", video_id)])
-        .header(reqwest::header::AUTHORIZATION, &auth_header)
+        .bearer_auth(&token)
         .send()
         .await;
 
-    let ok_response = check_peertube_system_user_response(response, auth_header).await?;
+    let ok_response = check_peertube_system_user_response(response, token).await?;
     let status = ok_response.status();
     let msg: Result<VideoAddedResponse, _> = ok_response.json().await;
     let msg = msg.map_err(|err| PeerTubeError::JsonParsingFailed(status, err))?;

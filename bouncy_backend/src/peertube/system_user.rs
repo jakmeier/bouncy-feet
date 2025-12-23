@@ -24,10 +24,10 @@ impl PeerTubeSystemUser {
         }
     }
 
-    pub async fn authorization_header(&self, state: &AppState) -> Result<String, PeerTubeError> {
+    pub async fn access_token(&self, state: &AppState) -> Result<String, PeerTubeError> {
         let guard = self.token.read().await;
         if let Some(token) = guard.as_ref() {
-            return Ok(token.bearer_string());
+            return Ok(token.token().to_owned());
         }
         drop(guard);
 
@@ -41,14 +41,18 @@ impl PeerTubeSystemUser {
             *mut_guard = Some(new_token);
         }
 
-        Ok(mut_guard.as_ref().expect("just inserted").bearer_string())
+        Ok(mut_guard
+            .as_ref()
+            .expect("just inserted")
+            .token()
+            .to_owned())
     }
 
     pub(crate) async fn clear_token(&self, failed_token: &str) {
         let mut guard = self.token.write().await;
         if guard
             .as_ref()
-            .is_some_and(|current| current.bearer_string() == failed_token)
+            .is_some_and(|current| current.token() == failed_token)
         {
             *guard = None;
         }

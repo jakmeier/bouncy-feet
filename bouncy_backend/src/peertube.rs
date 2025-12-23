@@ -4,6 +4,7 @@
 use crate::AppState;
 use reqwest::header::HeaderValue;
 
+pub(crate) mod channel;
 pub(crate) mod playlist;
 pub(crate) mod system_user;
 pub(crate) mod token;
@@ -25,6 +26,8 @@ pub(crate) enum PeerTubeError {
     JsonParsingFailed(reqwest::StatusCode, reqwest::Error),
     #[error("error sending request {0}")]
     ClientError(#[source] reqwest::Error),
+    #[error("invalid value {0}")]
+    ClientValidationError(String),
     #[error("system auth failed")]
     SystemAuthFailed(String),
 }

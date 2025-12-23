@@ -11,8 +11,8 @@ pub(crate) struct OAuthToken {
 }
 
 impl OAuthToken {
-    pub fn bearer_string(&self) -> String {
-        format!("Bearer {}", self.access_token)
+    pub fn token(&self) -> &str {
+        &self.access_token
     }
 }
 
