@@ -196,8 +196,6 @@
  * @property {string} name
  * @property {string} description
  * @property {AvatarStyleContext} style
- * @property {PlaylistInfo} public_playlist
- * @property {PlaylistInfo} [private_playlist]
  * @property {object} stats
  *
  * @typedef {Object} ClubsData

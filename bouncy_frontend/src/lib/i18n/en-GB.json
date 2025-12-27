@@ -52,7 +52,7 @@
         "create-new-title": "Found a new Club",
         "create-new-button": "Create club",
         "upload-video-button": "Upload video",
-        "upload-video-description": "Save a video in your private Bouncy Feet cloud",
+        "upload-video-description": "Add public club video",
         "select-user-title": "Select dancer",
         "confirm-add-user-p0": "Add ",
         "confirm-add-user-p1": " to ",
@@ -327,6 +327,7 @@
             "consent-title": "Show my progress in public leaderboard",
             "experimental-title": "Experimental Features"
         },
+        "upload-video-description": "Save a video in your private Bouncy Feet cloud",
         "upload": {
             "title": "Upload video to",
             "requires-login-description": "I gotta know who you are before you can upload videos."

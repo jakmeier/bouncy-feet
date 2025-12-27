@@ -52,7 +52,7 @@
         "create-new-title": "Gründe einen neuen Club",
         "create-new-button": "Club erstellen",
         "upload-video-button": "Video hochladen",
-        "upload-video-description": "Speichere ein Video in deiner privagten Bouncy Feet Cloud",
+        "upload-video-description": "Video öffentlich zum Club hinzufügen",
         "select-user-title": "Wähle Tänzer/in",
         "confirm-add-user-p0": "Füge ",
         "confirm-add-user-p1": " zu ",
@@ -327,6 +327,7 @@
             "consent-title": "Zeige mein Fortschritt in der öffentlichen Rangliste",
             "experimental-title": "Experimentelle Funktionen"
         },
+        "upload-video-description": "Speichere ein Video in deiner privagten Bouncy Feet Cloud",
         "upload": {
             "title": "Video hochladen zu",
             "requires-login-description": "Ich muss wissen wer du bist, bevor du ein Video hochladen kannst."

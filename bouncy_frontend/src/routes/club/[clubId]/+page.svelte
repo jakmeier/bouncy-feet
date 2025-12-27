@@ -38,6 +38,7 @@
   let showAddMorePopup = $state(false);
   let showAddVideoPopup = $state(false);
   let message = $state('');
+  let mainFeed = $state();
 
   /**
    * @param {PublicUserResponse} user
@@ -80,11 +81,14 @@
       return;
     }
     let videoId = video.video.id;
-    userCtx.authenticatedPost('/clubs/video/add', {
-      video_id: videoId,
-      club_id: clubId,
-      private: true,
-    });
+    userCtx
+      .authenticatedPost('/clubs/video/add', {
+        video_id: videoId,
+        club_id: clubId,
+        private: false,
+      })
+      .then(() => mainFeed.refreshVideos());
+    showAddVideoPopup = false;
   }
 
   function onAddMore() {
@@ -116,7 +120,16 @@
     > -->
 
     <h2>Public Club Videos</h2>
-    <ThumbnailFeed playlistId={data.main_playlist.short_uuid}></ThumbnailFeed>
+    <ThumbnailFeed bind:this={mainFeed} playlistId={data.main_playlist.id}
+    ></ThumbnailFeed>
+
+    {#each data.public_playlists as playlist}
+      {#if playlist.id != data.main_playlist.id}
+        <!-- TODO: playlist title -->
+        <h2>Playlist {playlist.id}</h2>
+        <ThumbnailFeed playlistId={playlist.id}></ThumbnailFeed>
+      {/if}
+    {/each}
 
     <PopupWithRunes bind:isOpen={showUsersPopup}>
       <div class="popup">
@@ -148,7 +161,9 @@
 </LightSection>
 
 <PopupWithRunes bind:isOpen={showAddMorePopup}>
-  {#if userCtx.isLoggedInToApi()}
+  <LoginRequiredContent
+    reason={$t('profile.upload.requires-login-description')}
+  >
     <Button
       symbol="boy"
       text="club.add-user-button"
@@ -165,14 +180,13 @@
         showAddVideoPopup = true;
       }}
     />
-  {/if}
+  </LoginRequiredContent>
 </PopupWithRunes>
 
 <PopupWithRunes bind:isOpen={showAddVideoPopup}>
   {#if userCtx.isLoggedInToApi()}
-    <p>Add club video</p>
-    <VideoUpload {onVideoUploaded} privacy={VIDEO_PRIVACY.UNLISTED}
-    ></VideoUpload>
+    <p>{$t('club.upload-video-description')}</p>
+    <VideoUpload {onVideoUploaded} privacy={VIDEO_PRIVACY.PUBLIC}></VideoUpload>
   {/if}
 </PopupWithRunes>
 

@@ -111,7 +111,7 @@
 
 <LightSection arrow>
   <h2>{$t('club.upload-video-button')}</h2>
-  <p>{$t('club.upload-video-description')}</p>
+  <p>{$t('profile.upload-video-description')}</p>
   <VideoUpload></VideoUpload>
 </LightSection>
 

@@ -16,6 +16,9 @@ export const load = async ({ fetch, params }) => {
      * @typedef {object} ClubDetailsResponse
      * @prop {PublicUserResponse[]} admins
      * @prop {PublicUserResponse[]} members
+     * @prop {PlaylistInfo} main_playlist
+     * @prop {PlaylistInfo[]} public_playlists
+     * @prop {PlaylistInfo[]} private_playlists
      */
     /** 
     * @type {ClubDetailsResponse}
@@ -25,5 +28,8 @@ export const load = async ({ fetch, params }) => {
     return {
         admins: data.admins,
         members: data.members,
+        main_playlist: data.main_playlist,
+        public_playlists: data.public_playlists,
+        private_playlists: data.private_playlists,
     }
 }
