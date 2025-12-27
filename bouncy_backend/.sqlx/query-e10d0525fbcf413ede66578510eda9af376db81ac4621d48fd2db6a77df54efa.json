@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE clubs\n            SET main_playlist = $1\n            WHERE clubs.id = $2;\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "e10d0525fbcf413ede66578510eda9af376db81ac4621d48fd2db6a77df54efa"
+}

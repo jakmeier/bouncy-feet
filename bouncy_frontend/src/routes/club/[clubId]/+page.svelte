@@ -115,16 +115,8 @@
       >https://www.east-attitude.com/shuffle-dance</a
     > -->
 
-    {#if club.private_playlist}
-      <LoginRequiredContent reason={$t('club.requires-login-description')}>
-        <h2>Private Club Videos</h2>
-        <ThumbnailFeed playlistId={club.private_playlist.short_uuid}
-        ></ThumbnailFeed>
-      </LoginRequiredContent>
-    {/if}
-
     <h2>Public Club Videos</h2>
-    <ThumbnailFeed playlistId={club.public_playlist.short_uuid}></ThumbnailFeed>
+    <ThumbnailFeed playlistId={data.main_playlist.short_uuid}></ThumbnailFeed>
 
     <PopupWithRunes bind:isOpen={showUsersPopup}>
       <div class="popup">
@@ -195,12 +187,5 @@
   .loading {
     text-align: center;
     margin: 2rem 0;
-  }
-
-  .link {
-    text-decoration: underline;
-  }
-  .link:hover {
-    color: var(--theme-accent-dark);
   }
 </style>

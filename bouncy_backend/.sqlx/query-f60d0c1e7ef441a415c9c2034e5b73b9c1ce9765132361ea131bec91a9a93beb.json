@@ -1,0 +1,49 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO clubs (title, description, channel_id, main_playlist)\n            VALUES ($1, $2, $3, $4)\n            RETURNING id, title, description, channel_id, main_playlist\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "description",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "channel_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 4,
+        "name": "main_playlist",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Varchar",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "f60d0c1e7ef441a415c9c2034e5b73b9c1ce9765132361ea131bec91a9a93beb"
+}

@@ -1,0 +1,49 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO club_playlists (club_id, playlist_id, playlist_short_uuid, is_private)\n            VALUES ($1, $2, $3, $4)\n            RETURNING id, club_id, playlist_id, playlist_short_uuid, is_private\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "club_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "playlist_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "playlist_short_uuid",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "is_private",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8",
+        "Varchar",
+        "Bool"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "987fbd37e06c0186b5a852478fe63c61dad0b29e7bdbc16e5d7637e3ca9444a4"
+}

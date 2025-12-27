@@ -5,7 +5,7 @@ use crate::{
 
 #[derive(Clone, Copy, Debug, serde::Deserialize)]
 #[serde(transparent)]
-pub(crate) struct ChannelId(i64);
+pub(crate) struct PeerTubeChannelId(pub i64);
 
 #[derive(Debug, Clone, serde::Serialize)]
 pub(crate) struct CreateChannel {
@@ -24,7 +24,7 @@ pub(crate) struct CreateChannelResponse {
 
 #[derive(Debug, Clone, serde::Deserialize)]
 struct ChannelIdResponse {
-    id: ChannelId,
+    id: PeerTubeChannelId,
 }
 
 pub(crate) async fn create_system_channel(
@@ -32,7 +32,7 @@ pub(crate) async fn create_system_channel(
     name: String,
     display_name: String,
     description: Option<String>,
-) -> Result<ChannelId, PeerTubeError> {
+) -> Result<PeerTubeChannelId, PeerTubeError> {
     if !is_valid_name(&name, 1, 50) {
         return Err(PeerTubeError::ClientValidationError(name));
     }
@@ -79,7 +79,7 @@ fn is_valid_name(s: &str, min: usize, max: usize) -> bool {
             .all(|c| c.is_ascii_alphanumeric() || matches!(c, '-' | '_' | '.' | ':'))
 }
 
-impl ChannelId {
+impl PeerTubeChannelId {
     pub fn num(&self) -> i64 {
         self.0
     }

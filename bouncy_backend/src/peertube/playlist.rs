@@ -5,19 +5,22 @@ use crate::{
 use uuid::Uuid;
 
 #[derive(Debug, Clone, serde::Deserialize)]
-pub(crate) struct Playlist {
-    #[allow(dead_code)]
-    pub id: i64,
+pub(crate) struct PeerTubePlaylist {
+    pub id: PeerTubePlaylistId,
     #[allow(dead_code)]
     pub uuid: Uuid,
     #[serde(alias = "shortUUID")]
     pub short_uuid: String,
 }
 
+#[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
+#[serde(transparent)]
+pub(crate) struct PeerTubePlaylistId(pub i64);
+
 #[derive(Debug, Clone, serde::Deserialize)]
 pub(crate) struct PlaylistCreatedResponse {
     #[serde(alias = "videoPlaylist")]
-    video_playlist: Playlist,
+    video_playlist: PeerTubePlaylist,
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -45,7 +48,7 @@ pub(crate) async fn create_unlisted_system_playlist(
     display_name: &str,
     description: &str,
     channel_id: i64,
-) -> Result<Playlist, PeerTubeError> {
+) -> Result<PeerTubePlaylist, PeerTubeError> {
     let body = [
         ("displayName", display_name),
         ("description", description),
@@ -61,7 +64,7 @@ pub(crate) async fn create_public_system_playlist(
     display_name: &str,
     description: &str,
     channel_id: i64,
-) -> Result<Playlist, PeerTubeError> {
+) -> Result<PeerTubePlaylist, PeerTubeError> {
     let body = [
         ("displayName", display_name),
         ("description", description),
@@ -74,7 +77,7 @@ pub(crate) async fn create_public_system_playlist(
 async fn create_system_playlist<T: serde::Serialize + ?Sized>(
     state: &AppState,
     body: &T,
-) -> Result<Playlist, PeerTubeError> {
+) -> Result<PeerTubePlaylist, PeerTubeError> {
     let url = state
         .peertube_url
         .join("api/v1/video-playlists")
@@ -100,11 +103,14 @@ async fn create_system_playlist<T: serde::Serialize + ?Sized>(
 pub(crate) async fn add_video_to_playlist(
     state: &AppState,
     video_id: i64,
-    playlist_id: i64,
+    playlist_id: PeerTubePlaylistId,
 ) -> Result<PlaylistElement, PeerTubeError> {
     let url = state
         .peertube_url
-        .join(&format!("api/v1/video-playlists/{}/videos", playlist_id))
+        .join(&format!(
+            "api/v1/video-playlists/{}/videos",
+            playlist_id.num()
+        ))
         .expect("must be valid url");
 
     let token = state.system_user.access_token(state).await?;
@@ -133,6 +139,12 @@ impl PlaylistPrivacy {
             3 => "3",
             _ => unreachable!("should not have other variants"),
         }
+    }
+}
+
+impl PeerTubePlaylistId {
+    pub fn num(&self) -> i64 {
+        self.0
     }
 }
 

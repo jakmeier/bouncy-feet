@@ -1,11 +1,10 @@
 use crate::api_endoints::user::PublicUserInfoResponse;
-use crate::club::{ClubId, ClubMembership, PlaylistInfo, PublicClubMemberInfo};
+use crate::club::{ClubId, ClubMembership, PublicClubMemberInfo};
 use crate::db::club::Club;
-use crate::peertube::channel::{create_system_channel, ChannelId};
-use crate::peertube::playlist::{
-    create_public_system_playlist, create_unlisted_system_playlist, Playlist,
-};
+use crate::peertube::channel::{create_system_channel, PeerTubeChannelId};
+use crate::peertube::playlist::{create_public_system_playlist, create_unlisted_system_playlist};
 use crate::peertube::{handle_peertube_error, PeerTubeError};
+use crate::playlist::{Playlist, PlaylistInfo};
 use crate::user::{User, UserId};
 use crate::AppState;
 use axum::extract::State;
@@ -32,9 +31,6 @@ struct ClubInfo {
     name: String,
     // lang: String, needed ?? -> not yet, maybe at some point
     description: String,
-    public_playlist: PlaylistInfo,
-    // Only set for authenticated members
-    private_playlist: Option<PlaylistInfo>,
     // TODO
     // style
 
@@ -50,11 +46,14 @@ struct ClubInfo {
 
 /// Additional details about a club, retrieved by /clubs/{club_id}.
 ///
-/// Conatains information to show a detailed club view.
+/// Contains information to show a detailed club view.
 #[derive(serde::Serialize)]
 pub(crate) struct ClubDetails {
     admins: Vec<PublicUserInfoResponse>,
     members: Vec<PublicUserInfoResponse>,
+    main_playlist: Option<PlaylistInfo>,
+    public_playlists: Vec<PlaylistInfo>,
+    private_playlist: Vec<PlaylistInfo>,
 }
 
 #[derive(serde::Deserialize)]
@@ -81,22 +80,18 @@ pub async fn my_clubs(Extension(user): Extension<User>, State(state): State<AppS
         return (StatusCode::INTERNAL_SERVER_ERROR, "DB ERROR").into_response();
     };
 
-    // Listing own clubs -> access granted
-    let private_access = true;
-    let clubs = db_clubs_to_club_infos(db_clubs, private_access);
+    let clubs = db_clubs_to_club_infos(db_clubs);
     let response = ClubsResponse { clubs };
     (StatusCode::OK, Json(response)).into_response()
 }
 
-fn db_clubs_to_club_infos(db_clubs: Vec<Club>, has_private_access: bool) -> Vec<ClubInfo> {
+fn db_clubs_to_club_infos(db_clubs: Vec<Club>) -> Vec<ClubInfo> {
     db_clubs
         .into_iter()
         .map(|club| ClubInfo {
             id: club.id.num(),
             name: club.title,
             description: club.description,
-            public_playlist: club.public_playlist,
-            private_playlist: has_private_access.then_some(club.private_playlist),
         })
         .collect()
 }
@@ -112,10 +107,9 @@ pub async fn clubs(State(state): State<AppState>) -> Response {
         return (StatusCode::INTERNAL_SERVER_ERROR, "DB ERROR").into_response();
     };
 
-    let private_access = false;
-    let clubs = db_clubs_to_club_infos(db_clubs, private_access);
-    let resonse = ClubsResponse { clubs };
-    (StatusCode::OK, Json(resonse)).into_response()
+    let clubs = db_clubs_to_club_infos(db_clubs);
+    let response = ClubsResponse { clubs };
+    (StatusCode::OK, Json(response)).into_response()
 }
 
 /// Retrieve extended info about a club, public info only.
@@ -145,7 +139,34 @@ pub async fn club(
         .collect();
     let members = db_members.into_iter().map(row_to_user_info).collect();
 
-    let details = ClubDetails { admins, members };
+    let Some(club) = Club::lookup(&state, club_id).await else {
+        return Err((StatusCode::NOT_FOUND, "no such club"))?;
+    };
+
+    let mut main_playlist = None;
+    if let Some(main_playlist_id) = club.main_playlist {
+        let Some(playlist) = Playlist::lookup_club_playlist(&state, main_playlist_id).await else {
+            return Err((StatusCode::NOT_FOUND, "no such playlist").into_response())?;
+        };
+        main_playlist = Some(playlist);
+    }
+
+    let mut playlists = Playlist::lookup_club_playlists(&state, club.id).await;
+    let _private_playlist: Vec<PlaylistInfo> = playlists
+        .extract_if(.., |p| p.is_private)
+        .map(Playlist::playlist_info)
+        .collect();
+    let public_playlists = playlists.into_iter().map(Playlist::playlist_info).collect();
+
+    let details = ClubDetails {
+        admins,
+        members,
+        main_playlist: main_playlist.map(Playlist::playlist_info),
+        public_playlists,
+        // TODO: access check to private playlists!
+        // private_playlist,
+        private_playlist: vec![],
+    };
     Ok(Json(details))
 }
 
@@ -186,9 +207,26 @@ pub async fn create_club(
         return (StatusCode::INTERNAL_SERVER_ERROR, "failed creating channel").into_response();
     };
 
+    let club_res: Result<Club, sqlx::Error> = Club::create(
+        &state,
+        &payload.title,
+        &payload.description,
+        channel_id,
+        // Create without playlist first, so the playlist can be created with a club id.
+        None,
+    )
+    .await;
+
+    let Ok(club) = club_res else {
+        // TODO: clean up inconsistent state (delete playlists on PeerTube)
+        let err = club_res.unwrap_err();
+        tracing::error!(?err, "DB error on create_club");
+        return (StatusCode::BAD_REQUEST, "Could not create club").into_response();
+    };
+
     let mut max_retry = 5;
     let playlists = loop {
-        let result = create_club_playlist_pair(&state, &payload.title, channel_id).await;
+        let result = create_club_playlist_pair(&state, &payload.title, channel_id, club.id).await;
         if let Err(e) = &result {
             let retry = handle_peertube_error(&state, e).await;
             if retry && max_retry > 0 {
@@ -199,7 +237,8 @@ pub async fn create_club(
         break result;
     };
 
-    let Ok((public_playlist, private_playlist)) = playlists else {
+    // TODO: do I even need a private playlist at this point?
+    let Ok((public_playlist, _private_playlist)) = playlists else {
         let err = playlists.unwrap_err();
         tracing::error!(?err, "failed creating playlists");
         return (
@@ -209,25 +248,18 @@ pub async fn create_club(
             .into_response();
     };
 
-    let res = Club::create(
-        &state,
-        &payload.title,
-        &payload.description,
-        public_playlist.id,
-        &public_playlist.short_uuid,
-        private_playlist.id,
-        &private_playlist.short_uuid,
-    )
-    .await;
-
+    // Now set the main playlist
+    let res = Club::set_main_playlist(&state, club.id, public_playlist.id).await;
     if let Err(err) = res {
-        // TODO: clean up inconsistent state (remove playlists)
-        tracing::error!(?err, "DB error on create_club");
-        return (StatusCode::BAD_REQUEST, "Could not create club").into_response();
+        tracing::error!(?err, "failed setting main playlist");
+        return (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "failed setting club main playlist",
+        )
+            .into_response();
     }
 
     // Add creator as first admin member
-    let club = res.expect("just checked");
     let res_add_admin = Club::add_or_update_member(&state, user.id, club.id, true).await;
     if let Err(err) = res_add_admin {
         // TODO: clean up inconsistent state (remove playlists, delete club)
@@ -239,14 +271,14 @@ pub async fn create_club(
         id: club.id.num(),
         name: club.title,
         description: club.description,
-        public_playlist: club.public_playlist,
-        // Creator made the request -> access granted
-        private_playlist: Some(club.private_playlist),
     };
     (StatusCode::CREATED, Json(club_info)).into_response()
 }
 
-async fn create_club_channel(state: &AppState, name: &str) -> Result<ChannelId, PeerTubeError> {
+async fn create_club_channel(
+    state: &AppState,
+    name: &str,
+) -> Result<PeerTubeChannelId, PeerTubeError> {
     let description = format!("auto-generated channel for the club {name}");
     let display_name = name.to_owned();
     let Some(id_name) = display_name_to_username(&display_name) else {
@@ -259,13 +291,15 @@ async fn create_club_channel(state: &AppState, name: &str) -> Result<ChannelId, 
 async fn create_club_playlist_pair(
     state: &AppState,
     title: &str,
-    channel_id: ChannelId,
+    channel_id: PeerTubeChannelId,
+    club_id: ClubId,
 ) -> Result<(Playlist, Playlist), PeerTubeError> {
     let public_display_name = format!("{title} - public videos");
     let public_description = format!("auto-generated public playlist for the club {title}");
     let private_display_name = format!("{title} - member-only videos");
     let private_description = format!("auto-generated unlisted playlist for the club {title}");
 
+    // create externally
     let public_playlist = create_public_system_playlist(
         state,
         &public_display_name,
@@ -281,7 +315,15 @@ async fn create_club_playlist_pair(
     )
     .await?;
 
-    Ok((public_playlist, private_playlist))
+    // insert to DB
+    let private = Playlist::create(state, club_id, private_playlist, true)
+        .await
+        .expect("creating playlist failed");
+    let public = Playlist::create(state, club_id, public_playlist, false)
+        .await
+        .expect("creating playlist failed");
+
+    Ok((public, private))
 }
 
 #[axum::debug_handler]
@@ -339,14 +381,34 @@ pub async fn add_video(
     };
 
     let playlist = if params.private {
-        club.private_playlist
+        // TODO: API for uploading to a specific playlist
+        return (
+            StatusCode::BAD_REQUEST,
+            "cannot add private video through this API",
+        )
+            .into_response();
     } else {
-        club.public_playlist
+        club.main_playlist
     };
 
-    let result =
-        crate::peertube::playlist::add_video_to_playlist(&state, params.video_id, playlist.id)
-            .await;
+    let Some(main_playlist_id) = playlist else {
+        tracing::error!(
+            ?club,
+            "User tried to upload to a club without a main playlist."
+        );
+        return (StatusCode::NOT_FOUND, "no main playlist").into_response();
+    };
+
+    let Some(playlist) = Playlist::lookup_club_playlist(&state, main_playlist_id).await else {
+        return (StatusCode::NOT_FOUND, "no such playlist").into_response();
+    };
+
+    let result = crate::peertube::playlist::add_video_to_playlist(
+        &state,
+        params.video_id,
+        playlist.peertube_info.id,
+    )
+    .await;
 
     if let Err(err) = result {
         tracing::error!(?err, "Adding video to playlist failed");
