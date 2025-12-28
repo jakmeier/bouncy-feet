@@ -20,8 +20,10 @@
    * @property {boolean} [backButton]
    * @property {boolean} [homeLink]
    * @property {null|string} [button]
+   * @property {null|string} [secondButton]
    * @property {()=>void} [onBack]
    * @property {()=>void} [onAction] -- create a plus icon on the top right and trigger this function when selected
+   * @property {()=>void} [onSecondAction]
    */
 
   /** @type {Props} */
@@ -35,10 +37,12 @@
     backButton = false,
     homeLink = false,
     button = null,
+    secondButton = null,
     onBack = () => {
       window.history.back();
     },
     onAction,
+    onSecondAction,
   } = $props();
 
   let bgColor = $derived(
@@ -112,19 +116,34 @@
     {:else}
       <img class="logo" src={imgUrl} alt="Bouncy Feet Logo" />
     {/if}
-    {#if onAction}
-      <UnstyledButton onClick={onAction}>
-        <div class="action">
-          {#if button}
-            <span class="material-symbols-outlined button" translate="no">
-              {button}
-            </span>
-          {:else}
-            <Plus />
-          {/if}
-        </div>
-      </UnstyledButton>
-    {/if}
+    <div class="right-button-group">
+      {#if onSecondAction}
+        <UnstyledButton onClick={onSecondAction}>
+          <div class="action">
+            {#if secondButton}
+              <span class="material-symbols-outlined button" translate="no">
+                {secondButton}
+              </span>
+            {:else}
+              <Plus />
+            {/if}
+          </div>
+        </UnstyledButton>
+      {/if}
+      {#if onAction}
+        <UnstyledButton onClick={onAction}>
+          <div class="action">
+            {#if button}
+              <span class="material-symbols-outlined button" translate="no">
+                {button}
+              </span>
+            {:else}
+              <Plus />
+            {/if}
+          </div>
+        </UnstyledButton>
+      {/if}
+    </div>
   </div>
   {#if !fadingOut.text}
     <h1
@@ -157,6 +176,11 @@
     justify-content: space-between;
   }
 
+  .right-button-group {
+    height: 2rem;
+    display: flex;
+  }
+
   .arrow {
     max-width: 2rem;
     max-height: 1.2rem;
@@ -167,6 +191,13 @@
   .action {
     max-width: 2rem;
     max-height: 2rem;
+    margin: 0 1rem;
+  }
+
+  .button {
+    height: 2rem;
+    display: flex;
+    align-items: center;
   }
 
   .action span {

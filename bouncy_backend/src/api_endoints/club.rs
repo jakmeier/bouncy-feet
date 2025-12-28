@@ -3,7 +3,7 @@ use crate::club::{ClubId, ClubMembership, PublicClubMemberInfo};
 use crate::db::club::Club;
 use crate::peertube::channel::{create_system_channel, PeerTubeChannelHandle, PeerTubeChannelId};
 use crate::peertube::playlist::{create_public_system_playlist, create_unlisted_system_playlist};
-use crate::peertube::{handle_peertube_error, PeerTubeError};
+use crate::peertube::{self, handle_peertube_error, PeerTubeError};
 use crate::playlist::{Playlist, PlaylistInfo};
 use crate::user::{User, UserId};
 use crate::AppState;
@@ -183,7 +183,6 @@ pub async fn create_club(
     State(state): State<AppState>,
     Json(payload): Json<CreateClubsRequest>,
 ) -> Response {
-    // TODO: Set profile pic, with a default image if not selected
     if payload.title.len() > 64 {
         return (StatusCode::BAD_REQUEST, "Title must be at most 64 chars").into_response();
     }
@@ -460,6 +459,77 @@ async fn get_membership(
     }
 
     Ok(result.expect("just checked"))
+}
+
+#[axum::debug_handler]
+pub async fn update_avatar(
+    Extension(user): Extension<User>,
+    State(state): State<AppState>,
+    axum::extract::Path(club_id): axum::extract::Path<ClubId>,
+    mut multipart: axum::extract::Multipart,
+) -> Response {
+    // Check user has permission
+    let membership = match get_membership(&state, user.id, club_id).await {
+        Ok(it) => it,
+        Err(response) => return response,
+    };
+    if !matches!(membership, ClubMembership::Admin) {
+        return (StatusCode::FORBIDDEN, "no permission to update club avatar").into_response();
+    }
+
+    let mut file_bytes = None;
+
+    // Read multipart fields
+    while let Some(field) = multipart.next_field().await.unwrap() {
+        let name = field.name().unwrap_or("");
+
+        if name == "avatar" {
+            let content_type = field.content_type().map(|s| s.to_string());
+
+            if content_type.as_deref() != Some("image/png") {
+                return (StatusCode::BAD_REQUEST, "image must be png").into_response();
+            }
+
+            let data = field.bytes().await.unwrap();
+            file_bytes = Some(data);
+            break;
+        }
+    }
+
+    let file_bytes = match file_bytes {
+        Some(it) => it,
+        None => return (StatusCode::BAD_REQUEST, "No image uploaded").into_response(),
+    };
+
+    // find club channel handle
+    let Some(club) = Club::lookup(&state, club_id).await else {
+        return (StatusCode::NOT_FOUND, "no such club").into_response();
+    };
+    let Some(channel_handle) = club.channel_handle else {
+        return (StatusCode::INTERNAL_SERVER_ERROR, "club has no channel").into_response();
+    };
+
+    // upload image to PeerTube
+    let mut max_retry = 5;
+    let final_result = loop {
+        let result =
+            peertube::channel::update_avatar(&state, channel_handle.clone(), file_bytes.to_vec())
+                .await;
+        if let Err(e) = &result {
+            let retry = handle_peertube_error(&state, e).await;
+            if retry && max_retry > 0 {
+                max_retry -= 1;
+                continue;
+            }
+        }
+        break result;
+    };
+    if let Err(err) = final_result {
+        tracing::error!(?err, "failed uploading avatar");
+        return (StatusCode::BAD_GATEWAY, "failed uploading avatar").into_response();
+    };
+
+    (StatusCode::OK, "OK").into_response()
 }
 
 fn display_name_to_username(input: &str) -> Option<String> {

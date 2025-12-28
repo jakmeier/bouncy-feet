@@ -261,7 +261,7 @@
    * @param {string} method
    * @param {string} path
    * @param {object} headers
-   * @param {string|undefined} body
+   * @param {string|FormData|undefined} body
    * @returns {Promise<import('$lib/stats').ApiResponse>}
    */
   async function authenticatedApiRequest(method, path, headers, body) {
@@ -654,6 +654,7 @@
     },
     authenticatedGet,
     authenticatedPost,
+    authenticatedApiRequest,
     skippedIntro: () => hasSkippedIntro,
     setSkippedIntro: (/** @type {boolean} */ yes) => (hasSkippedIntro = yes),
     loginError,

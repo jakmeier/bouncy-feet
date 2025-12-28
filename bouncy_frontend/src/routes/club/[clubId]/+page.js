@@ -13,17 +13,6 @@ export const load = async ({ fetch, params }) => {
         error(502, 'bad gateway');
     }
 
-    /**
-     * @typedef {object} ClubDetailsResponse
-     * @prop {PublicUserResponse[]} admins
-     * @prop {PublicUserResponse[]} members
-     * @prop {number} [channel_id]
-     * @prop {string} [channel_handle]
-     * @prop {PlaylistInfo} [main_playlist]
-     * @prop {PlaylistInfo[]} public_playlists
-     * @prop {PlaylistInfo[]} private_playlists
-     * @prop {string} [web_link]
-     */
     /** 
     * @type {ClubDetailsResponse}
     */

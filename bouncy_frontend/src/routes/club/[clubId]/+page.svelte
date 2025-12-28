@@ -1,7 +1,5 @@
 <script>
-  import { resolve } from '$app/paths';
   import { page } from '$app/state';
-  import { PUBLIC_BF_PEERTUBE_URL } from '$env/static/public';
   import LoginRequiredContent from '$lib/components/profile/LoginRequiredContent.svelte';
   import ScrollToTop from '$lib/components/ScrollToTop.svelte';
   import ThumbnailFeed from '$lib/components/ThumbnailFeed.svelte';
@@ -18,6 +16,8 @@
   import { t } from '$lib/i18n';
   import { VIDEO_PRIVACY } from '$lib/peertube';
   import { getClubsContext } from '$lib/stores/Clubs.svelte';
+  import ActorAvatar from './ActorAvatar.svelte';
+  import EditClub from './EditClub.svelte';
 
   /** @type {import('./$types').PageProps} */
   let { data } = $props();
@@ -37,21 +37,14 @@
   );
 
   const clubDetails = $derived(data.clubDetails);
-  const logoPath = $derived.by(() => {
-    if (
-      data.clubChannel &&
-      data.clubChannel.avatars &&
-      data.clubChannel.avatars.length >= 1
-    ) {
-      return PUBLIC_BF_PEERTUBE_URL + data.clubChannel.avatars[0].path;
-    } else {
-      return resolve('/img/symbols/bf_club.svg');
-    }
-  });
+  // TODO: isAdmin check
+  // const isAdmin = $derived(clubDetails.admins.findIndex((u) => u.id === myId) !== -1);
+  const isAdmin = true;
 
   let showUsersPopup = $state(false);
   let showAddMorePopup = $state(false);
   let showAddVideoPopup = $state(false);
+  let showEditPopup = $state(false);
   let message = $state('');
   let mainFeed = $state();
 
@@ -109,12 +102,22 @@
   function onAddMore() {
     showAddMorePopup = true;
   }
+
+  function openEdit() {
+    showEditPopup = true;
+  }
 </script>
 
 <ScrollToTop />
 
 <LimeSection>
-  <LogoHeader title={club?.name} backButton onAction={onAddMore} mainColor
+  <LogoHeader
+    title={club?.name}
+    backButton
+    onAction={onAddMore}
+    mainColor
+    onSecondAction={openEdit}
+    secondButton="edit"
   ></LogoHeader>
 
   {#if !club}
@@ -123,7 +126,7 @@
     </div>
   {:else}
     <div class="club-summary">
-      <img class="avatar" src={logoPath} alt="club avatar" />
+      <ActorAvatar actor={data.clubChannel} />
 
       <div class="club-description">
         <div>{club.description}</div>
@@ -155,6 +158,12 @@
           <div>{$t('club.select-user-title')}</div>
           <UserList onSelect={onSelectUser}></UserList>
         {/if}
+      </div>
+    </PopupWithRunes>
+
+    <PopupWithRunes bind:isOpen={showEditPopup}>
+      <div class="popup">
+        <EditClub {clubId} clubChannel={data.clubChannel} />
       </div>
     </PopupWithRunes>
   {/if}
@@ -231,13 +240,5 @@
     grid-template-columns: 1fr 3fr;
     gap: 1rem;
     margin-bottom: 1rem;
-  }
-
-  .avatar {
-    border-radius: 1rem;
-    max-width: 192px;
-    max-height: 192px;
-    width: 100%;
-    border: solid var(--theme-main-medium) 0.25rem;
   }
 </style>

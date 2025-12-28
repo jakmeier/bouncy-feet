@@ -66,3 +66,27 @@ export async function createNewClub(userCtx, title, description) {
     const club = await response?.json();
     clubsData.mine.push(club);
 }
+
+/**
+ * @param {UserContextData} userCtx
+ * @param {number} clubId
+ * @param {Blob} blob
+ */
+export async function updateClubAvatar(userCtx, clubId, blob) {
+
+    const formData = new FormData();
+    formData.append('avatar', blob, 'avatar.png');
+
+    const headers = {};
+    const response = await userCtx.authenticatedApiRequest("POST", `/clubs/${clubId}/avatar`, headers, formData);
+
+    if (response?.status !== 200) {
+        console.error("Failed to update avatar", response);
+        return;
+    }
+
+    /** @type { Club } */
+    const club = await response?.json();
+    clubsData.mine.push(club);
+}
+

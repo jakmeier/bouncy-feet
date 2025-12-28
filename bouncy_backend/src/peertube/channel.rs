@@ -75,6 +75,38 @@ pub(crate) async fn create_system_channel(
     Ok(channel.video_channel.id)
 }
 
+pub async fn update_avatar(
+    state: &AppState,
+    channel: PeerTubeChannelHandle,
+    file_bytes: Vec<u8>,
+) -> Result<(), PeerTubeError> {
+    let part = reqwest::multipart::Part::bytes(file_bytes)
+        .file_name("avatar.png".to_string())
+        .mime_str("image/png")
+        .unwrap();
+
+    let form = reqwest::multipart::Form::new().part("avatarfile", part);
+
+    let url = state
+        .peertube_url
+        .join(&format!("api/v1/video-channels/{}/avatar/pick", channel.0))
+        .expect("must be valid url");
+
+    let token = state.system_user.access_token(state).await?;
+
+    let response = state
+        .http_client
+        .post(url)
+        .bearer_auth(&token)
+        .multipart(form)
+        .send()
+        .await;
+
+    let _ok_response = check_peertube_system_user_response(response, token).await?;
+
+    Ok(())
+}
+
 /// [ min .. max ] characters /^[a-zA-Z0-9\\-_.:]+$/
 fn is_valid_name(s: &str, min: usize, max: usize) -> bool {
     s.len() >= min
