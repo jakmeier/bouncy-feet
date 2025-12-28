@@ -1,0 +1,4 @@
+ALTER TABLE clubs
+ADD COLUMN channel_handle VARCHAR(255),
+ADD COLUMN web_link VARCHAR(255)
+;

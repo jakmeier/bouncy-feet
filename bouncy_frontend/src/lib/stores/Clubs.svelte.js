@@ -32,8 +32,8 @@ export async function loadMyClubs(userCtx) {
 /**
  * @returns {Promise<Club[]>}
  */
-export async function loadPublicClubs() {
-    const response = await apiRequest("/clubs");
+export async function loadPublicClubs(fetch) {
+    const response = await apiRequest("/clubs", {}, fetch);
     if (response.okResponse) {
         /** @type { {clubs: Club[]} } */
         const data = await response.okResponse.json();

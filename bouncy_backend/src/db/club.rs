@@ -1,6 +1,6 @@
 use crate::{
     api_endoints::club::{AddClubMemberRequest, AddClubVideoRequest},
-    peertube::channel::PeerTubeChannelId,
+    peertube::channel::{PeerTubeChannelHandle, PeerTubeChannelId},
     playlist::PlaylistId,
     user::UserId,
     AppState,
@@ -17,6 +17,9 @@ pub struct Club {
     pub title: String,
     pub description: String,
     pub main_playlist: Option<PlaylistId>,
+    pub channel_id: Option<PeerTubeChannelId>,
+    pub channel_handle: Option<PeerTubeChannelHandle>,
+    pub web_link: Option<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -31,8 +34,9 @@ pub(crate) struct ClubRow {
     pub id: i64,
     pub title: String,
     pub description: String,
-    #[allow(dead_code)]
+    pub web_link: Option<String>,
     pub channel_id: Option<i64>,
+    pub channel_handle: Option<String>,
     pub main_playlist: Option<i64>,
 }
 
@@ -63,20 +67,24 @@ impl Club {
         state: &AppState,
         title: &str,
         description: &str,
+        web_link: Option<url::Url>,
         channel_id: PeerTubeChannelId,
+        channel_handle: PeerTubeChannelHandle,
         main_playlist: Option<PlaylistId>,
     ) -> Result<Club, sqlx::Error> {
         let rec = sqlx::query_as!(
             ClubRow,
             r#"
-            INSERT INTO clubs (title, description, channel_id, main_playlist)
-            VALUES ($1, $2, $3, $4)
-            RETURNING id, title, description, channel_id, main_playlist
+            INSERT INTO clubs (title, description, channel_id, main_playlist, channel_handle, web_link)
+            VALUES ($1, $2, $3, $4, $5, $6)
+            RETURNING id, title, description, channel_id, main_playlist, channel_handle, web_link
             "#,
             title,
             description,
             channel_id.num(),
             main_playlist.map(|id| id.num()),
+            channel_handle.0,
+            web_link.as_ref().map(|wl|wl.as_str())
         )
         .fetch_one(&state.pg_db_pool)
         .await?;
@@ -87,7 +95,7 @@ impl Club {
     pub(crate) async fn lookup(state: &AppState, id: ClubId) -> Option<Club> {
         let maybe_club = sqlx::query_as!(
             ClubRow,
-            r#"SELECT id, title, description, channel_id, main_playlist
+            r#"SELECT id, title, description, channel_id, main_playlist, channel_handle, web_link
             FROM clubs
             WHERE id = $1"#,
             id.num()
@@ -104,7 +112,7 @@ impl Club {
         let rows = sqlx::query_as!(
             ClubRow,
             r#"
-            SELECT id, title, description, channel_id, main_playlist
+            SELECT id, title, description, channel_id, main_playlist, channel_handle, web_link
             FROM clubs
             ORDER BY id
             LIMIT $1 OFFSET $2
@@ -259,7 +267,9 @@ impl Club {
             SELECT c.id,
                    c.title,
                    c.description,
+                   c.web_link,
                    c.channel_id,
+                   c.channel_handle,
                    c.main_playlist
             FROM clubs c
             JOIN user_club uc ON uc.club_id = c.id
@@ -310,6 +320,9 @@ impl From<ClubRow> for Club {
             id: ClubId(record.id),
             title: record.title,
             description: record.description,
+            channel_id: record.channel_id.map(PeerTubeChannelId),
+            channel_handle: record.channel_handle.map(PeerTubeChannelHandle),
+            web_link: record.web_link,
         }
     }
 }

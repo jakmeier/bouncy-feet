@@ -1,5 +1,6 @@
 <script>
   import { page } from '$app/state';
+  import { PUBLIC_BF_PEERTUBE_URL } from '$env/static/public';
   import LoginRequiredContent from '$lib/components/profile/LoginRequiredContent.svelte';
   import ScrollToTop from '$lib/components/ScrollToTop.svelte';
   import ThumbnailFeed from '$lib/components/ThumbnailFeed.svelte';
@@ -33,6 +34,8 @@
       clubsData.mine.find((c) => c.id === clubId) ||
       clubsData.public.find((c) => c.id === clubId)
   );
+
+  const clubDetails = $derived(data.clubDetails);
 
   let showUsersPopup = $state(false);
   let showAddMorePopup = $state(false);
@@ -107,24 +110,27 @@
       <Symbol size={100} styleClass="rotating">refresh</Symbol>
     </div>
   {:else}
-    <!-- TODO: image of club: where to upload and store? 
-        user profile pics could be on PeerTube
-        maybe each club should get a system channel, under which playlists (but not videos) are stored
-        then the chanel pic can be the club pic
-     -->
-    <!-- <img src={}/> -->
+    {#if data.clubChannel && data.clubChannel.avatars && data.clubChannel.avatars.length >= 1}
+      <img
+        src="{PUBLIC_BF_PEERTUBE_URL}{data.clubChannel.avatars[0].path}"
+        alt="club avatar"
+        width="192px"
+        height="192px"
+      />
+    {/if}
     <p>{club.description}</p>
-    <!-- TODO: link associated with club -->
-    <!-- <a class="link" href="https://www.east-attitude.com/shuffle-dance"
-      >https://www.east-attitude.com/shuffle-dance</a
-    > -->
+    {#if clubDetails.web_link}
+      <a class="link" href={clubDetails.web_link}>{clubDetails.web_link}</a>
+    {/if}
 
     <h2>Public Club Videos</h2>
-    <ThumbnailFeed bind:this={mainFeed} playlistId={data.main_playlist.id}
+    <ThumbnailFeed
+      bind:this={mainFeed}
+      playlistId={clubDetails.main_playlist.id}
     ></ThumbnailFeed>
 
-    {#each data.public_playlists as playlist}
-      {#if playlist.id != data.main_playlist.id}
+    {#each clubDetails.public_playlists as playlist}
+      {#if playlist.id != clubDetails.main_playlist.id}
         <!-- TODO: playlist title -->
         <h2>Playlist {playlist.id}</h2>
         <ThumbnailFeed playlistId={playlist.id}></ThumbnailFeed>
@@ -147,13 +153,13 @@
 <LightSection>
   <h2>{$t('club.admins-title')}</h2>
   <ul>
-    {#each data.admins as user}
+    {#each clubDetails.admins as user}
       <li>{user.display_name}</li>
     {/each}
   </ul>
   <h2>{$t('club.members-title')}</h2>
   <ul>
-    {#each data.members as user}
+    {#each clubDetails.members as user}
       <li>{user.display_name}</li>
     {/each}
   </ul>
@@ -201,5 +207,12 @@
   .loading {
     text-align: center;
     margin: 2rem 0;
+  }
+
+  .link {
+    text-decoration: underline;
+  }
+  .link:hover {
+    color: var(--theme-accent-dark);
   }
 </style>

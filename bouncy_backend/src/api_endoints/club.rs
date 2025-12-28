@@ -1,7 +1,7 @@
 use crate::api_endoints::user::PublicUserInfoResponse;
 use crate::club::{ClubId, ClubMembership, PublicClubMemberInfo};
 use crate::db::club::Club;
-use crate::peertube::channel::{create_system_channel, PeerTubeChannelId};
+use crate::peertube::channel::{create_system_channel, PeerTubeChannelHandle, PeerTubeChannelId};
 use crate::peertube::playlist::{create_public_system_playlist, create_unlisted_system_playlist};
 use crate::peertube::{handle_peertube_error, PeerTubeError};
 use crate::playlist::{Playlist, PlaylistInfo};
@@ -16,6 +16,7 @@ use axum::{Extension, Json};
 pub struct CreateClubsRequest {
     title: String,
     description: String,
+    url: Option<String>,
 }
 
 #[derive(serde::Serialize)]
@@ -51,9 +52,12 @@ struct ClubInfo {
 pub(crate) struct ClubDetails {
     admins: Vec<PublicUserInfoResponse>,
     members: Vec<PublicUserInfoResponse>,
+    channel_id: Option<PeerTubeChannelId>,
+    channel_handle: Option<PeerTubeChannelHandle>,
     main_playlist: Option<PlaylistInfo>,
     public_playlists: Vec<PlaylistInfo>,
     private_playlist: Vec<PlaylistInfo>,
+    web_link: Option<String>,
 }
 
 #[derive(serde::Deserialize)]
@@ -166,6 +170,9 @@ pub async fn club(
         // TODO: access check to private playlists!
         // private_playlist,
         private_playlist: vec![],
+        channel_id: club.channel_id,
+        channel_handle: club.channel_handle,
+        web_link: club.web_link,
     };
     Ok(Json(details))
 }
@@ -176,6 +183,7 @@ pub async fn create_club(
     State(state): State<AppState>,
     Json(payload): Json<CreateClubsRequest>,
 ) -> Response {
+    // TODO: Set profile pic, with a default image if not selected
     if payload.title.len() > 64 {
         return (StatusCode::BAD_REQUEST, "Title must be at most 64 chars").into_response();
     }
@@ -201,17 +209,33 @@ pub async fn create_club(
         }
         break result;
     };
-    let Ok(channel_id) = channel_result else {
+    let Ok((channel_id, channel_handle)) = channel_result else {
         let err = channel_result.unwrap_err();
         tracing::error!(?err, "failed creating channel");
         return (StatusCode::INTERNAL_SERVER_ERROR, "failed creating channel").into_response();
+    };
+
+    let maybe_url = {
+        if let Some(raw_url) = &payload.url {
+            let url = url::Url::parse(raw_url);
+            match url {
+                Ok(it) => Some(it),
+                Err(_err) => {
+                    return (StatusCode::BAD_REQUEST, "invalid URL in web_link").into_response();
+                }
+            }
+        } else {
+            None
+        }
     };
 
     let club_res: Result<Club, sqlx::Error> = Club::create(
         &state,
         &payload.title,
         &payload.description,
+        maybe_url,
         channel_id,
+        channel_handle,
         // Create without playlist first, so the playlist can be created with a club id.
         None,
     )
@@ -278,14 +302,15 @@ pub async fn create_club(
 async fn create_club_channel(
     state: &AppState,
     name: &str,
-) -> Result<PeerTubeChannelId, PeerTubeError> {
+) -> Result<(PeerTubeChannelId, PeerTubeChannelHandle), PeerTubeError> {
     let description = format!("auto-generated channel for the club {name}");
     let display_name = name.to_owned();
     let Some(id_name) = display_name_to_username(&display_name) else {
         return Err(PeerTubeError::ClientValidationError(display_name));
     };
 
-    create_system_channel(state, id_name, display_name, Some(description)).await
+    let id = create_system_channel(state, id_name.clone(), display_name, Some(description)).await?;
+    Ok((id, PeerTubeChannelHandle(id_name)))
 }
 
 async fn create_club_playlist_pair(

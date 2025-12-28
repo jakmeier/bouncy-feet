@@ -1,0 +1,58 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT c.id,\n                   c.title,\n                   c.description,\n                   c.web_link,\n                   c.channel_id,\n                   c.channel_handle,\n                   c.main_playlist\n            FROM clubs c\n            JOIN user_club uc ON uc.club_id = c.id\n            WHERE uc.user_id = $1\n            ORDER BY c.id\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "description",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "web_link",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "channel_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 5,
+        "name": "channel_handle",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "main_playlist",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "fd599084b43d486aeae43b1b9eb107eceaa562a6f2278e1017ca3992f095cc4f"
+}

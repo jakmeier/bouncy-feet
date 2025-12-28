@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT id, title, description, channel_id, main_playlist\n            FROM clubs\n            ORDER BY id\n            LIMIT $1 OFFSET $2\n            ",
+  "query": "\n            SELECT id, title, description, channel_id, main_playlist, channel_handle, web_link\n            FROM clubs\n            ORDER BY id\n            LIMIT $1 OFFSET $2\n            ",
   "describe": {
     "columns": [
       {
@@ -27,6 +27,16 @@
         "ordinal": 4,
         "name": "main_playlist",
         "type_info": "Int8"
+      },
+      {
+        "ordinal": 5,
+        "name": "channel_handle",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "web_link",
+        "type_info": "Varchar"
       }
     ],
     "parameters": {
@@ -40,8 +50,10 @@
       false,
       false,
       true,
+      true,
+      true,
       true
     ]
   },
-  "hash": "1b16f2b6235faf4bbdd89b0c5fe287dea4afb94ad2c8241fd4a0582fe58f8460"
+  "hash": "b566d5d8481895f9cf7bb1f65c1f031eecb37035a91dd9db22adb3f7c656f322"
 }

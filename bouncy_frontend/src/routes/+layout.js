@@ -58,7 +58,7 @@ export const load = async ({ fetch, data }) => {
     /** @type {Course[]} */
     // @ts-ignore
     const courses = coursesResults.filter((c) => c);
-    const publicClubs = await loadPublicClubs();
+    const publicClubs = await loadPublicClubs(fetch);
 
     return {
         i18n,

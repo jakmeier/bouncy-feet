@@ -31,12 +31,14 @@ export async function requestNewGuestSession() {
 /**
  * @param {string} endpoint
  * @param {object} options
+ * @param {(input: any) => Promise<Response>} [svelteFetch]
  * @returns {Promise<ApiResponse>}
  */
-export async function apiRequest(endpoint, options = {}) {
+export async function apiRequest(endpoint, options = {}, svelteFetch) {
     let response;
+    const resolvedFetch = svelteFetch || fetch;
     try {
-        response = await fetch(`${PUBLIC_API_BASE}${endpoint}`, {
+        response = await resolvedFetch(`${PUBLIC_API_BASE}${endpoint}`, {
             ...options,
             credentials: 'include', // Include cookies in the request
         });

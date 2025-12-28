@@ -3,9 +3,13 @@ use crate::{
     AppState,
 };
 
-#[derive(Clone, Copy, Debug, serde::Deserialize)]
+#[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
 #[serde(transparent)]
 pub(crate) struct PeerTubeChannelId(pub i64);
+
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
+#[serde(transparent)]
+pub(crate) struct PeerTubeChannelHandle(pub String);
 
 #[derive(Debug, Clone, serde::Serialize)]
 pub(crate) struct CreateChannel {
