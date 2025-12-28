@@ -48,6 +48,8 @@
         "description-0": "Psssst...",
         "description-1": "...in diesen Gruppen kannst du Videos mit Freunden teilen.",
         "description-2": "Videos werden nicht öffentlich geteilt.",
+        "public-videos-title": "Öffentliche Club Videos",
+        "private-videos-title": "Private Club Videos",
         "add-user-button": "Mitglied hinzufügen",
         "create-new-title": "Gründe einen neuen Club",
         "create-new-button": "Club erstellen",

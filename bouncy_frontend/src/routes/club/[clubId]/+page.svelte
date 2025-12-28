@@ -1,4 +1,5 @@
 <script>
+  import { resolve } from '$app/paths';
   import { page } from '$app/state';
   import { PUBLIC_BF_PEERTUBE_URL } from '$env/static/public';
   import LoginRequiredContent from '$lib/components/profile/LoginRequiredContent.svelte';
@@ -36,6 +37,17 @@
   );
 
   const clubDetails = $derived(data.clubDetails);
+  const logoPath = $derived.by(() => {
+    if (
+      data.clubChannel &&
+      data.clubChannel.avatars &&
+      data.clubChannel.avatars.length >= 1
+    ) {
+      return PUBLIC_BF_PEERTUBE_URL + data.clubChannel.avatars[0].path;
+    } else {
+      return resolve('/img/symbols/bf_club.svg');
+    }
+  });
 
   let showUsersPopup = $state(false);
   let showAddMorePopup = $state(false);
@@ -110,20 +122,18 @@
       <Symbol size={100} styleClass="rotating">refresh</Symbol>
     </div>
   {:else}
-    {#if data.clubChannel && data.clubChannel.avatars && data.clubChannel.avatars.length >= 1}
-      <img
-        src="{PUBLIC_BF_PEERTUBE_URL}{data.clubChannel.avatars[0].path}"
-        alt="club avatar"
-        width="192px"
-        height="192px"
-      />
-    {/if}
-    <p>{club.description}</p>
+    <div class="club-summary">
+      <img class="avatar" src={logoPath} alt="club avatar" />
+
+      <div class="club-description">
+        <div>{club.description}</div>
+      </div>
+    </div>
     {#if clubDetails.web_link}
       <a class="link" href={clubDetails.web_link}>{clubDetails.web_link}</a>
     {/if}
 
-    <h2>Public Club Videos</h2>
+    <h2>{$t('club.public-videos-title')}</h2>
     <ThumbnailFeed
       bind:this={mainFeed}
       playlistId={clubDetails.main_playlist.id}
@@ -214,5 +224,20 @@
   }
   .link:hover {
     color: var(--theme-accent-dark);
+  }
+
+  .club-summary {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .avatar {
+    border-radius: 1rem;
+    max-width: 192px;
+    max-height: 192px;
+    width: 100%;
+    border: solid var(--theme-main-medium) 0.25rem;
   }
 </style>
