@@ -5,16 +5,28 @@
 
   /**
    * @typedef {Object} Props
-   * @property {api.Actor | null} actor
+   * @property {api.Actor} [actor]
    * @property {string} [defaultSymbol]
+   * @property {number} [targetWidth]
    */
 
   /** @type {Props} */
-  let { actor, defaultSymbol = '/img/symbols/bf_club.svg' } = $props();
+  let {
+    actor,
+    defaultSymbol = '/img/symbols/bf_club.svg',
+    targetWidth = 192,
+  } = $props();
 
   const logoPath = $derived.by(() => {
     if (actor && actor.avatars && actor.avatars.length >= 1) {
-      return PUBLIC_BF_PEERTUBE_URL + actor.avatars[0].path;
+      let i = 0;
+      while (
+        i + 1 < actor.avatars.length &&
+        actor.avatars[i].width < targetWidth
+      ) {
+        i += 1;
+      }
+      return PUBLIC_BF_PEERTUBE_URL + actor.avatars[i].path;
     } else {
       return resolve(defaultSymbol);
     }

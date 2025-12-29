@@ -180,6 +180,7 @@ async fn main() -> anyhow::Result<()> {
             post(api_endoints::club::add_club_member),
         )
         .route("/clubs/video/add", post(api_endoints::club::add_video))
+        .route("/clubs/{club_id}", post(api_endoints::club::update_club))
         .route(
             "/clubs/{club_id}/avatar",
             post(api_endoints::club::update_avatar),

@@ -42,6 +42,10 @@
     });
   }
 
+  export function openFileInput() {
+    fileInput.click();
+  }
+
   /** @param {Event} e */
   function onFileChange(e) {
     /** @type {HTMLInputElement} */
@@ -146,10 +150,12 @@
 
 <style>
   canvas {
-    display: block;
-    margin-top: 0.5rem;
+    max-width: 100%;
+    margin: 1rem 0;
     border: 1px solid #ccc;
     touch-action: none;
     cursor: grab;
+    border-radius: 1rem;
+    border: solid var(--theme-main-medium) 0.25rem;
   }
 </style>

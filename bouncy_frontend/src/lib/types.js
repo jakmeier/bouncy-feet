@@ -214,7 +214,12 @@
  * @property {PlaylistInfo[]} private_playlists
  * @property {string} [web_link]
  *
- * 
+ *
+ * @typedef {object} EditableClubDetails
+ * @property {string} description
+ * @property {string} [url]
+ *
+ *
  * @typedef {Object} PlaylistInfo
  * @property {number} id
  * @property {string} short_uuid

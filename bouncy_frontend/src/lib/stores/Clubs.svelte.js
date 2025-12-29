@@ -48,14 +48,23 @@ export async function loadPublicClubs(fetch) {
  * @param {UserContextData} userCtx
  * @param {string} title
  * @param {string} description
+ * @param {string} [url]
+ * @returns {Promise<Club|undefined>}
  */
-export async function createNewClub(userCtx, title, description) {
-    if (title.length > 64 || description.length > 1024) {
+export async function createNewClub(userCtx, title, description, url) {
+    if (title.length > 64 || description.length > 1024 || (url && url.length > 255)) {
         // UI should catch this!
-        throw new Error("club title or description too long");
+        throw new Error("club title, url, or description too long");
     }
 
-    const response = await userCtx.authenticatedPost("/clubs/create", { title, description });
+    if (url?.length === 0) {
+        url = undefined
+    };
+    if (url) {
+        url = validateUrl(url);
+    }
+
+    const response = await userCtx.authenticatedPost("/clubs/create", { title, description, url });
 
     if (response?.status !== 201) {
         console.error("Failed to create club", response);
@@ -65,6 +74,7 @@ export async function createNewClub(userCtx, title, description) {
     /** @type { Club } */
     const club = await response?.json();
     clubsData.mine.push(club);
+    return club;
 }
 
 /**
@@ -80,13 +90,44 @@ export async function updateClubAvatar(userCtx, clubId, blob) {
     const headers = {};
     const response = await userCtx.authenticatedApiRequest("POST", `/clubs/${clubId}/avatar`, headers, formData);
 
-    if (response?.status !== 200) {
-        console.error("Failed to update avatar", response);
+    if (response.error) {
+        console.error("Failed to update avatar", response.error, response.errorBody);
+        return;
+    }
+}
+
+/**
+ * @param {UserContextData} userCtx
+ * @param {number} clubId
+ * @param {EditableClubDetails} details
+ */
+export async function updateClub(userCtx, clubId, details) {
+
+    const response = await userCtx.authenticatedPost(`/clubs/${clubId}`, details);
+
+    if (!response?.ok) {
+        console.error("Failed to update club", response);
         return;
     }
 
-    /** @type { Club } */
-    const club = await response?.json();
-    clubsData.mine.push(club);
+    const index = clubsData.mine.findIndex((club) => club.id == clubId);
+    if (index != -1) {
+        clubsData.mine[index].description = details.description;
+    }
 }
 
+/**
+ * @param {string} input
+ * @returns {string}
+ */
+function validateUrl(input) {
+    let prefixedUrl = input;
+
+    if (!input.startsWith("http")) {
+        prefixedUrl = "https://" + input;
+    }
+
+    // throws an error if it's an invalid url
+    const url = new URL(prefixedUrl);
+    return url.href;
+}

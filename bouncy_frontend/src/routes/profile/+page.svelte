@@ -9,7 +9,6 @@
   import { getUserContext } from '$lib/context';
   import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
   import DarkSection from '$lib/components/ui/sections/DarkSection.svelte';
-  import Clubs from '../Clubs.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
   import LimeSection from '$lib/components/ui/sections/LimeSection.svelte';
   import LoginRequiredContent from '$lib/components/profile/LoginRequiredContent.svelte';
@@ -17,9 +16,10 @@
   import { fetchMyVideos } from '$lib/peertube';
   import LightSection from '$lib/components/ui/sections/LightSection.svelte';
   import NightSection from '$lib/components/ui/sections/NightSection.svelte';
-  import CreateClub from '../CreateClub.svelte';
   import ThumbnailJuggler from '$lib/components/ui/ThumbnailJuggler.svelte';
   import ScrollToTop from '$lib/components/ScrollToTop.svelte';
+  import Clubs from '$lib/components/club/Clubs.svelte';
+  import CreateClub from '$lib/components/club/CreateClub.svelte';
 
   /** @type {UserContextData} */
   const { store: user, setUserMeta, logout } = getUserContext();

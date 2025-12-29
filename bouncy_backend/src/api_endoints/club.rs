@@ -24,6 +24,12 @@ struct ClubsResponse {
     clubs: Vec<ClubInfo>,
 }
 
+#[derive(serde::Deserialize)]
+pub struct UpdateClubRequest {
+    description: String,
+    url: Option<String>,
+}
+
 /// Club summary, contains information for displaying a list of clubs.
 #[derive(serde::Serialize)]
 struct ClubInfo {
@@ -193,6 +199,11 @@ pub async fn create_club(
         )
             .into_response();
     }
+    let maybe_url = match validate_web_link(payload.url.as_deref()) {
+        Ok(it) => it,
+        Err(err) => return err.into_response(),
+    };
+
     // Check unique name? (not enforced on db)
     // Limit clubs per user?
 
@@ -212,20 +223,6 @@ pub async fn create_club(
         let err = channel_result.unwrap_err();
         tracing::error!(?err, "failed creating channel");
         return (StatusCode::INTERNAL_SERVER_ERROR, "failed creating channel").into_response();
-    };
-
-    let maybe_url = {
-        if let Some(raw_url) = &payload.url {
-            let url = url::Url::parse(raw_url);
-            match url {
-                Ok(it) => Some(it),
-                Err(_err) => {
-                    return (StatusCode::BAD_REQUEST, "invalid URL in web_link").into_response();
-                }
-            }
-        } else {
-            None
-        }
     };
 
     let club_res: Result<Club, sqlx::Error> = Club::create(
@@ -348,6 +345,46 @@ async fn create_club_playlist_pair(
         .expect("creating playlist failed");
 
     Ok((public, private))
+}
+
+#[axum::debug_handler]
+pub async fn update_club(
+    Extension(user): Extension<User>,
+    State(state): State<AppState>,
+    axum::extract::Path(club_id): axum::extract::Path<ClubId>,
+    Json(payload): Json<UpdateClubRequest>,
+) -> Response {
+    if payload.description.len() > 1024 {
+        return (
+            StatusCode::BAD_REQUEST,
+            "Description must be at most 1024 chars",
+        )
+            .into_response();
+    }
+    if payload.url.as_ref().is_some_and(|s| s.len() > 255) {
+        return (StatusCode::BAD_REQUEST, "URL must be at most 255 chars").into_response();
+    }
+    let maybe_url = match validate_web_link(payload.url.as_deref()) {
+        Ok(it) => it,
+        Err(err) => return err.into_response(),
+    };
+
+    // Check user has permission
+    let membership = match get_membership(&state, user.id, club_id).await {
+        Ok(it) => it,
+        Err(response) => return response,
+    };
+    if !matches!(membership, ClubMembership::Admin) {
+        return (StatusCode::FORBIDDEN, "no permission to update club").into_response();
+    }
+
+    let res = Club::set_meta_fields(&state, club_id, payload.description, maybe_url).await;
+    if let Err(err) = res {
+        tracing::error!(?err, "DB error on update_club");
+        return (StatusCode::INTERNAL_SERVER_ERROR, "Internal error").into_response();
+    }
+
+    (StatusCode::OK, "OK").into_response()
 }
 
 #[axum::debug_handler]
@@ -530,6 +567,24 @@ pub async fn update_avatar(
     };
 
     (StatusCode::OK, "OK").into_response()
+}
+
+fn validate_web_link(
+    raw_url: Option<&str>,
+) -> Result<Option<url::Url>, (StatusCode, &'static str)> {
+    if raw_url.as_ref().is_some_and(|s| s.len() > 255) {
+        return Err((StatusCode::BAD_REQUEST, "URL must be at most 255 chars"));
+    }
+
+    if let Some(raw_url) = &raw_url {
+        let url = url::Url::parse(raw_url);
+        match url {
+            Ok(it) => Ok(Some(it)),
+            Err(_err) => Err((StatusCode::BAD_REQUEST, "invalid URL in web_link")),
+        }
+    } else {
+        Ok(None)
+    }
 }
 
 fn display_name_to_username(input: &str) -> Option<String> {

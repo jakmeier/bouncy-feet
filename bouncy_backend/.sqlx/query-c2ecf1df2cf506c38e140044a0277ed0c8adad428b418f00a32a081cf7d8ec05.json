@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE clubs\n            SET description = $1,\n                web_link = $2\n            WHERE clubs.id = $3;\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Varchar",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "c2ecf1df2cf506c38e140044a0277ed0c8adad428b418f00a32a081cf7d8ec05"
+}

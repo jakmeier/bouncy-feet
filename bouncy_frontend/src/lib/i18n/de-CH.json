@@ -53,6 +53,7 @@
         "add-user-button": "Mitglied hinzufügen",
         "create-new-title": "Gründe einen neuen Club",
         "create-new-button": "Club erstellen",
+        "update-button": "Club speichern",
         "upload-video-button": "Video hochladen",
         "upload-video-description": "Video öffentlich zum Club hinzufügen",
         "select-user-title": "Wähle Tänzer/in",
@@ -65,6 +66,8 @@
         "members-title": "Mitglieder",
         "requires-login-description": "Dieser Bereich vom Club ist privat.",
         "form-title": "Name",
+        "form-url": "Webseite / Social Link",
+        "form-logo": "Logo",
         "form-description": "Beschreibung"
     },
     "courses": {
@@ -308,6 +311,7 @@
         "button-login": "Einloggen",
         "button-register": "Registrieren",
         "button-cancel": "Geh zurück",
+        "button-select-image": "Bild wählen",
         "requires-login-title": "Wer bist du?",
         "requires-login-text": "Logg dich ein oder erstelle jetzt ein gratis Konto.",
         "guest-mode-text": "Du bist im Gastmodus.",

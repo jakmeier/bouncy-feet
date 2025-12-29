@@ -1,5 +1,7 @@
 <script>
+  import { goto } from '$app/navigation';
   import { page } from '$app/state';
+  import ActorAvatar from '$lib/components/profile/ActorAvatar.svelte';
   import LoginRequiredContent from '$lib/components/profile/LoginRequiredContent.svelte';
   import ScrollToTop from '$lib/components/ScrollToTop.svelte';
   import ThumbnailFeed from '$lib/components/ThumbnailFeed.svelte';
@@ -16,8 +18,6 @@
   import { t } from '$lib/i18n';
   import { VIDEO_PRIVACY } from '$lib/peertube';
   import { getClubsContext } from '$lib/stores/Clubs.svelte';
-  import ActorAvatar from './ActorAvatar.svelte';
-  import EditClub from './EditClub.svelte';
 
   /** @type {import('./$types').PageProps} */
   let { data } = $props();
@@ -44,7 +44,6 @@
   let showUsersPopup = $state(false);
   let showAddMorePopup = $state(false);
   let showAddVideoPopup = $state(false);
-  let showEditPopup = $state(false);
   let message = $state('');
   let mainFeed = $state();
 
@@ -104,7 +103,7 @@
   }
 
   function openEdit() {
-    showEditPopup = true;
+    goto('./edit');
   }
 </script>
 
@@ -158,12 +157,6 @@
           <div>{$t('club.select-user-title')}</div>
           <UserList onSelect={onSelectUser}></UserList>
         {/if}
-      </div>
-    </PopupWithRunes>
-
-    <PopupWithRunes bind:isOpen={showEditPopup}>
-      <div class="popup">
-        <EditClub {clubId} clubChannel={data.clubChannel} />
       </div>
     </PopupWithRunes>
   {/if}

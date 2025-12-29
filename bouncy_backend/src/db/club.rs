@@ -305,6 +305,30 @@ impl Club {
 
         Ok(())
     }
+
+    /// Update fields that admins can just modify, unlike fields that are fixed after creation or that require linked changes in PeerTube.
+    pub async fn set_meta_fields(
+        state: &AppState,
+        club_id: ClubId,
+        description: String,
+        web_link: Option<url::Url>,
+    ) -> Result<(), sqlx::Error> {
+        sqlx::query!(
+            r#"
+            UPDATE clubs
+            SET description = $1,
+                web_link = $2
+            WHERE clubs.id = $3;
+            "#,
+            description,
+            web_link.as_ref().map(|wl| wl.as_str()),
+            club_id.num(),
+        )
+        .execute(&state.pg_db_pool)
+        .await?;
+
+        Ok(())
+    }
 }
 
 impl ClubId {

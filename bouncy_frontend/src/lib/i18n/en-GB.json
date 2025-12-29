@@ -53,6 +53,7 @@
         "add-user-button": "Add club member",
         "create-new-title": "Found a new Club",
         "create-new-button": "Create club",
+        "update-button": "Save club",
         "upload-video-button": "Upload video",
         "upload-video-description": "Add public club video",
         "select-user-title": "Select dancer",
@@ -65,6 +66,8 @@
         "members-title": "Members",
         "requires-login-description": "This part of the club is private.",
         "form-title": "Name",
+        "form-url": "Website / Social Link",
+        "form-logo": "Logo",
         "form-description": "Description"
     },
     "courses": {
@@ -308,6 +311,7 @@
         "button-login": "Login",
         "button-register": "Register",
         "button-cancel": "Go back",
+        "button-select-image": "Select image",
         "requires-login-title": "Who are you?",
         "requires-login-text": "Log in or create your free account now.",
         "guest-mode-text": "You are in guest mode.",
