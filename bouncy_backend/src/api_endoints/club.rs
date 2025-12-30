@@ -31,8 +31,8 @@ pub struct UpdateClubRequest {
 }
 
 /// Club summary, contains information for displaying a list of clubs.
-#[derive(serde::Serialize)]
-struct ClubInfo {
+#[derive(Clone, Debug, serde::Serialize)]
+pub(crate) struct ClubInfo {
     /// BF API club id = DB id
     id: i64,
     name: String,
@@ -114,9 +114,12 @@ pub async fn my_clubs(Extension(user): Extension<User>, State(state): State<AppS
 async fn db_clubs_to_club_infos(state: &AppState, db_clubs: Vec<Club>) -> Vec<ClubInfo> {
     let mut out = Vec::with_capacity(db_clubs.len());
     for club in db_clubs {
+        if let Some(cached) = state.clubs_cache.club_info(club.id) {
+            out.push(cached.clone());
+            continue;
+        }
         let mut avatar = None;
         if let Some(channel_handle) = &club.channel_handle {
-            // TODO: these requests require caching
             let response = peertube::channel::fetch_channel(state, channel_handle).await;
 
             if let Ok(channel) = response {
@@ -139,6 +142,7 @@ async fn db_clubs_to_club_infos(state: &AppState, db_clubs: Vec<Club>) -> Vec<Cl
             description: club.description,
             avatar,
         };
+        state.clubs_cache.insert_club_info(club.id, info.clone());
         out.push(info)
     }
     out
@@ -457,6 +461,7 @@ pub async fn update_club(
         return (StatusCode::INTERNAL_SERVER_ERROR, "Internal error").into_response();
     }
 
+    state.clubs_cache.invalidate_club(club_id);
     (StatusCode::OK, "OK").into_response()
 }
 
@@ -639,6 +644,7 @@ pub async fn update_avatar(
         return (StatusCode::BAD_GATEWAY, "failed uploading avatar").into_response();
     };
 
+    state.clubs_cache.invalidate_club(club_id);
     (StatusCode::OK, "OK").into_response()
 }
 

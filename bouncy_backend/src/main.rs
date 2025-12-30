@@ -1,5 +1,6 @@
 use crate::api_endoints::auth::KeycloakClientConfig;
 use crate::api_endoints::peertube_token::{self, peertube_token_exchange};
+use crate::cache::ClubsCache;
 use crate::layers::oidc::{oidc_auth_layer, oidc_login_layer};
 use crate::layers::session::pg_backed_cookie_session_layer;
 use crate::peertube::system_user::PeerTubeSystemUser;
@@ -19,6 +20,7 @@ use tracing::Level;
 use url::Url;
 
 pub(crate) mod api_endoints;
+pub(crate) mod cache;
 pub(crate) mod db;
 pub(crate) mod layers;
 pub(crate) mod peertube;
@@ -37,6 +39,7 @@ struct AppState {
     peertube_client_config: Arc<tokio::sync::RwLock<Option<peertube_token::OAuthClientConfig>>>,
     kc_config: KeycloakClientConfig,
     system_user: PeerTubeSystemUser,
+    clubs_cache: ClubsCache,
 }
 
 #[tokio::main]
@@ -101,6 +104,7 @@ async fn main() -> anyhow::Result<()> {
             logout_url: kc_logout_url,
         },
         system_user,
+        clubs_cache: Default::default(),
     };
 
     let user_service = middleware::from_fn_with_state(state.clone(), layers::user::user_lookup);
