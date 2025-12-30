@@ -38,6 +38,13 @@ struct ClubInfo {
     name: String,
     // lang: String, needed ?? -> not yet, maybe at some point
     description: String,
+
+    /// full file path for 120x120 pixel avatar of the channel
+    avatar: Option<String>,
+    // could be added but not needed for listing
+    // channel_id: Option<PeerTubeChannelId>,
+    // channel_handle: Option<PeerTubeChannelHandle>,
+
     // TODO
     // style
 
@@ -99,20 +106,42 @@ pub async fn my_clubs(Extension(user): Extension<User>, State(state): State<AppS
         return (StatusCode::INTERNAL_SERVER_ERROR, "DB ERROR").into_response();
     };
 
-    let clubs = db_clubs_to_club_infos(db_clubs);
+    let clubs = db_clubs_to_club_infos(&state, db_clubs).await;
     let response = ClubsResponse { clubs };
     (StatusCode::OK, Json(response)).into_response()
 }
 
-fn db_clubs_to_club_infos(db_clubs: Vec<Club>) -> Vec<ClubInfo> {
-    db_clubs
-        .into_iter()
-        .map(|club| ClubInfo {
+async fn db_clubs_to_club_infos(state: &AppState, db_clubs: Vec<Club>) -> Vec<ClubInfo> {
+    let mut out = Vec::with_capacity(db_clubs.len());
+    for club in db_clubs {
+        let mut avatar = None;
+        if let Some(channel_handle) = &club.channel_handle {
+            // TODO: these requests require caching
+            let response = peertube::channel::fetch_channel(state, channel_handle).await;
+
+            if let Ok(channel) = response {
+                if !channel.avatars.is_empty() {
+                    let preferred_size = channel
+                        .avatars
+                        .iter()
+                        .find(|a| a.height >= 120)
+                        .unwrap_or(&channel.avatars[0]);
+                    avatar = Some(preferred_size.file_url.clone());
+                }
+            } else {
+                let err = response.unwrap_err();
+                tracing::warn!(?err, "Failed reading channel");
+            }
+        }
+        let info = ClubInfo {
             id: club.id.num(),
             name: club.title,
             description: club.description,
-        })
-        .collect()
+            avatar,
+        };
+        out.push(info)
+    }
+    out
 }
 
 /// Retrieve publicly listed clubs.
@@ -126,7 +155,7 @@ pub async fn clubs(State(state): State<AppState>) -> Response {
         return (StatusCode::INTERNAL_SERVER_ERROR, "DB ERROR").into_response();
     };
 
-    let clubs = db_clubs_to_club_infos(db_clubs);
+    let clubs = db_clubs_to_club_infos(&state, db_clubs).await;
     let response = ClubsResponse { clubs };
     (StatusCode::OK, Json(response)).into_response()
 }
@@ -331,6 +360,10 @@ pub async fn create_club(
         id: club.id.num(),
         name: club.title,
         description: club.description,
+        // The avatar isn't set on the channel, yet. Even if the user selected
+        // one, is's set with an update afterwards. Not ideal, but it can be
+        // handled by the client to show display it after the update.
+        avatar: None,
     };
     (StatusCode::CREATED, Json(club_info)).into_response()
 }

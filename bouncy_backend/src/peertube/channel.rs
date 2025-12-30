@@ -1,7 +1,8 @@
 use crate::{
-    peertube::{check_peertube_system_user_response, PeerTubeError},
+    peertube::{check_peertube_response, check_peertube_system_user_response, PeerTubeError},
     AppState,
 };
+use chrono::{DateTime, Utc};
 
 #[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
 #[serde(transparent)]
@@ -29,6 +30,48 @@ pub(crate) struct CreateChannelResponse {
 #[derive(Debug, Clone, serde::Deserialize)]
 struct ChannelIdResponse {
     id: PeerTubeChannelId,
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ChannelResponse {
+    pub id: PeerTubeChannelId,
+    pub url: Option<String>,
+    pub name: String,
+    pub avatars: Vec<Avatar>,
+    pub host: String,
+    pub host_redundancy_allowed: Option<bool>,
+    pub following_count: i32,
+    pub followers_count: i32,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+    pub display_name: String,
+    pub description: Option<String>,
+    pub support: Option<String>,
+    pub is_local: bool,
+    pub banners: Vec<Banner>,
+    // always system channel, not interesting
+    // pub owner_account: OwnerAccount,
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct Avatar {
+    pub file_url: String,
+    pub width: i32,
+    pub height: i32,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct Banner {
+    pub file_url: String,
+    pub width: i32,
+    pub height: i32,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
 }
 
 pub(crate) async fn create_system_channel(
@@ -73,6 +116,23 @@ pub(crate) async fn create_system_channel(
     let channel: Result<CreateChannelResponse, _> = ok_response.json().await;
     let channel = channel.map_err(|err| PeerTubeError::JsonParsingFailed(status, err))?;
     Ok(channel.video_channel.id)
+}
+
+pub async fn fetch_channel(
+    state: &AppState,
+    channel: &PeerTubeChannelHandle,
+) -> Result<ChannelResponse, PeerTubeError> {
+    let url = state
+        .peertube_url
+        .join(&format!("api/v1/video-channels/{}", channel.0))
+        .expect("must be valid url");
+
+    let response = state.http_client.get(url).send().await;
+    let ok_response = check_peertube_response(response).await?;
+    let status = ok_response.status();
+    let channel: Result<ChannelResponse, _> = ok_response.json().await;
+    let channel = channel.map_err(|err| PeerTubeError::JsonParsingFailed(status, err))?;
+    Ok(channel)
 }
 
 pub async fn update_avatar(

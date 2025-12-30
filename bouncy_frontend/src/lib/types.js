@@ -196,6 +196,7 @@
  * @property {number} id
  * @property {string} name
  * @property {string} description
+ * @property {string} [avatar] -- full PeerTube path
  * @property {AvatarStyleContext} style
  * @property {object} stats
  *
