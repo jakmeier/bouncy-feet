@@ -1,4 +1,6 @@
+import { PUBLIC_API_BASE } from "$env/static/public";
 import { apiRequest } from "$lib/stats";
+import { error } from "@sveltejs/kit";
 import { getContext } from "svelte";
 
 /** @returns {ClubsContextData} */
@@ -14,6 +16,8 @@ export function getClubsContext() {
 export const clubsData = $state({
     mine: [],
     public: [],
+    currentClubDetails: undefined,
+    loadedForUser: false,
     // TODO: consider adding
     // lastUpdated:
 })
@@ -30,6 +34,8 @@ export async function loadMyClubs(userCtx) {
 }
 
 /**
+ * Return a list of shallow club information.
+ *
  * @returns {Promise<Club[]>}
  */
 export async function loadPublicClubs(fetch) {
@@ -42,6 +48,42 @@ export async function loadPublicClubs(fetch) {
         console.warn("loading public clubs failed", response.error, response.errorBody);
         return [];
     }
+}
+
+/**
+ * @param {number|string} clubId 
+ * @param {UserContextData} [userCtx] 
+ * @param {(input: any) => Promise<Response>} [svelteFetch]
+ */
+export async function loadAndSetClubDetails(clubId, userCtx, svelteFetch) {
+    const details = await loadClubDetails(clubId, userCtx, svelteFetch);
+    clubsData.currentClubDetails = details;
+    clubsData.loadedForUser = true;
+}
+
+/**
+ * @param {number|string} clubId 
+ * @param {UserContextData} [userCtx] 
+ * @param {(input: any) => Promise<Response>} [svelteFetch]
+ * @returns {Promise<ClubDetailsResponse>}
+ */
+export async function loadClubDetails(clubId, userCtx, svelteFetch) {
+    const resolvedFetch = svelteFetch || fetch;
+    let response;
+    if (userCtx) {
+        response = await userCtx.authenticatedGet(`/clubs/${clubId}/private`);
+    } else {
+        response = await resolvedFetch(`${PUBLIC_API_BASE}/clubs/${clubId}`);
+    }
+
+    if (!response?.ok) {
+        console.error("failed fetching data", response);
+        error(502, 'bad gateway');
+    }
+    /** 
+    * @type {ClubDetailsResponse}
+    */
+    return await response.json();
 }
 
 /**

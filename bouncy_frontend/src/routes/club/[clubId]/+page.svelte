@@ -36,7 +36,9 @@
       clubsData.public.find((c) => c.id === clubId)
   );
 
-  const clubDetails = $derived(data.clubDetails);
+  const clubDetails = $derived(
+    clubsData.currentClubDetails || data.publicClubDetails
+  );
   // TODO: isAdmin check
   // const isAdmin = $derived(clubDetails.admins.findIndex((u) => u.id === myId) !== -1);
   const isAdmin = true;
@@ -135,6 +137,11 @@
       <a class="link" href={clubDetails.web_link}>{clubDetails.web_link}</a>
     {/if}
 
+    <p>
+      {clubDetails.num_members + clubDetails.admins.length}
+      {$t('club.members-title')}
+    </p>
+
     <h2>{$t('club.public-videos-title')}</h2>
     <ThumbnailFeed
       bind:this={mainFeed}
@@ -169,12 +176,14 @@
       <li>{user.display_name}</li>
     {/each}
   </ul>
-  <h2>{$t('club.members-title')}</h2>
-  <ul>
-    {#each clubDetails.members as user}
-      <li>{user.display_name}</li>
-    {/each}
-  </ul>
+  {#if clubDetails.private}
+    <h2>{$t('club.members-title')}</h2>
+    <ul>
+      {#each clubDetails.private.members as user}
+        <li>{user.display_name}</li>
+      {/each}
+    </ul>
+  {/if}
   <Footer />
 </LightSection>
 

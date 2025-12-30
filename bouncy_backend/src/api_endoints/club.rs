@@ -56,14 +56,23 @@ struct ClubInfo {
 /// Contains information to show a detailed club view.
 #[derive(serde::Serialize)]
 pub(crate) struct ClubDetails {
+    // public
     admins: Vec<PublicUserInfoResponse>,
-    members: Vec<PublicUserInfoResponse>,
+    num_members: u32,
     channel_id: Option<PeerTubeChannelId>,
     channel_handle: Option<PeerTubeChannelHandle>,
     main_playlist: Option<PlaylistInfo>,
     public_playlists: Vec<PlaylistInfo>,
-    private_playlist: Vec<PlaylistInfo>,
     web_link: Option<String>,
+    // only visible for members
+    private: Option<PrivateClubDetails>,
+}
+
+#[derive(serde::Serialize)]
+pub(crate) struct PrivateClubDetails {
+    /// Club members, without admins
+    members: Vec<PublicUserInfoResponse>,
+    private_playlists: Vec<PlaylistInfo>,
 }
 
 #[derive(serde::Deserialize)]
@@ -128,7 +137,30 @@ pub async fn club(
     State(state): State<AppState>,
     axum::extract::Path(club_id): axum::extract::Path<ClubId>,
 ) -> axum::response::Result<Json<ClubDetails>> {
-    let res = Club::list_members_with_info(&state, club_id, 100, 0).await;
+    club_details(&state, club_id, false).await
+}
+
+/// Retrieve extended info about a club, with private info.
+#[axum::debug_handler]
+pub async fn club_with_private_details(
+    Extension(user): Extension<User>,
+    State(state): State<AppState>,
+    axum::extract::Path(club_id): axum::extract::Path<ClubId>,
+) -> axum::response::Result<Json<ClubDetails>> {
+    let membership = get_membership(&state, user.id, club_id).await?;
+    if matches!(membership, ClubMembership::None) {
+        return Err((StatusCode::FORBIDDEN, "must be member of club").into());
+    }
+
+    club_details(&state, club_id, true).await
+}
+
+pub async fn club_details(
+    state: &AppState,
+    club_id: ClubId,
+    is_member: bool,
+) -> axum::response::Result<Json<ClubDetails>> {
+    let res = Club::list_members_with_info(state, club_id, 100, 0).await;
 
     let Ok(mut db_members) = res else {
         let err = res.unwrap_err();
@@ -147,38 +179,46 @@ pub async fn club(
         .extract_if(.., |row| matches!(row.membership, ClubMembership::Admin))
         .map(row_to_user_info)
         .collect();
-    let members = db_members.into_iter().map(row_to_user_info).collect();
+    let members: Vec<_> = db_members.into_iter().map(row_to_user_info).collect();
 
-    let Some(club) = Club::lookup(&state, club_id).await else {
+    let Some(club) = Club::lookup(state, club_id).await else {
         return Err((StatusCode::NOT_FOUND, "no such club"))?;
     };
 
     let mut main_playlist = None;
     if let Some(main_playlist_id) = club.main_playlist {
-        let Some(playlist) = Playlist::lookup_club_playlist(&state, main_playlist_id).await else {
+        let Some(playlist) = Playlist::lookup_club_playlist(state, main_playlist_id).await else {
             return Err((StatusCode::NOT_FOUND, "no such playlist").into_response())?;
         };
         main_playlist = Some(playlist);
     }
 
-    let mut playlists = Playlist::lookup_club_playlists(&state, club.id).await;
-    let _private_playlist: Vec<PlaylistInfo> = playlists
+    let mut playlists = Playlist::lookup_club_playlists(state, club.id).await;
+    let private_playlists: Vec<PlaylistInfo> = playlists
         .extract_if(.., |p| p.is_private)
         .map(Playlist::playlist_info)
         .collect();
     let public_playlists = playlists.into_iter().map(Playlist::playlist_info).collect();
+    let num_members = u32::try_from(members.len()).unwrap_or(u32::MAX);
+
+    let private = if is_member {
+        Some(PrivateClubDetails {
+            members,
+            private_playlists,
+        })
+    } else {
+        None
+    };
 
     let details = ClubDetails {
         admins,
-        members,
+        num_members,
         main_playlist: main_playlist.map(Playlist::playlist_info),
         public_playlists,
-        // TODO: access check to private playlists!
-        // private_playlist,
-        private_playlist: vec![],
         channel_id: club.channel_id,
         channel_handle: club.channel_handle,
         web_link: club.web_link,
+        private,
     };
     Ok(Json(details))
 }

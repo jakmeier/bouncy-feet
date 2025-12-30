@@ -120,7 +120,7 @@
  * @property {(warmupId: string, detection: DetectionResult) => DanceSessionResult | null} submitWarmup
  * @property {(stepId: string, bpm: number, detection: DetectionResult) => DanceSessionResult | null} submitStepTraining
  * @property {(result: DanceSessionResult) => void} addDanceToStats Update local stats, offline only.
- * @property {()=>boolean} isLoggedInToApi -- Has an active, non-expired API session. (Reactive $derived state)
+ * @property {()=>boolean} isLoggedInToApi -- Has an active, non-expired PeerTube API session. (Reactive $derived state)
  * @property {()=>{}} refreshPeerTubeUser
  * @property {()=>void} logout
  * @property {Promise<import("$lib/peertube-openapi").User | undefined>} peerTubeUser
@@ -202,17 +202,23 @@
  * @typedef {Object} ClubsData
  * @property {Club[]} mine
  * @property {Club[]} public
+ * @property {ClubDetailsResponse} [currentClubDetails]
+ * @property {boolean} loadedForUser
  *
  *
  * @typedef {object} ClubDetailsResponse
  * @property {PublicUserResponse[]} admins
- * @property {PublicUserResponse[]} members
+ * @property {number} num_members
  * @property {number} [channel_id]
  * @property {string} [channel_handle]
  * @property {PlaylistInfo} [main_playlist]
  * @property {PlaylistInfo[]} public_playlists
- * @property {PlaylistInfo[]} private_playlists
  * @property {string} [web_link]
+ * @property {PrivateClubDetails} [private]
+ * 
+ * @typedef {object} PrivateClubDetails
+ * @property {PlaylistInfo[]} private_playlists
+ * @property {PublicUserResponse[]} members
  *
  *
  * @typedef {object} EditableClubDetails
