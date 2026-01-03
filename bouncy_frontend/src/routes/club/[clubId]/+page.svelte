@@ -94,7 +94,8 @@
       .authenticatedPost('/clubs/video/add', {
         video_id: videoId,
         club_id: clubId,
-        private: false,
+        // TODO: allow uploading to different playlists (this one is public)
+        playlist_id: clubDetails.main_playlist?.id,
       })
       .then(() => mainFeed.refreshVideos());
     showAddVideoPopup = false;
