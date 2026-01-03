@@ -222,7 +222,9 @@ pub async fn club_details(
 
     let mut main_playlist = None;
     if let Some(main_playlist_id) = club.main_playlist {
-        let Some(playlist) = Playlist::lookup_club_playlist(state, main_playlist_id).await else {
+        let Some(playlist) =
+            Playlist::lookup_club_playlist_by_peertube_id(state, main_playlist_id).await
+        else {
             return Err((StatusCode::NOT_FOUND, "no such playlist").into_response())?;
         };
         main_playlist = Some(playlist);

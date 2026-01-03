@@ -6,13 +6,9 @@ use crate::{
     AppState,
 };
 
-#[derive(Clone, Copy, Debug, serde::Deserialize)]
-#[serde(transparent)]
-pub struct PlaylistId(i64);
-
 #[derive(Debug, Clone)]
 pub struct Playlist {
-    pub id: PlaylistId,
+    pub id: PeerTubePlaylistId,
     #[allow(dead_code)]
     pub club_id: ClubId,
     pub is_private: bool,
@@ -21,7 +17,6 @@ pub struct Playlist {
 
 #[derive(Debug, Clone, FromRow)]
 pub(crate) struct PlaylistRow {
-    pub id: i64,
     pub club_id: i64,
     pub playlist_id: i64,
     pub playlist_short_uuid: String,
@@ -46,7 +41,7 @@ impl Playlist {
             r#"
             INSERT INTO club_playlists (club_id, playlist_id, playlist_short_uuid, is_private)
             VALUES ($1, $2, $3, $4)
-            RETURNING id, club_id, playlist_id, playlist_short_uuid, is_private
+            RETURNING club_id, playlist_id, playlist_short_uuid, is_private
             "#,
             club_id.num(),
             playlist_info.id.num(),
@@ -59,28 +54,13 @@ impl Playlist {
         Ok(Playlist::from(rec))
     }
 
-    pub(crate) async fn lookup_club_playlist(state: &AppState, id: PlaylistId) -> Option<Playlist> {
-        let maybe_club = sqlx::query_as!(
-            PlaylistRow,
-            r#"SELECT id, club_id, playlist_id, playlist_short_uuid, is_private
-            FROM club_playlists
-            WHERE id = $1"#,
-            id.num()
-        )
-        .fetch_optional(&state.pg_db_pool)
-        .await
-        .expect("DB query failed");
-
-        maybe_club.map(Playlist::from)
-    }
-
     pub(crate) async fn lookup_club_playlist_by_peertube_id(
         state: &AppState,
         id: PeerTubePlaylistId,
     ) -> Option<Playlist> {
         let maybe_club = sqlx::query_as!(
             PlaylistRow,
-            r#"SELECT id, club_id, playlist_id, playlist_short_uuid, is_private
+            r#"SELECT club_id, playlist_id, playlist_short_uuid, is_private
             FROM club_playlists
             WHERE playlist_id = $1"#,
             id.num()
@@ -95,7 +75,7 @@ impl Playlist {
     pub(crate) async fn lookup_club_playlists(state: &AppState, club_id: ClubId) -> Vec<Playlist> {
         let clubs = sqlx::query_as!(
             PlaylistRow,
-            r#"SELECT id, club_id, playlist_id, playlist_short_uuid, is_private
+            r#"SELECT club_id, playlist_id, playlist_short_uuid, is_private
             FROM club_playlists
             WHERE club_id = $1"#,
             club_id.num()
@@ -118,7 +98,7 @@ impl Playlist {
 impl From<PlaylistRow> for Playlist {
     fn from(record: PlaylistRow) -> Self {
         Self {
-            id: PlaylistId(record.id),
+            id: PeerTubePlaylistId(record.playlist_id),
             club_id: record.club_id(),
             is_private: record.is_private,
             peertube_info: PlaylistInfo {
@@ -129,14 +109,8 @@ impl From<PlaylistRow> for Playlist {
     }
 }
 
-impl PlaylistId {
-    pub fn num(&self) -> i64 {
-        self.0
-    }
-}
-
 impl ClubRow {
-    pub(crate) fn main_playlist_id(&self) -> Option<PlaylistId> {
-        self.main_playlist.map(PlaylistId)
+    pub(crate) fn main_playlist_id(&self) -> Option<PeerTubePlaylistId> {
+        self.main_playlist.map(PeerTubePlaylistId)
     }
 }

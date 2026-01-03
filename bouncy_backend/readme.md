@@ -35,3 +35,38 @@ Or, do the same with the convenient script.
 ```bash
 bash update_query_cache.sh
 ```
+
+## Local development hints
+
+### SQL migration error: `Result::unwrap()` on an `Err` value: VersionMismatch(NUMBER)
+
+If you hit this error, you have probably edited one of the migration .sql files under ./db_migrations.
+
+You should never edit checked in files. Add a new migration script at the end instead.
+
+If your new script has an error and you want to change it, then it is best practice to drop the corresponding row in `_sqlx_migrations`, undo other changes if necessary, then re-run the migration cleanly.
+
+```sql
+DELETE FROM _sqlx_migrations
+WHERE version = NUMBER_IN_ERROR;
+```
+
+However, sometimes, you may want to just change an SQL script without re-running it. For example, if you change a comment.
+
+In such a case, it can be okay to update the checksum manually.
+
+```bash
+# Get the new checksum using sqlx-cli
+sqlx migrate info --source ./db_migrations/ \
+-D postgres://api_user:local_password@localhost:65432/bouncyfeet
+```
+
+```sql
+UPDATE _sqlx_migrations
+SET checksum = '\xCHECKSUM_HERE'
+WHERE version = 3;
+```
+
+Running the checksum check again should confirm that it is now fixed.
+
+Again, only do this for local changes. Never for checked-in queries!

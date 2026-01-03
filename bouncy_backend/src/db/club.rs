@@ -1,7 +1,9 @@
 use crate::{
     api_endoints::club::{AddClubMemberRequest, AddClubVideoRequest},
-    peertube::channel::{PeerTubeChannelHandle, PeerTubeChannelId},
-    playlist::PlaylistId,
+    peertube::{
+        channel::{PeerTubeChannelHandle, PeerTubeChannelId},
+        playlist::PeerTubePlaylistId,
+    },
     user::UserId,
     AppState,
 };
@@ -16,7 +18,7 @@ pub struct Club {
     pub id: ClubId,
     pub title: String,
     pub description: String,
-    pub main_playlist: Option<PlaylistId>,
+    pub main_playlist: Option<PeerTubePlaylistId>,
     pub channel_id: Option<PeerTubeChannelId>,
     pub channel_handle: Option<PeerTubeChannelHandle>,
     pub web_link: Option<String>,
@@ -70,7 +72,7 @@ impl Club {
         web_link: Option<url::Url>,
         channel_id: PeerTubeChannelId,
         channel_handle: PeerTubeChannelHandle,
-        main_playlist: Option<PlaylistId>,
+        main_playlist: Option<PeerTubePlaylistId>,
     ) -> Result<Club, sqlx::Error> {
         let rec = sqlx::query_as!(
             ClubRow,
@@ -289,7 +291,7 @@ impl Club {
     pub async fn set_main_playlist(
         state: &AppState,
         club_id: ClubId,
-        playlist_id: PlaylistId,
+        playlist_id: PeerTubePlaylistId,
     ) -> Result<(), sqlx::Error> {
         sqlx::query!(
             r#"

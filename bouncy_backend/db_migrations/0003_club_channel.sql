@@ -1,23 +1,18 @@
 ALTER TABLE clubs
 ADD COLUMN channel_id BIGINT;
 
-CREATE TABLE club_playlists (
-    id BIGSERIAL PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS club_playlists (
+    -- external playlist data
+    -- playlist_id is also as primary key in this db
+    playlist_id BIGINT PRIMARY KEY,
+    playlist_short_uuid VARCHAR(32) NOT NULL,
 
+    -- local data
     -- owning club
     club_id BIGINT NOT NULL
         REFERENCES clubs(id)
         ON DELETE CASCADE,
-
-    -- external playlist data
-    playlist_id BIGINT NOT NULL,
-    playlist_short_uuid VARCHAR(32) NOT NULL,
-
-    -- visibility
-    is_private BOOLEAN NOT NULL,
-
-    -- a club should not accidentally have the same playlist twice
-    UNIQUE (club_id, playlist_id)
+    is_private BOOLEAN NOT NULL
 );
 
 -- migrate existing public/private playlist pairs
@@ -51,11 +46,11 @@ FROM clubs;
 -- from now on, point to club_playlists form clubs to select main playlist
 ALTER TABLE clubs
 ADD COLUMN main_playlist BIGINT
-    REFERENCES club_playlists(id);
+    REFERENCES club_playlists(playlist_id);
 
 -- populate main_playlist
 UPDATE clubs c
-SET main_playlist = cp.id
+SET main_playlist = cp.playlist_id
 FROM club_playlists cp
 WHERE cp.club_id = c.id
   AND cp.is_private = FALSE;
@@ -67,11 +62,7 @@ DROP COLUMN public_playlist_short_uuid,
 DROP COLUMN private_playlist_id,
 DROP COLUMN private_playlist_short_uuid;
 
--- add constraints
-ALTER TABLE club_playlists
-ADD CONSTRAINT club_playlists_id_club_unique
-UNIQUE (id, club_id);
-
--- add indexes
+-- add indices
+  -- for lookup of playlists by a club
 CREATE INDEX idx_club_playlists_club_id
 ON club_playlists(club_id);

@@ -1,30 +1,25 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT id, club_id, playlist_id, playlist_short_uuid, is_private\n            FROM club_playlists\n            WHERE id = $1",
+  "query": "SELECT club_id, playlist_id, playlist_short_uuid, is_private\n            FROM club_playlists\n            WHERE club_id = $1",
   "describe": {
     "columns": [
       {
         "ordinal": 0,
-        "name": "id",
-        "type_info": "Int8"
-      },
-      {
-        "ordinal": 1,
         "name": "club_id",
         "type_info": "Int8"
       },
       {
-        "ordinal": 2,
+        "ordinal": 1,
         "name": "playlist_id",
         "type_info": "Int8"
       },
       {
-        "ordinal": 3,
+        "ordinal": 2,
         "name": "playlist_short_uuid",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 4,
+        "ordinal": 3,
         "name": "is_private",
         "type_info": "Bool"
       }
@@ -38,9 +33,8 @@
       false,
       false,
       false,
-      false,
       false
     ]
   },
-  "hash": "c751b976dd28a978c5803c7ac1156f7c6407120a0bc0c82b61a97a6f729e8d1b"
+  "hash": "69fb33282459dc2b5e5ba6d4f1781ce0ff2ad8868bc75bab0b6471b26f4e30b5"
 }
