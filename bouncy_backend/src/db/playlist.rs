@@ -74,6 +74,24 @@ impl Playlist {
         maybe_club.map(Playlist::from)
     }
 
+    pub(crate) async fn lookup_club_playlist_by_peertube_id(
+        state: &AppState,
+        id: PeerTubePlaylistId,
+    ) -> Option<Playlist> {
+        let maybe_club = sqlx::query_as!(
+            PlaylistRow,
+            r#"SELECT id, club_id, playlist_id, playlist_short_uuid, is_private
+            FROM club_playlists
+            WHERE playlist_id = $1"#,
+            id.num()
+        )
+        .fetch_optional(&state.pg_db_pool)
+        .await
+        .expect("DB query failed");
+
+        maybe_club.map(Playlist::from)
+    }
+
     pub(crate) async fn lookup_club_playlists(state: &AppState, club_id: ClubId) -> Vec<Playlist> {
         let clubs = sqlx::query_as!(
             PlaylistRow,

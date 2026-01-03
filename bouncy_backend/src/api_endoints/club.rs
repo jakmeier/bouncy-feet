@@ -2,7 +2,9 @@ use crate::api_endoints::user::PublicUserInfoResponse;
 use crate::club::{ClubId, ClubMembership, PublicClubMemberInfo};
 use crate::db::club::Club;
 use crate::peertube::channel::{create_system_channel, PeerTubeChannelHandle, PeerTubeChannelId};
-use crate::peertube::playlist::{create_public_system_playlist, create_unlisted_system_playlist};
+use crate::peertube::playlist::{
+    create_public_system_playlist, create_unlisted_system_playlist, PeerTubePlaylistId,
+};
 use crate::peertube::{self, handle_peertube_error, PeerTubeError};
 use crate::playlist::{Playlist, PlaylistInfo};
 use crate::user::{User, UserId};
@@ -93,7 +95,7 @@ pub struct AddClubMemberRequest {
 pub struct AddClubVideoRequest {
     pub video_id: i64,
     pub club_id: i64,
-    pub private: bool,
+    pub playlist_id: PeerTubePlaylistId,
 }
 
 /// Retrieve clubs of the user that made the request.
@@ -330,7 +332,7 @@ pub async fn create_club(
         break result;
     };
 
-    // TODO: do I even need a private playlist at this point?
+    // Create main playlist plus one private playlist for default uploads.
     let Ok((public_playlist, _private_playlist)) = playlists else {
         let err = playlists.unwrap_err();
         tracing::error!(?err, "failed creating playlists");
@@ -497,6 +499,10 @@ pub async fn add_club_member(
     (StatusCode::CREATED, "member added").into_response()
 }
 
+/// Add a video to a club playlist.
+///
+/// The video is stored on the user PeerTube account. They keep ownership of the
+/// video. This is just a matter of listing it.
 #[axum::debug_handler]
 pub async fn add_video(
     Extension(me): Extension<User>,
@@ -513,32 +519,11 @@ pub async fn add_video(
         return (StatusCode::FORBIDDEN, "not a club member").into_response();
     }
 
-    // Check the playlist that belongs to the club.
-    // The user would know it and could provide it but we need to check for permissions anyway.
-    let Some(club) = Club::lookup(&state, params.club_id()).await else {
-        return (StatusCode::NOT_FOUND, "no such club").into_response();
-    };
-
-    let playlist = if params.private {
-        // TODO: API for uploading to a specific playlist
-        return (
-            StatusCode::BAD_REQUEST,
-            "cannot add private video through this API",
-        )
-            .into_response();
-    } else {
-        club.main_playlist
-    };
-
-    let Some(main_playlist_id) = playlist else {
-        tracing::error!(
-            ?club,
-            "User tried to upload to a club without a main playlist."
-        );
-        return (StatusCode::NOT_FOUND, "no main playlist").into_response();
-    };
-
-    let Some(playlist) = Playlist::lookup_club_playlist(&state, main_playlist_id).await else {
+    // Check the playlist belongs to the club.
+    // The client should know it but we need to check for permissions.
+    let Some(playlist) =
+        Playlist::lookup_club_playlist_by_peertube_id(&state, params.playlist_id).await
+    else {
         return (StatusCode::NOT_FOUND, "no such playlist").into_response();
     };
 
