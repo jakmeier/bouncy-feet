@@ -5,7 +5,7 @@ use crate::peertube::channel::{create_system_channel, PeerTubeChannelHandle, Pee
 use crate::peertube::playlist::{
     create_public_system_playlist, create_unlisted_system_playlist, PeerTubePlaylistId,
 };
-use crate::peertube::{self, handle_peertube_error, PeerTubeError};
+use crate::peertube::{self, retry_peertube_op, PeerTubeError};
 use crate::playlist::{Playlist, PlaylistInfo};
 use crate::user::{User, UserId};
 use crate::AppState;
@@ -13,6 +13,7 @@ use axum::extract::State;
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::{Extension, Json};
+use futures::FutureExt;
 
 #[derive(serde::Deserialize)]
 pub struct CreateClubsRequest {
@@ -290,22 +291,10 @@ pub async fn create_club(
     // Check unique name? (not enforced on db)
     // Limit clubs per user?
 
-    let mut max_retry = 5;
-    let channel_result = loop {
-        let result = create_club_channel(&state, &payload.title).await;
-        if let Err(e) = &result {
-            let retry = handle_peertube_error(&state, e).await;
-            if retry && max_retry > 0 {
-                max_retry -= 1;
-                continue;
-            }
-        }
-        break result;
-    };
+    let channel_result =
+        retry_peertube_op(&state, |s| create_club_channel(s, &payload.title).boxed()).await;
     let Ok((channel_id, channel_handle)) = channel_result else {
-        let err = channel_result.unwrap_err();
-        tracing::error!(?err, "failed creating channel");
-        return (StatusCode::INTERNAL_SERVER_ERROR, "failed creating channel").into_response();
+        return channel_result.unwrap_err();
     };
 
     let club_res: Result<Club, sqlx::Error> = Club::create(
@@ -324,28 +313,14 @@ pub async fn create_club(
         return db_err_to_response(club_res.unwrap_err());
     };
 
-    let mut max_retry = 5;
-    let playlists = loop {
-        let result = create_club_playlist_pair(&state, &payload.title, channel_id, club.id).await;
-        if let Err(e) = &result {
-            let retry = handle_peertube_error(&state, e).await;
-            if retry && max_retry > 0 {
-                max_retry -= 1;
-                continue;
-            }
-        }
-        break result;
-    };
+    let playlists = retry_peertube_op(&state, |s| {
+        create_club_playlist_pair(s, &payload.title, channel_id, club.id).boxed()
+    })
+    .await;
 
     // Create main playlist plus one private playlist for default uploads.
     let Ok((public_playlist, _private_playlist)) = playlists else {
-        let err = playlists.unwrap_err();
-        tracing::error!(?err, "failed creating playlists");
-        return (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            "failed creating playlists",
-        )
-            .into_response();
+        return playlists.unwrap_err();
     };
 
     // Now set the main playlist
@@ -562,42 +537,32 @@ pub async fn add_playlist(
     };
 
     // externally create playlist
-    let mut max_retry = 5;
-    let final_result = loop {
-        let result = if params.public {
-            create_public_system_playlist(
-                &state,
-                &params.display_name,
-                &params.description,
-                channel_id,
-            )
-            .await
-        } else {
-            create_unlisted_system_playlist(
-                &state,
-                &params.display_name,
-                &params.description,
-                channel_id,
-            )
-            .await
-        };
 
-        if let Err(e) = &result {
-            let retry = handle_peertube_error(&state, e).await;
-            if retry && max_retry > 0 {
-                max_retry -= 1;
-                continue;
+    let playlist = retry_peertube_op(&state, |s| {
+        async {
+            if params.public {
+                create_public_system_playlist(
+                    s,
+                    &params.display_name,
+                    &params.description,
+                    channel_id,
+                )
+                .await
+            } else {
+                create_unlisted_system_playlist(
+                    s,
+                    &params.display_name,
+                    &params.description,
+                    channel_id,
+                )
+                .await
             }
         }
-        break result;
-    };
-    if let Err(err) = final_result {
-        tracing::error!(?err, "failed creating playlist");
-        return Err((StatusCode::BAD_GATEWAY, "failed creating playlist"))?;
-    }
-    let playlist = final_result.unwrap();
-    let playlist_id = playlist.id;
+        .boxed()
+    })
+    .await?;
 
+    let playlist_id = playlist.id;
     Playlist::create(&state, club_id, playlist, !params.public)
         .await
         .expect("creating playlist failed");
@@ -623,29 +588,17 @@ pub async fn edit_playlist(
     };
 
     // update all playlist fields on PeerTube
-    let mut max_retry = 5;
-    let final_result = loop {
-        let result = peertube::playlist::update_system_playlist(
-            &state,
+    retry_peertube_op(&state, |s| {
+        peertube::playlist::update_system_playlist(
+            s,
             playlist_id,
             &params.display_name,
             &params.description,
             channel_id,
         )
-        .await;
-        if let Err(e) = &result {
-            let retry = handle_peertube_error(&state, e).await;
-            if retry && max_retry > 0 {
-                max_retry -= 1;
-                continue;
-            }
-        }
-        break result;
-    };
-    if let Err(err) = final_result {
-        tracing::error!(?err, "failed updating playlist");
-        return Err((StatusCode::BAD_GATEWAY, "failed updating playlist"))?;
-    };
+        .boxed()
+    })
+    .await?;
 
     // possibly edit privacy in DB, to stay in sync with PeerTube
     let is_private = !params.public;
@@ -748,24 +701,10 @@ pub async fn update_avatar(
     };
 
     // upload image to PeerTube
-    let mut max_retry = 5;
-    let final_result = loop {
-        let result =
-            peertube::channel::update_avatar(&state, channel_handle.clone(), file_bytes.to_vec())
-                .await;
-        if let Err(e) = &result {
-            let retry = handle_peertube_error(&state, e).await;
-            if retry && max_retry > 0 {
-                max_retry -= 1;
-                continue;
-            }
-        }
-        break result;
-    };
-    if let Err(err) = final_result {
-        tracing::error!(?err, "failed uploading avatar");
-        return Err((StatusCode::BAD_GATEWAY, "failed uploading avatar"))?;
-    };
+    retry_peertube_op(&state, |s| {
+        peertube::channel::update_avatar(s, channel_handle.clone(), file_bytes.to_vec()).boxed()
+    })
+    .await?;
 
     state.clubs_cache.invalidate_club(club_id);
     Ok(())

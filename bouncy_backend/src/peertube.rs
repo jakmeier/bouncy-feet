@@ -2,7 +2,11 @@
 //! non-personal resources, such as club playlists.
 
 use crate::AppState;
+use axum::http::StatusCode;
+use axum::response::IntoResponse;
+use futures::future::BoxFuture;
 use reqwest::header::HeaderValue;
+use std::time::Duration;
 
 pub(crate) mod channel;
 pub(crate) mod playlist;
@@ -83,4 +87,38 @@ pub(crate) async fn handle_peertube_error(state: &AppState, err: &PeerTubeError)
         return true;
     }
     false
+}
+
+/// Retry a PeerTube operation a few times and then return an error response if
+/// it didn't succeed.
+///
+/// `Op``: a closure producing a boxed future that may borrow `AppState` and
+/// other locals
+pub async fn retry_peertube_op<'s, T, Op>(
+    state: &'s AppState,
+    mut op: Op,
+) -> Result<T, axum::response::Response>
+where
+    Op: FnMut(&'s AppState) -> BoxFuture<'s, Result<T, PeerTubeError>>,
+    T: 's,
+{
+    let mut remaining_attempts = 5;
+    loop {
+        match op(state).await {
+            Ok(v) => return Ok(v),
+            Err(e) => {
+                let should_retry = handle_peertube_error(state, &e).await;
+                tracing::error!(?e, ?remaining_attempts, "PeerTube operation failed");
+
+                if should_retry && remaining_attempts > 0 {
+                    remaining_attempts -= 1;
+                    tokio::time::sleep(Duration::from_millis(100)).await;
+                    continue;
+                }
+
+                let resp = (StatusCode::BAD_GATEWAY, "PeerTube service failure").into_response();
+                return Err(resp);
+            }
+        }
+    }
 }
