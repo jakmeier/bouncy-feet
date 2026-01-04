@@ -193,6 +193,10 @@ async fn main() -> anyhow::Result<()> {
             "/clubs/{club_id}/avatar",
             post(api_endoints::club::update_avatar),
         )
+        .route(
+            "/clubs/{club_id}/playlist/new",
+            post(api_endoints::club::add_playlist),
+        )
         .route("/user", get(api_endoints::user::user_info))
         .route("/user/meta", get(api_endoints::user_meta::metadata))
         .route("/users", post(api_endoints::user::list_users))

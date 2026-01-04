@@ -98,6 +98,20 @@ pub struct AddClubVideoRequest {
     pub playlist_id: PeerTubePlaylistId,
 }
 
+#[derive(serde::Deserialize)]
+pub struct AddClubPlaylistRequest {
+    pub display_name: String,
+    #[serde(default)]
+    pub public: bool,
+    #[serde(default)]
+    pub description: String,
+}
+
+#[derive(serde::Serialize)]
+pub struct AddClubPlaylistResponse {
+    pub playlist_id: PeerTubePlaylistId,
+}
+
 /// Retrieve clubs of the user that made the request.
 pub async fn my_clubs(Extension(user): Extension<User>, State(state): State<AppState>) -> Response {
     let res = Club::list_clubs_for_user(&state, user.id).await;
@@ -512,7 +526,7 @@ pub async fn add_video(
     Json(params): Json<AddClubVideoRequest>,
 ) -> Response {
     // Check permissions: Must be member
-    // Side-note: maybe should be admin for public videos?
+    // TODO: maybe should be admin for public videos?
     let membership = match get_membership(&state, me.id, params.club_id()).await {
         Ok(it) => it,
         Err(response) => return response,
@@ -549,6 +563,89 @@ pub async fn add_video(
     (StatusCode::CREATED, element.id.to_string()).into_response()
 }
 
+/// Create a new playlist for a club.
+#[axum::debug_handler]
+pub async fn add_playlist(
+    Extension(me): Extension<User>,
+    State(state): State<AppState>,
+    axum::extract::Path(club_id): axum::extract::Path<ClubId>,
+    Json(params): Json<AddClubPlaylistRequest>,
+) -> axum::response::Result<Json<AddClubPlaylistResponse>> {
+    if params.display_name.len() > 120 || params.display_name.len() < 3 {
+        return Err((
+            StatusCode::BAD_REQUEST,
+            "description must be between 3 and 120 characters",
+        ))?;
+    }
+    if !params.description.is_empty()
+        && (params.description.len() > 1000 || params.description.len() < 3)
+    {
+        return Err((
+            StatusCode::BAD_REQUEST,
+            "description must be between 3 and 1000 characters",
+        ))?;
+    }
+
+    // Check permissions: Must be member for private lists, admin for public lists
+    let membership = get_membership(&state, me.id, club_id).await?;
+    if params.public {
+        if !matches!(membership, ClubMembership::Admin) {
+            return Err((StatusCode::FORBIDDEN, "not a club admin"))?;
+        }
+    } else if !matches!(membership, ClubMembership::Admin | ClubMembership::Member) {
+        return Err((StatusCode::FORBIDDEN, "not a club member"))?;
+    }
+
+    let club = get_club(&state, club_id).await?;
+    let Some(channel_id) = club.channel_id else {
+        return Err((StatusCode::INTERNAL_SERVER_ERROR, "club has no channel"))?;
+    };
+
+    // externally create playlist
+    let mut max_retry = 5;
+    let final_result = loop {
+        let result = if params.public {
+            create_public_system_playlist(
+                &state,
+                &params.display_name,
+                &params.description,
+                channel_id.num(),
+            )
+            .await
+        } else {
+            create_unlisted_system_playlist(
+                &state,
+                &params.display_name,
+                &params.description,
+                channel_id.num(),
+            )
+            .await
+        };
+
+        if let Err(e) = &result {
+            let retry = handle_peertube_error(&state, e).await;
+            if retry && max_retry > 0 {
+                max_retry -= 1;
+                continue;
+            }
+        }
+        break result;
+    };
+    if let Err(err) = final_result {
+        tracing::error!(?err, "failed creating playlist");
+        return Err((StatusCode::BAD_GATEWAY, "failed creating playlist"))?;
+    }
+    let playlist = final_result.unwrap();
+    let playlist_id = playlist.id;
+
+    Playlist::create(&state, club_id, playlist, !params.public)
+        .await
+        .expect("creating playlist failed");
+
+    let response = AddClubPlaylistResponse { playlist_id };
+    Ok(Json(response))
+}
+
 async fn get_membership(
     state: &AppState,
     user_id: UserId,
@@ -562,6 +659,12 @@ async fn get_membership(
 
     Ok(result.expect("just checked"))
 }
+async fn get_club(state: &AppState, club_id: ClubId) -> Result<Club, Response> {
+    let Some(club) = Club::lookup(state, club_id).await else {
+        return Err((StatusCode::NOT_FOUND, "no such club").into_response());
+    };
+    Ok(club)
+}
 
 #[axum::debug_handler]
 pub async fn update_avatar(
@@ -569,14 +672,11 @@ pub async fn update_avatar(
     State(state): State<AppState>,
     axum::extract::Path(club_id): axum::extract::Path<ClubId>,
     mut multipart: axum::extract::Multipart,
-) -> Response {
+) -> axum::response::Result<()> {
     // Check user has permission
-    let membership = match get_membership(&state, user.id, club_id).await {
-        Ok(it) => it,
-        Err(response) => return response,
-    };
+    let membership = get_membership(&state, user.id, club_id).await?;
     if !matches!(membership, ClubMembership::Admin) {
-        return (StatusCode::FORBIDDEN, "no permission to update club avatar").into_response();
+        return Err((StatusCode::FORBIDDEN, "no permission to update club avatar"))?;
     }
 
     let mut file_bytes = None;
@@ -589,7 +689,7 @@ pub async fn update_avatar(
             let content_type = field.content_type().map(|s| s.to_string());
 
             if content_type.as_deref() != Some("image/png") {
-                return (StatusCode::BAD_REQUEST, "image must be png").into_response();
+                return Err((StatusCode::BAD_REQUEST, "image must be png"))?;
             }
 
             let data = field.bytes().await.unwrap();
@@ -600,15 +700,13 @@ pub async fn update_avatar(
 
     let file_bytes = match file_bytes {
         Some(it) => it,
-        None => return (StatusCode::BAD_REQUEST, "No image uploaded").into_response(),
+        None => return Err((StatusCode::BAD_REQUEST, "No image uploaded"))?,
     };
 
     // find club channel handle
-    let Some(club) = Club::lookup(&state, club_id).await else {
-        return (StatusCode::NOT_FOUND, "no such club").into_response();
-    };
+    let club = get_club(&state, club_id).await?;
     let Some(channel_handle) = club.channel_handle else {
-        return (StatusCode::INTERNAL_SERVER_ERROR, "club has no channel").into_response();
+        return Err((StatusCode::INTERNAL_SERVER_ERROR, "club has no channel"))?;
     };
 
     // upload image to PeerTube
@@ -628,11 +726,11 @@ pub async fn update_avatar(
     };
     if let Err(err) = final_result {
         tracing::error!(?err, "failed uploading avatar");
-        return (StatusCode::BAD_GATEWAY, "failed uploading avatar").into_response();
+        return Err((StatusCode::BAD_GATEWAY, "failed uploading avatar"))?;
     };
 
     state.clubs_cache.invalidate_club(club_id);
-    (StatusCode::OK, "OK").into_response()
+    Ok(())
 }
 
 fn validate_web_link(
