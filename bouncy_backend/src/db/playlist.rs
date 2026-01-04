@@ -87,6 +87,22 @@ impl Playlist {
         clubs.into_iter().map(Playlist::from).collect()
     }
 
+    pub(crate) async fn update_club_playlist_privacy(
+        state: &AppState,
+        playlist_id: PeerTubePlaylistId,
+        is_private: bool,
+    ) -> sqlx::Result<sqlx::postgres::PgQueryResult> {
+        sqlx::query!(
+            r#"UPDATE club_playlists
+            SET is_private = $1
+            WHERE playlist_id = $2"#,
+            is_private,
+            playlist_id.num(),
+        )
+        .execute(&state.pg_db_pool)
+        .await
+    }
+
     pub(crate) fn playlist_info(self) -> PlaylistInfo {
         PlaylistInfo {
             id: self.peertube_info.id,

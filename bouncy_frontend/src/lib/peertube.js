@@ -197,6 +197,7 @@ export async function uploadVideoToPeerTubeResumable(file, channelId, onProgress
             const retryAfter = response.headers.get('Retry-After');
             if (retryAfter) {
                 // We hit the rate-limit.
+                // https://docs.joinpeertube.org/api-rest-reference.html#section/Rate-limits
                 // "Retry-After" header should always be available, while
                 // "X-RateLimit-Remaining" and "X-RateLimit-Reset" are not
                 // available to scrips by default, as they are not listed as

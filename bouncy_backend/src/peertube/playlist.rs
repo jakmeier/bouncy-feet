@@ -1,5 +1,5 @@
 use crate::{
-    peertube::{check_peertube_system_user_response, PeerTubeError},
+    peertube::{channel::PeerTubeChannelId, check_peertube_system_user_response, PeerTubeError},
     AppState,
 };
 use uuid::Uuid;
@@ -40,7 +40,7 @@ pub(crate) struct VideoAddedResponse {
 
 #[derive(Debug, Clone, serde::Deserialize)]
 pub(crate) struct PlaylistElement {
-    pub id: i64,
+    pub id: PeerTubeChannelId,
 }
 
 /// Creates an impersonal (system) playlist on PeerTube that's unlisted.
@@ -48,13 +48,13 @@ pub(crate) async fn create_unlisted_system_playlist(
     state: &AppState,
     display_name: &str,
     description: &str,
-    channel_id: i64,
+    channel_id: PeerTubeChannelId,
 ) -> Result<PeerTubePlaylist, PeerTubeError> {
     let body = [
         ("displayName", display_name),
         ("description", description),
         ("privacy", PlaylistPrivacy::Unlisted.to_num_str()),
-        ("videoChannelId", &channel_id.to_string()),
+        ("videoChannelId", &channel_id.num().to_string()),
     ];
     create_system_playlist(state, &body).await
 }
@@ -64,13 +64,13 @@ pub(crate) async fn create_public_system_playlist(
     state: &AppState,
     display_name: &str,
     description: &str,
-    channel_id: i64,
+    channel_id: PeerTubeChannelId,
 ) -> Result<PeerTubePlaylist, PeerTubeError> {
     let body = [
         ("displayName", display_name),
         ("description", description),
         ("privacy", PlaylistPrivacy::Public.to_num_str()),
-        ("videoChannelId", &channel_id.to_string()),
+        ("videoChannelId", &channel_id.num().to_string()),
     ];
     create_system_playlist(state, &body).await
 }
@@ -141,6 +141,43 @@ impl PlaylistPrivacy {
             _ => unreachable!("should not have other variants"),
         }
     }
+}
+
+pub async fn update_system_playlist(
+    state: &AppState,
+    playlist_id: PeerTubePlaylistId,
+    display_name: &str,
+    description: &str,
+    channel_id: PeerTubeChannelId,
+) -> Result<PeerTubePlaylist, PeerTubeError> {
+    let body = [
+        ("displayName", display_name),
+        ("description", description),
+        ("privacy", PlaylistPrivacy::Unlisted.to_num_str()),
+        ("videoChannelId", &channel_id.num().to_string()),
+    ];
+
+    let relative_path = format!("api/v1/video-playlists/{}", playlist_id.num());
+    let url = state
+        .peertube_url
+        .join(&relative_path)
+        .expect("must be valid url");
+
+    let token = state.system_user.access_token(state).await?;
+
+    let response = state
+        .http_client
+        .put(url.as_str())
+        .form(&body)
+        .bearer_auth(&token)
+        .send()
+        .await;
+
+    let ok_response = check_peertube_system_user_response(response, token).await?;
+    let status = ok_response.status();
+    let playlist: Result<PlaylistCreatedResponse, _> = ok_response.json().await;
+    let playlist = playlist.map_err(|err| PeerTubeError::JsonParsingFailed(status, err))?;
+    Ok(playlist.video_playlist)
 }
 
 impl PeerTubePlaylistId {

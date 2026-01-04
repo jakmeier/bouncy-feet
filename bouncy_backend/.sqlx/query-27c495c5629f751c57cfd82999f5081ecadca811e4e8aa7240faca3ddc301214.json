@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE club_playlists\n            SET is_private = $1\n            WHERE playlist_id = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Bool",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "27c495c5629f751c57cfd82999f5081ecadca811e4e8aa7240faca3ddc301214"
+}

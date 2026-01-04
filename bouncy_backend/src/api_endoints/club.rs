@@ -117,9 +117,7 @@ pub async fn my_clubs(Extension(user): Extension<User>, State(state): State<AppS
     let res = Club::list_clubs_for_user(&state, user.id).await;
 
     let Ok(db_clubs) = res else {
-        let err = res.unwrap_err();
-        tracing::error!(?err, "DB error on my_clubs");
-        return (StatusCode::INTERNAL_SERVER_ERROR, "DB ERROR").into_response();
+        return db_err_to_response(res.unwrap_err());
     };
 
     let clubs = db_clubs_to_club_infos(&state, db_clubs).await;
@@ -170,9 +168,7 @@ pub async fn clubs(State(state): State<AppState>) -> Response {
     let res = Club::list(&state, 100, 0).await;
 
     let Ok(db_clubs) = res else {
-        let err = res.unwrap_err();
-        tracing::error!(?err, "DB error on clubs");
-        return (StatusCode::INTERNAL_SERVER_ERROR, "DB ERROR").into_response();
+        return db_err_to_response(res.unwrap_err());
     };
 
     let clubs = db_clubs_to_club_infos(&state, db_clubs).await;
@@ -211,11 +207,7 @@ pub async fn club_details(
 ) -> axum::response::Result<Json<ClubDetails>> {
     let res = Club::list_members_with_info(state, club_id, 100, 0).await;
 
-    let Ok(mut db_members) = res else {
-        let err = res.unwrap_err();
-        tracing::error!(?err, "DB error on listing club members");
-        return Err((StatusCode::INTERNAL_SERVER_ERROR, "DB ERROR"))?;
-    };
+    let mut db_members = res.map_err(db_err_to_response)?;
 
     fn row_to_user_info(row: PublicClubMemberInfo) -> PublicUserInfoResponse {
         PublicUserInfoResponse {
@@ -329,10 +321,7 @@ pub async fn create_club(
     .await;
 
     let Ok(club) = club_res else {
-        // TODO: clean up inconsistent state (delete playlists on PeerTube)
-        let err = club_res.unwrap_err();
-        tracing::error!(?err, "DB error on create_club");
-        return (StatusCode::BAD_REQUEST, "Could not create club").into_response();
+        return db_err_to_response(club_res.unwrap_err());
     };
 
     let mut max_retry = 5;
@@ -374,8 +363,7 @@ pub async fn create_club(
     let res_add_admin = Club::add_or_update_member(&state, user.id, club.id, true).await;
     if let Err(err) = res_add_admin {
         // TODO: clean up inconsistent state (remove playlists, delete club)
-        tracing::error!(?err, "DB error on create_club -> add admin member");
-        return (StatusCode::BAD_REQUEST, "Could not add as club admin").into_response();
+        return db_err_to_response(err);
     }
 
     let club_info = ClubInfo {
@@ -416,18 +404,14 @@ async fn create_club_playlist_pair(
     let private_description = format!("auto-generated unlisted playlist for the club {title}");
 
     // create externally
-    let public_playlist = create_public_system_playlist(
-        state,
-        &public_display_name,
-        &public_description,
-        channel_id.num(),
-    )
-    .await?;
+    let public_playlist =
+        create_public_system_playlist(state, &public_display_name, &public_description, channel_id)
+            .await?;
     let private_playlist = create_unlisted_system_playlist(
         state,
         &private_display_name,
         &private_description,
-        channel_id.num(),
+        channel_id,
     )
     .await?;
 
@@ -475,8 +459,7 @@ pub async fn update_club(
 
     let res = Club::set_meta_fields(&state, club_id, payload.description, maybe_url).await;
     if let Err(err) = res {
-        tracing::error!(?err, "DB error on update_club");
-        return (StatusCode::INTERNAL_SERVER_ERROR, "Internal error").into_response();
+        return db_err_to_response(err);
     }
 
     state.clubs_cache.invalidate_club(club_id);
@@ -508,9 +491,9 @@ pub async fn add_club_member(
     let is_admin = false;
     let result =
         Club::add_or_update_member(&state, params.user_id(), params.club_id(), is_admin).await;
+
     if let Err(err) = result {
-        tracing::error!(?err, "DB error on add_club_member -> add_or_update_member");
-        return (StatusCode::INTERNAL_SERVER_ERROR, "Internal error").into_response();
+        return db_err_to_response(err);
     }
     (StatusCode::CREATED, "member added").into_response()
 }
@@ -560,7 +543,7 @@ pub async fn add_video(
     }
     let element = result.expect("just checked");
 
-    (StatusCode::CREATED, element.id.to_string()).into_response()
+    (StatusCode::CREATED, element.id.num().to_string()).into_response()
 }
 
 /// Create a new playlist for a club.
@@ -571,30 +554,7 @@ pub async fn add_playlist(
     axum::extract::Path(club_id): axum::extract::Path<ClubId>,
     Json(params): Json<AddClubPlaylistRequest>,
 ) -> axum::response::Result<Json<AddClubPlaylistResponse>> {
-    if params.display_name.len() > 120 || params.display_name.len() < 3 {
-        return Err((
-            StatusCode::BAD_REQUEST,
-            "description must be between 3 and 120 characters",
-        ))?;
-    }
-    if !params.description.is_empty()
-        && (params.description.len() > 1000 || params.description.len() < 3)
-    {
-        return Err((
-            StatusCode::BAD_REQUEST,
-            "description must be between 3 and 1000 characters",
-        ))?;
-    }
-
-    // Check permissions: Must be member for private lists, admin for public lists
-    let membership = get_membership(&state, me.id, club_id).await?;
-    if params.public {
-        if !matches!(membership, ClubMembership::Admin) {
-            return Err((StatusCode::FORBIDDEN, "not a club admin"))?;
-        }
-    } else if !matches!(membership, ClubMembership::Admin | ClubMembership::Member) {
-        return Err((StatusCode::FORBIDDEN, "not a club member"))?;
-    }
+    check_playlist_fields_and_permissions(&state, me.id, club_id, &params).await?;
 
     let club = get_club(&state, club_id).await?;
     let Some(channel_id) = club.channel_id else {
@@ -609,7 +569,7 @@ pub async fn add_playlist(
                 &state,
                 &params.display_name,
                 &params.description,
-                channel_id.num(),
+                channel_id,
             )
             .await
         } else {
@@ -617,7 +577,7 @@ pub async fn add_playlist(
                 &state,
                 &params.display_name,
                 &params.description,
-                channel_id.num(),
+                channel_id,
             )
             .await
         };
@@ -646,19 +606,97 @@ pub async fn add_playlist(
     Ok(Json(response))
 }
 
+// Edit meta data on a playlist for a club.
+#[axum::debug_handler]
+pub async fn edit_playlist(
+    Extension(me): Extension<User>,
+    State(state): State<AppState>,
+    axum::extract::Path((club_id, playlist_id)): axum::extract::Path<(ClubId, PeerTubePlaylistId)>,
+    Json(params): Json<AddClubPlaylistRequest>,
+) -> axum::response::Result<()> {
+    check_playlist_fields_and_permissions(&state, me.id, club_id, &params).await?;
+
+    // find club channel id
+    let club = get_club(&state, club_id).await?;
+    let Some(channel_id) = club.channel_id else {
+        return Err((StatusCode::INTERNAL_SERVER_ERROR, "club has no channel"))?;
+    };
+
+    // update all playlist fields on PeerTube
+    let mut max_retry = 5;
+    let final_result = loop {
+        let result = peertube::playlist::update_system_playlist(
+            &state,
+            playlist_id,
+            &params.display_name,
+            &params.description,
+            channel_id,
+        )
+        .await;
+        if let Err(e) = &result {
+            let retry = handle_peertube_error(&state, e).await;
+            if retry && max_retry > 0 {
+                max_retry -= 1;
+                continue;
+            }
+        }
+        break result;
+    };
+    if let Err(err) = final_result {
+        tracing::error!(?err, "failed updating playlist");
+        return Err((StatusCode::BAD_GATEWAY, "failed updating playlist"))?;
+    };
+
+    // possibly edit privacy in DB, to stay in sync with PeerTube
+    let is_private = !params.public;
+    let db_res = Playlist::update_club_playlist_privacy(&state, playlist_id, is_private).await;
+    db_res.map_err(db_err_to_response)?;
+
+    Ok(())
+}
+
+async fn check_playlist_fields_and_permissions(
+    state: &AppState,
+    user_id: UserId,
+    club_id: ClubId,
+    params: &AddClubPlaylistRequest,
+) -> axum::response::Result<()> {
+    if params.display_name.len() > 120 || params.display_name.len() < 3 {
+        return Err((
+            StatusCode::BAD_REQUEST,
+            "description must be between 3 and 120 characters",
+        ))?;
+    }
+    if !params.description.is_empty()
+        && (params.description.len() > 1000 || params.description.len() < 3)
+    {
+        return Err((
+            StatusCode::BAD_REQUEST,
+            "description must be between 3 and 1000 characters",
+        ))?;
+    }
+
+    // Check permissions: Must be member for private lists, admin for public lists
+    let membership = get_membership(state, user_id, club_id).await?;
+    if params.public {
+        if !matches!(membership, ClubMembership::Admin) {
+            return Err((StatusCode::FORBIDDEN, "not a club admin"))?;
+        }
+    } else if !matches!(membership, ClubMembership::Admin | ClubMembership::Member) {
+        return Err((StatusCode::FORBIDDEN, "not a club member"))?;
+    }
+    Ok(())
+}
+
 async fn get_membership(
     state: &AppState,
     user_id: UserId,
     club_id: ClubId,
 ) -> Result<ClubMembership, Response> {
     let result = Club::membership(state, user_id, club_id).await;
-    if let Err(err) = result {
-        tracing::error!(?err, "DB error on reading club membership");
-        return Err((StatusCode::INTERNAL_SERVER_ERROR, "Internal error").into_response());
-    }
-
-    Ok(result.expect("just checked"))
+    result.map_err(db_err_to_response)
 }
+
 async fn get_club(state: &AppState, club_id: ClubId) -> Result<Club, Response> {
     let Some(club) = Club::lookup(state, club_id).await else {
         return Err((StatusCode::NOT_FOUND, "no such club").into_response());
@@ -731,6 +769,18 @@ pub async fn update_avatar(
 
     state.clubs_cache.invalidate_club(club_id);
     Ok(())
+}
+
+#[track_caller]
+fn db_err_to_response(err: sqlx::Error) -> Response {
+    let location = std::panic::Location::caller();
+    tracing::error!(
+        ?err,
+        file = location.file(),
+        line = location.line(),
+        "DB error"
+    );
+    (StatusCode::INTERNAL_SERVER_ERROR, "DB ERROR").into_response()
 }
 
 fn validate_web_link(
