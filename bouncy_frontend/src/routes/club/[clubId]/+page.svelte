@@ -49,6 +49,13 @@
   let showAddVideoPopup = $state(false);
   let message = $state('');
   let mainFeed = $state();
+  /** @type {Playlist[]} */
+  let privatePlaylists = $state([]);
+  // svelte-ignore state_referenced_locally
+  let uploadToPlaylist = $state(clubDetails.main_playlist?.id);
+  let uploadPrivacy = $state(VIDEO_PRIVACY.PUBLIC);
+  /** @type {{refreshVideos: ()=>void} | undefined} */
+  let uploadToFeed = $state();
 
   /**
    * @param {PublicUserResponse} user
@@ -91,14 +98,14 @@
       return;
     }
     let videoId = video.video.id;
+    const targetFeed = uploadToFeed;
     userCtx
       .authenticatedPost('/clubs/video/add', {
         video_id: videoId,
         club_id: clubId,
-        // TODO: allow uploading to different playlists (this one is public)
-        playlist_id: clubDetails.main_playlist?.id,
+        playlist_id: uploadToPlaylist,
       })
-      .then(() => mainFeed.refreshVideos());
+      .then(() => targetFeed?.refreshVideos());
     showAddVideoPopup = false;
   }
 
@@ -108,6 +115,19 @@
 
   function openEdit() {
     goto('./edit');
+  }
+
+  /**
+   * @param {number | undefined} playlistId
+   * @param {import('$lib/peertube-openapi').VideoPrivacySet} privacy
+   * @param {{{refreshVideos: ()=>void} | undefined}} feed
+   */
+  function openVideoUpload(playlistId, privacy, feed) {
+    showAddMorePopup = false;
+    showAddVideoPopup = true;
+    uploadToPlaylist = playlistId;
+    uploadPrivacy = privacy;
+    uploadToFeed = feed;
   }
 </script>
 
@@ -144,24 +164,34 @@
       {$t('club.members-title')}
     </p>
 
-    <h2>{$t('club.public-videos-title')}</h2>
-    <ThumbnailFeed
-      bind:this={mainFeed}
-      playlistUuid={clubDetails.main_playlist?.short_uuid}
-    ></ThumbnailFeed>
+    {#if clubDetails.main_playlist}
+      <h2>{$t('club.public-videos-title')}</h2>
+      <ThumbnailFeed
+        bind:this={mainFeed}
+        playlistUuid={clubDetails.main_playlist.short_uuid}
+      ></ThumbnailFeed>
+    {/if}
 
     {#each clubDetails.public_playlists as playlist}
-      {#if playlist.id != clubDetails.main_playlist.id}
+      {#if playlist.id != clubDetails.main_playlist?.id}
         <Playlist playlistInfo={playlist} />
       {/if}
     {/each}
 
     {#if clubDetails.private}
       <h2>{$t('club.private-videos-title')}</h2>
-      {#each clubDetails.private.private_playlists as playlist}
-        {#if playlist.id != clubDetails.main_playlist.id}
-          <Playlist playlistInfo={playlist} />
-        {/if}
+      {#each clubDetails.private.private_playlists as playlist, i}
+        <Playlist bind:this={privatePlaylists[i]} playlistInfo={playlist} />
+        <button
+          onclick={() =>
+            openVideoUpload(
+              playlist.id,
+              VIDEO_PRIVACY.UNLISTED,
+              privatePlaylists[i]
+            )}
+        >
+          {$t('club.upload-video-button')}
+        </button>
       {/each}
     {/if}
 
@@ -211,10 +241,12 @@
     <Button
       symbol="upload"
       text={'club.upload-video-button'}
-      on:click={() => {
-        showAddMorePopup = false;
-        showAddVideoPopup = true;
-      }}
+      on:click={() =>
+        openVideoUpload(
+          clubDetails.main_playlist?.id,
+          VIDEO_PRIVACY.PUBLIC,
+          mainFeed
+        )}
     />
   </LoginRequiredContent>
 </PopupWithRunes>
@@ -222,7 +254,7 @@
 <PopupWithRunes bind:isOpen={showAddVideoPopup}>
   {#if userCtx.isLoggedInToApi()}
     <p>{$t('club.upload-video-description')}</p>
-    <VideoUpload {onVideoUploaded} privacy={VIDEO_PRIVACY.PUBLIC}></VideoUpload>
+    <VideoUpload {onVideoUploaded} privacy={uploadPrivacy}></VideoUpload>
   {/if}
 </PopupWithRunes>
 

@@ -56,6 +56,7 @@
         "update-button": "Save club",
         "upload-video-button": "Upload video",
         "upload-video-description": "Add public club video",
+        "upload-video-description-private": "Add video visible only to club members only",
         "select-user-title": "Select dancer",
         "confirm-add-user-p0": "Add ",
         "confirm-add-user-p1": " to ",
