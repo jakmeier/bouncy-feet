@@ -50,13 +50,22 @@ pub(crate) async fn create_unlisted_system_playlist(
     description: &str,
     channel_id: PeerTubeChannelId,
 ) -> Result<PeerTubePlaylist, PeerTubeError> {
-    let body = [
-        ("displayName", display_name),
-        ("description", description),
-        ("privacy", PlaylistPrivacy::Unlisted.to_num_str()),
-        ("videoChannelId", &channel_id.num().to_string()),
-    ];
-    create_system_playlist(state, &body).await
+    if description.is_empty() {
+        let body = [
+            ("displayName", display_name),
+            ("privacy", PlaylistPrivacy::Unlisted.to_num_str()),
+            ("videoChannelId", &channel_id.num().to_string()),
+        ];
+        create_system_playlist(state, &body).await
+    } else {
+        let body = [
+            ("displayName", display_name),
+            ("description", description),
+            ("privacy", PlaylistPrivacy::Unlisted.to_num_str()),
+            ("videoChannelId", &channel_id.num().to_string()),
+        ];
+        create_system_playlist(state, &body).await
+    }
 }
 
 /// Creates an impersonal (system) playlist on PeerTube that's publicly listed.
@@ -66,13 +75,22 @@ pub(crate) async fn create_public_system_playlist(
     description: &str,
     channel_id: PeerTubeChannelId,
 ) -> Result<PeerTubePlaylist, PeerTubeError> {
-    let body = [
-        ("displayName", display_name),
-        ("description", description),
-        ("privacy", PlaylistPrivacy::Public.to_num_str()),
-        ("videoChannelId", &channel_id.num().to_string()),
-    ];
-    create_system_playlist(state, &body).await
+    if description.is_empty() {
+        let body = [
+            ("displayName", display_name),
+            ("privacy", PlaylistPrivacy::Public.to_num_str()),
+            ("videoChannelId", &channel_id.num().to_string()),
+        ];
+        create_system_playlist(state, &body).await
+    } else {
+        let body = [
+            ("displayName", display_name),
+            ("description", description),
+            ("privacy", PlaylistPrivacy::Public.to_num_str()),
+            ("videoChannelId", &channel_id.num().to_string()),
+        ];
+        create_system_playlist(state, &body).await
+    }
 }
 
 async fn create_system_playlist<T: serde::Serialize + ?Sized>(
@@ -150,12 +168,21 @@ pub async fn update_system_playlist(
     description: &str,
     channel_id: PeerTubeChannelId,
 ) -> Result<PeerTubePlaylist, PeerTubeError> {
-    let body = [
-        ("displayName", display_name),
-        ("description", description),
-        ("privacy", PlaylistPrivacy::Unlisted.to_num_str()),
-        ("videoChannelId", &channel_id.num().to_string()),
-    ];
+    let channel_id = channel_id.num().to_string();
+    let body = if description.is_empty() {
+        vec![
+            ("displayName", display_name),
+            ("privacy", PlaylistPrivacy::Unlisted.to_num_str()),
+            ("videoChannelId", &channel_id),
+        ]
+    } else {
+        vec![
+            ("displayName", display_name),
+            ("description", description),
+            ("privacy", PlaylistPrivacy::Unlisted.to_num_str()),
+            ("videoChannelId", &channel_id),
+        ]
+    };
 
     let relative_path = format!("api/v1/video-playlists/{}", playlist_id.num());
     let url = state

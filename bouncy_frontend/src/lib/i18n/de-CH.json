@@ -51,6 +51,7 @@
         "public-videos-title": "Öffentliche Club Videos",
         "private-videos-title": "Private Club Videos",
         "add-user-button": "Mitglied hinzufügen",
+        "add-playlist-button": "Neue Playlist",
         "create-new-title": "Gründe einen neuen Club",
         "create-new-button": "Club erstellen",
         "update-button": "Club speichern",
@@ -364,6 +365,12 @@
     },
     "music": {
         "by": "von"
+    },
+    "playlist": {
+        "new-title": "Neue Playliste",
+        "form-title": "Name",
+        "form-description": "Beschreibung",
+        "save-button": "Playliste speichern"
     },
     "video": {
         "privacy-selection-title": "Video Zugriff",

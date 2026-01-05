@@ -149,7 +149,7 @@
     </div>
   {:else}
     <div class="club-summary">
-      <ActorAvatar actor={data.clubChannel} />
+      <ActorAvatar actor={data.clubChannel || undefined} />
 
       <div class="club-description">
         <div>{club.description}</div>
@@ -230,24 +230,34 @@
   <LoginRequiredContent
     reason={$t('profile.upload.requires-login-description')}
   >
-    <Button
-      symbol="boy"
-      text="club.add-user-button"
-      on:click={() => {
-        showAddMorePopup = false;
-        showUsersPopup = true;
-      }}
-    />
-    <Button
-      symbol="upload"
-      text={'club.upload-video-button'}
-      on:click={() =>
-        openVideoUpload(
-          clubDetails.main_playlist?.id,
-          VIDEO_PRIVACY.PUBLIC,
-          mainFeed
-        )}
-    />
+    <div class="add-more">
+      <Button
+        symbol="boy"
+        text="club.add-user-button"
+        class="full-width"
+        on:click={() => {
+          showAddMorePopup = false;
+          showUsersPopup = true;
+        }}
+      />
+      <Button
+        symbol="upload"
+        text={'club.upload-video-button'}
+        class="full-width"
+        on:click={() =>
+          openVideoUpload(
+            clubDetails.main_playlist?.id,
+            VIDEO_PRIVACY.PUBLIC,
+            mainFeed
+          )}
+      />
+      <Button
+        symbol="perm_media"
+        text={'club.add-playlist-button'}
+        class="full-width"
+        on:click={() => goto('./playlist/new')}
+      />
+    </div>
   </LoginRequiredContent>
 </PopupWithRunes>
 
@@ -283,5 +293,12 @@
     grid-template-columns: 1fr 3fr;
     gap: 1rem;
     margin-bottom: 1rem;
+  }
+
+  .add-more {
+    min-width: 200px;
+    display: grid;
+    width: 100%;
+    gap: 1rem;
   }
 </style>

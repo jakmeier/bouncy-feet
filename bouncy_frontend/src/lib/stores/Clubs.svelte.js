@@ -159,6 +159,30 @@ export async function updateClub(userCtx, clubId, details) {
 }
 
 /**
+ * @param {UserContextData} userCtx
+ * @param {number} clubId
+ * @param {string} name
+ * @param {string} description
+ * @param {boolean} isPublic
+ * @returns {Promise<{playlist_id: number} | undefined>}
+ */
+export async function createNewClubPlaylist(userCtx, clubId, name, description, isPublic) {
+    const body = {
+        display_name: name,
+        description,
+        public: isPublic,
+    }
+    const response = await userCtx.authenticatedPost(`/clubs/${clubId}/playlist/new`, body);
+
+    if (!response?.ok) {
+        console.error("Failed to create playlist", response);
+        return;
+    }
+
+    return await response.json();
+}
+
+/**
  * @param {string} input
  * @returns {string}
  */
