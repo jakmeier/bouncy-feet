@@ -62,7 +62,9 @@
   class="container"
   style="--component-width: {width}; --component-height: {height}; --button-height: {buttonHeight};"
 >
-  <button onclick={prev}>&lt;</button>
+  {#if items.length > 1}
+    <button onclick={prev}>&lt;</button>
+  {/if}
   <div
     class="elements"
     {...useSwipe(handler, () => ({
@@ -77,7 +79,9 @@
       </JuggleElement>
     {/each}
   </div>
-  <button onclick={next}>&gt;</button>
+  {#if items.length > 1}
+    <button onclick={next}>&gt;</button>
+  {/if}
 </div>
 
 <style>
