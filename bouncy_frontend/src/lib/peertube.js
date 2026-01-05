@@ -7,21 +7,51 @@
  * (with this client): https://heyapi.dev/openapi-ts/clients/fetch
  */
 
-import { PUBLIC_BF_PEERTUBE_URL } from '$env/static/public';
 import * as api from '$lib/peertube-openapi';
 import { getVideoPlaylistVideos, getUserInfo, uploadLegacy, uploadResumable, uploadResumableInit, uploadResumableCancel, getApiV1UsersMeVideos } from './peertube-openapi';
 
-const peerTubeUrl = PUBLIC_BF_PEERTUBE_URL;
+/**
+ * @param {string} playlistUuid
+ * @returns {Promise<api.GetApiV1VideoPlaylistsByPlaylistIdResponse>}
+ */
+export async function fetchPlaylist(playlistUuid) {
+    /** @type {api.Options<api.GetApiV1VideoPlaylistsByPlaylistIdData>} */
+    const options = {
+        path: {
+            // @ts-ignore: string also works here, even if not included in the
+            // openapi generated code. Using the numeric id DOES NOT work for
+            // unlisted playlists.
+            playlistId: playlistUuid
+        },
+    };
+    const { response, data } = await api.getApiV1VideoPlaylistsByPlaylistId(options);
+
+    if (!response.ok) {
+        // Body has already been consumed...
+        // const error = await response.text();
+        throw new Error(`Fetch playlist failed: ${response.status}`);
+    }
+
+    if (!data) {
+        const error = await response.text();
+        throw new Error(`No data returned ${error}`);
+    }
+
+    return data;
+}
 
 /**
- * @param {number} playlistId
+ * @param {string} playlistUuid
  * @returns {Promise<api.GetVideoPlaylistVideosResponse>}
  */
-export async function fetchVideosOfPlaylist(playlistId, start = 0, count = 20) {
+export async function fetchVideosOfPlaylist(playlistUuid, start = 0, count = 20) {
     /** @type {api.Options<api.GetVideoPlaylistVideosData>} */
     const options = {
         path: {
-            playlistId
+            // @ts-ignore: string also works here, even if not included in the
+            // openapi generated code. Using the numeric id DOES NOT work for
+            // unlisted playlists.
+            playlistId: playlistUuid
         },
         query: {
             start,

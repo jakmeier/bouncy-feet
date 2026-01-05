@@ -6,15 +6,15 @@
 
   /**
    * @typedef {Object} Props
-   * @property {number} playlistId
+   * @property {string} playlistUuid
    */
 
   /** @type {Props} */
-  let { playlistId } = $props();
+  let { playlistUuid } = $props();
 
   /** @returns {Promise<import('$lib/peertube-openapi').Video[] | undefined>} */
   async function fetchVideos() {
-    const videos = await fetchVideosOfPlaylist(playlistId);
+    const videos = await fetchVideosOfPlaylist(playlistUuid);
     return videos.data?.flatMap((v) => (v.video ? [v.video] : []));
   }
   /** @type {import('$lib/peertube-openapi').Video[] | undefined} */

@@ -12,6 +12,7 @@
   import LightSection from '$lib/components/ui/sections/LightSection.svelte';
   import LimeSection from '$lib/components/ui/sections/LimeSection.svelte';
   import Symbol from '$lib/components/ui/Symbol.svelte';
+  import Playlist from '$lib/components/ui/video/Playlist.svelte';
   import VideoUpload from '$lib/components/ui/video/VideoUpload.svelte';
   import UserList from '$lib/components/UserList.svelte';
   import { getUserContext } from '$lib/context';
@@ -146,16 +147,23 @@
     <h2>{$t('club.public-videos-title')}</h2>
     <ThumbnailFeed
       bind:this={mainFeed}
-      playlistId={clubDetails.main_playlist.id}
+      playlistUuid={clubDetails.main_playlist?.short_uuid}
     ></ThumbnailFeed>
 
     {#each clubDetails.public_playlists as playlist}
       {#if playlist.id != clubDetails.main_playlist.id}
-        <!-- TODO: playlist title -->
-        <h2>Playlist {playlist.id}</h2>
-        <ThumbnailFeed playlistId={playlist.id}></ThumbnailFeed>
+        <Playlist playlistInfo={playlist} />
       {/if}
     {/each}
+
+    {#if clubDetails.private}
+      <h2>{$t('club.private-videos-title')}</h2>
+      {#each clubDetails.private.private_playlists as playlist}
+        {#if playlist.id != clubDetails.main_playlist.id}
+          <Playlist playlistInfo={playlist} />
+        {/if}
+      {/each}
+    {/if}
 
     <PopupWithRunes bind:isOpen={showUsersPopup}>
       <div class="popup">
