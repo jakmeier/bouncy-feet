@@ -368,6 +368,7 @@
     },
     "playlist": {
         "new-title": "Neue Playliste",
+        "edit-title": "Playlist bearbeiten",
         "form-title": "Name",
         "form-description": "Beschreibung",
         "save-button": "Playliste speichern"

@@ -12,7 +12,7 @@ import { getVideoPlaylistVideos, getUserInfo, uploadLegacy, uploadResumable, upl
 
 /**
  * @param {string} playlistUuid
- * @returns {Promise<api.GetApiV1VideoPlaylistsByPlaylistIdResponse>}
+ * @returns {Promise<api.VideoPlaylist>}
  */
 export async function fetchPlaylist(playlistUuid) {
     /** @type {api.Options<api.GetApiV1VideoPlaylistsByPlaylistIdData>} */

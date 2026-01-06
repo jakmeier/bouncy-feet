@@ -40,6 +40,9 @@
   const clubDetails = $derived(
     clubsData.currentClubDetails || data.publicClubDetails
   );
+  const isClubMember = $derived.by(
+    () => clubsData.mine.findIndex((c) => c.id === clubId) !== -1
+  );
   // TODO: isAdmin check
   // const isAdmin = $derived(clubDetails.admins.findIndex((u) => u.id === myId) !== -1);
   const isAdmin = true;
@@ -120,7 +123,7 @@
   /**
    * @param {number | undefined} playlistId
    * @param {import('$lib/peertube-openapi').VideoPrivacySet} privacy
-   * @param {{{refreshVideos: ()=>void} | undefined}} feed
+   * @param {{refreshVideos: ()=>void} | undefined} feed
    */
   function openVideoUpload(playlistId, privacy, feed) {
     showAddMorePopup = false;
@@ -174,14 +177,18 @@
 
     {#each clubDetails.public_playlists as playlist}
       {#if playlist.id != clubDetails.main_playlist?.id}
-        <Playlist playlistInfo={playlist} />
+        <Playlist playlistInfo={playlist} editable={isClubMember} />
       {/if}
     {/each}
 
     {#if clubDetails.private}
       <h2>{$t('club.private-videos-title')}</h2>
       {#each clubDetails.private.private_playlists as playlist, i}
-        <Playlist bind:this={privatePlaylists[i]} playlistInfo={playlist} />
+        <Playlist
+          bind:this={privatePlaylists[i]}
+          playlistInfo={playlist}
+          editable={isClubMember}
+        />
         <button
           onclick={() =>
             openVideoUpload(

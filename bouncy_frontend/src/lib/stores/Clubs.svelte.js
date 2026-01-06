@@ -183,6 +183,31 @@ export async function createNewClubPlaylist(userCtx, clubId, name, description, 
 }
 
 /**
+ * @param {UserContextData} userCtx
+ * @param {number} clubId
+ * @param {number} playlistId
+ * @param {string} name
+ * @param {string} description
+ * @param {boolean} isPublic
+ * @returns {Promise<boolean>} true if success
+ */
+export async function updateClubPlaylist(userCtx, clubId, playlistId, name, description, isPublic) {
+    const body = {
+        display_name: name,
+        description,
+        public: isPublic,
+    }
+    const response = await userCtx.authenticatedPost(`/clubs/${clubId}/playlist/${playlistId}/edit`, body);
+
+    if (!response?.ok) {
+        console.error("Failed to edit playlist", response);
+        return false;
+    }
+
+    return true;
+}
+
+/**
  * @param {string} input
  * @returns {string}
  */

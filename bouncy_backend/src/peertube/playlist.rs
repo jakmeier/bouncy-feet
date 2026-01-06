@@ -167,7 +167,7 @@ pub async fn update_system_playlist(
     display_name: &str,
     description: &str,
     channel_id: PeerTubeChannelId,
-) -> Result<PeerTubePlaylist, PeerTubeError> {
+) -> Result<(), PeerTubeError> {
     let channel_id = channel_id.num().to_string();
     let body = if description.is_empty() {
         vec![
@@ -200,11 +200,8 @@ pub async fn update_system_playlist(
         .send()
         .await;
 
-    let ok_response = check_peertube_system_user_response(response, token).await?;
-    let status = ok_response.status();
-    let playlist: Result<PlaylistCreatedResponse, _> = ok_response.json().await;
-    let playlist = playlist.map_err(|err| PeerTubeError::JsonParsingFailed(status, err))?;
-    Ok(playlist.video_playlist)
+    check_peertube_system_user_response(response, token).await?;
+    Ok(())
 }
 
 impl PeerTubePlaylistId {
