@@ -369,6 +369,7 @@
     "playlist": {
         "new-title": "Neue Playliste",
         "edit-title": "Playlist bearbeiten",
+        "edit-videos-title": "Playlist Videos",
         "form-title": "Name",
         "form-description": "Beschreibung",
         "save-button": "Playliste speichern"

@@ -3,6 +3,7 @@
   import PlaylistForm from '$lib/components/playlist/PlaylistForm.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
   import BackHeader from '$lib/components/ui/header/BackHeader.svelte';
+  import ClubInfoHeader from '$lib/components/ui/header/ClubInfoHeader.svelte';
   import LimeSection from '$lib/components/ui/sections/LimeSection.svelte';
   import { getUserContext } from '$lib/context';
   import { t } from '$lib/i18n';
@@ -37,14 +38,17 @@
 </script>
 
 <LimeSection fillScreen>
-  <BackHeader title={$t('playlist.new-title')} mainColor />
+  {#if data.clubChannel}
+    <ClubInfoHeader
+      title={$t('playlist.new-title')}
+      userOrChannel={data.clubChannel}
+      mainColor
+    />
+  {:else}
+    <BackHeader title={$t('playlist.new-title')} mainColor />
+  {/if}
 
-  <PlaylistForm
-    bind:name
-    bind:description
-    userOrChannel={data.clubChannel || undefined}
-    onSubmit={save}
-  />
+  <PlaylistForm bind:name bind:description onSubmit={save} />
 
   <Footer />
 </LimeSection>

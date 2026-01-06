@@ -41,13 +41,12 @@
 
 <style>
   .playlist {
-    background-color: var(--theme-main);
     position: relative;
   }
 
   .symbol {
     position: absolute;
-    right: 0.5rem;
-    top: 0.5rem;
+    right: 0;
+    top: -1rem;
   }
 </style>

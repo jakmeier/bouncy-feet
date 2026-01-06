@@ -51,5 +51,6 @@
   .right-button-group {
     height: 2rem;
     display: flex;
+    justify-content: right;
   }
 </style>

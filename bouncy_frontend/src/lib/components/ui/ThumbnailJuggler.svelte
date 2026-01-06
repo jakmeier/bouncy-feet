@@ -257,6 +257,7 @@
 
   .name:hover {
     background-color: var(--theme-neutral-light);
+    color: var(--theme-neutral-dark);
     border-radius: 0.5rem;
     height: auto;
     min-height: calc(2.5 * var(--font-normal));

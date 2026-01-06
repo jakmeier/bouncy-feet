@@ -7,10 +7,11 @@
   import ThumbnailFeed from '$lib/components/ThumbnailFeed.svelte';
   import Button from '$lib/components/ui/Button.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
-  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
+  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
   import PopupWithRunes from '$lib/components/ui/PopupWithRunes.svelte';
   import LightSection from '$lib/components/ui/sections/LightSection.svelte';
   import LimeSection from '$lib/components/ui/sections/LimeSection.svelte';
+  import NightSection from '$lib/components/ui/sections/NightSection.svelte';
   import Symbol from '$lib/components/ui/Symbol.svelte';
   import Playlist from '$lib/components/ui/video/Playlist.svelte';
   import VideoUpload from '$lib/components/ui/video/VideoUpload.svelte';
@@ -180,40 +181,23 @@
         <Playlist playlistInfo={playlist} editable={isClubMember} />
       {/if}
     {/each}
+  {/if}
+</LimeSection>
 
-    {#if clubDetails.private}
-      <h2>{$t('club.private-videos-title')}</h2>
-      {#each clubDetails.private.private_playlists as playlist, i}
+<NightSection>
+  {#if clubDetails.private}
+    <h2>{$t('club.private-videos-title')}</h2>
+    {#each clubDetails.private.private_playlists as playlist, i}
+      <div class="playlist">
         <Playlist
           bind:this={privatePlaylists[i]}
           playlistInfo={playlist}
           editable={isClubMember}
         />
-        <button
-          onclick={() =>
-            openVideoUpload(
-              playlist.id,
-              VIDEO_PRIVACY.UNLISTED,
-              privatePlaylists[i]
-            )}
-        >
-          {$t('club.upload-video-button')}
-        </button>
-      {/each}
-    {/if}
-
-    <PopupWithRunes bind:isOpen={showUsersPopup}>
-      <div class="popup">
-        {#if message}
-          <div>{message}</div>
-        {:else}
-          <div>{$t('club.select-user-title')}</div>
-          <UserList onSelect={onSelectUser}></UserList>
-        {/if}
       </div>
-    </PopupWithRunes>
+    {/each}
   {/if}
-</LimeSection>
+</NightSection>
 
 <LightSection>
   <h2>{$t('club.admins-title')}</h2>
@@ -232,6 +216,17 @@
   {/if}
   <Footer />
 </LightSection>
+
+<PopupWithRunes bind:isOpen={showUsersPopup}>
+  <div class="popup">
+    {#if message}
+      <div>{message}</div>
+    {:else}
+      <div>{$t('club.select-user-title')}</div>
+      <UserList onSelect={onSelectUser}></UserList>
+    {/if}
+  </div>
+</PopupWithRunes>
 
 <PopupWithRunes bind:isOpen={showAddMorePopup}>
   <LoginRequiredContent
@@ -307,5 +302,13 @@
     display: grid;
     width: 100%;
     gap: 1rem;
+  }
+
+  .playlist {
+    background-color: var(--theme-neutral-almost-black);
+    color: var(--theme-neutral-white);
+    border-radius: 1rem;
+    padding: 0 1rem;
+    margin: 1rem 0;
   }
 </style>

@@ -22,6 +22,11 @@
   let isUploading = $state(false);
   let uploadProgress = $state(0);
   let error = $state('');
+  let fileInput = $state();
+
+  export function open() {
+    fileInput.click();
+  }
 
   /**
    * @returns {Promise<number>}
@@ -97,7 +102,12 @@
 
 <!-- TODO: Is a nested Login-required a good idea? -->
 <LoginRequiredContent reason={$t('profile.upload.requires-login-description')}>
-  <input type="file" accept="video/*" onchange={handleFileSelect} />
+  <input
+    bind:this={fileInput}
+    type="file"
+    accept="video/*"
+    onchange={handleFileSelect}
+  />
 
   {#if isUploading}
     <p>Uploading… {uploadProgress}%</p>
