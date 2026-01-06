@@ -4,7 +4,7 @@
   import { beatCounter } from '$lib/stores/Beat';
   import LightSection from '$lib/components/ui/sections/LightSection.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
-  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
+  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
   import HelpUs from '$lib/components/info/HelpUs.svelte';
   import LifetimeStats from './profile/LifetimeStats.svelte';
   import About from '$lib/components/info/About.svelte';

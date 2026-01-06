@@ -7,7 +7,7 @@
   import { dev, displayedVersion } from '$lib/stores/FeatureSelection';
   import Symbol from '$lib/components/ui/Symbol.svelte';
   import { getUserContext } from '$lib/context';
-  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
+  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
   import DarkSection from '$lib/components/ui/sections/DarkSection.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
   import LimeSection from '$lib/components/ui/sections/LimeSection.svelte';

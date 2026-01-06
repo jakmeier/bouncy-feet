@@ -4,9 +4,8 @@
   import VideoReview from '../review/VideoReview.svelte';
   import Background from '../ui/sections/Background.svelte';
   import LessonEndResults from './LessonEndResults.svelte';
-  import NextSectionArrow from '../ui/NextSectionArrow.svelte';
   import DarkSection from '../ui/sections/DarkSection.svelte';
-  import LogoHeader from '../ui/LogoHeader.svelte';
+  import LogoHeader from '../ui/header/LogoHeader.svelte';
 
   let { detection, videoUrl, recordingStart, recordingEnd, onRestart, onBack } =
     $props();

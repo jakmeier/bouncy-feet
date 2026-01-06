@@ -4,7 +4,7 @@
   import { bpm } from '$lib/stores/Beat';
   import { getContext, onMount } from 'svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
-  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
+  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
   import { coachData } from '$lib/coach';
   import AvatarStyleContext from '$lib/components/avatar/AvatarStyleContext.svelte';
   import { goto } from '$app/navigation';

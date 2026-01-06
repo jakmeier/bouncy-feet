@@ -1,5 +1,5 @@
 <script>
-  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
+  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
   import { t } from '$lib/i18n';
 </script>
 

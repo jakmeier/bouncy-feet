@@ -8,7 +8,7 @@
   import DanceEditorSteps from './DanceEditorSteps.svelte';
   import { goto } from '$app/navigation';
   import { dynamicCounter } from '$lib/timer';
-  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
+  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
 
   /**
    * @typedef {Object} Props

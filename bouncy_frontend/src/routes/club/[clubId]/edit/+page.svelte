@@ -2,7 +2,7 @@
   import { page } from '$app/state';
   import EditClub from '$lib/components/club/EditClub.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
-  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
+  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
   import LimeSection from '$lib/components/ui/sections/LimeSection.svelte';
   import { getClubsContext } from '$lib/stores/Clubs.svelte';
 

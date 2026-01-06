@@ -13,7 +13,7 @@
   import { writable } from 'svelte/store';
   import Button from '$lib/components/ui/Button.svelte';
   import { downloadTextFile } from '$lib/text_utils';
-  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
+  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
 
   const localCollectionCtx = getContext('localCollection');
 

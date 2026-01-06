@@ -17,7 +17,7 @@
     detectionDelayTotal,
   } from '$lib/stores/System';
   import { getUserContext } from '$lib/context';
-  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
+  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
 
   const user = getUserContext().store;
 

@@ -15,7 +15,7 @@
   import Button from '$lib/components/ui/Button.svelte';
   import { DetectionState } from '$lib/instructor/bouncy_instructor';
   import { getUserContext } from '$lib/context';
-  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
+  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
 
   const stepName = page.params.stepName;
   const instructorStep = stepsByName(stepName)[0];

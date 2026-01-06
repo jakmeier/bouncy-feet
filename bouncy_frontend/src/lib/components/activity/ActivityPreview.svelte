@@ -8,7 +8,7 @@
   import DarkSection from '$lib/components/ui/sections/DarkSection.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
   import { Tracker, VideoDef } from '$lib/instructor/bouncy_instructor';
-  import LogoHeader from '../ui/LogoHeader.svelte';
+  import LogoHeader from '../ui/header/LogoHeader.svelte';
   import TrackerPreview from '../avatar/TrackerPreview.svelte';
   import Background from '../ui/sections/Background.svelte';
   import PreviewDetails from './PreviewDetails.svelte';

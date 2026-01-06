@@ -1,5 +1,5 @@
 <script>
-  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
+  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
   import LimeSection from '$lib/components/ui/sections/LimeSection.svelte';
   import { fetchMyVideos } from '$lib/peertube';
   import { t, locale, coachLocale } from '$lib/i18n';

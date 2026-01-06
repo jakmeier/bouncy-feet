@@ -1,13 +1,12 @@
 <script>
-  import { base } from '$app/paths';
-  import { receivePersonalityTitle } from '$lib/stores/Crossfade.svelte';
-  import Arrow from './svg/Arrow.svelte';
-  import { fadingOut } from '$lib/stores/UiState.svelte';
-  import Plus from './svg/Plus.svelte';
-  import UnstyledButton from './UnstyledButton.svelte';
+  import { asset } from '$app/paths';
+  import Arrow from '../svg/Arrow.svelte';
+  import Plus from '../svg/Plus.svelte';
+  import UnstyledButton from '../UnstyledButton.svelte';
   import { goto } from '$app/navigation';
   import { onDestroy, onMount } from 'svelte';
   import { fade, fly } from 'svelte/transition';
+  import HeaderTemplate from './HeaderTemplate.svelte';
 
   /**
    * @typedef {Object} Props
@@ -61,8 +60,8 @@
 
   let imgUrl = $derived(
     white || accent || mainColor
-      ? `${base}/icons/logo.svg`
-      : `${base}/icons/icon_tight_on_transparent.png`
+      ? asset('/icons/logo.svg')
+      : asset('/icons/icon_tight_on_transparent.png')
   );
 
   let oddAnimation = $state(true);
@@ -79,8 +78,8 @@
   });
 </script>
 
-<header style="background-color: {bgColor};">
-  <div class="buttons-wrapper">
+<HeaderTemplate {bgColor} {title}>
+  {#snippet topLeft()}
     {#if backButton}
       <UnstyledButton onClick={onBack}>
         <div class="arrow">
@@ -116,69 +115,42 @@
     {:else}
       <img class="logo" src={imgUrl} alt="Bouncy Feet Logo" />
     {/if}
-    <div class="right-button-group">
-      {#if onSecondAction}
-        <UnstyledButton onClick={onSecondAction}>
-          <div class="action">
-            {#if secondButton}
-              <span class="material-symbols-outlined button" translate="no">
-                {secondButton}
-              </span>
-            {:else}
-              <Plus />
-            {/if}
-          </div>
-        </UnstyledButton>
-      {/if}
-      {#if onAction}
-        <UnstyledButton onClick={onAction}>
-          <div class="action">
-            {#if button}
-              <span class="material-symbols-outlined button" translate="no">
-                {button}
-              </span>
-            {:else}
-              <Plus />
-            {/if}
-          </div>
-        </UnstyledButton>
-      {/if}
-    </div>
-  </div>
-  {#if !fadingOut.text}
-    <h1
-      class="title"
-      in:receivePersonalityTitle={{
-        key: 'pageTitle',
-      }}
-    >
-      {title}
-    </h1>
-  {/if}
-</header>
+  {/snippet}
+
+  {#snippet topRight()}
+    {#if onSecondAction}
+      <UnstyledButton onClick={onSecondAction}>
+        <div class="action">
+          {#if secondButton}
+            <span class="material-symbols-outlined button" translate="no">
+              {secondButton}
+            </span>
+          {:else}
+            <Plus />
+          {/if}
+        </div>
+      </UnstyledButton>
+    {/if}
+    {#if onAction}
+      <UnstyledButton onClick={onAction}>
+        <div class="action">
+          {#if button}
+            <span class="material-symbols-outlined button" translate="no">
+              {button}
+            </span>
+          {:else}
+            <Plus />
+          {/if}
+        </div>
+      </UnstyledButton>
+    {/if}
+  {/snippet}
+</HeaderTemplate>
 
 <style>
-  header {
-    display: flex;
-    flex-direction: column;
-    margin-top: 1.5rem;
-  }
-
-  header img.logo {
+  img.logo {
     height: 3rem;
     align-self: baseline;
-  }
-
-  .buttons-wrapper {
-    height: 2rem;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-  }
-
-  .right-button-group {
-    height: 2rem;
-    display: flex;
   }
 
   .arrow {

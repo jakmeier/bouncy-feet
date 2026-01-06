@@ -1,6 +1,6 @@
 <script>
   import Footer from '$lib/components/ui/Footer.svelte';
-  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
+  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
   import { locale, t } from '$lib/i18n';
   import { onMount } from 'svelte';
   import { fade, slide } from 'svelte/transition';

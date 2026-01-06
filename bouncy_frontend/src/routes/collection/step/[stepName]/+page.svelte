@@ -12,7 +12,7 @@
   import Symbol from '$lib/components/ui/Symbol.svelte';
   import Button from '$lib/components/ui/Button.svelte';
   import { getUserContext } from '$lib/context';
-  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
+  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
 
   const user = getUserContext().store;
   const name = page.params.stepName;

@@ -9,7 +9,7 @@
   import { PoseFileWrapper } from '$lib/instructor/bouncy_instructor';
   import { downloadTextFile } from '$lib/text_utils';
   import { goto } from '$app/navigation';
-  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
+  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
 
   /**
    * @typedef {Object} Props

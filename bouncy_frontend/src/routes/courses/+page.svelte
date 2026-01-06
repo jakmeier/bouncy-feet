@@ -5,7 +5,7 @@
   import Step from '../collection/Step.svelte';
   import { counter } from '$lib/timer';
   import { timeBetweenMoves } from '$lib/stores/Beat';
-  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
+  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
 
   const { courses } = getContext('courses');
   const beat = counter(-1, 1, $timeBetweenMoves);

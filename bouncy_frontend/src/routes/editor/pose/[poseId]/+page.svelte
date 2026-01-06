@@ -6,7 +6,7 @@
   import { getContext, onMount } from 'svelte';
   import { t } from '$lib/i18n';
   import { beforeNavigate } from '$app/navigation';
-  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
+  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
 
   const poseId = page.params.poseId;
 

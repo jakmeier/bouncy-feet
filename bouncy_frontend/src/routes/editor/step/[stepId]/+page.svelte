@@ -1,7 +1,7 @@
 <script>
   import { page } from '$app/state';
   import StepEditForm from '$lib/components/editor/StepEditForm.svelte';
-  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
+  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
   import { t } from '$lib/i18n';
   import { StepWrapper } from '$lib/instructor/bouncy_instructor';
   import { getContext, onMount } from 'svelte';

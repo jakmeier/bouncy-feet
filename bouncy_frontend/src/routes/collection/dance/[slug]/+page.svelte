@@ -13,7 +13,7 @@
   import DanceCounts from '$lib/components/DanceCounts.svelte';
   import { bpm, setBpm, beatCounter, timeBetweenMoves } from '$lib/stores/Beat';
   import Collapse from '$lib/components/ui/Collapse.svelte';
-  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
+  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
 
   /** @type {import('./$types').PageData} */
   export let data;

@@ -7,7 +7,7 @@
   import { coaches } from '$lib/coach';
   import DanceCounts from '$lib/components/DanceCounts.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
-  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
+  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
   import LightSection from '$lib/components/ui/sections/LightSection.svelte';
   import NightSection from '$lib/components/ui/sections/NightSection.svelte';
   import CornerMarker from '$lib/components/ui/CornerMarker.svelte';

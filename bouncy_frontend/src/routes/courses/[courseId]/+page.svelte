@@ -4,7 +4,7 @@
   import { counter } from '$lib/timer';
   import Background from '$lib/components/ui/sections/Background.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
-  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
+  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
   import NightSection from '$lib/components/ui/sections/NightSection.svelte';
   import VideoWithMetaData from '$lib/components/ui/video/VideoWithMetaData.svelte';
   import { getUserContext } from '$lib/context';

@@ -7,7 +7,7 @@
   import Exercise from './Exercise.svelte';
   import Explanation from '$lib/components/ui/Explanation.svelte';
   import { goto } from '$app/navigation';
-  import LogoHeader from '$lib/components/ui/LogoHeader.svelte';
+  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
 
   const { getCourse } = getContext('courses');
 

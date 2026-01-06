@@ -12,7 +12,7 @@
   import Button from '../ui/Button.svelte';
   import Toggle from '../ui/Toggle.svelte';
   import BeatVisualizer from './BeatVisualizer.svelte';
-  import LogoHeader from '../ui/LogoHeader.svelte';
+  import LogoHeader from '../ui/header/LogoHeader.svelte';
 
   /**
    * @typedef {Object} Props
