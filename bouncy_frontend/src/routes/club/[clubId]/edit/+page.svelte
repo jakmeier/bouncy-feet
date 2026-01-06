@@ -2,7 +2,7 @@
   import { page } from '$app/state';
   import EditClub from '$lib/components/club/EditClub.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
-  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
+  import BackHeader from '$lib/components/ui/header/BackHeader.svelte';
   import LimeSection from '$lib/components/ui/sections/LimeSection.svelte';
   import { getClubsContext } from '$lib/stores/Clubs.svelte';
 
@@ -26,7 +26,7 @@
 </script>
 
 <LimeSection>
-  <LogoHeader title={club?.name} backButton mainColor></LogoHeader>
+  <BackHeader title={club?.name} mainColor />
 
   {#if club}
     <EditClub

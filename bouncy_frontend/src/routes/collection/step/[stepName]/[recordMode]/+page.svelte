@@ -15,7 +15,7 @@
   import Button from '$lib/components/ui/Button.svelte';
   import { DetectionState } from '$lib/instructor/bouncy_instructor';
   import { getUserContext } from '$lib/context';
-  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
+  import BackHeader from '$lib/components/ui/header/BackHeader.svelte';
 
   const stepName = page.params.stepName;
   const instructorStep = stepsByName(stepName)[0];
@@ -174,9 +174,9 @@
 {#if $hideNavigation}
   <div class="title">{stepName}</div>
 {:else if isLearnMode}
-  <LogoHeader title="{$t('record.learn-dance-prefix')} {stepName}" backButton />
+  <BackHeader title="{$t('record.learn-dance-prefix')} {stepName}" />
 {:else}
-  <LogoHeader title="{$t('record.train-dance-prefix')} {stepName}" backButton />
+  <BackHeader title="{$t('record.train-dance-prefix')} {stepName}" />
 {/if}
 
 <div id="outer">

@@ -2,7 +2,7 @@
   import { page } from '$app/state';
   import PlaylistForm from '$lib/components/playlist/PlaylistForm.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
-  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
+  import BackHeader from '$lib/components/ui/header/BackHeader.svelte';
   import LimeSection from '$lib/components/ui/sections/LimeSection.svelte';
   import { getUserContext } from '$lib/context';
   import { t } from '$lib/i18n';
@@ -37,7 +37,7 @@
 </script>
 
 <LimeSection fillScreen>
-  <LogoHeader title={$t('playlist.new-title')} backButton mainColor />
+  <BackHeader title={$t('playlist.new-title')} mainColor />
 
   <PlaylistForm
     bind:name

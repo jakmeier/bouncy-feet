@@ -12,7 +12,7 @@
   import Button from '../ui/Button.svelte';
   import Toggle from '../ui/Toggle.svelte';
   import BeatVisualizer from './BeatVisualizer.svelte';
-  import LogoHeader from '../ui/header/LogoHeader.svelte';
+  import BackHeader from '../ui/header/BackHeader.svelte';
 
   /**
    * @typedef {Object} Props
@@ -75,7 +75,7 @@
   }
 </script>
 
-<LogoHeader title={$t('record.prepare-title')} backButton />
+<BackHeader title={$t('record.prepare-title')} />
 
 <div class="outer">
   <div class="visualizer" onpointerdown={tap}>

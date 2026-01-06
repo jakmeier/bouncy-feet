@@ -9,7 +9,7 @@
   import { PoseFileWrapper } from '$lib/instructor/bouncy_instructor';
   import { downloadTextFile } from '$lib/text_utils';
   import { goto } from '$app/navigation';
-  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
+  import SingleActionHeader from '$lib/components/ui/header/SingleActionHeader.svelte';
 
   /**
    * @typedef {Object} Props
@@ -75,11 +75,10 @@
   }
 </script>
 
-<LogoHeader
+<SingleActionHeader
   title={$t('editor.pose.title')}
   button="menu"
   onAction={openSettings}
-  backButton
 />
 
 <div class="centered">

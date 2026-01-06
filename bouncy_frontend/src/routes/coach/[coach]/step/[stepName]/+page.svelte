@@ -7,7 +7,7 @@
   import { coaches } from '$lib/coach';
   import DanceCounts from '$lib/components/DanceCounts.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
-  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
+  import BackHeader from '$lib/components/ui/header/BackHeader.svelte';
   import LightSection from '$lib/components/ui/sections/LightSection.svelte';
   import NightSection from '$lib/components/ui/sections/NightSection.svelte';
   import CornerMarker from '$lib/components/ui/CornerMarker.svelte';
@@ -62,7 +62,7 @@
 </script>
 
 <NightSection fillScreen arrow>
-  <LogoHeader title={name} backButton />
+  <BackHeader title={name} />
   <!-- TODO: could be nice to have square videos here for better screen fitting -->
   <div class="video-wrapper">
     {#if video && video.length > 0}

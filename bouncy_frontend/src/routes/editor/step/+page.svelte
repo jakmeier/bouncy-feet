@@ -13,7 +13,7 @@
   import { writable } from 'svelte/store';
   import Button from '$lib/components/ui/Button.svelte';
   import { downloadTextFile } from '$lib/text_utils';
-  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
+  import SingleActionHeader from '$lib/components/ui/header/SingleActionHeader.svelte';
 
   const localCollectionCtx = getContext('localCollection');
 
@@ -78,11 +78,10 @@
   }
 </script>
 
-<LogoHeader
+<SingleActionHeader
   title={$t('editor.step.title')}
   button="menu"
   onAction={openSettings}
-  backButton
 />
 
 <div class="centered">

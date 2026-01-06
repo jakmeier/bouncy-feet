@@ -17,7 +17,7 @@
     detectionDelayTotal,
   } from '$lib/stores/System';
   import { getUserContext } from '$lib/context';
-  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
+  import BackHeader from '$lib/components/ui/header/BackHeader.svelte';
 
   const user = getUserContext().store;
 
@@ -27,7 +27,7 @@
   }
 </script>
 
-<LogoHeader title={$t('profile.settings.title')} backButton />
+<BackHeader title={$t('profile.settings.title')} />
 
 <div id="control-panel">
   <div class="toggle-item">

@@ -4,7 +4,6 @@
   import { bpm } from '$lib/stores/Beat';
   import { getContext, onMount } from 'svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
-  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
   import { coachData } from '$lib/coach';
   import AvatarStyleContext from '$lib/components/avatar/AvatarStyleContext.svelte';
   import { goto } from '$app/navigation';
@@ -16,6 +15,7 @@
   import Section from '$lib/components/ui/sections/Section.svelte';
   import { PUBLIC_ENV } from '$env/static/public';
   import ScrollToTop from '$lib/components/ScrollToTop.svelte';
+  import SingleActionHeader from '$lib/components/ui/header/SingleActionHeader.svelte';
 
   /**
    * @typedef {Object} Props
@@ -67,9 +67,8 @@
     bgColor={'var(--theme-neutral-dark)'}
     color={coach.style.pageColoring.pageColor}
   >
-    <LogoHeader
+    <SingleActionHeader
       transparent
-      backButton
       {onBack}
       title={coach.title[coachLocale($locale)]}
       onAction={onAddVideo}

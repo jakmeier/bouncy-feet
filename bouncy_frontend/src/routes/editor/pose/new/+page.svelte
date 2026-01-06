@@ -1,9 +1,9 @@
 <script>
   import VideoToPose from '$lib/components/editor/VideoToPose.svelte';
-  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
+  import BackHeader from '$lib/components/ui/header/BackHeader.svelte';
   import { t } from '$lib/i18n';
 </script>
 
-<LogoHeader title={$t('editor.pose.new')} backButton />
+<BackHeader title={$t('editor.pose.new')} />
 
 <VideoToPose></VideoToPose>

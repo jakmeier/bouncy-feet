@@ -12,7 +12,7 @@
   import Symbol from '$lib/components/ui/Symbol.svelte';
   import Button from '$lib/components/ui/Button.svelte';
   import { getUserContext } from '$lib/context';
-  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
+  import BackHeader from '$lib/components/ui/header/BackHeader.svelte';
 
   const user = getUserContext().store;
   const name = page.params.stepName;
@@ -38,7 +38,7 @@
   let selected = $state(selectItems[0]);
 </script>
 
-<LogoHeader title={name} backButton />
+<BackHeader title={name} />
 
 <Step
   step={selected.value}

@@ -1,7 +1,7 @@
 <script>
   import { page } from '$app/state';
   import StepEditForm from '$lib/components/editor/StepEditForm.svelte';
-  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
+  import SingleActionHeader from '$lib/components/ui/header/SingleActionHeader.svelte';
   import { t } from '$lib/i18n';
   import { StepWrapper } from '$lib/instructor/bouncy_instructor';
   import { getContext, onMount } from 'svelte';
@@ -27,11 +27,10 @@
   });
 </script>
 
-<LogoHeader
+<SingleActionHeader
   title={$t('editor.step.edit')}
   button="save"
   onAction={save}
-  backButton
 />
 
 <StepEditForm bind:save bind:loadStep></StepEditForm>

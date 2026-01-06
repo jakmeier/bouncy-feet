@@ -8,7 +8,7 @@
   import DanceEditorSteps from './DanceEditorSteps.svelte';
   import { goto } from '$app/navigation';
   import { dynamicCounter } from '$lib/timer';
-  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
+  import SingleActionHeader from '$lib/components/ui/header/SingleActionHeader.svelte';
 
   /**
    * @typedef {Object} Props
@@ -90,12 +90,7 @@
   }
 </script>
 
-<LogoHeader
-  title={danceName}
-  button="save"
-  onAction={openSavePopup}
-  backButton
-/>
+<SingleActionHeader title={danceName} button="save" onAction={openSavePopup} />
 
 <div class="page">
   <div

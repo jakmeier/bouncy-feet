@@ -13,7 +13,7 @@
   import DanceCounts from '$lib/components/DanceCounts.svelte';
   import { bpm, setBpm, beatCounter, timeBetweenMoves } from '$lib/stores/Beat';
   import Collapse from '$lib/components/ui/Collapse.svelte';
-  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
+  import SingleActionHeader from '$lib/components/ui/header/SingleActionHeader.svelte';
 
   /** @type {import('./$types').PageData} */
   export let data;
@@ -68,11 +68,10 @@
 </script>
 
 <!-- TODO: translate -->
-<LogoHeader
+<SingleActionHeader
   title={$id}
   button="edit"
   onAction={() => optionsPopupActive.set(true)}
-  backButton
 />
 
 <div class="page">

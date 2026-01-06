@@ -6,7 +6,7 @@
   import { getContext, onMount } from 'svelte';
   import { t } from '$lib/i18n';
   import { beforeNavigate } from '$app/navigation';
-  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
+  import SingleActionHeader from '$lib/components/ui/header/SingleActionHeader.svelte';
 
   const poseId = page.params.poseId;
 
@@ -54,11 +54,10 @@
   });
 </script>
 
-<LogoHeader
+<SingleActionHeader
   title={$t('editor.pose.edit')}
   button="save"
   onAction={savePose}
-  backButton
 />
 
 <h2 class="box">{$t('editor.pose.angles-subtitle')}</h2>

@@ -7,7 +7,7 @@
   import Exercise from './Exercise.svelte';
   import Explanation from '$lib/components/ui/Explanation.svelte';
   import { goto } from '$app/navigation';
-  import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
+  import BackHeader from '$lib/components/ui/header/BackHeader.svelte';
 
   const { getCourse } = getContext('courses');
 
@@ -77,7 +77,7 @@
   }
 </script>
 
-<LogoHeader {title} backButton />
+<BackHeader {title} />
 
 <div bind:clientWidth={outerWidth}>
   <div class="subtitle">
