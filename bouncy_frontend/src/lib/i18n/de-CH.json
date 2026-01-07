@@ -368,11 +368,12 @@
     },
     "playlist": {
         "new-title": "Neue Playliste",
-        "edit-title": "Playlist bearbeiten",
-        "edit-videos-title": "Playlist Videos",
+        "edit-title": "Playliste bearbeiten",
+        "edit-videos-title": "Videos in Playliste",
         "form-title": "Name",
         "form-description": "Beschreibung",
-        "save-button": "Playliste speichern"
+        "save-button": "Playliste speichern",
+        "confirm-remove-video": "Video aus der Playliste entfernen?"
     },
     "video": {
         "privacy-selection-title": "Video Zugriff",

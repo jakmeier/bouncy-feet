@@ -15,11 +15,18 @@
   /**
    * @typedef {Object} Props
    * @property {api.Video[]} videos
-   * @property {boolean} [extraInfo]
+   * @property {boolean} [userExtraInfo]
+   * @property {boolean} [clubExtraInfo]
+   * @property {(video: api.Video, index: number)=>void} [onDelete]
    */
 
   /** @type {Props} */
-  let { videos = $bindable(), extraInfo = false } = $props();
+  let {
+    videos = $bindable(),
+    userExtraInfo = false,
+    clubExtraInfo = false,
+    onDelete,
+  } = $props();
   let juggler = $state();
   /** @type {number[]} */
   let imageHeight = $state([]);
@@ -161,14 +168,28 @@
             {formatDuration(video.duration)}
           </div>
         </div>
-        {#if index === currentIndex && !extraInfo}
+        {#if index === currentIndex && !userExtraInfo}
           <p class="name">
             {video.name}
           </p>
         {/if}
       </div>
     </UnstyledButton>
-    {#if extraInfo && index === currentIndex}
+    {#if onDelete && index === currentIndex}
+      <div class="delete-button">
+        <UnstyledButton onClick={() => onDelete(video, index)}>
+          <Symbol size={48}>delete</Symbol>
+        </UnstyledButton>
+      </div>
+    {/if}
+    {#if clubExtraInfo && index === currentIndex}
+      <div class="extra-info">
+        <Symbol size={32}>lock</Symbol>
+        <p>{video.account.displayName}</p>
+      </div>
+    {/if}
+
+    {#if userExtraInfo && index === currentIndex}
       <div class="extra-info">
         <UnstyledButton onClick={() => openNameEdit()}>
           <Symbol size={32}>edit</Symbol>
@@ -251,7 +272,7 @@
     word-wrap: break-word;
     overflow: hidden;
     text-overflow: ellipsis;
-    height: calc(2.5 * var(--font-normal));
+    max-height: calc(2.5 * var(--font-normal));
     padding: 0.5rem;
   }
 
@@ -275,5 +296,11 @@
     align-items: center;
     margin-top: 1rem;
     gap: 1rem 0;
+  }
+
+  .delete-button {
+    text-align: center;
+    color: var(--theme-red);
+    margin-top: -1rem;
   }
 </style>

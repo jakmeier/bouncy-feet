@@ -372,7 +372,8 @@
         "edit-videos-title": "Playlist videos",
         "form-title": "Name",
         "form-description": "Description",
-        "save-button": "Save Playlist" 
+        "save-button": "Save Playlist",
+        "confirm-remove-video": "Remove video from playlist?"
     },
     "video": {
         "privacy-selection-title": "Video access",

@@ -102,7 +102,7 @@
         {#if videos.length === 0}
           <p>{$t('video.empty-playlist')}</p>
         {:else}
-          <ThumbnailJuggler {videos} extraInfo />
+          <ThumbnailJuggler {videos} userExtraInfo />
         {/if}
       </div>
     {/await}

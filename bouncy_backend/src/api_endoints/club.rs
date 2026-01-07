@@ -4,6 +4,7 @@ use crate::db::club::Club;
 use crate::peertube::channel::{create_system_channel, PeerTubeChannelHandle, PeerTubeChannelId};
 use crate::peertube::playlist::{
     create_public_system_playlist, create_unlisted_system_playlist, PeerTubePlaylistId,
+    PeerTubeVideoId,
 };
 use crate::peertube::{self, retry_peertube_op, PeerTubeError};
 use crate::playlist::{Playlist, PlaylistInfo};
@@ -97,6 +98,12 @@ pub struct AddClubVideoRequest {
     pub video_id: i64,
     pub club_id: i64,
     pub playlist_id: PeerTubePlaylistId,
+}
+
+#[derive(serde::Deserialize)]
+pub struct RemoveClubVideoRequest {
+    pub video_id: PeerTubeVideoId,
+    pub element_index: u64,
 }
 
 #[derive(serde::Deserialize)]
@@ -518,7 +525,70 @@ pub async fn add_video(
     }
     let element = result.expect("just checked");
 
-    (StatusCode::CREATED, element.id.num().to_string()).into_response()
+    (StatusCode::CREATED, element.id.to_string()).into_response()
+}
+
+#[axum::debug_handler]
+pub async fn remove_video(
+    Extension(me): Extension<User>,
+    State(state): State<AppState>,
+    axum::extract::Path((club_id, playlist_id)): axum::extract::Path<(ClubId, PeerTubePlaylistId)>,
+    Json(params): Json<RemoveClubVideoRequest>,
+) -> axum::response::Result<()> {
+    // Check the playlist belongs to the club.
+    // The client should know it but we need to check for permissions.
+    let Some(playlist) = Playlist::lookup_club_playlist_by_peertube_id(&state, playlist_id).await
+    else {
+        return Err((StatusCode::NOT_FOUND, "no such playlist"))?;
+    };
+
+    // PeerTube only allows deleting by index, which is a natural race
+    // condition. Here we read the video to check the owner, as well as to
+    // reduce the race time frame.
+    let videos_result = peertube::playlist::list_system_playlist(
+        &state,
+        &playlist.peertube_info.short_uuid,
+        params.element_index,
+        1,
+    )
+    .await;
+    if let Err(err) = videos_result {
+        tracing::error!(?err, "Reading videos from playlist failed");
+        return Err((StatusCode::BAD_GATEWAY, "PeerTube service failed"))?;
+    }
+    let videos = videos_result.unwrap();
+    let Some(video) = videos.first() else {
+        return Err((StatusCode::BAD_REQUEST, "no such index in playlist"))?;
+    };
+    if video.video.id.0 != params.video_id.0 {
+        return Err((
+            StatusCode::CONFLICT,
+            "unexpected video at index in playlist",
+        ))?;
+    }
+    let element_index = video.id;
+
+    // TODO: Get PeerTube user somehow
+    // check permissions: should be admin or video owner
+    // let is_owner = me.peertube_id == video.video.account.id {}
+    let is_owner = false;
+    if !is_owner {
+        let membership = get_membership(&state, me.id, club_id).await?;
+        if !matches!(membership, ClubMembership::Admin) {
+            return Err((StatusCode::FORBIDDEN, "no permission to remove video"))?;
+        }
+    }
+
+    // delete on PeerTube
+    let result =
+        peertube::playlist::remove_video_from_playlist(&state, playlist_id, element_index).await;
+
+    if let Err(err) = result {
+        tracing::error!(?err, "Removing video from playlist failed");
+        return Err((StatusCode::BAD_GATEWAY, "PeerTube service failed"))?;
+    }
+
+    Ok(())
 }
 
 /// Create a new playlist for a club.

@@ -18,6 +18,14 @@ pub(crate) struct PeerTubePlaylist {
 #[serde(transparent)]
 pub(crate) struct PeerTubePlaylistId(pub i64);
 
+#[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
+#[serde(transparent)]
+pub(crate) struct PeerTubeVideoId(pub i64);
+
+#[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
+#[serde(transparent)]
+pub(crate) struct PeerTubeUserId(pub i64);
+
 #[derive(Debug, Clone, serde::Deserialize)]
 pub(crate) struct PlaylistCreatedResponse {
     #[serde(alias = "videoPlaylist")]
@@ -40,7 +48,68 @@ pub(crate) struct VideoAddedResponse {
 
 #[derive(Debug, Clone, serde::Deserialize)]
 pub(crate) struct PlaylistElement {
-    pub id: PeerTubeChannelId,
+    pub id: u64,
+}
+
+#[derive(Debug, Clone, serde::Deserialize)]
+struct ListPlaylistVideosResponse {
+    data: Vec<PlaylistVideoElement>,
+}
+
+#[derive(Debug, Clone, serde::Deserialize)]
+pub(crate) struct PlaylistVideoElement {
+    /// playlist element id
+    pub id: u64,
+    #[allow(dead_code)]
+    pub position: u64,
+    #[allow(dead_code)]
+    pub video: PlaylistVideo,
+}
+
+#[derive(Debug, Clone, serde::Deserialize)]
+pub(crate) struct PlaylistVideo {
+    pub id: PeerTubeVideoId,
+    #[allow(dead_code)]
+    pub account: PeerTubeAccount,
+    // other fields omitted
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct PeerTubeAccount {
+    pub id: PeerTubeUserId,
+    pub name: String,
+    pub display_name: String,
+    // other fields omitted
+}
+
+pub(crate) async fn list_system_playlist(
+    state: &AppState,
+    // must be uuid or short uuid to work with unlisted playlists
+    playlist_id: &str,
+    start: u64,
+    count: u64,
+) -> Result<Vec<PlaylistVideoElement>, PeerTubeError> {
+    let url = state
+        .peertube_url
+        .join(&format!("api/v1/video-playlists/{playlist_id}/videos"))
+        .expect("must be valid url");
+
+    let token = state.system_user.access_token(state).await?;
+
+    let response = state
+        .http_client
+        .get(url.as_str())
+        .query(&[("start", start), ("count", count)])
+        .bearer_auth(&token)
+        .send()
+        .await;
+
+    let ok_response = check_peertube_system_user_response(response, token).await?;
+    let status = ok_response.status();
+    let msg: Result<ListPlaylistVideosResponse, _> = ok_response.json().await;
+    let msg = msg.map_err(|err| PeerTubeError::JsonParsingFailed(status, err))?;
+    Ok(msg.data)
 }
 
 /// Creates an impersonal (system) playlist on PeerTube that's unlisted.
@@ -147,6 +216,32 @@ pub(crate) async fn add_video_to_playlist(
     let msg: Result<VideoAddedResponse, _> = ok_response.json().await;
     let msg = msg.map_err(|err| PeerTubeError::JsonParsingFailed(status, err))?;
     Ok(msg.video_playlist_element)
+}
+
+pub(crate) async fn remove_video_from_playlist(
+    state: &AppState,
+    playlist_id: PeerTubePlaylistId,
+    element_index: u64,
+) -> Result<(), PeerTubeError> {
+    let url = state
+        .peertube_url
+        .join(&format!(
+            "api/v1/video-playlists/{}/videos/{element_index}",
+            playlist_id.num(),
+        ))
+        .expect("must be valid url");
+
+    let token = state.system_user.access_token(state).await?;
+
+    let response = state
+        .http_client
+        .delete(url.as_str())
+        .bearer_auth(&token)
+        .send()
+        .await;
+
+    check_peertube_system_user_response(response, token).await?;
+    Ok(())
 }
 
 impl PlaylistPrivacy {

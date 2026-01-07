@@ -47,6 +47,9 @@
 
     --color: var(--theme-neutral-white);
     --background-color: var(--theme-neutral-black);
+
+    /* TODO: check if this fits the theme */
+    --theme-red: #D11149;
 }
 
 /*

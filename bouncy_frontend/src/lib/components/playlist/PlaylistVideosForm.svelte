@@ -39,6 +39,25 @@
       })
       .then(() => videoFeed?.refreshVideos());
   }
+
+  /**
+   * @param {api.Video} video
+   * @param {number} index
+   **/
+  function onDelete(video, index) {
+    if (!confirm($t('playlist.confirm-remove-video'))) {
+      return;
+    }
+    userCtx
+      .authenticatedPost(
+        `/clubs/${clubId}/playlist/${playlist.id}/remove-video`,
+        {
+          video_id: video.id,
+          element_index: index,
+        }
+      )
+      .then(() => videoFeed?.refreshVideos());
+  }
 </script>
 
 <!-- <p>{$t('club.upload-video-description')}</p> -->
@@ -48,7 +67,12 @@
 </button>
 
 {#if playlist.shortUUID}
-  <ThumbnailFeed playlistUuid={playlist.shortUUID} bind:this={videoFeed}
+  <ThumbnailFeed
+    playlistUuid={playlist.shortUUID}
+    bind:this={videoFeed}
+    clubExtraInfo
+    height="480px"
+    {onDelete}
   ></ThumbnailFeed>
 {/if}
 
