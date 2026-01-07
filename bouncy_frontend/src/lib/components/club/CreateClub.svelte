@@ -35,4 +35,4 @@
   }
 </script>
 
-<ClubForm bind:this={form} bind:details onSubmit={submit}></ClubForm>
+<ClubForm bind:this={form} bind:details bind:name onSubmit={submit}></ClubForm>
