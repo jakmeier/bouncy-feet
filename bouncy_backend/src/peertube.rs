@@ -12,6 +12,7 @@ pub(crate) mod channel;
 pub(crate) mod playlist;
 pub(crate) mod system_user;
 pub(crate) mod token;
+pub(crate) mod user;
 
 #[derive(serde::Deserialize, Clone, Debug)]
 pub(crate) struct PeertubeApiErrorResponse {

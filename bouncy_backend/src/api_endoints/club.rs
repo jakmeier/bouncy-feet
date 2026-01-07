@@ -568,10 +568,10 @@ pub async fn remove_video(
     }
     let element_index = video.id;
 
-    // TODO: Get PeerTube user somehow
     // check permissions: should be admin or video owner
-    // let is_owner = me.peertube_id == video.video.account.id {}
-    let is_owner = false;
+    let is_owner = me
+        .peertube_account_id
+        .is_some_and(|ptid| ptid == video.video.account.id);
     if !is_owner {
         let membership = get_membership(&state, me.id, club_id).await?;
         if !matches!(membership, ClubMembership::Admin) {

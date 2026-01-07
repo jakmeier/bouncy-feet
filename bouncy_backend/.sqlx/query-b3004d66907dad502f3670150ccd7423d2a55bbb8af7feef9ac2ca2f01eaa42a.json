@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT id, oidc_subject FROM users WHERE oidc_subject = $1",
+  "query": "SELECT id, oidc_subject, peertube_account_id FROM users WHERE id = $1",
   "describe": {
     "columns": [
       {
@@ -12,17 +12,23 @@
         "ordinal": 1,
         "name": "oidc_subject",
         "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "peertube_account_id",
+        "type_info": "Int8"
       }
     ],
     "parameters": {
       "Left": [
-        "Text"
+        "Int8"
       ]
     },
     "nullable": [
       false,
+      true,
       true
     ]
   },
-  "hash": "57dac4cb9b19352c56608327b6ad54d2bb702e14a88627de06e2eb6620ee3126"
+  "hash": "b3004d66907dad502f3670150ccd7423d2a55bbb8af7feef9ac2ca2f01eaa42a"
 }

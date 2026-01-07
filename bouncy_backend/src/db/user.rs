@@ -7,6 +7,7 @@ use crate::client_session::ClientSessionId;
 use crate::club::UserJoinedClubRow;
 use crate::db::club::UserClubRow;
 use crate::layers::oidc::AdditionalClaims;
+use crate::peertube::user::PeerTubeAccountId;
 use crate::AppState;
 
 #[derive(Clone, Debug)]
@@ -16,6 +17,7 @@ pub struct UserId(i64);
 pub struct User {
     pub id: UserId,
     pub oidc_subject: Option<Uuid>,
+    pub peertube_account_id: Option<PeerTubeAccountId>,
 }
 
 #[derive(Clone, Debug)]
@@ -28,6 +30,7 @@ pub struct PublicUserData {
 pub struct UserRow {
     id: i64,
     oidc_subject: Option<String>,
+    peertube_account_id: Option<i64>,
 }
 
 #[derive(Clone, Debug, sqlx::FromRow)]
@@ -92,15 +95,16 @@ impl UserId {
 
 impl User {
     pub(crate) async fn lookup(state: &AppState, user_id: UserId) -> Option<User> {
-        let maybe_user = sqlx::query!(
-            "SELECT id, oidc_subject FROM users WHERE id = $1",
+        let record = sqlx::query_as!(
+            UserRow,
+            "SELECT id, oidc_subject, peertube_account_id FROM users WHERE id = $1",
             user_id.num()
         )
         .fetch_optional(&state.pg_db_pool)
         .await
-        .expect("DB query failed");
+        .expect("DB query failed")?;
 
-        maybe_user.map(|record| User::new(record.id, record.oidc_subject.as_deref()))
+        Some(User::from(record))
     }
 
     pub(crate) async fn lookup_by_client_secret(
@@ -121,15 +125,16 @@ impl User {
     ) -> Option<User> {
         let subject = claims.subject().as_str();
 
-        let maybe_user = sqlx::query!(
-            "SELECT id, oidc_subject FROM users WHERE oidc_subject = $1",
+        let record = sqlx::query_as!(
+            UserRow,
+            "SELECT id, oidc_subject, peertube_account_id FROM users WHERE oidc_subject = $1",
             subject
         )
         .fetch_optional(&state.pg_db_pool)
         .await
         .expect("DB query failed")?;
 
-        Some(Self::new(maybe_user.id, Some(subject)))
+        Some(User::from(record))
     }
 
     pub(crate) async fn lookup_by_oidc_or_create(
@@ -156,7 +161,7 @@ impl User {
         .expect("Failed to insert new user")
         .id;
 
-        Self::new(id, Some(subject))
+        Self::new(id, Some(subject), None)
     }
 
     pub(crate) async fn add_oidc(&mut self, state: &AppState, sub: Uuid) -> sqlx::Result<()> {
@@ -179,6 +184,33 @@ impl User {
         }
 
         self.oidc_subject = Some(sub);
+        Ok(())
+    }
+
+    pub(crate) async fn add_peertube_id(
+        &mut self,
+        state: &AppState,
+        peertube_id: PeerTubeAccountId,
+    ) -> sqlx::Result<()> {
+        assert!(
+            self.peertube_account_id.is_none(),
+            "can't overwrite existing PeerTube ID: {:?}",
+            self.peertube_account_id
+        );
+
+        let result = sqlx::query!(
+            r#"UPDATE users SET peertube_account_id = $1 WHERE id = $2"#,
+            peertube_id.0,
+            self.id.num()
+        )
+        .execute(&state.pg_db_pool)
+        .await?;
+
+        if result.rows_affected() != 1 {
+            tracing::error!("add_peertube_id affected {} rows", result.rows_affected());
+        }
+
+        self.peertube_account_id = Some(peertube_id);
         Ok(())
     }
 
@@ -222,12 +254,13 @@ impl User {
         Ok(users)
     }
 
-    fn new(id: i64, subject: Option<&str>) -> User {
+    fn new(id: i64, subject: Option<&str>, peertube_account_id: Option<PeerTubeAccountId>) -> User {
         let oidc_subject =
             subject.map(|sub| Uuid::parse_str(sub).expect("sub must be a valid UUID"));
         User {
             id: UserId(id),
             oidc_subject,
+            peertube_account_id,
         }
     }
 }
@@ -252,7 +285,11 @@ impl UserJoinedClubRow {
 
 impl From<UserRow> for User {
     fn from(row: UserRow) -> Self {
-        User::new(row.id, row.oidc_subject.as_deref())
+        User::new(
+            row.id,
+            row.oidc_subject.as_deref(),
+            row.peertube_account_id.map(PeerTubeAccountId),
+        )
     }
 }
 

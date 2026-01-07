@@ -1,4 +1,6 @@
+use crate::peertube;
 use crate::peertube::token::fetch_api_token_from_bypass_token;
+use crate::user::User;
 use crate::AppState;
 use axum::http::{HeaderMap, StatusCode};
 use axum::response::Response;
@@ -22,6 +24,7 @@ pub(crate) struct OAuthClientConfig {
 
 #[axum::debug_handler]
 pub async fn peertube_token_exchange(
+    axum::Extension(me): axum::Extension<User>,
     token: OidcAccessToken,
     State(state): State<AppState>,
     headers: HeaderMap,
@@ -69,6 +72,15 @@ pub async fn peertube_token_exchange(
                 .into_response();
         }
     };
+
+    // Lazily set the PeerTube user id.
+    // It won't be updated for this request (not needed for token exchange) but
+    // future requests will read the new value from the DB.
+    let mut me = me.clone();
+    let res = peertube::user::ensure_peertube_id(&state, &mut me, &peertube_token).await;
+    if let Err(err) = res {
+        tracing::warn!(?err, "Failed setting PeerTube user id.");
+    }
 
     Json(peertube_token).into_response()
 }

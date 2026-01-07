@@ -86,7 +86,7 @@ pub async fn user_lookup(
     }
 
     // Continue with or without user info.
-    // `require_user_service` will catch it as an error later for protecetd routes.
+    // `require_user_service` will catch it as an error later for protected routes.
     // But the login route must work without user info.
     req.extensions_mut().insert(MaybeUser(maybe_user));
     next.run(req).await

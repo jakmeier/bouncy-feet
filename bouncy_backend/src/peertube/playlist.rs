@@ -1,5 +1,8 @@
 use crate::{
-    peertube::{channel::PeerTubeChannelId, check_peertube_system_user_response, PeerTubeError},
+    peertube::{
+        channel::PeerTubeChannelId, check_peertube_system_user_response, user::PeerTubeAccount,
+        PeerTubeError,
+    },
     AppState,
 };
 use uuid::Uuid;
@@ -21,10 +24,6 @@ pub(crate) struct PeerTubePlaylistId(pub i64);
 #[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
 #[serde(transparent)]
 pub(crate) struct PeerTubeVideoId(pub i64);
-
-#[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
-#[serde(transparent)]
-pub(crate) struct PeerTubeUserId(pub i64);
 
 #[derive(Debug, Clone, serde::Deserialize)]
 pub(crate) struct PlaylistCreatedResponse {
@@ -69,17 +68,7 @@ pub(crate) struct PlaylistVideoElement {
 #[derive(Debug, Clone, serde::Deserialize)]
 pub(crate) struct PlaylistVideo {
     pub id: PeerTubeVideoId,
-    #[allow(dead_code)]
     pub account: PeerTubeAccount,
-    // other fields omitted
-}
-
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct PeerTubeAccount {
-    pub id: PeerTubeUserId,
-    pub name: String,
-    pub display_name: String,
     // other fields omitted
 }
 
