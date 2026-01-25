@@ -6,7 +6,6 @@ use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use futures::future::BoxFuture;
 use reqwest::header::HeaderValue;
-use std::time::Duration;
 
 pub(crate) mod channel;
 pub(crate) mod playlist;
@@ -27,6 +26,8 @@ pub(crate) enum PeerTubeError {
     UnknownJsonError(reqwest::StatusCode, String),
     #[error("no json response provided with the error, status was {0}")]
     NoJsonError(reqwest::StatusCode),
+    #[error("no json response provided with a successful response, status was {0}")]
+    NoJsonResponse(reqwest::StatusCode, String),
     #[error("json response provided with a successful response could not be decoded, status was {0}, error was {1}")]
     JsonParsingFailed(reqwest::StatusCode, reqwest::Error),
     #[error("error sending request {0}")]
@@ -74,20 +75,29 @@ pub(crate) async fn check_peertube_response(
         let typed_error = result.map_err(|_err| PeerTubeError::UnknownJsonError(status, text))?;
         Err(PeerTubeError::ApiError(typed_error, status))
     } else {
+        if let Ok(error_text) = response.text().await {
+            tracing::warn!(?error_text, ?status, "Non-Json error from PeerTube");
+        }
         Err(PeerTubeError::NoJsonError(status))
     }
 }
 
 /// Returns true if a retry would make sense
-pub(crate) async fn handle_peertube_error(state: &AppState, err: &PeerTubeError) -> bool {
-    if let PeerTubeError::SystemAuthFailed(failed_token) = err {
-        // Note: We could also refresh in most cases. But since the pw of
-        // the system user is stored anyway, there is no benefit of a
-        // refresh. It would just be more code that needs to be maintained.
-        state.system_user.clear_token(failed_token).await;
-        return true;
+pub(crate) async fn handle_peertube_error(state: &AppState, err: &PeerTubeError) -> RetryHint {
+    match err {
+        PeerTubeError::SystemAuthFailed(failed_token) => {
+            // Note: We could also refresh in most cases. But since the pw of
+            // the system user is stored anyway, there is no benefit of a
+            // refresh. It would just be more code that needs to be maintained.
+            state.system_user.clear_token(failed_token).await;
+            RetryHint::RetryNow
+        }
+        PeerTubeError::NoJsonError(reqwest::StatusCode::BAD_GATEWAY) => {
+            // There can be temporary problems on the network.
+            RetryHint::RetryAfter(std::time::Duration::from_millis(1000))
+        }
+        _ => RetryHint::NoRetry,
     }
-    false
 }
 
 /// Retry a PeerTube operation a few times and then return an error response if
@@ -111,15 +121,32 @@ where
                 let should_retry = handle_peertube_error(state, &e).await;
                 tracing::error!(?e, ?remaining_attempts, "PeerTube operation failed");
 
-                if should_retry && remaining_attempts > 0 {
-                    remaining_attempts -= 1;
-                    tokio::time::sleep(Duration::from_millis(100)).await;
-                    continue;
+                if remaining_attempts <= 0 {
+                    let resp =
+                        (StatusCode::BAD_GATEWAY, "PeerTube service failure").into_response();
+                    return Err(resp);
                 }
+                remaining_attempts -= 1;
 
-                let resp = (StatusCode::BAD_GATEWAY, "PeerTube service failure").into_response();
-                return Err(resp);
+                match should_retry {
+                    RetryHint::NoRetry => {
+                        let resp =
+                            (StatusCode::BAD_GATEWAY, "PeerTube service failure").into_response();
+                        return Err(resp);
+                    }
+                    RetryHint::RetryNow => (),
+                    RetryHint::RetryAfter(delay) => {
+                        tokio::time::sleep(delay).await;
+                    }
+                }
+                remaining_attempts -= 1;
             }
         }
     }
+}
+
+pub(crate) enum RetryHint {
+    NoRetry,
+    RetryNow,
+    RetryAfter(std::time::Duration),
 }

@@ -1,11 +1,14 @@
-use crate::peertube;
 use crate::peertube::token::fetch_api_token_from_bypass_token;
+use crate::peertube::{
+    self, check_peertube_system_user_response, retry_peertube_op, PeerTubeError,
+};
 use crate::user::User;
 use crate::AppState;
 use axum::http::{HeaderMap, StatusCode};
 use axum::response::Response;
 use axum::{extract::State, response::IntoResponse, Json};
 use axum_oidc::OidcAccessToken;
+use futures::FutureExt;
 use reqwest::header::HeaderValue;
 use serde::Deserialize;
 
@@ -47,7 +50,9 @@ pub async fn peertube_token_exchange(
     // TODO: use caching and refreshing
 
     // Exchange JWT for bypass token
-    let bypass_token_result = fetch_bypass_token(&state, &token).await;
+    let bypass_token_result =
+        retry_peertube_op(&state, |s| fetch_bypass_token(s, &token).boxed()).await;
+
     let bypass_token = match bypass_token_result {
         Ok(r) => r,
         Err(err) => {
@@ -61,7 +66,12 @@ pub async fn peertube_token_exchange(
     };
 
     // Request PeerTube OAuth token
-    let peertube_token = match fetch_api_token_from_bypass_token(&state, bypass_token).await {
+    let peertube_token_result = retry_peertube_op(&state, |s| {
+        fetch_api_token_from_bypass_token(s, &bypass_token).boxed()
+    })
+    .await;
+
+    let peertube_token = match peertube_token_result {
         Ok(r) => r,
         Err(err) => {
             tracing::warn!(?err, "error exchanging bypass for OAuth token");
@@ -88,7 +98,7 @@ pub async fn peertube_token_exchange(
 async fn fetch_bypass_token(
     state: &AppState,
     token: &OidcAccessToken,
-) -> Result<TokenExchangeResponse, anyhow::Error> {
+) -> Result<TokenExchangeResponse, PeerTubeError> {
     let exchange_url = state
         .peertube_url
         .join("plugins/auth-openid-connect/router/token-exchange")
@@ -102,18 +112,24 @@ async fn fetch_bypass_token(
             ("assertion", &token.0),
         ])
         .send()
-        .await?;
+        .await;
 
-    let ok_res = res.error_for_status()?;
+    let ok_res = check_peertube_system_user_response(res, String::new()).await?;
+
+    let status = ok_res.status();
     if ok_res
         .headers()
         .get("Content-Type")
         .and_then(|hv| HeaderValue::to_str(hv).ok())
         .is_some_and(|hv| hv.contains("json"))
     {
-        let json = ok_res.json().await?;
+        let json = ok_res
+            .json()
+            .await
+            .map_err(|err: reqwest::Error| PeerTubeError::JsonParsingFailed(status, err))?;
         Ok(json)
     } else {
-        anyhow::bail!("PeerTube did not return a JSON response")
+        let err_msg = ok_res.text().await.unwrap_or_default();
+        Err(PeerTubeError::NoJsonResponse(status, err_msg))
     }
 }

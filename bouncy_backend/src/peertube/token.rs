@@ -18,7 +18,7 @@ impl OAuthToken {
 
 pub(crate) async fn fetch_api_token_from_bypass_token(
     state: &AppState,
-    bypass_token: TokenExchangeResponse,
+    bypass_token: &TokenExchangeResponse,
 ) -> Result<OAuthToken, PeerTubeError> {
     fetch_api_token(
         state,
