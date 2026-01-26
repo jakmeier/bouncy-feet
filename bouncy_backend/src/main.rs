@@ -158,7 +158,6 @@ async fn main() -> anyhow::Result<()> {
         .route("/clubs", get(api_endoints::club::clubs))
         .route("/clubs/{club_id}", get(api_endoints::club::club))
         .route("/register", get(api_endoints::auth::register))
-        .route("/logout", get(api_endoints::auth::logout))
         .route(
             "/new_guest_session",
             get(api_endoints::client_session::create_guest_session),
@@ -216,6 +215,7 @@ async fn main() -> anyhow::Result<()> {
             "/new_guest_activity",
             post(api_endoints::client_session::record_guest_activity),
         )
+        .route("/logout", get(api_endoints::auth::logout))
         .layer(axum::middleware::from_fn(
             layers::user::require_user_service,
         ));

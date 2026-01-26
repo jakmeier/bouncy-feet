@@ -13,7 +13,7 @@
 use axum::extract::{Query, State};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Redirect, Response};
-use axum_oidc::{EmptyAdditionalClaims, OidcClaims};
+use axum_oidc::{ClearSessionFlag, EmptyAdditionalClaims, OidcClaims};
 use url::Url;
 
 use crate::AppState;
@@ -114,7 +114,9 @@ pub async fn register(State(state): State<AppState>, query: Query<QueryParams>) 
 #[axum::debug_handler]
 pub async fn logout(
     query: Query<QueryParams>,
-    // _claims: OidcClaims<EmptyAdditionalClaims>,
+    // needed to ensure the oidc auth layer is active, otherwise clearing a
+    // session won't do anything
+    _claims: OidcClaims<EmptyAdditionalClaims>,
     State(state): State<AppState>,
 ) -> Response {
     let mut url = state.kc_config.logout_url.clone();
@@ -122,7 +124,12 @@ pub async fn logout(
         url.query_pairs_mut()
             .append_pair("post_logout_redirect_uri", redirect_back_to.as_str());
     }
-    Redirect::to(url.as_str()).into_response()
+
+    (
+        axum::Extension(ClearSessionFlag),
+        Redirect::to(url.as_str()),
+    )
+        .into_response()
 }
 
 fn safe_redirect_to_app(state: &AppState, redirect_back_to: &Url) -> Redirect {

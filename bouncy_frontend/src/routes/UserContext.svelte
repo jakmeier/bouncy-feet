@@ -612,7 +612,6 @@
   }
 
   async function logout() {
-    // TODO: also log out on backend / keycloak
     // TODO: handle local state without someone being logged in (without
     // creating a guest session -> be more explicit about guest sessions)
     pwaAuth.peerTubeToken = null;

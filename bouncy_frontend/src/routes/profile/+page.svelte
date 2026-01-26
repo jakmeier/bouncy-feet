@@ -64,9 +64,13 @@
 <ScrollToTop />
 
 <DarkSection fillScreen arrow>
-  <LogoHeader title={$t('profile.title')} backButton={false} homeLink />
-  <!-- onAction={logout}
-    button="logout" -->
+  <LogoHeader
+    title={$t('profile.title')}
+    backButton={false}
+    homeLink
+    onAction={logout}
+    button="logout"
+  />
 
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <!-- svelte-ignore a11y_no_static_element_interactions -->
