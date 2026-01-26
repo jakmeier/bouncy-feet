@@ -96,6 +96,10 @@ pub(crate) async fn handle_peertube_error(state: &AppState, err: &PeerTubeError)
             // There can be temporary problems on the network.
             RetryHint::RetryAfter(std::time::Duration::from_millis(1000))
         }
+        PeerTubeError::NoJsonError(reqwest::StatusCode::TOO_MANY_REQUESTS) => {
+            // Hitting rate limits
+            RetryHint::RetryAfter(std::time::Duration::from_millis(1000))
+        }
         _ => RetryHint::NoRetry,
     }
 }
