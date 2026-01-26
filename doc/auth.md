@@ -45,6 +45,8 @@ Client must be authenticated (using client_id + client_secret).
 
 ![Keycloak client configuration screenshot matching the description in text](./img/auth/api-backend-client.png)
 
+Don't forget to configure "Valid redirect URIs" and Valid post logout redirect URIs for the client. It should allow redirecting to both the API server domain and the frontend API.
+
 
 ## BouncyFeet JWT in the frontend
 
