@@ -1,0 +1,52 @@
+:root {
+    --theme-accent: #ff7301;
+    --theme-neutral-black: #000000;
+    --theme-neutral-almost-black: #1c1c1c;
+}
+
+@font-face {
+    font-family: 'Pleasure Medium';
+    src:
+        url('https://app.bouncy-feet.ch/fonts/PleasureInktrap.woff2') format('woff2');
+    font-weight: 500;
+}
+
+html,
+h1.pf-v5-c-title {
+    --pf-v5-global--FontFamily--text: 'Pleasure Medium', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+        Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    --pf-v5-c-title--FontFamily: 'Pleasure Medium', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+        Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.pf-v5-c-form-control {
+    --pf-v5-c-form-control--focus--after--BorderBottomColor: var(--theme-accent);
+    --pf-v5-c-form-control--focus--after--BorderBottomColor: var(--theme-accent);
+    --pf-v5-c-form-control--hover--after--BorderBottomColor: var(--theme-accent);
+    --pf-v5-c-form-control--m-expanded--after--BorderBottomColor: var(--theme-accent);
+}
+
+.login-pf body {
+    background: var(--theme-neutral-black) none;
+}
+
+.login-pf main {
+    background: var(--theme-neutral-almost-black) none;
+    border-radius: 1rem;
+    /* box-shadow: rgba(255, 115, 1, 0.64) 0px 16px 32px 0px, rgba(255, 255, 255, 0.4) 0px 0px 8px 0px; */
+}
+
+div.kc-logo-text {
+    background-image: url('../img/bf-text-orange.svg');
+}
+
+.pf-v5-c-login__main-header {
+    border-top: 4px solid var(--theme-accent);
+    border-radius: 1rem;
+}
+
+button.pf-v5-c-button.pf-m-primary {
+    background-color: var(--theme-accent);
+    border-radius: 999px;
+    color: black;
+}

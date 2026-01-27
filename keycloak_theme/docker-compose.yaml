@@ -1,0 +1,37 @@
+services:
+  keycloak:
+    build: .
+    environment:
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_PORT: 8080
+      KC_HOSTNAME_STRICT_BACKCHANNEL: "true"
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: unsafe-dev-password
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USER: keycloak
+      KC_DB_PASSWORD: unsafe-dev-db-password
+      KC_HEALTH_ENABLED: "true"
+      KC_LOG_LEVEL: warn
+    ports:
+      - "8080:8080"
+    volumes:
+    - ./themes:/opt/keycloak/themes
+    networks:
+      - local_network
+    restart: always
+  postgres:
+    image: postgres:16.2
+    volumes:
+      - kc-theme-test-pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: unsafe-dev-db-password
+    networks:
+      - local_network
+    restart: always
+networks:
+  local_network:
+    driver: bridge
+volumes:
+  kc-theme-test-pgdata:
