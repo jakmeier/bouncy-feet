@@ -32,7 +32,7 @@ pub(crate) struct PlaylistCreatedResponse {
 }
 
 #[derive(Clone, Copy, Debug)]
-enum PlaylistPrivacy {
+pub(crate) enum PlaylistPrivacy {
     Public = 1,
     Unlisted = 2,
     #[allow(dead_code)]
@@ -251,19 +251,20 @@ pub async fn update_system_playlist(
     display_name: &str,
     description: &str,
     channel_id: PeerTubeChannelId,
+    privacy: PlaylistPrivacy,
 ) -> Result<(), PeerTubeError> {
     let channel_id = channel_id.num().to_string();
     let body = if description.is_empty() {
         vec![
             ("displayName", display_name),
-            ("privacy", PlaylistPrivacy::Unlisted.to_num_str()),
+            ("privacy", privacy.to_num_str()),
             ("videoChannelId", &channel_id),
         ]
     } else {
         vec![
             ("displayName", display_name),
             ("description", description),
-            ("privacy", PlaylistPrivacy::Unlisted.to_num_str()),
+            ("privacy", privacy.to_num_str()),
             ("videoChannelId", &channel_id),
         ]
     };

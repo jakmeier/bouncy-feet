@@ -4,7 +4,7 @@ use crate::db::club::Club;
 use crate::peertube::channel::{create_system_channel, PeerTubeChannelHandle, PeerTubeChannelId};
 use crate::peertube::playlist::{
     create_public_system_playlist, create_unlisted_system_playlist, PeerTubePlaylistId,
-    PeerTubeVideoId,
+    PeerTubeVideoId, PlaylistPrivacy,
 };
 use crate::peertube::{self, retry_peertube_op, PeerTubeError};
 use crate::playlist::{Playlist, PlaylistInfo};
@@ -657,6 +657,13 @@ pub async fn edit_playlist(
         return Err((StatusCode::INTERNAL_SERVER_ERROR, "club has no channel"))?;
     };
 
+    let is_private = !params.public;
+    let privacy = if is_private {
+        PlaylistPrivacy::Unlisted
+    } else {
+        PlaylistPrivacy::Public
+    };
+
     // update all playlist fields on PeerTube
     retry_peertube_op(&state, |s| {
         peertube::playlist::update_system_playlist(
@@ -665,13 +672,13 @@ pub async fn edit_playlist(
             &params.display_name,
             &params.description,
             channel_id,
+            privacy,
         )
         .boxed()
     })
     .await?;
 
     // possibly edit privacy in DB, to stay in sync with PeerTube
-    let is_private = !params.public;
     let db_res = Playlist::update_club_playlist_privacy(&state, playlist_id, is_private).await;
     db_res.map_err(db_err_to_response)?;
 
