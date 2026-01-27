@@ -8,7 +8,7 @@ use axum::error_handling::HandleErrorLayer;
 use axum::http::header;
 use axum::http::{HeaderValue, Method, StatusCode};
 use axum::response::IntoResponse;
-use axum::routing::{get, post};
+use axum::routing::{delete, get, post};
 use axum::{middleware, Router};
 use axum_oidc::error::MiddlewareError;
 use sqlx::PgPool;
@@ -124,7 +124,7 @@ async fn main() -> anyhow::Result<()> {
         .expect("url should be valid origin");
     let cors_layer = tower_http::cors::CorsLayer::new()
         .allow_origin(AllowOrigin::exact(client_origin))
-        .allow_methods([Method::GET, Method::POST])
+        .allow_methods([Method::GET, Method::POST, Method::DELETE])
         .allow_headers([
             header::AUTHORIZATION,
             header::CONTENT_TYPE,
@@ -188,6 +188,7 @@ async fn main() -> anyhow::Result<()> {
             get(api_endoints::club::club_with_private_details),
         )
         .route("/clubs/{club_id}", post(api_endoints::club::update_club))
+        .route("/clubs/{club_id}", delete(api_endoints::club::delete_club))
         .route(
             "/clubs/{club_id}/avatar",
             post(api_endoints::club::update_avatar),

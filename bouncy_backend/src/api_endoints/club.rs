@@ -360,6 +360,44 @@ pub async fn create_club(
     (StatusCode::CREATED, Json(club_info)).into_response()
 }
 
+#[axum::debug_handler]
+pub async fn delete_club(
+    Extension(me): Extension<User>,
+    State(state): State<AppState>,
+    axum::extract::Path(club_id): axum::extract::Path<ClubId>,
+) -> axum::response::Result<()> {
+    let membership = get_membership(&state, me.id, club_id).await?;
+    if !matches!(membership, ClubMembership::Admin) {
+        return Err((StatusCode::FORBIDDEN, "no permission to add club member").into_response())?;
+    }
+
+    // delete channel on PeerTube
+    // this should cascade delete playlists, too
+    let club = get_club(&state, club_id).await?;
+    if let Some(channel_handle) = &club.channel_handle {
+        retry_peertube_op(&state, |s| {
+            peertube::channel::delete_system_channel(s, channel_handle).boxed()
+        })
+        .await?;
+    } else {
+        tracing::warn!(
+            ?club,
+            "Club for deletion has no channel. Deleting it anyway."
+        );
+    };
+
+    // delete club from local db
+    // this cascade deletes playlists, too
+    let deleted = Club::delete(&state, club_id)
+        .await
+        .map_err(db_err_to_response)?;
+    if !deleted {
+        tracing::warn!(?club, "Failed deleting club");
+    }
+
+    Ok(())
+}
+
 async fn create_club_channel(
     state: &AppState,
     name: &str,

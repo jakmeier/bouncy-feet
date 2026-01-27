@@ -118,6 +118,28 @@ pub(crate) async fn create_system_channel(
     Ok(channel.video_channel.id)
 }
 
+pub(crate) async fn delete_system_channel(
+    state: &AppState,
+    channel_handle: &PeerTubeChannelHandle,
+) -> Result<(), PeerTubeError> {
+    let url = state
+        .peertube_url
+        .join(&format!("api/v1/video-channels/{}", channel_handle.0))
+        .expect("must be valid url");
+
+    let token = state.system_user.access_token(state).await?;
+
+    let response = state
+        .http_client
+        .delete(url.as_str())
+        .bearer_auth(&token)
+        .send()
+        .await;
+
+    let _ok_response = check_peertube_system_user_response(response, token).await?;
+    Ok(())
+}
+
 pub async fn fetch_channel(
     state: &AppState,
     channel: &PeerTubeChannelHandle,

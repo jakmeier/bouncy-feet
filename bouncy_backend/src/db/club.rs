@@ -109,6 +109,24 @@ impl Club {
         maybe_club.map(Club::from)
     }
 
+    /// Remove a club from the DB.
+    ///
+    /// Triggers implicit cascade delete but will not explicitly clean up any
+    /// data for a club.
+    ///
+    /// Returns true iff club was deleted.
+    pub(crate) async fn delete(state: &AppState, club_id: ClubId) -> Result<bool, sqlx::Error> {
+        let res = sqlx::query!(
+            r#"
+            DELETE FROM clubs WHERE id = $1
+            "#,
+            club_id.num(),
+        )
+        .execute(&state.pg_db_pool)
+        .await?;
+        Ok(res.rows_affected() > 0)
+    }
+
     /// List clubs with optional limit/offset
     pub async fn list(state: &AppState, limit: i64, offset: i64) -> Result<Vec<Club>, sqlx::Error> {
         let rows = sqlx::query_as!(

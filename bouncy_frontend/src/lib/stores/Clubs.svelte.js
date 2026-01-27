@@ -161,6 +161,26 @@ export async function updateClub(userCtx, clubId, details) {
 /**
  * @param {UserContextData} userCtx
  * @param {number} clubId
+ * @returns {Promise<boolean>}
+ */
+export async function deleteClub(userCtx, clubId) {
+    const response = await userCtx.authenticatedApiRequest("DELETE", `/clubs/${clubId}`, {}, "");
+
+    if (response.error) {
+        console.error("Failed to update club", response);
+        return false;
+    }
+
+    const index = clubsData.mine.findIndex((club) => club.id == clubId);
+    if (index != -1) {
+        clubsData.mine.splice(index, 1);
+    }
+    return true;
+}
+
+/**
+ * @param {UserContextData} userCtx
+ * @param {number} clubId
  * @param {string} name
  * @param {string} description
  * @param {boolean} isPublic

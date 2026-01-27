@@ -121,7 +121,7 @@
 
 <NightSection>
   <div class="private">
-    <h2>{$t('club.my-clubs-title')}</h2>
+    <h2 id="my-clubs">{$t('club.my-clubs-title')}</h2>
     <p>{$t('club.description-0')}</p>
     <p>{$t('club.description-1')}</p>
     <p>{$t('club.description-2')}</p>

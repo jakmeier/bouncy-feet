@@ -126,7 +126,7 @@
  * @property {Promise<import("$lib/peertube-openapi").User | undefined>} peerTubeUser
  * @property {(path: string)=>Promise<Response | null | undefined>} authenticatedGet
  * @property {(path: string, jsonBody: object)=>Promise<Response | null | undefined>} authenticatedPost
- * @property {(method: "PUT"|"POST"|"GET", path: string, headers: object, body: string|FormData|undefined)=>Promise<import('./stats').ApiResponse>} authenticatedApiRequest
+ * @property {(method: "PUT"|"POST"|"GET"|"DELETE", path: string, headers: object, body: string|FormData|undefined)=>Promise<import('./stats').ApiResponse>} authenticatedApiRequest
  * @property {()=>boolean} skippedIntro
  * @property {(yes: boolean)=>void} setSkippedIntro
  * @property {BfError} loginError -- only set if login is impossible, otherwise just trigger a login

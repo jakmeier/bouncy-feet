@@ -62,6 +62,8 @@
         "confirm-add-user-p0": "Füge ",
         "confirm-add-user-p1": " zu ",
         "confirm-add-user-p2": " hinzu?",
+        "confirm-delete-club-p0": "Club ",
+        "confirm-delete-club-p1": " permanent löschen?",
         "add-user-success": "Hinzugefügt!",
         "add-user-failed": "Das hat leider nicht geklappt :(",
         "admins-title": "Admins",
