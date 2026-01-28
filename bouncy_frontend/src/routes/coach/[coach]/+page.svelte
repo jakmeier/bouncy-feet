@@ -40,6 +40,15 @@
       .filter((maybe) => maybe)
   );
 
+  /** @type {StepWrapper[] | null} */
+  const devSteps = $derived(
+    PUBLIC_ENV === 'prod' || !coach.devSteps
+      ? null
+      : Object.keys(coach.devSteps)
+          .map((stepId) => stepById(stepId, false))
+          .filter((maybe) => maybe)
+  );
+
   $bpm = 120;
 
   function onBack() {
@@ -96,6 +105,28 @@
       <p>{$t('collection.no-steps')}</p>
     {/each}
 
+    {#if devSteps}
+      <div class="dev">
+        <h2>Steps in Development</h2>
+        {#each devSteps as step}
+          <a href={`./step/${step.name}`}>
+            <div
+              class="step"
+              style="border-color: {coach.style.pageColoring.secondaryColor};"
+              style:color={coach.style.pageColoring.fontOnDanceFloorColor}
+            >
+              <AnimatedStep
+                {step}
+                size={100}
+                backgroundColor="var(--dance-floor)"
+              ></AnimatedStep>
+              <h3>{step.name}</h3>
+            </div>
+          </a>
+        {/each}
+      </div>
+    {/if}
+
     <h2>{$t('collection.combos-subtitle')}</h2>
     <p>{$t('collection.no-combos')}</p>
 
@@ -119,5 +150,13 @@
 
   .step h3 {
     margin: 0;
+  }
+
+  .dev {
+    border-left: 5px solid var(--theme-accent-dark);
+    border-right: 5px solid var(--theme-accent-dark);
+    border-radius: 10px;
+    margin: 0 -10px;
+    padding: 0 5px;
   }
 </style>

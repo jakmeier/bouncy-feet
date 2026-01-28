@@ -7,11 +7,17 @@ import { LEFT_RIGHT_COLORING, ORANGE_COLORING, TEAL_COLORING } from "./constants
  * @typedef {Object} Coach 
  * @property {string} name
  * @property {string[]} courseIds
- * @property {Object} steps
+ * @property {{[key: string]: StepInfo}} steps
+ * @property {{[key: string]: StepInfo}} [devSteps]
  * @property {AvatarStyleContext} style
  * @property {TranslatedText} description
  * @property {TranslatedText} title
  * @property {{ [key: string]: string }} peertubePlaylist
+ * 
+ * @typedef {Object} StepInfo
+ * @property {String} video
+ * @property {String[]} courses
+ * 
 */
 /** @type {Coach[]} */
 export const coaches = [
@@ -121,6 +127,8 @@ export const coaches = [
         name: 'frank',
         steps: {
             // TODO: add dnb steps
+        },
+        devSteps: {
             "back-and-forth-right": {
                 // TODO: add better video and course
                 video: "https://app.bouncy-feet.ch/media/videos/c6/lesson_2.mp4",
@@ -135,7 +143,6 @@ export const coaches = [
                 strokeWidth: 1,
             },
             headStyle: {
-                // TODO: try tophat
                 shape: 'disk',
                 size: 0.75,
                 strokeWidth: 1,

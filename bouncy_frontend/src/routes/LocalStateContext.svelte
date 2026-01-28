@@ -33,7 +33,7 @@
   /** @type {LocalState} */
   const defaultState = {
     avatarStyle: defaultAvatarStyle,
-    selectedCoach: 'chorok',
+    selectedCoach: 'rob',
     flags: {
       seenNoUploadHint: false
     }

@@ -5,6 +5,7 @@
   import LoginRequiredContent from '$lib/components/profile/LoginRequiredContent.svelte';
   import ScrollToTop from '$lib/components/ScrollToTop.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
+  import BackHeader from '$lib/components/ui/header/BackHeader.svelte';
   import ClubInfoHeader from '$lib/components/ui/header/ClubInfoHeader.svelte';
   import DarkSection from '$lib/components/ui/sections/DarkSection.svelte';
   import LimeSection from '$lib/components/ui/sections/LimeSection.svelte';
@@ -45,11 +46,15 @@
 
 <LoginRequiredContent reason="">
   <LimeSection arrow arrowText="Videos">
-    <ClubInfoHeader
-      title={$t('playlist.edit-title')}
-      userOrChannel={data.clubChannel}
-      mainColor
-    />
+    {#if data.clubChannel}
+      <ClubInfoHeader
+        title={$t('playlist.edit-title')}
+        userOrChannel={data.clubChannel}
+        mainColor
+      />
+    {:else}
+      <BackHeader mainColor title={$t('playlist.edit-title')} />
+    {/if}
 
     <div class="form">
       <PlaylistForm bind:name bind:description onSubmit={save} />
