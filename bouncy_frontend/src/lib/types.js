@@ -1,4 +1,3 @@
-
 /**
  * @typedef {Object} Features
  * @property {boolean} enableAvatarRotation
@@ -109,28 +108,23 @@
  *
  * @typedef {Object} PwaAuth
  * @property {null|AccessToken} peerTubeToken
- * @property {*} refreshPeerTubeToken
  *
+ * @typedef {import('$lib/stores/ApiUser.svelte.js').ApiUser} ApiUser
+ * 
  * @typedef {Object} UserContextData
- * @property {import('svelte/store').Writable<UserData>} store,
- * @property {ClientSession} clientSession,
+ * @property {UserData} user
+ * @property {ApiUser} [apiUser] -- this may be a guest session
+ * @property {FullUser} [fullUser] -- this is a fully onboarded user with a Keycloak entry and a PeerTube account
+ *
+ * @typedef {Object} FullUser
  * @property {PwaAuth} pwaAuth,
- * @property {(key: string, value: string)=>Promise<void>} setUserMeta,
- * @property {(courseId: string, lessonIndex: number, detection: DetectionResult) => DanceSessionResult | null} submitCourseLesson
- * @property {(warmupId: string, detection: DetectionResult) => DanceSessionResult | null} submitWarmup
- * @property {(stepId: string, bpm: number, detection: DetectionResult) => DanceSessionResult | null} submitStepTraining
- * @property {(result: DanceSessionResult) => void} addDanceToStats Update local stats, offline only.
  * @property {()=>boolean} isLoggedInToApi -- Has an active, non-expired PeerTube API session. (Reactive $derived state)
  * @property {()=>{}} refreshPeerTubeUser
  * @property {()=>void} logout
  * @property {Promise<import("$lib/peertube-openapi").User | undefined>} peerTubeUser
- * @property {(path: string)=>Promise<Response | null | undefined>} authenticatedGet
- * @property {(path: string, jsonBody: object)=>Promise<Response | null | undefined>} authenticatedPost
- * @property {(method: "PUT"|"POST"|"GET"|"DELETE", path: string, headers: object, body: string|FormData|undefined)=>Promise<import('./stats').ApiResponse>} authenticatedApiRequest
- * @property {()=>boolean} skippedIntro
- * @property {(yes: boolean)=>void} setSkippedIntro
- * @property {BfError} loginError -- only set if login is impossible, otherwise just trigger a login
- * @property {()=>void} clearErrors
+ * @property {() => Promise<BfError | { accessToken: string }>} peerTubeToken
+ *
+ *
  *
  * @typedef {Object} UserMetaResponse
  * @property {String} key_name
@@ -138,10 +132,10 @@
  * @property {String} [last_modified] -- Option<chrono::NaiveDateTime>
  * @property {number} version_nr -- i16
  *
- * @typedef {Object} BfError
- * @property {string} title
- * @property {string} description
- * 
+ * @typedef {Object} BfError -- for translated display to the user
+ * @property {string} title -- id to put inside $t() for translation
+ * @property {string} description -- id to put inside $t() for translation
+ *
  * @typedef {Object} UserLessonProgress
  * @property {LessonProgress[]} lessons
  * 
@@ -168,7 +162,7 @@
  * @typedef {Object} LocalFlags
  * @property {boolean} seenNoUploadHint
  * 
- * @typedef {Object} ClientSession
+ * @typedef {Object} ClientSessionData
  * @property {string} id
  * @property {string} secret
  * @property {DynUserMeta} meta

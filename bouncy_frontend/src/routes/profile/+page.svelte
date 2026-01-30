@@ -6,7 +6,6 @@
   import Toggle from '$lib/components/ui/Toggle.svelte';
   import { dev, displayedVersion } from '$lib/stores/FeatureSelection';
   import Symbol from '$lib/components/ui/Symbol.svelte';
-  import { getUserContext } from '$lib/context';
   import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
   import DarkSection from '$lib/components/ui/sections/DarkSection.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
@@ -21,12 +20,11 @@
   import Clubs from '$lib/components/club/Clubs.svelte';
   import CreateClub from '$lib/components/club/CreateClub.svelte';
 
-  /** @type {UserContextData} */
-  const { store: user, setUserMeta, logout } = getUserContext();
   // let showStatsSharingPopup = $state(writable(!$user.consentSendingStats));
 
-  async function submit() {
-    setUserMeta('publicName', $user.publicName);
+  /** @param {ApiUser} apiUser */
+  async function submit(apiUser) {
+    apiUser.setUserMeta('publicName', apiUser.user.publicName);
   }
 
   // function consent(yes) {
@@ -63,75 +61,85 @@
 
 <ScrollToTop />
 
-<DarkSection fillScreen arrow>
-  <LogoHeader
-    title={$t('profile.title')}
-    backButton={false}
-    homeLink
-    onAction={logout}
-    button="logout"
-  />
+<LoginRequiredContent reason={$t('profile.upload.requires-login-description')}>
+  {#snippet maybeFullUser({ apiUser, maybeFullUser })}
+    <DarkSection fillScreen arrow>
+      {#if maybeFullUser}
+        <LogoHeader
+          title={$t('profile.title')}
+          backButton={false}
+          homeLink
+          onAction={() => maybeFullUser.logout()}
+          button="logout"
+        />
+      {:else}
+        <LogoHeader title={$t('profile.title')} backButton={false} homeLink />
+      {/if}
 
-  <!-- svelte-ignore a11y_click_events_have_key_events -->
-  <!-- svelte-ignore a11y_no_static_element_interactions -->
-  <div class="profile-pic" onclick={clickProfile}>
-    <Symbol size={100}>person</Symbol>
-    {$user.publicName}
-  </div>
-  <h2 class="box">{$t('profile.stats-title')}</h2>
-  <DanceStats
-    seconds={$user.recordedSeconds}
-    numSteps={$user.recordedSteps}
-    numDances={$user.recordedDances}
-  />
-
-  <form class="inputs">
-    <label for="publicName">{$t('profile.public-name')}</label>
-    <input id="publicName" type="text" bind:value={$user.publicName} />
-    <button onclick={submit} class="wide"
-      >{$t('profile.update-name-button')}</button
-    >
-  </form>
-</DarkSection>
-
-<LimeSection arrow fillScreen>
-  <LoginRequiredContent
-    reason={$t('profile.upload.requires-login-description')}
-  >
-    <h2>{$t('profile.my-videos-title')}</h2>
-    {#await fetchMyVideos()}
-      waiting for videos
-    {:then videos}
-      <div class="videos">
-        {#if videos.length === 0}
-          <p>{$t('video.empty-playlist')}</p>
-        {:else}
-          <ThumbnailJuggler {videos} userExtraInfo />
-        {/if}
+      <!-- svelte-ignore a11y_click_events_have_key_events -->
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <div class="profile-pic" onclick={clickProfile}>
+        <Symbol size={100}>person</Symbol>
+        {apiUser.userCtx.user.publicName}
       </div>
-    {/await}
-  </LoginRequiredContent>
-</LimeSection>
+      <h2 class="box">{$t('profile.stats-title')}</h2>
+      <DanceStats
+        seconds={apiUser.userCtx.user.recordedSeconds}
+        numSteps={apiUser.userCtx.user.recordedSteps}
+        numDances={apiUser.userCtx.user.recordedDances}
+      />
 
-<LightSection arrow>
-  <h2>{$t('club.upload-video-button')}</h2>
-  <p>{$t('profile.upload-video-description')}</p>
-  <VideoUpload></VideoUpload>
-</LightSection>
+      <form class="inputs">
+        <label for="publicName">{$t('profile.public-name')}</label>
+        <input
+          id="publicName"
+          type="text"
+          bind:value={apiUser.userCtx.user.publicName}
+        />
+        <button onclick={() => submit(apiUser)} class="wide"
+          >{$t('profile.update-name-button')}</button
+        >
+      </form>
+    </DarkSection>
 
-<NightSection>
-  <div class="private">
-    <h2 id="my-clubs">{$t('club.my-clubs-title')}</h2>
-    <p>{$t('club.description-0')}</p>
-    <p>{$t('club.description-1')}</p>
-    <p>{$t('club.description-2')}</p>
-    <Clubs />
-  </div>
+    <LimeSection arrow fillScreen>
+      <h2>{$t('profile.my-videos-title')}</h2>
+      {#await fetchMyVideos()}
+        waiting for videos
+      {:then videos}
+        <div class="videos">
+          {#if videos.length === 0}
+            <p>{$t('video.empty-playlist')}</p>
+          {:else}
+            <ThumbnailJuggler {videos} userExtraInfo />
+          {/if}
+        </div>
+      {/await}
+    </LimeSection>
 
-  <h2>{$t('club.create-new-title')}</h2>
-  <CreateClub></CreateClub>
-  <Footer white />
-</NightSection>
+    {#if maybeFullUser}
+      <LightSection arrow>
+        <h2>{$t('club.upload-video-button')}</h2>
+        <p>{$t('profile.upload-video-description')}</p>
+        <VideoUpload fullUser={maybeFullUser}></VideoUpload>
+      </LightSection>
+    {/if}
+
+    <NightSection>
+      <div class="private">
+        <h2 id="my-clubs">{$t('club.my-clubs-title')}</h2>
+        <p>{$t('club.description-0')}</p>
+        <p>{$t('club.description-1')}</p>
+        <p>{$t('club.description-2')}</p>
+        <Clubs />
+      </div>
+
+      <h2>{$t('club.create-new-title')}</h2>
+      <CreateClub {apiUser}></CreateClub>
+      <Footer white />
+    </NightSection>
+  {/snippet}
+</LoginRequiredContent>
 
 <!-- <Popup title={'profile.consent.title'} bind:isOpen={showStatsSharingPopup}>
   <div>{$t('profile.consent.text0')}</div>

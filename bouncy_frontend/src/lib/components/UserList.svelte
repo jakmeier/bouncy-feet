@@ -1,21 +1,18 @@
 <script>
-  import { getUserContext } from '$lib/context';
   import { onMount } from 'svelte';
   import UnstyledButton from './ui/UnstyledButton.svelte';
 
   /**
    * @typedef {Object} Props
    * @property {(user: PublicUserResponse)=>void} [onSelect]
+   * @property {ApiUser} apiUser
    */
 
   /** @type {Props} */
-  let { onSelect = () => {} } = $props();
-
-  /** @type {UserContextData} */
-  const userCtx = getUserContext();
+  let { onSelect = () => {}, apiUser } = $props();
 
   async function load() {
-    const res = await userCtx.authenticatedPost('/users', {});
+    const res = await apiUser.authenticatedPost('/users', {});
     let result = await res?.json();
     return result?.users;
   }

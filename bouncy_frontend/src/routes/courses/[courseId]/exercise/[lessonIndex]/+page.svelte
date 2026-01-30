@@ -2,6 +2,7 @@
   import { browser } from '$app/environment';
   import { page } from '$app/state';
   import CourseLesson from '$lib/components/activity/CourseLesson.svelte';
+  import LoginRequiredContent from '$lib/components/profile/LoginRequiredContent.svelte';
   import { onMount } from 'svelte';
 
   /** @type {string} */
@@ -28,9 +29,14 @@
   });
 </script>
 
-<CourseLesson
-  courseId={id}
-  {lessonIndex}
-  onDone={onLessonDone}
-  onBack={backFromLesson}
-></CourseLesson>
+<LoginRequiredContent>
+  {#snippet guest({ apiUser })}
+    <CourseLesson
+      courseId={id}
+      {lessonIndex}
+      onDone={onLessonDone}
+      onBack={backFromLesson}
+      {apiUser}
+    ></CourseLesson>
+  {/snippet}
+</LoginRequiredContent>

@@ -7,11 +7,12 @@
   import BackHeader from '$lib/components/ui/header/BackHeader.svelte';
   import NightSection from '$lib/components/ui/sections/NightSection.svelte';
   import VideoWithMetaData from '$lib/components/ui/video/VideoWithMetaData.svelte';
-  import { getUserContext } from '$lib/context';
+  import { getUserContext } from '$lib/stores/context';
   import ScrollToTop from '$lib/components/ScrollToTop.svelte';
 
   const { getCourse } = getContext('courses');
-  const user = getUserContext().store;
+  const userCtx = getUserContext();
+  const user = $derived(userCtx.user);
 
   const id = page.params.courseId;
   /** @type {import('$lib/instructor/bouncy_instructor').Course} */
@@ -23,7 +24,7 @@
   const animationTime = stepTime * 0.7;
   const i = counter(-1, 1, stepTime);
 
-  let courseProgress = $derived($user.userLessonProgress[id]);
+  let courseProgress = $derived(user.userLessonProgress[id]);
 </script>
 
 <ScrollToTop />

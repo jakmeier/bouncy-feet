@@ -5,16 +5,10 @@
   import { t, locale, coachLocale } from '$lib/i18n';
   import { page } from '$app/state';
   import { coachData } from '$lib/coach';
-  import { getUserContext } from '$lib/context';
   import LoginRequiredContent from '$lib/components/profile/LoginRequiredContent.svelte';
   import PeertubeVideoPlayer from '$lib/components/ui/video/PeertubeVideoPlayer.svelte';
   import VideoUpload from '$lib/components/ui/video/VideoUpload.svelte';
   import ScrollToTop from '$lib/components/ScrollToTop.svelte';
-
-  /** @type {UserContextData} */
-  const userCtx = getUserContext();
-  const user = userCtx.store;
-  const pwaAuth = userCtx.pwaAuth;
 
   const coachId = $derived(page.url.searchParams.get('coach'));
   const coach = $derived(coachData(coachId || ''));
@@ -30,31 +24,33 @@
   <LoginRequiredContent
     reason={$t('profile.upload.requires-login-description')}
   >
-    <p>
-      BouncyFeet public name: {$user.publicName}
-    </p>
-    <p>
-      User id: {$user.openid}
-    </p>
+    {#snippet children({ apiUser, fullUser, user })}
+      <p>
+        BouncyFeet public name: {user.publicName}
+      </p>
+      <p>
+        User id: {user.openid}
+      </p>
 
-    <VideoUpload></VideoUpload>
+      <VideoUpload {fullUser}></VideoUpload>
 
-    <!-- TODO: pagination, general display etc -->
-    <!-- TODO: display private videos -->
-    {#await fetchMyVideos()}
-      waiting for videos
-    {:then videos}
-      {#each videos as video}
-        <p>
-          {video.id} <br />
-          {video.createdAt}
-          {video.name} <br />
-          {video.uuid} <br />
-          {#if video.shortUUID}
-            <PeertubeVideoPlayer videoId={video.uuid} />
-          {/if}
-        </p>
-      {/each}
-    {/await}
+      <!-- TODO: pagination, general display etc -->
+      <!-- TODO: display private videos -->
+      {#await fetchMyVideos()}
+        waiting for videos
+      {:then videos}
+        {#each videos as video}
+          <p>
+            {video.id} <br />
+            {video.createdAt}
+            {video.name} <br />
+            {video.uuid} <br />
+            {#if video.shortUUID}
+              <PeertubeVideoPlayer videoId={video.uuid} />
+            {/if}
+          </p>
+        {/each}
+      {/await}
+    {/snippet}
   </LoginRequiredContent>
 </LimeSection>

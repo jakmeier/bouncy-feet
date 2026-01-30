@@ -2,17 +2,18 @@
   import { t } from '$lib/i18n';
   import StandardPage from '../ui/StandardPage.svelte';
   import Thermometer from '../ui/svg/Thermometer.svelte';
-  import { getUserContext } from '$lib/context';
+  import { getUserContext } from '$lib/stores/context';
 
   let { detection, onContinue } = $props();
 
   /** @type {UserContextData} */
-  let { store: user } = getUserContext();
+  const userCtx = getUserContext();
+  const user = $derived(userCtx.user);
 
   //   TODO: Do something specific to warmup, where the energy level is measured rather than error.
   // let energyLevel = $derived(Math.min(1.0, detection.steps().length / 100));
   let energyLevel = 0.8;
-  let lifetimeSteps = $derived($user.recordedSteps);
+  let lifetimeSteps = $derived(user.recordedSteps);
   // TODO
   // let weeklySteps = 873;
   // let dailySteps = 77;

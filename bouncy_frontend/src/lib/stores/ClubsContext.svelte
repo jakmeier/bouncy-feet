@@ -1,7 +1,7 @@
 <script>
   import { onMount, setContext } from 'svelte';
   import { clubsData, loadMyClubs } from './Clubs.svelte';
-  import { getUserContext } from '$lib/context';
+  import { getUserContext } from '$lib/stores/context';
 
   /**
    * @typedef {Object} Props

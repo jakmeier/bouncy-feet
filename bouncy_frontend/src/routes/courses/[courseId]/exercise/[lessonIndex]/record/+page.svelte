@@ -4,6 +4,7 @@
   import DevUtility from '$lib/components/dev/DevUtility.svelte';
   import CourseLesson from '$lib/components/activity/CourseLesson.svelte';
   import { browser } from '$app/environment';
+  import LoginRequiredContent from '$lib/components/profile/LoginRequiredContent.svelte';
 
   /** @type {string} */
   let id = page.params.courseId;
@@ -25,13 +26,18 @@
   }
 </script>
 
-<CourseLesson
-  courseId={id}
-  {lessonIndex}
-  onDone={onLessonDone}
-  onBack={backFromLesson}
-></CourseLesson>
+<LoginRequiredContent>
+  {#snippet guest({ apiUser })}
+    <CourseLesson
+      courseId={id}
+      {lessonIndex}
+      onDone={onLessonDone}
+      onBack={backFromLesson}
+      {apiUser}
+    ></CourseLesson>
 
-{#if $dev}
-  <DevUtility />
-{/if}
+    {#if $dev}
+      <DevUtility />
+    {/if}
+  {/snippet}
+</LoginRequiredContent>

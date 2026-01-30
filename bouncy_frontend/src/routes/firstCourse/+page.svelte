@@ -6,17 +6,19 @@
   import AvatarStyleContext from '$lib/components/avatar/AvatarStyleContext.svelte';
   import ClassProgress from '$lib/components/class/ClassProgress.svelte';
   import StandardPage from '$lib/components/ui/StandardPage.svelte';
-  import { getUserContext } from '$lib/context';
+  import { getUserContext } from '$lib/stores/context';
   import { t } from '$lib/i18n';
   import { ONBOARDING_STATE } from '$lib/onboarding';
   import { onMount } from 'svelte';
+  import LoginRequiredContent from '$lib/components/profile/LoginRequiredContent.svelte';
 
   /** @type {UserContextData}*/
-  const { setUserMeta, clientSession } = getUserContext();
+  const userCtx = getUserContext();
+  const meta = $derived(userCtx.apiUser?.clientSession.clientSessionData.meta);
 
   const stepNames = ['Pendulum', 'Knee Up'];
 
-  let progress = $state(initProgress());
+  let progress = $derived(initProgress(meta));
   // svelte-ignore state_referenced_locally
   let selectedLesson = $state(Math.max(0, progress));
 
@@ -25,33 +27,45 @@
   let showProgressScreen = $state(initialProgress);
   let showEndScreen = $state(false);
 
-  function onWarmupDone() {
+  /** @param {ApiUser} apiUser */
+  function onWarmupDone(apiUser) {
     if (progress !== 0) return;
     progress = 1;
-    setUserMeta('onboarding', ONBOARDING_STATE.FINISHED_FIRST_WARMUP);
+    apiUser.setUserMeta('onboarding', ONBOARDING_STATE.FINISHED_FIRST_WARMUP);
     showProgressScreen = true;
   }
 
-  function onLessonDone() {
+  /** @param {ApiUser} apiUser */
+  function onLessonDone(apiUser) {
     showProgressScreen = true;
     switch (progress) {
       case 1:
-        setUserMeta('onboarding', ONBOARDING_STATE.FINISHED_FIRST_LESSON);
+        apiUser.setUserMeta(
+          'onboarding',
+          ONBOARDING_STATE.FINISHED_FIRST_LESSON
+        );
         progress = 2;
         break;
       case 2:
-        setUserMeta('onboarding', ONBOARDING_STATE.FINISHED_SECOND_LESSON);
+        apiUser.setUserMeta(
+          'onboarding',
+          ONBOARDING_STATE.FINISHED_SECOND_LESSON
+        );
         progress = 3;
         break;
       case 3:
-        setUserMeta('onboarding', ONBOARDING_STATE.FINISHED_INTRO_PART1);
+        apiUser.setUserMeta(
+          'onboarding',
+          ONBOARDING_STATE.FINISHED_INTRO_PART1
+        );
         progress = 4;
         break;
     }
   }
 
-  function initProgress() {
-    switch (clientSession.meta.onboarding) {
+  /** @param {DynUserMeta} meta */
+  function initProgress(meta) {
+    switch (meta.onboarding) {
       case ONBOARDING_STATE.FIRST_VISIT:
       case ONBOARDING_STATE.STARTED_FIRST_WARMUP: {
         return 0;
@@ -80,20 +94,21 @@
     resetScroll();
   }
 
-  function onContinue() {
+  /** @param {ApiUser} apiUser */
+  function onContinue(apiUser) {
     showProgressScreen = false;
     resetScroll();
 
     if (progress === 1 && selectedLesson == 0) {
-      setUserMeta('onboarding', ONBOARDING_STATE.STARTED_FIRST_LESSON);
+      apiUser.setUserMeta('onboarding', ONBOARDING_STATE.STARTED_FIRST_LESSON);
       selectedLesson = 1;
     }
     if (progress === 2 && selectedLesson == 1) {
-      setUserMeta('onboarding', ONBOARDING_STATE.STARTED_SECOND_LESSON);
+      apiUser.setUserMeta('onboarding', ONBOARDING_STATE.STARTED_SECOND_LESSON);
       selectedLesson = 2;
     }
     if (progress === 3 && selectedLesson == 2) {
-      setUserMeta('onboarding', ONBOARDING_STATE.STARTED_THIRD_LESSON);
+      apiUser.setUserMeta('onboarding', ONBOARDING_STATE.STARTED_THIRD_LESSON);
       selectedLesson = 3;
     }
   }
@@ -126,36 +141,46 @@
   });
 </script>
 
-{#if showProgressScreen}
-  <ClassProgress {progress} {onContinue} onDone={onClassDone} {onSelectLesson}
-  ></ClassProgress>
-{:else if showEndScreen}
-  <StandardPage mainColor title={$t('home.first-visit-done-title')}>
-    <p>{$t('home.first-visit-done-0')}</p>
-    <p>{$t('home.first-visit-done-1')}</p>
-    <p>{$t('home.first-visit-done-2')}</p>
-    <button onclick={onLeave}>
-      {$t('courses.lesson.show-teachers-button')}
-    </button>
-  </StandardPage>
-{:else}
-  <!-- TODO: real video -->
-  <AvatarStyleContext>
-    {#if selectedLesson === 0}
-      <WarmUp
-        {stepNames}
-        description={$t('record.warmup-preview-description')}
-        audioControl={false}
-        onDone={onWarmupDone}
-        onBack={backFromLesson}
-      ></WarmUp>
+<LoginRequiredContent>
+  {#snippet guest({ apiUser })}
+    {#if showProgressScreen}
+      <ClassProgress
+        {progress}
+        onContinue={() => onContinue(apiUser)}
+        onDone={onClassDone}
+        {onSelectLesson}
+      ></ClassProgress>
+    {:else if showEndScreen}
+      <StandardPage mainColor title={$t('home.first-visit-done-title')}>
+        <p>{$t('home.first-visit-done-0')}</p>
+        <p>{$t('home.first-visit-done-1')}</p>
+        <p>{$t('home.first-visit-done-2')}</p>
+        <button onclick={onLeave}>
+          {$t('courses.lesson.show-teachers-button')}
+        </button>
+      </StandardPage>
     {:else}
-      <CourseLesson
-        courseId="intro-lessons"
-        lessonIndex={selectedLesson - 1}
-        onDone={onLessonDone}
-        onBack={backFromLesson}
-      ></CourseLesson>
+      <!-- TODO: real video -->
+      <AvatarStyleContext>
+        {#if selectedLesson === 0}
+          <WarmUp
+            {stepNames}
+            description={$t('record.warmup-preview-description')}
+            audioControl={false}
+            onDone={() => onWarmupDone(apiUser)}
+            onBack={backFromLesson}
+            {apiUser}
+          ></WarmUp>
+        {:else}
+          <CourseLesson
+            courseId="intro-lessons"
+            lessonIndex={selectedLesson - 1}
+            onDone={() => onLessonDone(apiUser)}
+            onBack={backFromLesson}
+            {apiUser}
+          ></CourseLesson>
+        {/if}
+      </AvatarStyleContext>
     {/if}
-  </AvatarStyleContext>
-{/if}
+  {/snippet}
+</LoginRequiredContent>

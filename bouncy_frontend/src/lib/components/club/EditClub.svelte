@@ -1,11 +1,11 @@
 <script>
   import * as api from '$lib/peertube-openapi';
-  import { getUserContext } from '$lib/context';
   import { updateClub, updateClubAvatar } from '$lib/stores/Clubs.svelte';
   import ClubForm from './ClubForm.svelte';
 
   /**
    * @typedef {Object} Props
+   * @property {ApiUser} apiUser
    * @property {Club} club
    * @property {ClubDetailsResponse} clubDetails
    * @property {api.VideoChannel | undefined} clubChannel
@@ -13,10 +13,13 @@
    */
 
   /** @type {Props} */
-  let { club, clubDetails, clubChannel, onUpdateSuccess = () => {} } = $props();
-
-  /** @type {UserContextData} */
-  const userCtx = getUserContext();
+  let {
+    apiUser,
+    club,
+    clubDetails,
+    clubChannel,
+    onUpdateSuccess = () => {},
+  } = $props();
 
   let form = $state();
 
@@ -32,14 +35,14 @@
 
     try {
       if (club.description !== description || clubDetails.web_link !== url) {
-        await updateClub(userCtx, club.id, {
+        await updateClub(apiUser, club.id, {
           description,
           url,
         });
       }
 
       if (blob) {
-        await updateClubAvatar(userCtx, club.id, blob);
+        await updateClubAvatar(apiUser, club.id, blob);
       }
 
       onUpdateSuccess();

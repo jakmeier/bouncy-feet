@@ -14,8 +14,9 @@
   import { bpm, registerTracker, setBpm } from '$lib/stores/Beat';
   import Button from '$lib/components/ui/Button.svelte';
   import { DetectionState } from '$lib/instructor/bouncy_instructor';
-  import { getUserContext } from '$lib/context';
+  import { getUserContext } from '$lib/stores/context';
   import BackHeader from '$lib/components/ui/header/BackHeader.svelte';
+  import LoginRequiredContent from '$lib/components/profile/LoginRequiredContent.svelte';
 
   const stepName = page.params.stepName;
   const instructorStep = stepsByName(stepName)[0];
@@ -31,6 +32,7 @@
   // setHalfSpeed(true);
 
   const userCtx = getUserContext();
+  const user = $derived(userCtx.user);
 
   /** @type {undefined | string} */
   let reviewVideoSrc = $state();
@@ -71,7 +73,8 @@
     recordingStart = undefined;
   }
 
-  async function stopCameraAndRecording() {
+  /** @param {ApiUser} apiUser */
+  async function stopCameraAndRecording(apiUser) {
     isModelOn = false;
     stop();
     if (isLearnMode) {
@@ -91,10 +94,10 @@
     }
     showSummary = true;
 
-    sessionResult = userCtx.submitStepTraining(stepName, $bpm, detectedSteps);
+    sessionResult = apiUser.submitStepTraining(stepName, $bpm, detectedSteps);
     if (sessionResult) {
       setTimeout(() => {
-        userCtx.addDanceToStats(sessionResult);
+        apiUser.addDanceToStats(sessionResult);
       }, 1000);
     }
 
@@ -164,9 +167,13 @@
     }
   });
   let trackingState = $derived(tracker ? tracker.detectionState : null);
-  run(() => {
-    if ($trackingState === DetectionState.TrackingDone)
-      stopCameraAndRecording();
+
+  // TODO(refactor): Very hacky use of $effect, as well as using unguarded
+  // `userCtx.apiUser`.
+  $effect(() => {
+    if ($trackingState === DetectionState.TrackingDone) {
+      stopCameraAndRecording(userCtx.apiUser);
+    }
   });
 </script>
 
@@ -179,74 +186,79 @@
   <BackHeader title="{$t('record.train-dance-prefix')} {stepName}" />
 {/if}
 
-<div id="outer">
-  {#if showReview}
-    {#if reviewVideoSrc !== undefined && recordingStart !== undefined && recordingEnd !== undefined}
-      <VideoReview
-        {reviewVideoSrc}
-        {detectedSteps}
-        {recordingStart}
-        {recordingEnd}
-      ></VideoReview>
-      <div>
-        <a href={reviewVideoSrc} download>
-          <Button class="wide" symbol="download" text="record.download" />
-        </a>
-        <Button
-          class="wide"
-          on:click={closeReview}
-          symbol="arrow_back"
-          text="record.back-button"
-        />
-      </div>
-    {:else}
-      {$t('record.no-video-for-review')}
-      <Button
-        class="wide"
-        on:click={closeReview}
-        symbol="arrow_back"
-        text="record.back-button"
-      />
-    {/if}
-  {:else if showSummary}
-    <div>
-      <SessionReward data={sessionResult} step={instructorStep}></SessionReward>
+<LoginRequiredContent>
+  {#snippet guest({ apiUser })}
+    <div id="outer">
+      {#if showReview}
+        {#if reviewVideoSrc !== undefined && recordingStart !== undefined && recordingEnd !== undefined}
+          <VideoReview
+            {reviewVideoSrc}
+            {detectedSteps}
+            {recordingStart}
+            {recordingEnd}
+          ></VideoReview>
+          <div>
+            <a href={reviewVideoSrc} download>
+              <Button class="wide" symbol="download" text="record.download" />
+            </a>
+            <Button
+              class="wide"
+              on:click={closeReview}
+              symbol="arrow_back"
+              text="record.back-button"
+            />
+          </div>
+        {:else}
+          {$t('record.no-video-for-review')}
+          <Button
+            class="wide"
+            on:click={closeReview}
+            symbol="arrow_back"
+            text="record.back-button"
+          />
+        {/if}
+      {:else if showSummary}
+        <div>
+          <SessionReward data={sessionResult} step={instructorStep} {user}
+          ></SessionReward>
+        </div>
+        <div class="buttons">
+          <Button
+            class="wide"
+            on:click={openReview}
+            symbol="tv"
+            text="record.review-button"
+          />
+          <Button
+            class="wide"
+            on:click={reset}
+            symbol="videocam"
+            text="record.reset-button"
+          />
+          <Button
+            class="wide"
+            on:click={goBackToStep}
+            symbol="arrow_back"
+            text="record.back-button"
+          />
+        </div>
+      {:else}
+        <LiveRecording
+          bind:startCamera
+          bind:stopCamera
+          bind:startRecording
+          bind:stop={stopLiveRecording}
+          bind:recordingStart
+          bind:recordingEnd
+          onStop={onRecordingStopped}
+          {videoOpacity}
+          {enableLiveAvatar}
+          {enableInstructorAvatar}
+        ></LiveRecording>
+      {/if}
     </div>
-    <div class="buttons">
-      <Button
-        class="wide"
-        on:click={openReview}
-        symbol="tv"
-        text="record.review-button"
-      />
-      <Button
-        class="wide"
-        on:click={reset}
-        symbol="videocam"
-        text="record.reset-button"
-      />
-      <Button
-        class="wide"
-        on:click={goBackToStep}
-        symbol="arrow_back"
-        text="record.back-button"
-      />
-    </div>
-  {:else}
-    <LiveRecording
-      bind:startCamera
-      bind:stopCamera
-      bind:startRecording
-      bind:stop={stopLiveRecording}
-      bind:recordingStart
-      bind:recordingEnd
-      onStop={onRecordingStopped}
-      {videoOpacity}
-      {enableLiveAvatar}
-      {enableInstructorAvatar}
-    ></LiveRecording>
-  {/if}
-</div>
+  {/snippet}
+</LoginRequiredContent>
 
 <Popup
   title="record.learn-hint-title"

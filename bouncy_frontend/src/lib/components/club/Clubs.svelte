@@ -1,5 +1,5 @@
 <script>
-  import { getClubsContext } from '$lib/stores/Clubs.svelte';
+  import { getClubsContext } from '$lib/stores/context';
   import ActorAvatar from '../profile/ActorAvatar.svelte';
   import FormattedText from '../ui/FormattedText.svelte';
 

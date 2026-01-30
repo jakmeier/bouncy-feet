@@ -13,7 +13,7 @@
     floatingTitleRect,
   } from '$lib/stores/UiState.svelte.js';
   import PoseDetectionContext from './PoseDetectionContext.svelte';
-  import UserContext from './UserContext.svelte';
+  import UserContext from '../lib/stores/UserContext.svelte';
   import LocalCollectionContext from './LocalCollectionContext.svelte';
   import { dev } from '$lib/stores/FeatureSelection';
   import MusicContext from '../lib/components/audio/MusicContext.svelte';

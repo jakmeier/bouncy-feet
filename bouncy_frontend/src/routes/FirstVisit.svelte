@@ -7,7 +7,7 @@
   import { goto } from '$app/navigation';
   import { ONBOARDING_STATE } from '$lib/onboarding';
   import VideoPlayer from '$lib/components/ui/video/VideoPlayer.svelte';
-  import { getUserContext } from '$lib/context';
+  import { getUserContext } from '$lib/stores/context';
 
   /** @type {UserContextData}*/
   const { setUserMeta, setSkippedIntro } = getUserContext();

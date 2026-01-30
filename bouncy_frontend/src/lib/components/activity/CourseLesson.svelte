@@ -6,7 +6,6 @@
   import { DetectionResult } from '$lib/instructor/bouncy_instructor';
   import ActivityReview from './ActivityReview.svelte';
   import { registerTracker } from '$lib/stores/Beat';
-  import { getUserContext } from '$lib/context';
 
   /**
    * @typedef {Object} Props
@@ -14,14 +13,13 @@
    * @property {number} lessonIndex
    * @property {function} onDone
    * @property {()=>void} onBack
+   * @property {ApiUser} apiUser
    */
 
   /** @type {Props}*/
-  let { courseId, lessonIndex, onDone, onBack } = $props();
+  let { courseId, lessonIndex, onDone, onBack, apiUser } = $props();
 
   const { getCourse } = getContext('courses');
-  /** @type {UserContextData} */
-  const user = getUserContext();
 
   /** @type {import('$lib/instructor/bouncy_instructor').Course} */
   let course = getCourse(courseId);
@@ -60,13 +58,13 @@
 
     const fullId = courseId;
     const limitedId = fullId.slice(0, 128);
-    const sessionResult = user.submitCourseLesson(
+    const sessionResult = apiUser.submitCourseLesson(
       limitedId,
       lessonIndex,
       detection
     );
     if (sessionResult) {
-      user.addDanceToStats(sessionResult);
+      apiUser.addDanceToStats(sessionResult);
     }
   }
 

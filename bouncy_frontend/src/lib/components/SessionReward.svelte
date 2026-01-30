@@ -4,18 +4,16 @@
   import Experience from './Experience.svelte';
   import DanceStats from '../../routes/profile/DanceStats.svelte';
   import Step from '../../routes/collection/Step.svelte';
-  import { getUserContext } from '$lib/context';
 
   /**
    * @typedef {Object} Props
    * @property {DanceSessionResult?} data
    * @property {import('bouncy_instructor').StepWrapper} step
+   * @property {UserData} user
    */
 
   /** @type {Props} */
-  let { data, step } = $props();
-
-  const user = getUserContext().store;
+  let { data, step, user } = $props();
 
   const stepTime = 300;
   const animationTime = stepTime * 0.7;
@@ -40,9 +38,7 @@
 <div class="step">
   <div class="exp">
     <Experience
-      xp={$user.userSteps[step.name]
-        ? $user.userSteps[step.name].experience
-        : 0}
+      xp={user.userSteps[step.name] ? user.userSteps[step.name].experience : 0}
       height={50}
       twoRows
       lvlSize={150}

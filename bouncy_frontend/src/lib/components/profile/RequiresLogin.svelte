@@ -4,7 +4,7 @@
 
   /**
    * @typedef {Object} Props
-   * @property {string} reason
+   * @property {string} [reason]
    * @property {string} [username]
    * @property {string} [openid]
    */
@@ -64,5 +64,7 @@
 </button>
 
 <div>
-  {reason}
+  {#if reason}
+    {reason}
+  {/if}
 </div>

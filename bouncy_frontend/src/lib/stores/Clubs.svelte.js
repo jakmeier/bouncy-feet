@@ -1,16 +1,6 @@
 import { PUBLIC_API_BASE } from "$env/static/public";
 import { apiRequest } from "$lib/stats";
 import { error } from "@sveltejs/kit";
-import { getContext } from "svelte";
-
-/** @returns {ClubsContextData} */
-export function getClubsContext() {
-    const ctx = getContext('clubs');
-    if (!ctx) {
-        console.warn("missing clubs context");
-    }
-    return ctx;
-}
 
 /** @type {ClubsData} */
 export const clubsData = $state({
@@ -27,10 +17,14 @@ export const clubsData = $state({
  * @returns {Promise<Club[]>}
  */
 export async function loadMyClubs(userCtx) {
-    const response = await userCtx.authenticatedGet("/clubs/joined");
-    /** @type { {clubs: Club[]} } */
-    const data = await response?.json();
-    return data.clubs;
+    if (userCtx.apiUser) {
+        const response = await userCtx.apiUser.authenticatedGet("/clubs/joined");
+        /** @type { {clubs: Club[]} } */
+        const data = await response?.json();
+        return data.clubs;
+    } else {
+        return [];
+    }
 }
 
 /**
@@ -52,26 +46,26 @@ export async function loadPublicClubs(fetch) {
 
 /**
  * @param {number|string} clubId 
- * @param {UserContextData} [userCtx] 
+ * @param {ApiUser} [apiUser] 
  * @param {(input: any) => Promise<Response>} [svelteFetch]
  */
-export async function loadAndSetClubDetails(clubId, userCtx, svelteFetch) {
-    const details = await loadClubDetails(clubId, userCtx, svelteFetch);
+export async function loadAndSetClubDetails(clubId, apiUser, svelteFetch) {
+    const details = await loadClubDetails(clubId, apiUser, svelteFetch);
     clubsData.currentClubDetails = details;
     clubsData.loadedForUser = true;
 }
 
 /**
  * @param {number|string} clubId 
- * @param {UserContextData} [userCtx] 
+ * @param {ApiUser} [apiUser] 
  * @param {(input: any) => Promise<Response>} [svelteFetch]
  * @returns {Promise<ClubDetailsResponse>}
  */
-export async function loadClubDetails(clubId, userCtx, svelteFetch) {
+export async function loadClubDetails(clubId, apiUser, svelteFetch) {
     const resolvedFetch = svelteFetch || fetch;
     let response;
-    if (userCtx) {
-        response = await userCtx.authenticatedGet(`/clubs/${clubId}/private`);
+    if (apiUser) {
+        response = await apiUser.authenticatedGet(`/clubs/${clubId}/private`);
     } else {
         response = await resolvedFetch(`${PUBLIC_API_BASE}/clubs/${clubId}`);
     }
@@ -87,13 +81,13 @@ export async function loadClubDetails(clubId, userCtx, svelteFetch) {
 }
 
 /**
- * @param {UserContextData} userCtx
+ * @param {ApiUser} apiUser
  * @param {string} title
  * @param {string} description
  * @param {string} [url]
  * @returns {Promise<Club|undefined>}
  */
-export async function createNewClub(userCtx, title, description, url) {
+export async function createNewClub(apiUser, title, description, url) {
     if (title.length > 64 || description.length > 1024 || (url && url.length > 255)) {
         // UI should catch this!
         throw new Error("club title, url, or description too long");
@@ -106,7 +100,7 @@ export async function createNewClub(userCtx, title, description, url) {
         url = validateUrl(url);
     }
 
-    const response = await userCtx.authenticatedPost("/clubs/create", { title, description, url });
+    const response = await apiUser.authenticatedPost("/clubs/create", { title, description, url });
 
     if (response?.status !== 201) {
         console.error("Failed to create club", response);
@@ -120,17 +114,17 @@ export async function createNewClub(userCtx, title, description, url) {
 }
 
 /**
- * @param {UserContextData} userCtx
+ * @param {ApiUser} apiUser
  * @param {number} clubId
  * @param {Blob} blob
  */
-export async function updateClubAvatar(userCtx, clubId, blob) {
+export async function updateClubAvatar(apiUser, clubId, blob) {
 
     const formData = new FormData();
     formData.append('avatar', blob, 'avatar.png');
 
     const headers = {};
-    const response = await userCtx.authenticatedApiRequest("POST", `/clubs/${clubId}/avatar`, headers, formData);
+    const response = await apiUser.authenticatedApiRequest("POST", `/clubs/${clubId}/avatar`, headers, formData);
 
     if (response.error) {
         console.error("Failed to update avatar", response.error, response.errorBody);
@@ -139,13 +133,13 @@ export async function updateClubAvatar(userCtx, clubId, blob) {
 }
 
 /**
- * @param {UserContextData} userCtx
+ * @param {ApiUser} apiUser
  * @param {number} clubId
  * @param {EditableClubDetails} details
  */
-export async function updateClub(userCtx, clubId, details) {
+export async function updateClub(apiUser, clubId, details) {
 
-    const response = await userCtx.authenticatedPost(`/clubs/${clubId}`, details);
+    const response = await apiUser.authenticatedPost(`/clubs/${clubId}`, details);
 
     if (!response?.ok) {
         console.error("Failed to update club", response);
@@ -159,12 +153,12 @@ export async function updateClub(userCtx, clubId, details) {
 }
 
 /**
- * @param {UserContextData} userCtx
+ * @param {ApiUser} apiUser
  * @param {number} clubId
  * @returns {Promise<boolean>}
  */
-export async function deleteClub(userCtx, clubId) {
-    const response = await userCtx.authenticatedApiRequest("DELETE", `/clubs/${clubId}`, {}, "");
+export async function deleteClub(apiUser, clubId) {
+    const response = await apiUser.authenticatedApiRequest("DELETE", `/clubs/${clubId}`, {}, "");
 
     if (response.error) {
         console.error("Failed to update club", response);
@@ -179,20 +173,20 @@ export async function deleteClub(userCtx, clubId) {
 }
 
 /**
- * @param {UserContextData} userCtx
+ * @param {ApiUser} apiUser
  * @param {number} clubId
  * @param {string} name
  * @param {string} description
  * @param {boolean} isPublic
  * @returns {Promise<{playlist_id: number} | undefined>}
  */
-export async function createNewClubPlaylist(userCtx, clubId, name, description, isPublic) {
+export async function createNewClubPlaylist(apiUser, clubId, name, description, isPublic) {
     const body = {
         display_name: name,
         description,
         public: isPublic,
     }
-    const response = await userCtx.authenticatedPost(`/clubs/${clubId}/playlist/new`, body);
+    const response = await apiUser.authenticatedPost(`/clubs/${clubId}/playlist/new`, body);
 
     if (!response?.ok) {
         console.error("Failed to create playlist", response);
@@ -203,7 +197,7 @@ export async function createNewClubPlaylist(userCtx, clubId, name, description, 
 }
 
 /**
- * @param {UserContextData} userCtx
+ * @param {ApiUser} apiUser
  * @param {number} clubId
  * @param {number} playlistId
  * @param {string} name
@@ -211,13 +205,13 @@ export async function createNewClubPlaylist(userCtx, clubId, name, description, 
  * @param {boolean} isPublic
  * @returns {Promise<boolean>} true if success
  */
-export async function updateClubPlaylist(userCtx, clubId, playlistId, name, description, isPublic) {
+export async function updateClubPlaylist(apiUser, clubId, playlistId, name, description, isPublic) {
     const body = {
         display_name: name,
         description,
         public: isPublic,
     }
-    const response = await userCtx.authenticatedPost(`/clubs/${clubId}/playlist/${playlistId}/edit`, body);
+    const response = await apiUser.authenticatedPost(`/clubs/${clubId}/playlist/${playlistId}/edit`, body);
 
     if (!response?.ok) {
         console.error("Failed to edit playlist", response);

@@ -1,5 +1,4 @@
 <script>
-  import { getUserContext } from '$lib/context';
   import { t } from '$lib/i18n';
   import { VIDEO_PRIVACY } from '$lib/peertube';
   import ThumbnailFeed from '../ThumbnailFeed.svelte';
@@ -8,14 +7,13 @@
 
   /**
    * @typedef {Object} Props
+   * @property {ApiUser} apiUser
+   * @property {FullUser} fullUser
    * @property {api.VideoPlaylist} playlist
    * @property {number} clubId
    */
   /** @type {Props} */
-  let { playlist, clubId } = $props();
-
-  /** @type {UserContextData} */
-  const userCtx = getUserContext();
+  let { apiUser, fullUser, playlist, clubId } = $props();
 
   let videoUpload = $state();
   let videoFeed = $state();
@@ -31,7 +29,7 @@
       return;
     }
     let videoId = video.video.id;
-    userCtx
+    apiUser
       .authenticatedPost('/clubs/video/add', {
         video_id: videoId,
         club_id: clubId,
@@ -48,7 +46,7 @@
     if (!confirm($t('playlist.confirm-remove-video'))) {
       return;
     }
-    userCtx
+    apiUser
       .authenticatedPost(
         `/clubs/${clubId}/playlist/${playlist.id}/remove-video`,
         {
@@ -77,7 +75,11 @@
 {/if}
 
 <div class="hidden">
-  <VideoUpload bind:this={videoUpload} {onVideoUploaded} privacy={uploadPrivacy}
+  <VideoUpload
+    bind:this={videoUpload}
+    {onVideoUploaded}
+    privacy={uploadPrivacy}
+    {fullUser}
   ></VideoUpload>
 </div>
 

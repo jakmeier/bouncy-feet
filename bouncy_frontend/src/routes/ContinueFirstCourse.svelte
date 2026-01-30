@@ -1,11 +1,11 @@
 <script>
   import { goto } from '$app/navigation';
   import StandardPage from '$lib/components/ui/StandardPage.svelte';
-  import { getUserContext } from '$lib/context';
+  import { getUserContext } from '$lib/stores/context';
   import { t } from '$lib/i18n';
 
   /** @type {UserContextData}*/
-  const { setSkippedIntro } = getUserContext();
+  const userCtx = getUserContext();
 </script>
 
 <StandardPage title="" white={false}>
@@ -13,7 +13,7 @@
   <button onclick={() => goto('firstCourse')}>
     {$t('home.continue-button')}
   </button>
-  <button onclick={() => setSkippedIntro(true)}>
+  <button onclick={() => userCtx.apiUser.setSkippedIntro(true)}>
     {$t('home.skip-button')}
   </button>
 </StandardPage>

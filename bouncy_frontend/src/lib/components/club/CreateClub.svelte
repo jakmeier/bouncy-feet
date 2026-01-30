@@ -1,9 +1,15 @@
 <script>
-  import { getUserContext } from '$lib/context';
   import { createNewClub, updateClubAvatar } from '$lib/stores/Clubs.svelte';
   import ClubForm from './ClubForm.svelte';
 
-  const userCtx = getUserContext();
+  /**
+   * @typedef {Object} Props
+   * @property {ApiUser} apiUser
+   */
+
+  /** @type {Props} */
+  let { apiUser } = $props();
+
   let form = $state();
 
   /** @type {EditableClubDetails} */
@@ -18,9 +24,9 @@
     const { description, url } = details;
 
     try {
-      const club = await createNewClub(userCtx, name, description, url);
+      const club = await createNewClub(apiUser, name, description, url);
       if (club && blob) {
-        await updateClubAvatar(userCtx, club.id, blob);
+        await updateClubAvatar(apiUser, club.id, blob);
       }
 
       // clean up form

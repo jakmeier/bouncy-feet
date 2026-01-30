@@ -8,7 +8,7 @@
   import { features } from '$lib/stores/FeatureSelection';
   import { browser, dev } from '$app/environment';
   import Experience from '$lib/components/Experience.svelte';
-  import { getUserContext } from '$lib/context';
+  import { getUserContext } from '$lib/stores/context';
 
   /**
    * @typedef {Object} Props
@@ -20,7 +20,8 @@
 
   const localCollection = getContext('localCollection');
   const localDances = localCollection.dances;
-  const user = getUserContext().store;
+  const userCtx = getUserContext();
+  const user = $derived(userCtx.user);
 
   const stepTime = 300;
   // animationTime < stepTime will freeze the position for a moment, which makes
@@ -47,8 +48,8 @@
         <h3>{step.name}</h3>
       </a>
       <Experience
-        xp={$user.userSteps[step.name]
-          ? $user.userSteps[step.name].experience
+        xp={user.userSteps[step.name]
+          ? user.userSteps[step.name].experience
           : 0}
       ></Experience>
     </div>
@@ -70,8 +71,8 @@
         <h3>{step.name}</h3>
       </a>
       <Experience
-        xp={$user.userSteps[step.name]
-          ? $user.userSteps[step.name].experience
+        xp={user.userSteps[step.name]
+          ? user.userSteps[step.name].experience
           : 0}
       ></Experience>
     </div>
@@ -91,8 +92,8 @@
         <h3>{step.name}</h3>
       </a>
       <Experience
-        xp={$user.userSteps[step.name]
-          ? $user.userSteps[step.name].experience
+        xp={user.userSteps[step.name]
+          ? user.userSteps[step.name].experience
           : 0}
       ></Experience>
     </div>
@@ -111,8 +112,8 @@
         <h3>{step.name}</h3>
       </a>
       <Experience
-        xp={$user.userSteps[step.name]
-          ? $user.userSteps[step.name].experience
+        xp={user.userSteps[step.name]
+          ? user.userSteps[step.name].experience
           : 0}
       ></Experience>
     </div>
@@ -129,8 +130,8 @@
           <h3>{step.name}</h3>
         </a>
         <Experience
-          xp={$user.userSteps[step.name]
-            ? $user.userSteps[step.name].experience
+          xp={user.userSteps[step.name]
+            ? user.userSteps[step.name].experience
             : 0}
         ></Experience>
       </div>

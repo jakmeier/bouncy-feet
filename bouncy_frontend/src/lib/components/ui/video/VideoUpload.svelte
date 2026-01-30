@@ -1,22 +1,21 @@
 <script>
   import { uploadVideoToPeerTubeResumable, VIDEO_PRIVACY } from '$lib/peertube';
   import { t } from '$lib/i18n';
-  import { getUserContext } from '$lib/context';
   import LoginRequiredContent from '$lib/components/profile/LoginRequiredContent.svelte';
 
   /**
    * @typedef {Object} Props
    * @prop {(video: import('$lib/peertube-openapi').VideoUploadResponse)=>void} [onVideoUploaded]
    * @prop {import('$lib/peertube-openapi').VideoPrivacySet} [privacy]
+   * @prop {FullUser} fullUser
    */
 
   /** @type {Props}*/
-  let { onVideoUploaded = () => {}, privacy = VIDEO_PRIVACY.PRIVATE } =
-    $props();
-
-  /** @type {UserContextData} */
-  const userCtx = getUserContext();
-  const pwaAuth = userCtx.pwaAuth;
+  let {
+    onVideoUploaded = () => {},
+    privacy = VIDEO_PRIVACY.PRIVATE,
+    fullUser,
+  } = $props();
 
   let file = $state(null);
   let isUploading = $state(false);
@@ -32,7 +31,8 @@
    * @returns {Promise<number>}
    */
   async function getUserChannel() {
-    const ptu = await userCtx.peerTubeUser;
+    // TODO
+    const ptu = await fullUser.peerTubeUser;
     const channels = ptu?.videoChannels;
     // @ts-ignore
     const channelId = channels[0]?.id;
@@ -52,19 +52,20 @@
       return;
     }
 
-    let accessToken = pwaAuth.peerTubeToken?.access_token;
-    if (!accessToken) {
-      await pwaAuth.refreshPeerTubeToken();
-      accessToken = pwaAuth.peerTubeToken?.access_token;
-    }
+    // TODO
+    // let accessToken = pwaAuth.peerTubeToken?.access_token;
+    // if (!accessToken) {
+    //   await pwaAuth.refreshPeerTubeToken();
+    //   accessToken = pwaAuth.peerTubeToken?.access_token;
+    // }
 
-    if (!accessToken) {
-      console.error('No PeerTube access token');
-      // TODO: translate error to user
-      error =
-        'Uhm, failed authentication with video hosting service, sorry about that :(';
-      return;
-    }
+    // if (!accessToken) {
+    //   console.error('No PeerTube access token');
+    //   // TODO: translate error to user
+    //   error =
+    //     'Uhm, failed authentication with video hosting service, sorry about that :(';
+    //   return;
+    // }
 
     isUploading = true;
     uploadProgress = 0;

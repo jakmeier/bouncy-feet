@@ -1,14 +1,15 @@
 <script>
-  import { getUserContext } from '$lib/context';
+  import { getUserContext } from '$lib/stores/context';
   import { t, locale, dateLocale } from '$lib/i18n';
   import { formatDistance } from 'date-fns';
 
   /** @type {UserContextData} */
-  let { store: user } = getUserContext();
+  const userCtx = getUserContext();
+  const user = $derived(userCtx.user);
 
-  let steps = $derived($user.recordedSteps);
-  let seconds = $derived($user.recordedSeconds);
-  let activities = $derived($user.recordedDances);
+  let steps = $derived(user.recordedSteps);
+  let seconds = $derived(user.recordedSeconds);
+  let activities = $derived(user.recordedDances);
   // let uniqueSteps = 7; // TODO
 
   const formatOpts = $derived(dateLocale($locale));

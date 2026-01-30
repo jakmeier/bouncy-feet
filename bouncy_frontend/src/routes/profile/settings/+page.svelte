@@ -16,10 +16,11 @@
     detectionDelayNum,
     detectionDelayTotal,
   } from '$lib/stores/System';
-  import { getUserContext } from '$lib/context';
+  import { getUserContext } from '$lib/stores/context';
   import BackHeader from '$lib/components/ui/header/BackHeader.svelte';
 
-  const user = getUserContext().store;
+  const userCtx = getUserContext();
+  const user = $derived(userCtx.user);
 
   // format number
   function fnum(num) {
@@ -32,17 +33,17 @@
 <div id="control-panel">
   <div class="toggle-item">
     <Symbol size={45}>sports_score</Symbol>
-    <Toggle bind:isOn={$user.consentSendingStats} />
+    <Toggle bind:isOn={user.consentSendingStats} />
     <div>{$t('profile.settings.consent-title')}</div>
   </div>
   <div class="toggle-item">
     <Symbol size={45}>science</Symbol>
-    <Toggle bind:isOn={$user.experimentalFeatures} />
+    <Toggle bind:isOn={user.experimentalFeatures} />
     <div>{$t('profile.settings.experimental-title')}</div>
   </div>
 </div>
 
-{#if $user.experimentalFeatures}
+{#if user.experimentalFeatures}
   <div class="system-infos">
     <Symbol size={45}>translate</Symbol>
     <div>{$locale}</div>

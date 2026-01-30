@@ -11,10 +11,10 @@
   import Info from '$lib/components/ui/Info.svelte';
   import Symbol from '$lib/components/ui/Symbol.svelte';
   import Button from '$lib/components/ui/Button.svelte';
-  import { getUserContext } from '$lib/context';
+  import { getUserContext } from '$lib/stores/context';
   import BackHeader from '$lib/components/ui/header/BackHeader.svelte';
 
-  const user = getUserContext().store;
+  const user = getUserContext().user;
   const name = page.params.stepName;
   const variations = data.lookupSteps({
     uniqueNames: false,
@@ -106,7 +106,7 @@
     {$t('step.wip-tracking')}
   </div>
 {/if}
-{#if $features.enableStepRecording(name) || $user.experimentalFeatures || !browser}
+{#if $features.enableStepRecording(name) || user.experimentalFeatures || !browser}
   <div class="label buttons">
     <a href="./learn">
       <Button symbol="school" text="record.learn-button"></Button>

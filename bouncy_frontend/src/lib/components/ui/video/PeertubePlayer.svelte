@@ -1,7 +1,7 @@
 <script>
   import { base } from '$app/paths';
   import { onMount } from 'svelte';
-  import { getUserContext } from '$lib/context';
+  import { getUserContext } from '$lib/stores/context';
 
   /** @typedef {{ time: number, label: string, icon: string }} Marker */
   /**
@@ -114,8 +114,16 @@
     player = new PeerTubePlayer(iframe);
     // set up refreshed token forwarding
     player.addEventListener('authFailed', async () => {
-      console.log('authFailed event listener triggered');
-      await player.setAuthToken(userCtx.pwaAuth.peerTubeToken?.access_token);
+      if (userCtx.fullUser) {
+        await player.setAuthToken(
+          userCtx.fullUser?.pwaAuth.peerTubeToken?.access_token
+        );
+      } else {
+        // TODO: should show a login mask in place of the video
+        console.log(
+          'authFailed event listener triggered but user is not logged in'
+        );
+      }
     });
     // set current token once to resolve
     // await player.setAuthToken(userCtx.pwaAuth.peerTubeToken?.access_token);

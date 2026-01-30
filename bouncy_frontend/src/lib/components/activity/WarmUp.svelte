@@ -11,7 +11,6 @@
   import StandardPage from '../ui/StandardPage.svelte';
   import WarmupReview from './WarmupReview.svelte';
   import { onDestroy } from 'svelte';
-  import { getUserContext } from '$lib/context';
 
   /**
    * @typedef {Object} Props
@@ -21,14 +20,12 @@
    * @property {boolean} audioControl
    * @property {function} onDone
    * @property {()=>void} onBack
+   * @property {ApiUser} apiUser
    */
 
   /** @type {Props} */
-  let { stepNames, video, description, audioControl, onDone, onBack } =
+  let { stepNames, video, description, audioControl, onDone, onBack, apiUser } =
     $props();
-
-  /** @type {UserContextData} */
-  let user = getUserContext();
 
   let previewDone = $state(false);
 
@@ -61,10 +58,10 @@
 
     const fullId = stepNames.join('+');
     const limitedId = fullId.slice(0, 128);
-    const sessionResult = user.submitWarmup(limitedId, detection);
+    const sessionResult = apiUser.submitWarmup(limitedId, detection);
     if (sessionResult) {
       setTimeout(() => {
-        user.addDanceToStats(sessionResult);
+        apiUser.addDanceToStats(sessionResult);
       }, 3000);
     }
   }

@@ -16,18 +16,15 @@
   import Playlist from '$lib/components/ui/video/Playlist.svelte';
   import VideoUpload from '$lib/components/ui/video/VideoUpload.svelte';
   import UserList from '$lib/components/UserList.svelte';
-  import { getUserContext } from '$lib/context';
+  import { getClubsContext, getUserContext } from '$lib/stores/context';
   import { t } from '$lib/i18n';
   import { VIDEO_PRIVACY } from '$lib/peertube';
-  import { getClubsContext } from '$lib/stores/Clubs.svelte';
 
   /** @type {import('./$types').PageProps} */
   let { data } = $props();
 
   const clubId = Number.parseInt(page.params.clubId || '0');
 
-  /** @type {UserContextData} */
-  const userCtx = getUserContext();
   const { clubsData } = getClubsContext();
 
   // May be undefined while clubs are still loading.
@@ -63,8 +60,9 @@
 
   /**
    * @param {PublicUserResponse} user
+   * @param {ApiUser} apiUser
    */
-  async function onSelectUser(user) {
+  async function onSelectUser(user, apiUser) {
     const p0 = $t('club.confirm-add-user-p0');
     const p1 = $t('club.confirm-add-user-p1');
     const p2 = $t('club.confirm-add-user-p2');
@@ -73,7 +71,7 @@
       /** @type {boolean} */
       let ok = false;
       try {
-        const result = await userCtx.authenticatedPost('/clubs/add_member', {
+        const result = await apiUser.authenticatedPost('/clubs/add_member', {
           user_id: Number(user.id),
           club_id: club?.id,
         });
@@ -95,15 +93,16 @@
 
   /**
    * @param {import('$lib/peertube-openapi').VideoUploadResponse} video
+   * @param {ApiUser} apiUser
    */
-  function onVideoUploaded(video) {
+  function onVideoUploaded(video, apiUser) {
     if (!video.video) {
       console.error('Got no video to add');
       return;
     }
     let videoId = video.video.id;
     const targetFeed = uploadToFeed;
-    userCtx
+    apiUser
       .authenticatedPost('/clubs/video/add', {
         video_id: videoId,
         club_id: clubId,
@@ -218,14 +217,21 @@
 </LightSection>
 
 <PopupWithRunes bind:isOpen={showUsersPopup}>
-  <div class="popup">
-    {#if message}
-      <div>{message}</div>
-    {:else}
-      <div>{$t('club.select-user-title')}</div>
-      <UserList onSelect={onSelectUser}></UserList>
-    {/if}
-  </div>
+  <LoginRequiredContent
+    reason={$t('profile.upload.requires-login-description')}
+  >
+    {#snippet children({ apiUser })}
+      <div class="popup">
+        {#if message}
+          <div>{message}</div>
+        {:else}
+          <div>{$t('club.select-user-title')}</div>
+          <UserList onSelect={(u) => onSelectUser(u, apiUser)} {apiUser}
+          ></UserList>
+        {/if}
+      </div>
+    {/snippet}
+  </LoginRequiredContent>
 </PopupWithRunes>
 
 <PopupWithRunes bind:isOpen={showAddMorePopup}>
@@ -264,10 +270,18 @@
 </PopupWithRunes>
 
 <PopupWithRunes bind:isOpen={showAddVideoPopup}>
-  {#if userCtx.isLoggedInToApi()}
-    <p>{$t('club.upload-video-description')}</p>
-    <VideoUpload {onVideoUploaded} privacy={uploadPrivacy}></VideoUpload>
-  {/if}
+  <LoginRequiredContent
+    reason={$t('profile.upload.requires-login-description')}
+  >
+    {#snippet children({ fullUser, apiUser })}
+      <p>{$t('club.upload-video-description')}</p>
+      <VideoUpload
+        onVideoUploaded={(video) => onVideoUploaded(video, apiUser)}
+        privacy={uploadPrivacy}
+        {fullUser}
+      ></VideoUpload>
+    {/snippet}
+  </LoginRequiredContent>
 </PopupWithRunes>
 
 <style>

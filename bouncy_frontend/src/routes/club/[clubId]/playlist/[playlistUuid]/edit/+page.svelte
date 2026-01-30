@@ -9,7 +9,6 @@
   import ClubInfoHeader from '$lib/components/ui/header/ClubInfoHeader.svelte';
   import DarkSection from '$lib/components/ui/sections/DarkSection.svelte';
   import LimeSection from '$lib/components/ui/sections/LimeSection.svelte';
-  import { getUserContext } from '$lib/context';
   import { t } from '$lib/i18n';
   import {
     loadAndSetClubDetails,
@@ -20,15 +19,13 @@
   let { data } = $props();
   const clubId = Number.parseInt(page.params.clubId || '0');
 
-  /** @type {UserContextData} */
-  const userCtx = getUserContext();
-
   let name = $state(data.playlist.displayName);
   let description = $state(data.playlist.description);
 
-  async function save() {
+  /** @param {ApiUser} apiUser */
+  async function save(apiUser) {
     const response = await updateClubPlaylist(
-      userCtx,
+      apiUser,
       clubId,
       data.playlist.id,
       name,
@@ -36,7 +33,7 @@
       false
     );
     if (response) {
-      loadAndSetClubDetails(clubId, userCtx);
+      loadAndSetClubDetails(clubId, apiUser);
       history.back();
     }
   }
@@ -45,29 +42,36 @@
 <ScrollToTop />
 
 <LoginRequiredContent reason="">
-  <LimeSection arrow arrowText="Videos">
-    {#if data.clubChannel}
-      <ClubInfoHeader
-        title={$t('playlist.edit-title')}
-        userOrChannel={data.clubChannel}
-        mainColor
-      />
-    {:else}
-      <BackHeader mainColor title={$t('playlist.edit-title')} />
-    {/if}
+  {#snippet children({ apiUser, fullUser })}
+    <LimeSection arrow arrowText="Videos">
+      {#if data.clubChannel}
+        <ClubInfoHeader
+          title={$t('playlist.edit-title')}
+          userOrChannel={data.clubChannel}
+          mainColor
+        />
+      {:else}
+        <BackHeader mainColor title={$t('playlist.edit-title')} />
+      {/if}
 
-    <div class="form">
-      <PlaylistForm bind:name bind:description onSubmit={save} />
-    </div>
-  </LimeSection>
+      <div class="form">
+        <PlaylistForm
+          bind:name
+          bind:description
+          onSubmit={() => save(apiUser)}
+        />
+      </div>
+    </LimeSection>
 
-  <DarkSection>
-    <h1>{$t('playlist.edit-videos-title')}</h1>
+    <DarkSection>
+      <h1>{$t('playlist.edit-videos-title')}</h1>
 
-    <PlaylistVideosForm {clubId} playlist={data.playlist}></PlaylistVideosForm>
+      <PlaylistVideosForm {clubId} playlist={data.playlist} {apiUser} {fullUser}
+      ></PlaylistVideosForm>
 
-    <Footer white />
-  </DarkSection>
+      <Footer white />
+    </DarkSection>
+  {/snippet}
 </LoginRequiredContent>
 
 <style>
