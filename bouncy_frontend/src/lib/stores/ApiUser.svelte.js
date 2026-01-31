@@ -22,7 +22,6 @@ export class ApiUser {
         this.userCtx = userCtx;
         this.clientSession = clientSession;
 
-
         this.kvSync = new KvSync('bfkv_', this.updateMetaOnRemote.bind(this), this.updateMetaInMemory.bind(this));
         this.meta = this.kvSync.load();
     }
@@ -30,13 +29,15 @@ export class ApiUser {
     /**
      * Restore an existing API User from local storage. Optionally creates a
      * new guest client session.
+     * 
+     * The returned API user does not necessarily have an active login session
+     * with the API, yet!
      *
      * @param {boolean} createGuest
      * @param {UserContextData} userCtx
      * @returns {Promise<ApiUser | undefined>}
      */
     static async initApiUser(createGuest, userCtx) {
-
         const clientSession = await ClientSession.initClientSession(createGuest);
         if (!clientSession) {
             return;
@@ -49,14 +50,10 @@ export class ApiUser {
 
     /**
      * @param {string} path
-     * @returns {Promise<Response | null | undefined>}
+     * @returns {Promise<import('$lib/stats').ApiResponse>}
      */
     async authenticatedGet(path) {
-        const result = await this.authenticatedApiRequest('GET', path, {}, undefined);
-        if (result?.okResponse) {
-            return result.okResponse;
-        }
-        console.warn('get failed', result);
+        return await this.authenticatedApiRequest('GET', path, {}, undefined);
     }
 
     /**
@@ -123,7 +120,10 @@ export class ApiUser {
                     this.clientSession.clientSessionData.secret = newSession.client_session_secret;
 
                     // now update the server about our local state
-                    this.syncKvWithServer();
+                    let err = this.syncKvWithServer();
+                    if (err) {
+                        console.error("Failed syncing", err);
+                    }
 
                     // now we can try to make the unauthorized request again, with new auth headers
                     let auth = this.#authHeader();
@@ -163,16 +163,20 @@ export class ApiUser {
         return result;
     }
 
+    /** @returns {Promise<import('$lib/stats').ApiError | undefined>} */
     async syncKvWithServer() {
         const remoteData = await this.authenticatedGet('/user/meta');
-        if (remoteData && remoteData.ok) {
-            const remoteMods = await remoteData.json();
+        if (remoteData && remoteData.okResponse) {
+            const remoteMods = await remoteData.okResponse.json();
             if (Array.isArray(remoteMods)) {
                 await this.kvSync.sync(remoteMods);
             } else {
                 console.error('Unexpected response from meta query', remoteMods);
             }
-        } else {
+        } else if (remoteData.error === API_ERROR.NeedLogin) {
+            return API_ERROR.NeedLogin;
+        }
+        else {
             console.error('Meta query failed', remoteData);
         }
     }
@@ -203,8 +207,8 @@ export class ApiUser {
     async getAllUserMeta() {
         const response = await this.authenticatedGet('/user/meta');
 
-        if (response?.ok) {
-            return response.json();
+        if (response.okResponse) {
+            return response.okResponse.json();
         }
     }
 

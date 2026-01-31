@@ -58,17 +58,22 @@
     loginError.description = '';
   }
 
+  /**
+   * @returns {Promise<import('$lib/stats').ApiError | undefined>}
+   */
   async function refreshUserId() {
-    let response;
+    let apiResponse;
     if (!userCtx.apiUser) {
-      const apiResponse = await apiRequest('/user');
-      if (apiResponse.okResponse) {
-        response = apiResponse.okResponse;
-      }
+      apiResponse = await apiRequest('/user');
     } else {
-      response = await userCtx.apiUser.authenticatedGet('/user');
+      apiResponse = await userCtx.apiUser.authenticatedGet('/user');
     }
 
+    if (apiResponse.error) {
+      return apiResponse.error;
+    }
+
+    let response = apiResponse.okResponse;
     try {
       const userInfo = await response?.json();
       if (!userInfo || userInfo.sub === undefined) {
@@ -93,12 +98,22 @@
     if (!userCtx.apiUser) {
       if (!apiUserLock) {
         apiUserLock = true;
-        userCtx.apiUser = await ApiUser.initApiUser(false, userCtx);
+        const tmpApiUser = await ApiUser.initApiUser(false, userCtx);
+
+        // make the first use of the API user to see if it has a valid session
+        // (returning users can restore a client session but won't be logged in)
+        if (tmpApiUser) {
+          let err = await tmpApiUser.syncKvWithServer();
+          if (err) {
+            apiUserLock = false;
+            return undefined;
+          }
+        }
+
+        userCtx.apiUser = tmpApiUser;
         apiUserLock = false;
 
         if (userCtx.apiUser) {
-          await userCtx.apiUser.syncKvWithServer();
-
           // migration from old to new way of storing user meta in local storage
           await userCtx.apiUser.clientSession.migrateFromFirstMetaStorage(
             userCtx.apiUser.kvSync
@@ -128,6 +143,7 @@
     userCtx.apiUser = apiUser;
     apiUserLock = false;
 
+    // note: apiUser should have an active session now, as it was just created.
     if (apiUser) {
       apiUser.kvSync.setStringValue(
         'onboarding',
@@ -202,7 +218,12 @@
 
   onMount(async () => {
     if (!userCtx.user.openid) {
-      await refreshUserId();
+      let err = await refreshUserId();
+
+      if (err) {
+        loading = false;
+        return;
+      }
     }
 
     const apiUser = await maybeLoadApiUser();

@@ -20,7 +20,7 @@ export async function loadMyClubs(userCtx) {
     if (userCtx.apiUser) {
         const response = await userCtx.apiUser.authenticatedGet("/clubs/joined");
         /** @type { {clubs: Club[]} } */
-        const data = await response?.json();
+        const data = await response.okResponse?.json();
         return data.clubs;
     } else {
         return [];
@@ -65,7 +65,8 @@ export async function loadClubDetails(clubId, apiUser, svelteFetch) {
     const resolvedFetch = svelteFetch || fetch;
     let response;
     if (apiUser) {
-        response = await apiUser.authenticatedGet(`/clubs/${clubId}/private`);
+        const apiResponse = await apiUser.authenticatedGet(`/clubs/${clubId}/private`);
+        response = apiResponse.okResponse;
     } else {
         response = await resolvedFetch(`${PUBLIC_API_BASE}/clubs/${clubId}`);
     }
