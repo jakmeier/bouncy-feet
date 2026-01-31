@@ -1,5 +1,5 @@
 <script>
-  import { onMount, setContext } from 'svelte';
+  import { setContext } from 'svelte';
   import { clubsData, loadMyClubs } from './Clubs.svelte';
   import { getUserContext } from '$lib/stores/context';
   import { USER_AUH_STATE } from '$lib/enum_types';
@@ -28,7 +28,9 @@
   // necessary to log in and get clubs loaded.
   $effect(() => {
     if (userCtx.authState !== USER_AUH_STATE.Anonymous) {
-      loadMyClubs(userCtx).then((clubs) => (clubsData.mine = clubs));
+      loadMyClubs(userCtx).then((clubs) => {
+        clubsData.mine = clubs;
+      });
     }
   });
 </script>

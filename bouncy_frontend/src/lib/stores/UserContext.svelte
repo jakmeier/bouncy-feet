@@ -83,10 +83,26 @@
     showExperimentalFeatures(user.experimentalFeatures);
   });
 
+  /** @type {UserContextData} */
+  const userCtx = $state({
+    user,
+    apiUser: undefined,
+    fullUser: undefined,
+    get authState() {
+      return userAuthState;
+    },
+    logout: () => {
+      userCtx.fullUser?.logout();
+      userCtx.apiUser = undefined;
+      userCtx.fullUser = undefined;
+    },
+  });
+  setContext('user', userCtx);
+
   /**
    * @returns {UserAuthState}
    */
-  const userAuthState = () => {
+  const userAuthState = $derived.by(() => {
     const apiUserLoaded = !!userCtx.apiUser;
     const hasOpenId = !!userCtx.user.openid;
     const hasPeerTubeToken =
@@ -111,23 +127,7 @@
         ]);
         return USER_AUH_STATE.Anonymous;
     }
-  };
-
-  /** @type {UserContextData} */
-  const userCtx = {
-    user,
-    apiUser: undefined,
-    fullUser: undefined,
-    get authState() {
-      return userAuthState();
-    },
-    logout: () => {
-      userCtx.fullUser?.logout();
-      userCtx.apiUser = undefined;
-      userCtx.fullUser = undefined;
-    },
-  };
-  setContext('user', userCtx);
+  });
 </script>
 
 {@render children?.()}
