@@ -134,6 +134,11 @@
         ONBOARDING_STATE.FIRST_VISIT,
         new Date()
       );
+      apiUser.kvSync.setStringValue(
+        'publicName',
+        apiUser.userCtx.user.publicName,
+        new Date()
+      );
     }
   }
 
@@ -207,21 +212,22 @@
       return;
     }
 
-    // TODO: re-enable sync
-    // // TODO: Maybe check first if a sync is needed?
+    // TODO: Maybe check first if a sync is needed?
     // await apiUser.syncKvWithServer();
+    userCtx.user.publicName = apiUser.meta['publicName'];
 
     if (fullUserContent || maybeFullUserContent) {
       const fullUser = await ensureFullUser(apiUser);
       clearErrors();
-      // TODO: prevent this from firing too often
-      if (!fullUser.isLoggedInToApi()) {
-        try {
-          const _token = await fullUser.peerTubeToken();
-        } catch (e) {
-          console.debug('failed to refresh PeerTube token', e);
-        }
-      }
+      const _token = await fullUser.peerTubeToken();
+      // // TODO: prevent this from firing too often
+      // if (!fullUser.isLoggedInToApi()) {
+      //   try {
+      //     const _token = await fullUser.peerTubeToken();
+      //   } catch (e) {
+      //     console.debug('failed to refresh PeerTube token', e);
+      //   }
+      // }
     }
 
     loading = false;

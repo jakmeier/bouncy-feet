@@ -116,6 +116,7 @@
  * @property {ApiUser} [apiUser] -- this may be a guest session
  * @property {FullUser} [fullUser] -- this is a fully onboarded user with a Keycloak entry and a PeerTube account
  * @property {UserAuthState} authState
+ * @property {()=>void} logout
  *
  * @typedef {Object} FullUser
  * @property {PwaAuth} pwaAuth,
@@ -166,7 +167,6 @@
  * @typedef {Object} ClientSessionData
  * @property {string} id
  * @property {string} secret
- * @property {DynUserMeta} meta
  * 
  * @typedef {Object} UserMeta -- old in-memory meta values
  * @property {OnboardingState} [onboarding]
