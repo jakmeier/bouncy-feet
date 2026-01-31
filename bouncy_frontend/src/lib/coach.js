@@ -68,7 +68,7 @@ export const coaches = [
         peertubePlaylist: {
             localDev: "9aBHGBL88zSb6u1esWzDgD",
             dev: "3FWFPJds8qwVJUbzSsjFzH",
-            prod: "",
+            prod: "q6XY3Fbc1sCWDGpYSgkjkp",
         }
     },
 
@@ -118,7 +118,7 @@ export const coaches = [
         peertubePlaylist: {
             localDev: "9aBHGBL88zSb6u1esWzDgD",
             dev: "nAkAtJ2sdYFN73HZEjDft2",
-            prod: "",
+            prod: "6ioLvjwRSQrFSgaW9BJ6sj",
         }
     },
 
@@ -166,7 +166,7 @@ export const coaches = [
         peertubePlaylist: {
             localDev: "9aBHGBL88zSb6u1esWzDgD",
             dev: "hLhCbsRyaTBgQYcJFW2XbQ",
-            prod: "",
+            prod: "jCKhuJUB4aKpoEQRwqKd5P",
         }
     }
 ];

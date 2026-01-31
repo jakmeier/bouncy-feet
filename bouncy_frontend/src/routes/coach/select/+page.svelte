@@ -1,4 +1,5 @@
 <script>
+  // TODO: this should be obsolete now that personalities are listed on home
   import { coaches } from '$lib/coach';
   import { getContext } from 'svelte';
   import AvatarStyleContext from '$lib/components/avatar/AvatarStyleContext.svelte';
@@ -13,7 +14,7 @@
   const { getCourse } = getContext('courses');
 
   // TODO: read from user
-  const selected = 'chorok';
+  const selected = 'rob';
   let coachWidth;
 
   function selectCoach(coach) {
