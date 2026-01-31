@@ -28,9 +28,9 @@
     <!-- stop formatting for the array in one of the conditions -->
     <!-- prettier-ignore -->
     {#if apiUser.meta.onboarding === ONBOARDING_STATE.FIRST_VISIT && !apiUser.skippedIntro()}
-        <FirstVisit />
+        <FirstVisit {apiUser} />
       {:else if apiUser.meta.onboarding === ONBOARDING_STATE.STARTED_FIRST_WARMUP && !apiUser.skippedIntro()}
-        <ContinueFirstCourse />
+        <ContinueFirstCourse {apiUser}/>
       {:else if [
         ONBOARDING_STATE.FINISHED_FIRST_WARMUP,
         ONBOARDING_STATE.STARTED_FIRST_LESSON,
@@ -42,7 +42,7 @@
         && !apiUser.skippedIntro()
       }
         <!-- Maybe show a different continuation screen? -->
-        <ContinueFirstCourse />
+        <ContinueFirstCourse {apiUser}/>
       {:else}
         <HomeFeed featuredDances={data.officialDances} {featuredSteps} />
       {/if}

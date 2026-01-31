@@ -7,13 +7,17 @@
   import { goto } from '$app/navigation';
   import { ONBOARDING_STATE } from '$lib/onboarding';
   import VideoPlayer from '$lib/components/ui/video/VideoPlayer.svelte';
-  import { getUserContext } from '$lib/stores/context';
 
-  /** @type {UserContextData}*/
-  const { setUserMeta, setSkippedIntro } = getUserContext();
+  /**
+   * @typedef {Object} Props
+   * @property {ApiUser} apiUser
+   */
+
+  /** @type {Props} */
+  let { apiUser } = $props();
 
   function goToWarmup() {
-    setUserMeta('onboarding', ONBOARDING_STATE.STARTED_FIRST_WARMUP);
+    apiUser.setUserMeta('onboarding', ONBOARDING_STATE.STARTED_FIRST_WARMUP);
     goto('firstCourse');
   }
 
@@ -106,7 +110,7 @@
       <button onclick={goToWarmup}>
         {$t('home.first-visit-button-1')}
       </button>
-      <button onclick={() => setSkippedIntro(true)}>
+      <button onclick={() => apiUser.setSkippedIntro(true)}>
         {$t('home.first-visit-button-2')}
       </button>
     </div>

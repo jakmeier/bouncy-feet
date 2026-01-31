@@ -1,11 +1,15 @@
 <script>
   import { goto } from '$app/navigation';
   import StandardPage from '$lib/components/ui/StandardPage.svelte';
-  import { getUserContext } from '$lib/stores/context';
   import { t } from '$lib/i18n';
 
-  /** @type {UserContextData}*/
-  const userCtx = getUserContext();
+  /**
+   * @typedef {Object} Props
+   * @property {ApiUser} apiUser
+   */
+
+  /** @type {Props} */
+  let { apiUser } = $props();
 </script>
 
 <StandardPage title="" white={false}>
@@ -13,7 +17,7 @@
   <button onclick={() => goto('firstCourse')}>
     {$t('home.continue-button')}
   </button>
-  <button onclick={() => userCtx.apiUser.setSkippedIntro(true)}>
+  <button onclick={() => apiUser.setSkippedIntro(true)}>
     {$t('home.skip-button')}
   </button>
 </StandardPage>
