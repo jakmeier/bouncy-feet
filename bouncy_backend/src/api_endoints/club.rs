@@ -368,7 +368,7 @@ pub async fn delete_club(
 ) -> axum::response::Result<()> {
     let membership = get_membership(&state, me.id, club_id).await?;
     if !matches!(membership, ClubMembership::Admin) {
-        return Err((StatusCode::FORBIDDEN, "no permission to add club member").into_response())?;
+        return Err((StatusCode::FORBIDDEN, "no permission to delete club").into_response())?;
     }
 
     // delete channel on PeerTube

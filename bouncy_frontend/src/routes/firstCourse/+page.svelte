@@ -14,7 +14,7 @@
 
   /** @type {UserContextData}*/
   const userCtx = getUserContext();
-  const meta = $derived(userCtx.apiUser?.clientSession.clientSessionData.meta);
+  const meta = $derived(userCtx.apiUser?.meta);
 
   const stepNames = ['Pendulum', 'Knee Up'];
 

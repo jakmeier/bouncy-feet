@@ -1,12 +1,13 @@
 use axum::http::StatusCode;
 use axum::response::Response;
+use axum::Extension;
 use axum::{extract, response::Json};
 use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
 use crate::client_session::ClientSessionId;
 use crate::dance_activity::NewDanceActivity;
-use crate::user::UserId;
+use crate::user::{User, UserId};
 use crate::{internal_error, AppState};
 
 #[derive(serde::Serialize)]
@@ -34,6 +35,37 @@ pub(crate) async fn create_guest_session(
     let client_session_secret = Uuid::new_v4();
 
     let user_id = UserId::create_new_guest(&state.pg_db_pool).await;
+
+    let result: Option<(i64,)> = sqlx::query_as(
+        "INSERT INTO client_session (client_session_secret, user_id) VALUES ($1, $2) RETURNING id",
+    )
+    .bind(client_session_secret)
+    .bind(user_id.num())
+    .fetch_optional(&state.pg_db_pool)
+    .await
+    .map_err(internal_error)?;
+
+    if let Some((client_session_id,)) = result {
+        Ok(Json(ClientSessionResponse {
+            client_session_id,
+            client_session_secret,
+        }))
+    } else {
+        Err((
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "DB failed inserting new session".to_owned(),
+        ))
+    }
+}
+
+/// Protected API to create a new client session for a registered user.
+pub(crate) async fn create_client_session(
+    extract::State(state): extract::State<AppState>,
+    Extension(me): Extension<User>,
+) -> Result<Json<ClientSessionResponse>, (StatusCode, String)> {
+    let client_session_secret = Uuid::new_v4();
+
+    let user_id = me.id;
 
     let result: Option<(i64,)> = sqlx::query_as(
         "INSERT INTO client_session (client_session_secret, user_id) VALUES ($1, $2) RETURNING id",

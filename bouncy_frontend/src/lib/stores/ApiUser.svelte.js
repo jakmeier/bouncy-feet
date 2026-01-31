@@ -17,77 +17,33 @@ export class ApiUser {
     /**
      * @param {UserContextData} userCtx
      * @param {ClientSession} clientSession
-     * @param {KvSync} kvSync
      */
-    constructor(userCtx, clientSession, kvSync) {
+    constructor(userCtx, clientSession) {
         this.userCtx = userCtx;
         this.clientSession = clientSession;
-        this.kvSync = kvSync;
+
+
+        this.kvSync = new KvSync('bfkv_', this.updateMetaOnRemote, this.updateMetaInMemory);
+        this.meta = this.kvSync.load()
     }
 
     /**
      * Restore an existing API User from local storage. Optionally creates a
      * new guest client session.
+     *
      * @param {boolean} createGuest
      * @param {UserContextData} userCtx
      * @returns {Promise<ApiUser | undefined>}
      */
     static async initApiUser(createGuest, userCtx) {
-        const hasExistingSession = !!localStorage.clientSessionId;
 
-        if (!hasExistingSession && !createGuest) {
-            return undefined;
-        }
-
-        /**
-         * @param {string} key
-         * @param {string} value
-         * @param {Date} lastModified
-         * @param {number} version
-         * @returns {Promise<void>}
-         */
-        const updateMetaOnRemote = async function (key, value, lastModified, version) {
-            const headers = {
-                'Content-Type': 'application/json',
-            };
-            const body = JSON.stringify({
-                key_name: key,
-                key_value: value,
-                last_modified: lastModified,
-                version,
-            });
-
-            const result = await apiUser.authenticatedApiRequest(
-                'POST',
-                '/user/meta/update',
-                headers,
-                body
-            );
-
-            if (result.error || result.errorBody) {
-                // TODO: handle login etc
-                console.warn('meta update failed', result.errorBody);
-            }
-
+        const clientSession = await ClientSession.initClientSession(createGuest);
+        if (!clientSession) {
             return;
         }
 
-        /**
-         * @param {string} key
-         * @param {string} value
-         * @param {string} type
-         * @param {Date} _lastModified
-         * @param {number} _version
-         */
-        const updateMetaInMemory = async function (key, value, type, _lastModified, _version) {
-            return clientSession.updateMetaInMemory(key, value, type, _lastModified, _version);
-        }
+        const apiUser = new ApiUser(userCtx, clientSession);
 
-        // TODO(refactor): initialization order between clientSession / kvSyn / apiUser is circular and whacky
-        const kvSync = new KvSync('bfkv_', updateMetaOnRemote, updateMetaInMemory);
-        const clientSession = await ClientSession.initClientSession(kvSync);
-
-        const apiUser = new ApiUser(userCtx, clientSession, kvSync);
         return apiUser;
     }
 
@@ -367,6 +323,54 @@ export class ApiUser {
         this.userCtx.user.recordedDances += 1;
         this.userCtx.user.recordedSteps += result.numSteps;
         this.userCtx.user.recordedSeconds += result.duration / 1000;
+    }
+
+    /**
+     * @param {string} key
+     * @param {string} value
+     * @param {Date} lastModified
+     * @param {number} version
+     * @returns {Promise<void>}
+     */
+    async updateMetaOnRemote(key, value, lastModified, version) {
+        const headers = {
+            'Content-Type': 'application/json',
+        };
+        const body = JSON.stringify({
+            key_name: key,
+            key_value: value,
+            last_modified: lastModified,
+            version,
+        });
+
+        const result = await this.authenticatedApiRequest(
+            'POST',
+            '/user/meta/update',
+            headers,
+            body
+        );
+
+        if (result.error || result.errorBody) {
+            // TODO: handle login etc
+            console.warn('meta update failed', result.errorBody);
+        }
+
+        return;
+    }
+
+    /**
+     * @param {string} key
+     * @param {string} value
+     * @param {string} type
+     * @param {Date} _lastModified
+     * @param {number} _version
+     */
+    async updateMetaInMemory(key, value, type, _lastModified, _version) {
+        // for now, only handle strings here and avoid type conflicts
+        // (the design might require some more iterations)
+        if (type === 's:') {
+            this.meta[key] = value;
+        }
     }
 
     #authHeader() {

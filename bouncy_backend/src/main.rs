@@ -213,6 +213,10 @@ async fn main() -> anyhow::Result<()> {
             post(api_endoints::user_meta::update_user_metadata),
         )
         .route(
+            "/create_client_session",
+            get(api_endoints::client_session::create_client_session),
+        )
+        .route(
             "/new_guest_activity",
             post(api_endoints::client_session::record_guest_activity),
         )

@@ -23,6 +23,8 @@
   import { t } from '$lib/i18n';
   import LoginError from './LoginError.svelte';
   import RequiresLogin from './RequiresLogin.svelte';
+  import { ONBOARDING_STATE } from '$lib/onboarding';
+  import { apiRequest } from '$lib/stats';
 
   /**
    * @typedef {Object} Props
@@ -57,15 +59,24 @@
   }
 
   async function refreshUserId() {
+    let response;
+    if (!userCtx.apiUser) {
+      const apiResponse = await apiRequest('/user');
+      if (apiResponse.okResponse) {
+        response = apiResponse.okResponse;
+      }
+    } else {
+      response = await userCtx.apiUser.authenticatedGet('/user');
+    }
+
     try {
-      const response = await userCtx.apiUser.authenticatedGet('/user');
       const userInfo = await response?.json();
       if (!userInfo || userInfo.sub === undefined) {
         throw new Error(`missing sub in response: ${JSON.stringify(userInfo)}`);
       }
 
       // note: Sub may be null, this means the user is a guest.
-      if (!userInfo.sub && userCtx.apiUser.user.openid) {
+      if (!userInfo.sub && userCtx.user.openid) {
         console.warn(
           'Client has a oidc subject but the server thinks this is a guest. Dropping previously known oidc subject.'
         );
@@ -84,6 +95,15 @@
         apiUserLock = true;
         userCtx.apiUser = await ApiUser.initApiUser(false, userCtx);
         apiUserLock = false;
+
+        if (userCtx.apiUser) {
+          await userCtx.apiUser.syncKvWithServer();
+
+          // migration from old to new way of storing user meta in local storage
+          await userCtx.apiUser.clientSession.migrateFromFirstMetaStorage(
+            userCtx.apiUser.kvSync
+          );
+        }
       } else {
         while (!userCtx.apiUser) {
           await new Promise((resolve) => setTimeout(resolve, 100));
@@ -107,6 +127,14 @@
     console.assert(!!apiUser, 'creating a new guest API user failed');
     userCtx.apiUser = apiUser;
     apiUserLock = false;
+
+    if (apiUser) {
+      apiUser.kvSync.setStringValue(
+        'onboarding',
+        ONBOARDING_STATE.FIRST_VISIT,
+        new Date()
+      );
+    }
   }
 
   let fullUserLock = false;
@@ -168,15 +196,15 @@
   );
 
   onMount(async () => {
+    if (!userCtx.user.openid) {
+      await refreshUserId();
+    }
+
     const apiUser = await maybeLoadApiUser();
 
     if (!apiUser) {
       loading = false;
       return;
-    }
-
-    if (!userCtx.user.openid) {
-      await refreshUserId();
     }
 
     // TODO: re-enable sync
