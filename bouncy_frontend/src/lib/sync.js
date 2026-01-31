@@ -172,7 +172,7 @@ export class KvSync {
             var i = typedKey.indexOf(':');
             if (i !== -1) {
                 const prefix = typedKey.slice(0, i + 1);
-                const key = typedKey.slice(i + 1, 0);
+                const key = typedKey.slice(i + 1);
                 const value = this.#getLocalValue(key, prefix);
                 if (value) {
                     out[key] = value;
