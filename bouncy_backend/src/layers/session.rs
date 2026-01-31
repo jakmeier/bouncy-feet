@@ -49,16 +49,15 @@ fn cookie_session_layer<STORE: SessionStore>(
     if is_dev {
         session
             .with_secure(false) // dev?
-            // For dev, using a mix of, localnet with two ports and and
-            // auth.bouncy-feet.ch, somehow `Strict` it doesn't work
-            .with_same_site(SameSite::Lax)
+            .with_same_site(SameSite::None)
     } else {
         session
             // absolutely don't leak the session id, authentication relies on it!
             .with_secure(true) // dev?
             // Same-site should work within the same registerable domain, e.g. bouncy-feet.ch
             // https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-cookie-same-site-00#section-2
-            .with_same_site(SameSite::Strict)
+            // But when accessing from a web view in a PWA, Strict or Lax sadly doesn't work.
+            .with_same_site(SameSite::None)
     }
 }
 
