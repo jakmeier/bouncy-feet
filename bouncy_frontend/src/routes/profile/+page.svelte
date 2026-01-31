@@ -24,7 +24,7 @@
 
   /** @param {ApiUser} apiUser */
   async function submit(apiUser) {
-    apiUser.setUserMeta('publicName', apiUser.user.publicName);
+    apiUser.setUserMeta('publicName', apiUser.userCtx.user.publicName);
   }
 
   // function consent(yes) {
@@ -69,7 +69,7 @@
           title={$t('profile.title')}
           backButton={false}
           homeLink
-          onAction={() => maybeFullUser.logout()}
+          onAction={() => apiUser.userCtx.logout()}
           button="logout"
         />
       {:else}

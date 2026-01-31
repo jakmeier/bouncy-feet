@@ -52,7 +52,6 @@ export async function initFullUser(apiUser) {
  * @returns {Promise<BfError | { accessToken: string }>}
  */
 async function peerTubeToken(apiUser) {
-
     if (!pwaAuth.peerTubeToken?.access_token) {
         const err = await refreshPeerTubeToken(apiUser);
         if (err) {
@@ -127,8 +126,6 @@ async function refreshPeerTubeUser() {
 }
 
 async function logout() {
-    // TODO: handle local state without someone being logged in (without
-    // creating a guest session -> be more explicit about guest sessions)
     pwaAuth.peerTubeToken = null;
 
     const currentUrl = window.location.href;

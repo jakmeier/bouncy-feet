@@ -28,6 +28,10 @@ export async function requestNewGuestSession() {
     return await apiGetRequest('/new_guest_session');
 }
 
+export async function requestNewClientSession() {
+    return await apiGetRequest('/create_client_session');
+}
+
 /**
  * @param {string} endpoint
  * @param {object} options

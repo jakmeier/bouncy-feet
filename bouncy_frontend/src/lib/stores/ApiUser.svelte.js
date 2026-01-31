@@ -23,8 +23,8 @@ export class ApiUser {
         this.clientSession = clientSession;
 
 
-        this.kvSync = new KvSync('bfkv_', this.updateMetaOnRemote, this.updateMetaInMemory);
-        this.meta = this.kvSync.load()
+        this.kvSync = new KvSync('bfkv_', this.updateMetaOnRemote.bind(this), this.updateMetaInMemory.bind(this));
+        this.meta = this.kvSync.load();
     }
 
     /**
@@ -101,7 +101,6 @@ export class ApiUser {
         const result = await apiRequest(path, options);
 
         if (result.error || result.errorBody) {
-            console.error('result', result);
             switch (result.error) {
                 case API_ERROR.NeedLogin: {
                     // bubble up, RequiresLogin should handle this

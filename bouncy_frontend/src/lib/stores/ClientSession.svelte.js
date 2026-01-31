@@ -29,7 +29,7 @@ export class ClientSession {
     static async initClientSession(createGuest) {
         let clientSessionData = await loadClientSessionAsync();
 
-        if (!clientSession && createGuest) {
+        if (!clientSessionData && createGuest) {
             const newSession = await requestNewGuestSession();
             clientSessionData = await storeNewSession(newSession);
         }

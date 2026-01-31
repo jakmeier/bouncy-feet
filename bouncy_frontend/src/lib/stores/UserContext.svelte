@@ -121,6 +121,11 @@
     get authState() {
       return userAuthState();
     },
+    logout: () => {
+      userCtx.fullUser?.logout();
+      userCtx.apiUser = undefined;
+      userCtx.fullUser = undefined;
+    },
   };
   setContext('user', userCtx);
 </script>
