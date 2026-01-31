@@ -13,16 +13,16 @@
    *    uploading videos or joining a club.
    */
 
-  import { t } from '$lib/i18n';
   import { getUserContext } from '$lib/stores/context';
-  import RequiresLogin from './RequiresLogin.svelte';
   import { onMount } from 'svelte';
-  import { fade } from 'svelte/transition';
-  import { scaleY } from '$lib/sveltex/xtransition';
-  import { asset } from '$app/paths';
-  import { goto } from '$app/navigation';
   import { ApiUser } from '$lib/stores/ApiUser.svelte';
   import { initFullUser } from '$lib/stores/FullUser.svelte';
+  import { USER_AUH_STATE } from '$lib/enum_types';
+  import { fade } from 'svelte/transition';
+  import { scaleY } from '$lib/sveltex/xtransition';
+  import { t } from '$lib/i18n';
+  import LoginError from './LoginError.svelte';
+  import RequiresLogin from './RequiresLogin.svelte';
 
   /**
    * @typedef {Object} Props
@@ -77,15 +77,13 @@
   }
 
   let apiUserLock = false;
-  /**
-   * @returns {Promise<ApiUser>}
-   */
-  async function ensureApiUser() {
+  /** @returns {Promise<ApiUser|undefined>} */
+  async function maybeLoadApiUser() {
     if (!userCtx.apiUser) {
       if (!apiUserLock) {
         apiUserLock = true;
-        userCtx.apiUser = await ApiUser.initApiUser(true, userCtx);
-        await userCtx.apiUser?.syncKvWithServer();
+        userCtx.apiUser = await ApiUser.initApiUser(false, userCtx);
+        apiUserLock = false;
       } else {
         while (!userCtx.apiUser) {
           await new Promise((resolve) => setTimeout(resolve, 100));
@@ -93,6 +91,22 @@
       }
     }
     return userCtx.apiUser;
+  }
+
+  async function createGuestUser() {
+    console.assert(
+      !userCtx.apiUser,
+      'creating a guest while an account already exists'
+    );
+
+    while (apiUserLock) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    apiUserLock = true;
+    const apiUser = await ApiUser.initApiUser(true, userCtx);
+    console.assert(!!apiUser, 'creating a new guest API user failed');
+    userCtx.apiUser = apiUser;
+    apiUserLock = false;
   }
 
   let fullUserLock = false;
@@ -138,82 +152,96 @@
     // throw new Error("Error");
   }
 
-  let mounted = $state(false);
+  // While trying to establish the required auth state automatically, a loading
+  // animation is shown. Once that's done, successful or not, `loading` is set to false.
+  // If an error occurs, a `loginError` value is set.
+  let loading = $state(true);
+
+  const guestAllowed = $derived(!!guestContent || !!maybeFullUserContent);
+  const prefersFullUserView = $derived(
+    !!maybeFullUserContent || !!fullUserContent
+  );
+
+  const hasGuestAuth = $derived(!!userCtx.apiUser);
+  const hasFullAuth = $derived(
+    userCtx.authState === USER_AUH_STATE.SignedUpUser
+  );
+
   onMount(async () => {
-    const apiUser = await ensureApiUser();
+    const apiUser = await maybeLoadApiUser();
+
+    if (!apiUser) {
+      loading = false;
+      return;
+    }
+
     if (!userCtx.user.openid) {
       await refreshUserId();
     }
 
-    if (fullUserContent) {
+    // TODO: re-enable sync
+    // // TODO: Maybe check first if a sync is needed?
+    // await apiUser.syncKvWithServer();
+
+    if (fullUserContent || maybeFullUserContent) {
       const fullUser = await ensureFullUser(apiUser);
-      // TODO: Is this necessary?
-      // clearErrors();
-      // // TODO: prevent this from firing too often
-      // if (!fullUser.isLoggedInToApi()) {
-      //   try {
-      //     await fullUser.refreshPeerTubeToken();
-      //   } catch (e) {
-      //     console.debug('failed to refresh PeerTube token', e);
-      //   }
-      // }
+      clearErrors();
+      // TODO: prevent this from firing too often
+      if (!fullUser.isLoggedInToApi()) {
+        try {
+          const _token = await fullUser.peerTubeToken();
+        } catch (e) {
+          console.debug('failed to refresh PeerTube token', e);
+        }
+      }
     }
 
-    mounted = true;
+    loading = false;
   });
 </script>
 
-{#if mounted && fullUserContent && userCtx.fullUser && userCtx.apiUser && userCtx.fullUser.isLoggedInToApi()}
-  {@render fullUserContent?.({
+{#if loading}
+  {$t('profile.waiting-for-login-info')}
+{:else if fullUserContent && hasFullAuth}
+  {@render fullUserContent({
     apiUser: userCtx.apiUser,
     fullUser: userCtx.fullUser,
     user: userCtx.user,
   })}
-{:else if mounted && maybeFullUserContent && userCtx.apiUser}
-  {@render maybeFullUserContent?.({
+{:else if maybeFullUserContent && hasFullAuth}
+  {@render maybeFullUserContent({
     apiUser: userCtx.apiUser,
     maybeFullUser: userCtx.fullUser,
     user: userCtx.user,
   })}
-{:else if mounted && guestContent && userCtx.apiUser}
-  {@render guestContent?.({
+  <!-- {:else if hasGuestAuth && prefersFullUserView} -->
+  <!-- TODO: tell user that they could log in to see more -->
+{:else if maybeFullUserContent && hasGuestAuth}
+  {@render maybeFullUserContent({
+    apiUser: userCtx.apiUser,
+    user: userCtx.user,
+    maybeFullUser: undefined,
+  })}
+{:else if guestContent && hasGuestAuth}
+  {@render guestContent({
     apiUser: userCtx.apiUser,
     user: userCtx.user,
   })}
-{:else if mounted}
+{:else}
   <div class="overlay" transition:fade={{ delay: 400, duration: 200 }}>
     <div class="wrapper" transition:scaleY={{ delay: 800 }}>
       {#if loginError.title !== ''}
-        <h2>{$t(loginError.title)}</h2>
-        <div class="error-symbol">
-          <img src={asset('/img/symbols/bf_error.svg')} alt="bf_error" />
-        </div>
-        <div class="block">
-          {#if loginError.description}
-            <div>{$t(loginError.description)}</div>
-          {/if}
-          <div>{$t('common.sorry-error')}</div>
-        </div>
-        <button onclick={() => history.back()}>
-          {$t('common.go-to-prev-page-button')}
-        </button>
-        <button onclick={() => goto('/')}>
-          {$t('common.go-home-button')}
-        </button>
-        <div class="block">
-          <div>{$t('common.report-error')}</div>
-        </div>
+        <LoginError {loginError}></LoginError>
       {:else}
         <RequiresLogin
-          {reason}
-          username={userCtx.user.publicName}
-          openid={userCtx.user.openid}
+          authState={userCtx.authState}
+          {guestAllowed}
+          {prefersFullUserView}
+          requestNewGuestSession={createGuestUser}
         />
       {/if}
     </div>
   </div>
-{:else}
-  {$t('profile.waiting-for-login-info')}
 {/if}
 
 <style>
@@ -240,13 +268,5 @@
     align-items: center;
     text-align: center;
     gap: 10px;
-  }
-
-  .error-symbol img {
-    max-width: 6rem;
-  }
-
-  .block {
-    padding: 1rem 0;
   }
 </style>

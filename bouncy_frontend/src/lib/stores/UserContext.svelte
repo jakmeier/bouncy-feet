@@ -12,6 +12,7 @@
   import { showExperimentalFeatures } from './FeatureSelection';
   import { generateRandomUsername } from '$lib/username';
   import { browser } from '$app/environment';
+  import { USER_AUH_STATE } from '$lib/enum_types';
 
   /**
    * @typedef {Object} Props
@@ -82,16 +83,46 @@
     showExperimentalFeatures(user.experimentalFeatures);
   });
 
-  setContext(
-    'user',
-    /** @type {UserContextData} */
-    {
-      user,
-      apiUser: undefined,
-      fullUser: undefined,
-      // loginError,
+  /**
+   * @returns {UserAuthState}
+   */
+  const userAuthState = () => {
+    const apiUserLoaded = !!userCtx.apiUser;
+    const hasOpenId = !!userCtx.user.openid;
+    const hasPeerTubeToken =
+      !!userCtx?.fullUser?.pwaAuth.peerTubeToken?.access_token;
+
+    switch (true) {
+      case !apiUserLoaded && !hasOpenId:
+        return USER_AUH_STATE.Anonymous;
+      case apiUserLoaded && !hasOpenId:
+        return USER_AUH_STATE.Guest;
+      case !apiUserLoaded && hasOpenId:
+        return USER_AUH_STATE.SignedUpUserExpiredAPISession;
+      case apiUserLoaded && hasOpenId && !hasPeerTubeToken:
+        return USER_AUH_STATE.SignedUpUserExpiredPeerTubeSession;
+      case apiUserLoaded && hasOpenId && hasPeerTubeToken:
+        return USER_AUH_STATE.SignedUpUser;
+      default:
+        console.warn('Unhandled user state', [
+          apiUserLoaded,
+          hasOpenId,
+          hasPeerTubeToken,
+        ]);
+        return USER_AUH_STATE.Anonymous;
     }
-  );
+  };
+
+  /** @type {UserContextData} */
+  const userCtx = {
+    user,
+    apiUser: undefined,
+    fullUser: undefined,
+    get authState() {
+      return userAuthState();
+    },
+  };
+  setContext('user', userCtx);
 </script>
 
 {@render children?.()}

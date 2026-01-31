@@ -299,8 +299,9 @@ export async function fetchMyVideos(start = 0, count = 20) {
     const { response, data, error } = await getApiV1UsersMeVideos(options);
 
     if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`Upload failed: ${response.status} ${errText} ${error}`);
+        // Body has already been consumed...
+        // const errText = await response.text();
+        throw new Error(`Fetching videos failed: ${response.status} ${error}`);
     }
 
     if (!data || !data.data) {

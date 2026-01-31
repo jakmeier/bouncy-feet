@@ -102,42 +102,44 @@
       </form>
     </DarkSection>
 
-    <LimeSection arrow fillScreen>
-      <h2>{$t('profile.my-videos-title')}</h2>
-      {#await fetchMyVideos()}
-        waiting for videos
-      {:then videos}
-        <div class="videos">
-          {#if videos.length === 0}
-            <p>{$t('video.empty-playlist')}</p>
-          {:else}
-            <ThumbnailJuggler {videos} userExtraInfo />
-          {/if}
-        </div>
-      {/await}
-    </LimeSection>
-
     {#if maybeFullUser}
+      <LimeSection arrow fillScreen>
+        <h2>{$t('profile.my-videos-title')}</h2>
+        {#await fetchMyVideos()}
+          waiting for videos
+        {:then videos}
+          <div class="videos">
+            {#if videos.length === 0}
+              <p>{$t('video.empty-playlist')}</p>
+            {:else}
+              <ThumbnailJuggler {videos} userExtraInfo />
+            {/if}
+          </div>
+        {/await}
+      </LimeSection>
+
       <LightSection arrow>
         <h2>{$t('club.upload-video-button')}</h2>
         <p>{$t('profile.upload-video-description')}</p>
         <VideoUpload fullUser={maybeFullUser}></VideoUpload>
       </LightSection>
+
+      <NightSection>
+        <div class="private">
+          <h2 id="my-clubs">{$t('club.my-clubs-title')}</h2>
+          <p>{$t('club.description-0')}</p>
+          <p>{$t('club.description-1')}</p>
+          <p>{$t('club.description-2')}</p>
+          <Clubs />
+        </div>
+
+        <h2>{$t('club.create-new-title')}</h2>
+        <CreateClub {apiUser}></CreateClub>
+        <Footer white />
+      </NightSection>
+    {:else}
+      <!-- TODO: Log in / refresh session to show more -->
     {/if}
-
-    <NightSection>
-      <div class="private">
-        <h2 id="my-clubs">{$t('club.my-clubs-title')}</h2>
-        <p>{$t('club.description-0')}</p>
-        <p>{$t('club.description-1')}</p>
-        <p>{$t('club.description-2')}</p>
-        <Clubs />
-      </div>
-
-      <h2>{$t('club.create-new-title')}</h2>
-      <CreateClub {apiUser}></CreateClub>
-      <Footer white />
-    </NightSection>
   {/snippet}
 </LoginRequiredContent>
 

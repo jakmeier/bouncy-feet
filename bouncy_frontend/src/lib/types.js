@@ -115,6 +115,7 @@
  * @property {UserData} user
  * @property {ApiUser} [apiUser] -- this may be a guest session
  * @property {FullUser} [fullUser] -- this is a fully onboarded user with a Keycloak entry and a PeerTube account
+ * @property {UserAuthState} authState
  *
  * @typedef {Object} FullUser
  * @property {PwaAuth} pwaAuth,
@@ -124,7 +125,7 @@
  * @property {Promise<import("$lib/peertube-openapi").User | undefined>} peerTubeUser
  * @property {() => Promise<BfError | { accessToken: string }>} peerTubeToken
  *
- *
+ * @typedef {import('$lib/enum_types').UserAuthState} UserAuthState
  *
  * @typedef {Object} UserMetaResponse
  * @property {String} key_name

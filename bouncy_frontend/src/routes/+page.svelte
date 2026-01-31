@@ -21,16 +21,13 @@
     })
     .filter((_, i) => (i & 1) == 0)
     .slice(0, 3);
-
-  // TODO: Ask for returning user first, maybe?
 </script>
 
 <LoginRequiredContent>
   {#snippet guest({ apiUser })}
-    {#await apiUser then clientSession}
-      <!-- stop formatting for the array in one of the conditions -->
-      <!-- prettier-ignore -->
-      {#if apiUser.clientSession.clientSessionData.meta.onboarding === ONBOARDING_STATE.FIRST_VISIT && !apiUser.skippedIntro()}
+    <!-- stop formatting for the array in one of the conditions -->
+    <!-- prettier-ignore -->
+    {#if apiUser.clientSession.clientSessionData.meta.onboarding === ONBOARDING_STATE.FIRST_VISIT && !apiUser.skippedIntro()}
         <FirstVisit />
       {:else if apiUser.clientSession.clientSessionData.meta.onboarding === ONBOARDING_STATE.STARTED_FIRST_WARMUP && !apiUser.skippedIntro()}
         <ContinueFirstCourse />
@@ -49,6 +46,5 @@
       {:else}
         <HomeFeed featuredDances={data.officialDances} {featuredSteps} />
       {/if}
-    {/await}
   {/snippet}
 </LoginRequiredContent>
