@@ -5,11 +5,13 @@
   /**
    * @typedef {Object} Props
    * @property {() => void} onClick
+   * @property {string} [ariaLabel]
    * @property {import('svelte').Snippet} [children]
    */
 
+  // TODO: Make ariaLabel mandatory
   /** @type {Props} */
-  let { children, onClick } = $props();
+  let { children, onClick, ariaLabel } = $props();
 
   /**
    * @param {KeyboardEvent} event
@@ -28,6 +30,7 @@
   onkeydown={onKey}
   role="button"
   tabindex="0"
+  aria-label={ariaLabel}
 >
   {@render children?.()}
 </div>

@@ -57,6 +57,8 @@
 
 <div
   class="box"
+  class:left={position === 'left'}
+  class:right={position === 'right'}
   bind:clientWidth={width}
   style="transform: translate(calc({x.current}% - {width /
     2}px), {y.current}%) scale({size.current}); z-index: {z}"
@@ -66,11 +68,17 @@
 
 <style>
   .box {
-    position: absolute;
+    position: relative;
     top: 0;
     left: 50%;
     width: 100%;
     max-width: 400px;
     overflow: hidden;
+    flex: auto 1 0;
+  }
+
+  .left,
+  .right {
+    position: absolute;
   }
 </style>

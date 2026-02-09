@@ -2,6 +2,7 @@
   import { t } from '$lib/i18n';
   import { fetchVideosOfPlaylist } from '$lib/peertube';
   import VideoJuggler from './ui/VideoJuggler.svelte';
+  import * as api from '$lib/peertube-openapi';
 
   /**
    * @typedef {Object} Props
@@ -11,11 +12,13 @@
 
   /** @type {Props} */
   let { playlistId, autoplay = false } = $props();
-  let videoUuids = $derived(fetchVideoUuids());
+  /** @type {Promise<(api.Video | undefined)[] | undefined>}  */
+  let videosPromise = $derived(fetchVideos());
 
-  async function fetchVideoUuids() {
+  /** @returns {Promise<(api.Video | undefined)[] | undefined>}  */
+  async function fetchVideos() {
     const videos = await fetchVideosOfPlaylist(playlistId);
-    return videos.data?.map((v) => v.video?.uuid);
+    return videos.data?.map((v) => v.video);
   }
 </script>
 
@@ -23,9 +26,9 @@
   <!-- TODO(publish): like video -->
   <!-- TODO(publish): report video -->
 
-  {#await videoUuids then ids}
-    {#if ids?.length > 0}
-      <VideoJuggler {ids} {autoplay}></VideoJuggler>
+  {#await videosPromise then videos}
+    {#if videos && videos?.length > 0}
+      <VideoJuggler {videos} {autoplay}></VideoJuggler>
     {:else}
       {$t('video.empty-playlist')}
     {/if}

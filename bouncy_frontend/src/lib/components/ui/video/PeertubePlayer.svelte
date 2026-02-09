@@ -7,10 +7,11 @@
   /**
    * @typedef {Object} Props
    * @property {string} peertubeUrl
+   * @property {number} aspectRatio
    * @property {number[]} [beats] - Array of beat timestamps in ms
    * @property {Marker[]} [markers] - Array of markers to show on the timeline
    * @property {boolean} [muted]
-   * @property {boolean} [timeline]
+   * @property {"inline"|"external"} [timeline]
    */
 
   /** @type Props */
@@ -19,7 +20,8 @@
     beats = [],
     markers = [],
     muted = false,
-    timeline = false,
+    timeline = undefined,
+    aspectRatio,
   } = $props();
 
   /** @type {UserContextData} */
@@ -31,8 +33,6 @@
 
   let iframeOverlay = $state();
   let iframe = $state();
-  let iframeWrapperWidth = $state(90);
-  let iframeWrapperHeight = $state(160);
   let player = $state();
 
   export function play() {
@@ -145,13 +145,8 @@
   });
 </script>
 
-<div class="video-wrapper">
-  <!-- <CornerMarker> -->
-  <div
-    class="iframe-wrapper"
-    bind:clientWidth={iframeWrapperWidth}
-    bind:clientHeight={iframeWrapperHeight}
-  >
+<div class="video-wrapper" style="--video-ratio: {aspectRatio}">
+  <div class="iframe-wrapper">
     <div
       class="iframe-overlay"
       onclick={togglePlay}
@@ -163,15 +158,12 @@
     ></div>
     <iframe
       title="video"
-      width="{iframeWrapperWidth}px"
-      height="{iframeWrapperHeight}px"
       src={peertubeUrl}
       frameborder="0"
       sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
       bind:this={iframe}
     ></iframe>
   </div>
-  <!-- </CornerMarker> -->
   {#if !isPlaying}
     <div class="overlay-controls">
       <button class="play-button" onclick={togglePlay}>
@@ -185,7 +177,8 @@
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
-    class="timeline"
+    class:external_timeline={timeline === 'external'}
+    class:inlined_timeline={timeline === 'inline'}
     onclick={(e) => {
       const rect = e.currentTarget.getBoundingClientRect();
       const percent = (e.clientX - rect.left) / rect.width;
@@ -223,11 +216,14 @@
 <style>
   .video-wrapper {
     position: relative;
+    max-width: 100vw;
+    max-height: 100vh;
     width: 100%;
-    max-width: 800px;
-    /* left: -0.5rem; */
-
-    aspect-ratio: 9 / 16;
+    height: 100%;
+    aspect-ratio: var(--video-ratio);
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .overlay-controls {
@@ -249,7 +245,7 @@
     cursor: pointer;
   }
 
-  .timeline {
+  .external_timeline {
     position: relative;
     left: 0.25rem;
     height: 2rem;
@@ -258,6 +254,18 @@
     cursor: pointer;
     border-radius: 1rem;
     overflow: hidden;
+  }
+
+  .inlined_timeline {
+    position: absolute;
+    bottom: 1rem;
+    height: 2rem;
+    background: var(--theme-neutral-light);
+    cursor: pointer;
+    border-radius: 1rem;
+    overflow: hidden;
+    width: calc(100% - 1rem);
+    z-index: 11;
   }
 
   .progress {
@@ -291,8 +299,11 @@
 
   .iframe-wrapper {
     position: relative;
+    /* Use the known aspect ratio to scale */
     width: 100%;
     height: 100%;
+    /* scale to cover container */
+    display: flex;
   }
 
   .iframe-overlay {
@@ -308,10 +319,11 @@
   }
 
   iframe {
-    display: block;
-
-    /* width: 100%;
-    height: 100%; */
+    min-width: auto;
+    min-height: auto;
+    width: 100%;
+    height: 100%;
     border: 0;
+    object-fit: contain;
   }
 </style>

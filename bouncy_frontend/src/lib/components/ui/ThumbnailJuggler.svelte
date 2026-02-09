@@ -10,7 +10,7 @@
   import StringEditor from './StringEditor.svelte';
   import Symbol from './Symbol.svelte';
   import UnstyledButton from './UnstyledButton.svelte';
-  import PeertubeVideoPlayer from './video/PeertubeVideoPlayer.svelte';
+  import FullScreenVideo from './video/FullScreenVideo.svelte';
 
   /**
    * @typedef {Object} Props
@@ -32,6 +32,7 @@
   let imageHeight = $state([]);
   let currentIndex = $state(0);
   let videoId = $state();
+  let aspectRatio = $state();
   let showVideoPopup = $state(false);
   let showPrivacyPopUp = $state(false);
   let showEditPopUp = $state(false);
@@ -56,6 +57,7 @@
   /** @param {api.Video} video */
   function playVideo(video) {
     videoId = video.uuid;
+    aspectRatio = video.aspectRatio;
     showVideoPopup = true;
   }
 
@@ -124,20 +126,9 @@
   }
 </script>
 
-<PopupWithRunes bind:isOpen={showVideoPopup} {onClose}>
-  {#if videoId}
-    <div class="popup">
-      <div class="close">
-        <UnstyledButton onClick={() => (showVideoPopup = false)}>
-          <Symbol styleClass="white" size={32}>close</Symbol>
-        </UnstyledButton>
-      </div>
-      <div class="video">
-        <PeertubeVideoPlayer {videoId}></PeertubeVideoPlayer>
-      </div>
-    </div>
-  {/if}
-</PopupWithRunes>
+{#if videoId}
+  <FullScreenVideo bind:isOpen={showVideoPopup} {videoId} {aspectRatio} {onClose} />
+{/if}
 
 <PopupWithRunes bind:isOpen={showPrivacyPopUp}>
   <PrivacySelector selected={selectedPrivacy} onSelected={updatePrivacy}
@@ -214,33 +205,9 @@
 </Juggler>
 
 <style>
-  .popup {
-    background-color: var(--theme-neutral-black);
-    width: 100vw;
-    height: 100vh;
-  }
-
   .edit-pop-up {
     color: var(--theme-main);
   }
-
-  .close {
-    display: grid;
-    place-items: center;
-    height: 3rem;
-    width: 100%;
-    position: absolute;
-    z-index: 11; /* above video overlay */
-  }
-
-  .video {
-    display: grid;
-    place-items: center;
-    height: 100%;
-    max-height: calc(90vh - 3rem);
-    width: auto;
-  }
-
   .preview {
     display: inline-block;
     width: min(280px, calc(100vw - 3rem)); /* PeerTube thumbnail width */

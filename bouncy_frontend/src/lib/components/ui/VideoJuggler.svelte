@@ -1,21 +1,23 @@
 <script>
   import Juggler from './Juggler.svelte';
   import PeertubeVideoPlayer from './video/PeertubeVideoPlayer.svelte';
+  import * as api from '$lib/peertube-openapi';
 
   /**
    * @typedef {Object} Props
-   * @property {string[]} ids
+   * @property {api.Video[]} videos
    * @property {boolean} autoplay
    */
 
   /** @type {Props} */
-  let { ids, autoplay } = $props();
+  let { videos, autoplay } = $props();
   let juggler = $state();
   let currentIndex = $state(0);
-  const videos = $derived(
-    ids.map((id) => {
+  const videoPlayers = $derived(
+    videos.map((video) => {
       return {
-        id: id,
+        id: video.id,
+        aspectRation: video.aspectRatio,
         /** @type {PeertubeVideoPlayer | undefined} */
         player: undefined,
       };
@@ -29,24 +31,24 @@
   );
 
   $effect(() => {
-    const currentVideo = videos[currentIndex];
+    const currentVideo = videoPlayers[currentIndex];
     if (autoplay && currentVideo.player) {
       currentVideo.player.play();
       currentVideo.player.addEventListener('playbackStatusUpdate', nextOnEnded);
     }
 
-    const prevIdx = (currentIndex + ids.length - 1) % ids.length;
-    const nextIdx = (currentIndex + 1) % ids.length;
+    const prevIdx = (currentIndex + videos.length - 1) % videos.length;
+    const nextIdx = (currentIndex + 1) % videos.length;
     if (prevIdx !== currentIndex && videos[prevIdx].player) {
-      videos[prevIdx].player.pause();
-      videos[prevIdx].player.removeEventListener(
+      videoPlayers[prevIdx].player.pause();
+      videoPlayers[prevIdx].player.removeEventListener(
         'playbackStatusUpdate',
         nextOnEnded
       );
     }
     if (nextIdx !== currentIndex && videos[nextIdx].player) {
-      videos[nextIdx].player.pause();
-      videos[nextIdx].player.removeEventListener(
+      videoPlayers[nextIdx].player.pause();
+      videoPlayers[nextIdx].player.removeEventListener(
         'playbackStatusUpdate',
         nextOnEnded
       );
@@ -55,7 +57,7 @@
 
   /** @param {number} index */
   function onIndexChanged(index) {
-    videos[index].player?.forceLoad();
+    videoPlayers[index].player?.forceLoad();
     currentIndex = index;
   }
 
@@ -92,6 +94,7 @@
         bind:this={video.player}
         videoId={video.id}
         delayLoadingMs={delayMs(index)}
+        aspectRatio={video.aspectRatio}
       />
     </div>
   {/snippet}

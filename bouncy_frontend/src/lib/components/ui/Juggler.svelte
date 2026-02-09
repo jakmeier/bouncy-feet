@@ -7,8 +7,6 @@
    * @property {(index: number)=>void} [onIndexChanged]
    * @property {any[]} items
    * @property {import('svelte').Snippet<[any]>} element
-   * @property {string} [height]
-   * @property {string} [width]
    * @property {string} [buttonHeight]
    */
 
@@ -17,8 +15,6 @@
     onIndexChanged = () => {},
     items,
     element,
-    width = '100%',
-    height = '100%',
     buttonHeight = '50%',
   } = $props();
   let currentIndex = $state(0);
@@ -58,10 +54,7 @@
   }
 </script>
 
-<div
-  class="container"
-  style="--component-width: {width}; --component-height: {height}; --button-height: {buttonHeight};"
->
+<div class="container" style="--button-height: {buttonHeight};">
   {#if items.length > 1}
     <button onclick={prev}>&lt;</button>
   {/if}
@@ -87,8 +80,8 @@
 <style>
   .container {
     position: relative;
-    width: var(--component-width);
-    height: var(--component-height);
+    height: 100%;
+    width: 100%;
   }
 
   .container button {
@@ -113,5 +106,7 @@
 
   .elements {
     overflow: hidden;
+    display: flex;
+    position: relative;
   }
 </style>

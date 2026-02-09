@@ -9,7 +9,7 @@
    * @property {number[]} [beats] - Array of beat timestamps in ms
    * @property {Marker[]} [markers] - Array of markers to show on the timeline
    * @property {boolean} [muted]
-   * @property {boolean} [timeline]
+   * @property {"inline"|"external"} [timeline]
    */
 
   /** @type Props */

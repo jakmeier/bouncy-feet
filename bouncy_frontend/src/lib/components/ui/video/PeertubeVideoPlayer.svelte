@@ -8,10 +8,11 @@
   /**
    * @typedef {Object} Props
    * @property {string} videoId
+   * @property {number} aspectRatio
    * @property {number[]} [beats] - Array of beat timestamps in ms
    * @property {Marker[]} [markers] - Array of markers to show on the timeline
    * @property {boolean} [muted]
-   * @property {boolean} [timeline]
+   * @property {"inline"|"external"} [timeline]
    * @property {boolean} [isPrivate]
    * @property {number} [delayLoadingMs]
    */
@@ -25,11 +26,11 @@
     timeline,
     isPrivate = false,
     delayLoadingMs = 0,
+    aspectRatio,
   } = $props();
 
   /** @type {PeertubePlayer | undefined} */
   let player = $state();
-
   let deferred = $state(delayLoadingMs > 0);
 
   export function play() {
@@ -76,7 +77,7 @@
 </script>
 
 {#if deferred}
-  <div class="wrapper">
+  <div class="placeholder" style="aspect-ratio: {aspectRatio};">
     <Symbol size={100} styleClass="rotating">refresh</Symbol>
   </div>
 {:else}
@@ -87,13 +88,13 @@
     {markers}
     {muted}
     {timeline}
+    {aspectRatio}
   />
 {/if}
 
 <style>
-  .wrapper {
+  .placeholder {
     width: 300px;
-    aspect-ratio: 9 / 16;
     display: grid;
     place-items: center;
   }
