@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-  import UnstyledButton from './ui/UnstyledButton.svelte';
+  import UnstyledButton from '$lib/components/ui/UnstyledButton.svelte';
 
   /**
    * @typedef {Object} Props

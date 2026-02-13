@@ -15,7 +15,7 @@
   import Symbol from '$lib/components/ui/Symbol.svelte';
   import Playlist from '$lib/components/ui/video/Playlist.svelte';
   import VideoUpload from '$lib/components/ui/video/VideoUpload.svelte';
-  import UserList from '$lib/components/UserList.svelte';
+  import UserList from '$lib/components/user/UserList.svelte';
   import { getClubsContext, getUserContext } from '$lib/stores/context';
   import { t } from '$lib/i18n';
   import { VIDEO_PRIVACY } from '$lib/peertube';
