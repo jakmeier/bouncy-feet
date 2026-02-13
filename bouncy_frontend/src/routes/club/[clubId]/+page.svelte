@@ -226,8 +226,7 @@
           <div>{message}</div>
         {:else}
           <div>{$t('club.select-user-title')}</div>
-          <UserList onSelect={(u) => onSelectUser(u, apiUser)} {apiUser}
-          ></UserList>
+          <UserList onSelect={(u) => onSelectUser(u, apiUser)}></UserList>
         {/if}
       </div>
     {/snippet}

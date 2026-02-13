@@ -1,19 +1,19 @@
 <script>
   import { onMount } from 'svelte';
   import UnstyledButton from '$lib/components/ui/UnstyledButton.svelte';
+  import { apiRequest } from '$lib/stats';
 
   /**
    * @typedef {Object} Props
    * @property {(user: PublicUserResponse)=>void} [onSelect]
-   * @property {ApiUser} apiUser
    */
 
   /** @type {Props} */
-  let { onSelect = () => {}, apiUser } = $props();
+  let { onSelect = () => {} } = $props();
 
   async function load() {
-    const res = await apiUser.authenticatedPost('/users', {});
-    let result = await res?.json();
+    const res = await apiRequest('/users');
+    let result = await res.okResponse?.json();
     return result?.users;
   }
 
