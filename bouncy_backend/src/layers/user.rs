@@ -150,7 +150,7 @@ async fn validate_guest_user_matches_claims(
             let res = ClientSessionId::transfer_client_sessions(
                 &state.pg_db_pool,
                 user.id,
-                existing_user.id.clone(),
+                existing_user.id,
             )
             .await;
             res.map_err(|err| UserAuthError::db_error(err, "transferring client session failed"))?;

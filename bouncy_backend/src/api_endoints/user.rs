@@ -1,6 +1,7 @@
-use crate::user::{User, UserSearchFilter};
+use crate::peertube::user::PeerTubeAccountId;
+use crate::user::{User, UserId, UserSearchFilter};
 use crate::AppState;
-use axum::extract::State;
+use axum::extract::{Query, State};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::{Extension, Json};
@@ -19,6 +20,9 @@ pub struct PrivateUserInfoResponse {
 pub struct PublicUserInfoResponse {
     /// BF API user id
     pub id: i64,
+    /// The user's PeerTube account id, which is different from the user's
+    /// PeerTube user id.
+    pub peertube_account_id: Option<PeerTubeAccountId>,
     pub display_name: String,
 }
 
@@ -48,10 +52,10 @@ pub async fn user_info(Extension(user): Extension<User>) -> Response {
     (StatusCode::OK, Json(user_info)).into_response()
 }
 
-/// Show publicly visible list of users.
+/// Show publicly visible list of users, suitable for paginated lists.
 pub async fn list_users(
     State(state): State<AppState>,
-    Json(params): Json<UserSearchParams>,
+    Query(params): Query<UserSearchParams>,
 ) -> Response {
     let filter = UserSearchFilter {
         include_guests: false,
@@ -67,11 +71,31 @@ pub async fn list_users(
 
     let users = users
         .into_iter()
-        .map(|u| PublicUserInfoResponse {
-            id: u.id.num(),
-            display_name: u.public_name,
-        })
+        .map(PublicUserInfoResponse::from)
         .collect();
 
     Json(UsersResponse { users }).into_response()
+}
+
+/// Show publicly visible list of a single user, suitable to display a profile page.
+pub async fn user(
+    State(state): State<AppState>,
+    axum::extract::Path(user_id): axum::extract::Path<UserId>,
+) -> axum::response::Result<Json<PublicUserInfoResponse>, (StatusCode, &'static str)> {
+    let result = User::lookup_public_info(&state, user_id).await;
+    let Some(user) = result else {
+        return Err((StatusCode::NOT_FOUND, "No such user"));
+    };
+
+    Ok(Json(user.into()))
+}
+
+impl From<crate::user::PublicUserData> for PublicUserInfoResponse {
+    fn from(u: crate::user::PublicUserData) -> Self {
+        PublicUserInfoResponse {
+            id: u.id.num(),
+            display_name: u.public_name,
+            peertube_account_id: u.peertube_account_id,
+        }
+    }
 }

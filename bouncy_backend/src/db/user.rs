@@ -10,7 +10,7 @@ use crate::layers::oidc::AdditionalClaims;
 use crate::peertube::user::PeerTubeAccountId;
 use crate::AppState;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug, serde::Deserialize)]
 pub struct UserId(i64);
 
 #[derive(Clone, Debug)]
@@ -24,6 +24,7 @@ pub struct User {
 pub struct PublicUserData {
     pub id: UserId,
     pub public_name: String,
+    pub peertube_account_id: Option<PeerTubeAccountId>,
 }
 
 #[derive(Clone, Debug, sqlx::FromRow)]
@@ -36,6 +37,7 @@ pub struct UserRow {
 #[derive(Clone, Debug, sqlx::FromRow)]
 pub struct ExtendedUserRow {
     id: i64,
+    peertube_account_id: Option<i64>,
     public_name: String,
 }
 
@@ -214,6 +216,28 @@ impl User {
         Ok(())
     }
 
+    pub(crate) async fn lookup_public_info(
+        state: &AppState,
+        user_id: UserId,
+    ) -> Option<PublicUserData> {
+        let record = sqlx::query_as!(
+            ExtendedUserRow,
+            r#"
+                SELECT u.id, u.peertube_account_id, um.key_value AS public_name
+                FROM users u
+                JOIN user_meta um on um.user_id = u.id
+                WHERE u.id = $1
+                    AND um.key_name = 's:publicName'
+            "#,
+            user_id.num()
+        )
+        .fetch_optional(&state.pg_db_pool)
+        .await
+        .expect("DB query failed")?;
+
+        Some(PublicUserData::from(record))
+    }
+
     pub(crate) async fn list(
         state: &AppState,
         filter: &UserSearchFilter,
@@ -222,8 +246,9 @@ impl User {
             sqlx::query_as!(
                 ExtendedUserRow,
                 r#"
-                SELECT um.user_id as id, um.key_value AS public_name
-                FROM user_meta um
+                SELECT u.id, u.peertube_account_id, um.key_value AS public_name
+                FROM users u
+                JOIN user_meta um on um.user_id = u.id
                 WHERE um.key_name = 's:publicName'
                 ORDER BY um.user_id LIMIT $1 OFFSET $2
                 "#,
@@ -236,7 +261,7 @@ impl User {
             sqlx::query_as!(
                 ExtendedUserRow,
                 r#"
-                SELECT u.id, um.key_value AS public_name
+                SELECT u.id, u.peertube_account_id, um.key_value AS public_name
                 FROM users u
                 JOIN user_meta um on um.user_id = u.id
                 WHERE um.key_name = 's:publicName'
@@ -298,6 +323,7 @@ impl From<ExtendedUserRow> for PublicUserData {
         PublicUserData {
             id: UserId(row.id),
             public_name: row.public_name,
+            peertube_account_id: row.peertube_account_id.map(PeerTubeAccountId),
         }
     }
 }

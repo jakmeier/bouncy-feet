@@ -157,6 +157,8 @@ async fn main() -> anyhow::Result<()> {
         .route("/", get(root))
         .route("/clubs", get(api_endoints::club::clubs))
         .route("/clubs/{club_id}", get(api_endoints::club::club))
+        .route("/users", get(api_endoints::user::list_users))
+        .route("/user/{user_id}", get(api_endoints::user::user))
         .route("/register", get(api_endoints::auth::register))
         .route(
             "/new_guest_session",
@@ -207,7 +209,6 @@ async fn main() -> anyhow::Result<()> {
         )
         .route("/user", get(api_endoints::user::user_info))
         .route("/user/meta", get(api_endoints::user_meta::metadata))
-        .route("/users", post(api_endoints::user::list_users))
         .route(
             "/user/meta/update",
             post(api_endoints::user_meta::update_user_metadata),
