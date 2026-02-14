@@ -37,28 +37,19 @@ fn cookie_session_layer<STORE: SessionStore>(
     session_store: STORE,
 ) -> SessionManagerLayer<STORE> {
     let domain = url.domain().expect("invalid url").to_string();
-    let is_dev = domain.contains("localhost");
 
-    let session = SessionManagerLayer::new(session_store)
+    SessionManagerLayer::new(session_store)
         // js access is not needed
         .with_http_only(true)
         .with_domain(domain)
         .with_expiry(Expiry::OnInactivity(Duration::hours(24)))
-        .with_always_save(true);
-
-    if is_dev {
-        session
-            .with_secure(false) // dev?
-            .with_same_site(SameSite::None)
-    } else {
-        session
-            // absolutely don't leak the session id, authentication relies on it!
-            .with_secure(true) // dev?
-            // Same-site should work within the same registerable domain, e.g. bouncy-feet.ch
-            // https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-cookie-same-site-00#section-2
-            // But when accessing from a web view in a PWA, Strict or Lax sadly doesn't work.
-            .with_same_site(SameSite::None)
-    }
+        .with_always_save(true)
+        // absolutely don't leak the session id, authentication relies on it!
+        .with_secure(true) // dev?
+        // Same-site should work within the same registerable domain, e.g. bouncy-feet.ch
+        // https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-cookie-same-site-00#section-2
+        // But when accessing from a web view in a PWA, Strict or Lax sadly doesn't work.
+        .with_same_site(SameSite::None)
 }
 
 #[async_trait]
