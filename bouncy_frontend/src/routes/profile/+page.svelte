@@ -19,6 +19,7 @@
   import ScrollToTop from '$lib/components/ScrollToTop.svelte';
   import Clubs from '$lib/components/club/Clubs.svelte';
   import CreateClub from '$lib/components/club/CreateClub.svelte';
+  import ActorAvatar from '$lib/components/profile/ActorAvatar.svelte';
 
   // let showStatsSharingPopup = $state(writable(!$user.consentSendingStats));
 
@@ -79,8 +80,24 @@
       <!-- svelte-ignore a11y_click_events_have_key_events -->
       <!-- svelte-ignore a11y_no_static_element_interactions -->
       <div class="profile-pic" onclick={clickProfile}>
-        <Symbol size={100}>person</Symbol>
+        {#if maybeFullUser?.peerTubeUser}
+          {#await maybeFullUser?.peerTubeUser}
+            <Symbol size={100}>person</Symbol>
+          {:then ptu}
+            <ActorAvatar actor={ptu?.account || undefined} />
+          {/await}
+        {:else}
+          <Symbol size={100}>person</Symbol>
+        {/if}
         {apiUser.userCtx.user.publicName}
+
+        {#if maybeFullUser?.peerTubeUser}
+          {#await maybeFullUser?.peerTubeUser then ptu}
+            <div>
+              {ptu?.account?.description}
+            </div>
+          {/await}
+        {/if}
       </div>
       <h2 class="box">{$t('profile.stats-title')}</h2>
       <DanceStats
