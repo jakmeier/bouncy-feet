@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT uc.user_id, u.peertube_account_id, uc.is_admin, um.key_value AS public_name\n            FROM user_club uc\n            JOIN user_meta um ON uc.user_id = um.user_id\n            JOIN users u ON uc.user_id = u.id\n            WHERE uc.club_id = $1\n                AND um.key_name = 's:publicName'\n            ORDER BY um.user_id\n            LIMIT $2 OFFSET $3\n            ",
+  "query": "\n            SELECT uc.user_id, u.peertube_handle, uc.is_admin, um.key_value AS public_name\n            FROM user_club uc\n            JOIN user_meta um ON uc.user_id = um.user_id\n            JOIN users u ON uc.user_id = u.id\n            WHERE uc.club_id = $1\n                AND um.key_name = 's:publicName'\n            ORDER BY um.user_id\n            LIMIT $2 OFFSET $3\n            ",
   "describe": {
     "columns": [
       {
@@ -10,8 +10,8 @@
       },
       {
         "ordinal": 1,
-        "name": "peertube_account_id",
-        "type_info": "Int8"
+        "name": "peertube_handle",
+        "type_info": "Varchar"
       },
       {
         "ordinal": 2,
@@ -38,5 +38,5 @@
       false
     ]
   },
-  "hash": "90ab5663bb5a1efaac85e79f3c2ea86ab6fd10468191f8effbb6518f39a27725"
+  "hash": "46d7888b073f9588c98d4c59ec8ee56f0a5d8c7f6cae0311d4a0522dee20d554"
 }

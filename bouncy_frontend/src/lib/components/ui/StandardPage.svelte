@@ -15,9 +15,11 @@
    * @property {boolean} [black]
    * @property {boolean} [accent]
    * @property {boolean} [mainColor]
+   * @property {boolean} [backButton]
    */
   /** @type {Props} */
-  let { children, title, white, black, accent, mainColor } = $props();
+  let { children, title, white, black, accent, mainColor, backButton } =
+    $props();
 </script>
 
 {#if mainColor}
@@ -37,7 +39,7 @@
 
 <div class="wrapper">
   <div>
-    <LogoHeader {white} {black} {accent} {mainColor} {title} />
+    <LogoHeader {white} {black} {accent} {mainColor} {title} {backButton} />
   </div>
 
   <div class="content">

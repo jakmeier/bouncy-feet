@@ -7,6 +7,7 @@
   import { onDestroy, onMount } from 'svelte';
   import { fade, fly } from 'svelte/transition';
   import HeaderTemplate from './HeaderTemplate.svelte';
+  import { t } from '$lib/i18n';
 
   /**
    * @typedef {Object} Props
@@ -78,7 +79,7 @@
   });
 </script>
 
-<HeaderTemplate {bgColor} {title}>
+<HeaderTemplate {bgColor} title={$t(title)}>
   {#snippet topLeft()}
     {#if backButton}
       <UnstyledButton onClick={onBack}>

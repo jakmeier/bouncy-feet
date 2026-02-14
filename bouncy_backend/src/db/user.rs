@@ -7,7 +7,7 @@ use crate::client_session::ClientSessionId;
 use crate::club::UserJoinedClubRow;
 use crate::db::club::UserClubRow;
 use crate::layers::oidc::AdditionalClaims;
-use crate::peertube::user::PeerTubeAccountId;
+use crate::peertube::user::{PeerTubeAccountId, PeerTubeHandle};
 use crate::AppState;
 
 #[derive(Clone, Copy, Debug, serde::Deserialize)]
@@ -18,13 +18,14 @@ pub struct User {
     pub id: UserId,
     pub oidc_subject: Option<Uuid>,
     pub peertube_account_id: Option<PeerTubeAccountId>,
+    pub peertube_handle: Option<PeerTubeHandle>,
 }
 
 #[derive(Clone, Debug)]
 pub struct PublicUserData {
     pub id: UserId,
     pub public_name: String,
-    pub peertube_account_id: Option<PeerTubeAccountId>,
+    pub peertube_handle: Option<PeerTubeHandle>,
 }
 
 #[derive(Clone, Debug, sqlx::FromRow)]
@@ -32,12 +33,13 @@ pub struct UserRow {
     id: i64,
     oidc_subject: Option<String>,
     peertube_account_id: Option<i64>,
+    peertube_handle: Option<String>,
 }
 
 #[derive(Clone, Debug, sqlx::FromRow)]
 pub struct ExtendedUserRow {
     id: i64,
-    peertube_account_id: Option<i64>,
+    peertube_handle: Option<String>,
     public_name: String,
 }
 
@@ -99,7 +101,7 @@ impl User {
     pub(crate) async fn lookup(state: &AppState, user_id: UserId) -> Option<User> {
         let record = sqlx::query_as!(
             UserRow,
-            "SELECT id, oidc_subject, peertube_account_id FROM users WHERE id = $1",
+            "SELECT id, oidc_subject, peertube_account_id, peertube_handle FROM users WHERE id = $1",
             user_id.num()
         )
         .fetch_optional(&state.pg_db_pool)
@@ -129,7 +131,7 @@ impl User {
 
         let record = sqlx::query_as!(
             UserRow,
-            "SELECT id, oidc_subject, peertube_account_id FROM users WHERE oidc_subject = $1",
+            "SELECT id, oidc_subject, peertube_account_id, peertube_handle FROM users WHERE oidc_subject = $1",
             subject
         )
         .fetch_optional(&state.pg_db_pool)
@@ -163,7 +165,7 @@ impl User {
         .expect("Failed to insert new user")
         .id;
 
-        Self::new(id, Some(subject), None)
+        Self::new(id, Some(subject), None, None)
     }
 
     pub(crate) async fn add_oidc(&mut self, state: &AppState, sub: Uuid) -> sqlx::Result<()> {
@@ -216,6 +218,30 @@ impl User {
         Ok(())
     }
 
+    pub(crate) async fn set_peertube_handle(
+        &mut self,
+        state: &AppState,
+        peertube_handle: PeerTubeHandle,
+    ) -> sqlx::Result<()> {
+        let result = sqlx::query!(
+            r#"UPDATE users SET peertube_handle = $1 WHERE id = $2"#,
+            peertube_handle.0,
+            self.id.num()
+        )
+        .execute(&state.pg_db_pool)
+        .await?;
+
+        if result.rows_affected() != 1 {
+            tracing::error!(
+                "set_peertube_handle affected {} rows",
+                result.rows_affected()
+            );
+        }
+
+        self.peertube_handle = Some(peertube_handle);
+        Ok(())
+    }
+
     pub(crate) async fn lookup_public_info(
         state: &AppState,
         user_id: UserId,
@@ -223,7 +249,7 @@ impl User {
         let record = sqlx::query_as!(
             ExtendedUserRow,
             r#"
-                SELECT u.id, u.peertube_account_id, um.key_value AS public_name
+                SELECT u.id, u.peertube_handle, um.key_value AS public_name
                 FROM users u
                 JOIN user_meta um on um.user_id = u.id
                 WHERE u.id = $1
@@ -246,7 +272,7 @@ impl User {
             sqlx::query_as!(
                 ExtendedUserRow,
                 r#"
-                SELECT u.id, u.peertube_account_id, um.key_value AS public_name
+                SELECT u.id, u.peertube_handle, um.key_value AS public_name
                 FROM users u
                 JOIN user_meta um on um.user_id = u.id
                 WHERE um.key_name = 's:publicName'
@@ -261,7 +287,7 @@ impl User {
             sqlx::query_as!(
                 ExtendedUserRow,
                 r#"
-                SELECT u.id, u.peertube_account_id, um.key_value AS public_name
+                SELECT u.id, u.peertube_handle, um.key_value AS public_name
                 FROM users u
                 JOIN user_meta um on um.user_id = u.id
                 WHERE um.key_name = 's:publicName'
@@ -279,13 +305,19 @@ impl User {
         Ok(users)
     }
 
-    fn new(id: i64, subject: Option<&str>, peertube_account_id: Option<PeerTubeAccountId>) -> User {
+    fn new(
+        id: i64,
+        subject: Option<&str>,
+        peertube_account_id: Option<PeerTubeAccountId>,
+        peertube_handle: Option<PeerTubeHandle>,
+    ) -> User {
         let oidc_subject =
             subject.map(|sub| Uuid::parse_str(sub).expect("sub must be a valid UUID"));
         User {
             id: UserId(id),
             oidc_subject,
             peertube_account_id,
+            peertube_handle,
         }
     }
 }
@@ -314,6 +346,7 @@ impl From<UserRow> for User {
             row.id,
             row.oidc_subject.as_deref(),
             row.peertube_account_id.map(PeerTubeAccountId),
+            row.peertube_handle.map(PeerTubeHandle),
         )
     }
 }
@@ -323,7 +356,7 @@ impl From<ExtendedUserRow> for PublicUserData {
         PublicUserData {
             id: UserId(row.id),
             public_name: row.public_name,
-            peertube_account_id: row.peertube_account_id.map(PeerTubeAccountId),
+            peertube_handle: row.peertube_handle.map(PeerTubeHandle),
         }
     }
 }

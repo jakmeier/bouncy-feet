@@ -92,6 +92,11 @@ pub async fn peertube_token_exchange(
         tracing::warn!(?err, "Failed setting PeerTube user id.");
     }
 
+    let res = peertube::user::ensure_peertube_handle(&state, &mut me, &peertube_token).await;
+    if let Err(err) = res {
+        tracing::warn!(?err, "Failed setting PeerTube handle.");
+    }
+
     Json(peertube_token).into_response()
 }
 

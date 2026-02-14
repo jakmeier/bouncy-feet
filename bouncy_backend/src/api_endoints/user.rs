@@ -1,4 +1,4 @@
-use crate::peertube::user::PeerTubeAccountId;
+use crate::peertube::user::PeerTubeHandle;
 use crate::user::{User, UserId, UserSearchFilter};
 use crate::AppState;
 use axum::extract::{Query, State};
@@ -20,9 +20,9 @@ pub struct PrivateUserInfoResponse {
 pub struct PublicUserInfoResponse {
     /// BF API user id
     pub id: i64,
-    /// The user's PeerTube account id, which is different from the user's
-    /// PeerTube user id.
-    pub peertube_account_id: Option<PeerTubeAccountId>,
+    /// The user's PeerTube handle for their account, based on the info when
+    /// they last logged in. It might have changed on PeerTube since then.
+    pub peertube_handle: Option<PeerTubeHandle>,
     pub display_name: String,
 }
 
@@ -95,7 +95,7 @@ impl From<crate::user::PublicUserData> for PublicUserInfoResponse {
         PublicUserInfoResponse {
             id: u.id.num(),
             display_name: u.public_name,
-            peertube_account_id: u.peertube_account_id,
+            peertube_handle: u.peertube_handle,
         }
     }
 }

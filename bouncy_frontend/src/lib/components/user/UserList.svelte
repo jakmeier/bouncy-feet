@@ -1,7 +1,11 @@
 <script>
+  // TODO: show more info about user, e.g. profile pic
+  // TODO: pagination, search, sorting based on activity, etc etc
+
   import { onMount } from 'svelte';
   import UnstyledButton from '$lib/components/ui/UnstyledButton.svelte';
   import { apiRequest } from '$lib/stats';
+  import { goto } from '$app/navigation';
 
   /**
    * @typedef {Object} Props
@@ -9,12 +13,17 @@
    */
 
   /** @type {Props} */
-  let { onSelect = () => {} } = $props();
+  let { onSelect = selectUser } = $props();
 
   async function load() {
     const res = await apiRequest('/users');
     let result = await res.okResponse?.json();
     return result?.users;
+  }
+
+  /** @param { PublicUserResponse} user */
+  function selectUser(user) {
+    goto(`/users/${user.id}`);
   }
 
   onMount(load);

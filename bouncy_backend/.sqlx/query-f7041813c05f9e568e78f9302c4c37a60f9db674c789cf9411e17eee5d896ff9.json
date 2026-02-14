@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n                SELECT u.id, u.peertube_account_id, um.key_value AS public_name\n                FROM users u\n                JOIN user_meta um on um.user_id = u.id\n                WHERE u.id = $1\n                    AND um.key_name = 's:publicName'\n            ",
+  "query": "SELECT id, oidc_subject, peertube_account_id, peertube_handle FROM users WHERE id = $1",
   "describe": {
     "columns": [
       {
@@ -10,12 +10,17 @@
       },
       {
         "ordinal": 1,
+        "name": "oidc_subject",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
         "name": "peertube_account_id",
         "type_info": "Int8"
       },
       {
-        "ordinal": 2,
-        "name": "public_name",
+        "ordinal": 3,
+        "name": "peertube_handle",
         "type_info": "Varchar"
       }
     ],
@@ -27,8 +32,9 @@
     "nullable": [
       false,
       true,
-      false
+      true,
+      true
     ]
   },
-  "hash": "82d83300c141018b41ab6bb3b66c558992b4d156c6416e9bdace0458dff0dfb1"
+  "hash": "f7041813c05f9e568e78f9302c4c37a60f9db674c789cf9411e17eee5d896ff9"
 }

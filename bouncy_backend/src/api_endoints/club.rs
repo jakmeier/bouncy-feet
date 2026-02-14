@@ -221,7 +221,7 @@ pub async fn club_details(
         PublicUserInfoResponse {
             id: row.user_id.num(),
             display_name: row.public_name,
-            peertube_account_id: row.peertube_account_id,
+            peertube_handle: row.peertube_handle,
         }
     }
 

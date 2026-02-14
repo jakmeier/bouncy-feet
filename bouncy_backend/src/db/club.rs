@@ -3,7 +3,7 @@ use crate::{
     peertube::{
         channel::{PeerTubeChannelHandle, PeerTubeChannelId},
         playlist::PeerTubePlaylistId,
-        user::PeerTubeAccountId,
+        user::PeerTubeHandle,
     },
     user::UserId,
     AppState,
@@ -54,7 +54,7 @@ pub(crate) struct UserClubRow {
 #[derive(Debug, Clone, FromRow)]
 pub(crate) struct UserJoinedClubRow {
     pub user_id: i64,
-    pub peertube_account_id: Option<i64>,
+    pub peertube_handle: Option<String>,
     pub is_admin: bool,
     pub public_name: String,
 }
@@ -64,7 +64,7 @@ pub(crate) struct PublicClubMemberInfo {
     pub user_id: UserId,
     pub public_name: String,
     pub membership: ClubMembership,
-    pub peertube_account_id: Option<PeerTubeAccountId>,
+    pub peertube_handle: Option<PeerTubeHandle>,
 }
 
 impl Club {
@@ -252,7 +252,7 @@ impl Club {
         let rows = sqlx::query_as!(
             UserJoinedClubRow,
             r#"
-            SELECT uc.user_id, u.peertube_account_id, uc.is_admin, um.key_value AS public_name
+            SELECT uc.user_id, u.peertube_handle, uc.is_admin, um.key_value AS public_name
             FROM user_club uc
             JOIN user_meta um ON uc.user_id = um.user_id
             JOIN users u ON uc.user_id = u.id
@@ -274,7 +274,7 @@ impl Club {
                 user_id: record.user_id(),
                 public_name: record.public_name,
                 membership: ClubMembership::for_member(record.is_admin),
-                peertube_account_id: record.peertube_account_id.map(PeerTubeAccountId),
+                peertube_handle: record.peertube_handle.map(PeerTubeHandle),
             })
             .collect();
 

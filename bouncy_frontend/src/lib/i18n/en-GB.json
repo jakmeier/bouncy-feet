@@ -41,7 +41,9 @@
         "continue-learning-button": "Come dance with me!",
         "change-teacher-button": "Other teachers",
         "tutorial-button": "Intro course",
-        "nav": "Home"
+        "nav": "Home",
+        "users-title": "Dancers",
+        "more-users": "Show all"
     },
     "club": {
         "my-clubs-title": "My Clubs",

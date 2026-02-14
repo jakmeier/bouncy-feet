@@ -1,0 +1,35 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                SELECT u.id, u.peertube_handle, um.key_value AS public_name\n                FROM users u\n                JOIN user_meta um on um.user_id = u.id\n                WHERE um.key_name = 's:publicName'\n                    AND oidc_subject IS NOT NULL\n                ORDER BY u.id LIMIT $1 OFFSET $2\n                ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "peertube_handle",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "public_name",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "85cf6e1e0e7d4bca6da06e7feae3d3b228661c5cdded9c124be833772577c5fa"
+}

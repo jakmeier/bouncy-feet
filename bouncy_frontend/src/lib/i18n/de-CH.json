@@ -41,7 +41,9 @@
         "continue-learning-button": "Lass uns tanzen!",
         "change-teacher-button": "Andere Lehrer",
         "tutorial-button": "Intro-Kurs",
-        "nav": "Home"
+        "nav": "Home",
+        "users-title": "Tanzende",
+        "more-users": "Zeige alle"
     },
     "club": {
         "my-clubs-title": "Mein Clubs",

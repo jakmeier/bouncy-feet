@@ -14,11 +14,15 @@ pub(crate) struct PeerTubeUserId(pub i64);
 #[serde(transparent)]
 pub(crate) struct PeerTubeAccountId(pub i64);
 
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize, PartialEq)]
+#[serde(transparent)]
+pub(crate) struct PeerTubeHandle(pub String);
+
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct PeerTubeAccount {
     pub id: PeerTubeAccountId,
-    pub name: String,
+    pub name: PeerTubeHandle,
     pub display_name: String,
     // other fields omitted
 }
@@ -27,7 +31,7 @@ pub struct PeerTubeAccount {
 #[serde(rename_all = "camelCase")]
 pub struct MyPeerTubeUser {
     pub id: PeerTubeUserId,
-    pub username: String,
+    pub username: PeerTubeHandle,
     pub account: PeerTubeAccount,
     // other fields omitted
 }
@@ -45,6 +49,31 @@ pub(crate) async fn ensure_peertube_id(
     if user.peertube_account_id.is_none() {
         let peertube_user = fetch_my_user(state, token).await?;
         user.add_peertube_id(state, peertube_user.account.id)
+            .await?;
+    }
+    Ok(())
+}
+
+/// Add or update the PeerTube handle stored on the DB to match what is stored
+/// in the User.
+///
+/// The PeerTube handle can be changed in the PeerTube interface. Only the
+/// account ID is fixed. But APIs require on the handle, since this is what
+/// represents a user across the fediverse. Thus, the best I can come up with
+/// for now, check and update the handle if necessary on every access.
+pub(crate) async fn ensure_peertube_handle(
+    state: &AppState,
+    user: &mut User,
+    token: &OAuthToken,
+) -> anyhow::Result<()> {
+    let peertube_user = fetch_my_user(state, token).await?;
+    if user.peertube_handle.is_none()
+        || user
+            .peertube_handle
+            .as_ref()
+            .is_some_and(|handle| *handle != peertube_user.username)
+    {
+        user.set_peertube_handle(state, peertube_user.username)
             .await?;
     }
     Ok(())
