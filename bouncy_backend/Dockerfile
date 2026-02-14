@@ -1,4 +1,4 @@
-FROM docker.io/rust:1.89.0-slim AS builder
+FROM docker.io/rust:1.91.0-slim AS builder
 ARG TARGETARCH=amd64
 
 RUN apt-get update && apt-get install -y curl ca-certificates clang && rm -rf /var/lib/apt/lists/*
