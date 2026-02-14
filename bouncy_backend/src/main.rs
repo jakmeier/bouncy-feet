@@ -159,6 +159,10 @@ async fn main() -> anyhow::Result<()> {
         .route("/clubs/{club_id}", get(api_endoints::club::club))
         .route("/users", get(api_endoints::user::list_users))
         .route("/users/{user_id}", get(api_endoints::user::user))
+        .route(
+            "/users/{user_id}/combos",
+            get(api_endoints::combo::user_combos),
+        )
         .route("/register", get(api_endoints::auth::register))
         .route(
             "/new_guest_session",
@@ -207,6 +211,8 @@ async fn main() -> anyhow::Result<()> {
             "/clubs/{club_id}/playlist/{playlist_id}/remove-video",
             post(api_endoints::club::remove_video),
         )
+        .route("/combos/new", post(api_endoints::combo::create_combo))
+        .route("/combos/update", post(api_endoints::combo::update_combo))
         .route("/user", get(api_endoints::user::user_info))
         .route("/user/meta", get(api_endoints::user_meta::metadata))
         .route(

@@ -5,6 +5,7 @@ use uuid::Uuid;
 use crate::api_endoints::club::AddClubMemberRequest;
 use crate::client_session::ClientSessionId;
 use crate::club::UserJoinedClubRow;
+use crate::combo::ComboRow;
 use crate::db::club::UserClubRow;
 use crate::layers::oidc::AdditionalClaims;
 use crate::peertube::user::{PeerTubeAccountId, PeerTubeHandle};
@@ -336,6 +337,12 @@ impl UserClubRow {
 
 impl UserJoinedClubRow {
     pub fn user_id(&self) -> UserId {
+        UserId(self.user_id)
+    }
+}
+
+impl ComboRow {
+    pub(crate) fn user_id(&self) -> UserId {
         UserId(self.user_id)
     }
 }

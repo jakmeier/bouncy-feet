@@ -227,5 +227,22 @@
  * @typedef {Object} PlaylistInfo
  * @property {number} id
  * @property {string} short_uuid
- * 
+ *
+ * @typedef {Object} CreateComboRequest
+ *  @property {boolean} is_private
+ *  @property {number} [sort_order]
+ *  @property {string} [free_form_category]
+ *  @property {string} [title]
+ *  @property {string} [video_short_uuid]
+ *
+ * @typedef {Object} CombosResponse {
+ *  @property {ComboInfo[]} combos
+ *
+ * @typedef {Object} ComboInfo {
+ *  @property {number} id
+ *  @property {boolean} is_private
+ *  @property {number} [sort_order]
+ *  @property {String} [free_form_category]
+ *  @property {String} [title]
+ *  @property {String} [video_short_uuid]
  */
