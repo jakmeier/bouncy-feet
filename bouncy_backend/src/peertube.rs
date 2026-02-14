@@ -8,6 +8,7 @@ use futures::future::BoxFuture;
 use reqwest::header::HeaderValue;
 
 pub(crate) mod channel;
+pub(crate) mod common;
 pub(crate) mod playlist;
 pub(crate) mod system_user;
 pub(crate) mod token;
@@ -36,6 +37,8 @@ pub(crate) enum PeerTubeError {
     ClientValidationError(String),
     #[error("system auth failed")]
     SystemAuthFailed(String),
+    #[error("invalid URL {0}")]
+    InvalidUrl(#[from] url::ParseError),
 }
 
 pub(crate) async fn check_peertube_system_user_response(

@@ -1,5 +1,5 @@
 use crate::{
-    peertube::{check_peertube_response, token::OAuthToken, PeerTubeError},
+    peertube::{check_peertube_response, common::Avatar, token::OAuthToken, PeerTubeError},
     user::User,
     AppState,
 };
@@ -24,6 +24,8 @@ pub struct PeerTubeAccount {
     pub id: PeerTubeAccountId,
     pub name: PeerTubeHandle,
     pub display_name: String,
+    pub avatars: Vec<Avatar>,
+    pub description: Option<String>,
     // other fields omitted
 }
 
@@ -101,15 +103,47 @@ async fn fetch_my_user(
     let msg: Result<MyPeerTubeUser, _> = ok_response.json().await;
     let user = msg.map_err(|err| PeerTubeError::JsonParsingFailed(status, err))?;
     Ok(user)
+}
 
-    // let msg: Result<Vec<PeerTubeAccount>, _> = ok_response.json().await;
-    // let users = msg.map_err(|err| PeerTubeError::JsonParsingFailed(status, err))?;
-    // if users.len() != 1 {
-    //     return Err(PeerTubeError::BadResponse(format!(
-    //         "got {} me users instead of one",
-    //         users.len()
-    //     )));
-    // }
-    // let me = users.into_iter().next().unwrap();
-    // Ok(me)
+async fn fetch_user(
+    state: &AppState,
+    handle: &PeerTubeHandle,
+) -> Result<PeerTubeAccount, PeerTubeError> {
+    let url = state
+        .peertube_url
+        .join(&format!("api/v1/accounts/{}", handle.0))?;
+
+    let response = state.http_client.get(url.as_str()).send().await;
+
+    let ok_response = check_peertube_response(response).await?;
+    let status = ok_response.status();
+
+    let msg: Result<PeerTubeAccount, _> = ok_response.json().await;
+    let user = msg.map_err(|err| PeerTubeError::JsonParsingFailed(status, err))?;
+    Ok(user)
+}
+
+/// Read a user account from PeerTube or from cache.
+pub(crate) async fn user_account(
+    state: &AppState,
+    account_handle: &PeerTubeHandle,
+) -> Result<PeerTubeAccount, PeerTubeError> {
+    if let Some(cached) = state.data_cache.user_account(account_handle) {
+        return Ok(cached.clone());
+    }
+
+    let response = fetch_user(state, account_handle).await;
+
+    match &response {
+        Ok(account) => {
+            state
+                .data_cache
+                .insert_user_account(account_handle.clone(), account.clone());
+        }
+        Err(err) => {
+            tracing::warn!(?err, "Failed reading account");
+        }
+    }
+
+    response
 }

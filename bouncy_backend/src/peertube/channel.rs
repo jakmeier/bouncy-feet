@@ -1,5 +1,9 @@
 use crate::{
-    peertube::{check_peertube_response, check_peertube_system_user_response, PeerTubeError},
+    peertube::{
+        check_peertube_response, check_peertube_system_user_response,
+        common::{Avatar, Banner},
+        PeerTubeError,
+    },
     AppState,
 };
 use chrono::{DateTime, Utc};
@@ -52,26 +56,6 @@ pub struct ChannelResponse {
     pub banners: Vec<Banner>,
     // always system channel, not interesting
     // pub owner_account: OwnerAccount,
-}
-
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct Avatar {
-    pub file_url: String,
-    pub width: i32,
-    pub height: i32,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
-}
-
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct Banner {
-    pub file_url: String,
-    pub width: i32,
-    pub height: i32,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
 }
 
 pub(crate) async fn create_system_channel(

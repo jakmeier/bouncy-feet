@@ -50,6 +50,7 @@
     border-radius: 1rem;
     width: 100%;
     border: solid var(--theme-main-medium) 0.25rem;
+    margin: -0.25rem;
     background-color: var(--theme-main-alt);
   }
 </style>

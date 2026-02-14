@@ -1,6 +1,6 @@
-use crate::peertube::user::PeerTubeHandle;
+use crate::peertube::user::{PeerTubeAccount, PeerTubeHandle};
 use crate::user::{User, UserId, UserSearchFilter};
-use crate::AppState;
+use crate::{peertube, AppState};
 use axum::extract::{Query, State};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
@@ -24,6 +24,7 @@ pub struct PublicUserInfoResponse {
     /// they last logged in. It might have changed on PeerTube since then.
     pub peertube_handle: Option<PeerTubeHandle>,
     pub display_name: String,
+    pub small_avatar: Option<String>,
 }
 
 #[derive(serde::Deserialize)]
@@ -69,10 +70,20 @@ pub async fn list_users(
         return (StatusCode::INTERNAL_SERVER_ERROR, "Failed fetching users").into_response();
     };
 
-    let users = users
+    let mut users: Vec<_> = users
         .into_iter()
-        .map(PublicUserInfoResponse::from)
+        .map(PublicUserInfoResponse::from_db_info)
         .collect();
+
+    for user in &mut users {
+        if let Some(handle) = &user.peertube_handle {
+            let account = peertube::user::user_account(&state, handle).await;
+            match &account {
+                Ok(account_info) => user.add_peertube_info(account_info),
+                Err(err) => tracing::warn!(?err, "Error reading user account info from PeerTube"),
+            }
+        }
+    }
 
     Json(UsersResponse { users }).into_response()
 }
@@ -87,15 +98,26 @@ pub async fn user(
         return Err((StatusCode::NOT_FOUND, "No such user"));
     };
 
-    Ok(Json(user.into()))
+    // Without small avatar here, assuming the client will look up the full
+    // account info anyway.
+    Ok(Json(PublicUserInfoResponse::from_db_info(user)))
 }
 
-impl From<crate::user::PublicUserData> for PublicUserInfoResponse {
-    fn from(u: crate::user::PublicUserData) -> Self {
+impl PublicUserInfoResponse {
+    /// Fills info available from the local DB but leaves fields that require a
+    /// PeerTube API request empty.
+    fn from_db_info(u: crate::user::PublicUserData) -> Self {
         PublicUserInfoResponse {
             id: u.id.num(),
             display_name: u.public_name,
             peertube_handle: u.peertube_handle,
+            small_avatar: None,
+        }
+    }
+
+    fn add_peertube_info(&mut self, account: &PeerTubeAccount) {
+        if let Some(avatar) = account.avatars.first() {
+            self.small_avatar = Some(avatar.file_url.clone());
         }
     }
 }

@@ -100,6 +100,8 @@
  * @typedef {Object} PublicUserResponse
  * @property {number} id
  * @property {string} display_name
+ * @property {string} peertube_handle
+ * @property {string} [small_avatar]
  *
  * @typedef {Object} AccessToken
  * @property {string} token_type

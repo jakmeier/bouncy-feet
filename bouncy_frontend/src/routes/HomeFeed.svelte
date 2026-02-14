@@ -18,7 +18,6 @@
   import HomeNote from './HomeNote.svelte';
   import { goto } from '$app/navigation';
   import { asset } from '$app/paths';
-  import ScrollToTop from '$lib/components/ScrollToTop.svelte';
   import NightSection from '$lib/components/ui/sections/NightSection.svelte';
   import LimeSection from '$lib/components/ui/sections/LimeSection.svelte';
   import UserList from '$lib/components/user/UserList.svelte';
@@ -42,8 +41,6 @@
   });
   let imageHeight = $state(100);
 </script>
-
-<ScrollToTop />
 
 <Background
   bgColor="var(--theme-neutral-black)"
