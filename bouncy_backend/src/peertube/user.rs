@@ -128,7 +128,7 @@ pub(crate) async fn user_account(
     state: &AppState,
     account_handle: &PeerTubeHandle,
 ) -> Result<PeerTubeAccount, PeerTubeError> {
-    if let Some(cached) = state.data_cache.user_account(account_handle) {
+    if let Some(cached) = state.data_cache.user_account(account_handle).await {
         return Ok(cached.clone());
     }
 

@@ -135,8 +135,9 @@ pub async fn my_clubs(Extension(user): Extension<User>, State(state): State<AppS
 
 async fn db_clubs_to_club_infos(state: &AppState, db_clubs: Vec<Club>) -> Vec<ClubInfo> {
     let mut out = Vec::with_capacity(db_clubs.len());
+    // TODO: parallel map
     for club in db_clubs {
-        if let Some(cached) = state.data_cache.club_info(club.id) {
+        if let Some(cached) = state.data_cache.club_info(club.id).await {
             out.push(cached.clone());
             continue;
         }
@@ -485,7 +486,7 @@ pub async fn update_club(
         return db_err_to_response(err);
     }
 
-    state.data_cache.invalidate_club(club_id);
+    state.data_cache.invalidate_club(club_id).await;
     (StatusCode::OK, "OK").into_response()
 }
 
@@ -824,7 +825,7 @@ pub async fn update_avatar(
     })
     .await?;
 
-    state.data_cache.invalidate_club(club_id);
+    state.data_cache.invalidate_club(club_id).await;
     Ok(())
 }
 
