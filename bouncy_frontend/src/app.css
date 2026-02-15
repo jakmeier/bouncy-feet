@@ -198,6 +198,8 @@ button.short {
     height: 50px;
 }
 
+button:disabled,
+button[disabled],
 button.locked {
     background-color: var(--theme-neutral-dark);
     color: var(--theme-neutral-gray);

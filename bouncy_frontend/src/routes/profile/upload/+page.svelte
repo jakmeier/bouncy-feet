@@ -46,7 +46,7 @@
             {video.name} <br />
             {video.uuid} <br />
             {#if video.shortUUID}
-              <PeertubeVideoPlayer videoId={video.uuid} />
+              <PeertubeVideoPlayer videoId={video.uuid} aspectRatio={video.aspectRatio}/>
             {/if}
           </p>
         {/each}

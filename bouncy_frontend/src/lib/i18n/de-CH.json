@@ -331,6 +331,16 @@
         "guest-login-failed-description": "Der Server will wohl gerade nicht.",
         "login-failed-peertube-down": "Bouncy Tube reagiert nicht, vielleicht ist die Videoplattform aus.",
         "waiting-for-login-info": "Prüfe deine Logindaten...",
+        "my-combos-title": "Meine Combos",
+        "combos-title": "Combos",
+        "combo": {
+            "create-title": "Neue Combo",
+            "create-description": "Zeige was du kannst! Mit einer kurzen Schrittabfolge.",
+            "save-button": "Combo speichern",
+            "form-name": "Name für Combo (optional)",
+            "public-toggle": "Öffentlich in meinem Profil anzeigen",
+            "add-video-description": "Lade ein Video von deiner Combo hoch."
+        },
         "consent": {
             "title": "Rangliste beitreten",
             "text0": "Um auf der Rangliste zu erschienen, müssen wir deine tanzstatisken übermitteln. Videos werden nie hochgeladen.",

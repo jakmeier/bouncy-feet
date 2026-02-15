@@ -10,6 +10,34 @@
 import * as api from '$lib/peertube-openapi';
 import { getVideoPlaylistVideos, getUserInfo, uploadLegacy, uploadResumable, uploadResumableInit, uploadResumableCancel, getApiV1UsersMeVideos } from './peertube-openapi';
 
+
+/**
+ * @param {string | number} playlistId
+ * @returns {Promise<api.VideoDetails>}
+ */
+export async function fetchVideo(playlistId) {
+    /** @type {api.Options<api.GetVideoData>} */
+    const options = {
+        path: {
+            id: playlistId
+        }
+    };
+    const { response, data } = await api.getVideo(options);
+
+    if (!response.ok) {
+        //  Body has already been consumed...
+        throw new Error(`Fetch video failed: ${response.status}`);
+    }
+
+    if (!data) {
+        const error = await response.text();
+        throw new Error(`No data returned ${error}`);
+    }
+
+    return data;
+}
+
+
 /**
  * @param {string} playlistUuid
  * @returns {Promise<api.VideoPlaylist>}

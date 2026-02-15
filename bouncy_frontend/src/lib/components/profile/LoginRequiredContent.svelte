@@ -75,6 +75,7 @@
 
     let response = apiResponse.okResponse;
     try {
+      /** @type {PrivateUserInfoResponse} */
       const userInfo = await response?.json();
       if (!userInfo || userInfo.sub === undefined) {
         throw new Error(`missing sub in response: ${JSON.stringify(userInfo)}`);
@@ -87,6 +88,7 @@
         );
       }
       userCtx.user.openid = userInfo.sub;
+      userCtx.user.apiId = userInfo.id;
     } catch (errResponse) {
       console.warn('Failed reading user info');
     }
@@ -217,7 +219,7 @@
   );
 
   onMount(async () => {
-    if (!userCtx.user.openid) {
+    if (!userCtx.user.openid || userCtx.user.apiId === undefined) {
       let err = await refreshUserId();
 
       if (err) {

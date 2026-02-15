@@ -3,10 +3,11 @@
    * @typedef {Object} Props
    * @property {boolean} [isOn]
    * @property {boolean} [border]
+   * @property {string} [name]
    */
 
   /** @type {Props} */
-  let { isOn = $bindable(false), border = false } = $props();
+  let { isOn = $bindable(false), border = false, name } = $props();
 
   /** @param {{ key: string; preventDefault: () => void; }} event */
   function handleKeydown(event) {
@@ -24,6 +25,7 @@
   role="switch"
   aria-checked={isOn}
   tabindex="0"
+  id={name}
 >
   <div class="toggle-circle"></div>
 </div>

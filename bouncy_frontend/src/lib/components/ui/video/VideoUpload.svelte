@@ -52,21 +52,6 @@
       return;
     }
 
-    // TODO
-    // let accessToken = pwaAuth.peerTubeToken?.access_token;
-    // if (!accessToken) {
-    //   await pwaAuth.refreshPeerTubeToken();
-    //   accessToken = pwaAuth.peerTubeToken?.access_token;
-    // }
-
-    // if (!accessToken) {
-    //   console.error('No PeerTube access token');
-    //   // TODO: translate error to user
-    //   error =
-    //     'Uhm, failed authentication with video hosting service, sorry about that :(';
-    //   return;
-    // }
-
     isUploading = true;
     uploadProgress = 0;
 
@@ -101,26 +86,32 @@
   }
 </script>
 
-<!-- TODO: Is a nested Login-required a good idea? -->
-<LoginRequiredContent reason={$t('profile.upload.requires-login-description')}>
-  <input
-    bind:this={fileInput}
-    type="file"
-    accept="video/*"
-    onchange={handleFileSelect}
-  />
+<input
+  class="hidden"
+  bind:this={fileInput}
+  type="file"
+  accept="video/*"
+  onchange={handleFileSelect}
+/>
 
-  {#if isUploading}
-    <p>Uploading… {uploadProgress}%</p>
-  {/if}
+<button class="full-width" onclick={open}
+  >{$t('club.upload-video-button')}</button
+>
 
-  {#if error}
-    <p style="color: red">{error}</p>
-  {/if}
-</LoginRequiredContent>
+{#if isUploading}
+  <p>Uploading… {uploadProgress}%</p>
+{/if}
+
+{#if error}
+  <p style="color: red">{error}</p>
+{/if}
 
 <style>
   input[type='file'] {
     margin: 1rem 0;
+  }
+
+  .hidden {
+    display: None;
   }
 </style>

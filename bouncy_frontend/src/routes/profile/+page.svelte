@@ -20,6 +20,12 @@
   import Clubs from '$lib/components/club/Clubs.svelte';
   import CreateClub from '$lib/components/club/CreateClub.svelte';
   import ActorAvatar from '$lib/components/profile/ActorAvatar.svelte';
+  import UserCombos from '$lib/components/user/UserCombos.svelte';
+  import { getUserContext } from '$lib/stores/context';
+
+  /** @type {UserContextData} */
+  const userCtx = getUserContext();
+  const myUser = $derived(userCtx.user);
 
   // let showStatsSharingPopup = $state(writable(!$user.consentSendingStats));
 
@@ -67,7 +73,7 @@
     <DarkSection fillScreen arrow>
       {#if maybeFullUser}
         <LogoHeader
-          title={$t('profile.title')}
+          title={'profile.title'}
           backButton={false}
           homeLink
           onAction={() => apiUser.userCtx.logout()}
@@ -89,7 +95,9 @@
         {:else}
           <Symbol size={100}>person</Symbol>
         {/if}
-        {apiUser.userCtx.user.publicName}
+        <p>
+          {apiUser.userCtx.user.publicName}
+        </p>
 
         {#if maybeFullUser?.peerTubeUser}
           {#await maybeFullUser?.peerTubeUser then ptu}
@@ -120,6 +128,14 @@
     </DarkSection>
 
     {#if maybeFullUser}
+      <LimeSection arrow fillScreen>
+        <h2>{$t('profile.my-combos-title')}</h2>
+        <UserCombos userId={myUser.apiId} />
+        <a href="./combo/new">
+          <button class="full-width">{$t('profile.combo.create-title')}</button>
+        </a>
+      </LimeSection>
+
       <LimeSection arrow fillScreen>
         <h2>{$t('profile.my-videos-title')}</h2>
         {#await fetchMyVideos()}

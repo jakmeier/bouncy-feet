@@ -87,6 +87,7 @@
  *
  * @typedef {Object} UserData
  * @property {string} openid 
+ * @property {number} apiId API backend ID
  * @property {string} publicName 
  * @property {number} recordedSteps 
  * @property {number} recordedSeconds 
@@ -102,6 +103,10 @@
  * @property {string} display_name
  * @property {string} peertube_handle
  * @property {string} [small_avatar]
+ *
+ * @typedef {Object} PrivateUserInfoResponse
+ * @property {number} id
+ * @property {string} [sub]
  *
  * @typedef {Object} AccessToken
  * @property {string} token_type
