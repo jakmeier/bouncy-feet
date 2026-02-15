@@ -14,7 +14,7 @@ use axum::extract::State;
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::{Extension, Json};
-use futures::FutureExt;
+use futures::{FutureExt, StreamExt};
 
 #[derive(serde::Deserialize)]
 pub struct CreateClubsRequest {
@@ -134,41 +134,43 @@ pub async fn my_clubs(Extension(user): Extension<User>, State(state): State<AppS
 }
 
 async fn db_clubs_to_club_infos(state: &AppState, db_clubs: Vec<Club>) -> Vec<ClubInfo> {
-    let mut out = Vec::with_capacity(db_clubs.len());
-    // TODO: parallel map
-    for club in db_clubs {
-        if let Some(cached) = state.data_cache.club_info(club.id).await {
-            out.push(cached.clone());
-            continue;
-        }
-        let mut avatar = None;
-        if let Some(channel_handle) = &club.channel_handle {
-            let response = peertube::channel::fetch_channel(state, channel_handle).await;
-
-            if let Ok(channel) = response {
-                if !channel.avatars.is_empty() {
-                    let preferred_size = channel
-                        .avatars
-                        .iter()
-                        .find(|a| a.height >= 120)
-                        .unwrap_or(&channel.avatars[0]);
-                    avatar = Some(preferred_size.file_url.clone());
-                }
-            } else {
-                let err = response.unwrap_err();
-                tracing::warn!(?err, "Failed reading channel");
+    futures::stream::iter(db_clubs)
+        .map(|club| async move {
+            if let Some(cached) = state.data_cache.club_info(club.id).await {
+                return cached;
             }
-        }
-        let info = ClubInfo {
-            id: club.id.num(),
-            name: club.title,
-            description: club.description,
-            avatar,
-        };
-        state.data_cache.insert_club_info(club.id, info.clone());
-        out.push(info)
-    }
-    out
+            let mut avatar = None;
+            if let Some(channel_handle) = &club.channel_handle {
+                let response = peertube::channel::fetch_channel(state, channel_handle).await;
+
+                if let Ok(channel) = response {
+                    if !channel.avatars.is_empty() {
+                        let preferred_size = channel
+                            .avatars
+                            .iter()
+                            .find(|a| a.height >= 120)
+                            .unwrap_or(&channel.avatars[0]);
+                        avatar = Some(preferred_size.file_url.clone());
+                    }
+                } else {
+                    let err = response.unwrap_err();
+                    tracing::warn!(?err, "Failed reading channel");
+                }
+            }
+            let info = ClubInfo {
+                id: club.id.num(),
+                name: club.title,
+                description: club.description,
+                avatar,
+            };
+            state.data_cache.insert_club_info(club.id, info.clone());
+            info
+        })
+        // concurrency for when many clubs need to be fetched at once
+        // not too much though, to avoid hitting rate limits on PeerTube
+        .buffered(8)
+        .collect()
+        .await
 }
 
 /// Retrieve publicly listed clubs.
