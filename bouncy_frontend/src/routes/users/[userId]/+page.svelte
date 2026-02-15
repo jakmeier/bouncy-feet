@@ -5,6 +5,7 @@
   import BackHeader from '$lib/components/ui/header/BackHeader.svelte';
   import LimeSection from '$lib/components/ui/sections/LimeSection.svelte';
   import NightSection from '$lib/components/ui/sections/NightSection.svelte';
+  import UserCombos from '$lib/components/user/UserCombos.svelte';
   import { t } from '$lib/i18n';
 
   /** @type {import('./$types').PageProps} */
@@ -23,7 +24,9 @@
 
 <NightSection>
   <h1>{$t('profile.combos-title')}</h1>
-  TODO: User videos / combos etc
+  <UserCombos {userId}></UserCombos>
+
+  <!-- TODO: User videos, clubs, maybe more -->
   <!-- {#if clubDetails.private}
     <h2>{$t('club.private-videos-title')}</h2>
     {#each clubDetails.private.private_playlists as playlist, i}

@@ -1,17 +1,15 @@
 <script>
   import * as api from '$lib/peertube-openapi';
   import { t } from '$lib/i18n';
-  import PeertubeVideoPlayer from '../ui/video/PeertubeVideoPlayer.svelte';
   import VideoUpload from '../ui/video/VideoUpload.svelte';
   import { VIDEO_PRIVACY } from '$lib/peertube';
-  import VideoLoader from '../ui/video/VideoLoader.svelte';
   import ComboForm from './ComboForm.svelte';
+  import LoadAndShowPeertubeVideo from '../ui/video/LoadAndShowPeertubeVideo.svelte';
 
   /**
    * @typedef {Object} Props
    * @prop {FullUser} fullUser
    * @prop {ApiUser} apiUser
-   *
    */
 
   /** @type {Props}*/
@@ -65,12 +63,9 @@
   <p>{$t('profile.combo.add-video-description')}</p>
   <VideoUpload {fullUser} {onVideoUploaded} {privacy}></VideoUpload>
 {:else if !video}
-  <VideoLoader videoId={combo.video_short_uuid} onLoaded={(v) => (video = v)} />
-{:else}
   <div class="video">
-    <PeertubeVideoPlayer
+    <LoadAndShowPeertubeVideo
       videoId={combo.video_short_uuid}
-      aspectRatio={video.aspectRatio || 1}
       timeline="external"
     />
   </div>
