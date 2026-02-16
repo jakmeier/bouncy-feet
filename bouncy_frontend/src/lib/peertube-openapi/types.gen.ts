@@ -1463,8 +1463,8 @@ export type VideoUploadRequestResumable = VideoUploadRequestCommon & {
 export type VideoUploadResponse = {
     video?: {
         id?: 8;
-        uuid?: 2;
-        shortUUID?: 15;
+        uuid?: UuiDv4;
+        shortUUID?: ShortUuid;
     };
 };
 

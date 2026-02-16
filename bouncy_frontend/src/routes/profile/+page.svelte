@@ -130,10 +130,15 @@
     {#if maybeFullUser}
       <LimeSection arrow fillScreen>
         <h2>{$t('profile.my-combos-title')}</h2>
-        <UserCombos userId={myUser.apiId} />
-        <a href="./combo/new">
-          <button class="full-width">{$t('profile.combo.create-title')}</button>
-        </a>
+        <UserCombos userId={myUser.apiId} showEditLink />
+
+        <div class="controls">
+          <a href="./combo/new">
+            <button class="full-width"
+              >{$t('profile.combo.create-title')}</button
+            >
+          </a>
+        </div>
       </LimeSection>
 
       <LimeSection arrow fillScreen>
@@ -214,12 +219,6 @@
     display: grid;
     gap: 1rem;
     margin: 2rem 0;
-  }
-
-  .buttons {
-    display: grid;
-    grid-template-columns: auto auto;
-    gap: 2rem;
   }
 
   .hidden-features {

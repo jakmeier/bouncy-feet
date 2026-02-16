@@ -19,7 +19,7 @@
   });
 </script>
 
-<form onchange={() => (dirty = true)}>
+<form oninput={() => (dirty = true)}>
   <label for="title"> {$t('profile.combo.form-name')} </label>
   <input
     type="text"

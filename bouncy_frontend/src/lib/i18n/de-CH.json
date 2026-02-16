@@ -335,8 +335,12 @@
         "combos-title": "Combos",
         "combo": {
             "create-title": "Neue Combo",
+            "edit-title": "Bearbeite Combo",
             "create-description": "Zeige was du kannst! Mit einer kurzen Schrittabfolge.",
             "save-button": "Combo speichern",
+            "cancel-button": "Abbrechen",
+            "delete-button": "Combo löschen",
+            "confirm-delete": "Combo permanent löschen?",
             "form-name": "Name für Combo (optional)",
             "public-toggle": "Öffentlich in meinem Profil anzeigen",
             "add-video-description": "Lade ein Video von deiner Combo hoch."

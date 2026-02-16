@@ -6,10 +6,11 @@
   /**
    * @typedef {Object} Props
    * @prop {number} userId
+   * @prop {boolean} [showEditLink]
    */
 
   /** @type {Props}*/
-  let { userId } = $props();
+  let { userId, showEditLink } = $props();
 
   /** @type {ComboInfo[]}*/
   let combos = $state([]);
@@ -25,4 +26,4 @@
   });
 </script>
 
-<Combos {combos} />
+<Combos {combos} {showEditLink} />
