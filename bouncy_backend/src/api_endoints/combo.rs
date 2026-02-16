@@ -6,6 +6,7 @@ use axum::{
 
 use crate::{
     combo::{Combo, ComboId},
+    timestamp::Timestamp,
     user::{User, UserId},
     AppState,
 };
@@ -34,6 +35,16 @@ pub(crate) struct ComboInfo {
     pub free_form_category: Option<String>,
     pub title: Option<String>,
     pub video_short_uuid: Option<String>,
+}
+
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
+pub(crate) struct ComboTimestampInfos {
+    pub ms: Vec<i32>,
+}
+
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
+pub(crate) struct ComboTimestampInfo {
+    pub ms: i32,
 }
 
 impl UserId {
@@ -107,6 +118,70 @@ pub async fn user_combos(
         .collect();
 
     Ok(Json(CombosResponse { combos }))
+}
+
+pub async fn combo_timestamps(
+    Extension(user): Extension<User>,
+    State(state): State<AppState>,
+    Path(combo_id): Path<ComboId>,
+) -> JsonResponse<ComboTimestampInfos> {
+    assert_owns_combo(&state, user.id, combo_id).await?;
+
+    let result = Timestamp::list_by_combo(&state, combo_id).await;
+
+    let Ok(timestamps) = result else {
+        let err = result.unwrap_err();
+        tracing::error!(?err, ?combo_id, "Failed fetching combo timestamps");
+        return Err((
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Failed fetching combo timestamps",
+        ));
+    };
+
+    Ok(Json(ComboTimestampInfos {
+        ms: timestamps.into_iter().map(|t| t.milliseconds).collect(),
+    }))
+}
+
+pub async fn add_combo_timestamp(
+    Extension(user): Extension<User>,
+    State(state): State<AppState>,
+    Path(combo_id): Path<ComboId>,
+    Json(payload): Json<ComboTimestampInfo>,
+) -> axum::response::Result<()> {
+    assert_owns_combo(&state, user.id, combo_id).await?;
+
+    let result = Timestamp::create_for_combo(&state, combo_id, payload.ms).await;
+
+    if let Err(err) = result {
+        tracing::error!(?err, "Failed creating timestamp for combo");
+        return Err((
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Failed creating timestamp for combo",
+        ))?;
+    };
+
+    Ok(())
+}
+
+async fn assert_owns_combo(
+    state: &AppState,
+    user_id: UserId,
+    combo_id: ComboId,
+) -> Result<(), (StatusCode, &'static str)> {
+    let result = Combo::is_owned_by(state, combo_id, user_id).await;
+    match result {
+        Ok(true) => Ok(()),
+        Ok(false) => Err((StatusCode::NOT_FOUND, "combo not found for user")),
+        Err(err) => {
+            tracing::error!(?err, "Failed looking up combo ownership");
+
+            Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed looking up combo ownership",
+            ))
+        }
+    }
 }
 
 impl ComboInfo {

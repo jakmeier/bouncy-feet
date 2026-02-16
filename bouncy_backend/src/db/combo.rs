@@ -105,6 +105,27 @@ impl Combo {
         Ok(row.map(Combo::from))
     }
 
+    pub async fn is_owned_by(
+        state: &AppState,
+        id: ComboId,
+        user_id: UserId,
+    ) -> Result<bool, sqlx::Error> {
+        sqlx::query_scalar!(
+            r#"
+            SELECT EXISTS(
+                SELECT 1
+                FROM combos
+                WHERE id = $1 AND user_id = $2
+            )
+            "#,
+            id.num(),
+            user_id.num()
+        )
+        .fetch_one(&state.pg_db_pool)
+        .await
+        .map(|maybe| maybe.unwrap_or(false))
+    }
+
     pub async fn list_by_user(
         state: &AppState,
         user_id: UserId,

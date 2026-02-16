@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO combos_video_timestamps (\n                combo_id,\n                video_timestamp_id\n            )\n            VALUES ($1, $2)\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "221cb71e1e9b75ebcb70272de779ffac167ebdd4bbdfbbda5668a502ca94d2c6"
+}
