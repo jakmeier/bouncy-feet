@@ -6,7 +6,7 @@ use axum::{
 
 use crate::{
     combo::{Combo, ComboId},
-    timestamp::Timestamp,
+    timestamp::{Timestamp, TimestampId},
     user::{User, UserId},
     AppState,
 };
@@ -125,6 +125,7 @@ pub async fn combo_timestamps(
     State(state): State<AppState>,
     Path(combo_id): Path<ComboId>,
 ) -> JsonResponse<ComboTimestampInfos> {
+    // TODO: public combos should be visible without login
     assert_owns_combo(&state, user.id, combo_id).await?;
 
     let result = Timestamp::list_by_combo(&state, combo_id).await;
@@ -164,6 +165,27 @@ pub async fn add_combo_timestamp(
     Ok(())
 }
 
+pub async fn delete_combo_timestamp(
+    Extension(user): Extension<User>,
+    State(state): State<AppState>,
+    Path((combo_id, timestamp_id)): Path<(ComboId, TimestampId)>,
+) -> axum::response::Result<()> {
+    assert_owns_combo(&state, user.id, combo_id).await?;
+    assert_ts_belongs_to_combo(&state, combo_id, timestamp_id).await?;
+
+    let result = Timestamp::delete(&state, timestamp_id).await;
+
+    if let Err(err) = result {
+        tracing::error!(?err, "Failed deleting timestamp for combo");
+        return Err((
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Failed creating timestamp for combo",
+        ))?;
+    };
+
+    Ok(())
+}
+
 async fn assert_owns_combo(
     state: &AppState,
     user_id: UserId,
@@ -176,6 +198,31 @@ async fn assert_owns_combo(
         Err(err) => {
             tracing::error!(?err, "Failed looking up combo ownership");
 
+            Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed looking up combo ownership",
+            ))
+        }
+    }
+}
+
+async fn assert_ts_belongs_to_combo(
+    state: &AppState,
+    combo_id: ComboId,
+    timestamp_id: TimestampId,
+) -> Result<(), (StatusCode, &'static str)> {
+    let result = Timestamp::combo_of_timestamp(state, timestamp_id).await;
+    match result {
+        Ok(Some(c)) => {
+            if c.num() == combo_id.num() {
+                Ok(())
+            } else {
+                Err((StatusCode::NOT_FOUND, "combo not found for user"))
+            }
+        }
+        Ok(None) => Err((StatusCode::NOT_FOUND, "combo not found for user")),
+        Err(err) => {
+            tracing::error!(?err, "Failed looking up combo ownership");
             Err((
                 StatusCode::INTERNAL_SERVER_ERROR,
                 "Failed looking up combo ownership",

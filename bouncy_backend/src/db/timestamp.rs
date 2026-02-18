@@ -82,6 +82,17 @@ impl Timestamp {
         let timestamps = rows.into_iter().map(Timestamp::from).collect();
         Ok(timestamps)
     }
+
+    pub async fn delete(state: &AppState, timestamp_id: TimestampId) -> Result<bool, sqlx::Error> {
+        let res = sqlx::query_as!(
+            TimestampRow,
+            r#"DELETE FROM video_timestamps t WHERE t.id = $1"#,
+            timestamp_id.num()
+        )
+        .execute(&state.pg_db_pool)
+        .await?;
+        Ok(res.rows_affected() > 0)
+    }
 }
 
 impl From<TimestampRow> for Timestamp {

@@ -1,5 +1,6 @@
 use crate::{
     api_endoints::combo::ComboInfo,
+    timestamp::TimestampId,
     user::{User, UserId},
     AppState,
 };
@@ -205,5 +206,28 @@ impl From<ComboRow> for Combo {
             title: row.title,
             video_short_uuid: row.video_short_uuid,
         }
+    }
+}
+
+impl crate::db::timestamp::Timestamp {
+    pub async fn combo_of_timestamp(
+        state: &AppState,
+        timestamp_id: TimestampId,
+    ) -> Result<Option<ComboId>, sqlx::Error> {
+        let rows = sqlx::query_scalar!(
+            r#"
+            SELECT
+                ct.combo_id
+            FROM video_timestamps t
+                JOIN combos_video_timestamps ct ON ct.video_timestamp_id = t.id
+            WHERE t.id = $1
+            "#,
+            timestamp_id.num()
+        )
+        .fetch_optional(&state.pg_db_pool)
+        .await?;
+
+        let id = rows.map(ComboId);
+        Ok(id)
     }
 }

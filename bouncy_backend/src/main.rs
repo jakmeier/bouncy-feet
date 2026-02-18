@@ -218,6 +218,10 @@ async fn main() -> anyhow::Result<()> {
             get(api_endoints::combo::combo_timestamps),
         )
         .route(
+            "/combos/{combo_id}/timestamp/{timestamp_id}",
+            delete(api_endoints::combo::delete_combo_timestamp),
+        )
+        .route(
             "/combos/{combo_id}/timestamp/new",
             post(api_endoints::combo::add_combo_timestamp),
         )

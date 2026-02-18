@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                ct.combo_id\n            FROM video_timestamps t\n                JOIN combos_video_timestamps ct ON ct.video_timestamp_id = t.id\n            WHERE t.id = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "combo_id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "ef3e89f95844cb077ea60cde4d153e947ce1b73f1d62aff8e1cfde151aef394a"
+}
