@@ -10,6 +10,8 @@
   let player = $state();
   /** @type {VideoMarker[] | undefined} */
   let markers = $state();
+  /** @type {number[] | undefined} */
+  let beats = $state();
 
   /**
    * @typedef {Object} Props
@@ -38,6 +40,7 @@
   /** @arg {VideoMarker[]} loadedMarkers */
   function markersLoaded(loadedMarkers) {
     markers = loadedMarkers;
+    beats = loadedMarkers.map((marker) => marker.time);
   }
 </script>
 
@@ -51,6 +54,7 @@
       aspectRatio={video.aspectRatio || 1}
       {timeline}
       {markers}
+      {beats}
     />
   </div>
 {:else}

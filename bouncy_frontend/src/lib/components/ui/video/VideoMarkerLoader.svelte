@@ -21,7 +21,7 @@
       /** @type {VideoMarker[]} */
       const markers = markersResult.ms.map((ms) => ({
         time: ms,
-        icon: 'logo',
+        icon: '',
         label: '',
       }));
       if (markers) {

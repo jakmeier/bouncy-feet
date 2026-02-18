@@ -1,5 +1,5 @@
 <script>
-  import { base } from '$app/paths';
+  import { asset, base } from '$app/paths';
   import { onMount } from 'svelte';
   import { getUserContext } from '$lib/stores/context';
 
@@ -213,11 +213,13 @@
         title={marker.label}
         style="left: {(marker.time / 1000 / duration) * 100}%"
       >
-        <img
-          class="icon"
-          src="{base}/icons/{marker.icon}.svg"
-          alt="Bouncy Feet Logo"
-        />
+        {#if marker.icon.length > 0}
+          <img
+            class="icon"
+            src={asset(`/icons/${marker.icon}.svg`)}
+            alt="Bouncy Feet Logo"
+          />
+        {/if}
       </div>
     {/each}
   </div>

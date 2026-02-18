@@ -4,7 +4,7 @@
   import { onMount } from 'svelte';
   import { writable } from 'svelte/store';
   import CornerMarker from '../CornerMarker.svelte';
-  import { base } from '$app/paths';
+  import { asset, base } from '$app/paths';
 
   /** @typedef {{ time: number, label: string, icon: string }} Marker */
   /**
@@ -135,11 +135,13 @@
       title={marker.label}
       style="left: {(marker.time / 1000 / duration) * 100}%"
     >
-      <img
-        class="icon"
-        src="{base}/icons/{marker.icon}.svg"
-        alt="Bouncy Feet Logo"
-      />
+      {#if marker.icon.length > 0}
+        <img
+          class="icon"
+          src={asset(`/icons/${marker.icon}.svg`)}
+          alt="Bouncy Feet Logo"
+        />
+      {/if}
     </div>
   {/each}
 </div>
