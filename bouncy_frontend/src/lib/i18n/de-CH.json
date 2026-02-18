@@ -341,6 +341,7 @@
             "cancel-button": "Abbrechen",
             "delete-button": "Combo löschen",
             "confirm-delete": "Combo permanent löschen?",
+            "add-timestamp-button": "Zeitmarke einfügen",
             "form-name": "Name für Combo (optional)",
             "public-toggle": "Öffentlich in meinem Profil anzeigen",
             "add-video-description": "Lade ein Video von deiner Combo hoch."

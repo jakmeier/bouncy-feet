@@ -340,6 +340,7 @@
             "save-button": "Save combo",
             "cancel-button": "Cancel",
             "delete-button": "Delete combo",
+            "add-timestamp-button": "Insert timestamp",
             "confirm-delete": "Permanently delete combo?",
             "form-name": "Combo name (optional)",
             "public-toggle": "Show publicly in my profile",

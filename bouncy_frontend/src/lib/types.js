@@ -250,4 +250,13 @@
  *  @property {String} [free_form_category]
  *  @property {String} [title]
  *  @property {String} [video_short_uuid]
+ *
+ * @typedef {Object} VideoMarker
+ *  @property {number} time
+ *  @property {string} label
+ *  @property {string} icon
+ *
+ * @typedef {Object} ComboTimestampInfos
+ *  @property {number[]} ms
+ *
  */

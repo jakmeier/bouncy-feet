@@ -4,13 +4,12 @@
   import Symbol from '../Symbol.svelte';
   import PeertubePlayer from './PeertubePlayer.svelte';
 
-  /** @typedef {{ time: number, label: string, icon: string }} Marker */
   /**
    * @typedef {Object} Props
    * @property {string} videoId
    * @property {number} aspectRatio
    * @property {number[]} [beats] - Array of beat timestamps in ms
-   * @property {Marker[]} [markers] - Array of markers to show on the timeline
+   * @property {VideoMarker[]} [markers] - Array of markers to show on the timeline
    * @property {boolean} [muted]
    * @property {"inline"|"external"} [timeline]
    * @property {boolean} [isPrivate]
@@ -43,6 +42,19 @@
     if (player) {
       player.pause();
     }
+  }
+
+  /** @returns {Promise<number>} seconds */
+  export async function getCurrentTime() {
+    if (player) {
+      return player.getCurrentTime();
+    }
+    return 0;
+  }
+
+  /** @param {number} secs */
+  export async function seek(secs) {
+    return player?.seek(secs);
   }
 
   export function addEventListener(event, listener) {

@@ -50,6 +50,16 @@
     }
   }
 
+  /** @returns {Promise<number>} seconds */
+  export async function getCurrentTime() {
+    return player.getCurrentTime();
+  }
+
+  /** @param {number} secs */
+  export async function seek(secs) {
+    return player.seek(secs);
+  }
+
   export function addEventListener(event, listener) {
     if (player) {
       player.addEventListener(event, listener);
@@ -247,7 +257,6 @@
 
   .external_timeline {
     position: relative;
-    left: 0.25rem;
     height: 2rem;
     background: var(--theme-neutral-light);
     margin-top: 1.125rem;

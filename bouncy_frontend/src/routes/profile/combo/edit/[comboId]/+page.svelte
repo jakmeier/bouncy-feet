@@ -14,6 +14,9 @@
 
   let dirty = $state(false);
   let details = $state(deserializeFromQuery(page.url.search));
+  /** @type {LoadAndShowPeertubeVideo | undefined} */
+  let player = $state();
+
   /**
    * @param {string} queryString
    * @returns {ComboInfo}
@@ -40,7 +43,7 @@
     } else {
       response = await apiUser.authenticatedPost('/combos/new', details);
     }
-    if (response?.ok) {
+    if (response) {
       /** @type {ComboInfo}*/
       const newCombo = await response.json();
       details = newCombo;
@@ -53,6 +56,20 @@
     await saveCombo(apiUser);
     history.back();
   }
+
+  /** @param {ApiUser} apiUser */
+  async function addTimestamp(apiUser) {
+    if (player) {
+      const secs = await player.getCurrentTime();
+      const body = {
+        ms: Math.round(secs * 1000),
+      };
+      const response = await apiUser.authenticatedPost(
+        `/combos/${comboId}/timestamp/new`,
+        body
+      );
+    }
+  }
 </script>
 
 <LoginRequiredContent>
@@ -62,10 +79,17 @@
 
       <div class="video">
         <LoadAndShowPeertubeVideo
+          bind:this={player}
           videoId={details.video_short_uuid}
           timeline="external"
+          {apiUser}
+          {comboId}
         />
       </div>
+
+      <button class="full-width action" onclick={() => addTimestamp(apiUser)}>
+        {$t('profile.combo.add-timestamp-button')}
+      </button>
 
       <div class="form">
         <ComboForm bind:details bind:dirty />
