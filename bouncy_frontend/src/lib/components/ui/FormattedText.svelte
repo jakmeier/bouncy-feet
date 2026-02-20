@@ -1,9 +1,8 @@
 <script>
   let { text, color } = $props();
 
-  let parts = $derived(splitIntoParts(text));
-
   const regex = /\*\*(.*?)\*\*/g;
+  let parts = $derived(splitIntoParts(text));
 
   /**
    * @param {string} input

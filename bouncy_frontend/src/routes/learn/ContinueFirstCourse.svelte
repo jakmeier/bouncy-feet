@@ -13,12 +13,9 @@
 </script>
 
 <StandardPage title="" white={false}>
-  <h3>{$t('home.continue-first-warmup')}</h3>
+  <h3>{$t('learn.continue-first-warmup')}</h3>
   <button onclick={() => goto('firstCourse')}>
     {$t('home.continue-button')}
-  </button>
-  <button onclick={() => apiUser.setSkippedIntro(true)}>
-    {$t('home.skip-button')}
   </button>
 </StandardPage>
 

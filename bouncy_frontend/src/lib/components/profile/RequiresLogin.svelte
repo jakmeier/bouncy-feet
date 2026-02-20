@@ -3,6 +3,7 @@
   import { PUBLIC_API_BASE } from '$env/static/public';
   import { USER_AUH_STATE } from '$lib/enum_types';
   import { asset } from '$app/paths';
+  import { register } from '$lib/onboarding';
 
   /**
    * `RequiresLogin` is shown when the user needs to take an action to register,
@@ -77,16 +78,6 @@
     window.location.assign(
       PUBLIC_API_BASE +
         '/login?redirect_back_to=' +
-        encodeURIComponent(currentUrl)
-    );
-  }
-
-  function register() {
-    // redirect to backend register -> login
-    const currentUrl = window.location.href;
-    window.location.assign(
-      PUBLIC_API_BASE +
-        '/register?redirect_back_to=' +
         encodeURIComponent(currentUrl)
     );
   }

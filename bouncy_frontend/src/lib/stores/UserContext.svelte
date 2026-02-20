@@ -22,8 +22,6 @@
   /** @type {Props} */
   let { children } = $props();
 
-  // let loginError = $state({ title: '', description: '' });
-
   // Set base url as early as possible, or some components will accidentally use
   // the default url on a page reload.
   peerTubeApi.setConfig({

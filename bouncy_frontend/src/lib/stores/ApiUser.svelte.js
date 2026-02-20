@@ -212,13 +212,6 @@ export class ApiUser {
         }
     }
 
-    skippedIntro() { return hasSkippedIntro }
-
-    /** @param {boolean} yes */
-    setSkippedIntro(yes) {
-        hasSkippedIntro = yes;
-    }
-
     /**
      * @param {string} activityId
      * @param {DanceSessionResult} sessionResult
@@ -384,8 +377,4 @@ export class ApiUser {
         }
         return this.clientSession.authHeader();
     }
-
 }
-
-let hasSkippedIntro = $state(false);
-

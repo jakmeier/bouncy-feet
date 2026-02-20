@@ -151,10 +151,10 @@
         {onSelectLesson}
       ></ClassProgress>
     {:else if showEndScreen}
-      <StandardPage mainColor title={$t('home.first-visit-done-title')}>
-        <p>{$t('home.first-visit-done-0')}</p>
-        <p>{$t('home.first-visit-done-1')}</p>
-        <p>{$t('home.first-visit-done-2')}</p>
+      <StandardPage mainColor title={$t('learn.intro-done-title')}>
+        <p>{$t('learn.intro-done-0')}</p>
+        <p>{$t('learn.intro-done-1')}</p>
+        <p>{$t('learn.intro-done-2')}</p>
         <button onclick={onLeave}>
           {$t('courses.lesson.show-teachers-button')}
         </button>

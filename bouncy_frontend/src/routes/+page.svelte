@@ -1,9 +1,9 @@
 <script>
-  import { ONBOARDING_STATE } from '$lib/onboarding';
+  import UserLoader from '$lib/components/profile/UserLoader.svelte';
+  import { USER_AUH_STATE } from '$lib/enum_types';
+  import { getUserContext } from '$lib/stores/context';
   import FirstVisit from './FirstVisit.svelte';
   import HomeFeed from './HomeFeed.svelte';
-  import ContinueFirstCourse from './ContinueFirstCourse.svelte';
-  import LoginRequiredContent from '$lib/components/profile/LoginRequiredContent.svelte';
 
   /**
    * @typedef {Object} Props
@@ -13,6 +13,13 @@
   /** @type {Props} */
   let { data } = $props();
 
+  /** @type {UserContextData} */
+  const userCtx = getUserContext();
+
+  let loading = $state(true);
+  /** @type {UserLoader} */
+  let loader = $state();
+
   // (mockup) learn today step
   const featuredSteps = data
     .lookupSteps({
@@ -21,30 +28,19 @@
     })
     .filter((_, i) => (i & 1) == 0)
     .slice(0, 3);
+
+  /** @param {BfError} err */
+  function setError(err) {
+    // TODO: show to user?
+    console.log('error when loading user id', err);
+  }
 </script>
 
-<LoginRequiredContent>
-  {#snippet guest({ apiUser })}
-    <!-- stop formatting for the array in one of the conditions -->
-    <!-- prettier-ignore -->
-    {#if apiUser.meta.onboarding === ONBOARDING_STATE.FIRST_VISIT && !apiUser.skippedIntro()}
-        <FirstVisit {apiUser} />
-      {:else if apiUser.meta.onboarding === ONBOARDING_STATE.STARTED_FIRST_WARMUP && !apiUser.skippedIntro()}
-        <ContinueFirstCourse {apiUser}/>
-      {:else if [
-        ONBOARDING_STATE.FINISHED_FIRST_WARMUP,
-        ONBOARDING_STATE.STARTED_FIRST_LESSON,
-        ONBOARDING_STATE.FINISHED_FIRST_LESSON,
-        ONBOARDING_STATE.STARTED_SECOND_LESSON,
-        ONBOARDING_STATE.FINISHED_SECOND_LESSON,
-        ONBOARDING_STATE.STARTED_THIRD_LESSON
-      ].includes(apiUser.meta.onboarding) 
-        && !apiUser.skippedIntro()
-      }
-        <!-- Maybe show a different continuation screen? -->
-        <ContinueFirstCourse {apiUser}/>
-      {:else}
-        <HomeFeed featuredDances={data.officialDances} {featuredSteps} />
-      {/if}
-  {/snippet}
-</LoginRequiredContent>
+<UserLoader bind:this={loader} bind:loading {setError} />
+
+{#if !loading && userCtx.authState === USER_AUH_STATE.Anonymous}
+  <!-- TODO: does createGuest user work like this? -->
+  <FirstVisit createGuest={loader.createGuestUser} />
+{:else}
+  <HomeFeed featuredDances={data.officialDances} {featuredSteps} />
+{/if}

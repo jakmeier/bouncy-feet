@@ -1,3 +1,5 @@
+import { PUBLIC_API_BASE } from "$env/static/public";
+
 /**
  * @readonly
  * @enum {OnboardingState} 
@@ -20,4 +22,14 @@ export const ONBOARDING_STATE = {
     // TODO: show activated moves, teacher profiles, ...
     // : "",
 
+}
+
+export function register() {
+    // redirect to backend register -> login
+    const currentUrl = window.location.href;
+    window.location.assign(
+        PUBLIC_API_BASE +
+        '/register?redirect_back_to=' +
+        encodeURIComponent(currentUrl)
+    );
 }
