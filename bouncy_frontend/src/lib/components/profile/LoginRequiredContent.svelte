@@ -106,16 +106,16 @@
   }
 </script>
 
-{#if loading}
-  <UserLoader
-    bind:apiUser
-    bind:fullUser
-    bind:loading
-    loadApiUser
-    loadFullUser={!!(fullUserContent || maybeFullUserContent)}
-    {setError}
-  />
+<UserLoader
+  bind:apiUser
+  bind:fullUser
+  bind:loading
+  loadApiUser
+  loadFullUser={!!(fullUserContent || maybeFullUserContent)}
+  {setError}
+/>
 
+{#if loading}
   {$t('profile.waiting-for-login-info')}
 {:else if fullUserContent && hasFullAuth}
   {@render fullUserContent({
