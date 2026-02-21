@@ -28,7 +28,7 @@
       apiResponse = await userCtx.apiUser.authenticatedGet('/user');
     }
 
-    if (apiResponse.error) {
+    if (apiResponse.error && apiResponse.error !== 'NeedLogin') {
       return apiResponse.error;
     }
 
