@@ -23,29 +23,21 @@
     setError,
   } = $props();
 
-  let userIdLoading = $state(true);
-  let apiUserLoading = $state(loadApiUser);
+  let apiUserLoading = $state(true);
+  let userIdLoading = $state(false);
   let fullUserLoading = $state(loadFullUser);
-
-  let apiUserLoader = $state();
 
   $effect(() => {
     loading = userIdLoading || apiUserLoading || fullUserLoading;
   });
-
-  export async function createGuestUser() {
-    await apiUserLoader.createGuestUser();
-  }
 </script>
 
-<UserIdLoader bind:loading={userIdLoading} {setError} />
+{#if loadApiUser && !apiUser}
+  <ApiUserLoader bind:apiUser bind:loading={apiUserLoading} />
+{/if}
 
-{#if !userIdLoading && loadApiUser && !apiUser}
-  <ApiUserLoader
-    bind:this={apiUserLoader}
-    bind:apiUser
-    bind:loading={apiUserLoading}
-  />
+{#if loadApiUser && !apiUserLoading}
+  <UserIdLoader bind:loading={userIdLoading} {setError} />
 {/if}
 
 {#if !userIdLoading && apiUser && !fullUser}

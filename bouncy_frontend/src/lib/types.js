@@ -124,6 +124,8 @@
  * @property {FullUser} [fullUser] -- this is a fully onboarded user with a Keycloak entry and a PeerTube account
  * @property {UserAuthState} authState
  * @property {()=>void} logout
+ * @property {()=>Promise<ApiUser|undefined>} maybeLoadApiUser
+ * @property {()=>Promise<void>} createGuestUser
  *
  * @typedef {Object} FullUser
  * @property {PwaAuth} pwaAuth,

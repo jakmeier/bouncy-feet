@@ -8,24 +8,21 @@
   import { ONBOARDING_STATE, register } from '$lib/onboarding';
   import LoginRequiredContent from '$lib/components/profile/LoginRequiredContent.svelte';
   import NightSection from '$lib/components/ui/sections/NightSection.svelte';
+  import { getUserContext } from '$lib/stores/context';
 
   //   function goToWarmup() {
   //     apiUser.setUserMeta('onboarding', ONBOARDING_STATE.STARTED_FIRST_WARMUP);
   //     goto('firstCourse');
   //   }
 
-  /**
-   * @typedef {Object} Props
-   * @property {()=>void} createGuest
-   */
-
-  /** @type {Props} */
-  let { createGuest } = $props();
+  /** @type {UserContextData} */
+  const userCtx = getUserContext();
 
   let showTitle = $state(false);
-  let showQuestion = $state(false);
-  let showQuestionButtons = $state(false);
-  let showLogo = $state(false);
+  let showText = $state(false);
+  let showButtons = $state(false);
+
+  let showQuestion = $state(true);
   let showFirstVisit = $state(false);
   let showReturningVisitor = $state(false);
   let showLogin = $state(false);
@@ -41,38 +38,44 @@
     }, 1000);
 
     setTimeout(() => {
-      showQuestion = true;
+      showText = true;
     }, 2000);
 
     setTimeout(() => {
-      showQuestionButtons = true;
+      showButtons = true;
     }, 2900);
   }
 
   function toFirstVisit() {
     showQuestion = false;
-    showQuestionButtons = false;
-
-    setTimeout(() => {
-      showLogo = true;
-    }, 1000);
+    showText = false;
+    showButtons = false;
 
     setTimeout(() => {
       showFirstVisit = true;
+    }, 500);
+    setTimeout(() => {
+      showTitle = true;
+    }, 1000);
+    setTimeout(() => {
+      showText = true;
     }, 2000);
   }
 
   function toReturningVisitor() {
     showQuestion = false;
-    showQuestionButtons = false;
-
-    setTimeout(() => {
-      showLogo = true;
-    }, 1000);
+    showText = false;
+    showButtons = false;
 
     setTimeout(() => {
       showReturningVisitor = true;
-    }, 2000);
+    }, 1000);
+  }
+
+  function showButtonsDelayed() {
+    setTimeout(() => {
+      showButtons = true;
+    }, 500);
   }
 
   function toLogin() {
@@ -85,39 +88,41 @@
 </script>
 
 <div class="wrapper">
-  {#if showTitle}
-    <div class="text">
-      <h1 in:slide|fade out:fade onintroend={moreText}>
-        {$t('home.first-visit-0')}
-      </h1>
-    </div>
-  {/if}
   {#if showQuestion}
-    <div class="text">
-      <h1 in:slide|fade out:fade>
-        {$t('home.first-visit-question')}
-      </h1>
-      {#if showQuestionButtons}
-        <div class="buttons">
-          <button
-            class="full-width"
-            in:slide|fade
-            out:fade
-            onclick={toFirstVisit}
-          >
-            {$t('home.first-visit-button')}
-          </button>
-          <button
-            class="full-width"
-            in:slide|fade
-            out:fade
-            onclick={toReturningVisitor}
-          >
-            {$t('home.not-first-visit-button')}
-          </button>
-        </div>
-      {/if}
-    </div>
+    {#if showTitle}
+      <div class="text">
+        <h1 in:slide|fade out:fade onintroend={moreText}>
+          {$t('home.first-visit-0')}
+        </h1>
+      </div>
+    {/if}
+    {#if showText}
+      <div class="text">
+        <h1 in:slide|fade out:fade>
+          {$t('home.first-visit-question')}
+        </h1>
+        {#if showButtons}
+          <div class="buttons">
+            <button
+              class="full-width"
+              in:slide|fade
+              out:fade
+              onclick={toFirstVisit}
+            >
+              {$t('home.first-visit-button')}
+            </button>
+            <button
+              class="full-width"
+              in:slide|fade
+              out:fade
+              onclick={toReturningVisitor}
+            >
+              {$t('home.not-first-visit-button')}
+            </button>
+          </div>
+        {/if}
+      </div>
+    {/if}
   {/if}
 
   {#if showReturningVisitor}
@@ -148,7 +153,7 @@
         </p>
 
         <div class="buttons">
-          <button class="full-width" onclick={createGuest}>
+          <button class="full-width" onclick={userCtx.createGuestUser}>
             {$t('profile.button-create-guest')}
           </button>
 
@@ -172,9 +177,37 @@
   {/if}
 
   {#if showFirstVisit}
-    TODO: you may create a login or continue as guest and create a login later.
-    You can only access the guest account on this device and it can't be
-    recovered if you lost access to this device.
+    <NightSection>
+      <div transition:slide={{ duration: 500 }}>
+        <LogoHeader />
+      </div>
+
+      <div class="text">
+        {#if showTitle}
+          <h1 in:slide|fade out:fade>Welcome</h1>
+        {/if}
+        {#if showText}
+          <p in:fade out:fade>{$t('home.first-visit-welcome')}</p>
+          <p in:fade out:fade onintroend={showButtonsDelayed}>
+            {$t('home.first-visit-description')}
+          </p>
+        {/if}
+        {#if showButtons}
+          <div class="buttons" transition:fade>
+            <button class="full-width" onclick={userCtx.createGuestUser}>
+              {$t('profile.button-create-guest')}
+            </button>
+
+            <button class="full-width" onclick={register}>
+              {$t('profile.button-register')}
+            </button>
+          </div>
+        {/if}
+      </div>
+      <div class="fixed-footer" transition:slide={{ duration: 500 }}>
+        <Footer white />
+      </div>
+    </NightSection>
   {/if}
 
   {#if showLogin}
@@ -187,6 +220,16 @@
 </div>
 
 <style>
+  @keyframes intro-animation {
+    0% {
+      visibility: hidden;
+      height: 0%;
+    }
+    100% {
+      height: 100%;
+      visibility: visible;
+    }
+  }
   .wrapper {
     position: relative;
     height: 100dvh;
@@ -200,11 +243,12 @@
     justify-content: center;
     align-items: center;
     text-align: center;
+    /* animation: intro-animation 500ms; */
   }
 
-  .footer {
-    /* position: absolute; */
-    /* bottom: 1rem; */
-    /* z-index: -1; */
+  .fixed-footer {
+    position: absolute;
+    bottom: 1rem;
+    z-index: -1;
   }
 </style>

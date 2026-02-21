@@ -21,8 +21,10 @@
   async function refreshUserId() {
     let apiResponse;
     if (!userCtx.apiUser) {
+      // may work with an active session for non-guest users
       apiResponse = await apiRequest('/user');
     } else {
+      // works for guest and non-guest users
       apiResponse = await userCtx.apiUser.authenticatedGet('/user');
     }
 

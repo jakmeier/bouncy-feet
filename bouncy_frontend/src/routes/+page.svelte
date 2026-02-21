@@ -17,8 +17,6 @@
   const userCtx = getUserContext();
 
   let loading = $state(true);
-  /** @type {UserLoader} */
-  let loader = $state();
 
   // (mockup) learn today step
   const featuredSteps = data
@@ -36,11 +34,10 @@
   }
 </script>
 
-<UserLoader bind:this={loader} bind:loading {setError} />
+<UserLoader bind:loading loadApiUser {setError} />
 
 {#if !loading && userCtx.authState === USER_AUH_STATE.Anonymous}
-  <!-- TODO: does createGuest user work like this? -->
-  <FirstVisit createGuest={loader.createGuestUser} />
+  <FirstVisit />
 {:else}
   <HomeFeed featuredDances={data.officialDances} {featuredSteps} />
 {/if}
