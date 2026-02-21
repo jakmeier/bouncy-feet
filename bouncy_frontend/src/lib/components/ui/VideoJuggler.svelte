@@ -39,14 +39,14 @@
 
     const prevIdx = (currentIndex + videos.length - 1) % videos.length;
     const nextIdx = (currentIndex + 1) % videos.length;
-    if (prevIdx !== currentIndex && videos[prevIdx].player) {
+    if (prevIdx !== currentIndex && videoPlayers[prevIdx].player) {
       videoPlayers[prevIdx].player.pause();
       videoPlayers[prevIdx].player.removeEventListener(
         'playbackStatusUpdate',
         nextOnEnded
       );
     }
-    if (nextIdx !== currentIndex && videos[nextIdx].player) {
+    if (nextIdx !== currentIndex && videoPlayers[nextIdx].player) {
       videoPlayers[nextIdx].player.pause();
       videoPlayers[nextIdx].player.removeEventListener(
         'playbackStatusUpdate',
