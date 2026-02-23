@@ -34,7 +34,7 @@
   }
 </script>
 
-<UserLoader bind:loading loadApiUser {setError} />
+<UserLoader bind:loading {setError} />
 
 {#if !loading && userCtx.authState === USER_AUH_STATE.Anonymous}
   <FirstVisit />

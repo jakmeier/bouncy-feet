@@ -1,4 +1,7 @@
 <script>
+  /// Load `openid` and `apiId` of the user from the backend if it has not been
+  /// set, yet.
+
   import { onMount } from 'svelte';
   import { apiRequest } from '$lib/stats';
   import { getUserContext } from '$lib/stores/context';

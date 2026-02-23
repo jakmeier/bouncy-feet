@@ -4,6 +4,7 @@
   import { USER_AUH_STATE } from '$lib/enum_types';
   import { asset } from '$app/paths';
   import { register } from '$lib/onboarding';
+  import { getUserContext } from '$lib/stores/context';
 
   /**
    * `RequiresLogin` is shown when the user needs to take an action to register,
@@ -23,18 +24,14 @@
    * @property {UserAuthState} authState
    * @property {boolean} guestAllowed
    * @property {boolean} prefersFullUserView
-   * @property {()=>void} requestNewGuestSession
    */
 
   /** @type {Props} */
-  let {
-    reason,
-    username,
-    authState,
-    guestAllowed,
-    prefersFullUserView,
-    requestNewGuestSession,
-  } = $props();
+  let { reason, username, authState, guestAllowed, prefersFullUserView } =
+    $props();
+
+  /** @type {UserContextData} */
+  const userCtx = getUserContext();
 
   /** @type {string[]} */
   const displayedText = $derived.by(() => {
@@ -95,7 +92,7 @@
         return;
       }
     }
-    requestNewGuestSession();
+    userCtx.createGuestUser();
   }
 </script>
 

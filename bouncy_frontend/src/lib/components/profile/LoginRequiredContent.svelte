@@ -46,7 +46,6 @@
   let apiUser = $state();
   /** @type {FullUser|undefined} apiUser */
   let fullUser = $state();
-  let apiUserLoader = $state();
 
   // While trying to establish the required auth state automatically, a loading
   // animation is shown. Once that's done, successful or not, `loading` is set to false.
@@ -110,7 +109,6 @@
   bind:apiUser
   bind:fullUser
   bind:loading
-  loadApiUser
   loadFullUser={!!(fullUserContent || maybeFullUserContent)}
   {setError}
 />
@@ -152,7 +150,6 @@
           authState={userCtx.authState}
           {guestAllowed}
           {prefersFullUserView}
-          requestNewGuestSession={apiUserLoader.createGuestUser}
           {reason}
         />
       {/if}

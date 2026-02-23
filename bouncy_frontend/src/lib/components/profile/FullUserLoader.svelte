@@ -34,19 +34,20 @@
     return userCtx.fullUser;
   }
 
-  onMount(async () => {
-    fullUser = await ensureFullUser();
-    // TODO
-    // clearErrors();
-    const _token = await fullUser.peerTubeToken();
-    // // TODO: prevent this from firing too often
-    // if (!fullUser.isLoggedInToApi()) {
-    //   try {
-    //     const _token = await fullUser.peerTubeToken();
-    //   } catch (e) {
-    //     console.debug('failed to refresh PeerTube token', e);
-    //   }
-    // }
+  onMount(() => {
+    ensureFullUser().then((fullUser) => {
+      // TODO
+      // clearErrors();
+      const _token = fullUser.peerTubeToken();
+      // // TODO: prevent this from firing too often
+      // if (!fullUser.isLoggedInToApi()) {
+      //   try {
+      //     const _token = await fullUser.peerTubeToken();
+      //   } catch (e) {
+      //     console.debug('failed to refresh PeerTube token', e);
+      //   }
+      // }
+    });
 
     loading = false;
   });

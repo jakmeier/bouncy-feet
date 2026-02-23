@@ -18,28 +18,25 @@
     apiUser = $bindable(),
     fullUser = $bindable(),
     loading = $bindable(true),
-    loadApiUser = false,
     loadFullUser = false,
     setError,
   } = $props();
 
   let apiUserLoading = $state(true);
-  let userIdLoading = $state(false);
+  let userIdLoading = $state(true);
   let fullUserLoading = $state(loadFullUser);
 
   $effect(() => {
-    loading = userIdLoading || apiUserLoading || fullUserLoading;
+    loading = userIdLoading || apiUserLoading || (apiUser && fullUserLoading);
   });
 </script>
 
-{#if loadApiUser && !apiUser}
-  <ApiUserLoader bind:apiUser bind:loading={apiUserLoading} />
-{/if}
+<ApiUserLoader bind:apiUser bind:loading={apiUserLoading} />
 
-{#if loadApiUser && !apiUserLoading}
+{#if !apiUserLoading}
   <UserIdLoader bind:loading={userIdLoading} {setError} />
 {/if}
 
-{#if !userIdLoading && apiUser && !fullUser}
+{#if apiUser && loadFullUser}
   <FullUserLoader bind:fullUser bind:loading={fullUserLoading} {apiUser} />
 {/if}
