@@ -344,6 +344,9 @@
         "waiting-for-login-info": "Checking your login info...",
         "my-combos-title": "My Combos",
         "combos-title": "Combos",
+        "guest-mode-title": "Guest mode",
+        "guest-mode-text1": "You are not currently logged in.",
+        "guest-mode-text2": "Log in or create a new account to access all features.",
         "combo": {
             "create-title": "New Combo",
             "edit-title": "Edit Combo",

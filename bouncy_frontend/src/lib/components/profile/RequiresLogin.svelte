@@ -3,7 +3,7 @@
   import { PUBLIC_API_BASE } from '$env/static/public';
   import { USER_AUH_STATE } from '$lib/enum_types';
   import { asset } from '$app/paths';
-  import { register } from '$lib/onboarding';
+  import { login, register } from '$lib/onboarding';
   import { getUserContext } from '$lib/stores/context';
 
   /**
@@ -68,16 +68,6 @@
 
     return out;
   });
-
-  function login() {
-    // redirect to backend login
-    const currentUrl = window.location.href;
-    window.location.assign(
-      PUBLIC_API_BASE +
-        '/login?redirect_back_to=' +
-        encodeURIComponent(currentUrl)
-    );
-  }
 
   function goBack() {
     history.back();

@@ -22,6 +22,7 @@
   import ActorAvatar from '$lib/components/profile/ActorAvatar.svelte';
   import UserCombos from '$lib/components/user/UserCombos.svelte';
   import { getUserContext } from '$lib/stores/context';
+  import { login, register } from '$lib/onboarding';
 
   /** @type {UserContextData} */
   const userCtx = getUserContext();
@@ -176,7 +177,22 @@
         <Footer white />
       </NightSection>
     {:else}
-      <!-- TODO: Log in / refresh session to show more -->
+      <!-- Guest mode or session inactive -->
+      <LimeSection>
+        <h1>{$t('profile.guest-mode-title')}</h1>
+        <p>{$t('profile.guest-mode-text1')}</p>
+        <p>{$t('profile.guest-mode-text2')}</p>
+        <div class="buttons">
+          <button class="full-width" onclick={login}>
+            {$t('profile.button-login')}
+          </button>
+
+          <button class="full-width" onclick={register}>
+            {$t('profile.button-register')}
+          </button>
+        </div>
+        <Footer />
+      </LimeSection>
     {/if}
   {/snippet}
 </LoginRequiredContent>

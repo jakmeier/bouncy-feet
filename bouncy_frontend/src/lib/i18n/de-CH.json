@@ -344,6 +344,9 @@
         "waiting-for-login-info": "Prüfe deine Logindaten...",
         "my-combos-title": "Meine Combos",
         "combos-title": "Combos",
+        "guest-mode-title": "Gastmodus",
+        "guest-mode-text1": "Du bist nicht eingeloggt-",
+        "guest-mode-text2": "Logge dich ein oder erstelle deinen Account um alle Features zu nutzen.",
         "combo": {
             "create-title": "Neue Combo",
             "edit-title": "Bearbeite Combo",

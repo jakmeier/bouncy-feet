@@ -33,3 +33,13 @@ export function register() {
         encodeURIComponent(currentUrl)
     );
 }
+
+export function login() {
+    // redirect to backend login
+    const currentUrl = window.location.href;
+    window.location.assign(
+        PUBLIC_API_BASE +
+        '/login?redirect_back_to=' +
+        encodeURIComponent(currentUrl)
+    );
+}
