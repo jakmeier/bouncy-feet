@@ -235,6 +235,9 @@
             "ankle": "Ankle",
             "heel": "Heel",
             "toes": "Toes"
+        },
+        "video": {
+            "detect-bpm-button": "Detect beat"
         }
     },
     "record": {

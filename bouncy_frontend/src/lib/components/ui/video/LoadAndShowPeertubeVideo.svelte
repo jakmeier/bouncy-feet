@@ -4,8 +4,6 @@
   import VideoLoader from './VideoLoader.svelte';
   import VideoMarkerLoader from './VideoMarkerLoader.svelte';
 
-  /** @type {api.Video | undefined}*/
-  let video = $state();
   /** @type {PeertubeVideoPlayer | undefined}*/
   let player = $state();
   /** @type {VideoMarker[] | undefined} */
@@ -19,10 +17,11 @@
    * @property {"inline"|"external"} [timeline]
    * @property {number} [comboId]
    * @property {ApiUser} [apiUser]
+   * @property {api.VideoDetails | undefined} [video]
    */
 
   /** @type {Props}*/
-  let { videoId, timeline, comboId, apiUser } = $props();
+  let { videoId, timeline, comboId, apiUser, video = $bindable() } = $props();
 
   /** @returns {Promise<number>} seconds */
   export async function getCurrentTime() {

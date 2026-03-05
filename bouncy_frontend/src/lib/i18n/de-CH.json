@@ -235,6 +235,9 @@
             "ankle": "Knöchel",
             "heel": "Ferse",
             "toes": "Zehen"
+        },
+        "video": {
+            "detect-bpm-button": "Detect beat"
         }
     },
     "record": {

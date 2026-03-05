@@ -1,4 +1,6 @@
 <script>
+  import * as api from '$lib/peertube-openapi';
+  import { goto } from '$app/navigation';
   import { page } from '$app/state';
   import ComboForm from '$lib/components/combo/ComboForm.svelte';
   import LoginRequiredContent from '$lib/components/profile/LoginRequiredContent.svelte';
@@ -6,6 +8,7 @@
   import LimeSection from '$lib/components/ui/sections/LimeSection.svelte';
   import LoadAndShowPeertubeVideo from '$lib/components/ui/video/LoadAndShowPeertubeVideo.svelte';
   import { t } from '$lib/i18n';
+  import { detectBpm } from '$lib/bounce_listener';
 
   /** @type {import('./$types').PageProps} */
   let { data } = $props();
@@ -16,6 +19,8 @@
   let details = $state(deserializeFromQuery(page.url.search));
   /** @type {LoadAndShowPeertubeVideo | undefined} */
   let player = $state();
+  /** @type {api.VideoDetails | undefined}*/
+  let video = $state();
 
   /**
    * @param {string} queryString
@@ -54,7 +59,7 @@
   /** @param {ApiUser} apiUser */
   async function saveAndLeave(apiUser) {
     await saveCombo(apiUser);
-    history.back();
+    goto('../../..', { replaceState: true });
   }
 
   /** @param {ApiUser} apiUser */
@@ -70,6 +75,32 @@
       );
     }
   }
+
+  async function startBpmAnalysis() {
+    if (!video) {
+      console.warn('no video loaded, cannot run BPM detection');
+      return;
+    }
+
+    const bpmResult = await detectBpm(video);
+
+    if (bpmResult) {
+      // TODO: give a visual preview of the detected beat
+      // for now: iterate through beats and show them on the video
+      console.log(bpmResult?.bpm, 'BPM');
+      console.log('subbeats are at');
+      const numSubbeats = (((video.duration || 0) * 1000) / bpmResult.ms) * 2;
+      for (var i = 0; i < numSubbeats; i++) {
+        const ms = bpmResult?.offset + (i * bpmResult.ms) / 2;
+        console.log(ms, 'ms');
+        await player?.seek(ms / 1000);
+        await new Promise((r) => setTimeout(r, 1000));
+      }
+
+      // TODO: on accept => store timestamps online
+      // (add more detailed features later)
+    }
+  }
 </script>
 
 <LoginRequiredContent>
@@ -80,6 +111,7 @@
       <div class="video">
         <LoadAndShowPeertubeVideo
           bind:this={player}
+          bind:video
           videoId={details.video_short_uuid}
           timeline="external"
           {apiUser}
@@ -89,6 +121,10 @@
 
       <button class="full-width action" onclick={() => addTimestamp(apiUser)}>
         {$t('profile.combo.add-timestamp-button')}
+      </button>
+
+      <button class="full-width action" onclick={startBpmAnalysis}>
+        {$t('editor.video.detect-bpm-button')}
       </button>
 
       <div class="form">
