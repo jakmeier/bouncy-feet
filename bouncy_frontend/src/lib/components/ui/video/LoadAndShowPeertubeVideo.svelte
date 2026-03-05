@@ -4,13 +4,6 @@
   import VideoLoader from './VideoLoader.svelte';
   import VideoMarkerLoader from './VideoMarkerLoader.svelte';
 
-  /** @type {PeertubeVideoPlayer | undefined}*/
-  let player = $state();
-  /** @type {VideoMarker[] | undefined} */
-  let markers = $state();
-  /** @type {number[] | undefined} */
-  let beats = $state();
-
   /**
    * @typedef {Object} Props
    * @prop {number|string} videoId
@@ -18,10 +11,47 @@
    * @property {number} [comboId]
    * @property {ApiUser} [apiUser]
    * @property {api.VideoDetails | undefined} [video]
+   * @property {VideoMarker[]} [extraMarkers] -- added to those loaded externally
    */
 
   /** @type {Props}*/
-  let { videoId, timeline, comboId, apiUser, video = $bindable() } = $props();
+  let {
+    videoId,
+    timeline,
+    comboId,
+    apiUser,
+    video = $bindable(),
+    extraMarkers,
+  } = $props();
+
+  /** @type {PeertubeVideoPlayer | undefined}*/
+  let player = $state();
+  /** @type {VideoMarker[] | undefined} */
+  let rawMarkers = $state(extraMarkers);
+
+  /** @type {VideoMarker[] | undefined} */
+  const instantMarkers = $derived(
+    // TODO: make custom timestamps useful, with icons etc
+    rawMarkers?.filter((m) => !m.duration)
+  );
+
+  /** @type {number[] | undefined} */
+  const beats = $derived(
+    // for now, the only markers with duration are beats - later maybe also step ranges etc
+    rawMarkers?.flatMap((marker) => {
+      const markerBeats = [];
+      if (marker.duration && marker.interval) {
+        for (
+          var t = 0;
+          t < marker.duration && markerBeats.length < 10_000;
+          t += marker.interval
+        ) {
+          markerBeats.push(marker.time + t);
+        }
+      }
+      return markerBeats;
+    })
+  );
 
   /** @returns {Promise<number>} seconds */
   export async function getCurrentTime() {
@@ -38,8 +68,7 @@
 
   /** @arg {VideoMarker[]} loadedMarkers */
   function markersLoaded(loadedMarkers) {
-    markers = loadedMarkers;
-    beats = loadedMarkers.map((marker) => marker.time);
+    rawMarkers = [...(extraMarkers || []), ...loadedMarkers];
   }
 </script>
 
@@ -52,7 +81,7 @@
       videoId={video.shortUUID}
       aspectRatio={video.aspectRatio || 1}
       {timeline}
-      {markers}
+      markers={rawMarkers}
       {beats}
     />
   </div>
@@ -60,7 +89,7 @@
   Video missing shortUuid
 {/if}
 
-{#if markers === undefined && comboId && apiUser}
+{#if rawMarkers === undefined && comboId && apiUser}
   <VideoMarkerLoader {comboId} {apiUser} onLoaded={markersLoaded}
   ></VideoMarkerLoader>
 {/if}

@@ -21,6 +21,8 @@
   let player = $state();
   /** @type {api.VideoDetails | undefined}*/
   let video = $state();
+  /** @type {VideoMarker[]} */
+  const tempMarkers = $state([]);
 
   /**
    * @param {string} queryString
@@ -83,22 +85,18 @@
     }
 
     const bpmResult = await detectBpm(video);
-
     if (bpmResult) {
-      // TODO: give a visual preview of the detected beat
-      // for now: iterate through beats and show them on the video
-      console.log(bpmResult?.bpm, 'BPM');
-      console.log('subbeats are at');
-      const numSubbeats = (((video.duration || 0) * 1000) / bpmResult.ms) * 2;
-      for (var i = 0; i < numSubbeats; i++) {
-        const ms = bpmResult?.offset + (i * bpmResult.ms) / 2;
-        console.log(ms, 'ms');
-        await player?.seek(ms / 1000);
-        await new Promise((r) => setTimeout(r, 1000));
-      }
+      tempMarkers.push({
+        time: bpmResult.offset,
+        duration: (video.duration || 30) * 1000 - bpmResult.offset,
+        interval: bpmResult.ms,
+        icon: '',
+        label: '',
+      });
 
+      // TODO: show detected BPM value to user somewhere and store it as meta data, too
+      // TODO: allow editing, such as changing bpm + offset
       // TODO: on accept => store timestamps online
-      // (add more detailed features later)
     }
   }
 </script>
@@ -116,12 +114,14 @@
           timeline="external"
           {apiUser}
           {comboId}
+          extraMarkers={tempMarkers}
         />
       </div>
 
-      <button class="full-width action" onclick={() => addTimestamp(apiUser)}>
+      <!-- TODO: make this more useful -->
+      <!-- <button class="full-width action" onclick={() => addTimestamp(apiUser)}>
         {$t('profile.combo.add-timestamp-button')}
-      </button>
+      </button> -->
 
       <button class="full-width action" onclick={startBpmAnalysis}>
         {$t('editor.video.detect-bpm-button')}

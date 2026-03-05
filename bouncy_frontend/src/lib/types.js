@@ -254,7 +254,9 @@
  *  @property {String} [video_short_uuid]
  *
  * @typedef {Object} VideoMarker
- *  @property {number} time
+ *  @property {number} time -- start in ms
+ *  @property {number} [duration] -- duration in ms
+ *  @property {number} [interval] -- duration between two marked beats or subbeats
  *  @property {string} label
  *  @property {string} icon
  *
