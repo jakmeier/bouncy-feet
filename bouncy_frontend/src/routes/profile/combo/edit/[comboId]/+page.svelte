@@ -89,7 +89,7 @@
       tempMarkers.push({
         time: bpmResult.offset,
         duration: (video.duration || 30) * 1000 - bpmResult.offset,
-        interval: bpmResult.ms,
+        interval: bpmResult.ms / 2, // also mark subbeat
         icon: '',
         label: '',
       });
@@ -111,7 +111,7 @@
           bind:this={player}
           bind:video
           videoId={details.video_short_uuid}
-          timeline="external"
+          timeline={{ position: 'external', beatCounts: true }}
           {apiUser}
           {comboId}
           extraMarkers={tempMarkers}

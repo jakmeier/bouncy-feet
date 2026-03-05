@@ -263,4 +263,7 @@
  * @typedef {Object} ComboTimestampInfos
  *  @property {number[]} ms
  *
+ * @typedef {Object} VideoTimelineConfig
+ * @property {"inline"|"external"} position
+ * @property {boolean} [beatCounts]
  */

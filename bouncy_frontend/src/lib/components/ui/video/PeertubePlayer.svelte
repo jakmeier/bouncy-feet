@@ -1,5 +1,5 @@
 <script>
-  import { asset, base } from '$app/paths';
+  import { asset } from '$app/paths';
   import { onMount } from 'svelte';
   import { getUserContext } from '$lib/stores/context';
 
@@ -11,7 +11,7 @@
    * @property {number[]} [beats] - Array of beat timestamps in ms
    * @property {Marker[]} [markers] - Array of markers to show on the timeline
    * @property {boolean} [muted]
-   * @property {"inline"|"external"} [timeline]
+   * @property {VideoTimelineConfig} [timeline]
    */
 
   /** @type Props */
@@ -177,18 +177,28 @@
   {#if !isPlaying}
     <div class="overlay-controls">
       <button class="play-button" onclick={togglePlay}>
-        <img src="{base}/img/symbols/bf_play.svg" alt="bf_eye" />
+        <img src={asset('/img/symbols/bf_play.svg')} alt="bf_eye" />
       </button>
     </div>
   {/if}
 </div>
 
-{#if timeline}
+{#if timeline?.beatCounts && duration > 0}
+  <div class="counts-bar">
+    {#each beats as t, i}
+      <div class="beat-count" style="left: {(t / 1000 / duration) * 100}%">
+        {i % 2 ? `${(i + 1) / 2}` : '+'}
+      </div>
+    {/each}
+  </div>
+{/if}
+
+{#if timeline && duration > 0}
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
-    class:external_timeline={timeline === 'external'}
-    class:inlined_timeline={timeline === 'inline'}
+    class:external_timeline={timeline.position === 'external'}
+    class:inlined_timeline={timeline.position === 'inline'}
     onclick={(e) => {
       const rect = e.currentTarget.getBoundingClientRect();
       const percent = (e.clientX - rect.left) / rect.width;
@@ -299,6 +309,17 @@
 
   .beat-marker:nth-child(odd) {
     height: 50%;
+  }
+
+  .counts-bar {
+    position: relative;
+    height: 1rem;
+    margin-top: 1.125rem;
+    overflow: hidden;
+  }
+  .beat-count {
+    position: absolute;
+    font-size: var(--font-small);
   }
 
   .icon {

@@ -11,7 +11,7 @@
    * @property {number[]} [beats] - Array of beat timestamps in ms
    * @property {VideoMarker[]} [markers] - Array of markers to show on the timeline
    * @property {boolean} [muted]
-   * @property {"inline"|"external"} [timeline]
+   * @property {VideoTimelineConfig} [timeline]
    * @property {boolean} [isPrivate]
    * @property {number} [delayLoadingMs]
    */

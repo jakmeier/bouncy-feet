@@ -58,7 +58,11 @@
     </div>
 
     <div class="video">
-      <PeertubeVideoPlayer {videoId} {aspectRatio} timeline="inline" />
+      <PeertubeVideoPlayer
+        {videoId}
+        {aspectRatio}
+        timeline={{ position: 'inline' }}
+      />
     </div>
   </div>
 {/if}

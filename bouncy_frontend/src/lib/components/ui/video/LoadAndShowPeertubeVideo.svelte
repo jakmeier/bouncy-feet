@@ -7,7 +7,7 @@
   /**
    * @typedef {Object} Props
    * @prop {number|string} videoId
-   * @property {"inline"|"external"} [timeline]
+   * @property {VideoTimelineConfig} [timeline]
    * @property {number} [comboId]
    * @property {ApiUser} [apiUser]
    * @property {api.VideoDetails | undefined} [video]
