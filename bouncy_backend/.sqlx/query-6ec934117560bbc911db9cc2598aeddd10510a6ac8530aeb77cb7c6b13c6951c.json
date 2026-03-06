@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM video_beats t WHERE t.id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "6ec934117560bbc911db9cc2598aeddd10510a6ac8530aeb77cb7c6b13c6951c"
+}

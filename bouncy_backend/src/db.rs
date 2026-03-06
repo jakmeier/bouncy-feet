@@ -1,3 +1,4 @@
+pub(crate) mod beat;
 pub(crate) mod client_session;
 pub(crate) mod club;
 pub(crate) mod combo;

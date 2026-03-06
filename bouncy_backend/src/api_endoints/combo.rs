@@ -5,6 +5,7 @@ use axum::{
 };
 
 use crate::{
+    beat::{Beat, BeatId},
     combo::{Combo, ComboId},
     timestamp::{Timestamp, TimestampId},
     user::{User, UserId},
@@ -45,6 +46,21 @@ pub(crate) struct ComboTimestampInfos {
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
 pub(crate) struct ComboTimestampInfo {
     pub ms: i32,
+}
+
+#[derive(Clone, Debug, serde::Deserialize)]
+pub(crate) struct NewBeatInfo {
+    pub start: i32,
+    pub duration: i32,
+    pub bpm: f32,
+}
+
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
+pub(crate) struct BeatInfo {
+    pub id: BeatId,
+    pub start: i32,
+    pub duration: i32,
+    pub bpm: f32,
 }
 
 impl UserId {
@@ -186,6 +202,87 @@ pub async fn delete_combo_timestamp(
     Ok(())
 }
 
+pub async fn combo_beats(
+    Extension(user): Extension<User>,
+    State(state): State<AppState>,
+    Path(combo_id): Path<ComboId>,
+) -> JsonResponse<Vec<BeatInfo>> {
+    // TODO: public combos should be visible without login
+    assert_owns_combo(&state, user.id, combo_id).await?;
+
+    let result = Beat::list_by_combo(&state, combo_id).await;
+
+    let Ok(beats) = result else {
+        let err = result.unwrap_err();
+        tracing::error!(?err, ?combo_id, "Failed fetching combo beats");
+        return Err((
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Failed fetching combo beats",
+        ));
+    };
+
+    Ok(Json(
+        beats
+            .into_iter()
+            .map(|beat| BeatInfo {
+                id: beat.id,
+                start: beat.start,
+                duration: beat.duration,
+                bpm: beat.bpm,
+            })
+            .collect(),
+    ))
+}
+
+pub async fn add_combo_beat(
+    Extension(user): Extension<User>,
+    State(state): State<AppState>,
+    Path(combo_id): Path<ComboId>,
+    Json(payload): Json<NewBeatInfo>,
+) -> JsonResponse<BeatId> {
+    assert_owns_combo(&state, user.id, combo_id).await?;
+
+    let result = Beat::create_for_combo(
+        &state,
+        combo_id,
+        payload.start,
+        payload.duration,
+        payload.bpm,
+    )
+    .await;
+
+    if let Err(err) = result {
+        tracing::error!(?err, "Failed creating beat for combo");
+        return Err((
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Failed creating beat for combo",
+        ))?;
+    };
+
+    Ok(Json(result.unwrap().id))
+}
+
+pub async fn delete_combo_beat(
+    Extension(user): Extension<User>,
+    State(state): State<AppState>,
+    Path((combo_id, beat_id)): Path<(ComboId, BeatId)>,
+) -> axum::response::Result<()> {
+    assert_owns_combo(&state, user.id, combo_id).await?;
+    assert_beat_belongs_to_combo(&state, combo_id, beat_id).await?;
+
+    let result = Beat::delete(&state, beat_id).await;
+
+    if let Err(err) = result {
+        tracing::error!(?err, "Failed deleting beat for combo");
+        return Err((
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Failed creating beat for combo",
+        ))?;
+    };
+
+    Ok(())
+}
+
 async fn assert_owns_combo(
     state: &AppState,
     user_id: UserId,
@@ -212,6 +309,31 @@ async fn assert_ts_belongs_to_combo(
     timestamp_id: TimestampId,
 ) -> Result<(), (StatusCode, &'static str)> {
     let result = Timestamp::combo_of_timestamp(state, timestamp_id).await;
+    match result {
+        Ok(Some(c)) => {
+            if c.num() == combo_id.num() {
+                Ok(())
+            } else {
+                Err((StatusCode::NOT_FOUND, "combo not found for user"))
+            }
+        }
+        Ok(None) => Err((StatusCode::NOT_FOUND, "combo not found for user")),
+        Err(err) => {
+            tracing::error!(?err, "Failed looking up combo ownership");
+            Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed looking up combo ownership",
+            ))
+        }
+    }
+}
+
+async fn assert_beat_belongs_to_combo(
+    state: &AppState,
+    combo_id: ComboId,
+    beat_id: BeatId,
+) -> Result<(), (StatusCode, &'static str)> {
+    let result = Beat::combo_of_beat(state, beat_id).await;
     match result {
         Ok(Some(c)) => {
             if c.num() == combo_id.num() {

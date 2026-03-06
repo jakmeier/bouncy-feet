@@ -1,5 +1,6 @@
 use crate::{
     api_endoints::combo::ComboInfo,
+    beat::BeatId,
     timestamp::TimestampId,
     user::{User, UserId},
     AppState,
@@ -223,6 +224,29 @@ impl crate::db::timestamp::Timestamp {
             WHERE t.id = $1
             "#,
             timestamp_id.num()
+        )
+        .fetch_optional(&state.pg_db_pool)
+        .await?;
+
+        let id = rows.map(ComboId);
+        Ok(id)
+    }
+}
+
+impl crate::db::beat::Beat {
+    pub async fn combo_of_beat(
+        state: &AppState,
+        beat_id: BeatId,
+    ) -> Result<Option<ComboId>, sqlx::Error> {
+        let rows = sqlx::query_scalar!(
+            r#"
+            SELECT
+                cb.combo_id
+            FROM video_timestamps t
+                JOIN combos_video_beats cb ON cb.video_beat_id = t.id
+            WHERE t.id = $1
+            "#,
+            beat_id.num()
         )
         .fetch_optional(&state.pg_db_pool)
         .await?;
