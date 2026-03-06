@@ -4,23 +4,34 @@
    * @property {boolean} [isOn]
    * @property {boolean} [border]
    * @property {string} [name]
+   * @property {(newVal: boolean)=>void} [onInput]
    */
 
   /** @type {Props} */
-  let { isOn = $bindable(false), border = false, name } = $props();
+  let {
+    isOn = $bindable(false),
+    border = false,
+    name,
+    onInput = () => {},
+  } = $props();
 
   /** @param {{ key: string; preventDefault: () => void; }} event */
   function handleKeydown(event) {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
-      isOn = !isOn;
+      toggle();
     }
+  }
+
+  function toggle() {
+    isOn = !isOn;
+    onInput(isOn);
   }
 </script>
 
 <div
   class="toggle {isOn ? 'on' : ''} {border ? 'border' : ''}"
-  onclick={() => (isOn = !isOn)}
+  onclick={toggle}
   onkeydown={handleKeydown}
   role="switch"
   aria-checked={isOn}

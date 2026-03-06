@@ -237,7 +237,10 @@
             "toes": "Zehen"
         },
         "video": {
-            "detect-bpm-button": "Detect beat"
+            "detect-bpm-button": "Beat erkennen",
+            "music-bpm": "BPM",
+            "half-speed": "Halbe Geschwindigkeit",
+            "beat-offset": "Erster Beat"
         }
     },
     "record": {

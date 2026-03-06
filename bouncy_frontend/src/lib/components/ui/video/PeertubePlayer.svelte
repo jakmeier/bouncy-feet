@@ -35,6 +35,9 @@
   let iframe = $state();
   let player = $state();
 
+  const spm = $derived(timeline?.subbeat_per_move || 1);
+  const markersPerCount = $derived(spm === 1 ? 2 : 1);
+
   export function play() {
     if (player) {
       player.play();
@@ -193,7 +196,7 @@
         style="left: {(t / 1000 / duration) * 100}%"
         onclick={() => seekTo(t / 1000)}
       >
-        {i % 2 ? `${(i + 1) / 2}` : '+'}
+        {(i + 1) % markersPerCount === 0 ? `${(i + 1) / markersPerCount}` : '+'}
       </div>
     {/each}
   </div>

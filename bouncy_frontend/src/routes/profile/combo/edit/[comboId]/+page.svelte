@@ -21,10 +21,10 @@
   let player = $state();
   /** @type {api.VideoDetails | undefined}*/
   let video = $state();
-  /** @type {VideoMarker[]} */
-  const tempMarkers = $state([]);
   /** @type {Beat | undefined} */
-  let bpmInfo = $state();
+  let beat = $state();
+  /** @type {VideoMarker[]} */
+  const tempMarkers = $derived(beatMarkers(beat));
 
   /**
    * @param {string} queryString
@@ -85,8 +85,6 @@
       console.warn('no video loaded, cannot run BPM detection');
       return;
     }
-    bpmInfo = await detectBpm(video);
-    updateBeatMarkers(bpmInfo);
 
     if ((await player?.getCurrentTime()) === 0) {
       // Nothing will be shown to the user, until the video player loads the
@@ -96,25 +94,43 @@
       await player?.play();
       await player?.pause();
     }
-    await player?.seek((bpmInfo?.offset || 0) / 1000);
+
+    const beatResult = await detectBpm(video);
+    if (beatResult) {
+      beat = {
+        ms: beatResult.ms,
+        bpm: Math.round(beatResult?.bpm * 10) / 10,
+        offset: beatResult.offset,
+        subbeat_per_move: 1,
+      };
+      await player?.seek((beat?.offset || 0) / 1000);
+    } else {
+      // TODO: show user something
+      console.warn('beat detection failed');
+    }
 
     // TODO: show detected BPM value to user somewhere and store it as meta data, too
     // TODO: allow editing, such as changing bpm + offset
     // TODO: on accept => store timestamps online
   }
 
-  /** @param {Beat|undefined} bpmInfo */
-  function updateBeatMarkers(bpmInfo) {
-    tempMarkers.length = 0;
-    if (bpmInfo) {
-      tempMarkers.push({
-        time: bpmInfo.offset,
-        duration: (video?.duration || 30) * 1000 - bpmInfo.offset,
-        interval: bpmInfo.ms / 2, // also mark subbeat
+  /**
+   * @param {Beat|undefined} newBeat
+   * @returns {VideoMarker[]}
+   */
+  function beatMarkers(newBeat) {
+    /** @type {VideoMarker[]} */
+    const markers = [];
+    if (newBeat) {
+      markers.push({
+        time: newBeat.offset,
+        duration: (video?.duration || 30) * 1000 - newBeat.offset,
+        interval: (newBeat.ms / 2) * newBeat.subbeat_per_move,
         icon: '',
         label: '',
       });
     }
+    return markers;
   }
 </script>
 
@@ -128,7 +144,11 @@
           bind:this={player}
           bind:video
           videoId={details.video_short_uuid}
-          timeline={{ position: 'external', beatCounts: true }}
+          timeline={{
+            position: 'external',
+            beatCounts: true,
+            subbeat_per_move: beat?.subbeat_per_move,
+          }}
           {apiUser}
           {comboId}
           extraMarkers={tempMarkers}
@@ -145,7 +165,7 @@
       </button>
 
       <div class="form">
-        <ComboForm bind:details bind:dirty />
+        <ComboForm bind:details bind:dirty bind:beat />
       </div>
 
       <button

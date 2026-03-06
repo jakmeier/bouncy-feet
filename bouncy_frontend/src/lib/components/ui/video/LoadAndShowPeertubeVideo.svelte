@@ -26,8 +26,11 @@
 
   /** @type {PeertubeVideoPlayer | undefined}*/
   let player = $state();
-  /** @type {VideoMarker[] | undefined} */
-  let rawMarkers = $state(extraMarkers);
+  /** @type {VideoMarker[]} */
+  let loadedMarkers = $state([]);
+
+  /** @type {VideoMarker[]} */
+  let rawMarkers = $derived([...(extraMarkers || []), ...loadedMarkers]);
 
   /** @type {VideoMarker[] | undefined} */
   const instantMarkers = $derived(
@@ -73,9 +76,9 @@
     return player?.pause();
   }
 
-  /** @arg {VideoMarker[]} loadedMarkers */
-  function markersLoaded(loadedMarkers) {
-    rawMarkers = [...(extraMarkers || []), ...loadedMarkers];
+  /** @arg {VideoMarker[]} markers */
+  function markersLoaded(markers) {
+    loadedMarkers = markers;
   }
 </script>
 
@@ -88,7 +91,7 @@
       videoId={video.shortUUID}
       aspectRatio={video.aspectRatio || 1}
       {timeline}
-      markers={rawMarkers}
+      markers={instantMarkers}
       {beats}
     />
   </div>

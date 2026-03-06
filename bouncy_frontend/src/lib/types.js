@@ -266,9 +266,11 @@
  * @typedef {Object} VideoTimelineConfig
  * @property {"inline"|"external"} position
  * @property {boolean} [beatCounts]
+ * @property {number} [subbeat_per_move]
  * 
  * @typedef {Object} Beat
  * @property {number} ms
  * @property {number} bpm
  * @property {number} offset
+ * @property {number} subbeat_per_move
  */
