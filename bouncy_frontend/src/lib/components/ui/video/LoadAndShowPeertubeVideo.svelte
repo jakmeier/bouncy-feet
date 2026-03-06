@@ -66,6 +66,13 @@
     return player?.seek(secs);
   }
 
+  export async function play() {
+    return player?.play();
+  }
+  export async function pause() {
+    return player?.pause();
+  }
+
   /** @arg {VideoMarker[]} loadedMarkers */
   function markersLoaded(loadedMarkers) {
     rawMarkers = [...(extraMarkers || []), ...loadedMarkers];

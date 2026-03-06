@@ -186,7 +186,13 @@
 {#if timeline?.beatCounts && duration > 0}
   <div class="counts-bar">
     {#each beats as t, i}
-      <div class="beat-count" style="left: {(t / 1000 / duration) * 100}%">
+      <!-- svelte-ignore a11y_click_events_have_key_events -->
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <div
+        class="beat-count"
+        style="left: {(t / 1000 / duration) * 100}%"
+        onclick={() => seekTo(t / 1000)}
+      >
         {i % 2 ? `${(i + 1) / 2}` : '+'}
       </div>
     {/each}

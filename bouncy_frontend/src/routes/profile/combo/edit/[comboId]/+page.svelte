@@ -23,6 +23,8 @@
   let video = $state();
   /** @type {VideoMarker[]} */
   const tempMarkers = $state([]);
+  /** @type {Beat | undefined} */
+  let bpmInfo = $state();
 
   /**
    * @param {string} queryString
@@ -83,20 +85,35 @@
       console.warn('no video loaded, cannot run BPM detection');
       return;
     }
+    bpmInfo = await detectBpm(video);
+    updateBeatMarkers(bpmInfo);
 
-    const bpmResult = await detectBpm(video);
-    if (bpmResult) {
+    if ((await player?.getCurrentTime()) === 0) {
+      // Nothing will be shown to the user, until the video player loads the
+      // video. Force that to give user feedback after the beat has been
+      // detected. (This is hacky but at least better than no feedback.)
+      // Also, seeking afterwards only works if video is loaded.
+      await player?.play();
+      await player?.pause();
+    }
+    await player?.seek((bpmInfo?.offset || 0) / 1000);
+
+    // TODO: show detected BPM value to user somewhere and store it as meta data, too
+    // TODO: allow editing, such as changing bpm + offset
+    // TODO: on accept => store timestamps online
+  }
+
+  /** @param {Beat|undefined} bpmInfo */
+  function updateBeatMarkers(bpmInfo) {
+    tempMarkers.length = 0;
+    if (bpmInfo) {
       tempMarkers.push({
-        time: bpmResult.offset,
-        duration: (video.duration || 30) * 1000 - bpmResult.offset,
-        interval: bpmResult.ms / 2, // also mark subbeat
+        time: bpmInfo.offset,
+        duration: (video?.duration || 30) * 1000 - bpmInfo.offset,
+        interval: bpmInfo.ms / 2, // also mark subbeat
         icon: '',
         label: '',
       });
-
-      // TODO: show detected BPM value to user somewhere and store it as meta data, too
-      // TODO: allow editing, such as changing bpm + offset
-      // TODO: on accept => store timestamps online
     }
   }
 </script>

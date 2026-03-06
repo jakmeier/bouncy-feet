@@ -1,6 +1,9 @@
 import * as api from '$lib/peertube-openapi';
 
-/** @param {api.VideoDetails} videoMeta */
+/** 
+ * @param {api.VideoDetails} videoMeta
+ * @returns {Promise<Beat|undefined>}
+ */
 export async function detectBpm(videoMeta) {
     if (!videoMeta.files || videoMeta.files.length === 0) {
         console.error("need web video to be available for bpm detection", videoMeta);
