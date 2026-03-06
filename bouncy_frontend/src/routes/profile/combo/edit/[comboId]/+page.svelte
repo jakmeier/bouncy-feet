@@ -62,7 +62,11 @@
 
   /** @param {ApiUser} apiUser */
   async function saveAndLeave(apiUser) {
+    // TODO: only update what is needed, and do it concurrently
     await saveCombo(apiUser);
+    if (beat) {
+      await saveBeat(apiUser);
+    }
     goto('../../..', { replaceState: true });
   }
 
@@ -77,6 +81,53 @@
         `/combos/${comboId}/timestamp/new`,
         body
       );
+    }
+  }
+
+  /** @param {ApiUser} apiUser */
+  async function saveBeat(apiUser) {
+    if (beat) {
+      const body = {
+        start: Math.round(beat.offset),
+        duration: Math.round(beat.ms),
+        bpm: beat.bpm,
+        subbeat_per_move: beat.subbeat_per_move,
+      };
+
+      // Update case
+      if (beat.hasOwnProperty('id')) {
+        // TODO: implement update
+        // For now, just delete the old and replace it with a new one.
+        const response = await apiUser.authenticatedApiRequest(
+          'DELETE',
+          `/combos/${comboId}/beat/${beat.id}`,
+          {},
+          undefined
+        );
+        if (response.error) {
+          console.error(
+            'failed deleting old beat',
+            response.error,
+            response.errorBody
+          );
+          return;
+        }
+      }
+
+      // Store new beat
+      const response = await apiUser.authenticatedPost(
+        `/combos/${comboId}/beat/new`,
+        body
+      );
+      if (!response?.ok) {
+        console.error(
+          'failed deleting old beat',
+          response?.status,
+          await response?.text()
+        );
+        return;
+      }
+      beat = await response.json();
     }
   }
 
@@ -104,6 +155,7 @@
         subbeat_per_move: 1,
       };
       await player?.seek((beat?.offset || 0) / 1000);
+      dirty = true;
     } else {
       // TODO: show user something
       console.warn('beat detection failed');
