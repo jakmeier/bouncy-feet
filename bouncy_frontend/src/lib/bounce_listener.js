@@ -2,7 +2,7 @@ import * as api from '$lib/peertube-openapi';
 
 /** 
  * @param {api.VideoDetails} videoMeta
- * @returns {Promise<Beat|undefined>}
+ * @returns {Promise< {ms: number; bpm: number; offset: number } | undefined>}
  */
 export async function detectBpm(videoMeta) {
     if (!videoMeta.files || videoMeta.files.length === 0) {

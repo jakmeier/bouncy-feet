@@ -21,10 +21,17 @@
   let player = $state();
   /** @type {api.VideoDetails | undefined}*/
   let video = $state();
+  /** @type {Beat[] | undefined} */
+  let beats = $state([]);
   /** @type {Beat | undefined} */
   let beat = $state();
-  /** @type {VideoMarker[]} */
-  const tempMarkers = $derived(beatMarkers(beat));
+
+  // quick and dirty sync on initial loading, just pick the last beat and ignore others
+  $effect(() => {
+    if (beat === undefined && beats && beats.length >= 1) {
+      beat = beats[beats.length - 1];
+    }
+  });
 
   /**
    * @param {string} queryString
@@ -95,22 +102,24 @@
       };
 
       // Update case
-      if (beat.hasOwnProperty('id')) {
-        // TODO: implement update
-        // For now, just delete the old and replace it with a new one.
-        const response = await apiUser.authenticatedApiRequest(
-          'DELETE',
-          `/combos/${comboId}/beat/${beat.id}`,
-          {},
-          undefined
-        );
-        if (response.error) {
-          console.error(
-            'failed deleting old beat',
-            response.error,
-            response.errorBody
+      // TODO: implement update
+      // For now, just delete the old beat(s) and replace it with a new one.
+      for (var b of beats?.slice(0, -1) || []) {
+        if (b.hasOwnProperty('id')) {
+          const response = await apiUser.authenticatedApiRequest(
+            'DELETE',
+            `/combos/${comboId}/beat/${b.id}`,
+            {},
+            undefined
           );
-          return;
+          if (response.error) {
+            console.error(
+              'failed deleting old beat',
+              response.error,
+              response.errorBody
+            );
+            return;
+          }
         }
       }
 
@@ -152,9 +161,15 @@
         ms: beatResult.ms,
         bpm: Math.round(beatResult?.bpm * 10) / 10,
         offset: beatResult.offset,
+        duration: (video.duration || 30) * 1000 - beatResult.offset,
         subbeat_per_move: 1,
       };
       await player?.seek((beat?.offset || 0) / 1000);
+      if (beats) {
+        beats.push(beat);
+      } else {
+        beats = [beat];
+      }
       dirty = true;
     } else {
       // TODO: show user something
@@ -164,25 +179,6 @@
     // TODO: show detected BPM value to user somewhere and store it as meta data, too
     // TODO: allow editing, such as changing bpm + offset
     // TODO: on accept => store timestamps online
-  }
-
-  /**
-   * @param {Beat|undefined} newBeat
-   * @returns {VideoMarker[]}
-   */
-  function beatMarkers(newBeat) {
-    /** @type {VideoMarker[]} */
-    const markers = [];
-    if (newBeat) {
-      markers.push({
-        time: newBeat.offset,
-        duration: (video?.duration || 30) * 1000 - newBeat.offset,
-        interval: (newBeat.ms / 2) * newBeat.subbeat_per_move,
-        icon: '',
-        label: '',
-      });
-    }
-    return markers;
   }
 </script>
 
@@ -203,7 +199,7 @@
           }}
           {apiUser}
           {comboId}
-          extraMarkers={tempMarkers}
+          bind:beats
         />
       </div>
 
@@ -212,13 +208,13 @@
         {$t('profile.combo.add-timestamp-button')}
       </button> -->
 
-      <button class="full-width action" onclick={startBpmAnalysis}>
-        {$t('editor.video.detect-bpm-button')}
-      </button>
-
       <div class="form">
         <ComboForm bind:details bind:dirty bind:beat />
       </div>
+
+      <button class="full-width action" onclick={startBpmAnalysis}>
+        {$t('editor.video.detect-bpm-button')}
+      </button>
 
       <button
         class="full-width"

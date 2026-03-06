@@ -8,7 +8,7 @@
    * @typedef {Object} Props
    * @property {string} videoId
    * @property {number} aspectRatio
-   * @property {number[]} [beats] - Array of beat timestamps in ms
+   * @property {Beat[]} [beats]
    * @property {VideoMarker[]} [markers] - Array of markers to show on the timeline
    * @property {boolean} [muted]
    * @property {VideoTimelineConfig} [timeline]
@@ -31,6 +31,21 @@
   /** @type {PeertubePlayer | undefined} */
   let player = $state();
   let deferred = $state(delayLoadingMs > 0);
+
+  /** @type {number[] | undefined} */
+  const beatMarkers = $derived(
+    beats?.flatMap((beat) => {
+      const end = beat.duration;
+      const interval = (beat.ms / 2) * beat.subbeat_per_move;
+      const beatMarkers = [];
+      if (beat.ms && beat.offset && beat.offset > 0 && interval > 0) {
+        for (var t = beat.offset; t < end; t += interval) {
+          beatMarkers.push(t);
+        }
+      }
+      return beatMarkers;
+    })
+  );
 
   export function play() {
     if (player) {
@@ -96,7 +111,7 @@
   <PeertubePlayer
     bind:this={player}
     {peertubeUrl}
-    {beats}
+    beats={beatMarkers}
     {markers}
     {muted}
     {timeline}
