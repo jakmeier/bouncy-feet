@@ -53,6 +53,7 @@ pub(crate) struct NewBeatInfo {
     pub start: i32,
     pub duration: i32,
     pub bpm: f32,
+    pub subbeat_per_move: i16,
 }
 
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
@@ -61,6 +62,7 @@ pub(crate) struct BeatInfo {
     pub start: i32,
     pub duration: i32,
     pub bpm: f32,
+    pub subbeat_per_move: i16,
 }
 
 impl UserId {
@@ -229,6 +231,7 @@ pub async fn combo_beats(
                 start: beat.start,
                 duration: beat.duration,
                 bpm: beat.bpm,
+                subbeat_per_move: beat.subbeat_per_move,
             })
             .collect(),
     ))
@@ -248,6 +251,7 @@ pub async fn add_combo_beat(
         payload.start,
         payload.duration,
         payload.bpm,
+        payload.subbeat_per_move,
     )
     .await;
 

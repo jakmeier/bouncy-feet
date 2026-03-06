@@ -3,7 +3,8 @@ CREATE TABLE IF NOT EXISTS video_beats (
     id BIGSERIAL PRIMARY KEY,
     start INT NOT NULL, -- ms
     duration INT NOT NULL, -- ms
-    bpm REAL NOT NULL
+    bpm REAL NOT NULL, -- music speed
+    subbeat_per_move SMALLINT NOT NULL -- how many half-beats correspond to one dance move
 );
 
 CREATE TABLE IF NOT EXISTS combos_video_beats (

@@ -10,6 +10,7 @@ pub struct Beat {
     pub start: i32,
     pub duration: i32,
     pub bpm: f32,
+    pub subbeat_per_move: i16,
 }
 
 #[derive(Clone, Debug, sqlx::FromRow)]
@@ -18,6 +19,7 @@ pub(crate) struct BeatRow {
     start: i32,
     duration: i32,
     bpm: f32,
+    subbeat_per_move: i16,
 }
 
 impl BeatId {
@@ -33,21 +35,24 @@ impl Beat {
         start: i32,
         duration: i32,
         bpm: f32,
+        subbeat_per_move: i16,
     ) -> Result<Beat, sqlx::Error> {
         let row = sqlx::query_as!(
             BeatRow,
             r#"
-            INSERT INTO video_beats (start, duration, bpm)
-            VALUES ($1, $2, $3)
+            INSERT INTO video_beats (start, duration, bpm, subbeat_per_move)
+            VALUES ($1, $2, $3, $4)
             RETURNING
                 id,
                 start,
                 duration,
-                bpm
+                bpm,
+                subbeat_per_move
             "#,
             start,
             duration,
-            bpm
+            bpm,
+            subbeat_per_move
         )
         .fetch_one(&state.pg_db_pool)
         .await?;
@@ -81,7 +86,8 @@ impl Beat {
                 id,
                 start,
                 duration,
-                bpm
+                bpm,
+                subbeat_per_move
             FROM video_beats t
                 JOIN combos_video_beats ct ON ct.video_beat_id = t.id
             WHERE ct.combo_id = $1
@@ -114,6 +120,7 @@ impl From<BeatRow> for Beat {
             start: other.start,
             duration: other.duration,
             bpm: other.bpm,
+            subbeat_per_move: other.subbeat_per_move,
         }
     }
 }
