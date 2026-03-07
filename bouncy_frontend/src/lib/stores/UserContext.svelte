@@ -15,6 +15,7 @@
   import { USER_AUH_STATE } from '$lib/enum_types';
   import { ApiUser } from './ApiUser.svelte';
   import { ONBOARDING_STATE } from '$lib/onboarding';
+  import { ClientSession } from './ClientSession.svelte';
 
   /**
    * @typedef {Object} Props
@@ -44,9 +45,6 @@
   // TODO: user data should be synced with the server
   // => Migrate this to user meta data and local data, as appropriate
   const stored = browser ? parseOrNull(localStorage.user) : null;
-  if (stored && !stored.id) {
-    stored.id = crypto.randomUUID();
-  }
   if (stored && !stored.userSteps) {
     stored.userSteps = {};
   }
@@ -161,6 +159,10 @@
       userCtx.fullUser?.logout();
       userCtx.apiUser = undefined;
       userCtx.fullUser = undefined;
+      user.openid = undefined;
+      // TODO: for a guest user, ask to merge to a full acount or warn that all state will be deleted
+      ClientSession.clearLocalSession();
+      // TODO: also clear steps etc?
     },
     maybeLoadApiUser,
     createGuestUser,

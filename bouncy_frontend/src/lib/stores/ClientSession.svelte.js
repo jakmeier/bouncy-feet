@@ -31,7 +31,7 @@ export class ClientSession {
 
         if (!clientSessionData && createGuest) {
             const newSession = await requestNewGuestSession();
-            clientSessionData = await storeNewSession(newSession);
+            clientSessionData = storeNewSession(newSession);
         }
 
         if (!clientSessionData) {
@@ -42,6 +42,15 @@ export class ClientSession {
 
         return clientSession;
     }
+
+    /**
+    * Delete client session from local storage.
+    */
+    static clearLocalSession() {
+        localStorage.removeItem("clientSessionId");
+        localStorage.removeItem("clientSessionSecret");
+    }
+
 
     /**
      * @returns {Object}
@@ -116,7 +125,7 @@ async function loadClientSessionAsync() {
             // If we can read our private information, then we can also create a
             // new session for the user.
             const newSession = await requestNewClientSession();
-            return await storeNewSession(newSession);
+            return storeNewSession(newSession);
         }
         return null;
     }
@@ -128,11 +137,9 @@ async function loadClientSessionAsync() {
  * Could be a guest session or one for a full user.
  *
  * @param {{client_session_id: string, client_session_secret: string }} response
- * @return {Promise<ClientSessionData>}
+ * @return {ClientSessionData}
  */
-async function storeNewSession(response) {
-
-
+function storeNewSession(response) {
     /** @type {ClientSessionData} */
     const newClientSession = {
         id: response.client_session_id,
@@ -142,7 +149,6 @@ async function storeNewSession(response) {
     localStorage.clientSessionSecret = newClientSession.secret;
     return newClientSession;
 }
-
 
 /**
  * @param {string} key
