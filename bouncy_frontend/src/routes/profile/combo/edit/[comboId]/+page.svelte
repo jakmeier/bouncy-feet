@@ -95,8 +95,8 @@
   async function saveBeat(apiUser) {
     if (beat) {
       const body = {
-        start: Math.round(beat.offset),
-        duration: Math.round(beat.ms),
+        start: Math.round(beat.start),
+        duration: Math.round(beat.duration),
         bpm: beat.bpm,
         subbeat_per_move: beat.subbeat_per_move,
       };
@@ -158,13 +158,12 @@
     const beatResult = await detectBpm(video);
     if (beatResult) {
       beat = {
-        ms: beatResult.ms,
         bpm: Math.round(beatResult?.bpm * 10) / 10,
-        offset: beatResult.offset,
+        start: beatResult.offset,
         duration: (video.duration || 30) * 1000 - beatResult.offset,
         subbeat_per_move: 1,
       };
-      await player?.seek((beat?.offset || 0) / 1000);
+      await player?.seek((beat?.start || 0) / 1000);
       if (beats) {
         beats.push(beat);
       } else {

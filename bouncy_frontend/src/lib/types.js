@@ -270,9 +270,8 @@
  * 
  * @typedef {Object} Beat
  * @property {number} [id]
- * @property {number} ms
  * @property {number} duration
  * @property {number} bpm
- * @property {number} offset
+ * @property {number} start
  * @property {number} subbeat_per_move
  */

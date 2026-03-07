@@ -36,10 +36,10 @@
   const beatMarkers = $derived(
     beats?.flatMap((beat) => {
       const end = beat.duration;
-      const interval = (beat.ms / 2) * beat.subbeat_per_move;
+      const interval = (60000 / beat.bpm / 2) * beat.subbeat_per_move;
       const beatMarkers = [];
-      if (beat.ms && beat.offset && beat.offset > 0 && interval > 0) {
-        for (var t = beat.offset; t < end; t += interval) {
+      if (beat.bpm && beat.start && beat.start > 0 && interval > 0) {
+        for (var t = beat.start; t < end; t += interval) {
           beatMarkers.push(t);
         }
       }

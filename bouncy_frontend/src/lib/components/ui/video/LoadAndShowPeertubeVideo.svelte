@@ -58,7 +58,6 @@
   /** @arg {Beat[]} loadedBeats */
   function beatsLoaded(loadedBeats) {
     beats = loadedBeats;
-    console.log("loaded beats");
   }
 </script>
 

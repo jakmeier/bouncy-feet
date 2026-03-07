@@ -27,10 +27,6 @@
   /** @param {Event} event */
   function inputChanged(event) {
     dirty = true;
-
-    if (beat && event?.target?.getAttribute('name') === 'bpm') {
-      beat.ms = 60000 / beat.bpm;
-    }
   }
 
   function halfSpeedChanged() {
@@ -54,7 +50,7 @@
       />
 
       <label for="offset"> {$t('editor.video.beat-offset')}</label>
-      <input type="number" name="offset" bind:value={beat.offset} />
+      <input type="number" name="offset" bind:value={beat.start} />
     </div>
   {/if}
 
