@@ -242,9 +242,9 @@ impl crate::db::beat::Beat {
             r#"
             SELECT
                 cb.combo_id
-            FROM video_timestamps t
-                JOIN combos_video_beats cb ON cb.video_beat_id = t.id
-            WHERE t.id = $1
+            FROM video_beats b
+                JOIN combos_video_beats cb ON cb.video_beat_id = b.id
+            WHERE b.id = $1
             "#,
             beat_id.num()
         )
