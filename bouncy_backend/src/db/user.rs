@@ -384,7 +384,16 @@ mod tests {
     use std::sync::Arc;
     use url::Url;
 
-    static MIGRATOR: sqlx::migrate::Migrator = sqlx::migrate!(concat!(env!("CARGO_MANIFEST_DIR"), "/db_migrations"));
+    async fn apply_migrations(pool: &sqlx::PgPool) {
+        sqlx::migrate::Migrator::new(
+            std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("db_migrations")
+        )
+        .await
+        .expect("failed to build migrator")
+        .run(pool)
+        .await
+        .expect("failed to run migrations");
+    }
 
     /// Build a minimal AppState for testing.
     /// Only the `pg_db_pool` field is meaningful; all other fields use dummy values.
@@ -414,8 +423,9 @@ mod tests {
 
     // ── UserId::create_new_guest ─────────────────────────────────────────────
 
-    #[sqlx::test(migrator = "MIGRATOR")]
+    #[sqlx::test]
     async fn create_guest_user_returns_valid_id(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
         let user_id = UserId::create_new_guest(&pool).await;
         assert!(
             user_id.num() > 0,
@@ -424,8 +434,9 @@ mod tests {
         Ok(())
     }
 
-    #[sqlx::test(migrator = "MIGRATOR")]
+    #[sqlx::test]
     async fn create_multiple_guests_have_distinct_ids(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
         let id1 = UserId::create_new_guest(&pool).await;
         let id2 = UserId::create_new_guest(&pool).await;
         assert_ne!(
@@ -438,8 +449,9 @@ mod tests {
 
     // ── User::lookup ─────────────────────────────────────────────────────────
 
-    #[sqlx::test(migrator = "MIGRATOR")]
+    #[sqlx::test]
     async fn lookup_existing_user_returns_some(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
         let state = make_test_state(pool);
         let user_id = UserId::create_new_guest(&state.pg_db_pool).await;
 
@@ -459,8 +471,9 @@ mod tests {
         Ok(())
     }
 
-    #[sqlx::test(migrator = "MIGRATOR")]
+    #[sqlx::test]
     async fn lookup_nonexistent_user_returns_none(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
         let state = make_test_state(pool);
 
         // Use an id that cannot exist in an empty (freshly migrated) database.
@@ -474,8 +487,9 @@ mod tests {
 
     // ── User::lookup_by_oidc_or_create ───────────────────────────────────────
 
-    #[sqlx::test(migrator = "MIGRATOR")]
+    #[sqlx::test]
     async fn oidc_user_is_created_on_first_login(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
         // We test the underlying INSERT directly because constructing a full
         // OidcClaims is not feasible without an OIDC server.  This mirrors what
         // lookup_by_oidc_or_create does internally.
@@ -507,8 +521,9 @@ mod tests {
         Ok(())
     }
 
-    #[sqlx::test(migrator = "MIGRATOR")]
+    #[sqlx::test]
     async fn oidc_subject_uniqueness_is_enforced(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
         let subject = Uuid::new_v4().to_string();
 
         sqlx::query("INSERT INTO users (oidc_subject) VALUES ($1)")
