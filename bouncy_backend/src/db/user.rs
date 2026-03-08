@@ -384,6 +384,8 @@ mod tests {
     use std::sync::Arc;
     use url::Url;
 
+    static MIGRATOR: sqlx::migrate::Migrator = sqlx::migrate!("db_migrations");
+
     /// Build a minimal AppState for testing.
     /// Only the `pg_db_pool` field is meaningful; all other fields use dummy values.
     fn make_test_state(pool: PgPool) -> crate::AppState {
@@ -412,7 +414,7 @@ mod tests {
 
     // ── UserId::create_new_guest ─────────────────────────────────────────────
 
-    #[sqlx::test(migrations = "db_migrations")]
+    #[sqlx::test(migrator = "MIGRATOR")]
     async fn create_guest_user_returns_valid_id(pool: PgPool) -> sqlx::Result<()> {
         let user_id = UserId::create_new_guest(&pool).await;
         assert!(
@@ -422,7 +424,7 @@ mod tests {
         Ok(())
     }
 
-    #[sqlx::test(migrations = "db_migrations")]
+    #[sqlx::test(migrator = "MIGRATOR")]
     async fn create_multiple_guests_have_distinct_ids(pool: PgPool) -> sqlx::Result<()> {
         let id1 = UserId::create_new_guest(&pool).await;
         let id2 = UserId::create_new_guest(&pool).await;
@@ -436,7 +438,7 @@ mod tests {
 
     // ── User::lookup ─────────────────────────────────────────────────────────
 
-    #[sqlx::test(migrations = "db_migrations")]
+    #[sqlx::test(migrator = "MIGRATOR")]
     async fn lookup_existing_user_returns_some(pool: PgPool) -> sqlx::Result<()> {
         let state = make_test_state(pool);
         let user_id = UserId::create_new_guest(&state.pg_db_pool).await;
@@ -457,7 +459,7 @@ mod tests {
         Ok(())
     }
 
-    #[sqlx::test(migrations = "db_migrations")]
+    #[sqlx::test(migrator = "MIGRATOR")]
     async fn lookup_nonexistent_user_returns_none(pool: PgPool) -> sqlx::Result<()> {
         let state = make_test_state(pool);
 
@@ -472,7 +474,7 @@ mod tests {
 
     // ── User::lookup_by_oidc_or_create ───────────────────────────────────────
 
-    #[sqlx::test(migrations = "db_migrations")]
+    #[sqlx::test(migrator = "MIGRATOR")]
     async fn oidc_user_is_created_on_first_login(pool: PgPool) -> sqlx::Result<()> {
         // We test the underlying INSERT directly because constructing a full
         // OidcClaims is not feasible without an OIDC server.  This mirrors what
@@ -505,7 +507,7 @@ mod tests {
         Ok(())
     }
 
-    #[sqlx::test(migrations = "db_migrations")]
+    #[sqlx::test(migrator = "MIGRATOR")]
     async fn oidc_subject_uniqueness_is_enforced(pool: PgPool) -> sqlx::Result<()> {
         let subject = Uuid::new_v4().to_string();
 
