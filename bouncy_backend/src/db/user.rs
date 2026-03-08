@@ -384,7 +384,7 @@ mod tests {
     use std::sync::Arc;
     use url::Url;
 
-    static MIGRATOR: sqlx::migrate::Migrator = sqlx::migrate!("db_migrations");
+    static MIGRATOR: sqlx::migrate::Migrator = sqlx::migrate!(concat!(env!("CARGO_MANIFEST_DIR"), "/db_migrations"));
 
     /// Build a minimal AppState for testing.
     /// Only the `pg_db_pool` field is meaningful; all other fields use dummy values.
