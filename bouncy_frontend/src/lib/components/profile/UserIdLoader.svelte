@@ -52,7 +52,7 @@
       userCtx.user.openid = userInfo.sub;
       userCtx.user.apiId = userInfo.id;
     } catch (errResponse) {
-      console.warn('Failed reading user info');
+      console.warn('Failed reading user info', errResponse);
     }
   }
 

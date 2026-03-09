@@ -1,4 +1,5 @@
 <script>
+  import { apiRequest } from '$lib/stats';
   import { onMount } from 'svelte';
 
   /**
@@ -12,9 +13,14 @@
   let { comboId, onLoaded, apiUser } = $props();
 
   onMount(async () => {
-    const result = await apiUser.authenticatedGet(
-      `/combos/${comboId}/timestamp`
-    );
+    let result;
+    if (apiUser) {
+      result = await apiUser.authenticatedGet(
+        `/user/combos/${comboId}/timestamp`
+      );
+    } else {
+      result = await apiRequest(`/combos/${comboId}/timestamp`);
+    }
     if (result.okResponse) {
       /** @type {ComboTimestampInfos} */
       const markersResult = await result.okResponse.json();

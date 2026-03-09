@@ -32,21 +32,6 @@
   let player = $state();
   let deferred = $state(delayLoadingMs > 0);
 
-  /** @type {number[] | undefined} */
-  const beatMarkers = $derived(
-    beats?.flatMap((beat) => {
-      const end = beat.duration;
-      const interval = (60000 / beat.bpm / 2) * beat.subbeat_per_move;
-      const beatMarkers = [];
-      if (beat.bpm && beat.start && beat.start > 0 && interval > 0) {
-        for (var t = beat.start; t < end; t += interval) {
-          beatMarkers.push(t);
-        }
-      }
-      return beatMarkers;
-    })
-  );
-
   export function play() {
     if (player) {
       player.play();
@@ -111,7 +96,7 @@
   <PeertubePlayer
     bind:this={player}
     {peertubeUrl}
-    beats={beatMarkers}
+    {beats}
     {markers}
     {muted}
     {timeline}

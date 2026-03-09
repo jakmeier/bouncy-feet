@@ -1,18 +1,24 @@
 <script>
+  import { apiRequest } from '$lib/stats';
   import { onMount } from 'svelte';
 
   /**
    * @typedef {Object} Props
    * @property {number} comboId
    * @property {(beats: Beat[])=>void} onLoaded
-   * @property {ApiUser} apiUser -- TODO: make this optional for public viewing
+   * @property {ApiUser} [apiUser]
    */
 
   /** @type Props */
   let { comboId, onLoaded, apiUser } = $props();
 
   onMount(async () => {
-    const result = await apiUser.authenticatedGet(`/combos/${comboId}/beat`);
+    let result;
+    if (apiUser) {
+      result = await apiUser.authenticatedGet(`/user/combos/${comboId}/beat`);
+    } else {
+      result = await apiRequest(`/combos/${comboId}/beat`);
+    }
     if (result.okResponse) {
       /** @type {Beat[]} */
       const beats = await result.okResponse.json();

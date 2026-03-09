@@ -85,7 +85,7 @@
         ms: Math.round(secs * 1000),
       };
       const response = await apiUser.authenticatedPost(
-        `/combos/${comboId}/timestamp/new`,
+        `/user/combos/${comboId}/timestamp/new`,
         body
       );
     }
@@ -108,7 +108,7 @@
         if (b.hasOwnProperty('id')) {
           const response = await apiUser.authenticatedApiRequest(
             'DELETE',
-            `/combos/${comboId}/beat/${b.id}`,
+            `/user/combos/${comboId}/beat/${b.id}`,
             {},
             undefined
           );
@@ -125,7 +125,7 @@
 
       // Store new beat
       const response = await apiUser.authenticatedPost(
-        `/combos/${comboId}/beat/new`,
+        `/user/combos/${comboId}/beat/new`,
         body
       );
       if (!response?.ok) {
@@ -194,7 +194,6 @@
           timeline={{
             position: 'external',
             beatCounts: true,
-            subbeat_per_move: beat?.subbeat_per_move,
           }}
           {apiUser}
           {comboId}

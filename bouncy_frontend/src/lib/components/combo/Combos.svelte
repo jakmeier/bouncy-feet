@@ -54,7 +54,8 @@
         <div class="video">
           <LoadAndShowPeertubeVideo
             videoId={combo.video_short_uuid}
-            timeline={{ position: 'external' }}
+            timeline={{ position: 'external', beatCounts: true }}
+            comboId={combo.id}
           />
         </div>
       {/if}

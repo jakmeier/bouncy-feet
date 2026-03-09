@@ -35,9 +35,9 @@
   async function saveCombo() {
     let response;
     if (combo.hasOwnProperty('id')) {
-      response = await apiUser.authenticatedPost('/combos/update', combo);
+      response = await apiUser.authenticatedPost('/user/combos/update', combo);
     } else {
-      response = await apiUser.authenticatedPost('/combos/new', combo);
+      response = await apiUser.authenticatedPost('/user/combos/new', combo);
     }
     if (response?.ok) {
       /** @type {ComboInfo}*/

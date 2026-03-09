@@ -83,7 +83,7 @@
   ></VideoMarkerLoader>
 {/if}
 
-{#if comboId && apiUser}
+{#if comboId}
   <VideoBeatsLoader {comboId} {apiUser} onLoaded={beatsLoaded}
   ></VideoBeatsLoader>
 {/if}

@@ -8,7 +8,7 @@
    * @typedef {Object} Props
    * @property {string} peertubeUrl
    * @property {number} aspectRatio
-   * @property {number[]} [beats] - Array of beat timestamps in ms
+   * @property {Beat[]} [beats] - Array of beat timestamps in ms
    * @property {Marker[]} [markers] - Array of markers to show on the timeline
    * @property {boolean} [muted]
    * @property {VideoTimelineConfig} [timeline]
@@ -35,8 +35,27 @@
   let iframe = $state();
   let player = $state();
 
-  const spm = $derived(timeline?.subbeat_per_move || 1);
-  const markersPerCount = $derived(spm === 1 ? 2 : 1);
+  /** @type {{t: number, text: string}[]} */
+  const beatMarkers = $derived(
+    beats?.flatMap((beat) => {
+      const end = beat.duration;
+      const interval = (60000 / beat.bpm / 2) * beat.subbeat_per_move;
+      const beatMarkers = [];
+      if (beat.bpm && beat.start && beat.start > 0 && interval > 0) {
+        var i = 0;
+        for (var t = beat.start; t < end; t += interval, i++) {
+          const spm = beat.subbeat_per_move || 1;
+          const markersPerCount = spm === 1 ? 2 : 1;
+          const text =
+            (i + 1) % markersPerCount === 0
+              ? `${(i + 1) / markersPerCount}`
+              : '+';
+          beatMarkers.push({ t, text });
+        }
+      }
+      return beatMarkers;
+    })
+  );
 
   export function play() {
     if (player) {
@@ -110,14 +129,17 @@
 
   /**
    * @param {number} targetMs
+   * @returns {number}
    */
   function snapToBeat(targetMs) {
-    if (beats.length === 0) {
+    if (beatMarkers.length === 0) {
       return targetMs;
     }
-    return beats.reduce((prev, curr) =>
-      Math.abs(curr - targetMs) < Math.abs(prev - targetMs) ? curr : prev
-    );
+    return beatMarkers
+      .map((m) => m.t)
+      .reduce((prev, curr) =>
+        Math.abs(curr - targetMs) < Math.abs(prev - targetMs) ? curr : prev
+      );
   }
 
   onMount(async () => {
@@ -188,15 +210,15 @@
 
 {#if timeline?.beatCounts && duration > 0}
   <div class="counts-bar">
-    {#each beats as t, i}
+    {#each beatMarkers as marker, i}
       <!-- svelte-ignore a11y_click_events_have_key_events -->
       <!-- svelte-ignore a11y_no_static_element_interactions -->
       <div
         class="beat-count"
-        style="left: {(t / 1000 / duration) * 100}%"
-        onclick={() => seekTo(t / 1000)}
+        style="left: {(marker.t / 1000 / duration) * 100}%"
+        onclick={() => seekTo(marker.t / 1000)}
       >
-        {(i + 1) % markersPerCount === 0 ? `${(i + 1) / markersPerCount}` : '+'}
+        {marker.text}
       </div>
     {/each}
   </div>
@@ -219,10 +241,10 @@
       style="width: {(currentTime / duration) * 100}%"
     ></div>
 
-    {#each beats as t}
+    {#each beatMarkers as marker}
       <div
         class="beat-marker"
-        style="left: {(t / 1000 / duration) * 100}%"
+        style="left: {(marker.t / 1000 / duration) * 100}%"
       ></div>
     {/each}
 
