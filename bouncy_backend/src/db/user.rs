@@ -373,3 +373,184 @@ impl AddClubMemberRequest {
         UserId(self.user_id)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::api_endoints::auth::KeycloakClientConfig;
+    use crate::cache::DataCache;
+    use crate::peertube::system_user::PeerTubeSystemUser;
+    use sqlx::PgPool;
+    use std::sync::Arc;
+    use url::Url;
+
+    async fn apply_migrations(pool: &sqlx::PgPool) {
+        sqlx::migrate::Migrator::new(
+            std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("db_migrations")
+        )
+        .await
+        .expect("failed to build migrator")
+        .run(pool)
+        .await
+        .expect("failed to run migrations");
+    }
+
+    /// Build a minimal AppState for testing.
+    /// Only the `pg_db_pool` field is meaningful; all other fields use dummy values.
+    fn make_test_state(pool: PgPool) -> crate::AppState {
+        crate::AppState {
+            app_url: "http://localhost:3000".parse::<Url>().unwrap(),
+            api_url: "http://localhost:4000".parse::<Url>().unwrap(),
+            peertube_url: "http://localhost:9000".parse::<Url>().unwrap(),
+            pg_db_pool: pool,
+            http_client: reqwest::Client::new(),
+            peertube_client_config: Arc::new(tokio::sync::RwLock::new(None)),
+            kc_config: KeycloakClientConfig {
+                client_id: "test-client".to_string(),
+                client_secret: "test-secret".to_string(),
+                registration_url: "http://localhost:8080/register"
+                    .parse::<Url>()
+                    .unwrap(),
+                logout_url: "http://localhost:8080/logout".parse::<Url>().unwrap(),
+            },
+            system_user: PeerTubeSystemUser::new(
+                "system_user".to_string(),
+                "password".to_string(),
+            ),
+            data_cache: DataCache::default(),
+        }
+    }
+
+    // ── UserId::create_new_guest ─────────────────────────────────────────────
+
+    #[sqlx::test]
+    async fn create_guest_user_returns_valid_id(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        let user_id = UserId::create_new_guest(&pool).await;
+        assert!(
+            user_id.num() > 0,
+            "newly created user should have a positive id"
+        );
+        Ok(())
+    }
+
+    #[sqlx::test]
+    async fn create_multiple_guests_have_distinct_ids(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        let id1 = UserId::create_new_guest(&pool).await;
+        let id2 = UserId::create_new_guest(&pool).await;
+        assert_ne!(
+            id1.num(),
+            id2.num(),
+            "each guest creation should yield a unique id"
+        );
+        Ok(())
+    }
+
+    // ── User::lookup ─────────────────────────────────────────────────────────
+
+    #[sqlx::test]
+    async fn lookup_existing_user_returns_some(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        let state = make_test_state(pool);
+        let user_id = UserId::create_new_guest(&state.pg_db_pool).await;
+
+        let user = User::lookup(&state, user_id).await;
+
+        assert!(user.is_some(), "should find the user that was just created");
+        let user = user.unwrap();
+        assert_eq!(user.id.num(), user_id.num());
+        assert!(
+            user.oidc_subject.is_none(),
+            "guest user should have no OIDC subject"
+        );
+        assert!(
+            user.peertube_account_id.is_none(),
+            "fresh user should have no PeerTube account id"
+        );
+        Ok(())
+    }
+
+    #[sqlx::test]
+    async fn lookup_nonexistent_user_returns_none(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        let state = make_test_state(pool);
+
+        // Use an id that cannot exist in an empty (freshly migrated) database.
+        let missing = User::lookup(&state, UserId(i64::MAX)).await;
+        assert!(
+            missing.is_none(),
+            "looking up a non-existent user should return None"
+        );
+        Ok(())
+    }
+
+    // ── User::lookup_by_oidc_or_create ───────────────────────────────────────
+
+    #[sqlx::test]
+    async fn oidc_user_is_created_on_first_login(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        // We test the underlying INSERT directly because constructing a full
+        // OidcClaims is not feasible without an OIDC server.  This mirrors what
+        // lookup_by_oidc_or_create does internally.
+        let subject = Uuid::new_v4().to_string();
+
+        // Use the dynamic (non-macro) query to avoid compile-time DB checks
+        // in offline mode.  The correctness of the SQL is validated at
+        // runtime by the sqlx::test framework.
+        let id: i64 = sqlx::query_scalar(
+            "INSERT INTO users (oidc_subject) VALUES ($1) RETURNING id",
+        )
+        .bind(&subject)
+        .fetch_one(&pool)
+        .await?;
+
+        let state = make_test_state(pool);
+        let user = User::lookup(&state, UserId(id)).await;
+
+        assert!(user.is_some());
+        let user = user.unwrap();
+        let stored_sub = user
+            .oidc_subject
+            .expect("OIDC subject must be stored");
+        assert_eq!(
+            stored_sub.to_string(),
+            subject,
+            "stored OIDC subject must match the one that was inserted"
+        );
+        Ok(())
+    }
+
+    #[sqlx::test]
+    async fn oidc_subject_uniqueness_is_enforced(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        let subject = Uuid::new_v4().to_string();
+
+        sqlx::query("INSERT INTO users (oidc_subject) VALUES ($1)")
+            .bind(&subject)
+            .execute(&pool)
+            .await?;
+
+        // A second insert with the same subject must fail due to the UNIQUE
+        // constraint on users.oidc_subject.
+        let result = sqlx::query("INSERT INTO users (oidc_subject) VALUES ($1)")
+            .bind(&subject)
+            .execute(&pool)
+            .await;
+
+        assert!(
+            result.is_err(),
+            "inserting a duplicate OIDC subject should violate the UNIQUE constraint"
+        );
+        Ok(())
+    }
+
+    // ── UserId::num / Display ─────────────────────────────────────────────────
+
+    #[test]
+    fn user_id_display_shows_inner_value() {
+        let id = UserId(42);
+        assert_eq!(id.to_string(), "42");
+        assert_eq!(id.num(), 42);
+    }
+}
