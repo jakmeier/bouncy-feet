@@ -2,6 +2,8 @@
   import { asset } from '$app/paths';
   import { onMount } from 'svelte';
   import { getUserContext } from '$lib/stores/context';
+  import Arrow from '../svg/Arrow.svelte';
+  import UnstyledButton from '../UnstyledButton.svelte';
 
   /** @typedef {{ time: number, label: string, icon: string }} Marker */
   /**
@@ -34,6 +36,10 @@
   let iframeOverlay = $state();
   let iframe = $state();
   let player = $state();
+  let magnifierWidth = $state();
+
+  const magnifiedTimeRangeSec = 2;
+  const magnifiedPxPerSec = $derived(magnifierWidth / magnifiedTimeRangeSec);
 
   /** @type {{t: number, text: string}[]} */
   const beatMarkers = $derived(
@@ -79,6 +85,7 @@
 
   /** @param {number} secs */
   export async function seek(secs) {
+    currentTime = secs;
     return player.seek(secs);
   }
 
@@ -117,9 +124,9 @@
   /**
    * @param {number} time in seconds
    */
-  function seekTo(time) {
-    const maxSnap = 1000;
-    const snapped = snapToBeat(time * 1000);
+  function seekTo(time, snap = true) {
+    const maxSnap = 500;
+    const snapped = snap ? snapToBeat(time * 1000) : time * 1000;
     if (Math.abs(time * 1000 - snapped) <= maxSnap) {
       player.seek(snapped / 1000);
     } else {
@@ -140,6 +147,50 @@
       .reduce((prev, curr) =>
         Math.abs(curr - targetMs) < Math.abs(prev - targetMs) ? curr : prev
       );
+  }
+
+  let dragging = false;
+  let dragStartX = 0;
+  let dragStartTime = 0;
+
+  /** @param {PointerEvent} e */
+  function onPointerDown(e) {
+    dragging = true;
+    dragStartX = e.clientX;
+    dragStartTime = currentTime;
+
+    // @ts-ignore
+    e.currentTarget?.setPointerCapture(e.pointerId);
+  }
+
+  /** @param {PointerEvent} e */
+  function onPointerMove(e) {
+    if (!dragging) return;
+    seekToDragPosition(e.clientX, false);
+  }
+
+  /**
+   * @param {number} clientX
+   * @param {boolean} snap
+   */
+  function seekToDragPosition(clientX, snap) {
+    const dx = clientX - dragStartX;
+    const dt = dx / magnifiedPxPerSec;
+
+    let newTime = dragStartTime - dt;
+    newTime = Math.max(0, Math.min(duration, newTime));
+    seekTo(newTime, snap);
+  }
+
+  /** @param {PointerEvent} e */
+  function onPointerUp(e) {
+    seekToDragPosition(e.clientX, true);
+    dragging = false;
+
+    try {
+      // @ts-ignore
+      e.currentTarget?.releasePointerCapture(e.pointerId);
+    } catch {}
   }
 
   onMount(async () => {
@@ -178,6 +229,22 @@
       }
     );
   });
+
+  function seekToPrevBeat() {
+    const prev = beatMarkers.findLastIndex(
+      (m) => m.t - currentTime * 1000 < -0.001
+    );
+    if (prev !== -1) {
+      seekTo(beatMarkers[prev].t / 1000);
+    }
+  }
+
+  function seekToNextBeat() {
+    const prev = beatMarkers.findIndex((m) => m.t - currentTime * 1000 > 0.001);
+    if (prev !== -1) {
+      seekTo(beatMarkers[prev].t / 1000);
+    }
+  }
 </script>
 
 <div class="video-wrapper" style="--video-ratio: {aspectRatio}">
@@ -209,18 +276,44 @@
 </div>
 
 {#if timeline?.beatCounts && duration > 0}
-  <div class="counts-bar">
-    {#each beatMarkers as marker, i}
-      <!-- svelte-ignore a11y_click_events_have_key_events -->
-      <!-- svelte-ignore a11y_no_static_element_interactions -->
-      <div
-        class="beat-count"
-        style="left: {(marker.t / 1000 / duration) * 100}%"
-        onclick={() => seekTo(marker.t / 1000)}
-      >
-        {marker.text}
+  <div class="counts">
+    <UnstyledButton onClick={seekToPrevBeat}>
+      <div class="arrow left">
+        <Arrow color="var(--theme-neutral-white)" />
       </div>
-    {/each}
+    </UnstyledButton>
+
+    <div
+      class="counts-magnifier-bar"
+      bind:clientWidth={magnifierWidth}
+      onpointerdown={onPointerDown}
+      onpointermove={onPointerMove}
+      onpointerup={onPointerUp}
+      onpointercancel={onPointerUp}
+    >
+      <div
+        class="counts-magnifier-bar-content"
+        style="width: {magnifiedPxPerSec *
+          duration}px; transform: translate({-magnifiedPxPerSec * currentTime +
+          magnifierWidth / 2}px);"
+      >
+        {#each beatMarkers as marker}
+          <div
+            class="magnified-beat-count"
+            style="transform: translate({(marker.t / 1000) *
+              magnifiedPxPerSec}px);"
+          >
+            {marker.text}
+          </div>
+        {/each}
+      </div>
+    </div>
+
+    <UnstyledButton onClick={seekToNextBeat}>
+      <div class="arrow right">
+        <Arrow color="var(--theme-neutral-white)" />
+      </div>
+    </UnstyledButton>
   </div>
 {/if}
 
@@ -342,14 +435,55 @@
     height: 50%;
   }
 
-  .counts-bar {
+  .counts {
     position: relative;
-    height: 1rem;
-    margin-top: 1.125rem;
-    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1.2rem auto 1.2rem;
+    margin: 1rem 0;
+    height: 2rem;
   }
-  .beat-count {
+
+  .arrow {
+    max-width: 1.2rem;
+    max-height: 2rem;
+  }
+  .left {
+    rotate: 90deg;
+  }
+  .right {
+    rotate: -90deg;
+  }
+
+  .counts-magnifier-bar {
+    position: relative;
+    height: 100%;
+    width: 75%;
+    margin: auto;
+    overflow: hidden;
+    background-color: var(--theme-neutral-almost-black);
+    border-radius: 1rem;
+
+    /* Avoid touch scrolling the page */
+    touch-action: none;
+    user-select: none;
+    cursor: grab;
+  }
+
+  .counts-magnifier-bar:active {
+    cursor: grabbing;
+  }
+
+  .counts-magnifier-bar-content {
+    position: relative;
+    left: 0;
+    height: 100%;
+    display: flex;
+  }
+
+  .magnified-beat-count {
     position: absolute;
+    left: 0;
+    align-self: center;
     font-size: var(--font-small);
   }
 
