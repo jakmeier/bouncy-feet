@@ -300,8 +300,9 @@
         {#each beatMarkers as marker}
           <div
             class="magnified-beat-count"
-            style="transform: translate({(marker.t / 1000) *
-              magnifiedPxPerSec}px);"
+            class:highlighted={Math.abs(marker.t - currentTime * 1000) < 0.01}
+            style="transform: translate(calc({(marker.t / 1000) *
+              magnifiedPxPerSec}px - 0.5rem - 2.5px));"
           >
             {marker.text}
           </div>
@@ -485,6 +486,19 @@
     left: 0;
     align-self: center;
     font-size: var(--font-small);
+    width: 1rem;
+    height: 1rem;
+    text-align: center;
+    align-content: center;
+  }
+
+  .highlighted {
+    background-color: var(--theme-neutral-darker-gray);
+    border-radius: 50%;
+    padding: 5px;
+    width: 1rem;
+    height: 1rem;
+    text-align: center;
   }
 
   .icon {
