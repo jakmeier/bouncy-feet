@@ -163,6 +163,14 @@ async fn main() -> anyhow::Result<()> {
             "/users/{user_id}/combos",
             get(api_endoints::combo::user_combos),
         )
+        .route(
+            "/combos/{combo_id}/beat",
+            get(api_endoints::combo::public_combo_beats),
+        )
+        .route(
+            "/combos/{combo_id}/timestamp",
+            get(api_endoints::combo::public_combo_timestamps),
+        )
         .route("/register", get(api_endoints::auth::register))
         .route(
             "/new_guest_session",
@@ -214,27 +222,27 @@ async fn main() -> anyhow::Result<()> {
         .route("/combos/new", post(api_endoints::combo::create_combo))
         .route("/combos/update", post(api_endoints::combo::update_combo))
         .route(
-            "/combos/{combo_id}/beat",
+            "/user/combos/{combo_id}/beat",
             get(api_endoints::combo::combo_beats),
         )
         .route(
-            "/combos/{combo_id}/beat/{beat_id}",
+            "/user/combos/{combo_id}/beat/{beat_id}",
             delete(api_endoints::combo::delete_combo_beat),
         )
         .route(
-            "/combos/{combo_id}/beat/new",
+            "/user/combos/{combo_id}/beat/new",
             post(api_endoints::combo::add_combo_beat),
         )
         .route(
-            "/combos/{combo_id}/timestamp",
+            "/user/combos/{combo_id}/timestamp",
             get(api_endoints::combo::combo_timestamps),
         )
         .route(
-            "/combos/{combo_id}/timestamp/{timestamp_id}",
+            "/user/combos/{combo_id}/timestamp/{timestamp_id}",
             delete(api_endoints::combo::delete_combo_timestamp),
         )
         .route(
-            "/combos/{combo_id}/timestamp/new",
+            "/user/combos/{combo_id}/timestamp/new",
             post(api_endoints::combo::add_combo_timestamp),
         )
         .route("/user", get(api_endoints::user::user_info))

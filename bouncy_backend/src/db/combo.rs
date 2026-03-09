@@ -83,9 +83,8 @@ impl Combo {
         Ok(Combo::from(row))
     }
 
-    #[allow(unused)]
     pub async fn lookup(state: &AppState, id: ComboId) -> Result<Option<Combo>, sqlx::Error> {
-        let row = sqlx::query_as!(
+        let row: Option<ComboRow> = sqlx::query_as!(
             ComboRow,
             r#"
             SELECT

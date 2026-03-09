@@ -1,4 +1,5 @@
-use crate::{combo::ComboId, AppState};
+use crate::{db_err_to_status, AppState, CheckedBeatId, CheckedComboId};
+use axum::http::StatusCode;
 
 #[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
 #[serde(transparent)]
@@ -31,12 +32,14 @@ impl BeatId {
 impl Beat {
     pub async fn create_for_combo(
         state: &AppState,
-        combo_id: ComboId,
+        checked_combo_id: CheckedComboId,
         start: i32,
         duration: i32,
         bpm: f32,
         subbeat_per_move: i16,
-    ) -> Result<Beat, sqlx::Error> {
+    ) -> Result<Beat, (StatusCode, &'static str)> {
+        let combo_id = checked_combo_id.assert_write_access()?;
+
         let row = sqlx::query_as!(
             BeatRow,
             r#"
@@ -55,7 +58,9 @@ impl Beat {
             subbeat_per_move
         )
         .fetch_one(&state.pg_db_pool)
-        .await?;
+        .await
+        .map_err(db_err_to_status)?;
+
         let beat = Beat::from(row);
 
         let _row = sqlx::query!(
@@ -70,15 +75,18 @@ impl Beat {
             beat.id.num()
         )
         .execute(&state.pg_db_pool)
-        .await?;
+        .await
+        .map_err(db_err_to_status)?;
 
         Ok(beat)
     }
 
     pub async fn list_by_combo(
         state: &AppState,
-        combo_id: ComboId,
-    ) -> Result<Vec<Beat>, sqlx::Error> {
+        checked_combo_id: CheckedComboId,
+    ) -> Result<Vec<Beat>, (StatusCode, &'static str)> {
+        let combo_id = checked_combo_id.assert_read_access()?;
+
         let rows = sqlx::query_as!(
             BeatRow,
             r#"
@@ -95,20 +103,27 @@ impl Beat {
             combo_id.num()
         )
         .fetch_all(&state.pg_db_pool)
-        .await?;
+        .await
+        .map_err(db_err_to_status)?;
 
         let beats = rows.into_iter().map(Beat::from).collect();
         Ok(beats)
     }
 
-    pub async fn delete(state: &AppState, beat_id: BeatId) -> Result<bool, sqlx::Error> {
+    pub async fn delete(
+        state: &AppState,
+        checked_beat_id: CheckedBeatId,
+    ) -> Result<bool, (StatusCode, &'static str)> {
+        let beat_id = checked_beat_id.assert_write_access()?;
+
         let res = sqlx::query_as!(
             BeatRow,
             r#"DELETE FROM video_beats t WHERE t.id = $1"#,
             beat_id.num()
         )
         .execute(&state.pg_db_pool)
-        .await?;
+        .await
+        .map_err(db_err_to_status)?;
         Ok(res.rows_affected() > 0)
     }
 }

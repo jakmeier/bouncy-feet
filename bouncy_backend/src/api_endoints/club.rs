@@ -9,7 +9,7 @@ use crate::peertube::playlist::{
 use crate::peertube::{self, retry_peertube_op, PeerTubeError};
 use crate::playlist::{Playlist, PlaylistInfo};
 use crate::user::{User, UserId};
-use crate::AppState;
+use crate::{db_err_to_response, AppState};
 use axum::extract::State;
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
@@ -829,18 +829,6 @@ pub async fn update_avatar(
 
     state.data_cache.invalidate_club(club_id).await;
     Ok(())
-}
-
-#[track_caller]
-fn db_err_to_response(err: sqlx::Error) -> Response {
-    let location = std::panic::Location::caller();
-    tracing::error!(
-        ?err,
-        file = location.file(),
-        line = location.line(),
-        "DB error"
-    );
-    (StatusCode::INTERNAL_SERVER_ERROR, "DB ERROR").into_response()
 }
 
 fn validate_web_link(

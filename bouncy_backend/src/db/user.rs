@@ -386,7 +386,7 @@ mod tests {
 
     async fn apply_migrations(pool: &sqlx::PgPool) {
         sqlx::migrate::Migrator::new(
-            std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("db_migrations")
+            std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("db_migrations"),
         )
         .await
         .expect("failed to build migrator")
@@ -408,15 +408,10 @@ mod tests {
             kc_config: KeycloakClientConfig {
                 client_id: "test-client".to_string(),
                 client_secret: "test-secret".to_string(),
-                registration_url: "http://localhost:8080/register"
-                    .parse::<Url>()
-                    .unwrap(),
+                registration_url: "http://localhost:8080/register".parse::<Url>().unwrap(),
                 logout_url: "http://localhost:8080/logout".parse::<Url>().unwrap(),
             },
-            system_user: PeerTubeSystemUser::new(
-                "system_user".to_string(),
-                "password".to_string(),
-            ),
+            system_user: PeerTubeSystemUser::new("system_user".to_string(), "password".to_string()),
             data_cache: DataCache::default(),
         }
     }
@@ -498,21 +493,18 @@ mod tests {
         // Use the dynamic (non-macro) query to avoid compile-time DB checks
         // in offline mode.  The correctness of the SQL is validated at
         // runtime by the sqlx::test framework.
-        let id: i64 = sqlx::query_scalar(
-            "INSERT INTO users (oidc_subject) VALUES ($1) RETURNING id",
-        )
-        .bind(&subject)
-        .fetch_one(&pool)
-        .await?;
+        let id: i64 =
+            sqlx::query_scalar("INSERT INTO users (oidc_subject) VALUES ($1) RETURNING id")
+                .bind(&subject)
+                .fetch_one(&pool)
+                .await?;
 
         let state = make_test_state(pool);
         let user = User::lookup(&state, UserId(id)).await;
 
         assert!(user.is_some());
         let user = user.unwrap();
-        let stored_sub = user
-            .oidc_subject
-            .expect("OIDC subject must be stored");
+        let stored_sub = user.oidc_subject.expect("OIDC subject must be stored");
         assert_eq!(
             stored_sub.to_string(),
             subject,
