@@ -37,6 +37,13 @@ impl ComboId {
     pub fn num(&self) -> i64 {
         self.0
     }
+
+    /// Construct a `ComboId` from a raw database id. Only available in test
+    /// code; production code must obtain IDs through the normal DB functions.
+    #[cfg(test)]
+    pub(crate) fn for_test(id: i64) -> Self {
+        ComboId(id)
+    }
 }
 
 impl Combo {

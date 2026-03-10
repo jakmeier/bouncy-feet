@@ -139,3 +139,316 @@ impl From<BeatRow> for Beat {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::api_endoints::auth::KeycloakClientConfig;
+    use crate::cache::DataCache;
+    use crate::combo::ComboId;
+    use crate::peertube::system_user::PeerTubeSystemUser;
+    use sqlx::PgPool;
+    use std::sync::Arc;
+    use url::Url;
+
+    async fn apply_migrations(pool: &PgPool) {
+        sqlx::migrate::Migrator::new(
+            std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("db_migrations"),
+        )
+        .await
+        .expect("failed to build migrator")
+        .run(pool)
+        .await
+        .expect("failed to run migrations");
+    }
+
+    /// Build a minimal AppState for testing.
+    /// Only the `pg_db_pool` field is meaningful; all other fields use dummy values.
+    fn make_test_state(pool: PgPool) -> crate::AppState {
+        crate::AppState {
+            app_url: "http://localhost:3000".parse::<Url>().unwrap(),
+            api_url: "http://localhost:4000".parse::<Url>().unwrap(),
+            peertube_url: "http://localhost:9000".parse::<Url>().unwrap(),
+            pg_db_pool: pool,
+            http_client: reqwest::Client::new(),
+            peertube_client_config: Arc::new(tokio::sync::RwLock::new(None)),
+            kc_config: KeycloakClientConfig {
+                client_id: "test-client".to_string(),
+                client_secret: "test-secret".to_string(),
+                registration_url: "http://localhost:8080/register".parse::<Url>().unwrap(),
+                logout_url: "http://localhost:8080/logout".parse::<Url>().unwrap(),
+            },
+            system_user: PeerTubeSystemUser::new("system_user".to_string(), "password".to_string()),
+            data_cache: DataCache::default(),
+        }
+    }
+
+    /// Insert a guest user and one combo; return the raw ComboId.
+    async fn setup_combo(pool: &PgPool) -> ComboId {
+        let user_id: i64 = sqlx::query_scalar("INSERT INTO users (oidc_subject) VALUES (null) RETURNING id")
+            .fetch_one(pool)
+            .await
+            .expect("failed to insert test user");
+
+        let combo_id: i64 = sqlx::query_scalar(
+            "INSERT INTO combos (user_id, is_private) VALUES ($1, false) RETURNING id",
+        )
+        .bind(user_id)
+        .fetch_one(pool)
+        .await
+        .expect("failed to insert test combo");
+
+        ComboId::for_test(combo_id)
+    }
+
+    // ── Beat::create_for_combo ────────────────────────────────────────────────
+
+    #[sqlx::test]
+    async fn create_beat_for_owned_combo_returns_correct_fields(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        let state = make_test_state(pool.clone());
+        let combo_id = setup_combo(&pool).await;
+        let checked = CheckedComboId::Owned(combo_id);
+
+        let beat = Beat::create_for_combo(&state, checked, 100, 480, 125.0, 4)
+            .await
+            .expect("create_for_combo should succeed for an owned combo");
+
+        assert_eq!(beat.start, 100);
+        assert_eq!(beat.duration, 480);
+        assert_eq!((beat.bpm * 10.0).round(), 1250.0);
+        assert_eq!(beat.subbeat_per_move, 4);
+        assert!(beat.id.num() > 0, "assigned id should be positive");
+        Ok(())
+    }
+
+    #[sqlx::test]
+    async fn create_beat_for_public_combo_is_forbidden(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        let state = make_test_state(pool.clone());
+        let combo_id = setup_combo(&pool).await;
+        // Public means readable but not writable.
+        let checked = CheckedComboId::Public(combo_id);
+
+        let result = Beat::create_for_combo(&state, checked, 0, 100, 120.0, 2).await;
+
+        assert!(result.is_err(), "write to a public (non-owned) combo must be rejected");
+        let (status, _) = result.unwrap_err();
+        assert_eq!(status, axum::http::StatusCode::FORBIDDEN);
+        Ok(())
+    }
+
+    #[sqlx::test]
+    async fn create_beat_for_not_found_combo_returns_404(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        let state = make_test_state(pool);
+        let checked = CheckedComboId::NotFound;
+
+        let result = Beat::create_for_combo(&state, checked, 0, 100, 120.0, 2).await;
+
+        assert!(result.is_err());
+        let (status, _) = result.unwrap_err();
+        assert_eq!(status, axum::http::StatusCode::NOT_FOUND);
+        Ok(())
+    }
+
+    // ── Beat::list_by_combo ───────────────────────────────────────────────────
+
+    #[sqlx::test]
+    async fn list_by_combo_returns_inserted_beats(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        let state = make_test_state(pool.clone());
+        let combo_id = setup_combo(&pool).await;
+        let owned = CheckedComboId::Owned(combo_id);
+
+        Beat::create_for_combo(&state, owned, 0, 300, 120.0, 2)
+            .await
+            .unwrap();
+        Beat::create_for_combo(&state, owned, 300, 600, 130.0, 4)
+            .await
+            .unwrap();
+
+        let beats = Beat::list_by_combo(&state, owned)
+            .await
+            .expect("list should succeed");
+        assert_eq!(beats.len(), 2);
+        Ok(())
+    }
+
+    #[sqlx::test]
+    async fn list_by_combo_is_isolated_per_combo(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        let state = make_test_state(pool.clone());
+        let combo_a = setup_combo(&pool).await;
+        let combo_b = setup_combo(&pool).await;
+
+        Beat::create_for_combo(&state, CheckedComboId::Owned(combo_a), 0, 480, 120.0, 4)
+            .await
+            .unwrap();
+        Beat::create_for_combo(&state, CheckedComboId::Owned(combo_b), 0, 200, 100.0, 2)
+            .await
+            .unwrap();
+        Beat::create_for_combo(&state, CheckedComboId::Owned(combo_b), 200, 400, 110.0, 2)
+            .await
+            .unwrap();
+
+        let beats_a = Beat::list_by_combo(&state, CheckedComboId::Owned(combo_a))
+            .await
+            .unwrap();
+        let beats_b = Beat::list_by_combo(&state, CheckedComboId::Owned(combo_b))
+            .await
+            .unwrap();
+
+        assert_eq!(beats_a.len(), 1, "combo_a should have exactly 1 beat");
+        assert_eq!(beats_b.len(), 2, "combo_b should have exactly 2 beats");
+        Ok(())
+    }
+
+    #[sqlx::test]
+    async fn list_by_combo_empty_for_new_combo(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        let state = make_test_state(pool.clone());
+        let combo_id = setup_combo(&pool).await;
+
+        let beats = Beat::list_by_combo(&state, CheckedComboId::Owned(combo_id))
+            .await
+            .expect("list should succeed");
+        assert!(beats.is_empty(), "new combo should have no beats");
+        Ok(())
+    }
+
+    #[sqlx::test]
+    async fn list_by_public_combo_is_allowed(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        let state = make_test_state(pool.clone());
+        let combo_id = setup_combo(&pool).await;
+
+        // A public (non-owned) combo should still be readable.
+        let beats = Beat::list_by_combo(&state, CheckedComboId::Public(combo_id))
+            .await
+            .expect("read access on a public combo must succeed");
+        assert!(beats.is_empty());
+        Ok(())
+    }
+
+    #[sqlx::test]
+    async fn list_by_combo_not_found_returns_404(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        let state = make_test_state(pool);
+
+        let result = Beat::list_by_combo(&state, CheckedComboId::NotFound).await;
+
+        assert!(result.is_err());
+        let (status, _) = result.unwrap_err();
+        assert_eq!(status, axum::http::StatusCode::NOT_FOUND);
+        Ok(())
+    }
+
+    // ── Beat::delete ──────────────────────────────────────────────────────────
+
+    #[sqlx::test]
+    async fn delete_owned_beat_returns_true(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        let state = make_test_state(pool.clone());
+        let combo_id = setup_combo(&pool).await;
+
+        let beat = Beat::create_for_combo(&state, CheckedComboId::Owned(combo_id), 0, 480, 120.0, 4)
+            .await
+            .unwrap();
+
+        let deleted = Beat::delete(&state, CheckedBeatId::Owned(beat.id))
+            .await
+            .expect("delete should succeed for an owned beat");
+        assert!(deleted, "delete should return true when the beat existed");
+        Ok(())
+    }
+
+    #[sqlx::test]
+    async fn delete_removes_beat_from_list(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        let state = make_test_state(pool.clone());
+        let combo_id = setup_combo(&pool).await;
+
+        let beat = Beat::create_for_combo(&state, CheckedComboId::Owned(combo_id), 0, 480, 120.0, 4)
+            .await
+            .unwrap();
+        Beat::delete(&state, CheckedBeatId::Owned(beat.id))
+            .await
+            .unwrap();
+
+        let beats = Beat::list_by_combo(&state, CheckedComboId::Owned(combo_id))
+            .await
+            .unwrap();
+        assert!(beats.is_empty(), "beat should no longer appear in the list after deletion");
+        Ok(())
+    }
+
+    #[sqlx::test]
+    async fn delete_nonexistent_beat_returns_false(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        let state = make_test_state(pool);
+
+        let deleted = Beat::delete(&state, CheckedBeatId::Owned(BeatId(i64::MAX)))
+            .await
+            .expect("delete of non-existent beat should not error");
+        assert!(!deleted, "delete should return false when the beat did not exist");
+        Ok(())
+    }
+
+    #[sqlx::test]
+    async fn delete_public_beat_is_forbidden(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        let state = make_test_state(pool.clone());
+        let combo_id = setup_combo(&pool).await;
+
+        let beat = Beat::create_for_combo(&state, CheckedComboId::Owned(combo_id), 0, 480, 120.0, 4)
+            .await
+            .unwrap();
+
+        // Public means read-only; deleting should be rejected.
+        let result = Beat::delete(&state, CheckedBeatId::Public(beat.id)).await;
+
+        assert!(result.is_err(), "deleting a public beat must be rejected");
+        let (status, _) = result.unwrap_err();
+        assert_eq!(status, axum::http::StatusCode::FORBIDDEN);
+        Ok(())
+    }
+
+    #[sqlx::test]
+    async fn delete_not_found_beat_returns_404(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        let state = make_test_state(pool);
+
+        let result = Beat::delete(&state, CheckedBeatId::NotFound).await;
+
+        assert!(result.is_err());
+        let (status, _) = result.unwrap_err();
+        assert_eq!(status, axum::http::StatusCode::NOT_FOUND);
+        Ok(())
+    }
+
+    // ── Pure unit tests (no DB) ───────────────────────────────────────────────
+
+    #[test]
+    fn beat_id_num_roundtrips() {
+        let id = BeatId(42);
+        assert_eq!(id.num(), 42);
+    }
+
+    #[test]
+    fn beat_from_row_maps_all_fields() {
+        let row = BeatRow {
+            id: 7,
+            start: 100,
+            duration: 500,
+            bpm: 128.5,
+            subbeat_per_move: 3,
+        };
+        let beat = Beat::from(row);
+        assert_eq!(beat.id.num(), 7);
+        assert_eq!(beat.start, 100);
+        assert_eq!(beat.duration, 500);
+        assert_eq!((beat.bpm * 10.0).round(), 1285.0);
+        assert_eq!(beat.subbeat_per_move, 3);
+    }
+}
