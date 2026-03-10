@@ -299,3 +299,29 @@ fn require_env(var_name: &str) -> String {
     std::env::var(var_name)
         .unwrap_or_else(|err| panic!("missing {var_name} environment variable, err {err}"))
 }
+
+#[cfg(test)]
+pub(crate) fn make_test_state(pool: sqlx::PgPool) -> AppState {
+    use std::sync::Arc;
+    use tokio::sync::RwLock;
+
+    AppState {
+        app_url: "http://localhost".parse().unwrap(),
+        api_url: "http://localhost".parse().unwrap(),
+        peertube_url: "http://localhost".parse().unwrap(),
+        pg_db_pool: pool,
+        http_client: reqwest::Client::new(),
+        peertube_client_config: Arc::new(RwLock::new(None)),
+        kc_config: crate::api_endoints::auth::KeycloakClientConfig {
+            client_id: "test".to_owned(),
+            client_secret: "test".to_owned(),
+            registration_url: "http://localhost/register".parse().unwrap(),
+            logout_url: "http://localhost/logout".parse().unwrap(),
+        },
+        system_user: crate::peertube::system_user::PeerTubeSystemUser::new(
+            "test".to_owned(),
+            "test".to_owned(),
+        ),
+        data_cache: crate::cache::DataCache::default(),
+    }
+}
