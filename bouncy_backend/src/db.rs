@@ -4,6 +4,8 @@ pub(crate) mod club;
 pub(crate) mod combo;
 pub(crate) mod dance_activity;
 pub(crate) mod playlist;
+#[cfg(test)]
+pub(crate) mod test_helpers;
 pub(crate) mod timestamp;
 pub(crate) mod user;
 
