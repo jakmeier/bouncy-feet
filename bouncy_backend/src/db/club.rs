@@ -376,24 +376,6 @@ impl From<ClubRow> for Club {
     }
 }
 
-impl UserClubRow {
-    pub(crate) fn user_id(&self) -> UserId {
-        UserId(self.user_id)
-    }
-}
-
-impl UserJoinedClubRow {
-    pub(crate) fn user_id(&self) -> UserId {
-        UserId(self.user_id)
-    }
-}
-
-impl ClubRow {
-    pub(crate) fn main_playlist_id(&self) -> Option<PeerTubePlaylistId> {
-        self.main_playlist.map(PeerTubePlaylistId)
-    }
-}
-
 impl ClubMembership {
     fn for_member(is_admin: bool) -> Self {
         if is_admin {

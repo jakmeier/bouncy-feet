@@ -4,9 +4,8 @@ use uuid::Uuid;
 
 use crate::api_endoints::club::AddClubMemberRequest;
 use crate::client_session::ClientSessionId;
-use crate::club::UserJoinedClubRow;
 use crate::combo::ComboRow;
-use crate::db::club::UserClubRow;
+use crate::db::club::{UserClubRow, UserJoinedClubRow};
 use crate::layers::oidc::AdditionalClaims;
 use crate::peertube::user::{PeerTubeAccountId, PeerTubeHandle};
 use crate::AppState;
