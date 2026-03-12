@@ -174,4 +174,4 @@ You may also have a look at
 These are typically long-term features which I know I want in the app eventually
 but I don't have the capacity to work on them right now. If you want to work on
 them, I will give my best to help you help me and make it a pleasant
-collaboration experience for both of us.
+collaboration experience for both of us.# Fixed
