@@ -495,7 +495,7 @@ mod tests {
             &state,
             "Test Club",
             "A test club for testing",
-            Some("https://example.com".parse().unwrap()),
+            Some("https://example.com/".parse().unwrap()),
             PeerTubeChannelId(42),
             PeerTubeChannelHandle("test_channel".to_string()),
             None,
@@ -506,7 +506,7 @@ mod tests {
         assert!(club.id.num() > 0, "newly created club should have a positive id");
         assert_eq!(club.title, "Test Club");
         assert_eq!(club.description, "A test club for testing");
-        assert_eq!(club.web_link, Some("https://example.com".to_string()));
+        assert_eq!(club.web_link, Some("https://example.com/".to_string()));
         assert_eq!(club.channel_id, Some(PeerTubeChannelId(42)));
         assert_eq!(club.channel_handle, Some(PeerTubeChannelHandle("test_channel".to_string())));
         assert_eq!(club.main_playlist, None);
