@@ -362,6 +362,12 @@ impl ClubId {
     }
 }
 
+impl ClubRow {
+    pub(crate) fn main_playlist_id(&self) -> Option<PeerTubePlaylistId> {
+        self.main_playlist.map(PeerTubePlaylistId)
+    }
+}
+
 impl From<ClubRow> for Club {
     fn from(record: ClubRow) -> Self {
         Club {
