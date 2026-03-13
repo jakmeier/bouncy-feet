@@ -261,3 +261,484 @@ impl crate::db::beat::Beat {
         Ok(id)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::db::test_helpers::{apply_migrations, make_test_state};
+    use sqlx::PgPool;
+
+    /// Insert a guest user; return the UserId.
+    async fn setup_user(pool: &PgPool) -> UserId {
+        let user_id: i64 = sqlx::query_scalar("INSERT INTO users (oidc_subject) VALUES (null) RETURNING id")
+            .fetch_one(pool)
+            .await
+            .expect("failed to insert test user");
+        UserId::from_i64(user_id)
+    }
+
+    // ── Combo::create ──────────────────────────────────────────────────────────
+
+    #[sqlx::test]
+    async fn create_combo_with_all_fields_returns_correct_values(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        let state = make_test_state(pool);
+        let user_id = setup_user(&state.pg_db_pool).await;
+
+        let combo = Combo::create(
+            &state,
+            user_id,
+            true,
+            Some(1),
+            Some("Dance Move"),
+            Some("Salsa Turn"),
+            Some("short-uuid-abc"),
+        )
+        .await
+        .expect("create should succeed");
+
+        assert!(combo.id.num() > 0, "assigned id should be positive");
+        assert_eq!(combo.user_id.num(), user_id.num());
+        assert!(combo.is_private);
+        assert_eq!(combo.sort_order, Some(1));
+        assert_eq!(combo.free_form_category, Some("Dance Move".to_string()));
+        assert_eq!(combo.title, Some("Salsa Turn".to_string()));
+        assert_eq!(combo.video_short_uuid, Some("short-uuid-abc".to_string()));
+        Ok(())
+    }
+
+    #[sqlx::test]
+    async fn create_combo_with_minimal_fields(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        let state = make_test_state(pool);
+        let user_id = setup_user(&state.pg_db_pool).await;
+
+        let combo = Combo::create(&state, user_id, false, None, None, None, None)
+            .await
+            .expect("create should succeed with minimal fields");
+
+        assert!(combo.id.num() > 0);
+        assert_eq!(combo.user_id.num(), user_id.num());
+        assert!(!combo.is_private);
+        assert_eq!(combo.sort_order, None);
+        assert_eq!(combo.free_form_category, None);
+        assert_eq!(combo.title, None);
+        assert_eq!(combo.video_short_uuid, None);
+        Ok(())
+    }
+
+    #[sqlx::test]
+    async fn create_multiple_combos_have_distinct_ids(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        let state = make_test_state(pool);
+        let user_id = setup_user(&state.pg_db_pool).await;
+
+        let combo1 = Combo::create(&state, user_id, false, None, None, Some("First"), None)
+            .await
+            .expect("first create should succeed");
+        let combo2 = Combo::create(&state, user_id, false, None, None, Some("Second"), None)
+            .await
+            .expect("second create should succeed");
+
+        assert_ne!(
+            combo1.id.num(),
+            combo2.id.num(),
+            "each combo should have a unique id"
+        );
+        Ok(())
+    }
+
+    #[sqlx::test]
+    async fn create_combo_preserves_private_flag(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        let state = make_test_state(pool);
+        let user_id = setup_user(&state.pg_db_pool).await;
+
+        let private_combo = Combo::create(&state, user_id, true, None, None, None, None)
+            .await
+            .expect("create private combo");
+        let public_combo = Combo::create(&state, user_id, false, None, None, None, None)
+            .await
+            .expect("create public combo");
+
+        assert!(private_combo.is_private);
+        assert!(!public_combo.is_private);
+        Ok(())
+    }
+
+    // ── Combo::lookup ──────────────────────────────────────────────────────────
+
+    #[sqlx::test]
+    async fn lookup_existing_combo_returns_some(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        let state = make_test_state(pool);
+        let user_id = setup_user(&state.pg_db_pool).await;
+
+        let created = Combo::create(
+            &state,
+            user_id,
+            false,
+            Some(5),
+            Some("Category"),
+            Some("Title"),
+            Some("uuid-123"),
+        )
+        .await
+        .expect("create should succeed");
+
+        let looked_up = Combo::lookup(&state, created.id)
+            .await
+            .expect("lookup should succeed");
+
+        assert!(looked_up.is_some(), "should find the combo that was just created");
+        let combo = looked_up.unwrap();
+        assert_eq!(combo.id.num(), created.id.num());
+        assert_eq!(combo.user_id.num(), user_id.num());
+        assert_eq!(combo.sort_order, Some(5));
+        assert_eq!(combo.free_form_category, Some("Category".to_string()));
+        assert_eq!(combo.title, Some("Title".to_string()));
+        assert_eq!(combo.video_short_uuid, Some("uuid-123".to_string()));
+        Ok(())
+    }
+
+    #[sqlx::test]
+    async fn lookup_nonexistent_combo_returns_none(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        let state = make_test_state(pool);
+
+        let result = Combo::lookup(&state, ComboId(i64::MAX))
+            .await
+            .expect("lookup should not error");
+
+        assert!(result.is_none(), "looking up a non-existent combo should return None");
+        Ok(())
+    }
+
+    // ── Combo::is_owned_by ─────────────────────────────────────────────────────
+
+    #[sqlx::test]
+    async fn is_owned_by_returns_true_for_owner(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        let state = make_test_state(pool);
+        let user_id = setup_user(&state.pg_db_pool).await;
+
+        let combo = Combo::create(&state, user_id, false, None, None, None, None)
+            .await
+            .expect("create should succeed");
+
+        let is_owned = Combo::is_owned_by(&state, combo.id, user_id)
+            .await
+            .expect("is_owned_by should succeed");
+
+        assert!(is_owned, "creator should own the combo");
+        Ok(())
+    }
+
+    #[sqlx::test]
+    async fn is_owned_by_returns_false_for_non_owner(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        let state = make_test_state(pool);
+        let user1 = setup_user(&state.pg_db_pool).await;
+        let user2 = setup_user(&state.pg_db_pool).await;
+
+        let combo = Combo::create(&state, user1, false, None, None, None, None)
+            .await
+            .expect("create should succeed");
+
+        let is_owned = Combo::is_owned_by(&state, combo.id, user2)
+            .await
+            .expect("is_owned_by should succeed");
+
+        assert!(!is_owned, "different user should not own the combo");
+        Ok(())
+    }
+
+    #[sqlx::test]
+    async fn is_owned_by_returns_false_for_nonexistent_combo(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        let state = make_test_state(pool);
+        let user_id = setup_user(&state.pg_db_pool).await;
+
+        let is_owned = Combo::is_owned_by(&state, ComboId(i64::MAX), user_id)
+            .await
+            .expect("is_owned_by should succeed");
+
+        assert!(!is_owned, "non-existent combo cannot be owned by anyone");
+        Ok(())
+    }
+
+    // ── Combo::list_by_user ────────────────────────────────────────────────────
+
+    #[sqlx::test]
+    async fn list_by_user_returns_all_user_combos(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        let state = make_test_state(pool);
+        let user_id = setup_user(&state.pg_db_pool).await;
+
+        Combo::create(&state, user_id, false, None, None, Some("Combo 1"), None)
+            .await
+            .expect("create combo 1");
+        Combo::create(&state, user_id, false, None, None, Some("Combo 2"), None)
+            .await
+            .expect("create combo 2");
+        Combo::create(&state, user_id, false, None, None, Some("Combo 3"), None)
+            .await
+            .expect("create combo 3");
+
+        let combos = Combo::list_by_user(&state, user_id)
+            .await
+            .expect("list should succeed");
+
+        assert_eq!(combos.len(), 3, "should return all 3 combos for the user");
+        assert!(
+            combos.iter().all(|c| c.user_id.num() == user_id.num()),
+            "all returned combos should belong to the user"
+        );
+        Ok(())
+    }
+
+    #[sqlx::test]
+    async fn list_by_user_is_isolated_per_user(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        let state = make_test_state(pool);
+        let user1 = setup_user(&state.pg_db_pool).await;
+        let user2 = setup_user(&state.pg_db_pool).await;
+
+        Combo::create(&state, user1, false, None, None, Some("User1 Combo 1"), None)
+            .await
+            .expect("create for user 1");
+        Combo::create(&state, user1, false, None, None, Some("User1 Combo 2"), None)
+            .await
+            .expect("create for user 1");
+        Combo::create(&state, user2, false, None, None, Some("User2 Combo 1"), None)
+            .await
+            .expect("create for user 2");
+
+        let combos_user1 = Combo::list_by_user(&state, user1)
+            .await
+            .expect("list for user 1");
+        let combos_user2 = Combo::list_by_user(&state, user2)
+            .await
+            .expect("list for user 2");
+
+        assert_eq!(combos_user1.len(), 2, "user 1 should have exactly 2 combos");
+        assert_eq!(combos_user2.len(), 1, "user 2 should have exactly 1 combo");
+        Ok(())
+    }
+
+    #[sqlx::test]
+    async fn list_by_user_empty_for_user_with_no_combos(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        let state = make_test_state(pool);
+        let user_id = setup_user(&state.pg_db_pool).await;
+
+        let combos = Combo::list_by_user(&state, user_id)
+            .await
+            .expect("list should succeed");
+
+        assert!(combos.is_empty(), "user with no combos should return empty list");
+        Ok(())
+    }
+
+    // ── Combo::update_combo ────────────────────────────────────────────────────
+
+    #[sqlx::test]
+    async fn update_combo_changes_owned_combo(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        let state = make_test_state(pool);
+        let user_id = setup_user(&state.pg_db_pool).await;
+
+        let created = Combo::create(
+            &state,
+            user_id,
+            false,
+            Some(1),
+            Some("Old Category"),
+            Some("Old Title"),
+            Some("old-uuid"),
+        )
+        .await
+        .expect("create should succeed");
+
+        let user = User::lookup(&state, user_id)
+            .await
+            .expect("user lookup should succeed")
+            .expect("user should exist");
+
+        let update_payload = ComboInfo {
+            id: created.id,
+            is_private: true,
+            sort_order: Some(10),
+            free_form_category: Some("New Category".to_string()),
+            title: Some("New Title".to_string()),
+            video_short_uuid: Some("new-uuid".to_string()),
+        };
+
+        let updated = Combo::update_combo(&state, &user, update_payload)
+            .await
+            .expect("update should succeed");
+
+        assert!(updated.is_some(), "update should return Some for owned combo");
+        let combo = updated.unwrap();
+        assert_eq!(combo.id.num(), created.id.num());
+        assert!(combo.is_private, "should update private flag");
+        assert_eq!(combo.sort_order, Some(10), "should update sort_order");
+        assert_eq!(combo.free_form_category, Some("New Category".to_string()));
+        assert_eq!(combo.title, Some("New Title".to_string()));
+        assert_eq!(combo.video_short_uuid, Some("new-uuid".to_string()));
+        Ok(())
+    }
+
+    #[sqlx::test]
+    async fn update_combo_clears_optional_fields(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        let state = make_test_state(pool);
+        let user_id = setup_user(&state.pg_db_pool).await;
+
+        let created = Combo::create(
+            &state,
+            user_id,
+            false,
+            Some(5),
+            Some("Category"),
+            Some("Title"),
+            Some("uuid"),
+        )
+        .await
+        .expect("create should succeed");
+
+        let user = User::lookup(&state, user_id)
+            .await
+            .expect("user lookup should succeed")
+            .expect("user should exist");
+
+        let update_payload = ComboInfo {
+            id: created.id,
+            is_private: false,
+            sort_order: None,
+            free_form_category: None,
+            title: None,
+            video_short_uuid: None,
+        };
+
+        let updated = Combo::update_combo(&state, &user, update_payload)
+            .await
+            .expect("update should succeed");
+
+        assert!(updated.is_some());
+        let combo = updated.unwrap();
+        assert_eq!(combo.sort_order, None, "should clear sort_order");
+        assert_eq!(combo.free_form_category, None, "should clear category");
+        assert_eq!(combo.title, None, "should clear title");
+        assert_eq!(combo.video_short_uuid, None, "should clear video uuid");
+        Ok(())
+    }
+
+    #[sqlx::test]
+    async fn update_combo_returns_none_for_non_owned_combo(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        let state = make_test_state(pool);
+        let user1 = setup_user(&state.pg_db_pool).await;
+        let user2 = setup_user(&state.pg_db_pool).await;
+
+        let created = Combo::create(&state, user1, false, None, None, Some("Title"), None)
+            .await
+            .expect("create should succeed");
+
+        let user2_record = User::lookup(&state, user2)
+            .await
+            .expect("user lookup should succeed")
+            .expect("user should exist");
+
+        let update_payload = ComboInfo {
+            id: created.id,
+            is_private: true,
+            sort_order: None,
+            free_form_category: None,
+            title: Some("Hacked Title".to_string()),
+            video_short_uuid: None,
+        };
+
+        let result = Combo::update_combo(&state, &user2_record, update_payload)
+            .await
+            .expect("update should not error");
+
+        assert!(
+            result.is_none(),
+            "update by non-owner should return None"
+        );
+
+        // Verify the combo was not actually updated
+        let original = Combo::lookup(&state, created.id)
+            .await
+            .expect("lookup should succeed")
+            .expect("combo should exist");
+        assert_eq!(original.title, Some("Title".to_string()));
+        Ok(())
+    }
+
+    #[sqlx::test]
+    async fn update_combo_nonexistent_returns_none(pool: PgPool) -> sqlx::Result<()> {
+        apply_migrations(&pool).await;
+        let state = make_test_state(pool);
+        let user_id = setup_user(&state.pg_db_pool).await;
+
+        let user = User::lookup(&state, user_id)
+            .await
+            .expect("user lookup should succeed")
+            .expect("user should exist");
+
+        let update_payload = ComboInfo {
+            id: ComboId(i64::MAX),
+            is_private: false,
+            sort_order: None,
+            free_form_category: None,
+            title: Some("Title".to_string()),
+            video_short_uuid: None,
+        };
+
+        let result = Combo::update_combo(&state, &user, update_payload)
+            .await
+            .expect("update should not error");
+
+        assert!(result.is_none(), "update of non-existent combo should return None");
+        Ok(())
+    }
+
+    // ── Combo::from ────────────────────────────────────────────────────────────
+
+    #[test]
+    fn combo_from_row_maps_all_fields() {
+        let row = ComboRow {
+            id: 42,
+            user_id: 10,
+            is_private: true,
+            sort_order: Some(3),
+            free_form_category: Some("Footwork".to_string()),
+            title: Some("Triple Step".to_string()),
+            video_short_uuid: Some("vid-short-id".to_string()),
+        };
+
+        let combo = Combo::from(row);
+
+        assert_eq!(combo.id.num(), 42);
+        assert_eq!(combo.user_id.num(), 10);
+        assert!(combo.is_private);
+        assert_eq!(combo.sort_order, Some(3));
+        assert_eq!(combo.free_form_category, Some("Footwork".to_string()));
+        assert_eq!(combo.title, Some("Triple Step".to_string()));
+        assert_eq!(combo.video_short_uuid, Some("vid-short-id".to_string()));
+    }
+
+    #[test]
+    fn combo_id_num_roundtrips() {
+        let id = ComboId(999);
+        assert_eq!(id.num(), 999);
+    }
+
+    #[test]
+    fn combo_id_for_test_creates_valid_id() {
+        let id = ComboId::for_test(123);
+        assert_eq!(id.num(), 123);
+    }
+}
