@@ -11,7 +11,7 @@ use crate::peertube::user::{PeerTubeAccountId, PeerTubeHandle};
 use crate::AppState;
 
 #[derive(Clone, Copy, Debug, serde::Deserialize)]
-pub struct UserId(pub i64);
+pub struct UserId(i64);
 
 #[derive(Clone, Debug)]
 pub struct User {
@@ -54,6 +54,11 @@ pub struct UserSearchFilter {
 impl UserId {
     pub fn num(&self) -> i64 {
         self.0
+    }
+
+    #[cfg(test)]
+    pub fn from_i64(id: i64) -> Self {
+        UserId(id)
     }
 
     pub(crate) async fn create_new_guest(db: &PgPool) -> Self {
