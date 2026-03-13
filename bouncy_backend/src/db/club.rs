@@ -495,7 +495,7 @@ mod tests {
     #[sqlx::test]
     async fn create_club_returns_valid_id_and_fields(pool: PgPool) -> sqlx::Result<()> {
         apply_migrations(&pool).await;
-        let state = make_test_state(pool);
+        let state = make_test_state(pool.clone());
 
         let club = Club::create(
             &state,
@@ -522,7 +522,7 @@ mod tests {
     #[sqlx::test]
     async fn create_club_without_optional_fields(pool: PgPool) -> sqlx::Result<()> {
         apply_migrations(&pool).await;
-        let state = make_test_state(pool);
+        let state = make_test_state(pool.clone());
 
         let club = Club::create(
             &state,
@@ -547,7 +547,7 @@ mod tests {
     #[sqlx::test]
     async fn lookup_existing_club_returns_some(pool: PgPool) -> sqlx::Result<()> {
         apply_migrations(&pool).await;
-        let state = make_test_state(pool);
+        let state = make_test_state(pool.clone());
 
         let created = Club::create(
             &state,
@@ -572,7 +572,7 @@ mod tests {
     #[sqlx::test]
     async fn lookup_nonexistent_club_returns_none(pool: PgPool) -> sqlx::Result<()> {
         apply_migrations(&pool).await;
-        let state = make_test_state(pool);
+        let state = make_test_state(pool.clone());
 
         let missing = Club::lookup(&state, ClubId(i64::MAX)).await;
 
@@ -585,7 +585,7 @@ mod tests {
     #[sqlx::test]
     async fn delete_existing_club_returns_true(pool: PgPool) -> sqlx::Result<()> {
         apply_migrations(&pool).await;
-        let state = make_test_state(pool);
+        let state = make_test_state(pool.clone());
 
         let club = Club::create(
             &state,
@@ -607,7 +607,7 @@ mod tests {
     #[sqlx::test]
     async fn delete_removes_club_from_database(pool: PgPool) -> sqlx::Result<()> {
         apply_migrations(&pool).await;
-        let state = make_test_state(pool);
+        let state = make_test_state(pool.clone());
 
         let club = Club::create(
             &state,
@@ -633,7 +633,7 @@ mod tests {
     #[sqlx::test]
     async fn delete_nonexistent_club_returns_false(pool: PgPool) -> sqlx::Result<()> {
         apply_migrations(&pool).await;
-        let state = make_test_state(pool);
+        let state = make_test_state(pool.clone());
 
         let deleted = Club::delete(&state, ClubId(i64::MAX)).await?;
 
@@ -646,7 +646,7 @@ mod tests {
     #[sqlx::test]
     async fn list_clubs_returns_created_clubs(pool: PgPool) -> sqlx::Result<()> {
         apply_migrations(&pool).await;
-        let state = make_test_state(pool);
+        let state = make_test_state(pool.clone());
 
         Club::create(&state, "Club A", "A", None, PeerTubeChannelId(30), PeerTubeChannelHandle("a".to_string()), None).await?;
         Club::create(&state, "Club B", "B", None, PeerTubeChannelId(31), PeerTubeChannelHandle("b".to_string()), None).await?;
@@ -664,7 +664,7 @@ mod tests {
     #[sqlx::test]
     async fn list_clubs_respects_limit_and_offset(pool: PgPool) -> sqlx::Result<()> {
         apply_migrations(&pool).await;
-        let state = make_test_state(pool);
+        let state = make_test_state(pool.clone());
 
         for i in 0..5 {
             Club::create(
@@ -692,7 +692,7 @@ mod tests {
     #[sqlx::test]
     async fn list_clubs_empty_database_returns_empty_vec(pool: PgPool) -> sqlx::Result<()> {
         apply_migrations(&pool).await;
-        let state = make_test_state(pool);
+        let state = make_test_state(pool.clone());
 
         let clubs = Club::list(&state, 10, 0).await?;
 
@@ -705,7 +705,7 @@ mod tests {
     #[sqlx::test]
     async fn add_member_to_club_succeeds(pool: PgPool) -> sqlx::Result<()> {
         apply_migrations(&pool).await;
-        let state = make_test_state(pool);
+        let state = make_test_state(pool.clone());
         let user = setup_user(&pool).await;
         let club = Club::create(&state, "Club", "desc", None, PeerTubeChannelId(50), PeerTubeChannelHandle("ch".to_string()), None).await?;
 
@@ -719,7 +719,7 @@ mod tests {
     #[sqlx::test]
     async fn add_member_as_admin(pool: PgPool) -> sqlx::Result<()> {
         apply_migrations(&pool).await;
-        let state = make_test_state(pool);
+        let state = make_test_state(pool.clone());
         let user = setup_user(&pool).await;
         let club = Club::create(&state, "Club", "desc", None, PeerTubeChannelId(51), PeerTubeChannelHandle("ch".to_string()), None).await?;
 
@@ -733,7 +733,7 @@ mod tests {
     #[sqlx::test]
     async fn update_member_status_changes_admin_flag(pool: PgPool) -> sqlx::Result<()> {
         apply_migrations(&pool).await;
-        let state = make_test_state(pool);
+        let state = make_test_state(pool.clone());
         let user = setup_user(&pool).await;
         let club = Club::create(&state, "Club", "desc", None, PeerTubeChannelId(52), PeerTubeChannelHandle("ch".to_string()), None).await?;
 
@@ -752,7 +752,7 @@ mod tests {
     #[sqlx::test]
     async fn remove_existing_member_returns_true(pool: PgPool) -> sqlx::Result<()> {
         apply_migrations(&pool).await;
-        let state = make_test_state(pool);
+        let state = make_test_state(pool.clone());
         let user = setup_user(&pool).await;
         let club = Club::create(&state, "Club", "desc", None, PeerTubeChannelId(60), PeerTubeChannelHandle("ch".to_string()), None).await?;
 
@@ -766,7 +766,7 @@ mod tests {
     #[sqlx::test]
     async fn remove_member_updates_membership_to_none(pool: PgPool) -> sqlx::Result<()> {
         apply_migrations(&pool).await;
-        let state = make_test_state(pool);
+        let state = make_test_state(pool.clone());
         let user = setup_user(&pool).await;
         let club = Club::create(&state, "Club", "desc", None, PeerTubeChannelId(61), PeerTubeChannelHandle("ch".to_string()), None).await?;
 
@@ -781,7 +781,7 @@ mod tests {
     #[sqlx::test]
     async fn remove_nonexistent_member_returns_false(pool: PgPool) -> sqlx::Result<()> {
         apply_migrations(&pool).await;
-        let state = make_test_state(pool);
+        let state = make_test_state(pool.clone());
         let user = setup_user(&pool).await;
         let club = Club::create(&state, "Club", "desc", None, PeerTubeChannelId(62), PeerTubeChannelHandle("ch".to_string()), None).await?;
 
@@ -796,7 +796,7 @@ mod tests {
     #[sqlx::test]
     async fn membership_returns_none_for_non_member(pool: PgPool) -> sqlx::Result<()> {
         apply_migrations(&pool).await;
-        let state = make_test_state(pool);
+        let state = make_test_state(pool.clone());
         let user = setup_user(&pool).await;
         let club = Club::create(&state, "Club", "desc", None, PeerTubeChannelId(70), PeerTubeChannelHandle("ch".to_string()), None).await?;
 
@@ -809,7 +809,7 @@ mod tests {
     #[sqlx::test]
     async fn membership_distinguishes_member_and_admin(pool: PgPool) -> sqlx::Result<()> {
         apply_migrations(&pool).await;
-        let state = make_test_state(pool);
+        let state = make_test_state(pool.clone());
         let user1 = setup_user(&pool).await;
         let user2 = setup_user(&pool).await;
         let club = Club::create(&state, "Club", "desc", None, PeerTubeChannelId(71), PeerTubeChannelHandle("ch".to_string()), None).await?;
@@ -830,7 +830,7 @@ mod tests {
     #[sqlx::test]
     async fn list_members_returns_all_club_members(pool: PgPool) -> sqlx::Result<()> {
         apply_migrations(&pool).await;
-        let state = make_test_state(pool);
+        let state = make_test_state(pool.clone());
         let user1 = setup_user(&pool).await;
         let user2 = setup_user(&pool).await;
         let user3 = setup_user(&pool).await;
@@ -849,7 +849,7 @@ mod tests {
     #[sqlx::test]
     async fn list_members_returns_correct_membership_types(pool: PgPool) -> sqlx::Result<()> {
         apply_migrations(&pool).await;
-        let state = make_test_state(pool);
+        let state = make_test_state(pool.clone());
         let user1 = setup_user(&pool).await;
         let user2 = setup_user(&pool).await;
         let club = Club::create(&state, "Club", "desc", None, PeerTubeChannelId(81), PeerTubeChannelHandle("ch".to_string()), None).await?;
@@ -870,7 +870,7 @@ mod tests {
     #[sqlx::test]
     async fn list_members_empty_for_new_club(pool: PgPool) -> sqlx::Result<()> {
         apply_migrations(&pool).await;
-        let state = make_test_state(pool);
+        let state = make_test_state(pool.clone());
         let club = Club::create(&state, "Club", "desc", None, PeerTubeChannelId(82), PeerTubeChannelHandle("ch".to_string()), None).await?;
 
         let members = Club::list_members(&state, club.id).await?;
@@ -884,7 +884,7 @@ mod tests {
     #[sqlx::test]
     async fn list_members_with_info_includes_user_data(pool: PgPool) -> sqlx::Result<()> {
         apply_migrations(&pool).await;
-        let state = make_test_state(pool);
+        let state = make_test_state(pool.clone());
         let user1 = setup_user_with_name(&pool, "Alice").await;
         let user2 = setup_user_with_name(&pool, "Bob").await;
         let club = Club::create(&state, "Club", "desc", None, PeerTubeChannelId(90), PeerTubeChannelHandle("ch".to_string()), None).await?;
@@ -903,7 +903,7 @@ mod tests {
     #[sqlx::test]
     async fn list_members_with_info_respects_limit_and_offset(pool: PgPool) -> sqlx::Result<()> {
         apply_migrations(&pool).await;
-        let state = make_test_state(pool);
+        let state = make_test_state(pool.clone());
         let club = Club::create(&state, "Club", "desc", None, PeerTubeChannelId(91), PeerTubeChannelHandle("ch".to_string()), None).await?;
 
         for i in 0..5 {
@@ -926,7 +926,7 @@ mod tests {
     #[sqlx::test]
     async fn list_clubs_for_user_returns_user_clubs_only(pool: PgPool) -> sqlx::Result<()> {
         apply_migrations(&pool).await;
-        let state = make_test_state(pool);
+        let state = make_test_state(pool.clone());
         let user1 = setup_user(&pool).await;
         let user2 = setup_user(&pool).await;
         let club1 = Club::create(&state, "Club1", "desc", None, PeerTubeChannelId(100), PeerTubeChannelHandle("c1".to_string()), None).await?;
@@ -951,7 +951,7 @@ mod tests {
     #[sqlx::test]
     async fn list_clubs_for_user_empty_for_user_with_no_clubs(pool: PgPool) -> sqlx::Result<()> {
         apply_migrations(&pool).await;
-        let state = make_test_state(pool);
+        let state = make_test_state(pool.clone());
         let user = setup_user(&pool).await;
 
         let clubs = Club::list_clubs_for_user(&state, user).await?;
@@ -965,7 +965,7 @@ mod tests {
     #[sqlx::test]
     async fn set_main_playlist_updates_club(pool: PgPool) -> sqlx::Result<()> {
         apply_migrations(&pool).await;
-        let state = make_test_state(pool);
+        let state = make_test_state(pool.clone());
         let club = Club::create(&state, "Club", "desc", None, PeerTubeChannelId(110), PeerTubeChannelHandle("ch".to_string()), None).await?;
 
         assert_eq!(club.main_playlist, None);
@@ -980,7 +980,7 @@ mod tests {
     #[sqlx::test]
     async fn set_main_playlist_can_update_existing_playlist(pool: PgPool) -> sqlx::Result<()> {
         apply_migrations(&pool).await;
-        let state = make_test_state(pool);
+        let state = make_test_state(pool.clone());
         let club = Club::create(
             &state,
             "Club",
@@ -1004,7 +1004,7 @@ mod tests {
     #[sqlx::test]
     async fn set_meta_fields_updates_description_and_web_link(pool: PgPool) -> sqlx::Result<()> {
         apply_migrations(&pool).await;
-        let state = make_test_state(pool);
+        let state = make_test_state(pool.clone());
         let club = Club::create(
             &state,
             "Club",
@@ -1033,7 +1033,7 @@ mod tests {
     #[sqlx::test]
     async fn set_meta_fields_can_clear_web_link(pool: PgPool) -> sqlx::Result<()> {
         apply_migrations(&pool).await;
-        let state = make_test_state(pool);
+        let state = make_test_state(pool.clone());
         let club = Club::create(
             &state,
             "Club",
@@ -1055,7 +1055,7 @@ mod tests {
     #[sqlx::test]
     async fn set_meta_fields_does_not_modify_other_fields(pool: PgPool) -> sqlx::Result<()> {
         apply_migrations(&pool).await;
-        let state = make_test_state(pool);
+        let state = make_test_state(pool.clone());
         let club = Club::create(
             &state,
             "Original Title",
