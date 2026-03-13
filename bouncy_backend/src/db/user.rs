@@ -11,7 +11,7 @@ use crate::peertube::user::{PeerTubeAccountId, PeerTubeHandle};
 use crate::AppState;
 
 #[derive(Clone, Copy, Debug, serde::Deserialize)]
-pub struct UserId(i64);
+pub struct UserId(pub i64);
 
 #[derive(Clone, Debug)]
 pub struct User {

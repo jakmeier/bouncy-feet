@@ -12,7 +12,7 @@ use chrono::{DateTime, Utc};
 #[serde(transparent)]
 pub(crate) struct PeerTubeChannelId(pub i64);
 
-#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, Debug, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 #[serde(transparent)]
 pub(crate) struct PeerTubeChannelHandle(pub String);
 
