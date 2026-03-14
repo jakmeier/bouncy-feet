@@ -3,7 +3,7 @@ use crate::{
     beat::BeatId,
     timestamp::TimestampId,
     user::{User, UserId},
-    AppState,
+    AppState, CheckedUserId,
 };
 
 #[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
@@ -136,11 +136,13 @@ impl Combo {
 
     pub async fn list_by_user(
         state: &AppState,
-        user_id: UserId,
+        user_id: CheckedUserId,
     ) -> Result<Vec<Combo>, sqlx::Error> {
-        let rows = sqlx::query_as!(
-            ComboRow,
-            r#"
+        let rows = match user_id {
+            CheckedUserId::Owned(user_id) => {
+                sqlx::query_as!(
+                    ComboRow,
+                    r#"
             SELECT
                 id,
                 user_id,
@@ -152,10 +154,34 @@ impl Combo {
             FROM combos
             WHERE user_id = $1
             "#,
-            user_id.num()
-        )
-        .fetch_all(&state.pg_db_pool)
-        .await?;
+                    user_id.num()
+                )
+                .fetch_all(&state.pg_db_pool)
+                .await?
+            }
+            CheckedUserId::Public(user_id) => {
+                sqlx::query_as!(
+                    ComboRow,
+                    r#"
+            SELECT
+                id,
+                user_id,
+                is_private,
+                sort_order,
+                free_form_category,
+                title,
+                video_short_uuid
+            FROM combos
+            WHERE user_id = $1
+              AND NOT is_private
+            "#,
+                    user_id.num()
+                )
+                .fetch_all(&state.pg_db_pool)
+                .await?
+            }
+            CheckedUserId::NotFound => vec![],
+        };
 
         let combos = rows.into_iter().map(Combo::from).collect();
         Ok(combos)

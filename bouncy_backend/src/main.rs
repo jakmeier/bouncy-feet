@@ -161,7 +161,7 @@ async fn main() -> anyhow::Result<()> {
         .route("/users/{user_id}", get(api_endoints::user::user))
         .route(
             "/users/{user_id}/combos",
-            get(api_endoints::combo::user_combos),
+            get(api_endoints::combo::public_user_combos),
         )
         .route(
             "/combos/{combo_id}/beat",
@@ -221,6 +221,10 @@ async fn main() -> anyhow::Result<()> {
         )
         .route("/combos/new", post(api_endoints::combo::create_combo))
         .route("/combos/update", post(api_endoints::combo::update_combo))
+        .route(
+            "/users/{user_id}/combos",
+            get(api_endoints::combo::user_combos),
+        )
         .route(
             "/user/combos/{combo_id}/beat",
             get(api_endoints::combo::combo_beats),

@@ -10,7 +10,7 @@ use crate::{
     db_err_to_status,
     timestamp::{Timestamp, TimestampId},
     user::{User, UserId},
-    AppState, CheckedBeatId, CheckedComboId, CheckedTimestampId,
+    AppState, CheckedBeatId, CheckedComboId, CheckedTimestampId, CheckedUserId,
 };
 
 pub type JsonResponse<T> = axum::response::Result<Json<T>, (StatusCode, &'static str)>;
@@ -66,7 +66,7 @@ pub(crate) struct BeatInfo {
     pub subbeat_per_move: i16,
 }
 
-impl UserId {
+impl CheckedUserId {
     pub async fn combos(&self, state: &AppState) -> Result<Vec<Combo>, sqlx::Error> {
         Combo::list_by_user(state, *self).await
     }
@@ -118,11 +118,11 @@ pub async fn update_combo(
     Ok(Json(ComboInfo::from_db_info(updated)))
 }
 
-pub async fn user_combos(
+pub async fn public_user_combos(
     State(state): State<AppState>,
     Path(user_id): Path<UserId>,
 ) -> JsonResponse<CombosResponse> {
-    let result = user_id.combos(&state).await;
+    let result = CheckedUserId::Public(user_id).combos(&state).await;
 
     let Ok(db_combos) = result else {
         let err = result.unwrap_err();
@@ -130,11 +130,25 @@ pub async fn user_combos(
         return Err((StatusCode::INTERNAL_SERVER_ERROR, "Failed fetching combos"));
     };
 
-    let combos = db_combos
-        .into_iter()
-        .filter(|c| !c.is_private)
-        .map(ComboInfo::from_db_info)
-        .collect();
+    let combos = db_combos.into_iter().map(ComboInfo::from_db_info).collect();
+
+    Ok(Json(CombosResponse { combos }))
+}
+
+pub async fn user_combos(
+    Extension(user): Extension<User>,
+    State(state): State<AppState>,
+    Path(user_id): Path<UserId>,
+) -> JsonResponse<CombosResponse> {
+    let result = CheckedUserId::Owned(user.id).combos(&state).await;
+
+    let Ok(db_combos) = result else {
+        let err = result.unwrap_err();
+        tracing::error!(?err, ?user_id, "Failed fetching combos of user");
+        return Err((StatusCode::INTERNAL_SERVER_ERROR, "Failed fetching combos"));
+    };
+
+    let combos = db_combos.into_iter().map(ComboInfo::from_db_info).collect();
 
     Ok(Json(CombosResponse { combos }))
 }
