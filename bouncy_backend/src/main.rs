@@ -223,6 +223,10 @@ async fn main() -> anyhow::Result<()> {
         .route("/combos/update", post(api_endoints::combo::update_combo))
         .route("/user/combos", get(api_endoints::combo::user_combos))
         .route(
+            "/user/combos/{combo_id}",
+            delete(api_endoints::combo::delete_combo),
+        )
+        .route(
             "/user/combos/{combo_id}/beat",
             get(api_endoints::combo::combo_beats),
         )

@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                DELETE\n                FROM video_beats b\n                USING combos_video_beats cvb\n                WHERE cvb.combo_id = $1\n                AND b.id = cvb.video_beat_id\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "5a3a1172b50eebbe94207c31e5f648f38f7a88734cb7b062a1d73c8011d55175"
+}

@@ -118,6 +118,23 @@ pub async fn update_combo(
     Ok(Json(ComboInfo::from_db_info(updated)))
 }
 
+pub async fn delete_combo(
+    Extension(user): Extension<User>,
+    State(state): State<AppState>,
+    Path(combo_id): Path<ComboId>,
+) -> axum::response::Result<()> {
+    let checked_combo_id = CheckedComboId::check_for_user(&state, user.id, combo_id).await?;
+
+    let result = Combo::delete(&state, checked_combo_id).await;
+
+    if let Err(err) = result {
+        tracing::error!(?err, "Failed deleting combo");
+        return Err((StatusCode::INTERNAL_SERVER_ERROR, "Failed deleting combo"))?;
+    };
+
+    Ok(())
+}
+
 pub async fn public_user_combos(
     State(state): State<AppState>,
     Path(user_id): Path<UserId>,
@@ -318,7 +335,7 @@ pub async fn delete_combo_beat(
         tracing::error!(?err, "Failed deleting beat for combo");
         return Err((
             StatusCode::INTERNAL_SERVER_ERROR,
-            "Failed creating beat for combo",
+            "Failed deleting beat for combo",
         ))?;
     };
 

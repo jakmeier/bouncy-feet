@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                DELETE\n                FROM video_timestamps t\n                USING combos_video_timestamps cvt\n                WHERE cvt.combo_id = $1\n                AND t.id = cvt.video_timestamp_id\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "eb6692c13671af75bde7f747f2893a1530e098fc9883a5e23eb30332ade38b60"
+}

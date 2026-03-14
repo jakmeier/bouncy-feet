@@ -26,6 +26,7 @@
   const clubId = Number.parseInt(page.params.clubId || '0');
 
   const { clubsData } = getClubsContext();
+  const userCtx = getUserContext();
 
   // May be undefined while clubs are still loading.
   /** @type {Club | undefined} */
@@ -41,9 +42,9 @@
   const isClubMember = $derived.by(
     () => clubsData.mine.findIndex((c) => c.id === clubId) !== -1
   );
-  // TODO: isAdmin check
-  // const isAdmin = $derived(clubDetails.admins.findIndex((u) => u.id === myId) !== -1);
-  const isAdmin = true;
+  const isAdmin = $derived(
+    clubDetails.admins.findIndex((u) => u.id === userCtx.user.apiId) !== -1
+  );
 
   let showUsersPopup = $state(false);
   let showAddMorePopup = $state(false);
@@ -169,6 +170,13 @@
 
     {#if clubDetails.main_playlist}
       <h2>{$t('club.public-videos-title')}</h2>
+      {#if isAdmin}
+        <div class="symbol">
+          <a href={`./playlist/${clubDetails.main_playlist.short_uuid}/edit`}>
+            <Symbol size={32}>edit</Symbol>
+          </a>
+        </div>
+      {/if}
       <ThumbnailFeed
         bind:this={mainFeed}
         playlistUuid={clubDetails.main_playlist.short_uuid}

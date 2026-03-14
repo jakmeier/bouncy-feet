@@ -78,6 +78,23 @@ export class ApiUser {
     }
 
     /**
+     * @param {string} path
+     * @returns {Promise<Response | null | undefined>}
+     */
+    async authenticatedDelete(path) {
+        const result = await this.authenticatedApiRequest(
+            'DELETE',
+            path,
+            {},
+            ""
+        );
+        if (result?.okResponse) {
+            return result.okResponse;
+        }
+        console.warn('delete failed', result);
+    }
+
+    /**
      * @param {string} method
      * @param {string} path
      * @param {object} headers

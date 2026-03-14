@@ -1,10 +1,12 @@
 use crate::{
     api_endoints::combo::ComboInfo,
     beat::BeatId,
+    db_err_to_status,
     timestamp::TimestampId,
     user::{User, UserId},
-    AppState, CheckedUserId,
+    AppState, CheckedComboId, CheckedUserId,
 };
+use axum::http::StatusCode;
 
 #[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
 #[serde(transparent)]
@@ -225,6 +227,50 @@ impl Combo {
         .await?;
 
         Ok(row.map(Combo::from))
+    }
+
+    pub async fn delete(
+        state: &AppState,
+        checked_combo_id: CheckedComboId,
+    ) -> Result<bool, (StatusCode, &'static str)> {
+        let combo_id = checked_combo_id.assert_write_access()?;
+
+        // First delete video timestamps (which cascade deletes combos_video_timestamps)
+        sqlx::query!(
+            r#"
+                DELETE
+                FROM video_timestamps t
+                USING combos_video_timestamps cvt
+                WHERE cvt.combo_id = $1
+                AND t.id = cvt.video_timestamp_id
+                "#,
+            combo_id.num()
+        )
+        .execute(&state.pg_db_pool)
+        .await
+        .map_err(db_err_to_status)?;
+
+        // Same for video beats
+        sqlx::query!(
+            r#"
+                DELETE
+                FROM video_beats b
+                USING combos_video_beats cvb
+                WHERE cvb.combo_id = $1
+                AND b.id = cvb.video_beat_id
+                "#,
+            combo_id.num()
+        )
+        .execute(&state.pg_db_pool)
+        .await
+        .map_err(db_err_to_status)?;
+
+        let res = sqlx::query!(r#"DELETE FROM combos WHERE id = $1"#, combo_id.num())
+            .execute(&state.pg_db_pool)
+            .await
+            .map_err(db_err_to_status)?;
+
+        Ok(res.rows_affected() > 0)
     }
 }
 

@@ -9,6 +9,7 @@
   import LoadAndShowPeertubeVideo from '$lib/components/ui/video/LoadAndShowPeertubeVideo.svelte';
   import { t } from '$lib/i18n';
   import { detectBpm } from '$lib/bounce_listener';
+  import SingleActionHeader from '$lib/components/ui/header/SingleActionHeader.svelte';
 
   /** @type {import('./$types').PageProps} */
   let { data } = $props();
@@ -179,12 +180,29 @@
     // TODO: allow editing, such as changing bpm + offset
     // TODO: on accept => store timestamps online
   }
+
+  /**
+   * @param {ApiUser} apiUser
+   */
+  function onDelete(apiUser) {
+    if (!confirm($t('profile.combo.confirm-delete'))) {
+      return;
+    }
+    apiUser
+      .authenticatedDelete(`/user/combos/${comboId}`)
+      .then(() => history.back());
+  }
 </script>
 
 <LoginRequiredContent>
   {#snippet children({ apiUser })}
     <LimeSection>
-      <h1>{details.title || $t('profile.combo.edit-title')}</h1>
+      <SingleActionHeader
+        title={details.title || $t('profile.combo.edit-title')}
+        button="delete"
+        onAction={() => onDelete(apiUser)}
+        mainColor
+      ></SingleActionHeader>
 
       <div class="video">
         <LoadAndShowPeertubeVideo

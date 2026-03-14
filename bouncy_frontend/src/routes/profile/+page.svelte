@@ -62,8 +62,6 @@
   });
 </script>
 
-<ScrollToTop />
-
 <LoginRequiredContent reason={$t('profile.upload.requires-login-description')}>
   {#snippet maybeFullUser({ apiUser, maybeFullUser })}
     <DarkSection fillScreen arrow>
