@@ -11,7 +11,15 @@ use crate::peertube::user::{PeerTubeAccountId, PeerTubeHandle};
 use crate::AppState;
 
 #[derive(Clone, Copy, Debug, serde::Deserialize)]
-pub struct UserId(pub i64);
+pub struct UserId(i64);
+
+#[cfg(test)]
+impl UserId {
+    /// Construct a `UserId` from a raw integer in tests.
+    pub fn for_test(id: i64) -> Self {
+        Self(id)
+    }
+}
 
 #[derive(Clone, Debug)]
 pub struct User {
