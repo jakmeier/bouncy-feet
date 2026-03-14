@@ -138,13 +138,12 @@ pub async fn public_user_combos(
 pub async fn user_combos(
     Extension(user): Extension<User>,
     State(state): State<AppState>,
-    Path(user_id): Path<UserId>,
 ) -> JsonResponse<CombosResponse> {
     let result = CheckedUserId::Owned(user.id).combos(&state).await;
 
     let Ok(db_combos) = result else {
         let err = result.unwrap_err();
-        tracing::error!(?err, ?user_id, "Failed fetching combos of user");
+        tracing::error!(?err, user_id=?user.id, "Failed fetching combos of user");
         return Err((StatusCode::INTERNAL_SERVER_ERROR, "Failed fetching combos"));
     };
 

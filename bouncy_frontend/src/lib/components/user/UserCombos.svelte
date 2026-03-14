@@ -5,19 +5,30 @@
 
   /**
    * @typedef {Object} Props
-   * @prop {number} userId
+   * @prop {number} [userId] -- required if apiUser is not set
+   * @prop {ApiUser} [apiUser] -- only set if private combos should be shown
    * @prop {boolean} [showEditLink]
    */
 
   /** @type {Props}*/
-  let { userId, showEditLink } = $props();
+  let { userId, showEditLink, apiUser } = $props();
 
   /** @type {ComboInfo[]}*/
   let combos = $state([]);
 
   onMount(async () => {
-    const result = await apiRequest(`/users/${userId}/combos`);
-    // TODO: error handling
+    let result;
+    if (apiUser) {
+      result = await apiUser.authenticatedGet(`/user/combos`);
+    } else {
+      result = await apiRequest(`/users/${userId}/combos`);
+    }
+
+    if (result.error) {
+      console.warn('Failed loading combos', result);
+      return;
+    }
+
     /** @type {CombosResponse | undefined} */
     const response = await result.okResponse?.json();
     if (response && response.combos) {

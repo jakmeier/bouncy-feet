@@ -57,6 +57,8 @@
   }
 
   onMount(async () => {
+    // Note: All APIs that are for the own user usually use identification by
+    // the session. So, maybe this is superfluous.
     if (!userCtx.user.openid || userCtx.user.apiId === undefined) {
       let err = await refreshUserId();
       if (err) {

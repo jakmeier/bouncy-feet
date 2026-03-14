@@ -21,12 +21,7 @@
   import CreateClub from '$lib/components/club/CreateClub.svelte';
   import ActorAvatar from '$lib/components/profile/ActorAvatar.svelte';
   import UserCombos from '$lib/components/user/UserCombos.svelte';
-  import { getUserContext } from '$lib/stores/context';
   import { login, register } from '$lib/onboarding';
-
-  /** @type {UserContextData} */
-  const userCtx = getUserContext();
-  const myUser = $derived(userCtx.user);
 
   // let showStatsSharingPopup = $state(writable(!$user.consentSendingStats));
 
@@ -131,7 +126,7 @@
     {#if maybeFullUser}
       <LimeSection arrow fillScreen>
         <h2>{$t('profile.my-combos-title')}</h2>
-        <UserCombos userId={myUser.apiId} showEditLink />
+        <UserCombos {apiUser} showEditLink />
 
         <div class="controls">
           <a href="./combo/new">

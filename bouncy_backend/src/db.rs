@@ -74,6 +74,13 @@ macro_rules! checked_id {
 }
 
 checked_id!(
+    CheckedUserId,
+    crate::db::user::UserId,
+    crate::db::user::User,
+    "user not found"
+);
+
+checked_id!(
     CheckedComboId,
     crate::db::combo::ComboId,
     crate::db::combo::Combo,
