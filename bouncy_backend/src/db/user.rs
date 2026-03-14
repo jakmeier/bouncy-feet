@@ -4,9 +4,8 @@ use uuid::Uuid;
 
 use crate::api_endoints::club::AddClubMemberRequest;
 use crate::client_session::ClientSessionId;
-use crate::club::UserJoinedClubRow;
 use crate::combo::ComboRow;
-use crate::db::club::UserClubRow;
+use crate::db::club::{UserClubRow, UserJoinedClubRow};
 use crate::layers::oidc::AdditionalClaims;
 use crate::peertube::user::{PeerTubeAccountId, PeerTubeHandle};
 use crate::AppState;
@@ -55,6 +54,11 @@ pub struct UserSearchFilter {
 impl UserId {
     pub fn num(&self) -> i64 {
         self.0
+    }
+
+    #[cfg(test)]
+    pub fn from_i64(id: i64) -> Self {
+        UserId(id)
     }
 
     pub(crate) async fn create_new_guest(db: &PgPool) -> Self {

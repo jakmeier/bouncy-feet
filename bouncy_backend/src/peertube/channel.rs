@@ -8,11 +8,11 @@ use crate::{
 };
 use chrono::{DateTime, Utc};
 
-#[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 #[serde(transparent)]
 pub(crate) struct PeerTubeChannelId(pub i64);
 
-#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, Debug, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 #[serde(transparent)]
 pub(crate) struct PeerTubeChannelHandle(pub String);
 
