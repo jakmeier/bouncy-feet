@@ -238,6 +238,7 @@
         },
         "video": {
             "detect-bpm-button": "Detect beat",
+            "gen-avatars-button": "Generate stick figures",
             "music-bpm": "BPM",
             "half-speed": "Half speed",
             "beat-offset": "First beat"

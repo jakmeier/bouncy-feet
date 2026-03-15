@@ -8,8 +8,10 @@
   import LimeSection from '$lib/components/ui/sections/LimeSection.svelte';
   import LoadAndShowPeertubeVideo from '$lib/components/ui/video/LoadAndShowPeertubeVideo.svelte';
   import { t } from '$lib/i18n';
-  import { detectBpm } from '$lib/bounce_listener';
+  import { detectBpm, loadVideoArrayBuffer } from '$lib/bounce_listener';
   import SingleActionHeader from '$lib/components/ui/header/SingleActionHeader.svelte';
+  import VideoSkeletonLoader from '$lib/components/ui/video/VideoSkeletonLoader.svelte';
+  import { beatToMarkers } from '$lib/video_utils';
 
   /** @type {import('./$types').PageProps} */
   let { data } = $props();
@@ -26,6 +28,9 @@
   let beats = $state([]);
   /** @type {Beat | undefined} */
   let beat = $state();
+  /** @type {any[]} */
+  let skeletons = $state([]);
+  let genSkeletons = $state(false);
 
   // quick and dirty sync on initial loading, just pick the last beat and ignore others
   $effect(() => {
@@ -156,7 +161,12 @@
       await player?.pause();
     }
 
-    const beatResult = await detectBpm(video);
+    const buf = await videoArrayBuffer(video);
+    if (!buf) {
+      console.error('failed to read video');
+      return;
+    }
+    const beatResult = await detectBpm(video, buf);
     if (beatResult) {
       beat = {
         bpm: Math.round(beatResult?.bpm * 10) / 10,
@@ -181,6 +191,16 @@
     // TODO: on accept => store timestamps online
   }
 
+  async function generateAvatarAnalysis() {
+    if (!video) {
+      console.warn('no video loaded, cannot run BPM detection');
+      return;
+    }
+    await videoArrayBuffer(video);
+    genSkeletons = true;
+    // TODO: show skeletons
+  }
+
   /**
    * @param {ApiUser} apiUser
    */
@@ -191,6 +211,19 @@
     apiUser
       .authenticatedDelete(`/user/combos/${comboId}`)
       .then(() => history.back());
+  }
+
+  /** @type {ArrayBuffer | undefined} */
+  let cachedBuffer = $state();
+  /**
+   * @param {api.VideoDetails} video
+   * @returns {Promise<ArrayBuffer | undefined>}
+   */
+  async function videoArrayBuffer(video) {
+    if (!cachedBuffer) {
+      cachedBuffer = await loadVideoArrayBuffer(video);
+    }
+    return cachedBuffer;
   }
 </script>
 
@@ -219,6 +252,26 @@
         />
       </div>
 
+      {#if skeletons.length > 0}
+        <!-- TODO: show skeletons -->
+        There are {skeletons.length} skeletons
+        <!-- {#each skeletons as skeleton}
+          <Svg width={200} height={200} orderByZ>
+            <SvgAvatar2 {skeleton}></SvgAvatar2>
+          </Svg>
+        {/each} -->
+        <div class="skeletons"></div>
+      {/if}
+      {#if genSkeletons && cachedBuffer && beats}
+        <VideoSkeletonLoader
+          timestampsMs={beatToMarkers(beats).map((b) => b.t)}
+          arrayBuffer={cachedBuffer}
+          width={200}
+          height={200}
+          bind:skeletons
+        />
+      {/if}
+
       <!-- TODO: make this more useful -->
       <!-- <button class="full-width action" onclick={() => addTimestamp(apiUser)}>
         {$t('profile.combo.add-timestamp-button')}
@@ -232,6 +285,10 @@
         {$t('editor.video.detect-bpm-button')}
       </button>
 
+      <button class="full-width action" onclick={generateAvatarAnalysis}>
+        {$t('editor.video.gen-avatars-button')}
+      </button>
+
       <button
         class="full-width"
         onclick={() => saveAndLeave(apiUser)}
@@ -241,7 +298,7 @@
         {$t('profile.combo.cancel-button')}</button
       >
 
-      <Footer white />
+      <Footer />
     </LimeSection>
   {/snippet}
 </LoginRequiredContent>

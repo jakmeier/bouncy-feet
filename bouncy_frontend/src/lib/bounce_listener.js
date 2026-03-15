@@ -2,9 +2,9 @@ import * as api from '$lib/peertube-openapi';
 
 /** 
  * @param {api.VideoDetails} videoMeta
- * @returns {Promise< {ms: number; bpm: number; offset: number } | undefined>}
+ * @returns {Promise<ArrayBuffer | undefined>}
  */
-export async function detectBpm(videoMeta) {
+export async function loadVideoArrayBuffer(videoMeta) {
     if (!videoMeta.files || videoMeta.files.length === 0) {
         console.error("need web video to be available for bpm detection", videoMeta);
         return;
@@ -18,8 +18,6 @@ export async function detectBpm(videoMeta) {
     /** @type {string} */
     const url = file.fileUrl;
 
-    // offline context (rendering as fast as possible, not live)
-    const audioContext = new AudioContext();
     const response = await fetch(url, { mode: "cors" });
     if (!response.ok) {
         console.error("failed reading video source with status", response.status);
@@ -27,7 +25,17 @@ export async function detectBpm(videoMeta) {
         console.error(errBody, response);
         return;
     }
-    const arrayBuffer = await response.arrayBuffer();
+    return await response.arrayBuffer();
+}
+
+/** 
+ * @param {api.VideoDetails} videoMeta
+ * @param {ArrayBuffer} arrayBuffer
+ * @returns {Promise< {ms: number; bpm: number; offset: number } | undefined>}
+ */
+export async function detectBpm(videoMeta, arrayBuffer) {
+    // offline context (rendering as fast as possible, not live)
+    const audioContext = new AudioContext();
     const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
     // const sampleRate = 44100;
