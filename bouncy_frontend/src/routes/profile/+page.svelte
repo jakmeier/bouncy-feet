@@ -16,7 +16,6 @@
   import LightSection from '$lib/components/ui/sections/LightSection.svelte';
   import NightSection from '$lib/components/ui/sections/NightSection.svelte';
   import ThumbnailJuggler from '$lib/components/ui/ThumbnailJuggler.svelte';
-  import ScrollToTop from '$lib/components/ScrollToTop.svelte';
   import Clubs from '$lib/components/club/Clubs.svelte';
   import CreateClub from '$lib/components/club/CreateClub.svelte';
   import ActorAvatar from '$lib/components/profile/ActorAvatar.svelte';

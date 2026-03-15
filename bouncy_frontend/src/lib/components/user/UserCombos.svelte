@@ -37,4 +37,4 @@
   });
 </script>
 
-<Combos {combos} {showEditLink} />
+<Combos {combos} {showEditLink} {apiUser} />

@@ -7,10 +7,12 @@
    * @typedef {Object} Props
    * @prop {ComboInfo[]} combos
    * @prop {boolean} [showEditLink]
+   * @prop {ApiUser} [apiUser] -- only set if private combos should be shown
+   *
    */
 
   /** @type {Props}*/
-  let { combos, showEditLink = false } = $props();
+  let { combos, showEditLink = false, apiUser } = $props();
 
   let jugglerHeight = $state();
 
@@ -56,6 +58,7 @@
             videoId={combo.video_short_uuid}
             timeline={{ position: 'external', beatCounts: true }}
             comboId={combo.id}
+            {apiUser}
           />
         </div>
       {/if}

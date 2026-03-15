@@ -486,6 +486,7 @@
     left: 0;
     align-self: center;
     font-size: var(--font-small);
+    color: var(--theme-main);
     width: 1rem;
     height: 1rem;
     text-align: center;
