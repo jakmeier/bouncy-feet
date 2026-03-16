@@ -136,11 +136,10 @@ mod tests {
     use super::*;
     use crate::db::test_helpers::{apply_migrations, make_test_state};
     use crate::peertube::playlist::PeerTubePlaylist;
-    use crate::user::UserId;
     use sqlx::PgPool;
 
     /// Create a test club and return its ClubId
-    async fn setup_club(pool: &PgPool, state: &AppState) -> ClubId {
+    async fn setup_club(_pool: &PgPool, state: &AppState) -> ClubId {
         use crate::peertube::channel::{PeerTubeChannelHandle, PeerTubeChannelId};
         use crate::db::club::Club;
 
