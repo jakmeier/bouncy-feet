@@ -163,6 +163,7 @@ mod tests {
     fn create_test_playlist(id: i64, short_uuid: &str) -> PeerTubePlaylist {
         PeerTubePlaylist {
             id: PeerTubePlaylistId(id),
+            uuid: uuid::Uuid::nil(), // Dummy UUID for testing
             short_uuid: short_uuid.to_string(),
         }
     }
