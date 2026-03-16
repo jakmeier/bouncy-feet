@@ -12,6 +12,7 @@
   import SingleActionHeader from '$lib/components/ui/header/SingleActionHeader.svelte';
   import VideoSkeletonLoader from '$lib/components/ui/video/VideoSkeletonLoader.svelte';
   import { beatToMarkers } from '$lib/video_utils';
+  import { Skeleton } from '$lib/instructor/bouncy_instructor';
 
   /** @type {import('./$types').PageProps} */
   let { data } = $props();
@@ -28,7 +29,7 @@
   let beats = $state([]);
   /** @type {Beat | undefined} */
   let beat = $state();
-  /** @type {any[]} */
+  /** @type {Skeleton[]} */
   let skeletons = $state([]);
   let genSkeletons = $state(false);
 
@@ -249,19 +250,10 @@
           {apiUser}
           {comboId}
           bind:beats
+          {skeletons}
         />
       </div>
 
-      {#if skeletons.length > 0}
-        <!-- TODO: show skeletons -->
-        There are {skeletons.length} skeletons
-        <!-- {#each skeletons as skeleton}
-          <Svg width={200} height={200} orderByZ>
-            <SvgAvatar2 {skeleton}></SvgAvatar2>
-          </Svg>
-        {/each} -->
-        <div class="skeletons"></div>
-      {/if}
       {#if genSkeletons && cachedBuffer && beats}
         <VideoSkeletonLoader
           timestampsMs={beatToMarkers(beats).map((b) => b.t)}

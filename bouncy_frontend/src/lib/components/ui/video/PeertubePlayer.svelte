@@ -4,7 +4,10 @@
   import { getUserContext } from '$lib/stores/context';
   import Arrow from '../svg/Arrow.svelte';
   import UnstyledButton from '../UnstyledButton.svelte';
-    import { beatToMarkers } from '$lib/video_utils';
+  import { beatToMarkers } from '$lib/video_utils';
+  import { Skeleton } from '$lib/instructor/bouncy_instructor';
+  import InstructorAvatar from '$lib/components/avatar/InstructorAvatar.svelte';
+  import { LEFT_RIGHT_COLORING } from '$lib/constants';
 
   /** @typedef {{ time: number, label: string, icon: string }} Marker */
   /**
@@ -13,6 +16,7 @@
    * @property {number} aspectRatio
    * @property {Beat[]} [beats] - Array of beat timestamps in ms
    * @property {Marker[]} [markers] - Array of markers to show on the timeline
+   * @property {Skeleton[]} [skeletons]
    * @property {boolean} [muted]
    * @property {VideoTimelineConfig} [timeline]
    */
@@ -25,6 +29,7 @@
     muted = false,
     timeline = undefined,
     aspectRatio,
+    skeletons = [],
   } = $props();
 
   /** @type {UserContextData} */
@@ -258,7 +263,11 @@
 </div>
 
 {#if timeline?.beatCounts && duration > 0}
-  <div class="counts">
+  <div
+    class="counts"
+    class:with_skeletons={skeletons.length > 0}
+    class:no_skeletons={!skeletons || skeletons.length === 0}
+  >
     <UnstyledButton onClick={seekToPrevBeat}>
       <div class="arrow left">
         <Arrow color="var(--theme-neutral-white)" />
@@ -279,7 +288,7 @@
           duration}px; transform: translate({-magnifiedPxPerSec * currentTime +
           magnifierWidth / 2}px);"
       >
-        {#each beatMarkers as marker}
+        {#each beatMarkers as marker, i}
           <div
             class="magnified-beat-count"
             class:highlighted={Math.abs(marker.t - currentTime * 1000) < 0.01}
@@ -288,6 +297,24 @@
           >
             {marker.text}
           </div>
+
+          {#if skeletons.length > i}
+            <div
+              class="skeleton"
+              style="transform: translate(calc({(marker.t / 1000) *
+                magnifiedPxPerSec}px - 0.5rem - 2.5px));"
+            >
+              <div class="avatar-container">
+                {#if skeletons[i]}
+                  <InstructorAvatar
+                    avatarSize={1.0}
+                    skeleton={skeletons[i]}
+                    instructorStyle={LEFT_RIGHT_COLORING}
+                  />
+                {/if}
+              </div>
+            </div>
+          {/if}
         {/each}
       </div>
     </div>
@@ -425,6 +452,9 @@
     margin: 1rem 0;
     height: 2rem;
   }
+  .with_skeletons.counts {
+    height: 3rem;
+  }
 
   .arrow {
     max-width: 1.2rem;
@@ -435,6 +465,10 @@
   }
   .right {
     rotate: -90deg;
+  }
+
+  .with_skeletons .arrow {
+    max-height: 3rem;
   }
 
   .counts-magnifier-bar {
@@ -475,13 +509,35 @@
     align-content: center;
   }
 
-  .highlighted {
+  .with_skeletons .magnified-beat-count {
+    top: 2rem;
+    color: var(--theme-neutral-darker-gray);
+  }
+
+  .skeleton {
+    position: absolute;
+    left: -0.5rem;
+    top: 0;
+    height: 2rem;
+  }
+
+  .avatar-container {
+    position: relative;
+    /* margin: -50% 0; */
+    width: auto;
+    height: 100%;
+  }
+
+  .no_skeletons .highlighted {
     background-color: var(--theme-neutral-darker-gray);
     border-radius: 50%;
     padding: 5px;
     width: 1rem;
     height: 1rem;
     text-align: center;
+  }
+  .with_skeletons .highlighted {
+    color: var(--theme-main);
   }
 
   .icon {

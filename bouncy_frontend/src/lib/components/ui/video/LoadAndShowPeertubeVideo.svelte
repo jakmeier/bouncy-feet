@@ -4,6 +4,7 @@
   import VideoBeatsLoader from './VideoBeatsLoader.svelte';
   import VideoLoader from './VideoLoader.svelte';
   import VideoMarkerLoader from './VideoMarkerLoader.svelte';
+  import { Skeleton } from '$lib/instructor/bouncy_instructor';
 
   /**
    * @typedef {Object} Props
@@ -13,6 +14,7 @@
    * @property {ApiUser} [apiUser]
    * @property {api.VideoDetails | undefined} [video]
    * @property {Beat[]} [beats] -- bindable
+   * @property {Skeleton[]} [skeletons]
    */
 
   /** @type {Props}*/
@@ -23,6 +25,7 @@
     apiUser,
     video = $bindable(),
     beats = $bindable(),
+    skeletons = [],
   } = $props();
 
   /** @type {PeertubeVideoPlayer | undefined}*/
@@ -72,6 +75,7 @@
       {timeline}
       markers={timestampMarkers}
       {beats}
+      {skeletons}
     />
   </div>
 {:else}
