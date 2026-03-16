@@ -4,7 +4,11 @@
   import VideoBeatsLoader from './VideoBeatsLoader.svelte';
   import VideoLoader from './VideoLoader.svelte';
   import VideoMarkerLoader from './VideoMarkerLoader.svelte';
-  import { Skeleton } from '$lib/instructor/bouncy_instructor';
+  import {
+    PoseFileWrapper,
+    PoseWrapper,
+  } from '$lib/instructor/bouncy_instructor';
+  import { decodeBase64AndDecompress } from '$lib/text_utils';
 
   /**
    * @typedef {Object} Props
@@ -14,7 +18,7 @@
    * @property {ApiUser} [apiUser]
    * @property {api.VideoDetails | undefined} [video]
    * @property {Beat[]} [beats] -- bindable
-   * @property {Skeleton[]} [skeletons]
+   * @property {PoseWrapper[]} [poses]
    */
 
   /** @type {Props}*/
@@ -25,7 +29,7 @@
     apiUser,
     video = $bindable(),
     beats = $bindable(),
-    skeletons = [],
+    poses = [],
   } = $props();
 
   /** @type {PeertubeVideoPlayer | undefined}*/
@@ -60,6 +64,14 @@
 
   /** @arg {Beat[]} loadedBeats */
   function beatsLoaded(loadedBeats) {
+    for (var beat of loadedBeats) {
+      if (beat.pose_file) {
+        decodeBase64AndDecompress(beat.pose_file).then((ron) => {
+          const poseFile = PoseFileWrapper.fromRon(ron);
+          poses.push(...poseFile.poses());
+        });
+      }
+    }
     beats = loadedBeats;
   }
 </script>
@@ -75,7 +87,7 @@
       {timeline}
       markers={timestampMarkers}
       {beats}
-      {skeletons}
+      {poses}
     />
   </div>
 {:else}

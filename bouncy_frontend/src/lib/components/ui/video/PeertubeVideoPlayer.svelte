@@ -3,14 +3,14 @@
   import { onMount } from 'svelte';
   import Symbol from '../Symbol.svelte';
   import PeertubePlayer from './PeertubePlayer.svelte';
-  import { Skeleton } from '$lib/instructor/bouncy_instructor';
+  import { PoseWrapper } from '$lib/instructor/bouncy_instructor';
 
   /**
    * @typedef {Object} Props
    * @property {string} videoId
    * @property {number} aspectRatio
    * @property {Beat[]} [beats]
-   * @property {Skeleton[]} [skeletons]
+   * @property {PoseWrapper[]} [poses]
    * @property {VideoMarker[]} [markers] - Array of markers to show on the timeline
    * @property {boolean} [muted]
    * @property {VideoTimelineConfig} [timeline]
@@ -22,7 +22,7 @@
   let {
     videoId,
     beats = [],
-    skeletons = [],
+    poses = [],
     markers = [],
     muted = false,
     timeline,
@@ -104,7 +104,7 @@
     {muted}
     {timeline}
     {aspectRatio}
-    {skeletons}
+    {poses}
   />
 {/if}
 

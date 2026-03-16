@@ -55,6 +55,8 @@ pub(crate) struct NewBeatInfo {
     pub duration: i32,
     pub bpm: f32,
     pub subbeat_per_move: i16,
+    /// gzipped and Base64 encoded `PoseFile`
+    pub pose_file: Option<String>,
 }
 
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
@@ -64,6 +66,8 @@ pub(crate) struct BeatInfo {
     pub duration: i32,
     pub bpm: f32,
     pub subbeat_per_move: i16,
+    /// gzipped and Base64 encoded `PoseFile`
+    pub pose_file: Option<String>,
 }
 
 impl CheckedUserId {
@@ -295,6 +299,7 @@ async fn combo_beats_impl(
                 duration: beat.duration,
                 bpm: beat.bpm,
                 subbeat_per_move: beat.subbeat_per_move,
+                pose_file: beat.pose_file,
             })
             .collect(),
     ))
@@ -315,6 +320,7 @@ pub async fn add_combo_beat(
         payload.duration,
         payload.bpm,
         payload.subbeat_per_move,
+        payload.pose_file,
     )
     .await;
 

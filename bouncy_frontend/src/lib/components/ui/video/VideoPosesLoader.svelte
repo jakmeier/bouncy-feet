@@ -1,8 +1,9 @@
 <script>
-  import { Skeleton, Tracker } from '$lib/instructor/bouncy_instructor';
+  import { Tracker } from '$lib/instructor/bouncy_instructor';
   import { registerTracker } from '$lib/stores/Beat';
   import { getContext, onMount } from 'svelte';
   import { landmarksToKeypoints } from '$lib/pose';
+  import { PoseWrapper } from '$lib/instructor/bouncy_instructor';
 
   /**
    * @typedef {Object} Props
@@ -11,11 +12,11 @@
    * @property {number} width
    * @property {number} height
    * @property {number} height
-   * @property {Skeleton[]} skeletons --bindable
+   * @property {PoseWrapper[]} poses --bindable
    */
 
   /** @type {Props}*/
-  let { arrayBuffer, timestampsMs, skeletons = $bindable([]) } = $props();
+  let { arrayBuffer, timestampsMs, poses = $bindable([]) } = $props();
   let dataListener;
 
   let tracker = new Tracker();
@@ -40,9 +41,10 @@
         ) {
           const kp = landmarksToKeypoints(result.landmarks[0]);
           tracker.addKeypoints(kp, timestamp);
-          const skeleton = tracker.skeletonAt(timestamp);
-          if (skeleton) {
-            skeletons.push(skeleton);
+          const skeleton = tracker.skeletonWrapperAt(timestamp);
+          const pose = skeleton?.pose();
+          if (pose) {
+            poses.push(pose);
           }
         }
       }

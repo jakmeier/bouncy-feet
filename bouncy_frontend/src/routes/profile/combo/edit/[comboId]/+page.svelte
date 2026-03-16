@@ -10,9 +10,13 @@
   import { t } from '$lib/i18n';
   import { detectBpm, loadVideoArrayBuffer } from '$lib/bounce_listener';
   import SingleActionHeader from '$lib/components/ui/header/SingleActionHeader.svelte';
-  import VideoSkeletonLoader from '$lib/components/ui/video/VideoSkeletonLoader.svelte';
+  import VideoPosesLoader from '$lib/components/ui/video/VideoPosesLoader.svelte';
   import { beatToMarkers } from '$lib/video_utils';
-  import { Skeleton } from '$lib/instructor/bouncy_instructor';
+  import {
+    PoseFileWrapper,
+    PoseWrapper,
+  } from '$lib/instructor/bouncy_instructor';
+  import { compressAndBase64Encode } from '$lib/text_utils';
 
   /** @type {import('./$types').PageProps} */
   let { data } = $props();
@@ -29,9 +33,9 @@
   let beats = $state([]);
   /** @type {Beat | undefined} */
   let beat = $state();
-  /** @type {Skeleton[]} */
-  let skeletons = $state([]);
-  let genSkeletons = $state(false);
+  /** @type {PoseWrapper[]} */
+  let poses = $state([]);
+  let genPoses = $state(false);
 
   // quick and dirty sync on initial loading, just pick the last beat and ignore others
   $effect(() => {
@@ -101,11 +105,18 @@
   /** @param {ApiUser} apiUser */
   async function saveBeat(apiUser) {
     if (beat) {
+      let pose_file = undefined;
+      if (poses.length > 0) {
+        console.log('encoding poses');
+        pose_file = await encodePoses();
+        console.log('encoded poses');
+      }
       const body = {
         start: Math.round(beat.start),
         duration: Math.round(beat.duration),
         bpm: beat.bpm,
         subbeat_per_move: beat.subbeat_per_move,
+        pose_file,
       };
 
       // Update case
@@ -145,6 +156,21 @@
       }
       beat = await response.json();
     }
+  }
+
+  /**
+   * @returns {Promise<string>}
+   */
+  async function encodePoses() {
+    const poseFile = new PoseFileWrapper();
+    for (var pose of poses) {
+      poseFile.addPose(pose);
+    }
+    // The RON is GZIP compressed to reduce the size by a factor of 10-20. Then
+    // base64 encoded to send as part of a JSON body, increasing the size again
+    // by a factor of 4/3.
+    const serialized = poseFile.buildRon();
+    return await compressAndBase64Encode(serialized);
   }
 
   async function startBpmAnalysis() {
@@ -198,8 +224,7 @@
       return;
     }
     await videoArrayBuffer(video);
-    genSkeletons = true;
-    // TODO: show skeletons
+    genPoses = true;
   }
 
   /**
@@ -250,17 +275,17 @@
           {apiUser}
           {comboId}
           bind:beats
-          {skeletons}
+          {poses}
         />
       </div>
 
-      {#if genSkeletons && cachedBuffer && beats}
-        <VideoSkeletonLoader
+      {#if genPoses && cachedBuffer && beats}
+        <VideoPosesLoader
           timestampsMs={beatToMarkers(beats).map((b) => b.t)}
           arrayBuffer={cachedBuffer}
           width={200}
           height={200}
-          bind:skeletons
+          bind:poses
         />
       {/if}
 

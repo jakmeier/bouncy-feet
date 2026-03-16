@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            INSERT INTO video_beats (start, duration, bpm, subbeat_per_move)\n            VALUES ($1, $2, $3, $4)\n            RETURNING\n                id,\n                start,\n                duration,\n                bpm,\n                subbeat_per_move\n            ",
+  "query": "\n            SELECT\n                id,\n                start,\n                duration,\n                bpm,\n                subbeat_per_move,\n                pose_file\n            FROM video_beats t\n                JOIN combos_video_beats ct ON ct.video_beat_id = t.id\n            WHERE ct.combo_id = $1\n            ",
   "describe": {
     "columns": [
       {
@@ -27,14 +27,16 @@
         "ordinal": 4,
         "name": "subbeat_per_move",
         "type_info": "Int2"
+      },
+      {
+        "ordinal": 5,
+        "name": "pose_file",
+        "type_info": "Text"
       }
     ],
     "parameters": {
       "Left": [
-        "Int4",
-        "Int4",
-        "Float4",
-        "Int2"
+        "Int8"
       ]
     },
     "nullable": [
@@ -42,8 +44,9 @@
       false,
       false,
       false,
-      false
+      false,
+      true
     ]
   },
-  "hash": "211b87b45fa3af95b957cbf16e850b0d022dfc6ae33d4156bf927a97621776a1"
+  "hash": "4297205e2268ebf5eae15a701c4f66512fe4644480e96832a044d0e12bc0e4e2"
 }

@@ -5,7 +5,7 @@
   import Arrow from '../svg/Arrow.svelte';
   import UnstyledButton from '../UnstyledButton.svelte';
   import { beatToMarkers } from '$lib/video_utils';
-  import { Skeleton } from '$lib/instructor/bouncy_instructor';
+  import { PoseWrapper } from '$lib/instructor/bouncy_instructor';
   import InstructorAvatar from '$lib/components/avatar/InstructorAvatar.svelte';
   import { LEFT_RIGHT_COLORING } from '$lib/constants';
 
@@ -16,7 +16,7 @@
    * @property {number} aspectRatio
    * @property {Beat[]} [beats] - Array of beat timestamps in ms
    * @property {Marker[]} [markers] - Array of markers to show on the timeline
-   * @property {Skeleton[]} [skeletons]
+   * @property {PoseWrapper[]} [poses]
    * @property {boolean} [muted]
    * @property {VideoTimelineConfig} [timeline]
    */
@@ -29,7 +29,7 @@
     muted = false,
     timeline = undefined,
     aspectRatio,
-    skeletons = [],
+    poses = [],
   } = $props();
 
   /** @type {UserContextData} */
@@ -265,8 +265,8 @@
 {#if timeline?.beatCounts && duration > 0}
   <div
     class="counts"
-    class:with_skeletons={skeletons.length > 0}
-    class:no_skeletons={!skeletons || skeletons.length === 0}
+    class:with_skeletons={poses.length > 0}
+    class:no_skeletons={!poses || poses.length === 0}
   >
     <UnstyledButton onClick={seekToPrevBeat}>
       <div class="arrow left">
@@ -298,17 +298,17 @@
             {marker.text}
           </div>
 
-          {#if skeletons.length > i}
+          {#if poses.length > i}
             <div
               class="skeleton"
               style="transform: translate(calc({(marker.t / 1000) *
                 magnifiedPxPerSec}px - 0.5rem - 2.5px));"
             >
               <div class="avatar-container">
-                {#if skeletons[i]}
+                {#if poses[i]}
                   <InstructorAvatar
                     avatarSize={1.0}
-                    skeleton={skeletons[i]}
+                    skeleton={poses[i].skeleton()}
                     instructorStyle={LEFT_RIGHT_COLORING}
                   />
                 {/if}

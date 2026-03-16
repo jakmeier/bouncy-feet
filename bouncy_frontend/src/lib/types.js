@@ -273,4 +273,5 @@
  * @property {number} bpm
  * @property {number} start
  * @property {number} subbeat_per_move
+ * @property {string} [pose_file]
  */
