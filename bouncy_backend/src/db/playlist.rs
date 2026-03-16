@@ -135,12 +135,12 @@ impl ClubRow {
 mod tests {
     use super::*;
     use crate::db::test_helpers::{apply_migrations, make_test_state};
-    use crate::peertube::playlist::PeerTubePlaylist;
-    use crate::user::UserId;
+    use crate::peertube::playlist::{PeerTubePlaylist, PeerTubePlaylistId};
     use sqlx::PgPool;
+    use uuid::Uuid;
 
     /// Create a test club and return its ClubId
-    async fn setup_club(pool: &PgPool, state: &AppState) -> ClubId {
+    async fn setup_club(_pool: &PgPool, state: &AppState) -> ClubId {
         use crate::peertube::channel::{PeerTubeChannelHandle, PeerTubeChannelId};
         use crate::db::club::Club;
 
@@ -163,6 +163,7 @@ mod tests {
     fn create_test_playlist(id: i64, short_uuid: &str) -> PeerTubePlaylist {
         PeerTubePlaylist {
             id: PeerTubePlaylistId(id),
+            uuid: Uuid::new_v4(),
             short_uuid: short_uuid.to_string(),
         }
     }
@@ -595,7 +596,7 @@ mod tests {
         let club_id1 = setup_club(&pool, &state).await;
         let club_id2 = setup_club(&pool, &state).await;
 
-        let playlist1 = Playlist::create(
+        let _playlist1 = Playlist::create(
             &state,
             club_id1,
             create_test_playlist(5023, "uuid-023"),
@@ -603,7 +604,7 @@ mod tests {
         )
         .await?;
 
-        let playlist2 = Playlist::create(
+        let _playlist2 = Playlist::create(
             &state,
             club_id2,
             create_test_playlist(5024, "uuid-024"),
