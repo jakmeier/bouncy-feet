@@ -485,7 +485,7 @@ mod tests {
             .await
             .expect("create combo 3");
 
-        let combos = Combo::list_by_user(&state, user_id)
+        let combos = Combo::list_by_user(&state, crate::db::CheckedUserId::Owned(user_id))
             .await
             .expect("list should succeed");
 
@@ -514,10 +514,10 @@ mod tests {
             .await
             .expect("create for user 2");
 
-        let combos_user1 = Combo::list_by_user(&state, user1)
+        let combos_user1 = Combo::list_by_user(&state, crate::db::CheckedUserId::Owned(user1))
             .await
             .expect("list for user 1");
-        let combos_user2 = Combo::list_by_user(&state, user2)
+        let combos_user2 = Combo::list_by_user(&state, crate::db::CheckedUserId::Owned(user2))
             .await
             .expect("list for user 2");
 
@@ -532,7 +532,7 @@ mod tests {
         let state = make_test_state(pool);
         let user_id = setup_user(&state.pg_db_pool).await;
 
-        let combos = Combo::list_by_user(&state, user_id)
+        let combos = Combo::list_by_user(&state, crate::db::CheckedUserId::Owned(user_id))
             .await
             .expect("list should succeed");
 
