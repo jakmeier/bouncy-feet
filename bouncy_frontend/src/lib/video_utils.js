@@ -6,7 +6,7 @@
 */
 export function beatToMarkers(beats) {
     return beats?.flatMap((beat) => {
-        const end = beat.duration;
+        const end = beat.start + beat.duration;
         const interval = (60000 / beat.bpm / 2) * beat.subbeat_per_move;
         const beatMarkers = [];
         if (beat.bpm && beat.start && beat.start > 0 && interval > 0) {

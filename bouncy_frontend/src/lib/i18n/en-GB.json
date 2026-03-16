@@ -241,7 +241,8 @@
             "gen-avatars-button": "Generate stick figures",
             "music-bpm": "BPM",
             "half-speed": "Half speed",
-            "beat-offset": "First beat"
+            "beat-offset": "First beat",
+            "num-of-beats": "Number of beats"
         }
     },
     "record": {

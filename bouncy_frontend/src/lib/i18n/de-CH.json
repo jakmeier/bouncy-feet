@@ -241,7 +241,8 @@
             "gen-avatars-button": "Strichfiguren generieren",
             "music-bpm": "BPM",
             "half-speed": "Halbe Geschwindigkeit",
-            "beat-offset": "Erster Beat"
+            "beat-offset": "Erster Beat",
+            "num-of-beats": "Anzahl Beats"
         }
     },
     "record": {

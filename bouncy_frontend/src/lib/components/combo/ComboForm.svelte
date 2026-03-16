@@ -15,6 +15,12 @@
     beat = $bindable(),
   } = $props();
 
+  const timeBetweenMarkers = $derived(
+    ((60_000 / (beat?.bpm || 120)) * (beat?.subbeat_per_move || 1)) / 2
+  );
+  // svelte-ignore state_referenced_locally
+  let numOfBeats = $state((beat?.duration || 1000) / timeBetweenMarkers);
+
   let isPublic = $derived(!details.is_private);
   $effect(() => {
     if (details.is_private !== !isPublic) {
@@ -27,6 +33,10 @@
   /** @param {Event} event */
   function inputChanged(event) {
     dirty = true;
+
+    if (beat) {
+      beat.duration = numOfBeats * timeBetweenMarkers;
+    }
   }
 
   function halfSpeedChanged() {
@@ -49,8 +59,11 @@
         onInput={halfSpeedChanged}
       />
 
-      <label for="offset"> {$t('editor.video.beat-offset')}</label>
+      <label for="offset"> {$t('editor.video.beat-offset')} (ms)</label>
       <input type="number" name="offset" bind:value={beat.start} />
+
+      <label for="num-of-beats"> {$t('editor.video.num-of-beats')}</label>
+      <input type="number" name="num-of-beats" bind:value={numOfBeats} />
     </div>
   {/if}
 

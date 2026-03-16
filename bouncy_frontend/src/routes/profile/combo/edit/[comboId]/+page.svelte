@@ -107,9 +107,7 @@
     if (beat) {
       let pose_file = undefined;
       if (poses.length > 0) {
-        console.log('encoding poses');
         pose_file = await encodePoses();
-        console.log('encoded poses');
       }
       const body = {
         start: Math.round(beat.start),
@@ -122,7 +120,7 @@
       // Update case
       // TODO: implement update
       // For now, just delete the old beat(s) and replace it with a new one.
-      for (var b of beats?.slice(0, -1) || []) {
+      for (var b of beats || []) {
         if (b.hasOwnProperty('id')) {
           const response = await apiUser.authenticatedApiRequest(
             'DELETE',
@@ -202,11 +200,12 @@
         subbeat_per_move: 1,
       };
       await player?.seek((beat?.start || 0) / 1000);
-      if (beats) {
-        beats.push(beat);
-      } else {
-        beats = [beat];
-      }
+      // TODO: should I handle multiple beats to support bpm switch? or just simplify and make it a single beat?
+      // if (beats) {
+      //   beats.push(beat);
+      // } else {
+      beats = [beat];
+      // }
       dirty = true;
     } else {
       // TODO: show user something
