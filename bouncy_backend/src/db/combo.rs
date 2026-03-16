@@ -562,7 +562,6 @@ mod tests {
 
         let user = User::lookup(&state, user_id)
             .await
-            .expect("user lookup should succeed")
             .expect("user should exist");
 
         let update_payload = ComboInfo {
@@ -609,7 +608,6 @@ mod tests {
 
         let user = User::lookup(&state, user_id)
             .await
-            .expect("user lookup should succeed")
             .expect("user should exist");
 
         let update_payload = ComboInfo {
@@ -647,7 +645,6 @@ mod tests {
 
         let user2_record = User::lookup(&state, user2)
             .await
-            .expect("user lookup should succeed")
             .expect("user should exist");
 
         let update_payload = ComboInfo {
@@ -685,7 +682,6 @@ mod tests {
 
         let user = User::lookup(&state, user_id)
             .await
-            .expect("user lookup should succeed")
             .expect("user should exist");
 
         let update_payload = ComboInfo {
