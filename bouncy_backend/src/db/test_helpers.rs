@@ -9,20 +9,6 @@ use sqlx::PgPool;
 use std::sync::Arc;
 use url::Url;
 
-/// Run database migrations for a test.
-///
-/// This must be called at the beginning of any test that uses the database.
-pub async fn apply_migrations(pool: &PgPool) {
-    sqlx::migrate::Migrator::new(
-        std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("db_migrations"),
-    )
-    .await
-    .expect("failed to build migrator")
-    .run(pool)
-    .await
-    .expect("failed to run migrations");
-}
-
 /// Build a minimal AppState for testing.
 ///
 /// Only the `pg_db_pool` field is meaningful; all other fields use dummy values.

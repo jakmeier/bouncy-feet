@@ -1,8 +1,17 @@
 # API server of Bouncy Feet
 
-Handles persistent storage.
+Handles persistent storage and makes system user calls to PeerTube.
 
 ## Development
+
+## Running tests locally
+
+To run all tests, you will need docker installed and run `docker compose up`
+once, to get the postgres container running.
+
+The `.env` file will then set `DATABASE_URL`, which sqlx tests require.
+
+## SQLX static query checks
 
 The project uses sqlx for DB queries. It checks queries at compile-time against a cache of the db layout.
 

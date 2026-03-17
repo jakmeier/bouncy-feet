@@ -38,9 +38,5 @@ futures = "0.3.31"
 thiserror = "2.0.17"
 
 
-[dev-dependencies]
-tokio = { version = "1", features = ["full"] }
-anyhow = "1.0"
-
 [lints.clippy]
 uninlined_format_args = "allow"

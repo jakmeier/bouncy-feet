@@ -149,7 +149,7 @@ impl From<BeatRow> for Beat {
 mod tests {
     use super::*;
     use crate::combo::ComboId;
-    use crate::db::test_helpers::{apply_migrations, make_test_state};
+    use crate::db::test_helpers::make_test_state;
     use sqlx::PgPool;
 
     /// Insert a guest user and one combo; return the raw ComboId.
@@ -183,9 +183,8 @@ mod tests {
 
     // ── Beat::create_for_combo ────────────────────────────────────────────────
 
-    #[sqlx::test]
+    #[sqlx::test(migrations = "./db_migrations")]
     async fn create_beat_for_owned_combo_returns_correct_fields(pool: PgPool) -> sqlx::Result<()> {
-        apply_migrations(&pool).await;
         let state = make_test_state(pool.clone());
         let combo_id = setup_combo(&pool).await;
         let checked = CheckedComboId::Owned(combo_id);
@@ -209,9 +208,8 @@ mod tests {
         Ok(())
     }
 
-    #[sqlx::test]
+    #[sqlx::test(migrations = "./db_migrations")]
     async fn create_beat_for_public_combo_is_forbidden(pool: PgPool) -> sqlx::Result<()> {
-        apply_migrations(&pool).await;
         let state = make_test_state(pool.clone());
         let combo_id = setup_combo(&pool).await;
         // Public means readable but not writable.
@@ -228,9 +226,8 @@ mod tests {
         Ok(())
     }
 
-    #[sqlx::test]
+    #[sqlx::test(migrations = "./db_migrations")]
     async fn create_beat_for_not_found_combo_returns_404(pool: PgPool) -> sqlx::Result<()> {
-        apply_migrations(&pool).await;
         let state = make_test_state(pool);
         let checked = CheckedComboId::NotFound;
 
@@ -244,9 +241,8 @@ mod tests {
 
     // ── Beat::list_by_combo ───────────────────────────────────────────────────
 
-    #[sqlx::test]
+    #[sqlx::test(migrations = "./db_migrations")]
     async fn list_by_combo_returns_inserted_beats(pool: PgPool) -> sqlx::Result<()> {
-        apply_migrations(&pool).await;
         let state = make_test_state(pool.clone());
         let combo_id = setup_combo(&pool).await;
         let owned = CheckedComboId::Owned(combo_id);
@@ -265,9 +261,8 @@ mod tests {
         Ok(())
     }
 
-    #[sqlx::test]
+    #[sqlx::test(migrations = "./db_migrations")]
     async fn list_by_combo_is_isolated_per_combo(pool: PgPool) -> sqlx::Result<()> {
-        apply_migrations(&pool).await;
         let state = make_test_state(pool.clone());
         let combo_a = setup_combo(&pool).await;
         let combo_b = setup_combo(&pool).await;
@@ -294,9 +289,8 @@ mod tests {
         Ok(())
     }
 
-    #[sqlx::test]
+    #[sqlx::test(migrations = "./db_migrations")]
     async fn list_by_combo_empty_for_new_combo(pool: PgPool) -> sqlx::Result<()> {
-        apply_migrations(&pool).await;
         let state = make_test_state(pool.clone());
         let combo_id = setup_combo(&pool).await;
 
@@ -307,9 +301,8 @@ mod tests {
         Ok(())
     }
 
-    #[sqlx::test]
+    #[sqlx::test(migrations = "./db_migrations")]
     async fn list_by_public_combo_is_allowed(pool: PgPool) -> sqlx::Result<()> {
-        apply_migrations(&pool).await;
         let state = make_test_state(pool.clone());
         let combo_id = setup_combo(&pool).await;
 
@@ -321,9 +314,8 @@ mod tests {
         Ok(())
     }
 
-    #[sqlx::test]
+    #[sqlx::test(migrations = "./db_migrations")]
     async fn list_by_combo_not_found_returns_404(pool: PgPool) -> sqlx::Result<()> {
-        apply_migrations(&pool).await;
         let state = make_test_state(pool);
 
         let result = Beat::list_by_combo(&state, CheckedComboId::NotFound).await;
@@ -336,9 +328,8 @@ mod tests {
 
     // ── Beat::delete ──────────────────────────────────────────────────────────
 
-    #[sqlx::test]
+    #[sqlx::test(migrations = "./db_migrations")]
     async fn delete_owned_beat_returns_true(pool: PgPool) -> sqlx::Result<()> {
-        apply_migrations(&pool).await;
         let state = make_test_state(pool.clone());
         let combo_id = setup_combo(&pool).await;
 
@@ -354,9 +345,8 @@ mod tests {
         Ok(())
     }
 
-    #[sqlx::test]
+    #[sqlx::test(migrations = "./db_migrations")]
     async fn delete_removes_beat_from_list(pool: PgPool) -> sqlx::Result<()> {
-        apply_migrations(&pool).await;
         let state = make_test_state(pool.clone());
         let combo_id = setup_combo(&pool).await;
 
@@ -378,9 +368,8 @@ mod tests {
         Ok(())
     }
 
-    #[sqlx::test]
+    #[sqlx::test(migrations = "./db_migrations")]
     async fn delete_nonexistent_beat_returns_false(pool: PgPool) -> sqlx::Result<()> {
-        apply_migrations(&pool).await;
         let state = make_test_state(pool);
 
         let deleted = Beat::delete(&state, CheckedBeatId::Owned(BeatId(i64::MAX)))
@@ -393,9 +382,8 @@ mod tests {
         Ok(())
     }
 
-    #[sqlx::test]
+    #[sqlx::test(migrations = "./db_migrations")]
     async fn delete_public_beat_is_forbidden(pool: PgPool) -> sqlx::Result<()> {
-        apply_migrations(&pool).await;
         let state = make_test_state(pool.clone());
         let combo_id = setup_combo(&pool).await;
 
@@ -413,9 +401,8 @@ mod tests {
         Ok(())
     }
 
-    #[sqlx::test]
+    #[sqlx::test(migrations = "./db_migrations")]
     async fn delete_not_found_beat_returns_404(pool: PgPool) -> sqlx::Result<()> {
-        apply_migrations(&pool).await;
         let state = make_test_state(pool);
 
         let result = Beat::delete(&state, CheckedBeatId::NotFound).await;

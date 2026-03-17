@@ -52,7 +52,6 @@ impl NewDanceActivity {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::db::test_helpers::apply_migrations;
     use crate::user::UserId;
     use uuid::Uuid;
 
@@ -95,26 +94,26 @@ mod tests {
 
     // ── NewDanceActivity::store_to_db ─────────────────────────────────────────
 
-    #[sqlx::test]
+    #[sqlx::test(migrations = "./db_migrations")]
     async fn store_valid_activity_succeeds(pool: PgPool) -> sqlx::Result<()> {
-        apply_migrations(&pool).await;
         let session_id = setup_client_session(&pool).await;
 
         let activity = make_activity(session_id, "lesson:step-a:120bpm", 10, 2, 5);
         let result = activity.store_to_db(&pool).await;
 
-        assert!(result.is_ok(), "store_to_db should succeed for a valid activity");
+        assert!(
+            result.is_ok(),
+            "store_to_db should succeed for a valid activity"
+        );
         Ok(())
     }
 
-    #[sqlx::test]
+    #[sqlx::test(migrations = "./db_migrations")]
     async fn store_activity_persists_all_fields(pool: PgPool) -> sqlx::Result<()> {
-        apply_migrations(&pool).await;
         let session_id = setup_client_session(&pool).await;
 
-        let timestamp =
-            NaiveDateTime::parse_from_str("2024-03-15 09:30:00", "%Y-%m-%d %H:%M:%S")
-                .expect("valid timestamp");
+        let timestamp = NaiveDateTime::parse_from_str("2024-03-15 09:30:00", "%Y-%m-%d %H:%M:%S")
+            .expect("valid timestamp");
         let activity = NewDanceActivity {
             client_session_id: session_id,
             activity_id: "lesson:waltz:100bpm".to_string(),
@@ -144,24 +143,35 @@ mod tests {
         .fetch_one(&pool)
         .await?;
 
-        assert_eq!(row.client_session_id, session_id, "client_session_id must match");
-        assert_eq!(row.recorded_at, timestamp, "recorded_at must be preserved exactly");
-        assert_eq!(row.activity_id, "lesson:waltz:100bpm", "activity_id must match");
+        assert_eq!(
+            row.client_session_id, session_id,
+            "client_session_id must match"
+        );
+        assert_eq!(
+            row.recorded_at, timestamp,
+            "recorded_at must be preserved exactly"
+        );
+        assert_eq!(
+            row.activity_id, "lesson:waltz:100bpm",
+            "activity_id must match"
+        );
         assert_eq!(row.hits, 15, "hits must match");
         assert_eq!(row.misses, 3, "misses must match");
         assert_eq!(row.steps, 8, "steps must match");
         Ok(())
     }
 
-    #[sqlx::test]
+    #[sqlx::test(migrations = "./db_migrations")]
     async fn store_activity_with_zero_stats_succeeds(pool: PgPool) -> sqlx::Result<()> {
-        apply_migrations(&pool).await;
         let session_id = setup_client_session(&pool).await;
 
         let activity = make_activity(session_id, "lesson:empty", 0, 0, 0);
         let result = activity.store_to_db(&pool).await;
 
-        assert!(result.is_ok(), "zero hits/misses/steps should be accepted by the DB CHECK constraint");
+        assert!(
+            result.is_ok(),
+            "zero hits/misses/steps should be accepted by the DB CHECK constraint"
+        );
 
         let count: i64 = sqlx::query_scalar(
             "SELECT COUNT(*) FROM dance_activity WHERE activity_id = 'lesson:empty'",
@@ -172,21 +182,22 @@ mod tests {
         Ok(())
     }
 
-    #[sqlx::test]
+    #[sqlx::test(migrations = "./db_migrations")]
     async fn store_activity_with_large_stats_succeeds(pool: PgPool) -> sqlx::Result<()> {
-        apply_migrations(&pool).await;
         let session_id = setup_client_session(&pool).await;
 
         let activity = make_activity(session_id, "high-volume", i32::MAX, i32::MAX, i32::MAX);
         let result = activity.store_to_db(&pool).await;
 
-        assert!(result.is_ok(), "large integer stats should be stored successfully");
+        assert!(
+            result.is_ok(),
+            "large integer stats should be stored successfully"
+        );
         Ok(())
     }
 
-    #[sqlx::test]
+    #[sqlx::test(migrations = "./db_migrations")]
     async fn store_multiple_activities_for_same_session(pool: PgPool) -> sqlx::Result<()> {
-        apply_migrations(&pool).await;
         let session_id = setup_client_session(&pool).await;
 
         for i in 0..3_i32 {
@@ -194,20 +205,21 @@ mod tests {
             act.store_to_db(&pool).await.expect("insert failed");
         }
 
-        let count: i64 = sqlx::query_scalar(
-            "SELECT COUNT(*) FROM dance_activity WHERE client_session_id = $1",
-        )
-        .bind(session_id)
-        .fetch_one(&pool)
-        .await?;
+        let count: i64 =
+            sqlx::query_scalar("SELECT COUNT(*) FROM dance_activity WHERE client_session_id = $1")
+                .bind(session_id)
+                .fetch_one(&pool)
+                .await?;
 
-        assert_eq!(count, 3, "all 3 activities for the session should be stored");
+        assert_eq!(
+            count, 3,
+            "all 3 activities for the session should be stored"
+        );
         Ok(())
     }
 
-    #[sqlx::test]
+    #[sqlx::test(migrations = "./db_migrations")]
     async fn activities_are_isolated_per_session(pool: PgPool) -> sqlx::Result<()> {
-        apply_migrations(&pool).await;
         let session_a = setup_client_session(&pool).await;
         let session_b = setup_client_session(&pool).await;
 
@@ -240,9 +252,8 @@ mod tests {
         Ok(())
     }
 
-    #[sqlx::test]
+    #[sqlx::test(migrations = "./db_migrations")]
     async fn store_activity_with_special_chars_in_activity_id(pool: PgPool) -> sqlx::Result<()> {
-        apply_migrations(&pool).await;
         let session_id = setup_client_session(&pool).await;
 
         let id = "lesson:step-a_v2.0@120bpm";
@@ -255,13 +266,15 @@ mod tests {
                 .fetch_one(&pool)
                 .await?;
 
-        assert_eq!(stored, id, "activity_id with special characters should round-trip exactly");
+        assert_eq!(
+            stored, id,
+            "activity_id with special characters should round-trip exactly"
+        );
         Ok(())
     }
 
-    #[sqlx::test]
+    #[sqlx::test(migrations = "./db_migrations")]
     async fn store_activity_with_max_length_activity_id_succeeds(pool: PgPool) -> sqlx::Result<()> {
-        apply_migrations(&pool).await;
         let session_id = setup_client_session(&pool).await;
 
         // The schema defines activity_id as VARCHAR(256); a 256-character value must succeed.
@@ -269,13 +282,15 @@ mod tests {
         let activity = make_activity(session_id, &max_id, 1, 0, 1);
         let result = activity.store_to_db(&pool).await;
 
-        assert!(result.is_ok(), "activity_id at max VARCHAR(256) length should be accepted");
+        assert!(
+            result.is_ok(),
+            "activity_id at max VARCHAR(256) length should be accepted"
+        );
         Ok(())
     }
 
-    #[sqlx::test]
+    #[sqlx::test(migrations = "./db_migrations")]
     async fn store_activity_with_overlong_activity_id_fails(pool: PgPool) -> sqlx::Result<()> {
-        apply_migrations(&pool).await;
         let session_id = setup_client_session(&pool).await;
 
         // 257 characters exceeds the VARCHAR(256) limit.
@@ -290,10 +305,8 @@ mod tests {
         Ok(())
     }
 
-    #[sqlx::test]
+    #[sqlx::test(migrations = "./db_migrations")]
     async fn store_activity_fails_for_nonexistent_session(pool: PgPool) -> sqlx::Result<()> {
-        apply_migrations(&pool).await;
-
         // i64::MAX is guaranteed not to exist in a fresh DB.
         let activity = make_activity(i64::MAX, "orphan-activity", 5, 0, 3);
         let result = activity.store_to_db(&pool).await;
@@ -305,14 +318,12 @@ mod tests {
         Ok(())
     }
 
-    #[sqlx::test]
+    #[sqlx::test(migrations = "./db_migrations")]
     async fn store_activity_preserves_recorded_at_timestamp(pool: PgPool) -> sqlx::Result<()> {
-        apply_migrations(&pool).await;
         let session_id = setup_client_session(&pool).await;
 
-        let timestamp =
-            NaiveDateTime::parse_from_str("2023-12-25 23:59:59", "%Y-%m-%d %H:%M:%S")
-                .expect("valid timestamp");
+        let timestamp = NaiveDateTime::parse_from_str("2023-12-25 23:59:59", "%Y-%m-%d %H:%M:%S")
+            .expect("valid timestamp");
         let activity = NewDanceActivity {
             client_session_id: session_id,
             activity_id: "christmas-dance".to_string(),
@@ -329,15 +340,17 @@ mod tests {
         .fetch_one(&pool)
         .await?;
 
-        assert_eq!(stored_ts, timestamp, "recorded_at should survive a DB round-trip unchanged");
+        assert_eq!(
+            stored_ts, timestamp,
+            "recorded_at should survive a DB round-trip unchanged"
+        );
         Ok(())
     }
 
-    #[sqlx::test]
+    #[sqlx::test(migrations = "./db_migrations")]
     async fn store_same_activity_id_twice_for_same_session_succeeds(
         pool: PgPool,
     ) -> sqlx::Result<()> {
-        apply_migrations(&pool).await;
         let session_id = setup_client_session(&pool).await;
 
         // The schema has no UNIQUE constraint on (client_session_id, activity_id), so
@@ -354,13 +367,15 @@ mod tests {
         .fetch_one(&pool)
         .await?;
 
-        assert_eq!(count, 2, "the same activity_id can appear multiple times for a session");
+        assert_eq!(
+            count, 2,
+            "the same activity_id can appear multiple times for a session"
+        );
         Ok(())
     }
 
-    #[sqlx::test]
+    #[sqlx::test(migrations = "./db_migrations")]
     async fn concurrent_inserts_all_succeed(pool: PgPool) -> sqlx::Result<()> {
-        apply_migrations(&pool).await;
         let session_id = setup_client_session(&pool).await;
 
         let handles: Vec<_> = (0..5_i32)
@@ -376,14 +391,16 @@ mod tests {
             assert!(result.is_ok(), "each concurrent insert should succeed");
         }
 
-        let count: i64 = sqlx::query_scalar(
-            "SELECT COUNT(*) FROM dance_activity WHERE client_session_id = $1",
-        )
-        .bind(session_id)
-        .fetch_one(&pool)
-        .await?;
+        let count: i64 =
+            sqlx::query_scalar("SELECT COUNT(*) FROM dance_activity WHERE client_session_id = $1")
+                .bind(session_id)
+                .fetch_one(&pool)
+                .await?;
 
-        assert_eq!(count, 5, "all 5 concurrent inserts should have been committed");
+        assert_eq!(
+            count, 5,
+            "all 5 concurrent inserts should have been committed"
+        );
         Ok(())
     }
 

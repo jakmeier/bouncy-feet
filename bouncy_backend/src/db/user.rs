@@ -381,14 +381,13 @@ impl AddClubMemberRequest {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::db::test_helpers::{apply_migrations, make_test_state};
+    use crate::db::test_helpers::make_test_state;
     use sqlx::PgPool;
 
     // ── UserId::create_new_guest ─────────────────────────────────────────────
 
-    #[sqlx::test]
+    #[sqlx::test(migrations = "./db_migrations")]
     async fn create_guest_user_returns_valid_id(pool: PgPool) -> sqlx::Result<()> {
-        apply_migrations(&pool).await;
         let user_id = UserId::create_new_guest(&pool).await;
         assert!(
             user_id.num() > 0,
@@ -397,9 +396,8 @@ mod tests {
         Ok(())
     }
 
-    #[sqlx::test]
+    #[sqlx::test(migrations = "./db_migrations")]
     async fn create_multiple_guests_have_distinct_ids(pool: PgPool) -> sqlx::Result<()> {
-        apply_migrations(&pool).await;
         let id1 = UserId::create_new_guest(&pool).await;
         let id2 = UserId::create_new_guest(&pool).await;
         assert_ne!(
@@ -412,9 +410,8 @@ mod tests {
 
     // ── User::lookup ─────────────────────────────────────────────────────────
 
-    #[sqlx::test]
+    #[sqlx::test(migrations = "./db_migrations")]
     async fn lookup_existing_user_returns_some(pool: PgPool) -> sqlx::Result<()> {
-        apply_migrations(&pool).await;
         let state = make_test_state(pool);
         let user_id = UserId::create_new_guest(&state.pg_db_pool).await;
 
@@ -434,9 +431,8 @@ mod tests {
         Ok(())
     }
 
-    #[sqlx::test]
+    #[sqlx::test(migrations = "./db_migrations")]
     async fn lookup_nonexistent_user_returns_none(pool: PgPool) -> sqlx::Result<()> {
-        apply_migrations(&pool).await;
         let state = make_test_state(pool);
 
         // Use an id that cannot exist in an empty (freshly migrated) database.
@@ -450,9 +446,8 @@ mod tests {
 
     // ── User::lookup_by_oidc_or_create ───────────────────────────────────────
 
-    #[sqlx::test]
+    #[sqlx::test(migrations = "./db_migrations")]
     async fn oidc_user_is_created_on_first_login(pool: PgPool) -> sqlx::Result<()> {
-        apply_migrations(&pool).await;
         // We test the underlying INSERT directly because constructing a full
         // OidcClaims is not feasible without an OIDC server.  This mirrors what
         // lookup_by_oidc_or_create does internally.
@@ -481,9 +476,8 @@ mod tests {
         Ok(())
     }
 
-    #[sqlx::test]
+    #[sqlx::test(migrations = "./db_migrations")]
     async fn oidc_subject_uniqueness_is_enforced(pool: PgPool) -> sqlx::Result<()> {
-        apply_migrations(&pool).await;
         let subject = Uuid::new_v4().to_string();
 
         sqlx::query("INSERT INTO users (oidc_subject) VALUES ($1)")
