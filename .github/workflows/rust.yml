@@ -27,6 +27,8 @@ jobs:
 
   bouncy_backend:
     runs-on: ubuntu-latest
+    env:
+      SQLX_OFFLINE: true
 
     services:
       postgres:
@@ -57,4 +59,3 @@ jobs:
       env:
         # Used by #[sqlx::test] to create per-test databases and run migrations.
         DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
-        SQLX_OFFLINE: true
