@@ -44,6 +44,9 @@
   let player = $state();
   let magnifierWidth = $state();
 
+  let showSpeedControl = $state(true);
+  let playbackRates = $state([0.25, 0.5, 1.0]);
+
   const magnifiedTimeRangeSec = 2;
   const magnifiedPxPerSec = $derived(magnifierWidth / magnifiedTimeRangeSec);
 
@@ -232,6 +235,19 @@
       seekTo(beatMarkers[prev].t / 1000);
     }
   }
+
+  /**
+   * @param {number} indexChange
+   */
+  async function changePlayback(indexChange) {
+    const current = await player.getPlaybackRate();
+    const index = playbackRates.indexOf(current);
+    const newIndex = Math.min(
+      Math.max(index + indexChange, 0),
+      playbackRates.length - 1
+    );
+    await player.setPlaybackRate(playbackRates[newIndex]);
+  }
 </script>
 
 <div class="video-wrapper" style="--video-ratio: {aspectRatio}">
@@ -253,6 +269,29 @@
       bind:this={iframe}
     ></iframe>
   </div>
+
+  {#if showSpeedControl}
+    <div
+      class="speed-control"
+      class:speed-control-inlined-timeline={timeline?.position === 'inline'}
+    >
+      <div class="speed-button">
+        <UnstyledButton onClick={() => changePlayback(-1)}>
+          <img
+            class="rotate"
+            src={asset('/img/symbols/bf_faster.svg')}
+            alt="slower"
+          />
+        </UnstyledButton>
+      </div>
+      <div class="speed-button">
+        <UnstyledButton onClick={() => changePlayback(1)}>
+          <img src={asset('/img/symbols/bf_faster.svg')} alt="faster" />
+        </UnstyledButton>
+      </div>
+    </div>
+  {/if}
+
   {#if !isPlaying}
     <div class="overlay-controls">
       <button class="play-button" onclick={togglePlay}>
@@ -575,5 +614,31 @@
     height: 100%;
     border: 0;
     object-fit: contain;
+  }
+
+  .speed-control {
+    position: absolute;
+    bottom: 1rem;
+    height: 2rem;
+    overflow: hidden;
+    z-index: 12;
+    display: grid;
+    width: calc(100% - 1rem);
+    margin: 0 0.5rem;
+    grid-template-columns: min-content min-content;
+    justify-content: space-between;
+  }
+
+  .speed-control-inlined-timeline {
+    bottom: 3rem;
+  }
+
+  .speed-button {
+    height: 2rem;
+    width: 2rem;
+  }
+
+  .rotate {
+    rotate: 180deg;
   }
 </style>
