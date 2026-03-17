@@ -103,3 +103,21 @@ Configure the exact token exchange URL (e.g. https://tube.bouncy-feet.ch/plugins
 
 PeerTube configuration:
 No additional config other than described in [BouncyFeet's PeerTube instance](#bouncyfeets-peertube-instance).
+
+# Usernames and handles
+
+The username shown as display name can be changed freely. It is stored only on the API server, as a user meta data with key `publicName`.
+
+The account handle, however, is immutable. This is the same as the PeerTube default channel handle, thus making it public. It is mapped from the `preferred_username` claim set by Keycloak. Users set this during registration.
+
+For the login, users can also use their email, which of course remains private. In fact, the API server never stores it.
+
+In Keycloak, the realm's login settings should be:
+
+ Attribute | Value | Reason / note
+-- | -- | --
+Email as username | off | This would show the email publicly in PeerTube and in the app.
+Login with email | on | For convenience
+Duplicate emails | off | Can''t be set at the same time as "Login with email"
+Verify email | on | To avoid spam
+Edit username | off | PeerTube channels wouldn't be updated, thus breaking the link. Manual editing can be done by an admin for the Keycloak side. But the PeerTube handle won't be updated. It is not possible to edit the PeerTube account. It would have to be deleted and created anew.
