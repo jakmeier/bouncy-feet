@@ -1,4 +1,6 @@
-use crate::{db_err_to_status, AppState, CheckedBeatId, CheckedComboId};
+use crate::{
+    api_endoints::combo::NewBeatInfo, db_err_to_status, AppState, CheckedBeatId, CheckedComboId,
+};
 use axum::http::StatusCode;
 
 #[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
@@ -35,11 +37,7 @@ impl Beat {
     pub async fn create_for_combo(
         state: &AppState,
         checked_combo_id: CheckedComboId,
-        start: i32,
-        duration: i32,
-        bpm: f32,
-        subbeat_per_move: i16,
-        pose_file: Option<String>,
+        data: NewBeatInfo,
     ) -> Result<Beat, (StatusCode, &'static str)> {
         let combo_id = checked_combo_id.assert_write_access()?;
 
@@ -56,11 +54,11 @@ impl Beat {
                 subbeat_per_move,
                 pose_file
             "#,
-            start,
-            duration,
-            bpm,
-            subbeat_per_move,
-            pose_file
+            data.start,
+            data.duration,
+            data.bpm,
+            data.subbeat_per_move,
+            data.pose_file
         )
         .fetch_one(&state.pg_db_pool)
         .await
@@ -173,6 +171,16 @@ mod tests {
         ComboId::for_test(combo_id)
     }
 
+    fn new_beat_input() -> NewBeatInfo {
+        NewBeatInfo {
+            start: 250,
+            duration: 4000,
+            bpm: 120.0,
+            subbeat_per_move: 2,
+            pose_file: Some("dGVzdAo=".to_owned()),
+        }
+    }
+
     // ── Beat::create_for_combo ────────────────────────────────────────────────
 
     #[sqlx::test]
@@ -182,14 +190,21 @@ mod tests {
         let combo_id = setup_combo(&pool).await;
         let checked = CheckedComboId::Owned(combo_id);
 
-        let beat = Beat::create_for_combo(&state, checked, 100, 480, 125.0, 4, None)
+        let new_input = NewBeatInfo {
+            start: 100,
+            duration: 480,
+            bpm: 132.0,
+            subbeat_per_move: 1,
+            pose_file: Some("dGVzdAo=".to_owned()),
+        };
+        let beat = Beat::create_for_combo(&state, checked, new_input.clone())
             .await
             .expect("create_for_combo should succeed for an owned combo");
 
-        assert_eq!(beat.start, 100);
-        assert_eq!(beat.duration, 480);
-        assert_eq!((beat.bpm * 10.0).round(), 1250.0);
-        assert_eq!(beat.subbeat_per_move, 4);
+        assert_eq!(beat.start, new_input.start);
+        assert_eq!(beat.duration, new_input.duration);
+        assert_eq!(beat.bpm, new_input.bpm);
+        assert_eq!(beat.subbeat_per_move, new_input.subbeat_per_move);
         assert!(beat.id.num() > 0, "assigned id should be positive");
         Ok(())
     }
@@ -202,7 +217,7 @@ mod tests {
         // Public means readable but not writable.
         let checked = CheckedComboId::Public(combo_id);
 
-        let result = Beat::create_for_combo(&state, checked, 0, 100, 120.0, 2, None).await;
+        let result = Beat::create_for_combo(&state, checked, new_beat_input()).await;
 
         assert!(
             result.is_err(),
@@ -219,7 +234,7 @@ mod tests {
         let state = make_test_state(pool);
         let checked = CheckedComboId::NotFound;
 
-        let result = Beat::create_for_combo(&state, checked, 0, 100, 120.0, 2, None).await;
+        let result = Beat::create_for_combo(&state, checked, new_beat_input()).await;
 
         assert!(result.is_err());
         let (status, _) = result.unwrap_err();
@@ -236,10 +251,10 @@ mod tests {
         let combo_id = setup_combo(&pool).await;
         let owned = CheckedComboId::Owned(combo_id);
 
-        Beat::create_for_combo(&state, owned, 0, 300, 120.0, 2, None)
+        Beat::create_for_combo(&state, owned, new_beat_input())
             .await
             .unwrap();
-        Beat::create_for_combo(&state, owned, 300, 600, 130.0, 4, None)
+        Beat::create_for_combo(&state, owned, new_beat_input())
             .await
             .unwrap();
 
@@ -257,39 +272,15 @@ mod tests {
         let combo_a = setup_combo(&pool).await;
         let combo_b = setup_combo(&pool).await;
 
-        Beat::create_for_combo(
-            &state,
-            CheckedComboId::Owned(combo_a),
-            0,
-            480,
-            120.0,
-            4,
-            None,
-        )
-        .await
-        .unwrap();
-        Beat::create_for_combo(
-            &state,
-            CheckedComboId::Owned(combo_b),
-            0,
-            200,
-            100.0,
-            2,
-            None,
-        )
-        .await
-        .unwrap();
-        Beat::create_for_combo(
-            &state,
-            CheckedComboId::Owned(combo_b),
-            200,
-            400,
-            110.0,
-            2,
-            None,
-        )
-        .await
-        .unwrap();
+        Beat::create_for_combo(&state, CheckedComboId::Owned(combo_a), new_beat_input())
+            .await
+            .unwrap();
+        Beat::create_for_combo(&state, CheckedComboId::Owned(combo_b), new_beat_input())
+            .await
+            .unwrap();
+        Beat::create_for_combo(&state, CheckedComboId::Owned(combo_b), new_beat_input())
+            .await
+            .unwrap();
 
         let beats_a = Beat::list_by_combo(&state, CheckedComboId::Owned(combo_a))
             .await
@@ -351,17 +342,10 @@ mod tests {
         let state = make_test_state(pool.clone());
         let combo_id = setup_combo(&pool).await;
 
-        let beat = Beat::create_for_combo(
-            &state,
-            CheckedComboId::Owned(combo_id),
-            0,
-            480,
-            120.0,
-            4,
-            None,
-        )
-        .await
-        .unwrap();
+        let beat =
+            Beat::create_for_combo(&state, CheckedComboId::Owned(combo_id), new_beat_input())
+                .await
+                .unwrap();
 
         let deleted = Beat::delete(&state, CheckedBeatId::Owned(beat.id))
             .await
@@ -376,17 +360,10 @@ mod tests {
         let state = make_test_state(pool.clone());
         let combo_id = setup_combo(&pool).await;
 
-        let beat = Beat::create_for_combo(
-            &state,
-            CheckedComboId::Owned(combo_id),
-            0,
-            480,
-            120.0,
-            4,
-            Some("fake".to_owned()),
-        )
-        .await
-        .unwrap();
+        let beat =
+            Beat::create_for_combo(&state, CheckedComboId::Owned(combo_id), new_beat_input())
+                .await
+                .unwrap();
         Beat::delete(&state, CheckedBeatId::Owned(beat.id))
             .await
             .unwrap();
@@ -422,17 +399,10 @@ mod tests {
         let state = make_test_state(pool.clone());
         let combo_id = setup_combo(&pool).await;
 
-        let beat = Beat::create_for_combo(
-            &state,
-            CheckedComboId::Owned(combo_id),
-            0,
-            480,
-            120.0,
-            4,
-            None,
-        )
-        .await
-        .unwrap();
+        let beat =
+            Beat::create_for_combo(&state, CheckedComboId::Owned(combo_id), new_beat_input())
+                .await
+                .unwrap();
 
         // Public means read-only; deleting should be rejected.
         let result = Beat::delete(&state, CheckedBeatId::Public(beat.id)).await;

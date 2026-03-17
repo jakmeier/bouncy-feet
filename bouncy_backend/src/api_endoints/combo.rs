@@ -313,16 +313,7 @@ pub async fn add_combo_beat(
 ) -> JsonResponse<BeatId> {
     let checked_combo_id = CheckedComboId::check_for_user(&state, user.id, combo_id).await?;
 
-    let result = Beat::create_for_combo(
-        &state,
-        checked_combo_id,
-        payload.start,
-        payload.duration,
-        payload.bpm,
-        payload.subbeat_per_move,
-        payload.pose_file,
-    )
-    .await;
+    let result = Beat::create_for_combo(&state, checked_combo_id, payload).await;
 
     Ok(Json(result.unwrap().id))
 }
