@@ -2,7 +2,6 @@
   // A custom video player for Bouncy Feet, that's aware of music beats and just
   // generally styled in theme.
   import { onMount } from 'svelte';
-  import { writable } from 'svelte/store';
   import CornerMarker from '../CornerMarker.svelte';
   import { asset, base } from '$app/paths';
 
@@ -30,8 +29,6 @@
       videoElement.play();
     }
   }
-
-  const seekTime = writable(0);
 
   function togglePlay() {
     if (videoElement.paused) {

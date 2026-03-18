@@ -1,5 +1,6 @@
 <script>
   import { clubsData, loadAndSetClubDetails } from '$lib/stores/Clubs.svelte';
+  import { onMount } from 'svelte';
 
   /**
    * @typedef {Object} Props
@@ -11,11 +12,11 @@
   /** @type {Props} */
   let { isMember, apiUser, clubId } = $props();
 
-  const _currentClubDetails = $derived.by(() => {
+  onMount(async () => {
     if (isMember) {
-      loadAndSetClubDetails(clubId, apiUser);
+      await loadAndSetClubDetails(clubId, apiUser);
     } else {
-      loadAndSetClubDetails(clubId);
+      await loadAndSetClubDetails(clubId);
     }
     return clubsData.currentClubDetails;
   });

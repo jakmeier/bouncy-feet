@@ -19,6 +19,9 @@
   import { getClubsContext, getUserContext } from '$lib/stores/context';
   import { t } from '$lib/i18n';
   import { VIDEO_PRIVACY } from '$lib/peertube';
+  import Combos from '$lib/components/combo/Combos.svelte';
+  import MyCombosList from '$lib/components/user/MyCombosList.svelte';
+  import { loadAndSetClubDetails } from '$lib/stores/Clubs.svelte';
 
   /** @type {import('./$types').PageProps} */
   let { data } = $props();
@@ -49,6 +52,8 @@
   let showUsersPopup = $state(false);
   let showAddMorePopup = $state(false);
   let showAddVideoPopup = $state(false);
+  let showCombosPopup = $state(false);
+  let showComboPrivacySelection = $state(false);
   let message = $state('');
   let mainFeed = $state();
   /** @type {Playlist[]} */
@@ -58,6 +63,8 @@
   let uploadPrivacy = $state(VIDEO_PRIVACY.PUBLIC);
   /** @type {{refreshVideos: ()=>void} | undefined} */
   let uploadToFeed = $state();
+  /** @type {ComboInfo | undefined} */
+  let selectedCombo = $state();
 
   /**
    * @param {PublicUserResponse} user
@@ -90,6 +97,51 @@
     }
 
     showUsersPopup = false;
+  }
+
+  /**
+   * @param {ComboInfo} combo
+   * @param {ApiUser} apiUser
+   */
+  async function onSelectCombo(combo, apiUser) {
+    showComboPrivacySelection = true;
+    // TODO: ask for is_private
+    const is_private = true;
+
+    addCombo(combo, apiUser, is_private);
+  }
+
+  /**
+   * @param {ComboInfo} combo
+   * @param {ApiUser} apiUser
+   * @param {boolean} is_private
+   */
+  async function addCombo(combo, apiUser, is_private) {
+    /** @type {boolean} */
+    let ok = false;
+    try {
+      const result = await apiUser.authenticatedPost(
+        `/clubs/${clubId}/combo/new`,
+        {
+          combo_id: Number(combo.id),
+          is_private,
+        }
+      );
+      ok = result?.ok || false;
+    } catch (err) {
+      console.error('failed adding combo', err);
+    }
+
+    if (ok) {
+      message = $t('club.add-user-success');
+    } else {
+      message = $t('club.add-user-failed');
+    }
+    loadAndSetClubDetails(clubId, apiUser);
+    await new Promise((r) => setTimeout(r, 1200));
+
+    selectedCombo = undefined;
+    showCombosPopup = false;
   }
 
   /**
@@ -188,6 +240,9 @@
         <Playlist playlistInfo={playlist} editable={isClubMember} />
       {/if}
     {/each}
+
+    <h2>{$t('club.public-combos-title')}</h2>
+    <Combos combos={clubDetails.combos} />
   {/if}
 </LimeSection>
 
@@ -203,6 +258,15 @@
         />
       </div>
     {/each}
+
+    <LoginRequiredContent>
+      {#snippet children({ apiUser })}
+        {#if clubDetails.private}
+          <h2>{$t('club.private-combos-title')}</h2>
+          <Combos combos={clubDetails.private.private_combos} {apiUser} />
+        {/if}
+      {/snippet}
+    </LoginRequiredContent>
   {/if}
 </NightSection>
 
@@ -241,6 +305,52 @@
   </LoginRequiredContent>
 </PopupWithRunes>
 
+<PopupWithRunes bind:isOpen={showCombosPopup}>
+  <LoginRequiredContent
+    reason={$t('profile.upload.requires-login-description')}
+  >
+    {#snippet children({ apiUser })}
+      <div class="popup">
+        {#if message}
+          <div>{message}</div>
+        {:else if selectedCombo}
+          <h2>
+            {$t('club.adding-combo-description')}: {selectedCombo.title}
+          </h2>
+          <div>{$t('club.select-public')}</div>
+          <button
+            class="full-width"
+            onclick={() => addCombo(selectedCombo, apiUser, true)}
+          >
+            {$t('club.add-private-button')}
+          </button>
+          <button
+            class="full-width"
+            onclick={() => addCombo(selectedCombo, apiUser, false)}
+          >
+            {$t('club.add-public-button')}
+          </button>
+          <button
+            class="full-width"
+            onclick={() => {
+              selectedCombo = undefined;
+            }}
+          >
+            {$t('profile.combo.cancel-button')}
+          </button>
+        {:else}
+          <div>{$t('club.select-combo-title')}</div>
+          <MyCombosList
+            onSelect={(c) => {
+              selectedCombo = c;
+            }}
+          ></MyCombosList>
+        {/if}
+      </div>
+    {/snippet}
+  </LoginRequiredContent>
+</PopupWithRunes>
+
 <PopupWithRunes bind:isOpen={showAddMorePopup}>
   <LoginRequiredContent
     reason={$t('profile.upload.requires-login-description')}
@@ -271,6 +381,15 @@
         text={'club.add-playlist-button'}
         class="full-width"
         on:click={() => goto('./playlist/new')}
+      />
+      <Button
+        symbol="person_celebrate"
+        text={'club.add-combo-button'}
+        class="full-width"
+        on:click={() => {
+          showAddMorePopup = false;
+          showCombosPopup = true;
+        }}
       />
     </div>
   </LoginRequiredContent>

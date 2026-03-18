@@ -219,10 +219,12 @@
  * @property {PlaylistInfo} [main_playlist]
  * @property {PlaylistInfo[]} public_playlists
  * @property {string} [web_link]
+ * @property {ComboInfo[]} combos
  * @property {PrivateClubDetails} [private]
  * 
  * @typedef {object} PrivateClubDetails
  * @property {PlaylistInfo[]} private_playlists
+ * @property {ComboInfo[]} private_combos
  * @property {PublicUserResponse[]} members
  *
  *

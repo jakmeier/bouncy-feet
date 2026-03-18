@@ -27,8 +27,8 @@
 </script>
 
 <LoginRequiredContent
-  >{#snippet guest({ apiUser })}
-    <LoadClubInfo {apiUser} {isMember} clubId />
+  >{#snippet maybeFullUser({ apiUser })}
+    <LoadClubInfo {apiUser} {isMember} {clubId} />
     {@render children?.()}
   {/snippet}
 </LoginRequiredContent>
