@@ -97,6 +97,7 @@
     }
 
     showUsersPopup = false;
+    message = '';
   }
 
   /**
@@ -142,6 +143,7 @@
 
     selectedCombo = undefined;
     showCombosPopup = false;
+    message = '';
   }
 
   /**
