@@ -286,6 +286,67 @@ impl Club {
         Ok(members)
     }
 
+    pub async fn list_admins_with_info(
+        state: &AppState,
+        checked_club_id: CheckedClubId,
+        limit: i64,
+        offset: i64,
+    ) -> Result<Vec<PublicClubMemberInfo>, (StatusCode, &'static str)> {
+        let club_id = checked_club_id.assert_public_read_access()?;
+        let rows = sqlx::query_as!(
+            UserJoinedClubRow,
+            r#"
+            SELECT uc.user_id, u.peertube_handle, uc.is_admin, um.key_value AS public_name
+            FROM user_club uc
+            JOIN user_meta um ON uc.user_id = um.user_id
+            JOIN users u ON uc.user_id = u.id
+            WHERE uc.club_id = $1
+                AND um.key_name = 's:publicName'
+                AND uc.is_admin
+            ORDER BY um.user_id
+            LIMIT $2 OFFSET $3
+            "#,
+            club_id.num(),
+            limit,
+            offset
+        )
+        .fetch_all(&state.pg_db_pool)
+        .await
+        .map_err(db_err_to_status)?;
+
+        let members = rows
+            .into_iter()
+            .map(|record| PublicClubMemberInfo {
+                user_id: record.user_id(),
+                public_name: record.public_name,
+                membership: ClubMembership::for_member(record.is_admin),
+                peertube_handle: record.peertube_handle.map(PeerTubeHandle),
+            })
+            .collect();
+
+        Ok(members)
+    }
+
+    pub async fn members_count(
+        state: &AppState,
+        checked_club_id: CheckedClubId,
+    ) -> Result<i64, (StatusCode, &'static str)> {
+        let club_id = checked_club_id.assert_public_read_access()?;
+        let num = sqlx::query_scalar!(
+            r#"
+            SELECT COUNT(*)
+            FROM user_club
+            WHERE club_id = $1
+            "#,
+            club_id.num(),
+        )
+        .fetch_one(&state.pg_db_pool)
+        .await
+        .map_err(db_err_to_status)?;
+
+        Ok(num.expect("count should succeed"))
+    }
+
     /// List clubs for a user
     pub async fn list_clubs_for_user(
         state: &AppState,

@@ -229,8 +229,6 @@ pub async fn club_details(
     state: &AppState,
     checked_club_id: CheckedClubId,
 ) -> axum::response::Result<Json<ClubDetails>> {
-    let mut db_members = Club::list_members_with_info(state, checked_club_id, 100, 0).await?;
-
     fn row_to_user_info(row: PublicClubMemberInfo) -> PublicUserInfoResponse {
         PublicUserInfoResponse {
             id: row.user_id.num(),
@@ -241,11 +239,8 @@ pub async fn club_details(
         }
     }
 
-    let admins = db_members
-        .extract_if(.., |row| matches!(row.membership, ClubMembership::Admin))
-        .map(row_to_user_info)
-        .collect();
-    let members: Vec<_> = db_members.into_iter().map(row_to_user_info).collect();
+    let db_admins = Club::list_admins_with_info(state, checked_club_id, 100, 0).await?;
+    let admins = db_admins.into_iter().map(row_to_user_info).collect();
 
     let Some(club) = Club::lookup(state, checked_club_id).await else {
         return Err((StatusCode::NOT_FOUND, "no such club"))?;
@@ -267,7 +262,6 @@ pub async fn club_details(
         .map(Playlist::playlist_info)
         .collect();
     let public_playlists = playlists.into_iter().map(Playlist::playlist_info).collect();
-    let num_members = u32::try_from(members.len()).unwrap_or(u32::MAX);
 
     let public_db_combos = Combo::public_list_by_club(state, checked_club_id).await?;
     let public_combos = public_db_combos
@@ -275,7 +269,16 @@ pub async fn club_details(
         .map(ComboInfo::from_db_info)
         .collect();
 
+    let num_members;
     let private = if checked_club_id.assert_private_read_access().is_ok() {
+        let mut db_members = Club::list_members_with_info(state, checked_club_id, 100, 0).await?;
+        num_members = u32::try_from(db_members.len()).unwrap_or(u32::MAX);
+        let _admins: Vec<_> = db_members
+            .extract_if(.., |row| matches!(row.membership, ClubMembership::Admin))
+            .map(row_to_user_info)
+            .collect();
+        let members: Vec<_> = db_members.into_iter().map(row_to_user_info).collect();
+
         let private_combos = Combo::private_list_by_club(state, checked_club_id).await?;
         Some(PrivateClubDetails {
             members,
@@ -286,6 +289,8 @@ pub async fn club_details(
                 .collect(),
         })
     } else {
+        let num = Club::members_count(state, checked_club_id).await?;
+        num_members = u32::try_from(num).unwrap_or_default();
         None
     };
 
