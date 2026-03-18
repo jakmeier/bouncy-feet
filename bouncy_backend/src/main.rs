@@ -219,6 +219,10 @@ async fn main() -> anyhow::Result<()> {
             "/clubs/{club_id}/playlist/{playlist_id}/remove-video",
             post(api_endoints::club::remove_video),
         )
+        .route(
+            "/clubs/{club_id}/combo/new",
+            post(api_endoints::club::add_combo),
+        )
         .route("/combos/new", post(api_endoints::combo::create_combo))
         .route("/combos/update", post(api_endoints::combo::update_combo))
         .route("/user/combos", get(api_endoints::combo::user_combos))

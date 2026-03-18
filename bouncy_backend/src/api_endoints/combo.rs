@@ -143,7 +143,9 @@ pub async fn public_user_combos(
     State(state): State<AppState>,
     Path(user_id): Path<UserId>,
 ) -> JsonResponse<CombosResponse> {
-    let result = CheckedUserId::Public(user_id).combos(&state).await;
+    let result = CheckedUserId::PublicReadAccess(user_id)
+        .combos(&state)
+        .await;
 
     let Ok(db_combos) = result else {
         let err = result.unwrap_err();
@@ -340,7 +342,7 @@ pub async fn delete_combo_beat(
 }
 
 impl ComboInfo {
-    fn from_db_info(other: Combo) -> ComboInfo {
+    pub(crate) fn from_db_info(other: Combo) -> ComboInfo {
         ComboInfo {
             id: other.id,
             is_private: other.is_private,
@@ -353,7 +355,7 @@ impl ComboInfo {
 }
 
 impl CheckedComboId {
-    async fn check_for_user(
+    pub(crate) async fn check_for_user(
         state: &AppState,
         user_id: UserId,
         combo_id: ComboId,
@@ -381,7 +383,7 @@ impl CheckedComboId {
             .map_err(db_err_to_status)?;
 
         match result {
-            Some(combo) if !combo.is_private => Ok(CheckedComboId::Public(combo.id)),
+            Some(combo) if !combo.is_private => Ok(CheckedComboId::PublicReadAccess(combo.id)),
             Some(_combo) => Ok(CheckedComboId::NotFound),
             None => Ok(CheckedComboId::NotFound),
         }
@@ -393,7 +395,9 @@ impl CheckedComboId {
         timestamp_id: TimestampId,
     ) -> Result<CheckedTimestampId, (StatusCode, &'static str)> {
         let combo_id = match self {
-            CheckedComboId::Owned(combo_id) | CheckedComboId::Public(combo_id) => combo_id,
+            CheckedComboId::Owned(combo_id)
+            | CheckedComboId::FullReadAccess(combo_id)
+            | CheckedComboId::PublicReadAccess(combo_id) => combo_id,
             CheckedComboId::NotFound => return Ok(CheckedTimestampId::NotFound),
         };
 
@@ -405,7 +409,12 @@ impl CheckedComboId {
                 if c.num() == combo_id.num() {
                     match self {
                         CheckedComboId::Owned(_) => Ok(CheckedTimestampId::Owned(timestamp_id)),
-                        CheckedComboId::Public(_) => Ok(CheckedTimestampId::Public(timestamp_id)),
+                        CheckedComboId::FullReadAccess(_) => {
+                            Ok(CheckedTimestampId::FullReadAccess(timestamp_id))
+                        }
+                        CheckedComboId::PublicReadAccess(_) => {
+                            Ok(CheckedTimestampId::PublicReadAccess(timestamp_id))
+                        }
                         CheckedComboId::NotFound => unreachable!(),
                     }
                 } else {
@@ -422,7 +431,9 @@ impl CheckedComboId {
         beat_id: BeatId,
     ) -> Result<CheckedBeatId, (StatusCode, &'static str)> {
         let combo_id = match self {
-            CheckedComboId::Owned(combo_id) | CheckedComboId::Public(combo_id) => combo_id,
+            CheckedComboId::Owned(combo_id)
+            | CheckedComboId::FullReadAccess(combo_id)
+            | CheckedComboId::PublicReadAccess(combo_id) => combo_id,
             CheckedComboId::NotFound => return Ok(CheckedBeatId::NotFound),
         };
 
@@ -434,7 +445,12 @@ impl CheckedComboId {
                 if c.num() == combo_id.num() {
                     match self {
                         CheckedComboId::Owned(_) => Ok(CheckedBeatId::Owned(beat_id)),
-                        CheckedComboId::Public(_) => Ok(CheckedBeatId::Public(beat_id)),
+                        CheckedComboId::FullReadAccess(_) => {
+                            Ok(CheckedBeatId::FullReadAccess(beat_id))
+                        }
+                        CheckedComboId::PublicReadAccess(_) => {
+                            Ok(CheckedBeatId::PublicReadAccess(beat_id))
+                        }
                         CheckedComboId::NotFound => unreachable!(),
                     }
                 } else {

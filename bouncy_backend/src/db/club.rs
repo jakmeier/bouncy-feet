@@ -1,16 +1,18 @@
 use crate::{
     api_endoints::club::{AddClubMemberRequest, AddClubVideoRequest},
+    db_err_to_status,
     peertube::{
         channel::{PeerTubeChannelHandle, PeerTubeChannelId},
         playlist::PeerTubePlaylistId,
         user::PeerTubeHandle,
     },
     user::UserId,
-    AppState,
+    AppState, CheckedClubId,
 };
+use axum::http::StatusCode;
 use sqlx::FromRow;
 
-#[derive(Clone, Copy, Debug, serde::Deserialize)]
+#[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
 #[serde(transparent)]
 pub struct ClubId(i64);
 
@@ -97,13 +99,14 @@ impl Club {
         Ok(Club::from(rec))
     }
 
-    pub(crate) async fn lookup(state: &AppState, id: ClubId) -> Option<Club> {
+    pub(crate) async fn lookup(state: &AppState, id: CheckedClubId) -> Option<Club> {
+        let club_id = id.assert_public_read_access().ok()?;
         let maybe_club = sqlx::query_as!(
             ClubRow,
             r#"SELECT id, title, description, channel_id, main_playlist, channel_handle, web_link
             FROM clubs
             WHERE id = $1"#,
-            id.num()
+            club_id.num()
         )
         .fetch_optional(&state.pg_db_pool)
         .await
@@ -245,10 +248,11 @@ impl Club {
     /// List members of a club with their user info
     pub async fn list_members_with_info(
         state: &AppState,
-        club_id: ClubId,
+        checked_club_id: CheckedClubId,
         limit: i64,
         offset: i64,
-    ) -> Result<Vec<PublicClubMemberInfo>, sqlx::Error> {
+    ) -> Result<Vec<PublicClubMemberInfo>, (StatusCode, &'static str)> {
+        let club_id = checked_club_id.assert_private_read_access()?;
         let rows = sqlx::query_as!(
             UserJoinedClubRow,
             r#"
@@ -266,7 +270,8 @@ impl Club {
             offset
         )
         .fetch_all(&state.pg_db_pool)
-        .await?;
+        .await
+        .map_err(db_err_to_status)?;
 
         let members = rows
             .into_iter()
@@ -413,6 +418,12 @@ impl super::playlist::PlaylistRow {
     }
 }
 
+impl super::clubs_combos::ClubComboRow {
+    pub(crate) fn club_id(&self) -> ClubId {
+        ClubId(self.club_id)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -523,7 +534,7 @@ mod tests {
         )
         .await?;
 
-        let found = Club::lookup(&state, created.id).await;
+        let found = Club::lookup(&state, CheckedClubId::PublicReadAccess(created.id)).await;
 
         assert!(
             found.is_some(),
@@ -539,7 +550,7 @@ mod tests {
     async fn lookup_nonexistent_club_returns_none(pool: PgPool) -> sqlx::Result<()> {
         let state = make_test_state(pool.clone());
 
-        let missing = Club::lookup(&state, ClubId(i64::MAX)).await;
+        let missing = Club::lookup(&state, CheckedClubId::PublicReadAccess(ClubId(i64::MAX))).await;
 
         assert!(
             missing.is_none(),
@@ -572,7 +583,7 @@ mod tests {
     }
 
     #[sqlx::test(migrations = "./db_migrations")]
-    async fn delete_removes_club_from_database(pool: PgPool) -> sqlx::Result<()> {
+    async fn delete_removes_club_from_database(pool: PgPool) -> anyhow::Result<()> {
         let state = make_test_state(pool.clone());
 
         let club = Club::create(
@@ -587,7 +598,7 @@ mod tests {
         .await?;
 
         Club::delete(&state, club.id).await?;
-        let lookup_result = Club::lookup(&state, club.id).await;
+        let lookup_result = Club::lookup(&state, CheckedClubId::Owned(club.id)).await;
 
         assert!(
             lookup_result.is_none(),
@@ -993,7 +1004,10 @@ mod tests {
         Club::add_or_update_member(&state, user1, club.id, false).await?;
         Club::add_or_update_member(&state, user2, club.id, true).await?;
 
-        let members = Club::list_members_with_info(&state, club.id, 10, 0).await?;
+        let club_id = CheckedClubId::FullReadAccess(club.id);
+        let members = Club::list_members_with_info(&state, club_id, 10, 0)
+            .await
+            .unwrap();
 
         assert_eq!(members.len(), 2);
         assert!(members
@@ -1024,9 +1038,16 @@ mod tests {
             Club::add_or_update_member(&state, user, club.id, false).await?;
         }
 
-        let page1 = Club::list_members_with_info(&state, club.id, 2, 0).await?;
-        let page2 = Club::list_members_with_info(&state, club.id, 2, 2).await?;
-        let all = Club::list_members_with_info(&state, club.id, 10, 0).await?;
+        let club_id = CheckedClubId::FullReadAccess(club.id);
+        let page1 = Club::list_members_with_info(&state, club_id, 2, 0)
+            .await
+            .unwrap();
+        let page2 = Club::list_members_with_info(&state, club_id, 2, 2)
+            .await
+            .unwrap();
+        let all = Club::list_members_with_info(&state, club_id, 10, 0)
+            .await
+            .unwrap();
 
         assert_eq!(page1.len(), 2);
         assert_eq!(page2.len(), 2);
@@ -1101,6 +1122,7 @@ mod tests {
     // ── Club::set_main_playlist ─────────────────────────────────────────────
 
     #[sqlx::test(migrations = "./db_migrations")]
+    // TODO
     #[ignore] // Skipped: requires playlist to exist in club_playlists table
     async fn set_main_playlist_updates_club(pool: PgPool) -> sqlx::Result<()> {
         let state = make_test_state(pool.clone());
@@ -1119,12 +1141,15 @@ mod tests {
 
         Club::set_main_playlist(&state, club.id, PeerTubePlaylistId(200)).await?;
 
-        let updated = Club::lookup(&state, club.id).await.unwrap();
+        let updated = Club::lookup(&state, CheckedClubId::PublicReadAccess(club.id))
+            .await
+            .unwrap();
         assert_eq!(updated.main_playlist, Some(PeerTubePlaylistId(200)));
         Ok(())
     }
 
     #[sqlx::test(migrations = "./db_migrations")]
+    // TODO
     #[ignore] // Skipped: requires playlist to exist in club_playlists table
     async fn set_main_playlist_can_update_existing_playlist(pool: PgPool) -> sqlx::Result<()> {
         let state = make_test_state(pool.clone());
@@ -1141,7 +1166,9 @@ mod tests {
 
         Club::set_main_playlist(&state, club.id, PeerTubePlaylistId(300)).await?;
 
-        let updated = Club::lookup(&state, club.id).await.unwrap();
+        let updated = Club::lookup(&state, CheckedClubId::PublicReadAccess(club.id))
+            .await
+            .unwrap();
         assert_eq!(updated.main_playlist, Some(PeerTubePlaylistId(300)));
         Ok(())
     }
@@ -1170,7 +1197,9 @@ mod tests {
         )
         .await?;
 
-        let updated = Club::lookup(&state, club.id).await.unwrap();
+        let updated = Club::lookup(&state, CheckedClubId::PublicReadAccess(club.id))
+            .await
+            .unwrap();
         assert_eq!(updated.description, "new description");
         assert_eq!(
             updated.web_link,
@@ -1195,7 +1224,9 @@ mod tests {
 
         Club::set_meta_fields(&state, club.id, "new desc".to_string(), None).await?;
 
-        let updated = Club::lookup(&state, club.id).await.unwrap();
+        let updated = Club::lookup(&state, CheckedClubId::PublicReadAccess(club.id))
+            .await
+            .unwrap();
         assert_eq!(updated.web_link, None);
         Ok(())
     }
@@ -1216,7 +1247,9 @@ mod tests {
 
         Club::set_meta_fields(&state, club.id, "new desc".to_string(), None).await?;
 
-        let updated = Club::lookup(&state, club.id).await.unwrap();
+        let updated = Club::lookup(&state, CheckedClubId::Owned(club.id))
+            .await
+            .unwrap();
         assert_eq!(updated.title, "Original Title", "title should not change");
         assert_eq!(
             updated.channel_id,

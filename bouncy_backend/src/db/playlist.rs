@@ -3,7 +3,7 @@ use sqlx::prelude::FromRow;
 use crate::{
     club::{ClubId, ClubRow},
     peertube::playlist::{PeerTubePlaylist, PeerTubePlaylistId},
-    AppState,
+    AppState, CheckedClubId,
 };
 
 #[derive(Debug, Clone)]
@@ -72,17 +72,37 @@ impl Playlist {
         maybe_club.map(Playlist::from)
     }
 
-    pub(crate) async fn lookup_club_playlists(state: &AppState, club_id: ClubId) -> Vec<Playlist> {
-        let clubs = sqlx::query_as!(
-            PlaylistRow,
-            r#"SELECT club_id, playlist_id, playlist_short_uuid, is_private
-            FROM club_playlists
-            WHERE club_id = $1"#,
-            club_id.num()
-        )
-        .fetch_all(&state.pg_db_pool)
-        .await
-        .expect("DB query failed");
+    pub(crate) async fn lookup_club_playlists(
+        state: &AppState,
+        checked_club_id: CheckedClubId,
+    ) -> Vec<Playlist> {
+        let query = match checked_club_id {
+            CheckedClubId::Owned(club_id) | CheckedClubId::FullReadAccess(club_id) => {
+                sqlx::query_as!(
+                    PlaylistRow,
+                    r#"SELECT club_id, playlist_id, playlist_short_uuid, is_private
+                        FROM club_playlists
+                        WHERE club_id = $1"#,
+                    club_id.num()
+                )
+                .fetch_all(&state.pg_db_pool)
+                .await
+            }
+            CheckedClubId::PublicReadAccess(club_id) => {
+                sqlx::query_as!(
+                    PlaylistRow,
+                    r#"SELECT club_id, playlist_id, playlist_short_uuid, is_private
+                        FROM club_playlists
+                        WHERE club_id = $1
+                        AND NOT is_private"#,
+                    club_id.num()
+                )
+                .fetch_all(&state.pg_db_pool)
+                .await
+            }
+            CheckedClubId::NotFound => return vec![],
+        };
+        let clubs = query.expect("DB query failed");
 
         clubs.into_iter().map(Playlist::from).collect()
     }

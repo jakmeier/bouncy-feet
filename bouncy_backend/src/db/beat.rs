@@ -88,7 +88,7 @@ impl Beat {
         state: &AppState,
         checked_combo_id: CheckedComboId,
     ) -> Result<Vec<Beat>, (StatusCode, &'static str)> {
-        let combo_id = checked_combo_id.assert_read_access()?;
+        let combo_id = checked_combo_id.assert_public_read_access()?;
 
         let rows = sqlx::query_as!(
             BeatRow,
@@ -212,8 +212,7 @@ mod tests {
     async fn create_beat_for_public_combo_is_forbidden(pool: PgPool) -> sqlx::Result<()> {
         let state = make_test_state(pool.clone());
         let combo_id = setup_combo(&pool).await;
-        // Public means readable but not writable.
-        let checked = CheckedComboId::Public(combo_id);
+        let checked = CheckedComboId::PublicReadAccess(combo_id);
 
         let result = Beat::create_for_combo(&state, checked, new_beat_input()).await;
 
@@ -307,7 +306,7 @@ mod tests {
         let combo_id = setup_combo(&pool).await;
 
         // A public (non-owned) combo should still be readable.
-        let beats = Beat::list_by_combo(&state, CheckedComboId::Public(combo_id))
+        let beats = Beat::list_by_combo(&state, CheckedComboId::PublicReadAccess(combo_id))
             .await
             .expect("read access on a public combo must succeed");
         assert!(beats.is_empty());
@@ -393,7 +392,7 @@ mod tests {
                 .unwrap();
 
         // Public means read-only; deleting should be rejected.
-        let result = Beat::delete(&state, CheckedBeatId::Public(beat.id)).await;
+        let result = Beat::delete(&state, CheckedBeatId::PublicReadAccess(beat.id)).await;
 
         assert!(result.is_err(), "deleting a public beat must be rejected");
         let (status, _) = result.unwrap_err();

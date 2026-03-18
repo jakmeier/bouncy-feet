@@ -4,7 +4,7 @@ use crate::{
     db_err_to_status,
     timestamp::TimestampId,
     user::{User, UserId},
-    AppState, CheckedComboId, CheckedUserId,
+    AppState, CheckedClubId, CheckedComboId, CheckedUserId,
 };
 use axum::http::StatusCode;
 
@@ -141,7 +141,7 @@ impl Combo {
         user_id: CheckedUserId,
     ) -> Result<Vec<Combo>, sqlx::Error> {
         let rows = match user_id {
-            CheckedUserId::Owned(user_id) => {
+            CheckedUserId::Owned(user_id) | CheckedUserId::FullReadAccess(user_id) => {
                 sqlx::query_as!(
                     ComboRow,
                     r#"
@@ -161,7 +161,8 @@ impl Combo {
                 .fetch_all(&state.pg_db_pool)
                 .await?
             }
-            CheckedUserId::Public(user_id) => {
+            // Anyone who can read the user can also read its public combos.
+            CheckedUserId::PublicReadAccess(user_id) => {
                 sqlx::query_as!(
                     ComboRow,
                     r#"
@@ -184,6 +185,70 @@ impl Combo {
             }
             CheckedUserId::NotFound => vec![],
         };
+
+        let combos = rows.into_iter().map(Combo::from).collect();
+        Ok(combos)
+    }
+
+    pub async fn public_list_by_club(
+        state: &AppState,
+        checked_club_id: CheckedClubId,
+    ) -> Result<Vec<Combo>, (StatusCode, &'static str)> {
+        let club_id = checked_club_id.assert_public_read_access()?;
+
+        let rows = sqlx::query_as!(
+            ComboRow,
+            r#"
+                    SELECT
+                        c.id,
+                        c.user_id,
+                        c.is_private,
+                        c.sort_order,
+                        c.free_form_category,
+                        c.title,
+                        c.video_short_uuid
+                    FROM clubs_combos cc
+                    JOIN combos c ON c.id = cc.combo_id
+                    WHERE club_id = $1
+                    AND NOT cc.is_private
+                    "#,
+            club_id.num()
+        )
+        .fetch_all(&state.pg_db_pool)
+        .await
+        .map_err(db_err_to_status)?;
+
+        let combos = rows.into_iter().map(Combo::from).collect();
+        Ok(combos)
+    }
+
+    pub async fn private_list_by_club(
+        state: &AppState,
+        checked_club_id: CheckedClubId,
+    ) -> Result<Vec<Combo>, (StatusCode, &'static str)> {
+        let club_id = checked_club_id.assert_private_read_access()?;
+
+        let rows = sqlx::query_as!(
+            ComboRow,
+            r#"
+                    SELECT
+                        c.id,
+                        c.user_id,
+                        c.is_private,
+                        c.sort_order,
+                        c.free_form_category,
+                        c.title,
+                        c.video_short_uuid
+                    FROM clubs_combos cc
+                    JOIN combos c ON c.id = cc.combo_id
+                    WHERE club_id = $1
+                    AND cc.is_private
+                    "#,
+            club_id.num()
+        )
+        .fetch_all(&state.pg_db_pool)
+        .await
+        .map_err(db_err_to_status)?;
 
         let combos = rows.into_iter().map(Combo::from).collect();
         Ok(combos)
@@ -331,5 +396,11 @@ impl crate::db::beat::Beat {
 
         let id = rows.map(ComboId);
         Ok(id)
+    }
+}
+
+impl super::clubs_combos::ClubComboRow {
+    pub(crate) fn combo_id(&self) -> ComboId {
+        ComboId(self.club_id)
     }
 }

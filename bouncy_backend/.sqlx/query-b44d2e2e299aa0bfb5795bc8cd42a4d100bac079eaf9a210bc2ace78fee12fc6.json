@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE clubs_combos\n            SET is_private = $3\n            WHERE club_id = $1 AND combo_id = $2\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8",
+        "Bool"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "b44d2e2e299aa0bfb5795bc8cd42a4d100bac079eaf9a210bc2ace78fee12fc6"
+}

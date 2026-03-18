@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            DELETE FROM clubs_combos\n            WHERE club_id = $1 AND combo_id = $2\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "00d91abd9c387f3538a08a5be18dbeccb0984597105d9443727eb45fa35a7de8"
+}

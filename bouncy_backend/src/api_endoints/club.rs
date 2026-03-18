@@ -1,5 +1,8 @@
+use crate::api_endoints::combo::ComboInfo;
 use crate::api_endoints::user::PublicUserInfoResponse;
 use crate::club::{ClubId, ClubMembership, PublicClubMemberInfo};
+use crate::clubs_combos::ClubCombo;
+use crate::combo::{Combo, ComboId};
 use crate::db::club::Club;
 use crate::peertube::channel::{create_system_channel, PeerTubeChannelHandle, PeerTubeChannelId};
 use crate::peertube::playlist::{
@@ -9,7 +12,7 @@ use crate::peertube::playlist::{
 use crate::peertube::{self, retry_peertube_op, PeerTubeError};
 use crate::playlist::{Playlist, PlaylistInfo};
 use crate::user::{User, UserId};
-use crate::{db_err_to_response, AppState};
+use crate::{db_err_to_response, db_err_to_status, AppState, CheckedClubId, CheckedComboId};
 use axum::extract::State;
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
@@ -32,6 +35,12 @@ struct ClubsResponse {
 pub struct UpdateClubRequest {
     description: String,
     url: Option<String>,
+}
+
+#[derive(serde::Deserialize)]
+pub struct AddClubComboRequest {
+    combo_id: ComboId,
+    is_private: bool,
 }
 
 /// Club summary, contains information for displaying a list of clubs.
@@ -77,6 +86,7 @@ pub(crate) struct ClubDetails {
     web_link: Option<String>,
     // only visible for members
     private: Option<PrivateClubDetails>,
+    combos: Vec<ComboInfo>,
 }
 
 #[derive(serde::Serialize)]
@@ -84,6 +94,7 @@ pub(crate) struct PrivateClubDetails {
     /// Club members, without admins
     members: Vec<PublicUserInfoResponse>,
     private_playlists: Vec<PlaylistInfo>,
+    private_combos: Vec<ComboInfo>,
 }
 
 #[derive(serde::Deserialize)]
@@ -193,7 +204,7 @@ pub async fn club(
     State(state): State<AppState>,
     axum::extract::Path(club_id): axum::extract::Path<ClubId>,
 ) -> axum::response::Result<Json<ClubDetails>> {
-    club_details(&state, club_id, false).await
+    club_details(&state, CheckedClubId::PublicReadAccess(club_id)).await
 }
 
 /// Retrieve extended info about a club, with private info.
@@ -204,21 +215,21 @@ pub async fn club_with_private_details(
     axum::extract::Path(club_id): axum::extract::Path<ClubId>,
 ) -> axum::response::Result<Json<ClubDetails>> {
     let membership = get_membership(&state, user.id, club_id).await?;
-    if matches!(membership, ClubMembership::None) {
-        return Err((StatusCode::FORBIDDEN, "must be member of club").into());
-    }
-
-    club_details(&state, club_id, true).await
+    let checked_id = match membership {
+        ClubMembership::None => {
+            return Err((StatusCode::FORBIDDEN, "must be member of club").into())
+        }
+        ClubMembership::Member => CheckedClubId::FullReadAccess(club_id),
+        ClubMembership::Admin => CheckedClubId::Owned(club_id),
+    };
+    club_details(&state, checked_id).await
 }
 
 pub async fn club_details(
     state: &AppState,
-    club_id: ClubId,
-    is_member: bool,
+    checked_club_id: CheckedClubId,
 ) -> axum::response::Result<Json<ClubDetails>> {
-    let res = Club::list_members_with_info(state, club_id, 100, 0).await;
-
-    let mut db_members = res.map_err(db_err_to_response)?;
+    let mut db_members = Club::list_members_with_info(state, checked_club_id, 100, 0).await?;
 
     fn row_to_user_info(row: PublicClubMemberInfo) -> PublicUserInfoResponse {
         PublicUserInfoResponse {
@@ -236,7 +247,7 @@ pub async fn club_details(
         .collect();
     let members: Vec<_> = db_members.into_iter().map(row_to_user_info).collect();
 
-    let Some(club) = Club::lookup(state, club_id).await else {
+    let Some(club) = Club::lookup(state, checked_club_id).await else {
         return Err((StatusCode::NOT_FOUND, "no such club"))?;
     };
 
@@ -250,7 +261,7 @@ pub async fn club_details(
         main_playlist = Some(playlist);
     }
 
-    let mut playlists = Playlist::lookup_club_playlists(state, club.id).await;
+    let mut playlists = Playlist::lookup_club_playlists(state, checked_club_id).await;
     let private_playlists: Vec<PlaylistInfo> = playlists
         .extract_if(.., |p| p.is_private)
         .map(Playlist::playlist_info)
@@ -258,10 +269,21 @@ pub async fn club_details(
     let public_playlists = playlists.into_iter().map(Playlist::playlist_info).collect();
     let num_members = u32::try_from(members.len()).unwrap_or(u32::MAX);
 
-    let private = if is_member {
+    let public_db_combos = Combo::public_list_by_club(state, checked_club_id).await?;
+    let public_combos = public_db_combos
+        .into_iter()
+        .map(ComboInfo::from_db_info)
+        .collect();
+
+    let private = if checked_club_id.assert_private_read_access().is_ok() {
+        let private_combos = Combo::private_list_by_club(state, checked_club_id).await?;
         Some(PrivateClubDetails {
             members,
             private_playlists,
+            private_combos: private_combos
+                .into_iter()
+                .map(ComboInfo::from_db_info)
+                .collect(),
         })
     } else {
         None
@@ -275,6 +297,7 @@ pub async fn club_details(
         channel_id: club.channel_id,
         channel_handle: club.channel_handle,
         web_link: club.web_link,
+        combos: public_combos,
         private,
     };
     Ok(Json(details))
@@ -372,14 +395,14 @@ pub async fn delete_club(
     State(state): State<AppState>,
     axum::extract::Path(club_id): axum::extract::Path<ClubId>,
 ) -> axum::response::Result<()> {
-    let membership = get_membership(&state, me.id, club_id).await?;
-    if !matches!(membership, ClubMembership::Admin) {
-        return Err((StatusCode::FORBIDDEN, "no permission to delete club").into_response())?;
-    }
+    let checked_club_id = CheckedClubId::check_for_user(&state, me.id, club_id).await?;
+    let club_id = checked_club_id
+        .assert_write_access()
+        .map_err(|_| (StatusCode::FORBIDDEN, "no permission to delete club").into_response())?;
 
     // delete channel on PeerTube
     // this should cascade delete playlists, too
-    let club = get_club(&state, club_id).await?;
+    let club = get_club(&state, checked_club_id).await?;
     if let Some(channel_handle) = &club.channel_handle {
         retry_peertube_op(&state, |s| {
             peertube::channel::delete_system_channel(s, channel_handle).boxed()
@@ -477,7 +500,7 @@ pub async fn update_club(
     // Check user has permission
     let membership = match get_membership(&state, user.id, club_id).await {
         Ok(it) => it,
-        Err(response) => return response,
+        Err(response) => return response.into_response(),
     };
     if !matches!(membership, ClubMembership::Admin) {
         return (StatusCode::FORBIDDEN, "no permission to update club").into_response();
@@ -497,31 +520,27 @@ pub async fn add_club_member(
     Extension(me): Extension<User>,
     State(state): State<AppState>,
     Json(params): Json<AddClubMemberRequest>,
-) -> Response {
-    // Check permissions: Must be admin
-    let membership = match get_membership(&state, me.id, params.club_id()).await {
-        Ok(it) => it,
-        Err(response) => return response,
-    };
-    if !matches!(membership, ClubMembership::Admin) {
-        return (StatusCode::FORBIDDEN, "no permission to add club member").into_response();
-    }
+) -> Result<Response, Response> {
+    let checked_club_id = CheckedClubId::check_for_user(&state, me.id, params.club_id())
+        .await
+        .map_err(IntoResponse::into_response)?;
+    let _club_id = checked_club_id
+        .assert_write_access()
+        .map_err(|_| (StatusCode::FORBIDDEN, "no permission to add club member").into_response())?;
 
     // Check user exist to avoid accidentally overriding is_admin
     let result = Club::membership(&state, params.user_id(), params.club_id()).await;
     let their_membership = result.expect("just checked");
     if !matches!(their_membership, ClubMembership::None) {
-        return (StatusCode::OK, "already a member").into_response();
+        return Ok((StatusCode::OK, "already a member").into_response());
     }
 
     let is_admin = false;
-    let result =
-        Club::add_or_update_member(&state, params.user_id(), params.club_id(), is_admin).await;
+    Club::add_or_update_member(&state, params.user_id(), params.club_id(), is_admin)
+        .await
+        .map_err(db_err_to_response)?;
 
-    if let Err(err) = result {
-        return db_err_to_response(err);
-    }
-    (StatusCode::CREATED, "member added").into_response()
+    Ok((StatusCode::CREATED, "member added").into_response())
 }
 
 /// Add a video to a club playlist.
@@ -538,7 +557,7 @@ pub async fn add_video(
     // TODO: maybe should be admin for public videos?
     let membership = match get_membership(&state, me.id, params.club_id()).await {
         Ok(it) => it,
-        Err(response) => return response,
+        Err(response) => return response.into_response(),
     };
     if !matches!(membership, ClubMembership::Admin | ClubMembership::Member) {
         return (StatusCode::FORBIDDEN, "not a club member").into_response();
@@ -643,9 +662,10 @@ pub async fn add_playlist(
     axum::extract::Path(club_id): axum::extract::Path<ClubId>,
     Json(params): Json<AddClubPlaylistRequest>,
 ) -> axum::response::Result<Json<AddClubPlaylistResponse>> {
+    let checked_club_id = CheckedClubId::check_for_user(&state, me.id, club_id).await?;
     check_playlist_fields_and_permissions(&state, me.id, club_id, &params).await?;
 
-    let club = get_club(&state, club_id).await?;
+    let club = get_club(&state, checked_club_id).await?;
     let Some(channel_id) = club.channel_id else {
         return Err((StatusCode::INTERNAL_SERVER_ERROR, "club has no channel"))?;
     };
@@ -693,10 +713,11 @@ pub async fn edit_playlist(
     axum::extract::Path((club_id, playlist_id)): axum::extract::Path<(ClubId, PeerTubePlaylistId)>,
     Json(params): Json<AddClubPlaylistRequest>,
 ) -> axum::response::Result<()> {
+    let checked_club_id = CheckedClubId::check_for_user(&state, me.id, club_id).await?;
     check_playlist_fields_and_permissions(&state, me.id, club_id, &params).await?;
 
     // find club channel id
-    let club = get_club(&state, club_id).await?;
+    let club = get_club(&state, checked_club_id).await?;
     let Some(channel_id) = club.channel_id else {
         return Err((StatusCode::INTERNAL_SERVER_ERROR, "club has no channel"))?;
     };
@@ -766,12 +787,12 @@ async fn get_membership(
     state: &AppState,
     user_id: UserId,
     club_id: ClubId,
-) -> Result<ClubMembership, Response> {
+) -> Result<ClubMembership, (StatusCode, &'static str)> {
     let result = Club::membership(state, user_id, club_id).await;
-    result.map_err(db_err_to_response)
+    result.map_err(db_err_to_status)
 }
 
-async fn get_club(state: &AppState, club_id: ClubId) -> Result<Club, Response> {
+async fn get_club(state: &AppState, club_id: CheckedClubId) -> Result<Club, Response> {
     let Some(club) = Club::lookup(state, club_id).await else {
         return Err((StatusCode::NOT_FOUND, "no such club").into_response());
     };
@@ -786,10 +807,10 @@ pub async fn update_avatar(
     mut multipart: axum::extract::Multipart,
 ) -> axum::response::Result<()> {
     // Check user has permission
-    let membership = get_membership(&state, user.id, club_id).await?;
-    if !matches!(membership, ClubMembership::Admin) {
-        return Err((StatusCode::FORBIDDEN, "no permission to update club avatar"))?;
-    }
+    let checked_club_id = CheckedClubId::check_for_user(&state, user.id, club_id).await?;
+    let club_id = checked_club_id.assert_write_access().map_err(|_| {
+        (StatusCode::FORBIDDEN, "no permission to update club avatar").into_response()
+    })?;
 
     let mut file_bytes = None;
 
@@ -816,7 +837,7 @@ pub async fn update_avatar(
     };
 
     // find club channel handle
-    let club = get_club(&state, club_id).await?;
+    let club = get_club(&state, checked_club_id).await?;
     let Some(channel_handle) = club.channel_handle else {
         return Err((StatusCode::INTERNAL_SERVER_ERROR, "club has no channel"))?;
     };
@@ -828,6 +849,21 @@ pub async fn update_avatar(
     .await?;
 
     state.data_cache.invalidate_club(club_id).await;
+    Ok(())
+}
+
+#[axum::debug_handler]
+pub async fn add_combo(
+    Extension(me): Extension<User>,
+    State(state): State<AppState>,
+    axum::extract::Path(club_id): axum::extract::Path<ClubId>,
+    Json(params): Json<AddClubComboRequest>,
+) -> Result<(), (StatusCode, &'static str)> {
+    let checked_club_id = CheckedClubId::check_for_user(&state, me.id, club_id).await?;
+    let checked_combo_id = CheckedComboId::check_for_user(&state, me.id, params.combo_id).await?;
+
+    ClubCombo::assign_to_club(&state, checked_club_id, checked_combo_id, params.is_private).await?;
+
     Ok(())
 }
 
@@ -907,6 +943,22 @@ fn display_name_to_username(input: &str) -> Option<String> {
         None
     } else {
         Some(out)
+    }
+}
+
+impl CheckedClubId {
+    async fn check_for_user(
+        state: &AppState,
+        user_id: UserId,
+        club_id: ClubId,
+    ) -> Result<Self, (StatusCode, &'static str)> {
+        let membership = get_membership(state, user_id, club_id).await?;
+        let checked = match membership {
+            ClubMembership::None => CheckedClubId::PublicReadAccess(club_id),
+            ClubMembership::Member => CheckedClubId::FullReadAccess(club_id),
+            ClubMembership::Admin => CheckedClubId::Owned(club_id),
+        };
+        Ok(checked)
     }
 }
 

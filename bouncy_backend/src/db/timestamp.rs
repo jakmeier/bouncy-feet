@@ -68,7 +68,7 @@ impl Timestamp {
         state: &AppState,
         checked_combo_id: CheckedComboId,
     ) -> Result<Vec<Timestamp>, (StatusCode, &'static str)> {
-        let combo_id = checked_combo_id.assert_read_access()?;
+        let combo_id = checked_combo_id.assert_public_read_access()?;
 
         let rows = sqlx::query_as!(
             TimestampRow,

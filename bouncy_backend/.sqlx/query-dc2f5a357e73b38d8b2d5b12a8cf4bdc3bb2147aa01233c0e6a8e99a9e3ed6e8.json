@@ -1,0 +1,58 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    SELECT\n                        c.id,\n                        c.user_id,\n                        c.is_private,\n                        c.sort_order,\n                        c.free_form_category,\n                        c.title,\n                        c.video_short_uuid\n                    FROM clubs_combos cc\n                    JOIN combos c ON c.id = cc.combo_id\n                    WHERE club_id = $1\n                    AND NOT cc.is_private\n                    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "user_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "is_private",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 3,
+        "name": "sort_order",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "free_form_category",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "video_short_uuid",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "dc2f5a357e73b38d8b2d5b12a8cf4bdc3bb2147aa01233c0e6a8e99a9e3ed6e8"
+}

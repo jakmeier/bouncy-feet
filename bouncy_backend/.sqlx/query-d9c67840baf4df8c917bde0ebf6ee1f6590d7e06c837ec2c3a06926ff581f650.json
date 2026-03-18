@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT club_id, playlist_id, playlist_short_uuid, is_private\n            FROM club_playlists\n            WHERE club_id = $1",
+  "query": "\n            INSERT INTO clubs_combos (club_id, combo_id, is_private)\n            VALUES ($1, $2, $3)\n            RETURNING\n                club_id,\n                combo_id,\n                is_private\n            ",
   "describe": {
     "columns": [
       {
@@ -10,31 +10,27 @@
       },
       {
         "ordinal": 1,
-        "name": "playlist_id",
+        "name": "combo_id",
         "type_info": "Int8"
       },
       {
         "ordinal": 2,
-        "name": "playlist_short_uuid",
-        "type_info": "Varchar"
-      },
-      {
-        "ordinal": 3,
         "name": "is_private",
         "type_info": "Bool"
       }
     ],
     "parameters": {
       "Left": [
-        "Int8"
+        "Int8",
+        "Int8",
+        "Bool"
       ]
     },
     "nullable": [
       false,
       false,
-      false,
       false
     ]
   },
-  "hash": "69fb33282459dc2b5e5ba6d4f1781ce0ff2ad8868bc75bab0b6471b26f4e30b5"
+  "hash": "d9c67840baf4df8c917bde0ebf6ee1f6590d7e06c837ec2c3a06926ff581f650"
 }

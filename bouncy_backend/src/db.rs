@@ -1,6 +1,7 @@
 pub(crate) mod beat;
 pub(crate) mod client_session;
 pub(crate) mod club;
+pub(crate) mod clubs_combos;
 pub(crate) mod combo;
 pub(crate) mod dance_activity;
 pub(crate) mod playlist;
@@ -36,27 +37,40 @@ macro_rules! checked_id {
     (
         $checked:ident,
         $id:ty,
-        $entity:ty,
         $not_found_msg:expr
     ) => {
         #[derive(Debug, Clone, Copy)]
         /// Wrapper around ID after it has gone through access checks.
         pub enum $checked {
             #[allow(dead_code)]
+            /// Full read + write access granted to the current user.
             Owned($id),
             #[allow(dead_code)]
-            Public($id),
+            /// Entity exists and the current user can view private and public details.
+            FullReadAccess($id),
+            /// Entity exists and the current user can view public info.
+            PublicReadAccess($id),
             #[allow(dead_code)]
-            /// May also mean it exists but is private
+            /// May also mean it exists but is private.
             NotFound,
         }
 
         impl $checked {
             #[allow(dead_code)]
-            pub fn assert_read_access(self) -> Result<$id, (StatusCode, &'static str)> {
+            pub fn assert_public_read_access(self) -> Result<$id, (StatusCode, &'static str)> {
                 match self {
                     Self::Owned(id) => Ok(id),
-                    Self::Public(id) => Ok(id),
+                    Self::FullReadAccess(id) => Ok(id),
+                    Self::PublicReadAccess(id) => Ok(id),
+                    Self::NotFound => Err((StatusCode::NOT_FOUND, $not_found_msg)),
+                }
+            }
+            #[allow(dead_code)]
+            pub fn assert_private_read_access(self) -> Result<$id, (StatusCode, &'static str)> {
+                match self {
+                    Self::Owned(id) | Self::FullReadAccess(id)=> Ok(id),
+                    
+                    Self::PublicReadAccess(_id) =>  Err((StatusCode::FORBIDDEN, "no read access")),
                     Self::NotFound => Err((StatusCode::NOT_FOUND, $not_found_msg)),
                 }
             }
@@ -65,7 +79,9 @@ macro_rules! checked_id {
             pub fn assert_write_access(self) -> Result<$id, (StatusCode, &'static str)> {
                 match self {
                     Self::Owned(id) => Ok(id),
-                    Self::Public(_) => Err((StatusCode::FORBIDDEN, "no write access")),
+                    Self::PublicReadAccess(_) | Self::FullReadAccess(_) => {
+                        Err((StatusCode::FORBIDDEN, "no write access"))
+                    }
                     Self::NotFound => Err((StatusCode::NOT_FOUND, $not_found_msg)),
                 }
             }
@@ -73,30 +89,24 @@ macro_rules! checked_id {
     };
 }
 
-checked_id!(
-    CheckedUserId,
-    crate::db::user::UserId,
-    crate::db::user::User,
-    "user not found"
-);
+checked_id!(CheckedUserId, crate::db::user::UserId, "user not found");
+
+checked_id!(CheckedClubId, crate::db::club::ClubId, "club not found");
 
 checked_id!(
     CheckedComboId,
     crate::db::combo::ComboId,
-    crate::db::combo::Combo,
     "combo not found for user"
 );
 
 checked_id!(
     CheckedBeatId,
     crate::db::beat::BeatId,
-    crate::db::beat::Beat,
     "beat not found for user"
 );
 
 checked_id!(
     CheckedTimestampId,
     crate::db::timestamp::TimestampId,
-    crate::db::timestamp::Timestamp,
     "timestamp not found for user"
 );
