@@ -196,6 +196,7 @@
     title={club?.name}
     backButton
     onAction={onAddMore}
+    onBack={() => goto('/profile')}
     mainColor
     onSecondAction={openEdit}
     secondButton="edit"
