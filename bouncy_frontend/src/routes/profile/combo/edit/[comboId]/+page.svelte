@@ -250,6 +250,24 @@
     }
     return cachedBuffer;
   }
+
+  async function onDetectBeat() {
+    try {
+      await startBpmAnalysis();
+    } catch {
+      // for cases like no audio: create some beat to show form
+      if (!beats || beats.length === 0) {
+        beats = [
+          {
+            duration: 10,
+            bpm: 60,
+            start: 0,
+            subbeat_per_move: 1,
+          },
+        ];
+      }
+    }
+  }
 </script>
 
 <LoginRequiredContent>
@@ -297,7 +315,7 @@
         <ComboForm bind:details bind:dirty bind:beat />
       </div>
 
-      <button class="full-width action" onclick={startBpmAnalysis}>
+      <button class="full-width action" onclick={onDetectBeat}>
         {$t('editor.video.detect-bpm-button')}
       </button>
 
