@@ -218,7 +218,7 @@
     {/if}
 
     <p>
-      {clubDetails.num_members + clubDetails.admins.length}
+      {clubDetails.num_members}
       {$t('club.members-title')}
     </p>
 
