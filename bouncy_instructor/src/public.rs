@@ -42,7 +42,7 @@ use web_sys::Request;
 use wrapper::dance_wrapper::DanceWrapper;
 use wrapper::step_wrapper::StepWrapper;
 
-#[wasm_bindgen(js_name = init)]
+#[wasm_bindgen(js_name = bf_init)]
 pub fn init(random_seed: u32, lang: String) -> Result<(), JsValue> {
     if random_seed == 0 {
         return Err("random seed must not be 0".into());

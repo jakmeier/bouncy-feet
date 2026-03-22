@@ -13,8 +13,7 @@ export async function initInstructorWasmOnce(fetch) {
         if (!res.ok) throw new Error(`Failed to fetch WASM in SSR: ${res.status}`);
         const bytes = await res.arrayBuffer();
 
-        const initSync = mod.default;
-        initSync(bytes);
+        mod.initSync({ module: bytes });
     } else {
         const init = mod.default;
         // this uses fetch, which only works in the client

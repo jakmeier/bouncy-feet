@@ -3,7 +3,7 @@ import { initInstructorWasmOnce } from '$lib/instructor/loader.js';
 import {
     Course,
     dances,
-    init,
+    bf_init,
     loadDanceString,
     loadPoseString,
     loadStepString,
@@ -215,7 +215,7 @@ function loadRon(name) {
 function loadOnce(data, lang) {
     if (data.poseFileString && data.poseFileString.length > 0) {
         loadedOnce = true;
-        init(Math.random() * 4_294_967_295, lang);
+        bf_init(Math.random() * 4_294_967_295, lang);
         loadPoseString(data.poseFileString);
         loadStepString(data.stepFileStrings.basic, 'basic');
         loadStepString(data.stepFileStrings.footwork, 'footwork');
