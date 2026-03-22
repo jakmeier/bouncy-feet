@@ -232,7 +232,7 @@ pub async fn club_details(
     fn row_to_user_info(row: PublicClubMemberInfo) -> PublicUserInfoResponse {
         PublicUserInfoResponse {
             id: row.user_id.num(),
-            display_name: row.public_name,
+            display_name: Some(row.public_name),
             peertube_handle: row.peertube_handle,
             // TODO: add peertube info
             small_avatar: None,

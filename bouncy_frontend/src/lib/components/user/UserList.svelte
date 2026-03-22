@@ -43,9 +43,15 @@
             <ActorAvatar url={user.small_avatar}></ActorAvatar>
           </div>
           <div>
-            {user.display_name}
-            {#if user.peertube_handle}
-              (@{user.peertube_handle})
+            {#if user.display_name || user.peertube_handle}
+              {#if user.display_name}
+                {user.display_name}
+              {/if}
+              {#if user.peertube_handle}
+                (@{user.peertube_handle})
+              {/if}
+            {:else}
+              [User {user.id}]
             {/if}
           </div>
         </UnstyledButton>

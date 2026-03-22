@@ -24,7 +24,7 @@ pub struct User {
 #[derive(Clone, Debug)]
 pub struct PublicUserData {
     pub id: UserId,
-    pub public_name: String,
+    pub public_name: Option<String>,
     pub peertube_handle: Option<PeerTubeHandle>,
 }
 
@@ -40,7 +40,7 @@ pub struct UserRow {
 pub struct ExtendedUserRow {
     id: i64,
     peertube_handle: Option<String>,
-    public_name: String,
+    public_name: Option<String>,
 }
 
 #[derive(Clone, Debug)]
@@ -256,9 +256,8 @@ impl User {
             r#"
                 SELECT u.id, u.peertube_handle, um.key_value AS public_name
                 FROM users u
-                JOIN user_meta um on um.user_id = u.id
+                LEFT OUTER JOIN user_meta um on um.user_id = u.id AND um.key_name = 's:publicName'
                 WHERE u.id = $1
-                    AND um.key_name = 's:publicName'
             "#,
             user_id.num()
         )
@@ -279,8 +278,7 @@ impl User {
                 r#"
                 SELECT u.id, u.peertube_handle, um.key_value AS public_name
                 FROM users u
-                JOIN user_meta um on um.user_id = u.id
-                WHERE um.key_name = 's:publicName'
+                LEFT OUTER JOIN user_meta um on um.user_id = u.id AND um.key_name = 's:publicName'
                 ORDER BY um.user_id LIMIT $1 OFFSET $2
                 "#,
                 filter.limit as i32,
@@ -294,9 +292,8 @@ impl User {
                 r#"
                 SELECT u.id, u.peertube_handle, um.key_value AS public_name
                 FROM users u
-                JOIN user_meta um on um.user_id = u.id
-                WHERE um.key_name = 's:publicName'
-                    AND oidc_subject IS NOT NULL
+                LEFT OUTER JOIN user_meta um on um.user_id = u.id AND um.key_name = 's:publicName'
+                WHERE oidc_subject IS NOT NULL
                 ORDER BY u.id LIMIT $1 OFFSET $2
                 "#,
                 filter.limit as i32,

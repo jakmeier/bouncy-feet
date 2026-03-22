@@ -23,7 +23,7 @@ pub struct PublicUserInfoResponse {
     /// The user's PeerTube handle for their account, based on the info when
     /// they last logged in. It might have changed on PeerTube since then.
     pub peertube_handle: Option<PeerTubeHandle>,
-    pub display_name: String,
+    pub display_name: Option<String>,
     pub small_avatar: Option<String>,
 }
 

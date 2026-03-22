@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n                SELECT u.id, u.peertube_handle, um.key_value AS public_name\n                FROM users u\n                JOIN user_meta um on um.user_id = u.id\n                WHERE u.id = $1\n                    AND um.key_name = 's:publicName'\n            ",
+  "query": "\n                SELECT u.id, u.peertube_handle, um.key_value AS public_name\n                FROM users u\n                LEFT OUTER JOIN user_meta um on um.user_id = u.id AND um.key_name = 's:publicName'\n                WHERE oidc_subject IS NOT NULL\n                ORDER BY u.id LIMIT $1 OFFSET $2\n                ",
   "describe": {
     "columns": [
       {
@@ -21,14 +21,15 @@
     ],
     "parameters": {
       "Left": [
+        "Int8",
         "Int8"
       ]
     },
     "nullable": [
       false,
       true,
-      false
+      true
     ]
   },
-  "hash": "4cb263c95b138519e03129b9d014a98308a8a473ba26a4fea8b04402294e77f9"
+  "hash": "0f8eb93d8e39db7ddb3e227c9c601febd8d77fe0fadc17ac7ece09ab5d99e643"
 }
