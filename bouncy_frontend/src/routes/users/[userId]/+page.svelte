@@ -15,7 +15,12 @@
 </script>
 
 <LimeSection>
-  <BackHeader title={data.displayedUser.display_name} mainColor></BackHeader>
+  <BackHeader
+    title={data.displayedUser.display_name ||
+      data.displayedUser.peertube_handle ||
+      'profile.title'}
+    mainColor
+  ></BackHeader>
   <div class="pic">
     <ActorAvatar actor={data.displayedUser.account || undefined} />
   </div>
