@@ -15,7 +15,7 @@ export function steps(): StepWrapper[];
 export function stepsBySource(source: string): StepWrapper[];
 export function loadLocalSteps(steps: StepWrapper[]): void;
 export function loadPoseString(data: string): void;
-export function init(random_seed: number, lang: string): void;
+export function bf_init(random_seed: number, lang: string): void;
 export function loadDanceFile(url: string): Promise<void>;
 export enum DetectionFailureReason {
   /**
@@ -1010,6 +1010,7 @@ export interface InitOutput {
   readonly __wbg_dancebuilder_free: (a: number, b: number) => void;
   readonly __wbg_dancefilebuilder_free: (a: number, b: number) => void;
   readonly addLocalPoses: (a: number, b: number) => void;
+  readonly bf_init: (a: number, b: number, c: number, d: number) => void;
   readonly danceBuilderFromDance: (a: number, b: number, c: number) => void;
   readonly dancebuilder_addStep: (a: number, b: number, c: number) => void;
   readonly dancebuilder_clear: (a: number) => void;
@@ -1031,7 +1032,6 @@ export interface InitOutput {
   readonly dancefilebuilder_overwriteDance: (a: number, b: number, c: number) => void;
   readonly dancefilebuilder_removeDance: (a: number, b: number, c: number, d: number) => void;
   readonly dances: (a: number) => void;
-  readonly init: (a: number, b: number, c: number, d: number) => void;
   readonly loadDanceFile: (a: number, b: number) => number;
   readonly loadDanceString: (a: number, b: number, c: number) => void;
   readonly loadLocalSteps: (a: number, b: number) => void;
