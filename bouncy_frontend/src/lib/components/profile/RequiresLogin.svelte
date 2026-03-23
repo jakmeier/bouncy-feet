@@ -20,18 +20,16 @@
   /**
    * @typedef {Object} Props
    * @property {string} [reason]
-   * @property {string} [username]
    * @property {UserAuthState} authState
    * @property {boolean} guestAllowed
-   * @property {boolean} prefersFullUserView
    */
 
   /** @type {Props} */
-  let { reason, username, authState, guestAllowed, prefersFullUserView } =
-    $props();
+  let { reason, authState, guestAllowed } = $props();
 
   /** @type {UserContextData} */
   const userCtx = getUserContext();
+  const username = userCtx.user.publicName;
 
   /** @type {string[]} */
   const displayedText = $derived.by(() => {
@@ -98,7 +96,7 @@
   alt="Bouncy Feet Text Logo"
 />
 
-{#if username}
+{#if username && userCtx.user.apiId}
   Hi {username}!
 {/if}
 

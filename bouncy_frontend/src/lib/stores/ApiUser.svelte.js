@@ -23,7 +23,7 @@ export class ApiUser {
         this.clientSession = clientSession;
 
         this.kvSync = new KvSync('bfkv_', this.updateMetaOnRemote.bind(this), this.updateMetaInMemory.bind(this));
-        this.meta = this.kvSync.load();
+        this.meta = $state(this.kvSync.load());
     }
 
     /**

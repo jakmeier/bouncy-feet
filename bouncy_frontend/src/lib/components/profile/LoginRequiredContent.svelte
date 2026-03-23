@@ -22,6 +22,7 @@
   import LoginError from './LoginError.svelte';
   import RequiresLogin from './RequiresLogin.svelte';
   import UserLoader from './UserLoader.svelte';
+  import UsernameSetter from './UsernameSetter.svelte';
 
   /**
    * @typedef {Object} Props
@@ -90,11 +91,8 @@
   }
 
   const guestAllowed = $derived(!!guestContent || !!maybeFullUserContent);
-  const prefersFullUserView = $derived(
-    !!maybeFullUserContent || !!fullUserContent
-  );
-
   const hasGuestAuth = $derived(!!userCtx.apiUser);
+  const hasDisplayName = $derived(!!userCtx.apiUser?.meta['publicName']);
   const hasFullAuth = $derived(
     userCtx.authState === USER_AUH_STATE.SignedUpUser
   );
@@ -115,6 +113,9 @@
 
 {#if loading}
   {$t('profile.waiting-for-login-info')}
+{:else if hasFullAuth && apiUser && !hasDisplayName}
+  {$t('profile.waiting-for-set-username')}
+  <UsernameSetter {apiUser} userId={userCtx.user.apiId} />
 {:else if fullUserContent && hasFullAuth}
   {@render fullUserContent({
     apiUser: userCtx.apiUser,
@@ -146,12 +147,7 @@
       {#if loginError.title !== ''}
         <LoginError {loginError}></LoginError>
       {:else}
-        <RequiresLogin
-          authState={userCtx.authState}
-          {guestAllowed}
-          {prefersFullUserView}
-          {reason}
-        />
+        <RequiresLogin authState={userCtx.authState} {guestAllowed} {reason} />
       {/if}
     </div>
   </div>

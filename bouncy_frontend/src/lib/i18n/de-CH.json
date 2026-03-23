@@ -358,6 +358,7 @@
         "guest-login-failed-description": "Der Server will wohl gerade nicht.",
         "login-failed-peertube-down": "Bouncy Tube reagiert nicht, vielleicht ist die Videoplattform aus.",
         "waiting-for-login-info": "Prüfe deine Logindaten...",
+        "waiting-for-set-username": "Richte deinen Nutzer ein...",
         "my-combos-title": "Meine Combos",
         "combos-title": "Combos",
         "guest-mode-title": "Gastmodus",
