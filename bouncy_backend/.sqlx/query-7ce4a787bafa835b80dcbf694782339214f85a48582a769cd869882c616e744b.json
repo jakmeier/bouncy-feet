@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n                SELECT u.id, u.peertube_handle, um.key_value AS public_name\n                FROM users u\n                LEFT OUTER JOIN user_meta um on um.user_id = u.id AND um.key_name = 's:publicName'\n                WHERE u.id = $1\n            ",
+  "query": "\n                SELECT u.id, u.peertube_handle, um.key_value AS \"public_name?\"\n                FROM users u\n                LEFT OUTER JOIN user_meta um on um.user_id = u.id AND um.key_name = 's:publicName'\n                WHERE u.id = $1\n            ",
   "describe": {
     "columns": [
       {
@@ -15,7 +15,7 @@
       },
       {
         "ordinal": 2,
-        "name": "public_name",
+        "name": "public_name?",
         "type_info": "Varchar"
       }
     ],
@@ -30,5 +30,5 @@
       false
     ]
   },
-  "hash": "3a71ff296c2cfa175f55ce3936be4df1c9154c8364757159de80184a69eb6fd2"
+  "hash": "7ce4a787bafa835b80dcbf694782339214f85a48582a769cd869882c616e744b"
 }

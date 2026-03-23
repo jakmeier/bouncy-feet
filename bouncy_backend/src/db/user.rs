@@ -254,7 +254,7 @@ impl User {
         let record = sqlx::query_as!(
             ExtendedUserRow,
             r#"
-                SELECT u.id, u.peertube_handle, um.key_value AS public_name
+                SELECT u.id, u.peertube_handle, um.key_value AS "public_name?"
                 FROM users u
                 LEFT OUTER JOIN user_meta um on um.user_id = u.id AND um.key_name = 's:publicName'
                 WHERE u.id = $1
@@ -276,7 +276,7 @@ impl User {
             sqlx::query_as!(
                 ExtendedUserRow,
                 r#"
-                SELECT u.id, u.peertube_handle, um.key_value AS public_name
+                SELECT u.id, u.peertube_handle, um.key_value AS "public_name?"
                 FROM users u
                 LEFT OUTER JOIN user_meta um on um.user_id = u.id AND um.key_name = 's:publicName'
                 ORDER BY um.user_id LIMIT $1 OFFSET $2
@@ -290,7 +290,7 @@ impl User {
             sqlx::query_as!(
                 ExtendedUserRow,
                 r#"
-                SELECT u.id, u.peertube_handle, um.key_value AS public_name
+                SELECT u.id, u.peertube_handle, um.key_value AS "public_name?"
                 FROM users u
                 LEFT OUTER JOIN user_meta um on um.user_id = u.id AND um.key_name = 's:publicName'
                 WHERE oidc_subject IS NOT NULL

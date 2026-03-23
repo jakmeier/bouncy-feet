@@ -18,7 +18,7 @@
   <BackHeader
     title={data.displayedUser.display_name ||
       data.displayedUser.peertube_handle ||
-      'profile.title'}
+      $t('profile.title')}
     mainColor
   ></BackHeader>
   <div class="pic">
