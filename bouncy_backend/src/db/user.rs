@@ -1,14 +1,11 @@
-use axum_oidc::OidcClaims;
-use sqlx::PgPool;
-use uuid::Uuid;
-
 use crate::api_endoints::club::AddClubMemberRequest;
 use crate::client_session::ClientSessionId;
 use crate::combo::ComboRow;
 use crate::db::club::{UserClubRow, UserJoinedClubRow};
-use crate::layers::oidc::AdditionalClaims;
 use crate::peertube::user::{PeerTubeAccountId, PeerTubeHandle};
 use crate::AppState;
+use sqlx::PgPool;
+use uuid::Uuid;
 
 #[derive(Clone, Copy, Debug, serde::Deserialize)]
 pub struct UserId(i64);
@@ -128,16 +125,11 @@ impl User {
         User::lookup(state, user_id).await
     }
 
-    pub(crate) async fn try_lookup_by_oidc(
-        state: &AppState,
-        claims: &OidcClaims<axum_oidc::EmptyAdditionalClaims>,
-    ) -> Option<User> {
-        let subject = claims.subject().as_str();
-
+    pub(crate) async fn try_lookup_by_oidc(state: &AppState, oidc_subject: &str) -> Option<User> {
         let record = sqlx::query_as!(
             UserRow,
             "SELECT id, oidc_subject, peertube_account_id, peertube_handle FROM users WHERE oidc_subject = $1",
-            subject
+            oidc_subject
         )
         .fetch_optional(&state.pg_db_pool)
         .await
@@ -146,31 +138,26 @@ impl User {
         Some(User::from(record))
     }
 
-    pub(crate) async fn lookup_by_oidc_or_create(
-        state: &AppState,
-        claims: OidcClaims<AdditionalClaims>,
-    ) -> User {
-        if let Some(maybe_user) = Self::try_lookup_by_oidc(state, &claims).await {
+    pub(crate) async fn lookup_by_oidc_or_create(state: &AppState, oidc_subject: &str) -> User {
+        if let Some(maybe_user) = Self::try_lookup_by_oidc(state, oidc_subject).await {
             return maybe_user;
         }
 
         // Lazy user row creation in DB
-        let subject = claims.subject().as_str();
-
         let id = sqlx::query!(
             r#"
         INSERT INTO users (oidc_subject) 
         VALUES ($1)
         RETURNING id
         "#,
-            subject
+            oidc_subject
         )
         .fetch_one(&state.pg_db_pool)
         .await
         .expect("Failed to insert new user")
         .id;
 
-        Self::new(id, Some(subject), None, None)
+        Self::new(id, Some(oidc_subject), None, None)
     }
 
     pub(crate) async fn add_oidc(&mut self, state: &AppState, sub: Uuid) -> sqlx::Result<()> {

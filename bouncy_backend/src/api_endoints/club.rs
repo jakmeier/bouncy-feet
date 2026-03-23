@@ -1,4 +1,4 @@
-use crate::api_endoints::combo::ComboInfo;
+use crate::api_endoints::combo::{ComboInfo, JsonResponse};
 use crate::api_endoints::user::PublicUserInfoResponse;
 use crate::club::{ClubId, ClubMembership, PublicClubMemberInfo};
 use crate::clubs_combos::ClubCombo;
@@ -21,9 +21,9 @@ use futures::{FutureExt, StreamExt};
 
 #[derive(serde::Deserialize)]
 pub struct CreateClubsRequest {
-    title: String,
-    description: String,
-    url: Option<String>,
+    pub(crate) title: String,
+    pub(crate) description: String,
+    pub(crate) url: Option<String>,
 }
 
 #[derive(serde::Serialize)]
@@ -39,15 +39,15 @@ pub struct UpdateClubRequest {
 
 #[derive(serde::Deserialize)]
 pub struct AddClubComboRequest {
-    combo_id: ComboId,
-    is_private: bool,
+    pub(crate) combo_id: ComboId,
+    pub(crate) is_private: bool,
 }
 
 /// Club summary, contains information for displaying a list of clubs.
 #[derive(Clone, Debug, serde::Serialize)]
 pub(crate) struct ClubInfo {
     /// BF API club id = DB id
-    id: i64,
+    pub(crate) id: ClubId,
     name: String,
     // lang: String, needed ?? -> not yet, maybe at some point
     description: String,
@@ -169,7 +169,7 @@ async fn db_clubs_to_club_infos(state: &AppState, db_clubs: Vec<Club>) -> Vec<Cl
                 }
             }
             let info = ClubInfo {
-                id: club.id.num(),
+                id: club.id,
                 name: club.title,
                 description: club.description,
                 avatar,
@@ -313,30 +313,24 @@ pub async fn create_club(
     Extension(user): Extension<User>,
     State(state): State<AppState>,
     Json(payload): Json<CreateClubsRequest>,
-) -> Response {
+) -> JsonResponse<ClubInfo> {
     if payload.title.len() > 64 {
-        return (StatusCode::BAD_REQUEST, "Title must be at most 64 chars").into_response();
+        return Err((StatusCode::BAD_REQUEST, "Title must be at most 64 chars"));
     }
     if payload.description.len() > 1024 {
-        return (
+        return Err((
             StatusCode::BAD_REQUEST,
             "Description must be at most 1024 chars",
-        )
-            .into_response();
+        ));
     }
-    let maybe_url = match validate_web_link(payload.url.as_deref()) {
-        Ok(it) => it,
-        Err(err) => return err.into_response(),
-    };
+    let maybe_url = validate_web_link(payload.url.as_deref())?;
 
     // Check unique name? (not enforced on db)
     // Limit clubs per user?
 
     let channel_result =
         retry_peertube_op(&state, |s| create_club_channel(s, &payload.title).boxed()).await;
-    let Ok((channel_id, channel_handle)) = channel_result else {
-        return channel_result.unwrap_err();
-    };
+    let (channel_id, channel_handle) = channel_result?;
 
     let club_res: Result<Club, sqlx::Error> = Club::create(
         &state,
@@ -351,39 +345,36 @@ pub async fn create_club(
     .await;
 
     let Ok(club) = club_res else {
-        return db_err_to_response(club_res.unwrap_err());
+        return Err(db_err_to_status(club_res.unwrap_err()));
     };
 
     let playlists = retry_peertube_op(&state, |s| {
         create_club_playlist_pair(s, &payload.title, channel_id, club.id).boxed()
     })
-    .await;
+    .await?;
 
     // Create main playlist plus one private playlist for default uploads.
-    let Ok((public_playlist, _private_playlist)) = playlists else {
-        return playlists.unwrap_err();
-    };
+    let (public_playlist, _private_playlist) = playlists;
 
     // Now set the main playlist
     let res = Club::set_main_playlist(&state, club.id, public_playlist.id).await;
     if let Err(err) = res {
         tracing::error!(?err, "failed setting main playlist");
-        return (
+        return Err((
             StatusCode::INTERNAL_SERVER_ERROR,
             "failed setting club main playlist",
-        )
-            .into_response();
+        ));
     }
 
     // Add creator as first admin member
     let res_add_admin = Club::add_or_update_member(&state, user.id, club.id, true).await;
     if let Err(err) = res_add_admin {
         // TODO: clean up inconsistent state (remove playlists, delete club)
-        return db_err_to_response(err);
+        return Err(db_err_to_status(err));
     }
 
     let club_info = ClubInfo {
-        id: club.id.num(),
+        id: club.id,
         name: club.title,
         description: club.description,
         // The avatar isn't set on the channel, yet. Even if the user selected
@@ -391,7 +382,7 @@ pub async fn create_club(
         // handled by the client to show display it after the update.
         avatar: None,
     };
-    (StatusCode::CREATED, Json(club_info)).into_response()
+    Ok(Json(club_info))
 }
 
 #[axum::debug_handler]
@@ -525,13 +516,11 @@ pub async fn add_club_member(
     Extension(me): Extension<User>,
     State(state): State<AppState>,
     Json(params): Json<AddClubMemberRequest>,
-) -> Result<Response, Response> {
-    let checked_club_id = CheckedClubId::check_for_user(&state, me.id, params.club_id())
-        .await
-        .map_err(IntoResponse::into_response)?;
+) -> Result<Response, (StatusCode, &'static str)> {
+    let checked_club_id = CheckedClubId::check_for_user(&state, me.id, params.club_id()).await?;
     let _club_id = checked_club_id
         .assert_write_access()
-        .map_err(|_| (StatusCode::FORBIDDEN, "no permission to add club member").into_response())?;
+        .map_err(|_| (StatusCode::FORBIDDEN, "no permission to add club member"))?;
 
     // Check user exist to avoid accidentally overriding is_admin
     let result = Club::membership(&state, params.user_id(), params.club_id()).await;
@@ -543,7 +532,7 @@ pub async fn add_club_member(
     let is_admin = false;
     Club::add_or_update_member(&state, params.user_id(), params.club_id(), is_admin)
         .await
-        .map_err(db_err_to_response)?;
+        .map_err(db_err_to_status)?;
 
     Ok((StatusCode::CREATED, "member added").into_response())
 }

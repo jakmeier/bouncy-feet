@@ -362,7 +362,20 @@ impl CheckedComboId {
     ) -> Result<Self, (StatusCode, &'static str)> {
         let result = Combo::is_owned_by(state, combo_id, user_id).await;
         match result {
-            Ok(true) => Ok(CheckedComboId::Owned(combo_id)),
+            Ok(true) => return Ok(CheckedComboId::Owned(combo_id)),
+            Ok(false) => (),
+            Err(err) => {
+                tracing::error!(?err, "Failed looking up combo ownership");
+                return Err((
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "Failed looking up combo ownership",
+                ));
+            }
+        }
+
+        let result = Combo::is_visible_through_club_access(state, combo_id, user_id).await;
+        match result {
+            Ok(true) => Ok(CheckedComboId::FullReadAccess(combo_id)),
             Ok(false) => Ok(CheckedComboId::NotFound),
             Err(err) => {
                 tracing::error!(?err, "Failed looking up combo ownership");
@@ -459,5 +472,115 @@ impl CheckedComboId {
             }
             None => Ok(CheckedBeatId::NotFound),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{
+        api_endoints::{
+            self,
+            club::{add_club_member, AddClubComboRequest, AddClubMemberRequest},
+        },
+        test_helpers::*,
+    };
+    use axum::extract::Path;
+    use sqlx::PgPool;
+
+    /// Combos private to a club must be readable to club members only.
+    #[sqlx::test(migrations = "./db_migrations")]
+    async fn test_club_combo(pool: PgPool) -> sqlx::Result<()> {
+        let state = State(make_test_state(pool));
+        let member = create_new_full_user(&state).await;
+        let outsider = create_new_full_user(&state).await;
+        let admin = create_new_full_user(&state).await;
+
+        let club = crate::club::Club::create(
+            &state,
+            "Bets club ever",
+            "This is for testing",
+            Some("https://www.bouncy-feet.ch".parse().unwrap()),
+            crate::peertube::channel::PeerTubeChannelId(7),
+            crate::peertube::channel::PeerTubeChannelHandle("Fake".to_owned()),
+            None,
+        )
+        .await
+        .expect("create club must not fail");
+
+        // Add creator as first admin member
+        crate::club::Club::add_or_update_member(&state, admin.id, club.id, true)
+            .await
+            .expect("must not fail adding admin");
+
+        let add_member_request = AddClubMemberRequest {
+            user_id: member.id.num(),
+            club_id: club.id.num(),
+        };
+        add_club_member(
+            Extension(admin.clone()),
+            state.clone(),
+            Json(add_member_request),
+        )
+        .await
+        .expect("adding club member must not fail");
+
+        let create_combo_request = CreateComboRequest {
+            is_private: true,
+            sort_order: None,
+            free_form_category: None,
+            title: Some("two-step".to_owned()),
+            video_short_uuid: Some("some-id".to_owned()),
+        };
+        let combo = create_combo(
+            Extension(admin.clone()),
+            state.clone(),
+            Json(create_combo_request),
+        )
+        .await
+        .expect("combo creation must not fail");
+
+        let add_combo_request = AddClubComboRequest {
+            combo_id: combo.id,
+            is_private: true,
+        };
+        api_endoints::club::add_combo(
+            Extension(admin.clone()),
+            state.clone(),
+            Path(club.id),
+            Json(add_combo_request),
+        )
+        .await
+        .expect("add combo must not fail");
+
+        // check the member can read all combo data
+        let _ = combo_timestamps(Extension(member.clone()), state.clone(), Path(combo.id))
+            .await
+            .expect("user must be able to read combo timestamps");
+        // TODO: insert and check timestamp
+
+        let _ = combo_beats(Extension(member.clone()), state.clone(), Path(combo.id))
+            .await
+            .expect("user must be able to read combo beats");
+        // TODO: insert and check beats
+
+        // check that a non-member cannot read the combo
+        let _ = combo_timestamps(Extension(outsider.clone()), state.clone(), Path(combo.id))
+            .await
+            .expect_err("outsider must not be able to read combo timestamps");
+
+        let _ = combo_beats(Extension(outsider.clone()), state.clone(), Path(combo.id))
+            .await
+            .expect_err("outsider must not be able to read combo beats");
+
+        // check that an anonymous request cannot read the combo
+        public_combo_beats(state.clone(), Path(combo.id))
+            .await
+            .expect_err("outsider must not be able to read combo beats");
+        public_combo_timestamps(state.clone(), Path(combo.id))
+            .await
+            .expect_err("outsider must not be able to read combo timestamps");
+
+        Ok(())
     }
 }

@@ -133,7 +133,7 @@ async fn try_get_user(
     } else if let Some(claims) = maybe_claims {
         // Flow B: Keycloak user is created without client session (if necessary)
         // this will lazily create the user if necessary
-        Ok(User::lookup_by_oidc_or_create(state, claims).await)
+        Ok(User::lookup_by_oidc_or_create(state, claims.subject().as_str()).await)
     } else {
         Err(UserAuthError::NoAuthProvided)
     }
@@ -145,7 +145,9 @@ async fn validate_guest_user_matches_claims(
     mut user: User,
 ) -> Result<User, UserAuthError> {
     if let Some(claims) = maybe_claims {
-        if let Some(existing_user) = User::try_lookup_by_oidc(state, claims).await {
+        if let Some(existing_user) =
+            User::try_lookup_by_oidc(state, claims.subject().as_str()).await
+        {
             // Flow C: Guest into existing user
             let res = ClientSessionId::transfer_client_sessions(
                 &state.pg_db_pool,

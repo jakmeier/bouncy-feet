@@ -3,7 +3,6 @@
 
 use crate::AppState;
 use axum::http::StatusCode;
-use axum::response::IntoResponse;
 use futures::future::BoxFuture;
 use reqwest::header::HeaderValue;
 
@@ -115,7 +114,7 @@ pub(crate) async fn handle_peertube_error(state: &AppState, err: &PeerTubeError)
 pub async fn retry_peertube_op<'s, T, Op>(
     state: &'s AppState,
     mut op: Op,
-) -> Result<T, axum::response::Response>
+) -> Result<T, (StatusCode, &'static str)>
 where
     Op: FnMut(&'s AppState) -> BoxFuture<'s, Result<T, PeerTubeError>>,
     T: 's,
@@ -129,17 +128,13 @@ where
                 tracing::error!(?e, ?remaining_attempts, "PeerTube operation failed");
 
                 if remaining_attempts <= 0 {
-                    let resp =
-                        (StatusCode::BAD_GATEWAY, "PeerTube service failure").into_response();
-                    return Err(resp);
+                    return Err((StatusCode::BAD_GATEWAY, "PeerTube service failure"));
                 }
                 remaining_attempts -= 1;
 
                 match should_retry {
                     RetryHint::NoRetry => {
-                        let resp =
-                            (StatusCode::BAD_GATEWAY, "PeerTube service failure").into_response();
-                        return Err(resp);
+                        return Err((StatusCode::BAD_GATEWAY, "PeerTube service failure"));
                     }
                     RetryHint::RetryNow => (),
                     RetryHint::RetryAfter(delay) => {

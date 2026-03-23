@@ -136,6 +136,28 @@ impl Combo {
         .map(|maybe| maybe.unwrap_or(false))
     }
 
+    pub async fn is_visible_through_club_access(
+        state: &AppState,
+        id: ComboId,
+        user_id: UserId,
+    ) -> Result<bool, sqlx::Error> {
+        sqlx::query_scalar!(
+            r#"
+            SELECT EXISTS(
+                SELECT 1
+                FROM user_club uc
+                JOIN clubs_combos cc ON uc.club_id = cc.club_id
+                WHERE cc.combo_id = $1 AND uc.user_id = $2
+            )
+            "#,
+            id.num(),
+            user_id.num()
+        )
+        .fetch_one(&state.pg_db_pool)
+        .await
+        .map(|maybe| maybe.unwrap_or(false))
+    }
+
     pub async fn list_by_user(
         state: &AppState,
         user_id: CheckedUserId,

@@ -5,9 +5,11 @@
 use crate::api_endoints::auth::KeycloakClientConfig;
 use crate::cache::DataCache;
 use crate::peertube::system_user::PeerTubeSystemUser;
+use crate::user::User;
 use sqlx::PgPool;
 use std::sync::Arc;
 use url::Url;
+use uuid::Uuid;
 
 /// Build a minimal AppState for testing.
 ///
@@ -29,4 +31,9 @@ pub fn make_test_state(pool: PgPool) -> crate::AppState {
         system_user: PeerTubeSystemUser::new("system_user".to_string(), "password".to_string()),
         data_cache: DataCache::default(),
     }
+}
+
+pub async fn create_new_full_user(state: &crate::AppState) -> User {
+    let sub = Uuid::new_v4().to_string();
+    User::lookup_by_oidc_or_create(&state, &sub).await
 }
