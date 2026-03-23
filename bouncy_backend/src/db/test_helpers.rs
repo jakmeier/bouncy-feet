@@ -35,5 +35,5 @@ pub fn make_test_state(pool: PgPool) -> crate::AppState {
 
 pub async fn create_new_full_user(state: &crate::AppState) -> User {
     let sub = Uuid::new_v4().to_string();
-    User::lookup_by_oidc_or_create(&state, &sub).await
+    User::lookup_by_oidc_or_create(state, &sub).await
 }
