@@ -170,7 +170,7 @@ mod tests {
         .await;
 
         for _ in 0..10 {
-            seed = setup_deterministic_users(&state, 10, 10, seed).await;
+            seed = setup_deterministic_users(state, 10, 10, seed).await;
         }
 
         check_list_user(

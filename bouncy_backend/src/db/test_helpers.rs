@@ -106,5 +106,5 @@ pub async fn setup_deterministic_users(
         create_new_full_user_det(state, user_seed, Some(display_name)).await;
     }
 
-    return seed + num_full_users as u64;
+    seed + num_full_users as u64
 }
