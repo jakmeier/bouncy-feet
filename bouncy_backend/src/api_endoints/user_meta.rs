@@ -8,22 +8,23 @@ use chrono::{DateTime, Utc};
 
 #[derive(serde::Deserialize, Debug)]
 pub struct UpdateMetaDataRequest {
-    key_name: String,
-    key_value: String,
-    last_modified: DateTime<Utc>,
-    version: u16,
+    pub(crate) key_name: String,
+    pub(crate) key_value: String,
+    pub(crate) last_modified: DateTime<Utc>,
+    pub(crate) version: u16,
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, Debug)]
 enum UpdateMetaDataErrorCode {
     InvalidKeyName = 1,
     InvalidKeyValue = 2,
     UnexpectedVersion = 3,
     NewerValueExists = 4,
+    InternalServerError = 5,
 }
 
-#[derive(serde::Serialize)]
-struct UpdateMetaDataError {
+#[derive(serde::Serialize, Debug)]
+pub struct UpdateMetaDataError {
     code: UpdateMetaDataErrorCode,
     message: String,
 }
@@ -61,46 +62,43 @@ pub async fn update_user_metadata(
     Extension(user): Extension<User>,
     State(state): State<AppState>,
     Json(payload): Json<UpdateMetaDataRequest>,
-) -> Response {
+) -> Result<(StatusCode, &'static str), (StatusCode, Json<UpdateMetaDataError>)> {
     let key_name = payload.key_name.trim();
     let key_value = payload.key_value;
     let new_last_modified = payload.last_modified.naive_utc();
     let version = i16::try_from(payload.version).unwrap_or(i16::MAX);
 
     if key_name.is_empty() || key_name.len() > 64 {
-        return (
+        return Err((
             StatusCode::BAD_REQUEST,
             UpdateMetaDataError::json(
                 UpdateMetaDataErrorCode::InvalidKeyName,
                 "Invalid key_name. Must be non-empty and up to 64 characters.",
             ),
-        )
-            .into_response();
+        ));
     }
 
     if key_value.is_empty() || key_value.len() > 1024 {
-        return (
+        return Err((
             StatusCode::BAD_REQUEST,
             UpdateMetaDataError::json(
                 UpdateMetaDataErrorCode::InvalidKeyValue,
                 "Invalid key_name. Must be non-empty and up to 1024 characters.",
             ),
-        )
-            .into_response();
+        ));
     }
 
     // This version check is for the future, in case fields or the general
     // format need to be updated. For now, there is only one version, so there
     // should only be requests matching that version.
     if version != 0 {
-        return (
+        return Err((
             StatusCode::BAD_REQUEST,
             UpdateMetaDataError::json(
                 UpdateMetaDataErrorCode::UnexpectedVersion,
                 format!("Unexpected data version {version}."),
             ),
-        )
-            .into_response();
+        ));
     }
 
     let result = sqlx::query!(
@@ -124,26 +122,23 @@ pub async fn update_user_metadata(
     .execute(&state.pg_db_pool)
     .await;
 
-    match result {
-        Ok(query_result) => {
-            if query_result.rows_affected() == 0 {
-                (
-                    StatusCode::CONFLICT,
-                    UpdateMetaDataError::json(
-                        UpdateMetaDataErrorCode::NewerValueExists,
-                        "Update rejected, a newer value for the key exists.",
-                    ),
-                )
-                    .into_response()
-            } else {
-                (
-                    StatusCode::OK,
-                    "User metadata updated successfully.".to_string(),
-                )
-                    .into_response()
-            }
-        }
-        Err(e) => internal_error(e).into_response(),
+    let query_result = result.map_err(|err| {
+        tracing::error!(?err, "DB error in update_user_metadata");
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            UpdateMetaDataError::json(UpdateMetaDataErrorCode::InternalServerError, "DB error"),
+        )
+    })?;
+    if query_result.rows_affected() == 0 {
+        Err((
+            StatusCode::CONFLICT,
+            UpdateMetaDataError::json(
+                UpdateMetaDataErrorCode::NewerValueExists,
+                "Update rejected, a newer value for the key exists.",
+            ),
+        ))
+    } else {
+        Ok((StatusCode::OK, "User metadata updated successfully."))
     }
 }
 

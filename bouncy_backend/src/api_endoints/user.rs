@@ -1,3 +1,4 @@
+use crate::api_endoints::combo::JsonResponse;
 use crate::peertube::user::{PeerTubeAccount, PeerTubeHandle};
 use crate::user::{User, UserId, UserSearchFilter};
 use crate::{peertube, AppState};
@@ -16,7 +17,7 @@ pub struct PrivateUserInfoResponse {
     sub: Option<String>,
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, Debug)]
 pub struct PublicUserInfoResponse {
     /// BF API user id
     pub id: i64,
@@ -35,7 +36,7 @@ pub struct UserSearchParams {
     pub offset: i64,
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, Debug)]
 pub struct UsersResponse {
     users: Vec<PublicUserInfoResponse>,
 }
@@ -57,7 +58,7 @@ pub async fn user_info(Extension(user): Extension<User>) -> Response {
 pub async fn list_users(
     State(state): State<AppState>,
     Query(params): Query<UserSearchParams>,
-) -> Response {
+) -> JsonResponse<UsersResponse> {
     let filter = UserSearchFilter {
         include_guests: false,
         offset: params.offset,
@@ -67,7 +68,7 @@ pub async fn list_users(
     let Ok(users) = results else {
         let err = results.unwrap_err();
         tracing::error!(?err, "Failed fetching users");
-        return (StatusCode::INTERNAL_SERVER_ERROR, "Failed fetching users").into_response();
+        return Err((StatusCode::INTERNAL_SERVER_ERROR, "Failed fetching users"));
     };
 
     let mut users: Vec<_> = users
@@ -85,7 +86,7 @@ pub async fn list_users(
         }
     }
 
-    Json(UsersResponse { users }).into_response()
+    Ok(Json(UsersResponse { users }))
 }
 
 /// Show publicly visible list of a single user, suitable to display a profile page.
@@ -119,5 +120,58 @@ impl PublicUserInfoResponse {
         if let Some(avatar) = account.avatars.first() {
             self.small_avatar = Some(avatar.file_url.clone());
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use sqlx::PgPool;
+
+    use crate::test_helpers::{make_test_state, setup_deterministic_users};
+
+    use super::*;
+
+    /// Test setup and checker function for list_user test cases.
+    ///
+    /// Insert users to DB ahead of time, then call this.
+    async fn check_list_user(
+        state: &AppState,
+        search: UserSearchParams,
+        expect: expect_test::ExpectFile,
+    ) {
+        let result = list_users(State(state.clone()), Query(search)).await;
+        expect.assert_debug_eq(&result);
+    }
+
+    #[sqlx::test(migrations = "./db_migrations")]
+    async fn test_list_users(pool: PgPool) {
+        let state = &State(make_test_state(pool));
+        let mut seed = 1000;
+        seed = setup_deterministic_users(state, 3, 3, seed).await;
+
+        check_list_user(
+            state,
+            UserSearchParams { offset: 0 },
+            expect_test::expect_file!["./test_snapshots/list_users_1.snapshot"],
+        )
+        .await;
+
+        for _ in 0..10 {
+            seed = setup_deterministic_users(&state, 10, 10, seed).await;
+        }
+
+        check_list_user(
+            state,
+            UserSearchParams { offset: 0 },
+            expect_test::expect_file!["./test_snapshots/list_users_2.snapshot"],
+        )
+        .await;
+
+        check_list_user(
+            state,
+            UserSearchParams { offset: 35 },
+            expect_test::expect_file!["./test_snapshots/list_users_3.snapshot"],
+        )
+        .await;
     }
 }

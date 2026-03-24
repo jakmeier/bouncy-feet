@@ -1,0 +1,32 @@
+Ok(
+    Json(
+        UsersResponse {
+            users: [
+                PublicUserInfoResponse {
+                    id: 4,
+                    peertube_handle: None,
+                    display_name: Some(
+                        "Pro Dancer 1000",
+                    ),
+                    small_avatar: None,
+                },
+                PublicUserInfoResponse {
+                    id: 5,
+                    peertube_handle: None,
+                    display_name: Some(
+                        "Pro Dancer 1001",
+                    ),
+                    small_avatar: None,
+                },
+                PublicUserInfoResponse {
+                    id: 6,
+                    peertube_handle: None,
+                    display_name: Some(
+                        "Pro Dancer 1002",
+                    ),
+                    small_avatar: None,
+                },
+            ],
+        },
+    ),
+)

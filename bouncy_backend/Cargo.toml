@@ -37,6 +37,8 @@ async-trait = "0.1.89"
 futures = "0.3.31"
 thiserror = "2.0.17"
 
+[dev-dependencies]
+expect-test = "1.4.1"
 
 [lints.clippy]
 uninlined_format_args = "allow"

@@ -5,10 +5,11 @@ pub(crate) mod clubs_combos;
 pub(crate) mod combo;
 pub(crate) mod dance_activity;
 pub(crate) mod playlist;
-#[cfg(test)]
-pub(crate) mod test_helpers;
 pub(crate) mod timestamp;
 pub(crate) mod user;
+
+#[cfg(test)]
+pub(crate) mod test_helpers;
 
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
@@ -68,9 +69,8 @@ macro_rules! checked_id {
             #[allow(dead_code)]
             pub fn assert_private_read_access(self) -> Result<$id, (StatusCode, &'static str)> {
                 match self {
-                    Self::Owned(id) | Self::FullReadAccess(id)=> Ok(id),
-                    
-                    Self::PublicReadAccess(_id) =>  Err((StatusCode::FORBIDDEN, "no read access")),
+                    Self::Owned(id) | Self::FullReadAccess(id) => Ok(id),
+                    Self::PublicReadAccess(_id) => Err((StatusCode::FORBIDDEN, "no read access")),
                     Self::NotFound => Err((StatusCode::NOT_FOUND, $not_found_msg)),
                 }
             }
