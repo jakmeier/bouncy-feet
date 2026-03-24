@@ -1,0 +1,36 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                SELECT u.id, u.peertube_handle, um.key_value AS \"public_name?\"\n                FROM users u\n                LEFT OUTER JOIN user_meta um on um.user_id = u.id AND um.key_name = 's:publicName'\n                WHERE ($3::text IS NULL\n                    OR um.key_value ILIKE '%' || $3 || '%'\n                    OR u.peertube_handle ILIKE '%' || $3 || '%')\n                ORDER BY um.user_id LIMIT $1 OFFSET $2\n                ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "peertube_handle",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "public_name?",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "4e6128c0a60fd87d77dad1b9df4f7c8593c1e3f4e6f780873899515771a3e322"
+}

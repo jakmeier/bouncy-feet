@@ -1,6 +1,7 @@
 use crate::api_endoints::combo::JsonResponse;
 use crate::peertube::user::{PeerTubeAccount, PeerTubeHandle};
-use crate::user::{User, UserId, UserSearchFilter};
+use crate::search::DbSearchCheckedString;
+use crate::user::{TrustedUserSearchFilter, User, UserId};
 use crate::{peertube, AppState};
 use axum::extract::{Query, State};
 use axum::http::StatusCode;
@@ -28,12 +29,13 @@ pub struct PublicUserInfoResponse {
     pub small_avatar: Option<String>,
 }
 
-#[derive(serde::Deserialize)]
+#[derive(serde::Deserialize, Default)]
 pub struct UserSearchParams {
-    // TODO: support searching
-    // pub name_fragment: Option<String>,
+    pub name_fragment: Option<String>,
+    pub include_guests: Option<bool>,
     #[serde(default)]
     pub offset: i64,
+    pub limit: Option<u32>,
 }
 
 #[derive(serde::Serialize, Debug)]
@@ -59,11 +61,22 @@ pub async fn list_users(
     State(state): State<AppState>,
     Query(params): Query<UserSearchParams>,
 ) -> JsonResponse<UsersResponse> {
-    let filter = UserSearchFilter {
-        include_guests: false,
-        offset: params.offset,
-        limit: 50,
+    let name_fragment = if let Some(frag) = params.name_fragment {
+        let checked = DbSearchCheckedString::check(frag).map_err(|err| {
+            tracing::info!(?err, "invalid search request");
+            (StatusCode::OK, "`name_fragment` invalid")
+        })?;
+        Some(checked)
+    } else {
+        None
     };
+    let filter = TrustedUserSearchFilter {
+        name_fragment,
+        include_guests: params.include_guests.unwrap_or(false),
+        offset: params.offset,
+        limit: params.limit.unwrap_or(10).min(50) as u16,
+    };
+
     let results = User::list(&state, &filter).await;
     let Ok(users) = results else {
         let err = results.unwrap_err();
@@ -151,7 +164,7 @@ mod tests {
 
         check_list_user(
             state,
-            UserSearchParams { offset: 0 },
+            UserSearchParams::default(),
             expect_test::expect_file!["./test_snapshots/list_users_1.snapshot"],
         )
         .await;
@@ -162,15 +175,54 @@ mod tests {
 
         check_list_user(
             state,
-            UserSearchParams { offset: 0 },
+            UserSearchParams::default(),
             expect_test::expect_file!["./test_snapshots/list_users_2.snapshot"],
         )
         .await;
 
+        // with offset
         check_list_user(
             state,
-            UserSearchParams { offset: 35 },
+            UserSearchParams {
+                offset: 35,
+                ..Default::default()
+            },
             expect_test::expect_file!["./test_snapshots/list_users_3.snapshot"],
+        )
+        .await;
+
+        // with guests included
+        check_list_user(
+            state,
+            UserSearchParams {
+                include_guests: Some(true),
+                ..Default::default()
+            },
+            expect_test::expect_file!["./test_snapshots/list_users_4.snapshot"],
+        )
+        .await;
+
+        // with search and guests included
+        check_list_user(
+            state,
+            UserSearchParams {
+                include_guests: Some(true),
+                name_fragment: Some("13".to_owned()),
+                ..Default::default()
+            },
+            expect_test::expect_file!["./test_snapshots/list_users_5.snapshot"],
+        )
+        .await;
+
+        // with search and guests excluded
+        check_list_user(
+            state,
+            UserSearchParams {
+                include_guests: Some(false),
+                name_fragment: Some("01".to_owned()),
+                ..Default::default()
+            },
+            expect_test::expect_file!["./test_snapshots/list_users_6.snapshot"],
         )
         .await;
     }

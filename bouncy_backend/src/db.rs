@@ -5,6 +5,7 @@ pub(crate) mod clubs_combos;
 pub(crate) mod combo;
 pub(crate) mod dance_activity;
 pub(crate) mod playlist;
+pub(crate) mod search;
 pub(crate) mod timestamp;
 pub(crate) mod user;
 

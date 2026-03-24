@@ -3,82 +3,82 @@ Ok(
         UsersResponse {
             users: [
                 PublicUserInfoResponse {
-                    id: 79,
+                    id: 1,
                     peertube_handle: None,
                     display_name: Some(
-                        "Pro Dancer 1035",
+                        "Noob Dancer 1000",
                     ),
                     small_avatar: None,
                 },
                 PublicUserInfoResponse {
-                    id: 80,
+                    id: 2,
                     peertube_handle: None,
                     display_name: Some(
-                        "Pro Dancer 1036",
+                        "Noob Dancer 1001",
                     ),
                     small_avatar: None,
                 },
                 PublicUserInfoResponse {
-                    id: 81,
+                    id: 3,
                     peertube_handle: None,
                     display_name: Some(
-                        "Pro Dancer 1037",
+                        "Noob Dancer 1002",
                     ),
                     small_avatar: None,
                 },
                 PublicUserInfoResponse {
-                    id: 82,
+                    id: 4,
                     peertube_handle: None,
                     display_name: Some(
-                        "Pro Dancer 1038",
+                        "Pro Dancer 1000",
                     ),
                     small_avatar: None,
                 },
                 PublicUserInfoResponse {
-                    id: 83,
+                    id: 5,
                     peertube_handle: None,
                     display_name: Some(
-                        "Pro Dancer 1039",
+                        "Pro Dancer 1001",
                     ),
                     small_avatar: None,
                 },
                 PublicUserInfoResponse {
-                    id: 84,
+                    id: 6,
                     peertube_handle: None,
                     display_name: Some(
-                        "Pro Dancer 1040",
+                        "Pro Dancer 1002",
                     ),
                     small_avatar: None,
                 },
                 PublicUserInfoResponse {
-                    id: 85,
+                    id: 7,
                     peertube_handle: None,
                     display_name: Some(
-                        "Pro Dancer 1041",
+                        "Noob Dancer 1003",
                     ),
                     small_avatar: None,
                 },
                 PublicUserInfoResponse {
-                    id: 86,
+                    id: 8,
                     peertube_handle: None,
                     display_name: Some(
-                        "Pro Dancer 1042",
+                        "Noob Dancer 1004",
                     ),
                     small_avatar: None,
                 },
                 PublicUserInfoResponse {
-                    id: 97,
+                    id: 9,
                     peertube_handle: None,
                     display_name: Some(
-                        "Pro Dancer 1043",
+                        "Noob Dancer 1005",
                     ),
                     small_avatar: None,
                 },
                 PublicUserInfoResponse {
-                    id: 98,
+                    id: 10,
                     peertube_handle: None,
                     display_name: Some(
-                        "Pro Dancer 1044",
+                        "Noob Dancer 1006",
                     ),
                     small_avatar: None,
                 },

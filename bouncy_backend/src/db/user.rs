@@ -3,6 +3,7 @@ use crate::client_session::ClientSessionId;
 use crate::combo::ComboRow;
 use crate::db::club::{UserClubRow, UserJoinedClubRow};
 use crate::peertube::user::{PeerTubeAccountId, PeerTubeHandle};
+use crate::search::DbSearchCheckedString;
 use crate::AppState;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -41,11 +42,11 @@ pub struct ExtendedUserRow {
 }
 
 #[derive(Clone, Debug)]
-pub struct UserSearchFilter {
+pub struct TrustedUserSearchFilter {
     pub include_guests: bool,
     pub offset: i64,
     pub limit: u16,
-    // pub name_fragment: Option<String>,
+    pub name_fragment: Option<DbSearchCheckedString>,
 }
 
 impl UserId {
@@ -257,7 +258,7 @@ impl User {
 
     pub(crate) async fn list(
         state: &AppState,
-        filter: &UserSearchFilter,
+        filter: &TrustedUserSearchFilter,
     ) -> sqlx::Result<Vec<PublicUserData>> {
         let rows = if filter.include_guests {
             sqlx::query_as!(
@@ -266,10 +267,14 @@ impl User {
                 SELECT u.id, u.peertube_handle, um.key_value AS "public_name?"
                 FROM users u
                 LEFT OUTER JOIN user_meta um on um.user_id = u.id AND um.key_name = 's:publicName'
+                WHERE ($3::text IS NULL
+                    OR um.key_value ILIKE '%' || $3 || '%'
+                    OR u.peertube_handle ILIKE '%' || $3 || '%')
                 ORDER BY um.user_id LIMIT $1 OFFSET $2
                 "#,
                 filter.limit as i32,
                 filter.offset,
+                filter.name_fragment.as_deref(),
             )
             .fetch_all(&state.pg_db_pool)
             .await?
@@ -281,10 +286,14 @@ impl User {
                 FROM users u
                 LEFT OUTER JOIN user_meta um on um.user_id = u.id AND um.key_name = 's:publicName'
                 WHERE oidc_subject IS NOT NULL
+                    AND ($3::text IS NULL
+                        OR um.key_value ILIKE '%' || $3 || '%'
+                        OR u.peertube_handle ILIKE '%' || $3 || '%')
                 ORDER BY u.id LIMIT $1 OFFSET $2
                 "#,
                 filter.limit as i32,
                 filter.offset,
+                filter.name_fragment.as_deref(),
             )
             .fetch_all(&state.pg_db_pool)
             .await?
