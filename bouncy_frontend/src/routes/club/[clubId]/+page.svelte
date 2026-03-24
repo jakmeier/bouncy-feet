@@ -22,6 +22,8 @@
   import Combos from '$lib/components/combo/Combos.svelte';
   import MyCombosList from '$lib/components/user/MyCombosList.svelte';
   import { loadAndSetClubDetails } from '$lib/stores/Clubs.svelte';
+  import UserListControl from '$lib/components/user/UserListControl.svelte';
+  import UserListPagination from '$lib/components/user/UserListPagination.svelte';
 
   /** @type {import('./$types').PageProps} */
   let { data } = $props();
@@ -65,6 +67,13 @@
   let uploadToFeed = $state();
   /** @type {ComboInfo | undefined} */
   let selectedCombo = $state();
+
+  /** @type {UserSearchConfig} */
+  let searchConfig = $state({
+    searchTerm: '',
+    page: 0,
+    showGuests: false,
+  });
 
   /**
    * @param {PublicUserResponse} user
@@ -301,7 +310,14 @@
           <div>{message}</div>
         {:else}
           <div>{$t('club.select-user-title')}</div>
-          <UserList onSelect={(u) => onSelectUser(u, apiUser)}></UserList>
+          <UserListControl bind:searchConfig></UserListControl>
+          <UserList
+            onSelect={(u) => onSelectUser(u, apiUser)}
+            {searchConfig}
+            pageSize={5}
+            verbose
+          ></UserList>
+          <UserListPagination bind:searchConfig></UserListPagination>
         {/if}
       </div>
     {/snippet}

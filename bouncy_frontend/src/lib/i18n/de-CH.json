@@ -76,7 +76,7 @@
         "upload-video-button": "Video hochladen",
         "upload-video-description": "Video öffentlich zum Club hinzufügen",
         "upload-video-description-private": "Video für Clubmitglieder sichtbar hinzufügen",
-        "select-user-title": "Wähle Tänzer/in",        
+        "select-user-title": "Wähle Tänzer/in",
         "select-combo-title": "Wähle Combo",
         "adding-combo-description": "Combo",
         "select-public": "Öffentlich machen?",
@@ -394,6 +394,10 @@
             "title": "Video hochladen zu",
             "requires-login-description": "Ich muss wissen wer du bist, bevor du ein Video hochladen kannst."
         }
+    },
+    "users": {
+        "show-guests-label": "Gäste anzeigen",
+        "search-label": "Suche"
     },
     "step": {
         "wip-tracking": "Video-Tracking für diesen Schritt ist noch in Entwicklung.",

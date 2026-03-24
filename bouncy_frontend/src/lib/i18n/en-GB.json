@@ -395,6 +395,10 @@
             "requires-login-description": "I gotta know who you are before you can upload videos."
         }
     },
+    "users": {
+        "show-guests-label": "Show guests",
+        "search-label": "Search"
+    },
     "step": {
         "wip-tracking": "Video tracking this step is still under development.",
         "variation": {

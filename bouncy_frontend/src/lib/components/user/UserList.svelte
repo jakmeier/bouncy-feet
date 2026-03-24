@@ -2,7 +2,6 @@
   // TODO: show more info about user, e.g. profile pic
   // TODO: pagination, search, sorting based on activity, etc etc
 
-  import { onMount } from 'svelte';
   import UnstyledButton from '$lib/components/ui/UnstyledButton.svelte';
   import { apiRequest } from '$lib/stats';
   import { goto } from '$app/navigation';
@@ -11,29 +10,86 @@
   /**
    * @typedef {Object} Props
    * @property {(user: PublicUserResponse)=>void} [onSelect]
+   * @property {boolean} [verbose] -- always show handle + display name
+   * (default: only show handle when no display name is set
+   * @property {number} [pageSize] -- how many users to show at once
+   * @property {UserSearchConfig} [searchConfig]
    */
 
   /** @type {Props} */
-  let { onSelect = selectUser } = $props();
+  let {
+    onSelect = selectUser,
+    verbose = false,
+    pageSize = 20,
+    searchConfig,
+  } = $props();
 
-  /** @return {Promise<PublicUserResponse[]>} */
-  async function load() {
-    const res = await apiRequest('/users');
+  let loading = $state(true);
+  let error = $state();
+
+  /**
+   * @type {PublicUserResponse[]}
+   */
+  let users = $state([]);
+  let lastUsersUpdate = 0;
+  // update users on config change - but at most once per second
+  $effect(() => {
+    const page = searchConfig?.page || 0;
+    const searchTerm = searchConfig?.searchTerm || '';
+    const showGuests = searchConfig?.showGuests || false;
+
+    const doLoad = () => {
+      lastUsersUpdate = Date.now();
+      load(page, searchTerm, showGuests)
+        .then((result) => {
+          users = result;
+        })
+        .catch((e) => {
+          error = e;
+          loading = false;
+        });
+    };
+
+    const elapsed = Date.now() - lastUsersUpdate;
+    const delay = elapsed >= 1000 ? 0 : 1000 - elapsed;
+
+    const timer = setTimeout(doLoad, delay);
+    return () => clearTimeout(timer);
+  });
+
+  /**
+   * @return {Promise<PublicUserResponse[]>}
+   * @param {number} loadPage
+   * @param {string} searchTerm
+   * @param {boolean} showGuests
+   */
+  async function load(loadPage, searchTerm, showGuests) {
+    const query = new URLSearchParams();
+    if (searchTerm && searchTerm.length >= 2 && searchTerm.length <= 100) {
+      query.append('name_fragment', searchTerm);
+    }
+    query.append('include_guests', showGuests.toString());
+    query.append('offset', (loadPage * pageSize).toString());
+    query.append('limit', pageSize.toString());
+
+    loading = true;
+    const res = await apiRequest(`/users?${query}`);
     let result = await res.okResponse?.json();
-    return result?.users;
+    loading = false;
+    return result.users;
   }
 
   /** @param { PublicUserResponse} user */
   function selectUser(user) {
     goto(`/users/${user.id}`);
   }
-
-  onMount(load);
 </script>
 
-{#await load()}
+{#if loading}
   <p>Loading...</p>
-{:then users}
+{:else if error}
+  <p style="color:red">{error.message}</p>
+{:else}
   <ul>
     {#each users as user}
       <li>
@@ -44,29 +100,27 @@
           </div>
           <div>
             {#if user.display_name || user.peertube_handle}
-              {#if user.display_name}
+              {#if verbose && user.display_name && user.peertube_handle}
+                {user.display_name}(@{user.peertube_handle})
+              {:else if user.display_name}
                 {user.display_name}
-              {/if}
-              {#if user.peertube_handle}
-                (@{user.peertube_handle})
+              {:else if user.peertube_handle}
+                @{user.peertube_handle}
               {/if}
             {:else}
-              [User {user.id}]
+              Anonymous #{user.id}
             {/if}
           </div>
         </UnstyledButton>
       </li>
     {/each}
   </ul>
-{:catch error}
-  <p style="color:red">{error.message}</p>
-{/await}
+{/if}
 
 <style>
   ul {
     color: var(--theme-neutral-dark);
     width: 100%;
-    max-height: 40vh;
     overflow-y: auto;
   }
 
