@@ -65,18 +65,18 @@
       : asset('/icons/icon_tight_on_transparent.png')
   );
 
-  let oddAnimation = $state(true);
-  /** @type {number | undefined} */
-  let interval;
+  // let oddAnimation = $state(true);
+  // /** @type {number | undefined} */
+  // let interval;
 
-  onMount(() => {
-    interval = setInterval(() => (oddAnimation = !oddAnimation), 5000);
-  });
-  onDestroy(() => {
-    if (interval) {
-      clearInterval(interval);
-    }
-  });
+  // onMount(() => {
+  //   interval = setInterval(() => (oddAnimation = !oddAnimation), 5000);
+  // });
+  // onDestroy(() => {
+  //   if (interval) {
+  //     clearInterval(interval);
+  //   }
+  // });
 </script>
 
 <HeaderTemplate {bgColor} title={$t(title)}>
@@ -94,23 +94,19 @@
         }}
       >
         <div class="animated-logo">
-          {#if oddAnimation}
-            <img
-              class="logo"
-              src={imgUrl}
-              alt="Bouncy Feet Logo"
-              in:fly={{ x: -120 }}
-              out:fade={{ delay: 2000 }}
-            />
-          {:else}
-            <div
-              class="arrow"
-              in:fade={{ duration: 1000, delay: 2000 }}
-              out:fade
-            >
-              <Arrow />
-            </div>
-          {/if}
+          <!-- {#if oddAnimation}
+          <img
+            class="logo"
+            src={imgUrl}
+            alt="Bouncy Feet Logo"
+            in:fly={{ x: -120 }}
+            out:fade={{ delay: 2000 }}
+          />
+          {:else} -->
+          <div class="arrow" in:fade={{ duration: 1000, delay: 2000 }} out:fade>
+            <Arrow />
+          </div>
+          <!-- {/if} -->
         </div>
       </UnstyledButton>
     {:else}
