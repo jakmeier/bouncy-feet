@@ -2,6 +2,7 @@
   import { resolve } from '$app/paths';
   import { PUBLIC_BF_PEERTUBE_URL } from '$env/static/public';
   import * as api from '$lib/peertube-openapi';
+  import BfGenLogo from '$lib/components/ui/svg/BfGenLogo.svelte';
 
   /**
    * @typedef {Object} Props
@@ -9,14 +10,18 @@
    * @property {string} [url]
    * @property {string} [defaultSymbol]
    * @property {number} [targetWidth]
+   * @property {boolean} [isClub]
+   * @property {number} seed
    */
 
   /** @type {Props} */
   let {
     actor,
-    defaultSymbol = '/img/symbols/bf_club.svg',
+    defaultSymbol = undefined,
     targetWidth = 192,
     url,
+    isClub = false,
+    seed,
   } = $props();
 
   const logoPath = $derived.by(() => {
@@ -32,18 +37,34 @@
         i += 1;
       }
       return PUBLIC_BF_PEERTUBE_URL + actor.avatars[i].path;
-    } else {
+    } else if (defaultSymbol) {
       return resolve(defaultSymbol);
+    } else {
+      return null;
     }
   });
 </script>
 
-<img
-  class="avatar"
-  src={logoPath}
-  alt="club avatar"
-  style:max-width="{targetWidth}px"
-/>
+{#if logoPath}
+  <img
+    class="avatar"
+    src={logoPath}
+    alt="club avatar"
+    style:max-width="{targetWidth}px"
+  />
+{:else}
+  <div
+    class="avatar"
+    style:width="{targetWidth}px"
+    style:height="{targetWidth}px"
+  >
+    <BfGenLogo
+      {isClub}
+      seed={isClub ? seed + 100_000_000 : seed}
+      size={targetWidth}
+    ></BfGenLogo>
+  </div>
+{/if}
 
 <style>
   .avatar {
@@ -53,5 +74,6 @@
     border: solid var(--theme-main-medium) 0.25rem;
     margin: -0.25rem;
     background-color: var(--theme-main-alt);
+    overflow: hidden;
   }
 </style>

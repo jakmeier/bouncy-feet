@@ -28,7 +28,10 @@
 <LimeSection>
   <BackHeader title={name} mainColor></BackHeader>
   <div class="pic">
-    <ActorAvatar actor={data.displayedUser.account || undefined} />
+    <ActorAvatar
+      actor={data.displayedUser.account || undefined}
+      seed={userId}
+    />
   </div>
   <div class="description">{data.displayedUser.account?.description}</div>
 </LimeSection>

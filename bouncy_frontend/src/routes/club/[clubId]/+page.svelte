@@ -217,7 +217,7 @@
     </div>
   {:else}
     <div class="club-summary">
-      <ActorAvatar actor={data.clubChannel || undefined} />
+      <ActorAvatar actor={data.clubChannel || undefined} seed={clubId} isClub />
 
       <div class="club-description">
         <div>{club.description}</div>

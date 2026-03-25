@@ -13,6 +13,7 @@
    * @property {boolean} [transparent]
    * @property {()=>void} [onBack]
    * @property {api.Actor & api.ActorInfo} userOrChannel
+   * @property {number} clubId
    */
 
   /** @type {Props} */
@@ -27,13 +28,19 @@
       window.history.back();
     },
     userOrChannel,
+    clubId,
   } = $props();
 </script>
 
 <InfoHeader {white} {black} {accent} {mainColor} {transparent} {title} {onBack}>
   <div class="actor">
     <div class="logo">
-      <ActorAvatar actor={userOrChannel} targetWidth={32} />
+      <ActorAvatar
+        actor={userOrChannel}
+        targetWidth={32}
+        isClub
+        seed={clubId}
+      />
     </div>
     <div>{userOrChannel.displayName}</div>
   </div>

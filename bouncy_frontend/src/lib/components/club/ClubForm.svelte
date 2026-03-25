@@ -120,7 +120,7 @@
     {#if imageBlobUrl}
       <img class="new-logo" src={imageBlobUrl} alt="new logo" />
     {:else}
-      <ActorAvatar actor={clubChannel} />
+      <ActorAvatar actor={clubChannel} isClub seed={club?.id || 0} />
     {/if}
   </div>
 

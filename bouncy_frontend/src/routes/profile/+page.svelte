@@ -81,9 +81,12 @@
       <div class="profile-pic" onclick={clickProfile}>
         {#if maybeFullUser?.peerTubeUser}
           {#await maybeFullUser?.peerTubeUser}
-            <Symbol size={100}>person</Symbol>
+            <ActorAvatar seed={apiUser.userCtx.user.apiId} />
           {:then ptu}
-            <ActorAvatar actor={ptu?.account || undefined} />
+            <ActorAvatar
+              actor={ptu?.account || undefined}
+              seed={apiUser.userCtx.user.apiId}
+            />
           {/await}
         {:else}
           <Symbol size={100}>person</Symbol>

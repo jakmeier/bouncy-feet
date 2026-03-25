@@ -95,8 +95,8 @@
       <li>
         <UnstyledButton onClick={() => onSelect(user)}>
           <div class="pic">
-            <!-- TODO: better user default avatar -->
-            <ActorAvatar url={user.small_avatar}></ActorAvatar>
+            <ActorAvatar url={user.small_avatar} targetWidth={32} seed={user.id}
+            ></ActorAvatar>
           </div>
           <div>
             {#if user.display_name || user.peertube_handle}

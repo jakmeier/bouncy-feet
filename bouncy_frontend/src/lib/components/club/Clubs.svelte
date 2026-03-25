@@ -9,7 +9,12 @@
 {#each clubsData.mine as club}
   <a href="/club/{club.id}">
     <div class="club card">
-      <ActorAvatar url={club.avatar} targetWidth={120}></ActorAvatar>
+      <ActorAvatar
+        url={club.avatar}
+        targetWidth={120}
+        isClub
+        seed={club.id || 0}
+      ></ActorAvatar>
       <!-- style="color: {club.style.coloring.headColor}" -->
       <div class="text">
         <div class="title">
