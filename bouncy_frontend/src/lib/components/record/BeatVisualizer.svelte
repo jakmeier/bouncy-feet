@@ -70,8 +70,8 @@
   let innerColor = $derived(
     accentColor ? '--theme-main' : '--theme-neutral-gray'
   );
-  run(() => {
-    timeBetweenBeats, start, replaceAnimation(timeBetweenBeats);
+  $effect(() => {
+    replaceAnimation(timeBetweenBeats);
   });
 </script>
 

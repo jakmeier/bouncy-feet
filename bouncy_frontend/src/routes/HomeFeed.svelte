@@ -46,7 +46,11 @@
   bgColor="var(--theme-neutral-black)"
   color="var(--theme-neutral-white)"
 ></Background>
-<LogoHeader button="account_circle" onAction={() => goto('/profile')} />
+<LogoHeader
+  button="account_circle"
+  onAction={() => goto('/profile')}
+  onLogo={() => goto('/tools/bpm')}
+/>
 
 <HomeNote />
 

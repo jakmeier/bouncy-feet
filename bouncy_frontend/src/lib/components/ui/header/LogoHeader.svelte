@@ -24,6 +24,7 @@
    * @property {()=>void} [onBack]
    * @property {()=>void} [onAction] -- create a plus icon on the top right and trigger this function when selected
    * @property {()=>void} [onSecondAction]
+   * @property {()=>void} [onLogo]
    */
 
   /** @type {Props} */
@@ -43,6 +44,7 @@
     },
     onAction,
     onSecondAction,
+    onLogo,
   } = $props();
 
   let bgColor = $derived(
@@ -108,6 +110,10 @@
           </div>
           <!-- {/if} -->
         </div>
+      </UnstyledButton>
+    {:else if onLogo}
+      <UnstyledButton onClick={onLogo}>
+        <img class="logo" src={imgUrl} alt="Bouncy Feet Logo" />
       </UnstyledButton>
     {:else}
       <img class="logo" src={imgUrl} alt="Bouncy Feet Logo" />
