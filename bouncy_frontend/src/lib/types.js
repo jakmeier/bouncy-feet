@@ -276,4 +276,9 @@
  * @property {number} start
  * @property {number} subbeat_per_move
  * @property {string} [pose_file]
+ * 
+ * @typedef {Object} UserSearchConfig
+ * @property {string} searchTerm
+ * @property {number} page
+ * @property {boolean} showGuests -- include guest accounts
  */

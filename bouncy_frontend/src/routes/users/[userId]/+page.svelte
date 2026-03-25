@@ -5,6 +5,7 @@
   import BackHeader from '$lib/components/ui/header/BackHeader.svelte';
   import LimeSection from '$lib/components/ui/sections/LimeSection.svelte';
   import NightSection from '$lib/components/ui/sections/NightSection.svelte';
+  import EmptyUserText from '$lib/components/user/EmptyUserText.svelte';
   import UserCombos from '$lib/components/user/UserCombos.svelte';
   import { t } from '$lib/i18n';
 
@@ -12,15 +13,20 @@
   let { data } = $props();
 
   const userId = Number.parseInt(page.params.userId || '0');
+
+  let hasCombos = $state();
+  let isEmpty = $derived(
+    hasCombos === false && !data.displayedUser.account?.description
+  );
+  let name = $derived(
+    data.displayedUser.display_name ||
+      data.displayedUser.peertube_handle ||
+      $t('profile.title')
+  );
 </script>
 
 <LimeSection>
-  <BackHeader
-    title={data.displayedUser.display_name ||
-      data.displayedUser.peertube_handle ||
-      $t('profile.title')}
-    mainColor
-  ></BackHeader>
+  <BackHeader title={name} mainColor></BackHeader>
   <div class="pic">
     <ActorAvatar actor={data.displayedUser.account || undefined} />
   </div>
@@ -28,22 +34,16 @@
 </LimeSection>
 
 <NightSection>
-  <h1>{$t('profile.combos-title')}</h1>
-  <UserCombos {userId}></UserCombos>
+  {#if isEmpty}
+    <p>
+      <EmptyUserText {name}></EmptyUserText>
+    </p>
+  {/if}
 
-  <!-- TODO: User videos, clubs, maybe more -->
-  <!-- {#if clubDetails.private}
-    <h2>{$t('club.private-videos-title')}</h2>
-    {#each clubDetails.private.private_playlists as playlist, i}
-      <div class="playlist">
-        <Playlist
-          bind:this={privatePlaylists[i]}
-          playlistInfo={playlist}
-          editable={isClubMember}
-        />
-      </div>
-    {/each} 
-  {/if}-->
+  {#if hasCombos}
+    <h1>{$t('profile.combos-title')}</h1>
+  {/if}
+  <UserCombos {userId} bind:hasContent={hasCombos}></UserCombos>
   <Footer white />
 </NightSection>
 
@@ -51,6 +51,8 @@
   .pic {
     display: grid;
     justify-content: center;
+    min-width: 192px;
+    min-height: 192px;
   }
 
   .description {

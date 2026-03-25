@@ -307,6 +307,7 @@ dependencies = [
  "axum",
  "axum-oidc",
  "chrono",
+ "expect-test",
  "futures",
  "moka",
  "reqwest",
