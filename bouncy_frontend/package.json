@@ -13,7 +13,9 @@
     "test": "npm run test:integration && npm run test:unit",
     "lint": "prettier --check . && eslint .",
     "format": "prettier --write .",
-    "test:integration": "playwright test",
+    "test:integration": "dotenv -e .env playwright test",
+    "test:e2e:dev": "dotenv -e .env.staging playwright test",
+    "test:e2e:prod": " dotenv -e .env.production playwright test",
     "test:unit": "vitest",
     "openapi-generate": "openapi-ts -i peertube-openapi.yaml -o src/lib/peertube-openapi",
     "openapi-download": "wget -O peertube-openapi.yaml https://raw.githubusercontent.com/Chocobozzz/PeerTube/refs/heads/develop/support/doc/api/openapi.yaml"
@@ -26,6 +28,7 @@
     "@sveltejs/vite-plugin-svelte": "^6.2.1",
     "bouncy_instructor": "file:./src/lib/instructor",
     "date-fns": "^3.6.0",
+    "dotenv-cli": "^11.0.0",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-svelte": "^2.46.1",

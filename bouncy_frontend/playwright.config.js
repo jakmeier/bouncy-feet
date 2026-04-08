@@ -1,11 +1,14 @@
+
 /** @type {import('@playwright/test').PlaywrightTestConfig} */
 const config = {
     webServer: {
-        command: 'npm run build && npm run preview',
-        port: 4173
+        command: 'npm run dev',
+        port: 5173,
+        reuseExistingServer: true
     },
     testDir: 'tests',
-    testMatch: /(.+\.)?(test|spec)\.[jt]s/
+    testMatch: /(.+\.)?(test|spec)\.[jt]s/,
+    baseURL: process.env.TEST_ENV || 'http://localhost:5173',
 };
 
 export default config;
