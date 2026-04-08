@@ -92,8 +92,8 @@
 {:else}
   <ul>
     {#each users as user}
-      <li>
-        <UnstyledButton onClick={() => onSelect(user)}>
+      <UnstyledButton onClick={() => onSelect(user)}>
+        <li>
           <div class="pic">
             <ActorAvatar url={user.small_avatar} targetWidth={32} seed={user.id}
             ></ActorAvatar>
@@ -111,8 +111,8 @@
               Anonymous #{user.id}
             {/if}
           </div>
-        </UnstyledButton>
-      </li>
+        </li>
+      </UnstyledButton>
     {/each}
   </ul>
 {/if}
