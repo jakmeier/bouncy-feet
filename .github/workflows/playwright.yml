@@ -12,6 +12,9 @@ jobs:
   test-dev:
     if: github.event_name != 'release'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./bouncy_frontend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -24,6 +27,9 @@ jobs:
   test-prod:
     if: github.event_name == 'release'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./bouncy_frontend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
