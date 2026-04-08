@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "@hey-api/openapi-ts": "0.83.1",
-    "@playwright/test": "^1.51.0",
+    "@playwright/test": "^1.59.0",
     "@sveltejs/adapter-node": "^5.4.0",
     "@sveltejs/kit": "^2.49.2",
     "@sveltejs/vite-plugin-svelte": "^6.2.1",
