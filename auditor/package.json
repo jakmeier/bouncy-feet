@@ -1,0 +1,17 @@
+{
+  "name": "auditor",
+  "version": "1.0.0",
+  "description": "QA for BF",
+  "scripts": {
+    "audit": "node page-loads-perf.js",
+    "db:init": "psql $DATABASE_URL -f ./db/init_page_audits.sql"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "pg": "^8.20.0",
+    "playwright": "^1.59.1"
+  }
+}

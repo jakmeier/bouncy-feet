@@ -1,0 +1,1 @@
+ALTER TABLE page_audits ADD COLUMN lcp_ms NUMERIC(8,2);
