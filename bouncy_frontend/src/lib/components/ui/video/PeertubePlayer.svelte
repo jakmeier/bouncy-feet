@@ -266,6 +266,7 @@
       src={peertubeUrl}
       frameborder="0"
       sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+      allow="autoplay"
       bind:this={iframe}
     ></iframe>
   </div>
@@ -428,6 +429,7 @@
     right: 0;
     bottom: 0;
     pointer-events: none;
+    z-index: 11;
   }
 
   .play-button {

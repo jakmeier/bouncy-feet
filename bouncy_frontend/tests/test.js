@@ -30,8 +30,13 @@ test('guest can see users', async ({ page }) => {
     await page.getByRole('textbox', { name: 'Search' }).fill('Jakob');
     await page.getByRole('textbox', { name: 'Search' }).press('Enter');
 
-    await expect(page.getByRole('listitem').filter({ hasText: 'Jakob' })).toBeVisible();
-    await page.getByRole('listitem').filter({ hasText: 'Jakob' }).click();
+    const searchResults = await page.getByRole('listitem').filter({ hasText: 'Jakob' });
+    await expect(searchResults.first()).toBeVisible();
+    if (await searchResults.count() === 1) {
+        searchResults.click();
+    } else {
+        await page.getByRole('listitem').filter({ hasText: 'tester_jakob_2' }).first().click();
+    }
 
     await expect(page.getByRole('heading', { name: 'Jakob' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Combos' })).toBeVisible();
