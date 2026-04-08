@@ -1,0 +1,35 @@
+name: Playwright Tests
+
+on:
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  release:
+    types: [ "published" ]
+
+jobs:
+  test-dev:
+    if: github.event_name != 'release'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npx playwright install --with-deps
+      - run: npm run test:e2e:dev
+
+  test-prod:
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npx playwright install --with-deps
+      - run: npm run test:e2e:prod
