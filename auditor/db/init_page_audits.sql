@@ -21,7 +21,8 @@ CREATE TABLE IF NOT EXISTS page_audits (
   lcp_ms          NUMERIC(8,2),
   total_requests  INTEGER,
   total_kb        NUMERIC(10,2),
-  recorded_at     TIMESTAMPTZ NOT NULL DEFAULT now()
+  recorded_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
+  precached       BOOLEAN NOT NULL DEFAULT false
 );
 
 -- One row per resource type per page audit (script/fetch/img/doc etc.)

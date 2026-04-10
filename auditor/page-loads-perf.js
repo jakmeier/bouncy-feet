@@ -11,15 +11,14 @@ const baseUrl = process.env.BASE_URL
             : "";
 const saveToPg = process.env.SAVE || false
 
-const URLS = [
-    '/',
-    '/users/',
-    '/club/3/',
-];
+// Checked without caching, essentially the installation of the PWA
+const COLD_URL = '/';
+// Checked after the PWA has pre-cached all assets
+const WARM_URLS = ['/', '/users/', '/club/3/'];
 
-async function auditPage(browser, url) {
-    const context = await browser.newContext();
+async function auditPage(context, relativeUrl, precached) {
     const page = await context.newPage();
+    const url = baseUrl + relativeUrl;
 
     // Set up LCP (Largest Contentful Paint) observer
     await page.addInitScript(() => {
@@ -79,15 +78,15 @@ async function auditPage(browser, url) {
         return acc;
     }, {});
 
-    await context.close();
-
     return {
         url,
+        relativeUrl,
         loadTime,
         totalRequests: requests.length,
         totalKB: (totalBytes / 1024).toFixed(1),
         byType,
         timing,
+        precached
     };
 }
 
@@ -106,15 +105,16 @@ async function saveResults(pool, results, { environment, gitCommit } = {}) {
             // Insert page audit
             const { rows: [audit] } = await client.query(
                 `INSERT INTO page_audits
-          (run_id, url, load_time_ms, ttfb_ms, dns_ms, tcp_ms, dom_ready_ms, full_load_ms, total_requests, total_kb, lcp_ms)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+          (run_id, url, load_time_ms, ttfb_ms, dns_ms, tcp_ms, dom_ready_ms, full_load_ms, total_requests, total_kb, lcp_ms, precached)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
          RETURNING id`,
                 [
-                    run.id, r.url, r.loadTime,
+                    run.id, r.relativeUrl, r.loadTime,
                     r.timing.ttfb, r.timing.dns, r.timing.tcp,
                     r.timing.domLoad, r.timing.fullLoad,
                     r.totalRequests, r.totalKB,
                     r.timing.lcp ?? null,
+                    r.precached
                 ]
             );
 
@@ -144,13 +144,29 @@ async function run() {
     });
     const results = [];
 
-    for (const relativeUrl of URLS) {
-        const url = baseUrl + relativeUrl;
-        console.log(`Auditing ${url}...`);
-        const result = await auditPage(browser, url);
-        results.push(result);
+    // Cold: Default playwright already has that
+    console.log(`Cold audit: ${COLD_URL}`);
+    const coldContext = await browser.newContext();
+    results.push(await auditPage(coldContext, COLD_URL, false));
+    await coldContext.close();
+
+    // Warm: Set up persistent context and prime the service worker
+    const userDataDir = process.env.PROFILE_DIR || '/tmp/pw-profile';
+    const warmContext = await chromium.launchPersistentContext(userDataDir, {
+        executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || '/usr/bin/chromium',
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
+    const primePage = await warmContext.newPage();
+    await primePage.goto(baseUrl + '/', { waitUntil: 'networkidle' });
+    await primePage.waitForLoadState('networkidle'); // let precache settle
+    await primePage.close();
+
+    for (const relativeUrl of WARM_URLS) {
+        console.log(`Warm audit: ${relativeUrl}`);
+        results.push(await auditPage(warmContext, relativeUrl, true));
     }
 
+    await warmContext.close();
     await browser.close();
 
     console.log('\n=== Performance Audit ===\n');
