@@ -246,6 +246,11 @@
       (index + indexChange + playbackRates.length) % playbackRates.length;
     await player.setPlaybackRate(playbackRates[newIndex]);
   }
+
+  let mirrored = $state(false);
+  function toggleMirror() {
+    mirrored = !mirrored;
+  }
 </script>
 
 <div class="video-wrapper" style="--video-ratio: {aspectRatio}">
@@ -266,6 +271,7 @@
       sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
       allow="autoplay"
       bind:this={iframe}
+      class:mirror={mirrored}
     ></iframe>
   </div>
 
@@ -274,11 +280,11 @@
       class="config-buttons"
       class:speed-control-inlined-timeline={timeline?.position === 'inline'}
     >
-      <!-- <div class="mirror-button">
-        <UnstyledButton onClick={() => {}}>
+      <div class="mirror-button">
+        <UnstyledButton onClick={toggleMirror}>
           <img src={asset('/img/symbols/bf_mirror.svg')} alt="mirror" />
         </UnstyledButton>
-      </div> -->
+      </div>
       <div class="speed-button">
         <UnstyledButton onClick={() => changePlayback(-1)}>
           <img src={asset('/img/symbols/bf_slower.svg')} alt="slower" />
@@ -630,7 +636,7 @@
     bottom: 3rem;
   }
 
-  /* .mirror-button, */
+  .mirror-button,
   .speed-button {
     height: 2rem;
     width: 2rem;
@@ -638,5 +644,9 @@
 
   img {
     height: 100%;
+  }
+
+  .mirror {
+    transform: scaleX(-1);
   }
 </style>
