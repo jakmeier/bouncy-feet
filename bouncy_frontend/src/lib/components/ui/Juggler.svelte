@@ -63,7 +63,7 @@
     {...useSwipe(handler, () => ({
       timeframe: 300,
       minSwipeDistance: 50,
-      touchAction: 'none',
+      touchAction: 'pan-y',
     }))}
   >
     {#each items as item, index}
