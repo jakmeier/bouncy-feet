@@ -242,10 +242,8 @@
   async function changePlayback(indexChange) {
     const current = await player.getPlaybackRate();
     const index = playbackRates.indexOf(current);
-    const newIndex = Math.min(
-      Math.max(index + indexChange, 0),
-      playbackRates.length - 1
-    );
+    const newIndex =
+      (index + indexChange + playbackRates.length) % playbackRates.length;
     await player.setPlaybackRate(playbackRates[newIndex]);
   }
 </script>
@@ -273,21 +271,17 @@
 
   {#if showSpeedControl}
     <div
-      class="speed-control"
+      class="config-buttons"
       class:speed-control-inlined-timeline={timeline?.position === 'inline'}
     >
+      <!-- <div class="mirror-button">
+        <UnstyledButton onClick={() => {}}>
+          <img src={asset('/img/symbols/bf_mirror.svg')} alt="mirror" />
+        </UnstyledButton>
+      </div> -->
       <div class="speed-button">
         <UnstyledButton onClick={() => changePlayback(-1)}>
-          <img
-            class="rotate"
-            src={asset('/img/symbols/bf_faster.svg')}
-            alt="slower"
-          />
-        </UnstyledButton>
-      </div>
-      <div class="speed-button">
-        <UnstyledButton onClick={() => changePlayback(1)}>
-          <img src={asset('/img/symbols/bf_faster.svg')} alt="faster" />
+          <img src={asset('/img/symbols/bf_slower.svg')} alt="slower" />
         </UnstyledButton>
       </div>
     </div>
@@ -618,7 +612,7 @@
     object-fit: contain;
   }
 
-  .speed-control {
+  .config-buttons {
     position: absolute;
     bottom: 1rem;
     height: 2rem;
@@ -628,19 +622,21 @@
     width: calc(100% - 1rem);
     margin: 0 0.5rem;
     grid-template-columns: min-content min-content;
-    justify-content: space-between;
+    justify-content: right;
+    gap: 1rem;
   }
 
   .speed-control-inlined-timeline {
     bottom: 3rem;
   }
 
+  /* .mirror-button, */
   .speed-button {
     height: 2rem;
     width: 2rem;
   }
 
-  .rotate {
-    rotate: 180deg;
+  img {
+    height: 100%;
   }
 </style>
