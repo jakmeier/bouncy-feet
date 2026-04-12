@@ -45,7 +45,7 @@ test('club member can play private combo', async ({ page, baseURL }) => {
 
   // Assert at least one child element exists and has UI elements visible
   const firstElement = privateComboElements.locator('> .box').first();
-  await expect(firstElement.locator('.speed-control')).toBeVisible();
+  await expect(firstElement.getByAltText('slower')).toBeVisible();
 
   // Try to play the video by clicking the overlay (but play button should be visible)
   await expect(firstElement.locator('.play-button')).toBeVisible();
