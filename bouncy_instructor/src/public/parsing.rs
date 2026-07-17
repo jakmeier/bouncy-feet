@@ -5,6 +5,7 @@
 //! logic. Instead, translate to internal types. This allows refactoring
 //! internal without changing the external formats.
 
+pub(crate) mod challenge_file;
 pub(crate) mod course_file;
 pub(crate) mod dance_file;
 pub(crate) mod pose_file;
@@ -31,6 +32,24 @@ pub enum ParseFileError {
     UnknownStepName(String),
     #[error("missing translation for `{id}` with lang `{lang}`")]
     MissingTranslation { id: String, lang: String },
+    #[error("duplicate challenge ID")]
+    DuplicateChallengeId,
+    #[error("unknown challenge prerequisite `{0}`")]
+    UnknownChallengePrerequisite(String),
+    #[error("a challenge cannot depend on itself: `{0}`")]
+    ChallengeSelfDependency(String),
+    #[error("challenge prerequisites contain a cycle")]
+    ChallengeDependencyCycle,
+    #[error("challenge set has no root challenge")]
+    NoChallengeRoot,
+    #[error("challenge `{0}` has an empty combo")]
+    EmptyChallengeCombo(String),
+    #[error("invalid challenge {0}")]
+    InvalidChallengeValue(&'static str),
+    #[error("challenge `{0}` is missing a solution video")]
+    MissingSolutionVideo(String),
+    #[error("challenge `{0}` has missing or invalid solution-video beat alignment")]
+    InvalidSolutionVideoAlignment(String),
 }
 
 impl From<ParseFileError> for JsValue {

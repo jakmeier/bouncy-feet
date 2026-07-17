@@ -1,0 +1,63 @@
+#![enable(implicit_some)]
+(
+  version: 0,
+  definition_version: 1,
+  id: "jumping-jacks",
+  names: {"en": "Jumping jacks"},
+  explanations: {"en": "Do three jumping jacks in a row, on the beat."},
+  challenges: [
+    (
+      id: "three-jumping-jacks",
+      names: {"en": "Three jumping jacks"},
+      explanations: {"en": "Start with your arms at your sides, then complete three full jumping jacks."},
+      prerequisites: [],
+      bpm: 100,
+      // Replace this content-contract video with the recorded demonstration
+      // and deterministic detector fixture before publishing the challenge.
+      solution_video: (
+        path: "https://app.bouncy-feet.ch/media/videos/challenges/jumping_jack.mp4",
+        beats: [0, 600, 1200, 1800, 2400, 3000, 3600],
+        markers: {0: Start},
+      ),
+      solution_start_timestamp: 0,
+      parts: [(step: "jumping-jack", repeat: 3, subbeats_per_move: 1)],
+    ),
+  ],
+  poses: [
+    (
+      id: "standing-straight-front",
+      direction: Front,
+      limbs: [
+        (limb: LeftShin, angle: 0, tolerance: 10, weight: 1.0),
+        (limb: LeftThigh, angle: 0, tolerance: 10, weight: 1.0),
+        (limb: RightShin, angle: 0, tolerance: 10, weight: 1.0),
+        (limb: RightThigh, angle: 0, tolerance: 10, weight: 1.0),
+      ],
+    ),
+    (
+      id: "standing-straight-side",
+      direction: Right,
+      limbs: [(limb: LeftShin, angle: 0, tolerance: 10, weight: 1.0)],
+    ),
+    (
+      id: "jumping-jack-open",
+      direction: Front,
+      limbs: [
+        (limb: LeftArm, angle: -155, tolerance: 25, weight: 1.0),
+        (limb: RightArm, angle: 155, tolerance: 25, weight: 1.0),
+        (limb: LeftThigh, angle: -30, tolerance: 20, weight: 1.0),
+        (limb: RightThigh, angle: 30, tolerance: 20, weight: 1.0),
+      ],
+    ),
+  ],
+  steps: [
+    (
+      name: "Jumping jack",
+      id: "jumping-jack",
+      keyframes: [
+        (pose: "standing-straight-front", orientation: ToCamera),
+        (pose: "jumping-jack-open", orientation: ToCamera, jump_height: 1.0),
+      ],
+    ),
+  ],
+)

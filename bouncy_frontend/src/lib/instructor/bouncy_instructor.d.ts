@@ -5,6 +5,7 @@ export function stepById(id: string, flipped: boolean): StepWrapper | undefined;
 export function dances(): DanceWrapper[];
 export function loadDanceString(data: string): void;
 export function parseCourseString(data: string, lang: string): Course;
+export function parseChallengeString(data: string, lang: string): ChallengeSet;
 export function loadStepFile(url: string, source: string): Promise<void>;
 export function poses(): PoseWrapper[];
 export function danceBuilderFromDance(dance_id: string): DanceBuilder;
@@ -225,6 +226,35 @@ export class Cartesian3d {
    * distance to camera
    */
   z: number;
+}
+export class Challenge {
+  private constructor();
+  free(): void;
+  readonly explanation: string;
+  readonly prerequisites: string[];
+  readonly solutionVideo: VideoDef;
+  readonly solutionStartTimestamp: number;
+  readonly id: string;
+  readonly bpm: number;
+  readonly name: string;
+  readonly parts: ChallengePart[];
+}
+export class ChallengePart {
+  private constructor();
+  free(): void;
+  readonly subbeatsPerMove: number;
+  readonly repeat: number;
+  readonly stepName: string;
+}
+export class ChallengeSet {
+  private constructor();
+  free(): void;
+  tracker(index: number): Tracker | undefined;
+  readonly challenges: Challenge[];
+  readonly explanation: string;
+  readonly definitionVersion: number;
+  readonly id: string;
+  readonly name: string;
 }
 export class Course {
   private constructor();

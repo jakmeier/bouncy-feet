@@ -1,5 +1,6 @@
 //! Wrapper module for all types and methods that are exported by the WASM
 //! module.
+mod challenge;
 mod course;
 pub(crate) mod dance_info;
 pub(crate) mod editor;
@@ -14,6 +15,7 @@ pub(crate) mod video_def;
 pub(crate) mod wrapper;
 
 use crate::intern::step::StepSource;
+pub use crate::public::challenge::{Challenge, ChallengePart, ChallengeSet};
 pub use crate::public::course::Course;
 pub use dance_info::DanceInfo;
 pub use keypoints::{Keypoints, Side as KeypointsSide};
@@ -29,6 +31,7 @@ use wrapper::pose_wrapper::PoseWrapper;
 use super::STATE;
 use crate::intern::lfsr;
 use editor::dance_builder::DanceBuilder;
+use parsing::challenge_file::ChallengeFile;
 use parsing::course_file::CourseFile;
 use parsing::dance_file::DanceFile;
 use parsing::pose_file::PoseFile;
@@ -177,6 +180,15 @@ pub fn load_dance_str(text: &str) -> Result<(), ParseFileError> {
 pub fn parse_course_str(text: &str, lang: &str) -> Result<Course, ParseFileError> {
     let parsed = CourseFile::from_str(text)?;
     parsed.into_course(lang)
+}
+
+#[wasm_bindgen(js_name = "parseChallengeString")]
+pub fn parse_challenge_string(data: &str, lang: &str) -> Result<ChallengeSet, JsValue> {
+    Ok(parse_challenge_str(data, lang)?)
+}
+
+pub fn parse_challenge_str(text: &str, lang: &str) -> Result<ChallengeSet, ParseFileError> {
+    ChallengeFile::from_str(text)?.into_challenge_set(lang)
 }
 
 async fn load_text_file(url: &str) -> Result<String, JsValue> {
