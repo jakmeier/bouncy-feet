@@ -1,2 +1,7 @@
 target
 *.ron.bak
+design
+node_modules
+bouncy_lab/output
+bouncy_lab/test_output
+**/*.wasm

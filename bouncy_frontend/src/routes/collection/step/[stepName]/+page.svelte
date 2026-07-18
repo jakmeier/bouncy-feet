@@ -142,13 +142,4 @@
     font-style: italic;
     grid-template-columns: auto auto;
   }
-  input[type='color'] {
-    width: 100%;
-    margin: 15px;
-  }
-  .input-group {
-    display: grid;
-    gap: 10px;
-    grid-template-columns: 1fr 1fr 1fr;
-  }
 </style>

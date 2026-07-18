@@ -49,6 +49,7 @@
           title={$t('playlist.edit-title')}
           userOrChannel={data.clubChannel}
           mainColor
+          {clubId}
         />
       {:else}
         <BackHeader mainColor title={$t('playlist.edit-title')} />

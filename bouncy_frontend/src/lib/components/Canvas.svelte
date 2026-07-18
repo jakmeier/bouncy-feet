@@ -12,10 +12,11 @@
    * @typedef {Object} Props
    * @property {number} [width]
    * @property {number} [height]
+   * @property {import('svelte').Snippet} [children]
    */
 
   /** @type {Props} */
-  let { width = 100, height = 100 } = $props();
+  let { width = 100, height = 100, children } = $props();
 
   /** @type HTMLCanvasElement */
   let canvas;
@@ -56,5 +57,5 @@
   {height}
   style="width: {width}px; height: {height}px;"
 >
-  <slot />
+  {@render children?.()}
 </canvas>
