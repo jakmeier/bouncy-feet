@@ -43,13 +43,11 @@
       audio: false,
       video: {
         facingMode: 'user',
-        width: 360,
-        height: 480,
-        // The only way I managed to get a portrait camera on phones...
-        aspectRatio: { exact: 1.5 },
-        frameRate: {
-          ideal: 60,
-        },
+        width: { ideal: 640 },
+        height: { ideal: 480 },
+        aspectRatio: { ideal: 4 / 3 },
+        // Right now, inference usuallyt takes >30ms, so there is no point in more than 30FPS.
+        frameRate: { ideal: 30 },
       },
     };
 

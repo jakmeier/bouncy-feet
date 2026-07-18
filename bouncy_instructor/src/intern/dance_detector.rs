@@ -152,7 +152,8 @@ impl DanceDetector {
                         };
                         let resting_pose = &db.poses()[resting_pose_idx];
                         let error_details = resting_pose.skeleton_error(skeleton);
-                        if error_details.error_score() < 0.075 {
+                        // Be lenient on the accuracy for the entry gate.
+                        if error_details.error_score() < 0.5 {
                             self.transition_to_state(DetectionState::CountDown, now);
                         }
                     }
