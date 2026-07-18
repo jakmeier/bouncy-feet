@@ -304,6 +304,7 @@ export const posewrapper_id: (a: number, b: number) => void;
 export const posewrapper_name: (a: number, b: number, c: number, d: number) => void;
 export const posewrapper_setAngle: (a: number, b: number, c: number) => void;
 export const posewrapper_setDirection: (a: number, b: number) => void;
+export const posewrapper_setId: (a: number, b: number, c: number) => void;
 export const posewrapper_setName: (a: number, b: number, c: number, d: number, e: number) => void;
 export const posewrapper_setWeight: (a: number, b: number, c: number) => void;
 export const posewrapper_setZ: (a: number, b: number, c: number) => void;

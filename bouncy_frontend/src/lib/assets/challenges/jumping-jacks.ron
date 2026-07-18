@@ -12,12 +12,11 @@
       explanations: {"en": "Start with your arms at your sides, then complete three full jumping jacks."},
       prerequisites: [],
       bpm: 100,
-      // Replace this content-contract video with the recorded demonstration
-      // and deterministic detector fixture before publishing the challenge.
+      // TODO: better video
       solution_video: (
         path: "https://app.bouncy-feet.ch/media/videos/challenges/jumping_jack.mp4",
-        beats: [0, 600, 1200, 1800, 2400, 3000, 3600],
-        markers: {0: Start},
+        beats: [1432, 2212, 2672, 3222, 3721, 4271, 4885],
+        markers: {1432: Start},
       ),
       solution_start_timestamp: 0,
       parts: [(step: "jumping-jack", repeat: 3, subbeats_per_move: 1)],
@@ -28,16 +27,19 @@
       id: "standing-straight-front",
       direction: Front,
       limbs: [
-        (limb: LeftShin, angle: 0, tolerance: 10, weight: 1.0),
-        (limb: LeftThigh, angle: 0, tolerance: 10, weight: 1.0),
-        (limb: RightShin, angle: 0, tolerance: 10, weight: 1.0),
-        (limb: RightThigh, angle: 0, tolerance: 10, weight: 1.0),
+        (limb: LeftThigh, weight: 1.0, angle: -13, tolerance: 10),
+        (limb: LeftShin, weight: 1.0, angle: -23, tolerance: 10),
+        (limb: LeftFoot, weight: 0.0, angle: -18, tolerance: 10),
+        (limb: LeftArm, weight: 1.0, angle: -152, tolerance: 10),
+        (limb: LeftForearm, weight: 1.0, angle: 123, tolerance: 10),
+        (limb: RightThigh, weight: 1.0, angle: 12, tolerance: 10),
+        (limb: RightShin, weight: 1.0, angle: 12, tolerance: 10),
+        (limb: RightFoot, weight: 0.0, angle: 8, tolerance: 10),
+        (limb: RightArm, weight: 1.0, angle: 150, tolerance: 10),
+        (limb: RightForearm, weight: 1.0, angle: -138, tolerance: 10),
+        (limb: LeftLeg, weight: 1.0, angle: -17, tolerance: 10),
+        (limb: RightLeg, weight: 1.0, angle: 12, tolerance: 10),
       ],
-    ),
-    (
-      id: "standing-straight-side",
-      direction: Right,
-      limbs: [(limb: LeftShin, angle: 0, tolerance: 10, weight: 1.0)],
     ),
     (
       id: "jumping-jack-open",

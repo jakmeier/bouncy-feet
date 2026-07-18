@@ -176,6 +176,12 @@ impl PoseWrapper {
         self.pose_definition.id.clone()
     }
 
+    /// Set the stable ID used by steps and challenge files.
+    #[wasm_bindgen(js_name = "setId")]
+    pub fn set_id(&mut self, id: String) {
+        self.pose_definition.id = id;
+    }
+
     pub fn name(&self, lang: String) -> Option<String> {
         if let Some(translated) = &self.pose_definition.names {
             translated.get(&lang)

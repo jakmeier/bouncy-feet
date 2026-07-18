@@ -116,13 +116,10 @@
 
 <h1>Dev</h1>
 
+<p><a href="/dev/challenge-author">Challenge video author</a></p>
+
 <p>
-  <input
-    bind:this={upload}
-    type="file"
-    accept="video/*"
-    onchange={loadVideo}
-  />
+  <input bind:this={upload} type="file" accept="video/*" onchange={loadVideo} />
 </p>
 
 <!-- svelte-ignore a11y_media_has_caption -->
