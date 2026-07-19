@@ -21,10 +21,12 @@
           {club.name}
         </div>
         <div class="description">
-          <FormattedText
-            text={club.description}
-            color={club.style.coloring.headColor}
-          ></FormattedText>
+          <p>
+            <FormattedText
+              text={club.description}
+              color={club.style.coloring.headColor}
+            ></FormattedText>
+          </p>
         </div>
       </div>
     </div>

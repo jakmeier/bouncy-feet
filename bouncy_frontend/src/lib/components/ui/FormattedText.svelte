@@ -1,4 +1,5 @@
 <script>
+  // Split dynamic strings into multiple parts with **highlighting**.
   let { text, color } = $props();
 
   const regex = /\*\*(.*?)\*\*/g;
@@ -23,19 +24,17 @@
       lastIndex = regex.lastIndex;
     }
 
-    if (lastIndex < text.length) {
+    if (lastIndex < input.length) {
       parts.push({ text: text.slice(lastIndex), highlight: false });
     }
     return parts;
   }
 </script>
 
-<p>
-  {#each parts as part}
-    {#if part.highlight}
-      <span style="color: {color};">{part.text}</span>
-    {:else}
-      {part.text}
-    {/if}
-  {/each}
-</p>
+{#each parts as part}
+  {#if part.highlight}
+    <span style="color: {color};">{part.text}</span>
+  {:else}
+    {part.text}
+  {/if}
+{/each}

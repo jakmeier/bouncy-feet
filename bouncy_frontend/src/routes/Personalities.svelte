@@ -40,10 +40,12 @@
             with {coach.name}
             </div> -->
       <div class="description">
-        <FormattedText
-          text={coach.description[coachLocale($locale)]}
-          color={coach.style.coloring.headColor}
-        ></FormattedText>
+        <p>
+          <FormattedText
+            text={coach.description[coachLocale($locale)]}
+            color={coach.style.coloring.headColor}
+          ></FormattedText>
+        </p>
       </div>
     </div>
     <div class="buttons">
