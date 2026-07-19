@@ -5,7 +5,7 @@
   import { coachLocale, locale, t } from '$lib/i18n';
   import TrackerPreview from '$lib/components/avatar/TrackerPreview.svelte';
   import FormattedText from '$lib/components/ui/FormattedText.svelte';
-  import { fadeOutAndNavigate } from '$lib/stores/UiState.svelte';
+  import { startCoachTransition } from '$lib/stores/UiState.svelte';
 
   /** @type {LocalState}*/
   const { getCourse } = getContext('courses');
@@ -52,7 +52,7 @@
       <a
         href="./coach/{coach.name}"
         on:click|preventDefault={() =>
-          fadeOutAndNavigate(
+          startCoachTransition(
             `./coach/${coach.name}`,
             coach.titleNode,
             coach.title[coachLocale($locale)]

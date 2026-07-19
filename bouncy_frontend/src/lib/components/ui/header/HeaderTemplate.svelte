@@ -1,6 +1,5 @@
 <script>
-  import { receivePersonalityTitle } from '$lib/stores/Crossfade.svelte';
-  import { fadingOut } from '$lib/stores/UiState.svelte';
+  import { pageTransition, publishCoachDest } from '$lib/stores/UiState.svelte';
   import FormattedText from '../FormattedText.svelte';
 
   /**
@@ -14,6 +13,11 @@
 
   /** @type {Props} */
   let { title = '', bgColor, accentColor, topLeft, topRight } = $props();
+  let titleNode = $state();
+
+  $effect(() => {
+    publishCoachDest(titleNode);
+  });
 </script>
 
 <header style="background-color: {bgColor};">
@@ -24,16 +28,14 @@
       {@render topRight()}
     </div>
   </div>
-  {#if !fadingOut.text}
-    <h1
-      class="title"
-      in:receivePersonalityTitle={{
-        key: 'pageTitle',
-      }}
-    >
-      <FormattedText text={title} color={accentColor}></FormattedText>
-    </h1>
-  {/if}
+  <h1
+    class="title"
+    class:transition-target={pageTransition.kind === 'coach' &&
+      pageTransition.phase === 'settle'}
+    bind:this={titleNode}
+  >
+    <FormattedText text={title} color={accentColor}></FormattedText>
+  </h1>
 </header>
 
 <style>
@@ -54,5 +56,10 @@
     height: 2rem;
     display: flex;
     justify-content: right;
+  }
+
+  /* Keep it measurable while its a clone replaces it. */
+  .transition-target {
+    opacity: 0;
   }
 </style>

@@ -9,8 +9,7 @@
     backgroundColor,
     hideNavigation,
     wideView,
-    fadingOut,
-    floatingTitleRect,
+    pageTransition,
   } from '$lib/stores/UiState.svelte.js';
   import PoseDetectionContext from './PoseDetectionContext.svelte';
   import UserContext from '../lib/stores/UserContext.svelte';
@@ -22,8 +21,7 @@
   import { setContext } from 'svelte';
   import { readable } from 'svelte/store';
   import { fade } from 'svelte/transition';
-  import { sendPersonalityTitle } from '$lib/stores/Crossfade.svelte';
-  import ChallengeTransitionOverlay from './ChallengeTransitionOverlay.svelte';
+  import PageTransitionOverlay from './PageTransitionOverlay.svelte';
   import ClubsContext from '$lib/stores/ClubsContext.svelte';
   /**
    * @typedef {Object} Props
@@ -63,27 +61,10 @@
             <MusicContext>
               <UserAvatarStyleContext>
                 <ClubsContext publicClubs={data.publicClubs}>
-                  {#if !fadingOut.state}
+                  {#if pageTransition.kind !== 'coach' || !pageTransition.active || pageTransition.phase === 'settle' || pageTransition.phase === 'finishing'}
                     <div out:fade in:fade={{ delay: 600 }}>
                       {@render children?.()}
                     </div>
-                  {/if}
-                  {#if fadingOut.text}
-                    <h1
-                      class="floating-title"
-                      out:sendPersonalityTitle={{ key: 'pageTitle' }}
-                      style="
-                      position: fixed;
-                      top: {floatingTitleRect.top}px;
-                      left: {floatingTitleRect.left}px;
-                      color: {fadingOut.color};
-                      font-size: {fadingOut.fontSize.current}px;
-                      margin: 0;
-                      z-index: 999;
-                    "
-                    >
-                      {fadingOut.text}
-                    </h1>
                   {/if}
                 </ClubsContext>
               </UserAvatarStyleContext>
@@ -98,7 +79,7 @@
   </main>
 </div>
 
-<ChallengeTransitionOverlay />
+<PageTransitionOverlay />
 
 {#if !$hideNavigation}
   <TabNavigation height={navBarHeight} />

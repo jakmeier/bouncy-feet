@@ -1,72 +1,46 @@
-
 import { goto } from '$app/navigation';
 import { tick } from 'svelte';
-import { Tween } from 'svelte/motion';
 import { writable } from 'svelte/store';
 
 export const hideNavigation = writable(true);
 export const wideView = writable(false);
-export const backgroundColor = writable("var(--theme-neutral-black)");
-export const fontColor = writable("var(--theme-neutral-white)");
-
-
-/**
- * @typedef {{ state: boolean, text: string | undefined, color: string | undefined, fontSize: Tween<number> }} FadingOutState
- */
-/** @type {FadingOutState} */
-export const fadingOut = $state({
-    state: false,
-    text: undefined,
-    color: undefined,
-    fontSize: new Tween(16, { duration: 300, delay: 0 }),
-});
-export const floatingTitleRect = $state({
-    top: 0,
-    left: 0,
-    width: 0,
-    height: 0,
-});
+export const backgroundColor = writable('var(--theme-neutral-black)');
+export const fontColor = writable('var(--theme-neutral-white)');
 
 /**
- * Shared-element transition for opening a challenge set.
- *
- * @typedef {{ top: number, left: number, width: number, height: number }} ChallengeRect
- * @typedef {ChallengeRect & { borderRadius: number }} ChallengeSurface
- * @typedef {ChallengeRect & { fontSize: number, color: string, fontWeight: string, text: string }} ChallengeTitle
- * @typedef {ChallengeRect & { fontSize: number, color: string, fontWeight: string }} ChallengeTitleTarget
- * @typedef {ChallengeRect & { html: string }} ChallengeProgress
- * @typedef {{
- *   active: boolean,
- *   finishing: boolean,
- *   setId: string | undefined,
- *   phase: 'expand' | 'settle' | 'finishing' | 'idle',
- *   surface: ChallengeSurface | null,
- *   title: ChallengeTitle | null,
- *   progress: ChallengeProgress | null,
- *   destTitle: ChallengeTitleTarget | null,
- *   destProgress: ChallengeRect | null,
- *   destReady: boolean,
- * }} ChallengeTransitionState
+ * State for persistent, root-level shared-element route transitions.
+ * @typedef {{ top: number, left: number, width: number, height: number }} TransitionRect
+ * @typedef {TransitionRect & { borderRadius: number }} TransitionSurface
+ * @typedef {TransitionRect & { fontSize: number, color: string, fontWeight: string, text: string }} TransitionTitle
+ * @typedef {TransitionRect & { fontSize: number, color: string, fontWeight: string }} TransitionTitleTarget
+ * @typedef {TransitionRect & { html: string }} TransitionProgress
  */
-/** @type {ChallengeTransitionState} */
-export const challengeTransition = $state({
+export const pageTransition = $state({
     active: false,
+    kind: /** @type {'challenge' | 'coach' | null} */ (null),
     finishing: false,
-    setId: undefined,
-    phase: 'idle',
-    surface: null,
-    title: null,
-    progress: null,
-    destTitle: null,
-    destProgress: null,
+    setId: /** @type {string | undefined} */ (undefined),
+    phase:
+    /** @type {'fade-source' | 'enlarge-title' | 'expand' | 'settle' | 'finishing' | 'idle'} */ (
+            'idle'
+        ),
+    surface: /** @type {TransitionSurface | null} */ (null),
+    title: /** @type {TransitionTitle | null} */ (null),
+    progress: /** @type {TransitionProgress | null} */ (null),
+    destTitle: /** @type {TransitionTitleTarget | null} */ (null),
+    destProgress: /** @type {TransitionRect | null} */ (null),
     destReady: false,
 });
+
+// Existing challenge pages retain this name; coach and challenge transitions
+// now share the same state machine and root overlay.
+export const challengeTransition = pageTransition;
 
 const CHALLENGE_EXPAND_WAIT = 460;
 const CHALLENGE_SETTLE_WAIT = 490;
 const CHALLENGE_FINISH_WAIT = 400;
 
-/** @param {Element} node @returns {ChallengeRect} */
+/** @param {Element} node @returns {TransitionRect} */
 function rectOf(node) {
     const r = node.getBoundingClientRect();
     return { top: r.top, left: r.left, width: r.width, height: r.height };
@@ -74,23 +48,22 @@ function rectOf(node) {
 
 /** @param {number} ms */
 function wait(ms) {
-    return new Promise((r) => setTimeout(r, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-/**
- * Wait until the destination page has published its target rects.
- *
- * @param {string} setId
- * @param {number} timeout
- * @returns {Promise<void>}
- */
+/** @param {string} setId @param {number} timeout @returns {Promise<void>} */
 function waitForDest(setId, timeout) {
     const start = Date.now();
     return new Promise((resolve) => {
         function check() {
-            if (challengeTransition.setId !== setId) return resolve();
-            if (challengeTransition.destReady) return resolve();
-            if (Date.now() - start > timeout) return resolve();
+            if (
+                pageTransition.setId !== setId ||
+                pageTransition.destReady ||
+                Date.now() - start > timeout
+            ) {
+                resolve();
+                return;
+            }
             setTimeout(check, 30);
         }
         check();
@@ -103,7 +76,7 @@ function waitForDest(setId, timeout) {
  * @param {{ surfaceNode: HTMLElement, titleNode: HTMLElement, progressNode: HTMLElement }} nodes
  */
 export async function startChallengeTransition(href, setId, nodes) {
-    if (challengeTransition.active) return;
+    if (pageTransition.active) return;
     if (
         typeof window !== 'undefined' &&
         window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -112,116 +85,164 @@ export async function startChallengeTransition(href, setId, nodes) {
         return;
     }
 
-    const { surfaceNode, titleNode, progressNode } = nodes;
-    const surfaceStyle = getComputedStyle(surfaceNode);
-    const titleStyle = getComputedStyle(titleNode);
-
-    challengeTransition.setId = setId;
-    challengeTransition.surface = {
-        ...rectOf(surfaceNode),
+    const surfaceStyle = getComputedStyle(nodes.surfaceNode);
+    const titleStyle = getComputedStyle(nodes.titleNode);
+    pageTransition.kind = 'challenge';
+    pageTransition.setId = setId;
+    pageTransition.surface = {
+        ...rectOf(nodes.surfaceNode),
         borderRadius: parseFloat(surfaceStyle.borderRadius) || 24,
     };
-    challengeTransition.title = {
-        ...rectOf(titleNode),
+    pageTransition.title = {
+        ...rectOf(nodes.titleNode),
         fontSize: parseFloat(titleStyle.fontSize),
         color: titleStyle.color,
         fontWeight: titleStyle.fontWeight,
-        text: (titleNode.textContent || '').trim(),
+        text: (nodes.titleNode.textContent || '').trim(),
     };
-    challengeTransition.progress = {
-        ...rectOf(progressNode),
-        html: progressNode.innerHTML,
+    pageTransition.progress = {
+        ...rectOf(nodes.progressNode),
+        html: nodes.progressNode.innerHTML,
     };
-    challengeTransition.destReady = false;
-    challengeTransition.destTitle = null;
-    challengeTransition.destProgress = null;
-    challengeTransition.finishing = false;
-    challengeTransition.phase = 'expand';
-    challengeTransition.active = true;
+    pageTransition.destReady = false;
+    pageTransition.destTitle = null;
+    pageTransition.destProgress = null;
+    pageTransition.finishing = false;
+    pageTransition.phase = 'expand';
+    pageTransition.active = true;
 
     await tick();
     await wait(CHALLENGE_EXPAND_WAIT);
-
     goto(href);
-
     await waitForDest(setId, 1200);
-
-    challengeTransition.phase = 'settle';
+    pageTransition.phase = 'settle';
     await tick();
     await wait(CHALLENGE_SETTLE_WAIT);
-
-    // Crossfade: fade the overlay clones out while the destination page fades
-    // in, then tear the overlay down.
-    challengeTransition.phase = 'finishing';
-    challengeTransition.finishing = true;
+    pageTransition.phase = 'finishing';
+    pageTransition.finishing = true;
     await tick();
     await wait(CHALLENGE_FINISH_WAIT);
-
-    challengeTransition.active = false;
-    challengeTransition.finishing = false;
-    challengeTransition.phase = 'idle';
-    challengeTransition.destReady = false;
+    resetTransition();
 }
 
-/**
- * Called by the destination challenge page on mount so the overlay can glide
- * its cloned title / progress into the real target positions.
- *
- * @param {string} setId
- * @param {Element | null | undefined} titleNode
- * @param {Element | null | undefined} progressNode
- */
+/** @param {string} setId @param {Element | null | undefined} titleNode @param {Element | null | undefined} progressNode */
 export function publishChallengeDest(setId, titleNode, progressNode) {
-    if (!challengeTransition.active || challengeTransition.setId !== setId) {
+    if (
+        pageTransition.kind !== 'challenge' ||
+        !pageTransition.active ||
+        pageTransition.setId !== setId
+    )
         return;
-    }
     if (titleNode) {
-        const s = getComputedStyle(titleNode);
-        challengeTransition.destTitle = {
+        const style = getComputedStyle(titleNode);
+        pageTransition.destTitle = {
             ...rectOf(titleNode),
-            fontSize: parseFloat(s.fontSize),
-            color: s.color,
-            fontWeight: s.fontWeight,
+            fontSize: parseFloat(style.fontSize),
+            color: style.color,
+            fontWeight: style.fontWeight,
         };
     }
-    if (progressNode) {
-        challengeTransition.destProgress = rectOf(progressNode);
-    }
-    challengeTransition.destReady = true;
+    if (progressNode) pageTransition.destProgress = rectOf(progressNode);
+    pageTransition.destReady = true;
 }
 
 /**
- * Delayed navigation to allow fading out.
- *
  * @param {string} href
- * @param {HTMLElement} preservedNode
+ * @param {HTMLElement} titleNode
  * @param {string} text
  */
-export async function fadeOutAndNavigate(href, preservedNode, text) {
+export async function startCoachTransition(href, titleNode, text) {
+    if (pageTransition.active) return;
+    if (
+        typeof window !== 'undefined' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+        goto(href);
+        return;
+    }
 
-    const rect = preservedNode?.getBoundingClientRect();
-    floatingTitleRect.top = rect?.top;
-    floatingTitleRect.left = rect?.left;
-    floatingTitleRect.width = rect?.width;
-    floatingTitleRect.height = rect?.height;
+    const style = getComputedStyle(titleNode);
+    pageTransition.kind = 'coach';
+    pageTransition.setId = undefined;
+    pageTransition.surface = null;
+    pageTransition.progress = null;
+    pageTransition.destTitle = null;
+    pageTransition.destProgress = null;
+    pageTransition.destReady = false;
+    pageTransition.title = {
+        ...rectOf(titleNode),
+        fontSize: parseFloat(style.fontSize),
+        color: style.color,
+        fontWeight: style.fontWeight,
+        text,
+    };
+    pageTransition.finishing = false;
+    pageTransition.phase = 'fade-source';
+    pageTransition.active = true;
 
-    const style = getComputedStyle(preservedNode);
-
-
-    fadingOut.state = true;
-    fadingOut.text = text;
-    fadingOut.fontSize.set(parseFloat(style.fontSize), { duration: 0, delay: 0 });
-    fadingOut.color = style.color;
     await tick();
-
-    await new Promise((r) => setTimeout(r, 600));
-    fadingOut.fontSize.set(36);
+    await wait(600);
+    // The old floating element was an h1, which became bold before enlarging.
+    pageTransition.title.fontWeight = '700';
+    pageTransition.phase = 'enlarge-title';
     await tick();
-    await new Promise((r) => setTimeout(r, 600));
+    await wait(600);
 
     goto(href);
-    fadingOut.state = false;
+    pageTransition.phase = 'settle';
     await tick();
-    fadingOut.text = undefined;
-    fadingOut.color = undefined;
+    await waitForCoachDest(1200);
+    // Settle the clone onto the real header, then crossfade to that header while
+    // the destination page is already fading in underneath.
+    await wait(600);
+    pageTransition.phase = 'finishing';
+    pageTransition.finishing = true;
+    await tick();
+    await wait(600);
+    resetTransition();
+}
+
+/** @param {number} timeout @returns {Promise<void>} */
+function waitForCoachDest(timeout) {
+    const start = Date.now();
+    return new Promise((resolve) => {
+        function check() {
+            if (
+                pageTransition.kind !== 'coach' ||
+                pageTransition.destReady ||
+                Date.now() - start > timeout
+            ) {
+                resolve();
+                return;
+            }
+            setTimeout(check, 30);
+        }
+        check();
+    });
+}
+
+/** @param {Element | null | undefined} titleNode */
+export function publishCoachDest(titleNode) {
+    if (
+        pageTransition.kind !== 'coach' ||
+        pageTransition.phase !== 'settle' ||
+        !titleNode
+    )
+        return;
+    const style = getComputedStyle(titleNode);
+    pageTransition.destTitle = {
+        ...rectOf(titleNode),
+        fontSize: parseFloat(style.fontSize),
+        color: style.color,
+        fontWeight: style.fontWeight,
+    };
+    pageTransition.destReady = true;
+}
+
+function resetTransition() {
+    pageTransition.active = false;
+    pageTransition.kind = null;
+    pageTransition.finishing = false;
+    pageTransition.phase = 'idle';
+    pageTransition.destReady = false;
 }
