@@ -4,7 +4,6 @@
   import Plus from '../svg/Plus.svelte';
   import UnstyledButton from '../UnstyledButton.svelte';
   import { goto } from '$app/navigation';
-  import { onDestroy, onMount } from 'svelte';
   import { fade, fly } from 'svelte/transition';
   import HeaderTemplate from './HeaderTemplate.svelte';
   import { t } from '$lib/i18n';
@@ -61,6 +60,20 @@
               : 'var(--theme-neutral-black)'
   );
 
+  let accentColor = $derived(
+    white
+      ? 'var(--theme-neutral-black)'
+      : black
+        ? 'var(--theme-neutral-light)'
+        : accent
+          ? 'var(--theme-main-dark)'
+          : mainColor
+            ? 'var(--theme-neutral-light)'
+            : transparent
+              ? 'transparent'
+              : 'var(--theme-main)'
+  );
+
   let imgUrl = $derived(
     white || accent || mainColor
       ? asset('/icons/logo.svg')
@@ -81,7 +94,7 @@
   // });
 </script>
 
-<HeaderTemplate {bgColor} title={$t(title)}>
+<HeaderTemplate {bgColor} {accentColor} title={$t(title)}>
   {#snippet topLeft()}
     {#if backButton}
       <UnstyledButton onClick={onBack}>

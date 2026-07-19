@@ -1,17 +1,19 @@
 <script>
   import { receivePersonalityTitle } from '$lib/stores/Crossfade.svelte';
   import { fadingOut } from '$lib/stores/UiState.svelte';
+  import FormattedText from '../FormattedText.svelte';
 
   /**
    * @typedef {Object} Props
    * @property {string} [title]
    * @property {string} bgColor
+   * @property {string} accentColor
    * @property {import('svelte').Snippet} topLeft
    * @property {import('svelte').Snippet} topRight
    */
 
   /** @type {Props} */
-  let { title = '', bgColor, topLeft, topRight } = $props();
+  let { title = '', bgColor, accentColor, topLeft, topRight } = $props();
 </script>
 
 <header style="background-color: {bgColor};">
@@ -29,7 +31,7 @@
         key: 'pageTitle',
       }}
     >
-      {title}
+      <FormattedText text={title} color={accentColor}></FormattedText>
     </h1>
   {/if}
 </header>
