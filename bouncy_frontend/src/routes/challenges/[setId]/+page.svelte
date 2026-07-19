@@ -1,11 +1,12 @@
 <script>
-  import { getContext } from 'svelte';
+  import { getContext, onMount } from 'svelte';
   import StandardPage from '$lib/components/ui/StandardPage.svelte';
   import {
     deriveChallengeProgress,
     readChallengeProgress,
     challengeProgressKey,
   } from '$lib/challengeProgress.js';
+  import { publishChallengeDest } from '$lib/stores/UiState.svelte';
   import { asset, base } from '$app/paths';
 
   let { data } = $props();
@@ -63,6 +64,16 @@
   }
 
   const levels = set ? buildLevels(set.challenges) : [];
+
+  // Tranistion animation. No-op when the page is reached directly.
+  onMount(() => {
+    if (!set) return;
+    requestAnimationFrame(() => {
+      const titleNode = document.querySelector('header h1.title');
+      const progressNode = document.querySelector('[data-challenge-progress]');
+      publishChallengeDest(set.id, titleNode, progressNode);
+    });
+  });
 </script>
 
 <StandardPage black title={set ? set.name : '???'} backButton>
@@ -89,7 +100,7 @@
           </div>
         </div>
         <div class="rewards">
-          <span>
+          <span data-challenge-progress>
             0 / 1000
             <img
             src={asset('/img/symbols/bf_eye_black.svg')}

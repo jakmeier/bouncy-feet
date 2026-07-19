@@ -23,6 +23,7 @@
   import { readable } from 'svelte/store';
   import { fade } from 'svelte/transition';
   import { sendPersonalityTitle } from '$lib/stores/Crossfade.svelte';
+  import ChallengeTransitionOverlay from './ChallengeTransitionOverlay.svelte';
   import ClubsContext from '$lib/stores/ClubsContext.svelte';
   /**
    * @typedef {Object} Props
@@ -96,6 +97,8 @@
     {/if}
   </main>
 </div>
+
+<ChallengeTransitionOverlay />
 
 {#if !$hideNavigation}
   <TabNavigation height={navBarHeight} />

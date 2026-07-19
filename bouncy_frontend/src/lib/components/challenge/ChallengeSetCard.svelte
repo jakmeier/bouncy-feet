@@ -1,6 +1,7 @@
 <script>
   import { asset } from '$app/paths';
   import { onMount } from 'svelte';
+  import { startChallengeTransition } from '$lib/stores/UiState.svelte';
 
   /**
    * @typedef {Object} Props
@@ -10,6 +11,17 @@
 
   /** @type {Props} */
   let { set, index } = $props();
+
+  const href = `/challenges/${set.id}`;
+
+  /** @type {HTMLAnchorElement | undefined} */
+  let cardEl = $state();
+  /** @type {HTMLDivElement | undefined} */
+  let copyEl = $state();
+  /** @type {HTMLHeadingElement | undefined} */
+  let titleEl = $state();
+  /** @type {HTMLDivElement | undefined} */
+  let progressEl = $state();
 
   /** @type {HTMLDivElement | undefined} */
   let art = $state();
@@ -65,9 +77,30 @@
       if (interval) window.clearInterval(interval);
     };
   });
+
+  /** @param {MouseEvent} event */
+  function handleClick(event) {
+    if (
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    ) {
+      return;
+    }
+    if (!cardEl || !copyEl || !titleEl || !progressEl) return;
+    event.preventDefault();
+    startChallengeTransition(href, set.id, {
+      surfaceNode: copyEl,
+      titleNode: titleEl,
+      progressNode: progressEl,
+    });
+  }
 </script>
 
-<a class="set-card" href={`/challenges/${set.id}`}>
+<a class="set-card" {href} onclick={handleClick} bind:this={cardEl}>
   <div class="art" aria-hidden="true" bind:this={art}>
     {#if activeVideo}
       <video
@@ -88,21 +121,21 @@
     <span class="beat beat-two"></span>
     <span class="number">0{index + 1}</span>
   </div>
-  <div class="card-copy">
+  <div class="card-copy" bind:this={copyEl}>
     <div class="label-row">
       <span>New</span>
       <span class="difficulty">Beginners</span>
     </div>
-    <h2>{set.name}</h2>
+    <h2 bind:this={titleEl}>{set.name}</h2>
     <div class="reward-line">
       <span class="reward-label">Progress</span>
-      <div class="reward-row">
+      <div class="reward-row" bind:this={progressEl}>
+        0 / 1000
         <img
           src={asset('/img/symbols/bf_eye_black.svg')}
           alt=""
           class="currency"
         />
-        0 / 1000
       </div>
     </div>
     <div class="card-bottom">
@@ -263,12 +296,14 @@
   .reward-row {
     display: inline-flex;
     align-items: center;
-    gap: 0.3rem;
-    padding: 0.25rem 0.55rem;
+    justify-content: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.65rem;
     border-radius: 999px;
     background: var(--theme-neutral-light);
     color: var(--theme-neutral-almost-black);
-    font-weight: 700;
+    font-size: var(--font-normal);
+    font-weight: 800;
   }
   .currency {
     width: 1rem;
