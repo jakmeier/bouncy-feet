@@ -73,7 +73,7 @@
       src={challenge.solutionVideo.path()}
       aria-label={`${challenge.name} solution video`}
     ></video>
-    <p>Complete all three jumping jacks in one uninterrupted, on-beat run.</p>
+    <p>Complete every move in one uninterrupted, on-beat run.</p>
     <button onclick={start}>Start challenge</button>
   {:else if !finished}
     <div data-testid="challenge-live">

@@ -361,7 +361,7 @@
   .message {
     font-weight: bold;
   }
-  @media (max-width: 650px) {
+  @media (max-width: 600px) {
     .preview {
       grid-template-columns: 1fr;
     }
