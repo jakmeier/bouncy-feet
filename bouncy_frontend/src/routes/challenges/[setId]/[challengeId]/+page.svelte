@@ -1,5 +1,4 @@
 <script>
-  // @ts-nocheck
   import { getContext, onDestroy } from 'svelte';
   import StandardPage from '$lib/components/ui/StandardPage.svelte';
   import LiveActivity from '$lib/components/activity/LiveActivity.svelte';
@@ -11,7 +10,9 @@
   const user = getContext('user');
   const set = getSet(data.params.setId);
   const challengeIndex = set?.challenges.findIndex(
-    (item) => item.id === data.params.challengeId
+    (
+      /** @type {import('$lib/instructor/bouncy_instructor').Challenge} */ item
+    ) => item.id === data.params.challengeId
   );
   const challenge =
     challengeIndex === undefined || challengeIndex < 0
@@ -33,6 +34,9 @@
     started = true;
   }
 
+  /**
+   * @param {import('$lib/instructor/bouncy_instructor').DetectionResult} detection
+   */
   async function onDone(detection) {
     finished = true;
     // `forceBeat` records every expected beat. A complete challenge therefore
@@ -60,14 +64,13 @@
   onDestroy(() => unregisterTracker?.());
 </script>
 
-<StandardPage white>
+<StandardPage backButton title={challenge.name}>
   {#if !challenge}
     <h1>Challenge not found</h1>
   {:else if !started}
-    <a href={`/challenges/${set.id}`}>← Back to challenges</a>
-    <h1>{challenge.name}</h1>
     <p>{challenge.explanation || ''}</p>
     <p><strong>{challenge.bpm} BPM</strong></p>
+    <!-- svelte-ignore a11y_media_has_caption -->
     <video
       controls
       src={challenge.solutionVideo.path()}
