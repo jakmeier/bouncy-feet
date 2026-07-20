@@ -22,6 +22,12 @@
   const status = $derived(
     state.completed ? 'completed' : state.locked ? 'locked' : 'available'
   );
+  const stateSymbol = $derived(
+    state.completed ? 'bf_check' : state.locked ? 'bf_lock' : 'bf_play'
+  );
+  const stateSymbolClass = $derived(
+    state.locked ? 'state-img-locked' : 'state-img'
+  );
 </script>
 
 <svelte:element
@@ -35,21 +41,33 @@
 >
   <div class="card-topline">
     <span class="level-number">LEVEL {number}</span>
-    <span class="state-icon material-symbols-outlined">
-      {state.completed ? 'check' : state.locked ? 'lock' : 'play_arrow'}
+    <span class="state-icon">
+      <img
+        src={asset(`/img/symbols/${stateSymbol}.svg`)}
+        alt=""
+        class={stateSymbolClass}
+      />
     </span>
   </div>
   <h2>{challenge.name}</h2>
-  <p>{challenge.explanation}</p>
-  <span class="reward">
-    <img src={asset('/img/symbols/bf_eye_black.svg')} alt="" class="currency" />
-    0 / 100
-  </span>
+  {#if challenge.explanation && challenge.explanation.length > 0}
+    <p>{challenge.explanation}</p>
+  {/if}
   <div class="card-meta">
-    <span>
-      <span class="material-symbols-outlined">music_note</span>
-      {challenge.bpm} BPM
-    </span>
+    <div class="meta-bubbles">
+      <span class="bubble reward">
+        <img
+          src={asset('/img/symbols/bf_eye_black.svg')}
+          alt=""
+          class="currency"
+        />
+        0 / 100
+      </span>
+      <span class="bubble bpm">
+        <img src={asset('/img/symbols/bf_note.svg')} alt="" class="meta-icon" />
+        {challenge.bpm} BPM
+      </span>
+    </div>
     {#if state.completed}
       <strong>Done</strong>
     {:else if state.locked}
@@ -70,39 +88,30 @@
     flex-direction: column;
     min-width: 0;
     padding: 1rem 1.05rem;
-    border: 1.5px solid var(--theme-neutral-gray);
-    border-radius: 18px;
+    border-radius: 1.5rem;
     color: var(--theme-neutral-almost-black);
     background: var(--theme-neutral-white);
-    box-shadow: 0 5px 14px var(--theme-neutral-dark-transparent);
-    transition:
-      transform 160ms ease,
-      box-shadow 160ms ease,
-      border-color 160ms ease;
+    transition: transform 160ms ease;
+    container-type: inline-size;
   }
 
   a.challenge-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 9px 22px var(--theme-neutral-dark-transparent);
   }
   .challenge-card.available {
-    border-color: var(--theme-main-alt);
-    box-shadow: 0 7px 20px var(--theme-main-60);
+    background: var(--theme-main);
   }
   .challenge-card.completed {
     background: var(--theme-main-light);
-    border-color: var(--theme-main-medium);
   }
   .challenge-card.locked {
     color: var(--theme-neutral-darker-gray);
     background: var(--theme-neutral-light);
-    border-color: transparent;
-    box-shadow: none;
   }
 
   .card-topline,
   .card-meta,
-  .card-meta > span {
+  .meta-bubbles {
     display: flex;
     align-items: center;
   }
@@ -110,8 +119,8 @@
   .card-meta {
     justify-content: space-between;
   }
-  .card-meta > span {
-    gap: 0.2rem;
+  .meta-bubbles {
+    gap: 0.4rem;
   }
   .level-number {
     color: var(--theme-neutral-darker-gray);
@@ -126,46 +135,49 @@
     height: 28px;
     border-radius: 50%;
     background: var(--theme-neutral-gray);
-    font-size: var(--font-normal);
   }
   .available .state-icon {
-    color: var(--theme-neutral-almost-black);
     background: var(--theme-main);
   }
   .completed .state-icon {
-    color: var(--theme-neutral-white);
     background: var(--theme-main-dark);
   }
+  .state-img-locked {
+    height: 18px;
+    width: auto;
+  }
+  .state-img {
+    width: auto;
+  }
+
   h2 {
     margin: 0.45rem 0 0.3rem;
-    font-size: var(--font-normal);
-    font-weight: 750;
+    font-weight: 700;
     line-height: 1.15;
+    text-align: center;
   }
   p {
     flex-grow: 1;
     margin: 0;
-    color: var(--theme-neutral-darker-gray);
-    font-size: var(--font-small);
     line-height: 1.4;
   }
-  .reward {
-    margin-top: 0.8rem;
-    font-size: var(--font-small);
+  .bubble {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.55rem;
+    border-radius: 9999px;
+    background: var(--theme-neutral-white);
   }
-  .currency {
-    width: 1rem;
+  .currency,
+  .meta-icon {
     height: 1rem;
-    vertical-align: middle;
+    width: auto;
   }
   .card-meta {
     gap: 0.4rem;
     margin-top: 0.8rem;
     font-size: var(--font-small);
-  }
-  .card-meta .material-symbols-outlined {
-    font-size: var(--font-small);
-    color: var(--theme-main);
   }
   .card-meta strong {
     color: var(--theme-main-dark);
@@ -185,6 +197,18 @@
   @media (max-width: 600px) {
     .challenge-card {
       padding: 0.85rem;
+    }
+  }
+
+  @container (max-width: 14rem) {
+    .card-meta {
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    .meta-bubbles {
+      flex-direction: column;
+      align-items: center;
     }
   }
 </style>
