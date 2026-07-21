@@ -60,21 +60,26 @@ impl ChallengeFile {
     }
 
     pub(crate) fn into_challenge_set(self, lang: &str) -> Result<ChallengeSet, ParseFileError> {
-        let mut collection = ContentCollection::default();
-        collection.add_poses(self.poses)?;
-        collection.add_steps(self.steps, StepSource::new("challenge".to_owned()))?;
-        let set_id = self.id.clone();
-        let name = translation(self.names, lang, &set_id)?;
-        let explanation = self
-            .explanations
+        let ChallengeFile {
+            definition_version,
+            id: set_id,
+            names,
+            explanations,
+            challenges: challenge_defs,
+            poses,
+            steps,
+            ..
+        } = self;
+        let name = translation(names, lang, &set_id)?;
+        let explanation = explanations
             .map(|v| translation(v, lang, &set_id))
             .transpose()?;
-        let ids: HashSet<String> = self.challenges.iter().map(|c| c.id.clone()).collect();
-        if ids.len() != self.challenges.len() {
+        let ids: HashSet<String> = challenge_defs.iter().map(|c| c.id.clone()).collect();
+        if ids.len() != challenge_defs.len() {
             return Err(ParseFileError::DuplicateChallengeId);
         }
-        let mut challenges = Vec::with_capacity(self.challenges.len());
-        for challenge in self.challenges {
+        let mut challenges = Vec::with_capacity(challenge_defs.len());
+        for challenge in challenge_defs {
             if challenge.bpm == 0 {
                 return Err(ParseFileError::InvalidChallengeValue("bpm"));
             }
@@ -95,6 +100,7 @@ impl ChallengeFile {
                     ));
                 }
             }
+            let collection = challenge_collection(&poses, &steps, &challenge.parts)?;
             let mut parts = vec![];
             for p in challenge.parts {
                 if p.repeat == 0 || p.subbeats_per_move == 0 {
@@ -121,19 +127,64 @@ impl ChallengeFile {
                 solution_video: video.into(),
                 solution_start_timestamp: challenge.solution_start_timestamp.unwrap() as f64,
                 parts,
+                collection,
             });
         }
         validate_graph(&challenges)?;
         Ok(ChallengeSet {
             id: set_id,
-            definition_version: self.definition_version,
+            definition_version,
             name,
             explanation,
             challenges,
-            collection,
         })
     }
 }
+
+/// Only uses poses and steps for this specific challenge.
+fn challenge_collection(
+    poses: &[Pose],
+    steps: &[Step],
+    parts: &[Part],
+) -> Result<ContentCollection, ParseFileError> {
+    let step_ids: HashSet<&str> = parts.iter().map(|part| part.step.as_str()).collect();
+    let selected_steps: Vec<Step> = steps
+        .iter()
+        .filter(|step| step_ids.contains(step.id.as_str()))
+        .cloned()
+        .collect();
+
+    let mut pose_ids: HashSet<&str> = selected_steps
+        .iter()
+        .flat_map(|step| step.keyframes.iter().map(|keyframe| keyframe.pose.as_str()))
+        .collect();
+    loop {
+        let mut changed = false;
+        for pose in poses {
+            if pose_ids.contains(pose.id.as_str())
+                && !pose.mirror_of.is_empty()
+                && pose_ids.insert(pose.mirror_of.as_str())
+            {
+                changed = true;
+            }
+        }
+        if !changed {
+            break;
+        }
+    }
+
+    let mut collection = ContentCollection::default();
+    collection.add_poses(
+        poses
+            .iter()
+            .filter(|pose| pose_ids.contains(pose.id.as_str()))
+            .cloned()
+            .collect(),
+    )?;
+    collection.add_steps(selected_steps, StepSource::new("challenge".to_owned()))?;
+    Ok(collection)
+}
+
 fn translation(value: TranslatedString, lang: &str, id: &str) -> Result<String, ParseFileError> {
     value
         .take(lang)
@@ -160,6 +211,61 @@ fn validate_video(id: &str, video: &VideoDef, start: Option<u32>) -> Result<(), 
     }
     Ok(())
 }
+#[cfg(test)]
+mod tests {
+    use super::ChallengeFile;
+
+    #[test]
+    fn challenge_tracker_collection_excludes_unrelated_steps_and_poses() {
+        let file = ChallengeFile::from_str(
+            r#"#![enable(implicit_some)]
+            (
+                version: 0,
+                definition_version: 1,
+                id: "test-set",
+                names: {"en": "Test"},
+                challenges: [(
+                    id: "only-this-step",
+                    names: {"en": "Only this step"},
+                    bpm: 100,
+                    solution_video: (
+                        path: "solution.mp4",
+                        beats: [0],
+                        markers: {0: Start},
+                    ),
+                    solution_start_timestamp: 0,
+                    parts: [(step: "included-step", repeat: 1, subbeats_per_move: 1)],
+                )],
+                poses: [
+                    (id: "included-pose", direction: Front, limbs: []),
+                    (id: "unrelated-pose", direction: Front, limbs: []),
+                ],
+                steps: [
+                    (
+                        id: "included-step",
+                        name: "Included",
+                        keyframes: [(pose: "included-pose")],
+                    ),
+                    (
+                        id: "unrelated-step",
+                        name: "Unrelated",
+                        keyframes: [(pose: "unrelated-pose")],
+                    ),
+                ],
+            )"#,
+        )
+        .unwrap();
+
+        let set = file.into_challenge_set("en").unwrap();
+        let challenge = &set.challenges[0];
+        let db = &challenge.collection.tracker_view;
+        assert_eq!(db.steps().len(), 1);
+        assert_eq!(db.steps()[0].id, "included-step");
+        assert!(db.pose_by_id("included-pose").is_some());
+        assert!(db.pose_by_id("unrelated-pose").is_none());
+    }
+}
+
 fn validate_graph(challenges: &[Challenge]) -> Result<(), ParseFileError> {
     if challenges.is_empty() {
         return Err(ParseFileError::NoChallengeRoot);

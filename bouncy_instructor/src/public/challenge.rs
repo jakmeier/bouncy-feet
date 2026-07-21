@@ -1,7 +1,6 @@
 use crate::intern::content_collection::ContentCollection;
 use crate::intern::step_pace::StepPace;
 use crate::intern::teacher::Teacher;
-use crate::intern::tracker_dance_collection::TrackerDanceCollection;
 use crate::public::course::CourseError;
 use crate::public::wrapper::step_wrapper::StepWrapper;
 use crate::{Tracker, VideoDef};
@@ -16,7 +15,6 @@ pub struct ChallengeSet {
     pub(crate) name: String,
     pub(crate) explanation: Option<String>,
     pub(crate) challenges: Vec<Challenge>,
-    pub(crate) collection: ContentCollection,
 }
 #[derive(Debug, Clone)]
 #[wasm_bindgen]
@@ -29,6 +27,9 @@ pub struct Challenge {
     pub(crate) solution_video: VideoDef,
     pub(crate) solution_start_timestamp: f64,
     pub(crate) parts: Vec<ChallengePart>,
+    /// The definitions needed to run this challenge, excluding unrelated
+    /// challenge-set poses and steps.
+    pub(crate) collection: ContentCollection,
 }
 #[derive(Debug, Clone)]
 #[wasm_bindgen]
@@ -62,9 +63,7 @@ impl ChallengeSet {
         self.challenges.clone()
     }
     pub fn tracker(&self, index: usize) -> Option<Tracker> {
-        self.challenges
-            .get(index)
-            .map(|c| c.tracker(self.collection.tracker_view.clone()))
+        self.challenges.get(index).map(Challenge::tracker)
     }
 }
 #[wasm_bindgen]
@@ -103,8 +102,8 @@ impl Challenge {
     }
 }
 impl Challenge {
-    fn tracker(&self, db: impl Into<Rc<TrackerDanceCollection>>) -> Tracker {
-        let db = db.into();
+    fn tracker(&self) -> Tracker {
+        let db = Rc::clone(&self.collection.tracker_view);
         let mut teacher = Teacher::default();
         for p in &self.parts {
             teacher.add_step(p.step_wrapper.info(&db), p.repeat, p.pace);

@@ -97,22 +97,26 @@ fn check_challenge_set(challenge_ron: &str, ron_path_from_crate: &str) {
         );
         assert_eq!(
             actual, expected_ids,
-            "challenge {challenge_id}: solution detections do not match configured parts"
+            "challenge **{challenge_id}**: solution detections do not match configured parts"
         );
-        for (step, (_, subbeats_per_move)) in detected.into_iter().zip(expected) {
+        for step in &detected {
             assert!(
                 step.error < ERROR_THRESHOLD,
-                "challenge {challenge_id}: pose error {} for step {} exceeds {}",
+                "challenge **{challenge_id}**: pose error {} for step **{}** exceeds {}",
                 step.error,
                 step.id(),
                 ERROR_THRESHOLD
             );
-            assert_bpm_about_equal(
-                challenge.bpm() as usize,
-                step.bpm_with_subbeats_per_move(subbeats_per_move),
-                &challenge_id,
-            );
         }
+
+        // Check the configured beat grid and that every detected step starts on
+        // it. This catches arbitrary pose matches that don't match the beat.
+        assert_detected_starts_follow_beat_grid(
+            &video.beats(),
+            challenge.bpm() as usize,
+            detected.iter().map(|step| step.start),
+            &challenge_id,
+        );
     }
 }
 
@@ -123,11 +127,82 @@ fn fixture_path(set_id: &str, challenge_id: &str) -> PathBuf {
         .join(format!("{challenge_id}.ron"))
 }
 
-#[track_caller]
-fn assert_bpm_about_equal(expected: usize, actual: f32, challenge_id: &str) {
-    let ratio = actual / expected as f32;
+/// Validate a known video beat grid and ensure detected steps begin near
+/// monotonically advancing beats.
+///
+/// Only works for challenges with explicit beat markers configured.
+fn assert_detected_starts_follow_beat_grid(
+    beats: &[f64],
+    configured_bpm: usize,
+    starts: impl IntoIterator<Item = f64>,
+    challenge_id: &str,
+) {
+    if beats.len() < 2 {
+        return;
+    }
+
+    let intervals: Vec<_> = beats.windows(2).map(|pair| pair[1] - pair[0]).collect();
     assert!(
-        (0.7..=1.3).contains(&ratio),
-        "challenge {challenge_id}: detected BPM {actual} is not within 30% of configured BPM {expected}"
+        intervals.iter().all(|interval| *interval > 0.0),
+        "challenge {challenge_id}: beats must be strictly increasing"
     );
+    let beat_duration = intervals.iter().sum::<f64>() / intervals.len() as f64;
+    let grid_bpm = 60_000.0 / beat_duration;
+    let bpm_ratio = grid_bpm / configured_bpm as f64;
+    assert!(
+        (0.95..=1.05).contains(&bpm_ratio),
+        "challenge {challenge_id}: beat grid BPM {grid_bpm} does not match configured BPM {configured_bpm}"
+    );
+
+    // The source keypoints are sampled at video-frame cadence and the Start
+    // marker is authored manually, so permit just over one third of a beat.
+    let max_offset = beat_duration * 0.35;
+    let mut previous_beat_index = None;
+    for start in starts {
+        let (beat_index, nearest_beat) = beats
+            .iter()
+            .enumerate()
+            .min_by(|(_, left), (_, right)| {
+                (start - **left).abs().total_cmp(&(start - **right).abs())
+            })
+            .expect("at least two beats were checked above");
+        let offset = (start - *nearest_beat).abs();
+        assert!(
+            offset <= max_offset,
+            "challenge {challenge_id}: detected step start {start} is {offset:.1}ms off the nearest beat {nearest_beat}"
+        );
+        assert!(
+            previous_beat_index.is_none_or(|previous| beat_index > previous),
+            "challenge {challenge_id}: detected step starts must advance through the beat grid"
+        );
+        previous_beat_index = Some(beat_index);
+    }
+}
+
+#[cfg(test)]
+mod beat_grid_tests {
+    use super::assert_detected_starts_follow_beat_grid;
+
+    #[test]
+    fn rejects_a_low_error_pose_match_that_starts_off_beat() {
+        let result = std::panic::catch_unwind(|| {
+            assert_detected_starts_follow_beat_grid(
+                &[0.0, 600.0, 1_200.0],
+                100,
+                [300.0],
+                "off-beat-regression",
+            );
+        });
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn accepts_step_starts_near_successive_beats() {
+        assert_detected_starts_follow_beat_grid(
+            &[0.0, 600.0, 1_200.0, 1_800.0],
+            100,
+            [25.0, 1_150.0],
+            "on-beat-regression",
+        );
+    }
 }
