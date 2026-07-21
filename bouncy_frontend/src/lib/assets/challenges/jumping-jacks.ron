@@ -17,8 +17,8 @@
         beats: [2174, 2746, 3317, 3889, 4460, 5032, 5603, 6175],
         markers: {2174: Start},
       ),
-      solution_start_timestamp: 0,
-      parts: [(step: "jumping-jack", repeat: 3, subbeats_per_move: 1)],
+      solution_start_timestamp: 2174,
+      parts: [(step: "jumping-jack", repeat: 4, subbeats_per_move: 2)],
     ),
     (
       id: "bird-jacks",

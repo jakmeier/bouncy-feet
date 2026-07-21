@@ -4,8 +4,9 @@ use crate::tracker::DetectedStep;
 use crate::{StepInfo, Tracker};
 
 impl DetectedStep {
-    pub(crate) fn new(step_name: String, poses: Vec<PoseApproximation>) -> Self {
+    pub(crate) fn new(step_id: String, step_name: String, poses: Vec<PoseApproximation>) -> Self {
         Self {
+            step_id,
             step_name,
             start: poses.first().map(|p| p.timestamp).unwrap_or(0.0),
             end: poses.last().map(|p| p.timestamp).unwrap_or(0.0),
@@ -28,7 +29,8 @@ impl DetectionResult {
             partial.poses.push(pose);
             partial.update_stats();
         } else {
-            let mut new_partial = DetectedStep::new("unknown".to_owned(), vec![pose]);
+            let mut new_partial =
+                DetectedStep::new(String::new(), "unknown".to_owned(), vec![pose]);
             new_partial.update_stats();
             self.partial = Some(new_partial);
         }
@@ -39,6 +41,7 @@ impl DetectionResult {
         if let (target, Some(partial)) = (target_step, &mut self.partial) {
             if target.skeletons.len() == partial.poses.len() {
                 let mut full_step = self.partial.take().unwrap();
+                full_step.step_id = target_step.id();
                 full_step.step_name = target_step.name();
                 self.steps.push(full_step);
             }
@@ -150,7 +153,7 @@ impl Tracker {
                 }
             }
             if !pose_matches.is_empty() {
-                let detection = DetectedStep::new(step.name.clone(), pose_matches);
+                let detection = DetectedStep::new(step.id.clone(), step.name.clone(), pose_matches);
                 if detection.error < best_error {
                     // hack: only overwrite with non-idle step with idle step if we are sure
                     if !step.name.contains("Idle")

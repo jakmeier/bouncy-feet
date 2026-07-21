@@ -1,0 +1,15 @@
+{
+  "videoUrl": "https://app.bouncy-feet.ch/media/videos/challenges/jumping_jacks/jj_00.mp4",
+  "capturedAt": "2026-07-21T14:05:24.675Z",
+  "range": {
+    "semantics": "inclusive [startMs, endMs]",
+    "startMs": 2174,
+    "endMs": 6175
+  },
+  "mediaPipe": {
+    "package": "@mediapipe/tasks-vision 0.10.21",
+    "wasm": "@mediapipe/tasks-vision 0.10.18 CDN",
+    "model": "pose_landmarker_lite.task"
+  },
+  "frameCount": 121
+}

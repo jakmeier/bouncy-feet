@@ -18,7 +18,8 @@
     "test:e2e:prod": " dotenv -e .env.production playwright test",
     "test:unit": "vitest",
     "openapi-generate": "openapi-ts -i peertube-openapi.yaml -o src/lib/peertube-openapi",
-    "openapi-download": "wget -O peertube-openapi.yaml https://raw.githubusercontent.com/Chocobozzz/PeerTube/refs/heads/develop/support/doc/api/openapi.yaml"
+    "openapi-download": "wget -O peertube-openapi.yaml https://raw.githubusercontent.com/Chocobozzz/PeerTube/refs/heads/develop/support/doc/api/openapi.yaml",
+    "export:challenge-keypoints": "node scripts/export-challenge-keypoints.mjs"
   },
   "devDependencies": {
     "@hey-api/openapi-ts": "0.83.1",
