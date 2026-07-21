@@ -1,5 +1,5 @@
 <script>
-  import { onDestroy } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
   import { PoseFileWrapper, Tracker } from '$lib/instructor/bouncy_instructor';
   import { PoseDetection, landmarksToKeypoints } from '$lib/pose';
   import { fileToUrl } from '$lib/promise_util';
@@ -9,10 +9,24 @@
   import Svg from '../avatar/Svg.svelte';
   import SvgAvatar2 from '../avatar/SvgAvatar2.svelte';
 
+  /** @type {string} */
   const defaultVideo =
     'https://app.bouncy-feet.ch/media/videos/challenges/jumping_jack.mp4';
 
-  let videoUrl = $state(defaultVideo);
+  /**
+   * @typedef {Object} Props
+   * @property {string} [initialVideoUrl]
+   * @property {number[]} [initialBeats]
+   * @property {number} [initialStartTimestamp]
+   */
+  /** @type {Props} */
+  let {
+    initialVideoUrl = defaultVideo,
+    initialBeats = [],
+    initialStartTimestamp = 0,
+  } = $props();
+
+  let videoUrl = $state(initialVideoUrl);
   let video = $state();
   let videoWidth = $state(0);
   let videoHeight = $state(0);
@@ -31,8 +45,8 @@
   let stepName = $state('Jumping jack');
   let jumpHeight = $state('1.0');
   /** @type {number[]} */
-  let beats = $state([]);
-  let startTimestamp = $state(0);
+  let beats = $state(initialBeats);
+  let startTimestamp = $state(initialStartTimestamp);
   /** @type {{id: string, pose: import('bouncy_instructor').PoseWrapper}[]} */
   let captured = $state([]);
   /** @type {{id: string, jumpHeight: string}[]} */
@@ -41,6 +55,7 @@
   let request = 0;
 
   onDestroy(() => detector?.close());
+  onMount(() => loadUrl());
 
   function videoTime() {
     return Math.round((video?.currentTime || 0) * 1000);
