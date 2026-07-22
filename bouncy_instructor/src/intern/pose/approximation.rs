@@ -39,11 +39,16 @@ impl Tracker {
     }
 
     /// Find the best matching approximation of the given pose in the given range.
+    ///
+    /// Combines spatial and timely errors. Spatial error are the acceptance
+    /// criterion and the reported error, but similarly good frames are biased
+    /// towards `expected_timestamp`.
     pub(crate) fn find_pose(
         &self,
         pose_index: usize,
         start: Timestamp,
         end: Timestamp,
+        expected_timestamp: Timestamp,
         db: &TrackerDanceCollection,
     ) -> Option<PoseApproximation> {
         let first = self.timestamps.partition_point(|t| *t < start);
@@ -56,8 +61,13 @@ impl Tracker {
             return None;
         }
         let mut best_error = f32::INFINITY;
+        let mut best_score = f32::INFINITY;
         let mut best_details = ErrorDetails::default();
         let mut history_index = 0;
+        let timing_scale = (expected_timestamp - start)
+            .abs()
+            .max((end - expected_timestamp).abs())
+            .max(f64::EPSILON);
 
         for i in first..last {
             let pose = &db.poses()[pose_index];
@@ -68,8 +78,12 @@ impl Tracker {
 
             let details = pose.skeleton_error(skeleton);
             let error = details.error_score();
-            if error < best_error {
+            let timing_error =
+                ((self.timestamps[i] - expected_timestamp).abs() / timing_scale) as f32;
+            let score = timed_pose_score(error, timing_error);
+            if score < best_score {
                 best_error = error;
+                best_score = score;
                 best_details = details;
                 history_index = i;
             }
@@ -101,13 +115,6 @@ impl Tracker {
             Ok(i) | Err(i) => &self.skeletons[i],
         };
 
-        // for debugging, quite useful for now
-        for (limb_index, _limb) in self.db.limbs() {
-            let name = self.db.limb_name(limb_index);
-            let angle = skeleton.angles()[limb_index.as_usize()];
-            crate::println!("{name}: {angle:?}");
-        }
-
         self.db
             .poses()
             .iter()
@@ -123,5 +130,25 @@ impl Tracker {
                 }
             })
             .collect()
+    }
+}
+
+fn timed_pose_score(pose_error: f32, timing_error: f32) -> f32 {
+    const TIMING_WEIGHT: f32 = 0.25;
+    pose_error + TIMING_WEIGHT * timing_error
+}
+
+#[cfg(test)]
+mod timing_tests {
+    use super::timed_pose_score;
+
+    #[test]
+    fn slightly_worse_pose_on_time_beats_closest_pose_off_time() {
+        assert!(timed_pose_score(0.10, 0.0) < timed_pose_score(0.05, 1.0));
+    }
+
+    #[test]
+    fn timing_does_not_hide_a_bad_pose() {
+        assert!(timed_pose_score(0.50, 0.0) > timed_pose_score(0.05, 1.0));
     }
 }

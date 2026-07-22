@@ -263,8 +263,10 @@ impl Tracker {
 
     /// Goes over all data and detects the best fitting dance.
     ///
-    /// There is no re-use or consistency between calls. It always starts at 0
-    /// and computes the global best fit.
+    /// A tracker with a finite teacher sequence matches that configured order
+    /// and pace. Freestyle trackers search all registered steps. There is no
+    /// re-use or consistency between calls. It always starts at the first
+    /// recorded frame.
     ///
     /// Use [`Tracker::run_detection`] for incremental detection.
     #[wasm_bindgen(js_name = detectDance)]
@@ -272,12 +274,17 @@ impl Tracker {
         let mut start = 0;
         let end = self.timestamps.len();
 
-        let mut out = vec![];
-        while let Some(step) = self.find_first_step(start, end) {
-            let end_t = step.end;
-            start = start + self.timestamps[start..end].partition_point(|t| *t <= end_t);
-            out.push(step);
-        }
+        let out = if let Some(configured) = self.detect_configured_steps(start, end) {
+            configured
+        } else {
+            let mut detected = vec![];
+            while let Some(step) = self.find_first_step(start, end) {
+                let end_t = step.end;
+                start += self.timestamps[start..end].partition_point(|t| *t <= end_t);
+                detected.push(step);
+            }
+            detected
+        };
         // TODO: dance detection is untested and unused at the moment
         let cursor = DanceCursor {
             // TODO: does not take pace into consideration

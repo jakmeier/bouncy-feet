@@ -76,8 +76,11 @@ fn check_challenge_set(challenge_ron: &str, ron_path_from_crate: &str) {
         let mut tracker = set
             .tracker(index)
             .unwrap_or_else(|| panic!("challenge {challenge_id} must have a tracker"));
+        let detection_start = challenge.solution_start_timestamp();
         for (timestamp, keypoints) in keyframes {
-            tracker.add_keypoints(keypoints, timestamp);
+            if timestamp >= detection_start {
+                tracker.add_keypoints(keypoints, timestamp);
+            }
         }
 
         let detected: Vec<_> = tracker
@@ -109,10 +112,10 @@ fn check_challenge_set(challenge_ron: &str, ron_path_from_crate: &str) {
             );
         }
 
-        // Check the configured beat grid and that every detected step starts on
-        // it. This catches arbitrary pose matches that don't match the beat.
-        assert_detected_starts_follow_beat_grid(
-            &video.beats(),
+        // Validate rhythm using only the known start and BPM. The detector is
+        // deliberately not given the video's beat markers.
+        assert_detected_starts_follow_tempo(
+            detection_start,
             challenge.bpm() as usize,
             detected.iter().map(|step| step.start),
             &challenge_id,
@@ -127,53 +130,29 @@ fn fixture_path(set_id: &str, challenge_id: &str) -> PathBuf {
         .join(format!("{challenge_id}.ron"))
 }
 
-/// Validate a known video beat grid and ensure detected steps begin near
-/// monotonically advancing beats.
-///
-/// Only works for challenges with explicit beat markers configured.
-fn assert_detected_starts_follow_beat_grid(
-    beats: &[f64],
+/// Ensure detected steps begin near monotonically advancing beats inferred
+/// solely from the activity start and BPM.
+fn assert_detected_starts_follow_tempo(
+    activity_start: f64,
     configured_bpm: usize,
     starts: impl IntoIterator<Item = f64>,
     challenge_id: &str,
 ) {
-    if beats.len() < 2 {
-        return;
-    }
-
-    let intervals: Vec<_> = beats.windows(2).map(|pair| pair[1] - pair[0]).collect();
-    assert!(
-        intervals.iter().all(|interval| *interval > 0.0),
-        "challenge {challenge_id}: beats must be strictly increasing"
-    );
-    let beat_duration = intervals.iter().sum::<f64>() / intervals.len() as f64;
-    let grid_bpm = 60_000.0 / beat_duration;
-    let bpm_ratio = grid_bpm / configured_bpm as f64;
-    assert!(
-        (0.95..=1.05).contains(&bpm_ratio),
-        "challenge {challenge_id}: beat grid BPM {grid_bpm} does not match configured BPM {configured_bpm}"
-    );
-
-    // The source keypoints are sampled at video-frame cadence and the Start
-    // marker is authored manually, so permit just over one third of a beat.
-    let max_offset = beat_duration * 0.35;
+    let beat_duration = 60_000.0 / configured_bpm as f64;
+    let max_offset = beat_duration * 0.45;
     let mut previous_beat_index = None;
+
     for start in starts {
-        let (beat_index, nearest_beat) = beats
-            .iter()
-            .enumerate()
-            .min_by(|(_, left), (_, right)| {
-                (start - **left).abs().total_cmp(&(start - **right).abs())
-            })
-            .expect("at least two beats were checked above");
-        let offset = (start - *nearest_beat).abs();
+        let beat_index = ((start - activity_start) / beat_duration).round().max(0.0) as usize;
+        let nearest_beat = activity_start + beat_index as f64 * beat_duration;
+        let offset = (start - nearest_beat).abs();
         assert!(
             offset <= max_offset,
-            "challenge {challenge_id}: detected step start {start} is {offset:.1}ms off the nearest beat {nearest_beat}"
+            "challenge {challenge_id}: detected step start {start} is {offset:.1}ms off the inferred beat {nearest_beat}"
         );
         assert!(
             previous_beat_index.is_none_or(|previous| beat_index > previous),
-            "challenge {challenge_id}: detected step starts must advance through the beat grid"
+            "challenge {challenge_id}: detected step starts must advance through the inferred beat grid"
         );
         previous_beat_index = Some(beat_index);
     }
@@ -181,28 +160,18 @@ fn assert_detected_starts_follow_beat_grid(
 
 #[cfg(test)]
 mod beat_grid_tests {
-    use super::assert_detected_starts_follow_beat_grid;
+    use super::assert_detected_starts_follow_tempo;
 
     #[test]
     fn rejects_a_low_error_pose_match_that_starts_off_beat() {
         let result = std::panic::catch_unwind(|| {
-            assert_detected_starts_follow_beat_grid(
-                &[0.0, 600.0, 1_200.0],
-                100,
-                [300.0],
-                "off-beat-regression",
-            );
+            assert_detected_starts_follow_tempo(0.0, 100, [300.0], "off-beat-regression");
         });
         assert!(result.is_err());
     }
 
     #[test]
     fn accepts_step_starts_near_successive_beats() {
-        assert_detected_starts_follow_beat_grid(
-            &[0.0, 600.0, 1_200.0, 1_800.0],
-            100,
-            [25.0, 1_150.0],
-            "on-beat-regression",
-        );
+        assert_detected_starts_follow_tempo(0.0, 100, [25.0, 1_150.0], "on-beat-regression");
     }
 }

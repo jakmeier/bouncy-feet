@@ -237,6 +237,28 @@ impl Teacher {
         self.total_subbeats
     }
 
+    /// The finite sequence expected from the dancer, including repetitions.
+    ///
+    /// Freestyle and demonstration sections cannot be used to constrain
+    /// offline dance detection, so return `None` when either is present.
+    pub(crate) fn tracked_step_sequence(&self) -> Option<Vec<(StepInfo, u32)>> {
+        let mut result = Vec::new();
+        for section in &self.sections {
+            let Section::Step(step_section) = section else {
+                return None;
+            };
+            let repetitions = section.num_steps();
+            result.extend(std::iter::repeat_n(
+                (
+                    step_section.step.clone(),
+                    step_section.pace.subbeats_per_pose(),
+                ),
+                repetitions as usize,
+            ));
+        }
+        (!result.is_empty()).then_some(result)
+    }
+
     /// number of subbeats to delay
     pub(crate) fn subbeats_before_tracking(&self) -> u32 {
         let mut delay = 0;

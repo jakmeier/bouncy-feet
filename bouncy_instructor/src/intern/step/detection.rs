@@ -50,67 +50,34 @@ impl DetectionResult {
 }
 
 impl Tracker {
-    /// find the first step that can be matched in the given range
+    /// Find the first complete step that can be matched in the given range.
     pub(crate) fn find_first_step(&self, mut start: usize, end: usize) -> Option<DetectedStep> {
-        if start + 1 > self.timestamps.len() {
+        let end = end.min(self.timestamps.len());
+        if start >= end {
             return None;
         }
-        let end = end.min(self.timestamps.len());
         let dt = 60_000.0 / self.detector.bpm;
         let min_dt = (dt * 0.5).round() as f64;
         let max_dt = (dt * 1.5).round() as f64;
-
-        let threshold = 0.2;
-        let pose_window_ms = max_dt;
-        // let step_window_ms = dt;
-
-        // hack: only return idle if nothing else was found
+        // Only return idle if no non-idle step is found.
         let mut idle_result = None;
-
-        // pre-conditions:
-        //   timestamps are sorted in increasing order
-        // loop invariants:
-        //   i0 start_t >= timestamps[start]
-        //   i1 start_t <= timestamps[start+1]
-        //   (assume `timestamps[n] = INFINITY` if n >= timestamps.len())
-        // loop variant:
-        //   v0 start increases every iteration
-        let mut start_t = self.timestamps[start];
-        // i0 holds because of above assignment, i1 because of the pre-condition
-        while start < self.timestamps.len() {
-            let end_t = (start_t + pose_window_ms).min(self.timestamps[end - 1]);
-            let first_pose_candidate = self.best_fit_pose(start_t, end_t);
-            if first_pose_candidate
-                .as_ref()
-                .is_some_and(|p| p.error <= threshold)
-            {
-                // a pose was found, let's try to find a step starting around that time frame
-                let step_start_t = first_pose_candidate.unwrap().timestamp;
-                let step_start_index =
-                    start + self.timestamps[start..end].partition_point(|t| *t < step_start_t);
-                if let Some(step) = self.detect_step(step_start_index, min_dt, max_dt, &self.db) {
+        while start < end {
+            if let Some(step) = self.detect_step(start, min_dt, max_dt, &self.db) {
+                // `find_pose` permits errors below 1.0 so it can construct a
+                // full sequence. Require a strong match for the first pose to
+                // avoid accepting arbitrary frame windows as step starts.
+                if step.poses.first().is_some_and(|pose| pose.error <= 0.2) {
                     if !step.step_name.contains("Idle") {
                         return Some(step);
-                    } else if idle_result.is_none() {
-                        idle_result = Some(step)
+                    }
+                    if idle_result.is_none() {
+                        idle_result = Some(step);
                     }
                 }
-                // no step follows that pose, move search window to be after the pose just checked
-                // TODO: should the pose be recorded and the search window moved by min_dt?
-                // satisfies v0
-                start = step_start_index + 1;
-                // recover i0 and i1
-                start_t = *self.timestamps.get(start).unwrap_or(&f64::MAX);
-            } else {
-                // couldn't even match a pose, shift search window by one window length
-                start_t += pose_window_ms;
-                // recover i0 and i1, plus:
-                // start_t just increased
-                // => timestamps[start] < start_t
-                // => the partition point can't be 0
-                // => satisfies v0
-                start = start + self.timestamps[start..end].partition_point(|t| *t < start_t);
             }
+            // Do not jump past a different, lower-error pose: it might be a
+            // later keyframe while this frame can still lead to a full step.
+            start += 1;
         }
 
         idle_result
@@ -135,34 +102,24 @@ impl Tracker {
         max_dt: f64,
         db: &TrackerDanceCollection,
     ) -> Option<DetectedStep> {
-        let mut best_error = f32::INFINITY;
+        let expected_dt = (min_dt + max_dt) / 2.0;
+        let mut best_score = f32::INFINITY;
+        let mut best_pose_error = f32::INFINITY;
         let mut result = None;
 
         for step in db.steps() {
-            let mut pose_matches = vec![];
-            let mut start_t = self.timestamps[start];
-            let mut end_t = start_t + max_dt;
-            for pose in &step.poses {
-                if let Some(pose_match) = self.find_pose(*pose, start_t, end_t, db) {
-                    start_t = pose_match.timestamp + min_dt;
-                    end_t = pose_match.timestamp + max_dt;
-                    pose_matches.push(pose_match);
-                } else {
-                    pose_matches.clear();
-                    break;
-                }
-            }
-            if !pose_matches.is_empty() {
-                let detection = DetectedStep::new(step.id.clone(), step.name.clone(), pose_matches);
-                if detection.error < best_error {
+            if let Some(detection) = self.detect_specific_step(start, min_dt, max_dt, step, db) {
+                let score = step_match_score(&detection, expected_dt);
+                if score < best_score {
                     // hack: only overwrite with non-idle step with idle step if we are sure
                     if !step.name.contains("Idle")
                         || result
                             .as_ref()
                             .is_some_and(|r: &DetectedStep| r.step_name.contains("Idle"))
-                        || (best_error > 0.2 && detection.error < 0.075)
+                        || (best_pose_error > 0.2 && detection.error < 0.075)
                     {
-                        best_error = detection.error;
+                        best_score = score;
+                        best_pose_error = detection.error;
                         result = Some(detection);
                     }
                 }
@@ -170,6 +127,153 @@ impl Tracker {
         }
         result
     }
+
+    fn detect_specific_step(
+        &self,
+        start: usize,
+        min_dt: f64,
+        max_dt: f64,
+        step: &crate::intern::step::Step,
+        db: &TrackerDanceCollection,
+    ) -> Option<DetectedStep> {
+        let expected_dt = (min_dt + max_dt) / 2.0;
+        let mut pose_matches = Vec::with_capacity(step.poses.len());
+        let mut start_t = self.timestamps[start];
+        let mut end_t = start_t + max_dt;
+        let mut expected_t = start_t;
+
+        for pose in &step.poses {
+            let pose_match = self.find_pose(*pose, start_t, end_t, expected_t, db)?;
+            expected_t = pose_match.timestamp + expected_dt;
+            start_t = pose_match.timestamp + min_dt;
+            end_t = pose_match.timestamp + max_dt;
+            pose_matches.push(pose_match);
+        }
+
+        Some(DetectedStep::new(
+            step.id.clone(),
+            step.name.clone(),
+            pose_matches,
+        ))
+    }
+
+    /// Detect the finite sequence configured by a teacher. Returning `None`
+    /// means this tracker is freestyle and should use unconstrained detection.
+    pub(crate) fn detect_configured_steps(
+        &self,
+        mut start: usize,
+        end: usize,
+    ) -> Option<Vec<DetectedStep>> {
+        let sequence = self.detector.teacher.tracked_step_sequence()?;
+        let mut detections = Vec::with_capacity(sequence.len());
+        let mut next_scheduled_start = None;
+
+        for (target, subbeats_per_pose) in sequence {
+            let expected_dt = self.detector.subbeat_time() * subbeats_per_pose as f64;
+            let detection = if let Some(scheduled_start) = next_scheduled_start {
+                self.find_specific_step_near(start, end, &target, expected_dt, scheduled_start)
+            } else {
+                self.find_first_specific_step(start, end, &target, expected_dt)
+            };
+            let Some(detection) = detection else {
+                break;
+            };
+
+            // Anchor the sequence to its first observed movement. Anchoring to
+            // each previous match would accumulate frame-selection drift.
+            next_scheduled_start = Some(
+                next_scheduled_start.unwrap_or(detection.start)
+                    + expected_dt * target.num_poses() as f64,
+            );
+            start += self.timestamps[start..end]
+                .partition_point(|timestamp| *timestamp <= detection.end);
+            detections.push(detection);
+        }
+        Some(detections)
+    }
+
+    fn find_specific_step_near(
+        &self,
+        start: usize,
+        end: usize,
+        target: &StepInfo,
+        expected_dt: f64,
+        scheduled_start: f64,
+    ) -> Option<DetectedStep> {
+        const START_TIMING_WEIGHT: f32 = 0.5;
+        let earliest = scheduled_start - expected_dt * 0.5;
+        let latest = scheduled_start + expected_dt * 0.5;
+        let first = start + self.timestamps[start..end].partition_point(|t| *t < earliest);
+        let last = start + self.timestamps[start..end].partition_point(|t| *t <= latest);
+        let step = self.db.step(&target.id())?;
+        let min_dt = (expected_dt * 0.5).round();
+        let max_dt = (expected_dt * 1.5).round();
+        let mut best = None;
+        let mut best_score = f32::INFINITY;
+
+        for candidate_start in first..last {
+            let Some(detection) =
+                self.detect_specific_step(candidate_start, min_dt, max_dt, step, &self.db)
+            else {
+                continue;
+            };
+            if detection.poses.first().is_none_or(|pose| pose.error >= 1.0)
+                || detection.start > latest
+            {
+                continue;
+            }
+            let start_error = ((detection.start - scheduled_start).abs() / expected_dt) as f32;
+            let score =
+                step_match_score(&detection, expected_dt) + START_TIMING_WEIGHT * start_error;
+            if score < best_score {
+                best_score = score;
+                best = Some(detection);
+            }
+        }
+        best
+    }
+
+    fn find_first_specific_step(
+        &self,
+        mut start: usize,
+        end: usize,
+        target: &StepInfo,
+        expected_dt: f64,
+    ) -> Option<DetectedStep> {
+        let step = self.db.step(&target.id())?;
+        let min_dt = (expected_dt * 0.5).round();
+        let max_dt = (expected_dt * 1.5).round();
+
+        while start < end {
+            if let Some(detection) =
+                self.detect_specific_step(start, min_dt, max_dt, step, &self.db)
+            {
+                if detection.poses.first().is_some_and(|pose| pose.error < 1.0) {
+                    return Some(detection);
+                }
+            }
+            start += 1;
+        }
+        None
+    }
+}
+
+/// Keep the public pose error spatial-only, while using rhythm to rank otherwise
+/// plausible complete steps.
+fn step_match_score(step: &DetectedStep, expected_dt: f64) -> f32 {
+    const TIMING_WEIGHT: f32 = 0.25;
+    let timing_error = if step.poses.len() < 2 {
+        0.0
+    } else {
+        step.poses
+            .windows(2)
+            .map(|poses| {
+                ((poses[1].timestamp - poses[0].timestamp - expected_dt).abs() / expected_dt) as f32
+            })
+            .sum::<f32>()
+            / (step.poses.len() - 1) as f32
+    };
+    step.error + TIMING_WEIGHT * timing_error
 }
 
 // Tests below check basic step detection has no major bugs. They are not
