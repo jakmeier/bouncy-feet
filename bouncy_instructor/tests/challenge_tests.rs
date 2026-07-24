@@ -14,6 +14,15 @@ fn jumping_jacks_solutions_match_their_configuration() {
     );
 }
 
+#[test]
+fn challenge_tracker_exposes_expected_poses_not_subbeats() {
+    let set = parse_challenge_str(CHALLENGE_RON, "en").unwrap();
+    let tracker = set.tracker(0).unwrap();
+
+    assert_eq!(tracker.expected_poses(), 8);
+    assert_eq!(tracker.tracked_subbeats(), 16);
+}
+
 /// Replays every challenge fixture.
 fn check_challenge_set(challenge_ron: &str, ron_path_from_crate: &str) {
     let set = parse_challenge_str(challenge_ron, "en")

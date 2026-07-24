@@ -139,6 +139,21 @@
             "own-music-button": "Ich habe meine eigene Musik"
         }
     },
+    "challenges": {
+        "not-found": "Challenge nicht gefunden",
+        "solution-video": "Lösungsvideo",
+        "start-description": "Führe jeden Move in einem durchgehenden Lauf im Takt aus.",
+        "start-button": "Challenge starten",
+        "edit-in-author-button": "Challenge bearbeiten",
+        "completed-title": "Challenge geschafft!",
+        "not-completed-title": "Noch nicht geschafft",
+        "completion-saved": "Geschafft und gespeichert.",
+        "retry-description": "Führe jeden Move in einem Lauf im Takt aus und versuche es dann erneut.",
+        "review-hint": "Deine Aufnahme bleibt auf diesem Gerät.",
+        "review-unavailable": "Für diesen Versuch ist kein Review-Video verfügbar.",
+        "retry-button": "Nochmals versuchen",
+        "back-button": "Zurück zu den Challenges"
+    },
     "leaderboard": {
         "user-header": "Tänzer/in",
         "steps-header": "Schritte"

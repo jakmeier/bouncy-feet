@@ -329,6 +329,11 @@ impl Tracker {
         self.detector.teacher.tracked_subbeats()
     }
 
+    #[wasm_bindgen(getter, js_name = expectedPoses)]
+    pub fn expected_poses(&self) -> u32 {
+        self.detector.teacher.expected_poses()
+    }
+
     #[wasm_bindgen(js_name = nextSubbeat)]
     pub fn next_sub_beat(&self, now: Option<Timestamp>) -> Timestamp {
         let now = now.unwrap_or_else(|| *self.timestamps.last().unwrap_or(&0.0));

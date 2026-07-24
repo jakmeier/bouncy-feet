@@ -864,6 +864,8 @@ export class Tracker {
   poseHint(): PoseHint;
   exportFrame(timestamp: number): ExportedFrame;
   exportKeypoints(): string;
+  /** Number of individual expected poses, excluding unconstrained sections. */
+  readonly expectedPoses: number;
   readonly lastDetection: DetectionResult;
   readonly detectionState: ReadableDetectionState;
   readonly trackedSubbeats: number;
@@ -969,6 +971,7 @@ export interface InitOutput {
   readonly tracker_enforceBeat: (a: number, b: number) => void;
   readonly tracker_expectedJumpHeight: (a: number) => number;
   readonly tracker_expectedPoseBodyShift: (a: number) => number;
+  readonly tracker_expectedPoses: (a: number) => number;
   readonly tracker_expectedPoseSkeleton: (a: number) => number;
   readonly tracker_finishTracking: (a: number) => void;
   readonly tracker_hipPosition: (a: number, b: number) => number;

@@ -25,6 +25,7 @@
    * @property {number} recordingStart
    * @property {number} recordingEnd
    * @property {import("bouncy_instructor").DetectedStep[]} [detectedSteps]
+   * @property {string} [reviewHint]
    */
 
   /** @type {Props} */
@@ -33,6 +34,7 @@
     recordingStart,
     recordingEnd,
     detectedSteps = [],
+    reviewHint = undefined,
   } = $props();
 
   let videoSrcWidth = $state(0);
@@ -209,6 +211,9 @@ once per 250ms. -->
 
 <LightSection>
   <h2>{$t('record.review-title')}</h2>
+  {#if reviewHint}
+    <span class=bubble>{$t(reviewHint)}</span>
+  {/if}
 
   <div class="upper">
     <CornerMarker>
@@ -379,5 +384,17 @@ once per 250ms. -->
     /* background-color: var(--theme-neutral-black); */
     padding: 1rem;
     color: var(--theme-accent);
+  }
+
+  .bubble {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    width: fit-content;
+    padding: 0.25rem 0.55rem;
+    border-radius: 9999px;
+    background: var(--theme-neutral-almost-black);
+    color: var(--theme-neutral-white);
+    font-size: var(--font-small);
   }
 </style>

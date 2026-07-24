@@ -4,8 +4,10 @@
   import { dev } from '$lib/stores/FeatureSelection';
   import StandardPage from '$lib/components/ui/StandardPage.svelte';
   import LiveActivity from '$lib/components/activity/LiveActivity.svelte';
+  import VideoReview from '$lib/components/review/VideoReview.svelte';
   import { registerTracker, setBpm } from '$lib/stores/Beat';
   import { completeChallenge } from '$lib/challengeProgress.js';
+  import { t } from '$lib/i18n';
 
   let { data } = $props();
   const { getSet } = getContext('challengeSets');
@@ -24,6 +26,14 @@
   let started = $state(false);
   let finished = $state(false);
   let succeeded = $state(false);
+  /** @type {import('$lib/instructor/bouncy_instructor').DetectionResult | undefined} */
+  let detection = $state();
+  /** @type {number | undefined} */
+  let recordingStart = $state();
+  /** @type {number | undefined} */
+  let recordingEnd = $state();
+  /** @type {string | undefined} */
+  let reviewVideoSrc = $state();
   let tracker = challenge ? set.tracker(challengeIndex) : undefined;
   // registerTracker establishes Svelte context, so it must run while this
   // component is being initialised (not later from the click handler).
@@ -37,16 +47,29 @@
   }
 
   /**
-   * @param {import('$lib/instructor/bouncy_instructor').DetectionResult} detection
+   * @param {import('$lib/instructor/bouncy_instructor').DetectionResult} newDetection
+   * @param {number} newRecordingStart
+   * @param {number} newRecordingEnd
+   * @param {string} newVideoUrl
    */
-  async function onDone(detection) {
+  async function onDone(
+    newDetection,
+    newRecordingStart,
+    newRecordingEnd,
+    newVideoUrl
+  ) {
+    detection = newDetection;
+    recordingStart = newRecordingStart;
+    recordingEnd = newRecordingEnd;
+    reviewVideoSrc = newVideoUrl;
     finished = true;
-    // `forceBeat` records every expected beat. A complete challenge therefore
-    // needs one match for every configured subbeat and no forced misses.
+
+    // `poseMatches` counts poses, whereas `trackedSubbeats` counts timing
+    // intervals. Compare matches with the tracker-provided pose count instead.
     succeeded =
       Boolean(detection) &&
       detection.poseMisses === 0 &&
-      detection.poseMatches >= tracker.trackedSubbeats;
+      detection.poseMatches >= tracker.expectedPoses;
     if (succeeded && user.apiUser) {
       await completeChallenge(user.apiUser, set, challenge.id);
       user.apiUser.submitActivity(
@@ -56,8 +79,17 @@
     }
   }
 
+  function clearReview() {
+    if (reviewVideoSrc) URL.revokeObjectURL(reviewVideoSrc);
+    detection = undefined;
+    recordingStart = undefined;
+    recordingEnd = undefined;
+    reviewVideoSrc = undefined;
+  }
+
   function retry() {
     tracker.clear();
+    clearReview();
     finished = false;
     succeeded = false;
     started = false;
@@ -73,12 +105,15 @@
     return `/dev/challenge-author?${params}`;
   }
 
-  onDestroy(() => unregisterTracker?.());
+  onDestroy(() => {
+    clearReview();
+    unregisterTracker?.();
+  });
 </script>
 
 <StandardPage backButton title={challenge.name}>
   {#if !challenge}
-    <h1>Challenge not found</h1>
+    <h1>{$t('challenges.not-found')}</h1>
   {:else if !started}
     <p>{challenge.explanation || ''}</p>
     <p><strong>{challenge.bpm} BPM</strong></p>
@@ -86,15 +121,15 @@
     <video
       controls
       src={challenge.solutionVideo.path()}
-      aria-label={`${challenge.name} solution video`}
+      aria-label={`${challenge.name} ${$t('challenges.solution-video')}`}
     ></video>
-    <p>Complete every move in one uninterrupted, on-beat run.</p>
-    <button onclick={start}>Start challenge</button>
+    <p>{$t('challenges.start-description')}</p>
+    <button onclick={start}>{$t('challenges.start-button')}</button>
     {#if $dev}
       <button
         class="author-button"
         onclick={() => goto(challengeAuthorHref(challenge))}
-        >Edit in challenge author</button
+        >{$t('challenges.edit-in-author-button')}</button
       >
     {/if}
   {:else if !finished}
@@ -102,14 +137,25 @@
       <LiveActivity {onDone} teacherVideo={challenge.solutionVideo.path()} />
     </div>
   {:else}
-    <h1>{succeeded ? 'Challenge completed!' : 'Not completed yet'}</h1>
+    <h1>
+      {$t(succeeded ? 'challenges.completed-title' : 'challenges.not-completed-title')}
+    </h1>
     <p>
-      {succeeded
-        ? 'Your completion has been saved.'
-        : 'Complete every move on beat in one run, then try again.'}
+      {$t(succeeded ? 'challenges.completion-saved' : 'challenges.retry-description')}
     </p>
-    <button onclick={retry}>Try again</button>
-    <a href={`/challenges/${set.id}`}>Back to challenges</a>
+    {#if detection && recordingStart !== undefined && recordingEnd !== undefined}
+      <VideoReview
+        reviewVideoSrc={reviewVideoSrc || ''}
+        detectedSteps={detection.steps()}
+        reviewHint="challenges.review-hint"
+        {recordingStart}
+        {recordingEnd}
+      />
+    {:else}
+      <p>{$t('challenges.review-unavailable')}</p>
+    {/if}
+    <button onclick={retry}>{$t('challenges.retry-button')}</button>
+    <a href={`/challenges/${set.id}`}>{$t('challenges.back-button')}</a>
   {/if}
 </StandardPage>
 

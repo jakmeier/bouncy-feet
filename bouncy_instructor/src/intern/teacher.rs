@@ -232,9 +232,26 @@ impl Teacher {
         self.total_subbeats = self.sections.iter().map(|section| section.subbeats()).sum();
     }
 
-    /// How many beats to track for in total
+    /// How many subbeats to track for in total.
     pub(crate) fn tracked_subbeats(&self) -> u32 {
         self.total_subbeats
+    }
+
+    /// How many individual poses the tracker expects to evaluate.
+    ///
+    /// This deliberately excludes demonstration and freestyle sections: they
+    /// do not have a fixed pose target. Unlike `tracked_subbeats`, this count
+    /// is in the same unit as `DetectionResult::pose_matches`.
+    pub(crate) fn expected_poses(&self) -> u32 {
+        self.sections
+            .iter()
+            .filter(|section| section.is_tracked())
+            .filter_map(|section| {
+                section
+                    .pose_duration()
+                    .map(|duration| section.subbeats() / duration)
+            })
+            .sum()
     }
 
     /// The finite sequence expected from the dancer, including repetitions.

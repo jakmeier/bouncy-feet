@@ -382,6 +382,7 @@ export const tracker_enforceBeat: (a: number, b: number) => void;
 export const tracker_expectedJumpHeight: (a: number) => number;
 export const tracker_expectedPoseBodyShift: (a: number) => number;
 export const tracker_expectedPoseSkeleton: (a: number) => number;
+export const tracker_expectedPoses: (a: number) => number;
 export const tracker_exportFrame: (a: number, b: number) => number;
 export const tracker_exportKeypoints: (a: number, b: number) => void;
 export const tracker_finishTracking: (a: number) => void;
