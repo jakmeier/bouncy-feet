@@ -6,9 +6,10 @@ test('jumping-jacks preview uses its recorded video and starts an attempt', asyn
   const video = page.getByLabel('Jumping jacks solution video');
   await expect(video).toHaveAttribute(
     'src',
-    'https://app.bouncy-feet.ch/media/videos/challenges/jumping_jack.mp4',
+    'https://app.bouncy-feet.ch/media/videos/challenges/jumping_jacks/jj_00.mp4',
   );
 
+  await page.getByRole('button', { name: 'Continue as guest' }).click();
   await page.getByRole('button', { name: 'Start challenge' }).click();
   await expect(page.getByTestId('challenge-live')).toBeVisible();
 });

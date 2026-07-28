@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 test('index page has expected h1', async ({ page }) => {
     await page.goto('/');
-    await expect(page.getByRole('heading', { name: 'Hey hey! :)' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Have we met before?' })).toBeVisible();
 });
 
 test('guest can see users', async ({ page }) => {
