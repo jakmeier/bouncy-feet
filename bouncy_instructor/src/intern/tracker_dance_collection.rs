@@ -116,12 +116,6 @@ impl TrackerDanceCollection {
         Ok(())
     }
 
-    pub(crate) fn add_foreign_pose_by_id(&mut self, other: &Self, foreign_pose_id: &str) {
-        if let Some(index) = other.pose_by_id(foreign_pose_id) {
-            self.add_foreign_pose(other, index);
-        }
-    }
-
     /// Copies a pose from a different dance collection
     fn add_foreign_pose(&mut self, other: &Self, foreign_pose_index: usize) -> usize {
         let pose = &other.poses()[foreign_pose_index];
@@ -579,5 +573,32 @@ pub enum ForeignCollectionError {
 impl From<ForeignCollectionError> for wasm_bindgen::JsValue {
     fn from(value: ForeignCollectionError) -> Self {
         format!("{value}").into()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Built-in positioning poses rely on these base limb indices never changing.
+    #[test]
+    fn base_limb_indices_are_stable() {
+        let db = TrackerDanceCollection::default();
+        let expected = [
+            (Limb::LEFT_THIGH, pose_file::Limb::LeftThigh),
+            (Limb::LEFT_SHIN, pose_file::Limb::LeftShin),
+            (Limb::LEFT_FOOT, pose_file::Limb::LeftFoot),
+            (Limb::LEFT_ARM, pose_file::Limb::LeftArm),
+            (Limb::LEFT_FOREARM, pose_file::Limb::LeftForearm),
+            (Limb::RIGHT_THIGH, pose_file::Limb::RightThigh),
+            (Limb::RIGHT_SHIN, pose_file::Limb::RightShin),
+            (Limb::RIGHT_FOOT, pose_file::Limb::RightFoot),
+            (Limb::RIGHT_ARM, pose_file::Limb::RightArm),
+            (Limb::RIGHT_FOREARM, pose_file::Limb::RightForearm),
+        ];
+
+        for (index, limb) in expected {
+            assert_eq!(db.limb(index), &Limb::from(limb));
+        }
     }
 }

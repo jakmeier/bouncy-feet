@@ -117,8 +117,6 @@ impl Tracker {
     pub fn new_unique_step_tracker(step_id: String) -> Result<Tracker, ForeignCollectionError> {
         let mut db = TrackerDanceCollection::default();
         crate::STATE.with_borrow(|state| {
-            db.add_foreign_pose_by_id(&state.global_db.tracker_view, "standing-straight-side");
-            db.add_foreign_pose_by_id(&state.global_db.tracker_view, "standing-straight-front");
             db.add_foreign_step(&state.global_db.tracker_view, &step_id)?;
             Ok(())
         })?;

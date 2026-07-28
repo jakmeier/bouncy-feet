@@ -5,13 +5,72 @@ use crate::tracker::{DanceCursor, PoseApproximation, TeacherView};
 use crate::ui_event::UiEvents;
 use crate::{DetectionFailureReason, DetectionResult, PoseHint, StepInfo};
 
-use super::pose::PoseDirection;
+use super::geom::SignedAngle;
+use super::pose::{Limb, LimbPosition, Pose, PoseDirection};
 use super::skeleton_3d::Skeleton3d;
 use super::step_pace::StepPace;
 use super::teacher::Teacher;
-use super::tracker_dance_collection::TrackerDanceCollection;
+use super::tracker_dance_collection::{LimbIndex, TrackerDanceCollection};
 
 type Timestamp = f64;
+
+fn positioning_pose(direction: PoseDirection, limbs: Vec<(LimbIndex, f32, f32, f32)>) -> Pose {
+    Pose::new(
+        direction,
+        limbs
+            .into_iter()
+            .map(|(limb, angle, tolerance, weight)| {
+                LimbPosition::new(
+                    limb,
+                    SignedAngle::degree(angle),
+                    SignedAngle::degree(tolerance),
+                    weight,
+                )
+            })
+            .collect(),
+        Default::default(),
+        SignedAngle::ZERO,
+        SignedAngle::ZERO,
+        Default::default(),
+        vec![],
+    )
+}
+
+/// Pose that a tracker looks for before starting a camera-facing exercise.
+fn positioning_front_pose() -> Pose {
+    positioning_pose(
+        PoseDirection::Front,
+        vec![
+            (Limb::LEFT_SHIN, 0.0, 5.0, 1.0),
+            (Limb::LEFT_THIGH, 0.0, 5.0, 1.0),
+            (Limb::RIGHT_SHIN, 0.0, 5.0, 1.0),
+            (Limb::LEFT_FOOT, 0.0, 5.0, 1.0),
+            (Limb::RIGHT_THIGH, 0.0, 5.0, 1.0),
+            (Limb::RIGHT_FOOT, 0.0, 5.0, 1.0),
+            (Limb::RIGHT_ARM, 10.0, 0.0, 0.0),
+            (Limb::RIGHT_FOREARM, -5.0, 0.0, 0.0),
+            (Limb::LEFT_ARM, -10.0, 0.0, 0.0),
+            (Limb::LEFT_FOREARM, 5.0, 0.0, 0.0),
+        ],
+    )
+}
+
+/// Pose that a tracker looks for before starting a sideways exercise.
+fn positioning_side_pose() -> Pose {
+    positioning_pose(
+        PoseDirection::Right,
+        vec![
+            (Limb::LEFT_SHIN, 0.0, 5.0, 1.0),
+            (Limb::LEFT_THIGH, 0.0, 5.0, 1.0),
+            (Limb::RIGHT_SHIN, 0.0, 5.0, 1.0),
+            (Limb::RIGHT_THIGH, 0.0, 5.0, 1.0),
+            (Limb::RIGHT_ARM, 6.0, 0.0, 0.0),
+            (Limb::RIGHT_FOREARM, 18.0, 0.0, 0.0),
+            (Limb::LEFT_ARM, -12.0, 0.0, 0.0),
+            (Limb::LEFT_FOREARM, 6.0, 0.0, 0.0),
+        ],
+    )
+}
 
 /// Contains all information about a dance to be detected and has an interface
 /// to be used by a Tracker to match tracked skeletons to it.
@@ -32,6 +91,10 @@ pub(crate) struct DanceDetector {
 
     /// picks steps, switches between views, etc
     pub(crate) teacher: Teacher,
+    /// Runtime-only entry-gate poses. They deliberately do not belong to the
+    /// tracking collection, which may contain only the poses used by its steps.
+    positioning_front_pose: Pose,
+    positioning_side_pose: Pose,
 
     // state
     /// Data about detection so far.
@@ -93,6 +156,8 @@ impl Default for DanceDetector {
             ui_events: UiEvents::default(),
             on_beat_candidates: vec![],
             teacher: Default::default(),
+            positioning_front_pose: positioning_front_pose(),
+            positioning_side_pose: positioning_side_pose(),
         }
     }
 }
@@ -141,21 +206,20 @@ impl DanceDetector {
                 self.transition_to_state(DetectionState::Positioning, now);
             }
             DetectionState::Positioning => {
-                if let Some((target, _)) = self.teacher.step_at_subbeat(0) {
-                    if let Some(skeleton) = skeletons.last() {
-                        let resting_pose_idx = if target.skeleton(0).sideway {
-                            db.pose_by_id("standing-straight-side")
-                                .expect("missing resting pose")
-                        } else {
-                            db.pose_by_id("standing-straight-front")
-                                .expect("missing side resting pose")
-                        };
-                        let resting_pose = &db.poses()[resting_pose_idx];
-                        let error_details = resting_pose.skeleton_error(skeleton);
-                        // Be lenient on the accuracy for the entry gate.
-                        if error_details.error_score() < 0.5 {
-                            self.transition_to_state(DetectionState::CountDown, now);
-                        }
+                if let Some(skeleton) = skeletons.last() {
+                    let sideway = self
+                        .teacher
+                        .step_at_subbeat(0)
+                        .is_some_and(|(target, _)| target.skeleton(0).sideway);
+                    let positioning_pose = if sideway {
+                        &self.positioning_side_pose
+                    } else {
+                        &self.positioning_front_pose
+                    };
+                    let error_details = positioning_pose.skeleton_error(skeleton);
+                    // Be lenient on the accuracy for the entry gate.
+                    if error_details.error_score() < 0.5 {
+                        self.transition_to_state(DetectionState::CountDown, now);
                     }
                 }
             }
@@ -479,5 +543,60 @@ impl DanceDetector {
     /// For debugging pruposes, set the state directly.
     pub(crate) fn dev_set_state(&mut self, state: DetectionState, t: Timestamp) {
         self.transition_to_state(state, t);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::Keypoints;
+
+    fn skeleton(fixture: &str) -> Skeleton3d {
+        let frames: Vec<(f64, Keypoints)> = ron::from_str(fixture).unwrap();
+        Skeleton3d::from_keypoints(&frames[0].1, &TrackerDanceCollection::default())
+    }
+
+    /// Built-in positioning criteria remain compatible with the standing fixtures.
+    #[test]
+    fn positioning_poses_accept_standing_fixtures() {
+        let front = skeleton(include_str!(
+            "../../tests/data/test_poses/standing_front.keypoints.ron"
+        ));
+        let east = skeleton(include_str!(
+            "../../tests/data/test_poses/standing_east.keypoints.ron"
+        ));
+        let west = skeleton(include_str!(
+            "../../tests/data/test_poses/standing_west.keypoints.ron"
+        ));
+
+        assert!(
+            positioning_front_pose()
+                .skeleton_error(&front)
+                .error_score()
+                < 0.5
+        );
+        assert!(positioning_side_pose().skeleton_error(&east).error_score() < 0.5);
+        assert!(positioning_side_pose().skeleton_error(&west).error_score() < 0.5);
+    }
+
+    /// Freestyle trackers can pass the entry gate without content poses in their DB.
+    #[test]
+    fn no_target_positions_with_an_empty_collection() {
+        let db = TrackerDanceCollection::default();
+        let skeleton = skeleton(include_str!(
+            "../../tests/data/test_poses/standing_front.keypoints.ron"
+        ));
+        let mut detector = DanceDetector::new(None, None);
+
+        detector.tick(0.0, &db, std::slice::from_ref(&skeleton));
+        assert!(matches!(
+            detector.detection_state,
+            DetectionState::Positioning
+        ));
+        detector.tick(1.0, &db, std::slice::from_ref(&skeleton));
+        assert!(matches!(
+            detector.detection_state,
+            DetectionState::CountDown
+        ));
     }
 }
