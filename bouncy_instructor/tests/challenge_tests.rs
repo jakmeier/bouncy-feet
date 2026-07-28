@@ -78,8 +78,10 @@ fn check_challenge_set(challenge_ron: &str, ron_path_from_crate: &str) {
             .parts()
             .into_iter()
             .flat_map(|part| {
-                std::iter::repeat((part.step_name(), part.subbeats_per_move()))
-                    .take(part.repeat() as usize)
+                std::iter::repeat_n(
+                    (part.step_name(), part.subbeats_per_move()),
+                    part.repeat() as usize,
+                )
             })
             .collect();
         let mut tracker = set

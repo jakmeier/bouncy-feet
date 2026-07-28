@@ -211,6 +211,44 @@ fn validate_video(id: &str, video: &VideoDef, start: Option<u32>) -> Result<(), 
     }
     Ok(())
 }
+fn validate_graph(challenges: &[Challenge]) -> Result<(), ParseFileError> {
+    if challenges.is_empty() {
+        return Err(ParseFileError::NoChallengeRoot);
+    }
+    let by_id: HashMap<_, _> = challenges.iter().map(|c| (c.id.as_str(), c)).collect();
+    let roots: Vec<_> = challenges
+        .iter()
+        .filter(|c| c.prerequisites.is_empty())
+        .collect();
+    if roots.is_empty() {
+        return Err(ParseFileError::NoChallengeRoot);
+    }
+    fn visit<'a>(
+        id: &'a str,
+        by_id: &HashMap<&'a str, &'a Challenge>,
+        visiting: &mut HashSet<&'a str>,
+        visited: &mut HashSet<&'a str>,
+    ) -> Result<(), ParseFileError> {
+        if visited.contains(id) {
+            return Ok(());
+        }
+        if !visiting.insert(id) {
+            return Err(ParseFileError::ChallengeDependencyCycle);
+        }
+        for p in &by_id[id].prerequisites {
+            visit(p, by_id, visiting, visited)?;
+        }
+        visiting.remove(id);
+        visited.insert(id);
+        Ok(())
+    }
+    let mut visited = HashSet::new();
+    for c in challenges {
+        visit(&c.id, &by_id, &mut HashSet::new(), &mut visited)?;
+    }
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::ChallengeFile;
@@ -264,42 +302,4 @@ mod tests {
         assert!(db.pose_by_id("included-pose").is_some());
         assert!(db.pose_by_id("unrelated-pose").is_none());
     }
-}
-
-fn validate_graph(challenges: &[Challenge]) -> Result<(), ParseFileError> {
-    if challenges.is_empty() {
-        return Err(ParseFileError::NoChallengeRoot);
-    }
-    let by_id: HashMap<_, _> = challenges.iter().map(|c| (c.id.as_str(), c)).collect();
-    let roots: Vec<_> = challenges
-        .iter()
-        .filter(|c| c.prerequisites.is_empty())
-        .collect();
-    if roots.is_empty() {
-        return Err(ParseFileError::NoChallengeRoot);
-    }
-    fn visit<'a>(
-        id: &'a str,
-        by_id: &HashMap<&'a str, &'a Challenge>,
-        visiting: &mut HashSet<&'a str>,
-        visited: &mut HashSet<&'a str>,
-    ) -> Result<(), ParseFileError> {
-        if visited.contains(id) {
-            return Ok(());
-        }
-        if !visiting.insert(id) {
-            return Err(ParseFileError::ChallengeDependencyCycle);
-        }
-        for p in &by_id[id].prerequisites {
-            visit(p, by_id, visiting, visited)?;
-        }
-        visiting.remove(id);
-        visited.insert(id);
-        Ok(())
-    }
-    let mut visited = HashSet::new();
-    for c in challenges {
-        visit(&c.id, &by_id, &mut HashSet::new(), &mut visited)?;
-    }
-    Ok(())
 }
