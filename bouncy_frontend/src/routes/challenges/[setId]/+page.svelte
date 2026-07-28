@@ -1,6 +1,7 @@
 <script>
   import { getContext, onMount } from 'svelte';
   import StandardPage from '$lib/components/ui/StandardPage.svelte';
+  import ApiUserLoader from '$lib/components/profile/ApiUserLoader.svelte';
   import ChallengeCard from '$lib/components/challenge/ChallengeCard.svelte';
   import {
     deriveChallengeProgress,
@@ -14,6 +15,8 @@
   const { getSet } = getContext('challengeSets');
   const set = getSet(data.params.setId);
   const user = getContext('user');
+  /** @type {ApiUser | undefined} */
+  let loadedApiUser = $state();
 
   let progress = $derived(
     set
@@ -89,6 +92,8 @@
     });
   });
 </script>
+
+<ApiUserLoader bind:apiUser={loadedApiUser} />
 
 <StandardPage black title={set ? set.name : '???'} backButton>
   {#if !set}

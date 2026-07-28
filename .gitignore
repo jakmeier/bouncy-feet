@@ -5,3 +5,4 @@ node_modules
 bouncy_lab/output
 bouncy_lab/test_output
 **/*.wasm
+bouncy_frontend/test-results

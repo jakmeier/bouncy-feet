@@ -201,19 +201,17 @@ export class ApiUser {
     /**
      * @param {string} key
      * @param {string} value
-     * @returns {Promise<void>}
+     * @returns {Promise<{updated: boolean, synced: boolean}>}
      */
     async setUserMeta(key, value) {
         if (!key) {
             console.warn('Tried setting user meta with empty key');
-            return;
+            return { updated: false, synced: false };
         }
 
         // All updates go through sync object which first persists in local storage
         // and then updates in-memory and remote states.
-        await this.kvSync.setStringValue(key, value, new Date());
-
-        return;
+        return await this.kvSync.setStringValue(key, value, new Date());
     }
 
     /**
@@ -343,7 +341,7 @@ export class ApiUser {
      * @param {string} value
      * @param {Date} lastModified
      * @param {number} version
-     * @returns {Promise<void>}
+     * @returns {Promise<boolean>}
      */
     async updateMetaOnRemote(key, value, lastModified, version) {
         const headers = {
@@ -365,10 +363,13 @@ export class ApiUser {
 
         if (result.error || result.errorBody) {
             // TODO: handle login etc
+            // The local update remains durable, but callers need to be able
+            // to show that the remote synchronization is pending.
             console.warn('meta update failed', result.errorBody);
+            return false;
         }
 
-        return;
+        return true;
     }
 
     /**

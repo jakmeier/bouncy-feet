@@ -25,9 +25,6 @@
   const stateSymbol = $derived(
     state.completed ? 'bf_check' : state.locked ? 'bf_lock' : 'bf_play'
   );
-  const stateSymbolClass = $derived(
-    state.locked ? 'state-img-locked' : 'state-img'
-  );
 </script>
 
 <svelte:element
@@ -45,7 +42,7 @@
       <img
         src={asset(`/img/symbols/${stateSymbol}.svg`)}
         alt=""
-        class={stateSymbolClass}
+        class="state-img"
       />
     </span>
   </div>
@@ -137,16 +134,13 @@
     background: var(--theme-neutral-gray);
   }
   .available .state-icon {
-    background: var(--theme-main);
+    background: var(--theme-neutral-light);
   }
   .completed .state-icon {
     background: var(--theme-main-dark);
   }
-  .state-img-locked {
-    height: 18px;
-    width: auto;
-  }
   .state-img {
+    height: 18px;
     width: auto;
   }
 

@@ -50,7 +50,7 @@ npm --prefix bouncy_frontend run export:challenge-keypoints -- \
   bouncy_frontend/src/lib/assets/challenges/jumping-jacks.ron --all
 npm --prefix bouncy_frontend run export:challenge-keypoints -- \
   bouncy_frontend/src/lib/assets/challenges/jumping-jacks.ron \
-  --challenge three-jumping-jacks --all
+  --challenge jumping-jacks --all
 ```
 
 The command is author tooling, not part of `cargo test` or CI. It uses the

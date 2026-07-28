@@ -7,9 +7,11 @@
   explanations: {"en": "Build your rhythm, unlock new levels and become the beat boss."},
   challenges: [
     (
-      id: "three-jumping-jacks",
-      names: {"en": "Three Jumping Jacks"},
-      explanations: {"en": "Start simple: land three clean jumping jacks right on the beat."},
+      id: "jumping-jacks",
+      names: {"en": "Jumping Jacks"},
+      explanations: {
+        "en": "Start simple: land four clean jumping jacks right on the beat."
+        },
       prerequisites: [],
       bpm: 105,
       solution_video: (
@@ -24,7 +26,7 @@
       id: "bird-jacks",
       names: {"en": "Bird Jacks"},
       explanations: {"en": "Spread your wings like a bird."},
-      prerequisites: ["three-jumping-jacks"],
+      prerequisites: ["jumping-jacks"],
       bpm: 105,
       solution_video: (
         path: "https://app.bouncy-feet.ch/media/videos/challenges/jumping_jacks/jj_01.mp4",
@@ -35,22 +37,6 @@
       parts: [(step: "bird-jack", repeat: 4, subbeats_per_move: 2)],
     ),
     (
-      id: "bird-2",
-      names: {"en": "Nimble Bird"},
-      explanations: {"en": "Fly around those obstacles."},
-      prerequisites: ["bird-jacks"],
-      bpm: 105,
-      solution_video: (
-        path: "https://app.bouncy-feet.ch/media/videos/challenges/jumping_jacks/jj_04.mp4",
-        // TODO
-        beats: [0],
-        markers: {0: Start},
-      ),
-      // TODO
-      solution_start_timestamp: 0,
-      parts: [(step: "jumping-jack", repeat: 4, subbeats_per_move: 1)],
-    ),
-    (
       id: "side-step",
       names: {"en": "Side Step"},
       explanations: {"en": "Step right, step left, repeat."},
@@ -58,15 +44,18 @@
       bpm: 105,
       solution_video: (
         path: "https://app.bouncy-feet.ch/media/videos/challenges/jumping_jacks/jj_02.mp4",
-        // TODO
-        beats: [0],
-        markers: {0: Start},
+        beats: [4224, 4795, 5367, 5938, 6510, 7081, 7653, 8224],
+        markers: {3652: Start},
       ),
-      solution_start_timestamp: 0,
-      // TODO (note, left and right step are differnt steps, repeat the pair twice for a 4-beat combo)
-      // note: don't care about arms here
-      parts: [(step: "jumping-jack", repeat: 2, subbeats_per_move: 1)],
+      solution_start_timestamp: 3652,
+      parts: [
+        (step: "side-step-right", repeat: 1, subbeats_per_move: 2),
+        (step: "side-step-left", repeat: 1, subbeats_per_move: 2),
+        (step: "side-step-right", repeat: 1, subbeats_per_move: 2),
+        (step: "side-step-left", repeat: 1, subbeats_per_move: 2),
+      ],
     ),
+    // TODO: eyeball-verify poses
     (
       id: "pump",
       names: {"en": "Pump Step"},
@@ -75,15 +64,26 @@
       bpm: 105,
       solution_video: (
         path: "https://app.bouncy-feet.ch/media/videos/challenges/jumping_jacks/jj_03.mp4",
-        // TODO
-        beats: [0],
-        markers: {0: Start},
+        beats: [1926, 2497, 3069, 3640, 4212, 4783, 5355, 5926, 6497, 7069, 7640, 8212, 8783, 9355, 9926, 10497],
+        markers: {1355: Start},
       ),
-      // TODO
-      solution_start_timestamp: 0,
-      // TODO (note, left and right step are differnt steps, repeat the pair twice for a 4-beat combo)
-      // note: DO care about arms here
-      parts: [(step: "jumping-jack", repeat: 2, subbeats_per_move: 1)],
+      solution_start_timestamp: 1355,
+      parts: [(step: "pump-step", repeat: 4, subbeats_per_move: 2)],
+    ),
+    // TODO: eyeball-verify poses
+    (
+      id: "bird-2",
+      names: {"en": "Nimble Bird"},
+      explanations: {"en": "Fly around those obstacles."},
+      prerequisites: ["bird-jacks"],
+      bpm: 105,
+      solution_video: (
+        path: "https://app.bouncy-feet.ch/media/videos/challenges/jumping_jacks/jj_04.mp4",
+        beats: [3583, 4154, 4726, 5297, 5869, 6440, 7012, 7583],
+        markers: {3011: Start},
+      ),
+      solution_start_timestamp: 3011,
+      parts: [(step: "nimble-bird", repeat: 2, subbeats_per_move: 2)],
     ),
   ],
   poses: [
@@ -91,18 +91,18 @@
       id: "standing-straight-front",
       direction: Front,
       limbs: [
-        (limb: LeftThigh, weight: 1.0, angle: -13, tolerance: 10),
-        (limb: LeftShin, weight: 1.0, angle: -23, tolerance: 10),
+        (limb: LeftThigh, weight: 1.0, angle: -10, tolerance: 10),
+        (limb: LeftShin, weight: 1.0, angle: -15, tolerance: 10),
         (limb: LeftFoot, weight: 0.0, angle: -18, tolerance: 10),
-        (limb: LeftArm, weight: 1.0, angle: -152, tolerance: 10),
-        (limb: LeftForearm, weight: 1.0, angle: 123, tolerance: 10),
-        (limb: RightThigh, weight: 1.0, angle: 12, tolerance: 10),
-        (limb: RightShin, weight: 1.0, angle: 12, tolerance: 10),
-        (limb: RightFoot, weight: 0.0, angle: 8, tolerance: 10),
-        (limb: RightArm, weight: 1.0, angle: 150, tolerance: 10),
-        (limb: RightForearm, weight: 1.0, angle: -138, tolerance: 10),
-        (limb: LeftLeg, weight: 1.0, angle: -17, tolerance: 10),
-        (limb: RightLeg, weight: 1.0, angle: 12, tolerance: 10),
+        (limb: LeftArm, weight: 1.0, angle: -30, tolerance: 15),
+        (limb: LeftForearm, weight: 0.5, angle: 0, tolerance: 10),
+        (limb: RightThigh, weight: 1.0, angle: 10, tolerance: 10),
+        (limb: RightShin, weight: 1.0, angle: 15, tolerance: 10),
+        (limb: RightFoot, weight: 0.0, angle: 18, tolerance: 10),
+        (limb: RightArm, weight: 1.0, angle: 18, tolerance: 10),
+        (limb: RightForearm, weight: 1.0, angle: 30, tolerance: 15),
+        (limb: LeftLeg, weight: 1.0, angle: -10, tolerance: 10),
+        (limb: RightLeg, weight: 1.0, angle: 10, tolerance: 10),
       ],
     ),
     (
@@ -125,12 +125,118 @@
       limbs: [
         (limb: LeftArm, angle: -155, tolerance: 25, weight: 0.5),
         (limb: RightArm, angle: 155, tolerance: 25, weight: 0.5),
-        (limb: LeftForearm, weight: 0.5, angle: -120, tolerance: 30),
-        (limb: RightForearm, weight: 0.5, angle: 120, tolerance: 30),
+        (limb: LeftForearm, weight: 0.5, angle: 120, tolerance: 30),
+        (limb: RightForearm, weight: 0.5, angle: -120, tolerance: 30),
         (limb: LeftThigh, angle: -30, tolerance: 20, weight: 1.0),
         (limb: RightThigh, angle: 30, tolerance: 20, weight: 1.0),
         (limb: LeftShin, weight: 0.5, angle: -30, tolerance: 12),
         (limb: RightShin, weight: 0.5, angle: 30, tolerance: 12),
+      ],
+    ),
+    (
+      id: "nimble-bird-left",
+      direction: Front,
+      turn_hip: 45,
+      turn_shouler: 45,
+      limbs: [
+        (limb: LeftArm, weight: 1.0, angle: -90, tolerance: 10),
+        (limb: RightArm, weight: 1.0, angle: 90, tolerance: 10),
+        (limb: LeftForearm, weight: 0.5, angle: 90, tolerance: 12),
+        (limb: RightForearm, weight: 0.5, angle: -90, tolerance: 12),
+        (limb: LeftThigh, weight: 1.0, angle: -30, tolerance: 10),
+        (limb: RightThigh, weight: 1.0, angle: 30, tolerance: 10),
+        (limb: LeftShin, weight: 0.5, angle: -30, tolerance: 12),
+        (limb: RightShin, weight: 0.5, angle: 30, tolerance: 12),
+      ],
+    ),
+    (
+      id: "nimble-bird-right",
+      direction: Front,
+      turn_hip: -45,
+      turn_shouler: -45,
+      limbs: [
+        (limb: LeftArm, weight: 1.0, angle: -90, tolerance: 10),
+        (limb: RightArm, weight: 1.0, angle: 90, tolerance: 10),
+        (limb: LeftForearm, weight: 0.5, angle: 90, tolerance: 12),
+        (limb: RightForearm, weight: 0.5, angle: -90, tolerance: 12),
+        (limb: LeftThigh, weight: 1.0, angle: -30, tolerance: 10),
+        (limb: RightThigh, weight: 1.0, angle: 30, tolerance: 10),
+        (limb: LeftShin, weight: 0.5, angle: -30, tolerance: 12),
+        (limb: RightShin, weight: 0.5, angle: 30, tolerance: 12),
+      ],
+    ),
+    (
+      id: "nimble-bird-neutral",
+      direction: Front,
+      limbs: [
+        (limb: LeftThigh, angle: -3, tolerance: 10, weight: 1.0),
+        (limb: LeftShin, angle: 12, tolerance: 10, weight: 0.5),
+        (limb: LeftArm, angle: -7, tolerance: 10, weight: 0.8),
+        (limb: LeftForearm, angle: 147, tolerance: 10, weight: 0.5),
+        (limb: RightThigh, angle: -8, tolerance: 10, weight: 1.0),
+        (limb: RightShin, angle: 0, tolerance: 10, weight: 0.5),
+        (limb: RightArm, angle: 20, tolerance: 10, weight: 0.8),
+        (limb: RightForearm, angle: -119, tolerance: 10, weight: 0.5),
+      ],
+    ),
+    (
+      id: "side-step-right-open",
+      direction: Front,
+      limbs: [
+        (limb: LeftThigh, angle: 0, tolerance: 5, weight: 0.5),
+        (limb: LeftShin, angle: 0, tolerance: 5, weight: 0.5),
+        (limb: LeftLeg, angle: 0, tolerance: 5, weight: 0.5),
+        (limb: LeftFoot, angle: -78, tolerance: 5, weight: 0.0),
+        (limb: RightThigh, angle: 30, tolerance: 10, weight: 2.0),
+        (limb: RightShin, angle: 25, tolerance: 10, weight: 2.0),
+        (limb: RightLeg, angle: 30, tolerance: 10, weight: 2.0),
+        (limb: RightFoot, angle: 49, tolerance: 5, weight: 0.0),
+      ],
+    ),
+    (
+      id: "side-step-left-open",
+      direction: Front,
+      limbs: [
+        (limb: LeftThigh, angle: -30, tolerance: 10, weight: 2.0),
+        (limb: LeftShin, angle: -25, tolerance: 10, weight: 2.0),
+        (limb: LeftLeg, angle: -30, tolerance: 10, weight: 2.0),
+        (limb: LeftFoot, angle: -49, tolerance: 5, weight: 0.0),
+        (limb: RightThigh, angle: 0, tolerance: 5, weight: 0.5),
+        (limb: RightShin, angle: 0, tolerance: 5, weight: 0.5),
+        (limb: RightLeg, angle: 0, tolerance: 5, weight: 0.5),
+        (limb: RightFoot, angle: 68, tolerance: 5, weight: 0.0),
+      ],
+    ),
+    (
+      id: "pump-left",
+      direction: Front,
+      limbs: [
+        (limb: LeftThigh, angle: -44, tolerance: 10, weight: 1.0),
+        (limb: LeftShin, angle: 26, tolerance: 10, weight: 0.5),
+        (limb: LeftFoot, angle: -70, tolerance: 10, weight: 0.2),
+        (limb: LeftArm, angle: -94, tolerance: 10, weight: 1.0),
+        (limb: LeftForearm, angle: 103, tolerance: 10, weight: 0.7),
+        (limb: RightThigh, angle: 43, tolerance: 10, weight: 1.0),
+        (limb: RightShin, angle: 51, tolerance: 10, weight: 0.5),
+        (limb: RightFoot, angle: 32, tolerance: 10, weight: 0.2),
+        (limb: RightArm, angle: 91, tolerance: 10, weight: 1.0),
+        (limb: RightForearm, angle: -98, tolerance: 10, weight: 0.7),
+      ],
+    ),
+    (
+      id: "pump-right",
+      direction: Front,
+      limbs: [
+        (limb: LeftThigh, angle: -43, tolerance: 10, weight: 1.0),
+        (limb: LeftShin, angle: -49, tolerance: 10, weight: 0.5),
+        (limb: LeftFoot, angle: -35, tolerance: 10, weight: 0.2),
+        (limb: LeftArm, angle: -96, tolerance: 10, weight: 1.0),
+        (limb: LeftForearm, angle: 102, tolerance: 10, weight: 0.7),
+        (limb: RightThigh, angle: 50, tolerance: 10, weight: 1.0),
+        (limb: RightShin, angle: -33, tolerance: 10, weight: 0.5),
+        (limb: RightFoot, angle: 66, tolerance: 10, weight: 0.2),
+        (limb: RightArm, angle: 78, tolerance: 10, weight: 1.0),
+        (limb: RightForearm, angle: -115, tolerance: 10, weight: 0.7),
       ],
     ),
   ],
@@ -148,6 +254,42 @@
       id: "bird-jack",
       keyframes: [
         (pose: "bird-jack-open", orientation: ToCamera),
+        (pose: "standing-straight-front", orientation: ToCamera),
+      ],
+    ),
+    (
+      name: "Nimble bird",
+      id: "nimble-bird",
+      keyframes: [
+        (pose: "nimble-bird-left", orientation: ToCamera),
+        (pose: "nimble-bird-neutral", orientation: ToCamera),
+        (pose: "nimble-bird-right", orientation: ToCamera),
+        (pose: "nimble-bird-neutral", orientation: ToCamera),
+      ],
+    ),
+    (
+      name: "Side step right",
+      id: "side-step-right",
+      keyframes: [
+        (pose: "side-step-right-open", orientation: ToCamera),
+        (pose: "standing-straight-front", orientation: ToCamera),
+      ],
+    ),
+    (
+      name: "Side step left",
+      id: "side-step-left",
+      keyframes: [
+        (pose: "side-step-left-open", orientation: ToCamera),
+        (pose: "standing-straight-front", orientation: ToCamera),
+      ],
+    ),
+    (
+      name: "Pump step",
+      id: "pump-step",
+      keyframes: [
+        (pose: "pump-left", orientation: ToCamera),
+        (pose: "standing-straight-front", orientation: ToCamera),
+        (pose: "pump-right", orientation: ToCamera),
         (pose: "standing-straight-front", orientation: ToCamera),
       ],
     ),

@@ -11,7 +11,13 @@ import { browser } from "$app/environment";
  * @param {string} value
  * @param {Date} lastModified
  * @param {number} version
- * @returns {Promise<void>}
+ * @returns {Promise<boolean|void>}
+ */
+
+/**
+ * @typedef {Object} KvSetResult
+ * @property {boolean} updated
+ * @property {boolean} synced
  */
 
 /**
@@ -106,7 +112,7 @@ export class KvSync {
      * @param {string} key
      * @param {string} value
      * @param {Date} lastModified
-     * @returns {Promise<boolean>}
+     * @returns {Promise<KvSetResult>}
      */
     async setStringValue(key, value, lastModified) {
         const updated = await this.#setLocalValue(key, value, lastModified, PREFIX_STRING_T);
@@ -194,7 +200,7 @@ export class KvSync {
      * @param {Date} timestamp
      * @param {string} type
      * @param {string} [namespace]
-     * @returns {Promise<boolean>}
+     * @returns {Promise<KvSetResult>}
     */
     async #setLocalValue(key, value, timestamp, type, namespace = "") {
         const typedKey = `${namespace}${type}${key}`;
@@ -202,14 +208,21 @@ export class KvSync {
         const oldMods = this.#getModifications(typedKey);
         if (oldMods.length > 0 && new Date(oldMods[oldMods.length - 1].t) > timestamp) {
             // existing value is newer!
-            return false;
+            return { updated: false, synced: true };
         }
 
         this.#setLocalValueSideEffectFree(typedKey, value, timestamp);
         this.onUpdatedLocal(key, value, type, timestamp, this.version);
-        await this.updateRemote(typedKey, value, timestamp, this.version);
 
-        return true;
+        let synced = false;
+        try {
+            synced =
+                (await this.updateRemote(typedKey, value, timestamp, this.version)) !== false;
+        } catch (error) {
+            console.warn('Could not sync local value', key, error);
+        }
+
+        return { updated: true, synced };
     }
 
     /**
@@ -243,7 +256,7 @@ export class KvSync {
      * @param {number} value
      * @param {Date} lastModified
      * @param {string} [namespace]
-     * @returns {Promise<boolean>}
+     * @returns {Promise<KvSetResult>}
     */
     async #setLocalNumber(key, value, lastModified, namespace = "") {
         return this.#setLocalValue(key, value.toString(10), lastModified, PREFIX_NUMBER_T, namespace);
@@ -321,11 +334,14 @@ export class KvSync {
         if (!browser) {
             return new Set();
         }
+        /** @type {Set<string>} */
         const out = new Set();
+        const prefix = this.prefix;
+        if (!prefix) return out;
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
-            if (key?.startsWith(this.prefix)) {
-                out.add(key.slice(this.prefix.length));
+            if (key && key.startsWith(prefix)) {
+                out.add(key.slice(prefix.length));
             }
         }
         return out;

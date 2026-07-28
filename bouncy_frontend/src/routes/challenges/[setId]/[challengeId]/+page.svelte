@@ -7,11 +7,11 @@
   import VideoReview from '$lib/components/review/VideoReview.svelte';
   import { registerTracker, setBpm } from '$lib/stores/Beat';
   import { completeChallenge } from '$lib/challengeProgress.js';
+  import LoginRequiredContent from '$lib/components/profile/LoginRequiredContent.svelte';
   import { t } from '$lib/i18n';
 
   let { data } = $props();
   const { getSet } = getContext('challengeSets');
-  const user = getContext('user');
   const set = getSet(data.params.setId);
   const challengeIndex = set?.challenges.findIndex(
     (
@@ -24,8 +24,13 @@
       : set.challenges[challengeIndex];
 
   let started = $state(false);
+  /** @type {ApiUser | undefined} */
+  let activityUser = $state();
   let finished = $state(false);
   let succeeded = $state(false);
+  let savingCompletion = $state(false);
+  let completionSaved = $state(false);
+  let completionSyncPending = $state(false);
   /** @type {import('$lib/instructor/bouncy_instructor').DetectionResult | undefined} */
   let detection = $state();
   /** @type {number | undefined} */
@@ -39,8 +44,10 @@
   // component is being initialised (not later from the click handler).
   const unregisterTracker = tracker ? registerTracker(tracker) : undefined;
 
-  function start() {
+  /** @param {ApiUser} apiUser */
+  function start(apiUser) {
     if (!tracker || !challenge) return;
+    activityUser = apiUser;
     // Challenges own their tempo; don't inherit the last practice activity's BPM.
     setBpm(challenge.bpm);
     started = true;
@@ -70,12 +77,25 @@
       Boolean(detection) &&
       detection.poseMisses === 0 &&
       detection.poseMatches >= tracker.expectedPoses;
-    if (succeeded && user.apiUser) {
-      await completeChallenge(user.apiUser, set, challenge.id);
-      user.apiUser.submitActivity(
-        `challenge/${set.id}/${challenge.id}`,
-        detection
-      );
+    if (succeeded && activityUser) {
+      savingCompletion = true;
+      try {
+        const completion = await completeChallenge(
+          activityUser,
+          set,
+          challenge.id
+        );
+        completionSaved = true;
+        completionSyncPending = completion.syncPending;
+        activityUser.submitActivity(
+          `challenge/${set.id}/${challenge.id}`,
+          detection
+        );
+      } catch (error) {
+        console.error('Could not save challenge completion', error);
+      } finally {
+        savingCompletion = false;
+      }
     }
   }
 
@@ -92,6 +112,9 @@
     clearReview();
     finished = false;
     succeeded = false;
+    savingCompletion = false;
+    completionSaved = false;
+    completionSyncPending = false;
     started = false;
   }
 
@@ -124,7 +147,13 @@
       aria-label={`${challenge.name} ${$t('challenges.solution-video')}`}
     ></video>
     <p>{$t('challenges.start-description')}</p>
-    <button onclick={start}>{$t('challenges.start-button')}</button>
+    <LoginRequiredContent>
+      {#snippet guest({ apiUser })}
+        <button onclick={() => start(apiUser)}>
+          {$t('challenges.start-button')}
+        </button>
+      {/snippet}
+    </LoginRequiredContent>
     {#if $dev}
       <button
         class="author-button"
@@ -138,10 +167,24 @@
     </div>
   {:else}
     <h1>
-      {$t(succeeded ? 'challenges.completed-title' : 'challenges.not-completed-title')}
+      {$t(
+        succeeded
+          ? 'challenges.completed-title'
+          : 'challenges.not-completed-title'
+      )}
     </h1>
     <p>
-      {$t(succeeded ? 'challenges.completion-saved' : 'challenges.retry-description')}
+      {$t(
+        succeeded
+          ? savingCompletion
+            ? 'challenges.completion-saving'
+            : completionSaved
+              ? completionSyncPending
+                ? 'challenges.completion-sync-pending'
+                : 'challenges.completion-saved'
+              : 'challenges.completion-save-failed'
+          : 'challenges.retry-description'
+      )}
     </p>
     {#if detection && recordingStart !== undefined && recordingEnd !== undefined}
       <VideoReview
@@ -155,7 +198,9 @@
       <p>{$t('challenges.review-unavailable')}</p>
     {/if}
     <button onclick={retry}>{$t('challenges.retry-button')}</button>
-    <a href={`/challenges/${set.id}`}>{$t('challenges.back-button')}</a>
+    {#if !savingCompletion}
+      <a href={`/challenges/${set.id}`}>{$t('challenges.back-button')}</a>
+    {/if}
   {/if}
 </StandardPage>
 
