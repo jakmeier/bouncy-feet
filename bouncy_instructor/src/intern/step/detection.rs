@@ -59,25 +59,66 @@ impl Tracker {
         let dt = 60_000.0 / self.detector.bpm;
         let min_dt = (dt * 0.5).round() as f64;
         let max_dt = (dt * 1.5).round() as f64;
+        // A tracker containing only variations of one dance already knows the
+        // intended dance. When choosing among different dance names, every
+        // keyframe must be a strong match.
+        let mut non_idle_steps = self
+            .db
+            .steps()
+            .iter()
+            .filter(|step| !step.name.contains("Idle"));
+        let first_step_name = non_idle_steps.next().map(|step| &step.name);
+        let require_all_pose_matches = first_step_name
+            .is_some_and(|first_name| non_idle_steps.any(|step| step.name != *first_name));
+
         // Only return idle if no non-idle step is found.
         let mut idle_result = None;
         while start < end {
-            if let Some(step) = self.detect_step(start, min_dt, max_dt, &self.db) {
-                // `find_pose` permits errors below 1.0 so it can construct a
-                // full sequence. Require a strong match for the first pose to
-                // avoid accepting arbitrary frame windows as step starts.
-                if step.poses.first().is_some_and(|pose| pose.error <= 0.2) {
-                    if !step.step_name.contains("Idle") {
-                        return Some(step);
-                    }
-                    if idle_result.is_none() {
-                        idle_result = Some(step);
+            if !require_all_pose_matches {
+                if let Some(step) = self.detect_step(start, min_dt, max_dt, &self.db) {
+                    if step.poses.first().is_some_and(|pose| pose.error <= 0.2) {
+                        if !step.step_name.contains("Idle") {
+                            return Some(step);
+                        }
+                        if idle_result.is_none() {
+                            idle_result = Some(step);
+                        }
                     }
                 }
+                start += 1;
+                continue;
             }
-            // Do not jump past a different, lower-error pose: it might be a
-            // later keyframe while this frame can still lead to a full step.
-            start += 1;
+
+            let start_t = self.timestamps[start];
+            let end_t = (start_t + max_dt).min(self.timestamps[end - 1]);
+
+            // Seed a sequence from the strongest pose in a bounded look-ahead
+            // window.
+            if let Some(first_pose) = self.best_fit_pose(start_t, end_t) {
+                if first_pose.error <= 0.2 {
+                    let candidate_start = start
+                        + self.timestamps[start..end]
+                            .partition_point(|timestamp| *timestamp < first_pose.timestamp);
+                    if let Some(step) = self.detect_step(candidate_start, min_dt, max_dt, &self.db)
+                    {
+                        if step.poses.iter().all(|pose| pose.error <= 0.2) {
+                            if !step.step_name.contains("Idle") {
+                                return Some(step);
+                            }
+                            if idle_result.is_none() {
+                                idle_result = Some(step);
+                            }
+                        }
+                    }
+                    start = candidate_start + 1;
+                    continue;
+                }
+            }
+
+            // No strong pose in this window, skip it as a whole.
+            start += self.timestamps[start..end]
+                .partition_point(|timestamp| *timestamp < end_t)
+                .max(1);
         }
 
         idle_result
