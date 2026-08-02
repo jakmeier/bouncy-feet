@@ -1,6 +1,7 @@
 use axum::{
     extract::{Path, State},
     http::StatusCode,
+    response::IntoResponse,
     Extension, Json,
 };
 
@@ -133,7 +134,9 @@ pub async fn delete_combo(
 
     if let Err(err) = result {
         tracing::error!(?err, "Failed deleting combo");
-        return Err((StatusCode::INTERNAL_SERVER_ERROR, "Failed deleting combo"))?;
+        return Err((StatusCode::INTERNAL_SERVER_ERROR, "Failed deleting combo")
+            .into_response()
+            .into());
     };
 
     Ok(())
@@ -226,7 +229,9 @@ pub async fn add_combo_timestamp(
         return Err((
             StatusCode::INTERNAL_SERVER_ERROR,
             "Failed creating timestamp for combo",
-        ))?;
+        )
+            .into_response()
+            .into());
     };
 
     Ok(())
@@ -249,7 +254,9 @@ pub async fn delete_combo_timestamp(
         return Err((
             StatusCode::INTERNAL_SERVER_ERROR,
             "Failed creating timestamp for combo",
-        ))?;
+        )
+            .into_response()
+            .into());
     };
 
     Ok(())
@@ -335,7 +342,9 @@ pub async fn delete_combo_beat(
         return Err((
             StatusCode::INTERNAL_SERVER_ERROR,
             "Failed deleting beat for combo",
-        ))?;
+        )
+            .into_response()
+            .into());
     };
 
     Ok(())

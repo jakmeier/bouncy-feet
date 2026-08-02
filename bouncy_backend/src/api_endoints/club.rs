@@ -611,7 +611,9 @@ pub async fn remove_video(
     .await;
     if let Err(err) = videos_result {
         tracing::error!(?err, "Reading videos from playlist failed");
-        return Err((StatusCode::BAD_GATEWAY, "PeerTube service failed"))?;
+        return Err((StatusCode::BAD_GATEWAY, "PeerTube service failed")
+            .into_response()
+            .into());
     }
     let videos = videos_result.unwrap();
     let Some(video) = videos.first() else {
@@ -621,7 +623,9 @@ pub async fn remove_video(
         return Err((
             StatusCode::CONFLICT,
             "unexpected video at index in playlist",
-        ))?;
+        )
+            .into_response()
+            .into());
     }
     let element_index = video.id;
 
@@ -632,7 +636,9 @@ pub async fn remove_video(
     if !is_owner {
         let membership = get_membership(&state, me.id, club_id).await?;
         if !matches!(membership, ClubMembership::Admin) {
-            return Err((StatusCode::FORBIDDEN, "no permission to remove video"))?;
+            return Err((StatusCode::FORBIDDEN, "no permission to remove video")
+                .into_response()
+                .into());
         }
     }
 
@@ -642,7 +648,9 @@ pub async fn remove_video(
 
     if let Err(err) = result {
         tracing::error!(?err, "Removing video from playlist failed");
-        return Err((StatusCode::BAD_GATEWAY, "PeerTube service failed"))?;
+        return Err((StatusCode::BAD_GATEWAY, "PeerTube service failed")
+            .into_response()
+            .into());
     }
 
     Ok(())
@@ -754,7 +762,9 @@ async fn check_playlist_fields_and_permissions(
         return Err((
             StatusCode::BAD_REQUEST,
             "description must be between 3 and 120 characters",
-        ))?;
+        )
+            .into_response()
+            .into());
     }
     if !params.description.is_empty()
         && (params.description.len() > 1000 || params.description.len() < 3)
@@ -762,17 +772,23 @@ async fn check_playlist_fields_and_permissions(
         return Err((
             StatusCode::BAD_REQUEST,
             "description must be between 3 and 1000 characters",
-        ))?;
+        )
+            .into_response()
+            .into());
     }
 
     // Check permissions: Must be member for private lists, admin for public lists
     let membership = get_membership(state, user_id, club_id).await?;
     if params.public {
         if !matches!(membership, ClubMembership::Admin) {
-            return Err((StatusCode::FORBIDDEN, "not a club admin"))?;
+            return Err((StatusCode::FORBIDDEN, "not a club admin")
+                .into_response()
+                .into());
         }
     } else if !matches!(membership, ClubMembership::Admin | ClubMembership::Member) {
-        return Err((StatusCode::FORBIDDEN, "not a club member"))?;
+        return Err((StatusCode::FORBIDDEN, "not a club member")
+            .into_response()
+            .into());
     }
     Ok(())
 }
@@ -816,7 +832,9 @@ pub async fn update_avatar(
             let content_type = field.content_type().map(|s| s.to_string());
 
             if content_type.as_deref() != Some("image/png") {
-                return Err((StatusCode::BAD_REQUEST, "image must be png"))?;
+                return Err((StatusCode::BAD_REQUEST, "image must be png")
+                    .into_response()
+                    .into());
             }
 
             let data = field.bytes().await.unwrap();
