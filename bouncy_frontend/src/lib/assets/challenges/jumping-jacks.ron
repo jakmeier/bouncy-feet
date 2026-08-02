@@ -137,7 +137,7 @@
     (
       // turning left, right is in front
       id: "nimble-bird-left",
-      direction: Front,
+      direction: Right, // TODO: this right between front and sideway, figure out how to deal with that
       turn_hip: -30, // TODO: this is not used for detection, only for rendering
       turn_shoulder: -30, // TODO: this is not used for detection, only for rendering
       limbs: [
@@ -155,7 +155,7 @@
     ),
     (
       id: "nimble-bird-right",
-      direction: Front,
+      direction: Right,
       turn_hip: 30,
       turn_shoulder: 30,
       limbs: [
