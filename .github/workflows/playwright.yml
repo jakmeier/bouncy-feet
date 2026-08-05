@@ -1,22 +1,28 @@
 name: Playwright Tests
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  # Run dev E2E tests only after a commit has been deployed to dev.
+  workflow_dispatch:
+    inputs:
+      deployed_sha:
+        description: "Commit SHA deployed to dev"
+        required: true
+        type: string
   release:
     types: [ "published" ]
 
 jobs:
   test-dev:
-    if: github.event_name != 'release'
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./bouncy_frontend
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Test the same source revision that was deployed to dev.
+          ref: ${{ inputs.deployed_sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
