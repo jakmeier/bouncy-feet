@@ -2,6 +2,15 @@
     "meta": {
         "title": "Bouncy Feet - Dancing is for everybody."
     },
+    "qr": {
+        "meta": {
+            "title": "Bouncy Feet QR reference",
+            "description": "Open the Bouncy Feet app from this QR reference."
+        },
+        "title": "Hi!\nAre you looking for something?",
+        "open-app": "Open the Bouncy Feet app",
+        "reference": "QR reference:"
+    },
     "home": {
         "title": "Bouncy Feet!",
         "slogan-0": "Dancing is for everyone!",

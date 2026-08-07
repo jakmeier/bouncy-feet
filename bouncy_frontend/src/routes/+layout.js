@@ -1,20 +1,53 @@
 import { addTranslations, locale, setLocale, setRoute } from '$lib/i18n.js';
-import { initInstructorWasmOnce } from '$lib/instructor/loader.js';
-import {
-    Course,
-    dances,
-    bf_init,
-    loadDanceString,
-    loadPoseString,
-    loadStepString,
-    parseCourseString,
-    poses,
-    PoseWrapper,
-    steps,
-    stepsBySource,
-    StepWrapper,
-} from '$lib/instructor/bouncy_instructor';
-import { loadPublicClubs } from '$lib/stores/Clubs.svelte';
+
+// These modules pull in the instructor WASM and the full application data. Keep
+// them dynamic so the lightweight QR landing route never downloads or starts
+// the app shell.
+/** @type {typeof import('$lib/instructor/loader.js').initInstructorWasmOnce} */
+let initInstructorWasmOnce;
+/** @type {typeof import('$lib/instructor/bouncy_instructor').dances} */
+let dances;
+/** @type {typeof import('$lib/instructor/bouncy_instructor').bf_init} */
+let bf_init;
+/** @type {typeof import('$lib/instructor/bouncy_instructor').loadDanceString} */
+let loadDanceString;
+/** @type {typeof import('$lib/instructor/bouncy_instructor').loadPoseString} */
+let loadPoseString;
+/** @type {typeof import('$lib/instructor/bouncy_instructor').loadStepString} */
+let loadStepString;
+/** @type {typeof import('$lib/instructor/bouncy_instructor').parseCourseString} */
+let parseCourseString;
+/** @type {typeof import('$lib/instructor/bouncy_instructor').poses} */
+let poses;
+/** @type {typeof import('$lib/instructor/bouncy_instructor').steps} */
+let steps;
+/** @type {typeof import('$lib/instructor/bouncy_instructor').stepsBySource} */
+let stepsBySource;
+/** @type {typeof import('$lib/stores/Clubs.svelte').loadPublicClubs} */
+let loadPublicClubs;
+
+async function loadAppDependencies() {
+    if (!initInstructorWasmOnce) {
+        const [loader, instructor, clubs] = await Promise.all([
+            import('$lib/instructor/loader.js'),
+            import('$lib/instructor/bouncy_instructor'),
+            import('$lib/stores/Clubs.svelte'),
+        ]);
+        ({ initInstructorWasmOnce } = loader);
+        ({
+            dances,
+            bf_init,
+            loadDanceString,
+            loadPoseString,
+            loadStepString,
+            parseCourseString,
+            poses,
+            steps,
+            stepsBySource,
+        } = instructor);
+        ({ loadPublicClubs } = clubs);
+    }
+}
 
 // This is the root layout, hence it defines prerendering for the entire app default.
 // Translations act weird with prerender on, so I'm disabling it.
@@ -25,15 +58,33 @@ export const trailingSlash = 'always';
 let loadedOnce = false;
 
 /** @type {import('@sveltejs/kit').Load} */
-export const load = async ({ fetch, data }) => {
-    await initInstructorWasmOnce(fetch);
-    const { i18n, translations } = data;
+export const load = async ({ fetch, data, url }) => {
+    const { i18n, translations } = /** @type {any} */ (data);
     const { locale, route } = i18n;
+    const isQrShell = url.pathname === '/qr' || url.pathname.startsWith('/qr/');
 
     addTranslations(translations);
-
     await setRoute(route);
     await setLocale(locale);
+
+    if (isQrShell) {
+        // Keep the layout data shape stable for non-QR child routes without
+        // loading their data or returning non-serializable placeholder
+        // functions. The QR shell never consumes these values.
+        return {
+            i18n,
+            translations,
+            officialDances: /** @type {any} */ ([]),
+            courses: /** @type {any} */ ([]),
+            publicClubs: /** @type {any} */ ([]),
+            lookupSteps: /** @type {any} */ (null),
+            lookupPoses: /** @type {any} */ (null),
+            isQrShell,
+        };
+    }
+
+    await loadAppDependencies();
+    await initInstructorWasmOnce(fetch);
 
     const { lookupSteps, lookupPoses } = await loadCollectionAssets();
     const officialDances = dances();
@@ -53,9 +104,9 @@ export const load = async ({ fetch, data }) => {
         )
         .catch((e) => console.error(e)));
 
-    /** @type {(Course|void)[]} */
+    /** @type {(import('$lib/instructor/bouncy_instructor').Course|void)[]} */
     const coursesResults = await Promise.all(coursePromises);
-    /** @type {Course[]} */
+    /** @type {import('$lib/instructor/bouncy_instructor').Course[]} */
     // @ts-ignore
     const courses = coursesResults.filter((c) => c);
     const publicClubs = await loadPublicClubs(fetch);
@@ -68,6 +119,7 @@ export const load = async ({ fetch, data }) => {
         publicClubs,
         lookupSteps,
         lookupPoses,
+        isQrShell,
     };
 }
 
@@ -95,7 +147,7 @@ async function loadCollectionAssets() {
         ...stepFileResponses
     ] = await Promise.all([poseFile, animationPoseFile, danceFile, ...stepFiles]);
 
-    const stepFileStrings = await Promise.all(stepFileResponses.map((data) => data.default)).catch((e) => console.error(e));
+    const stepFileStrings = (await Promise.all(stepFileResponses.map((data) => /** @type {any} */ (data).default)).catch((e) => console.error(e))) || [];
 
     const poseFileString = poseFileResponse;
     const animationPoseFileString = animationPoseFileResponse;
@@ -141,7 +193,7 @@ async function loadCollectionAssets() {
      *
      * (Note: I might want to move this to Rust code.)
      * @param {StepFilter} filter 
-     * @returns {StepWrapper[]}
+     * @returns {import('$lib/instructor/bouncy_instructor').StepWrapper[]}
     */
     function lookupSteps(filter) {
         // collect all steps to include from sources
@@ -149,7 +201,7 @@ async function loadCollectionAssets() {
         if (filter.sources) {
             for (let i = 0; i < filter.sources.length; i++) {
                 const sourceName = filter.sources[i];
-                const list = stepData.bySource[sourceName];
+                const list = stepData.bySource[/** @type {keyof typeof stepData.bySource} */ (sourceName)];
                 if (list) {
                     stepLists.push(list);
                 } else {
@@ -189,7 +241,7 @@ async function loadCollectionAssets() {
      *
      * (Note: I might want to move this to Rust code.)
      * @param {StepFilter} filter 
-     * @returns {PoseWrapper[]}
+     * @returns {import('$lib/instructor/bouncy_instructor').PoseWrapper[]}
     */
     function lookupPoses(filter) {
         // TODO: filtering
