@@ -61,6 +61,14 @@ enum UserAuthError {
 #[derive(Clone, Debug)]
 struct MaybeUser(Result<User, UserAuthError>);
 
+/// OIDC-only capability data retained after user lookup. Client-session guests
+/// never receive this capability, even when they resolve to a database user.
+#[derive(Clone, Copy, Debug)]
+struct QrAdminPrincipal {
+    authenticated_by_oidc: bool,
+    has_qr_admin_role: bool,
+}
+
 /// Middleware to lookup user or create it lazily from an OIDC claim.
 ///
 /// Sets `MaybeUser`.
@@ -71,6 +79,14 @@ pub async fn user_lookup(
     next: Next,
 ) -> Response {
     let auth_headers = &req.headers().get_all("Authorization");
+    let qr_admin_principal = QrAdminPrincipal {
+        authenticated_by_oidc: maybe_claims.is_some(),
+        has_qr_admin_role: maybe_claims.as_ref().is_some_and(|claims| {
+            claims
+                .additional_claims()
+                .has_client_role(&state.kc_config.client_id, "qr-admin")
+        }),
+    };
     let maybe_user = try_get_user(&state, auth_headers, maybe_claims).await;
 
     // Add user info to logs
@@ -89,6 +105,7 @@ pub async fn user_lookup(
     // `require_user_service` will catch it as an error later for protected routes.
     // But the login route must work without user info.
     req.extensions_mut().insert(MaybeUser(maybe_user));
+    req.extensions_mut().insert(qr_admin_principal);
     next.run(req).await
 }
 
@@ -107,6 +124,42 @@ pub async fn require_user_service(mut req: Request, next: Next) -> Response {
         }
         Err(e) => e.to_response(),
     }
+}
+
+/// Require a full OIDC login and the dedicated Keycloak `qr-admin` role.
+pub async fn require_qr_admin(mut req: Request, next: Next) -> Response {
+    let extensions = req.extensions_mut();
+    let Some(QrAdminPrincipal {
+        authenticated_by_oidc,
+        has_qr_admin_role,
+    }) = extensions.get::<QrAdminPrincipal>()
+    else {
+        tracing::error!("QR admin route ran without user lookup");
+        return internal_error_response("user lookup failed");
+    };
+    let Some(MaybeUser(maybe_user)) = extensions.get::<MaybeUser>() else {
+        tracing::error!("QR admin route ran without authenticated user lookup");
+        return internal_error_response("user lookup failed");
+    };
+
+    let Ok(user) = maybe_user else {
+        tracing::warn!("Denied unauthenticated QR admin request");
+        return auth_error_response("QR admin login required");
+    };
+    if !authenticated_by_oidc {
+        tracing::warn!(user_id = %user.id, "Denied guest QR admin request");
+        return auth_error_response("QR admin login required");
+    }
+    if !has_qr_admin_role {
+        tracing::warn!(user_id = %user.id, "Denied QR admin request without role");
+        return Response::builder()
+            .status(StatusCode::FORBIDDEN)
+            .body("QR admin role required".into())
+            .expect("response builder should succeed");
+    }
+
+    extensions.insert(user.clone());
+    next.run(req).await
 }
 
 async fn try_get_user(
@@ -141,7 +194,7 @@ async fn try_get_user(
 
 async fn validate_guest_user_matches_claims(
     state: &AppState,
-    maybe_claims: &Option<OidcClaims<axum_oidc::EmptyAdditionalClaims>>,
+    maybe_claims: &Option<OidcClaims<AdditionalClaims>>,
     mut user: User,
 ) -> Result<User, UserAuthError> {
     if let Some(claims) = maybe_claims {
@@ -174,7 +227,7 @@ async fn validate_guest_user_matches_claims(
 // TODO: Fix clippy warning
 #[allow(clippy::result_large_err)]
 fn validate_existing_oidc_user_matches_claims(
-    maybe_claims: &Option<OidcClaims<axum_oidc::EmptyAdditionalClaims>>,
+    maybe_claims: &Option<OidcClaims<AdditionalClaims>>,
     user: User,
     existing_user_oidc_sub: String,
 ) -> Result<User, UserAuthError> {

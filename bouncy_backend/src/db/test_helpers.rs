@@ -32,6 +32,8 @@ pub fn make_test_state(pool: PgPool) -> crate::AppState {
             registration_url: "http://localhost:8080/register".parse::<Url>().unwrap(),
             logout_url: "http://localhost:8080/logout".parse::<Url>().unwrap(),
         },
+        qr_trusted_target_origins: Vec::new(),
+        qr_allow_localhost_http: true,
         system_user: PeerTubeSystemUser::new("system_user".to_string(), "password".to_string()),
         data_cache: DataCache::default(),
     }

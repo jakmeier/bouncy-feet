@@ -45,6 +45,33 @@ Or, do the same with the convenient script.
 bash update_query_cache.sh
 ```
 
+## QR administration
+
+`/admin/qr/*` requires a normal OIDC login plus the dedicated Keycloak client
+role `qr-admin`.
+
+The canonical app origin is always an allowed target. Set
+`QR_TRUSTED_TARGET_ORIGINS` to a comma-separated list of any additional exact
+origins, for example:
+
+```text
+QR_TRUSTED_TARGET_ORIGINS=https://partner.example,https://discount.example
+```
+
+A simple UI is accessible for QR admins:
+
+```text
+https://stats.bouncy-feet.ch/admin/qr/ui
+```
+
+The API is also available for scripting:
+
+```bash
+curl -b 'id=SECRET_FROM_BROWSER_COOKIES' -X POST https://stats.bouncy-feet.ch/admin/qr \
+  -H 'content-type: application/json' \
+  -d '{"code":"1234","target_url":"https://app.bouncy-feet.ch/challenges/"}'
+```
+
 ## Local development hints
 
 ### SQL migration error: `Result::unwrap()` on an `Err` value: VersionMismatch(NUMBER)

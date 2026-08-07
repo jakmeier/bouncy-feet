@@ -13,9 +13,10 @@
 use axum::extract::{Query, State};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Redirect, Response};
-use axum_oidc::{ClearSessionFlag, EmptyAdditionalClaims, OidcClaims};
+use axum_oidc::{ClearSessionFlag, OidcClaims};
 use url::Url;
 
+use crate::layers::oidc::AdditionalClaims;
 use crate::AppState;
 
 #[derive(serde::Deserialize)]
@@ -25,7 +26,6 @@ pub struct QueryParams {
 
 #[derive(Clone)]
 pub struct KeycloakClientConfig {
-    #[allow(unused)]
     pub client_id: String,
     #[allow(unused)]
     pub client_secret: String,
@@ -38,7 +38,7 @@ pub struct KeycloakClientConfig {
 #[axum::debug_handler]
 pub async fn login(
     query: Query<QueryParams>, //< order important, query must be before claims for registration to succeed in parsing both
-    claims: OidcClaims<EmptyAdditionalClaims>,
+    claims: OidcClaims<AdditionalClaims>,
     State(state): State<AppState>,
 ) -> Response {
     // The main checks are done in the OIDC middleware.
@@ -116,7 +116,7 @@ pub async fn logout(
     query: Query<QueryParams>,
     // needed to ensure the oidc auth layer is active, otherwise clearing a
     // session won't do anything
-    _claims: OidcClaims<EmptyAdditionalClaims>,
+    _claims: OidcClaims<AdditionalClaims>,
     State(state): State<AppState>,
 ) -> Response {
     let mut url = state.kc_config.logout_url.clone();

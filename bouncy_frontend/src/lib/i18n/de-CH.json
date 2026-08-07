@@ -7,8 +7,10 @@
             "title": "Bouncy Feet QR-Referenz",
             "description": "Öffne die Bouncy-Feet-App über diese QR-Referenz."
         },
-        "title": "Hallo! \nSuchst du etwas?",
-        "open-app": "Bouncy-Feet-App öffnen",
+        "title": "Hallo!",
+        "open-app": "Bouncy Feet App öffnen",
+        "opening": "Einen Moment kurz...",
+        "unavailable": "Suchst du etwas?\nDieser QR-Link führt leider nirgendwo hin.",
         "reference": "QR-Referenz:"
     },
     "home": {

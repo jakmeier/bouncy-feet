@@ -38,6 +38,8 @@ struct AppState {
     http_client: reqwest::Client,
     peertube_client_config: Arc<tokio::sync::RwLock<Option<peertube_token::OAuthClientConfig>>>,
     kc_config: KeycloakClientConfig,
+    qr_trusted_target_origins: Vec<Url>,
+    qr_allow_localhost_http: bool,
     system_user: PeerTubeSystemUser,
     data_cache: DataCache,
 }
@@ -61,6 +63,12 @@ async fn main() -> anyhow::Result<()> {
 
     let parsed_api_url = Url::parse(&api_url).unwrap();
     let parsed_app_url = Url::parse(&app_url).unwrap();
+    let qr_trusted_target_origins = parse_qr_trusted_target_origins()?;
+    let qr_allow_localhost_http = parsed_app_url.scheme() == "http"
+        && matches!(
+            parsed_app_url.host_str(),
+            Some("localhost") | Some("127.0.0.1") | Some("::1")
+        );
 
     // `prompt=create` is the recommended way to open the registration page.
     // Requires Keycloak 26.1.0 or newer.
@@ -103,6 +111,8 @@ async fn main() -> anyhow::Result<()> {
             registration_url: kc_registration_url,
             logout_url: kc_logout_url,
         },
+        qr_trusted_target_origins,
+        qr_allow_localhost_http,
         system_user,
         data_cache: Default::default(),
     };
@@ -176,7 +186,8 @@ async fn main() -> anyhow::Result<()> {
             "/new_guest_session",
             get(api_endoints::client_session::create_guest_session),
         )
-        .route("/stats", get(api_endoints::stats::stats));
+        .route("/stats", get(api_endoints::stats::stats))
+        .route("/qr/{code_hash}/resolve", get(api_endoints::qr::resolve));
 
     // bottom-to-top order for router
     let login_route = Router::new()
@@ -273,10 +284,27 @@ async fn main() -> anyhow::Result<()> {
             layers::user::require_user_service,
         ));
 
-    // auth_service must run before protected routes as well as login
+    let admin_qr_app = Router::new()
+        .route("/admin/qr/ui", get(api_endoints::qr::admin_ui))
+        .route("/admin/qr", get(api_endoints::qr::list))
+        .route("/admin/qr", post(api_endoints::qr::create))
+        .route("/admin/qr/{code_hash}", get(api_endoints::qr::detail))
+        .route(
+            "/admin/qr/{code_hash}/mapping",
+            post(api_endoints::qr::change_mapping),
+        )
+        .route(
+            "/admin/qr/{code_hash}/disable",
+            post(api_endoints::qr::disable),
+        )
+        .route("/admin/qr/{code_hash}/stats", get(api_endoints::qr::stats))
+        .layer(axum::middleware::from_fn(layers::user::require_qr_admin));
+
+    // auth_service must run before protected routes, login, and QR administration.
     let authenticated_app = Router::new()
         .merge(login_route)
         .merge(protected_app)
+        .merge(admin_qr_app)
         .layer(auth_service);
 
     // bottom-to-top order for router
@@ -315,4 +343,21 @@ where
 fn require_env(var_name: &str) -> String {
     std::env::var(var_name)
         .unwrap_or_else(|err| panic!("missing {var_name} environment variable, err {err}"))
+}
+
+fn parse_qr_trusted_target_origins() -> anyhow::Result<Vec<Url>> {
+    std::env::var("QR_TRUSTED_TARGET_ORIGINS")
+        .unwrap_or_default()
+        .split(',')
+        .map(str::trim)
+        .filter(|value| !value.is_empty())
+        .map(|value| {
+            let url = Url::parse(value)?;
+            if url.origin().is_tuple() {
+                Ok(url)
+            } else {
+                anyhow::bail!("QR_TRUSTED_TARGET_ORIGINS entries must have an origin")
+            }
+        })
+        .collect()
 }

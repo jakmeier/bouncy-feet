@@ -7,8 +7,10 @@
             "title": "Bouncy Feet QR reference",
             "description": "Open the Bouncy Feet app from this QR reference."
         },
-        "title": "Hi!\nAre you looking for something?",
+        "title": "Hi!",
         "open-app": "Open the Bouncy Feet app",
+        "opening": "Just a second...",
+        "unavailable": "Are you looking for something?\nI'm afraid this QR link doesn't go anywhere.",
         "reference": "QR reference:"
     },
     "home": {

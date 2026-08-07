@@ -37,7 +37,9 @@ The access token remains on the backend server, never to be revealed to the user
 Cookie-based sessions are used to authenticate the user.
 
 Authorization:
-The backend checks user permissions, currently only based on the user id.
+The backend checks user permissions based on the authenticated user ID and,
+for QR administration, a dedicated Keycloak client role. See
+[QR forwarding administration](#qr-forwarding-administration).
 
 Keycloak configuration:
 Only the standard flow enabled.
@@ -46,6 +48,33 @@ Client must be authenticated (using client_id + client_secret).
 ![Keycloak client configuration screenshot matching the description in text](./img/auth/api-backend-client.png)
 
 Don't forget to configure "Valid redirect URIs" and Valid post logout redirect URIs for the client. It should allow redirecting to both the API server domain and the frontend API.
+
+### QR forwarding administration
+
+The API's QR-management routes (`/admin/qr/*`) require both a normal OIDC
+session and the `qr-admin` **client role** on the API backend's Keycloak
+client.
+
+For each environment:
+
+1. In Keycloak, open the client named by the backend's `OIDC_CLIENT_ID` (for
+   example `bouncy-dev-backend` in development), create the client role
+   `qr-admin`, and assign it to named operators through **Users -> Role
+   mappings**.
+2. Ensure the native Keycloak client-role claim is included in the **ID token**.
+   The standard `roles` client scope/role mapper normally emits it.
+3. Verify a newly issued ID token has this shape, using the actual backend
+   client ID as the map key:
+
+   ```json
+   {
+     "resource_access": {
+       "bouncy-dev-backend": {
+         "roles": ["qr-admin"]
+       }
+     }
+   }
+   ```
 
 
 ## BouncyFeet JWT in the frontend
