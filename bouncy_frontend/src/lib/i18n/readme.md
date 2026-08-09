@@ -18,6 +18,13 @@ dictionary. It is hard to predict which word needs a different translation in a
 different context. Therefore, different occurrence in the app = different
 translation entry.
 
+# Verification
+
+Run `npm run test:i18n` to verify that every locale has the same keys, literal
+`$t('key')` calls resolve in every locale, and no translation key is unused. It
+also recognises translation keys passed to components as string props. Dynamic
+keys are matched using their static prefix and suffix.
+
 # Contributions
 
 Creating or updating a locale requires no programming knowledge.

@@ -14,10 +14,6 @@
         "reference": "QR reference:"
     },
     "home": {
-        "title": "Bouncy Feet!",
-        "slogan-0": "Dancing is for everyone!",
-        "slogan-1": "A dance a day keeps worries at bay.",
-        "slogan-2": "What are you up to today? Select the dance style that matches your body's mood!",
         "first-visit-0": "Hey hey! :)",
         "first-visit-question": "Have we met before?",
         "first-visit-button": "I'm visiting for the first time",
@@ -39,20 +35,11 @@
         "help-0": "The app urgently needs more content! Step breakdowns with videos, simple warm-ups, and more. Anything is welcome!",
         "help-1": "If you want to help me, please reach out!",
         "help-2": "I’d be super happy!",
-        "alpha-disclaimer": "Features are experimental and incomplete.",
         "go-to-github-title": "For the nerds",
         "go-to-github-0": "The whole thing is 100% open-source, built with a mix of JavaScript and Rust.",
         "go-to-github-1": "If you’d like to contribute, check it out on GitHub!",
         "go-to-issues": "If something’s not working as expected, feel free to report bugs as a GitHub issue.",
-        "version-label": "version",
-        "go-button": "Let's Go!",
         "more-button": "See more",
-        "progress-title": "Your Progress",
-        "collection-button": "Browse moves",
-        "courses-button": "Learn Shuffle",
-        "continue-learning-button": "Come dance with me!",
-        "change-teacher-button": "Other teachers",
-        "tutorial-button": "Intro course",
         "nav": "Home",
         "users-title": "Dancers",
         "more-users": "Show all"
@@ -62,10 +49,11 @@
         "intro-button-0": "Yeah!",
         "intro-button-1": "Teach me your moves",
         "continue-first-warmup": "There you are! Common, the training isn't done, yet.",
-        "into-done-title": "Well done!",
-        "into-done-0": "Congrats on finishing your first class with Bouncy Feet!",
-        "into-done-1": "You can now select a coach to develop your skill in the direction of your choice.",
-        "into-done-2": "And don't forget to come back for your daily vibe!"
+        "intro-0": "Welcome to Bouncy Feet!",
+        "intro-done-title": "Well done!",
+        "intro-done-0": "Congrats on finishing your first class with Bouncy Feet!",
+        "intro-done-1": "You can now select a coach to develop your skill in the direction of your choice.",
+        "intro-done-2": "And don't forget to come back for your daily vibe!"
     },
     "club": {
         "my-clubs-title": "My Clubs",
@@ -86,7 +74,6 @@
         "update-button": "Save club",
         "upload-video-button": "Upload video",
         "upload-video-description": "Add public club video",
-        "upload-video-description-private": "Add video visible only to club members only",
         "select-user-title": "Select dancer",
         "select-combo-title": "Select Combo",
         "adding-combo-description": "Adding",
@@ -100,7 +87,6 @@
         "add-user-failed": "Sorry something went wrong:(",
         "admins-title": "Admins",
         "members-title": "Members",
-        "requires-login-description": "This part of the club is private.",
         "form-title": "Name",
         "form-url": "Website / Social Link",
         "form-logo": "Logo",
@@ -111,12 +97,8 @@
         "title": "Courses",
         "more-coming": "More courses coming soon",
         "course-overview": {
-            "title": "Course Overview",
             "start-lesson": "Go!",
-            "lesson": "lesson with",
-            "lessons-subtitle": "Lessons done",
-            "part": "part",
-            "parts": "parts"
+            "lessons-subtitle": "Lessons done"
         },
         "end": {
             "again-button": "Dance again",
@@ -127,7 +109,6 @@
         },
         "lesson": {
             "title": "Lesson",
-            "steps-subtitle": "Steps",
             "settings-subtitle": "About the lesson",
             "next-button": "Next",
             "start-button": "Start exercise",
@@ -135,15 +116,11 @@
             "back-button": "Back to overview",
             "done-button": "Done",
             "show-teachers-button": "Visit coaches",
-            "to-video-button": "Explainer Video",
             "next-song-button": "Next Song",
             "done-text": "Lesson complete",
             "audio-label": "Play beat",
             "bpm-label": "Speed",
-            "duration-label": "Duration",
-            "num-beats-label": "Beats",
             "exercise-popup-title": "Start exercise",
-            "exercise-beat-description": "You can either dance along a simple beat or play your own music outside Bouncy Feet and match the beat.",
             "exercise-start-description-0": "Place your phone far enough for the camera to see your whole body.",
             "exercise-start-description-1": "Then stand in the camera image and the fun begins!",
             "play-beat-button": "Play a beat",
@@ -168,10 +145,7 @@
         "retry-button": "Try again",
         "back-button": "Back to challenges"
     },
-    "leaderboard": {
-        "user-header": "Dancer",
-        "steps-header": "Steps"
-    },
+    "leaderboard": {},
     "collection": {
         "title": "Collection",
         "nav": "Collection",
@@ -208,7 +182,6 @@
         "delete-dance-button": "Delete dance",
         "delete-dance-confirmation": "Delete the dance?",
         "edit-button": "Edit dance",
-        "edit-copy-button": "Copy and edit",
         "pick-pose-prompt": "Pick a pose",
         "pick-step-prompt": "Pick a step",
         "saving-prompt": "How to save the dance?",
@@ -221,8 +194,6 @@
         "cancel-delete-button": "Cancel",
         "confirm-delete-button": "Delete",
         "confirm-leave": "You have unsaved changes that will be lost if you leave. Leave anyway?",
-        "export-dances": "Export all my dances",
-        "import-dances": "Import dances",
         "pose": {
             "title": "Lab: Poses",
             "list": "My poses",
@@ -307,9 +278,7 @@
         "warmup-line-neutral-0": "Are you all warmed up already?",
         "preview-energy-title": "Energy",
         "preview-difficulty-title": "Difficulty",
-        "preview-video-title": "Need help?",
         "energy-level": "Energy level",
-        "stop-camera": "stop camera",
         "stop-record": "stop video",
         "learn-dance-prefix": "Learn",
         "train-dance-prefix": "Train",
@@ -347,19 +316,14 @@
         "num-dances": "Dances",
         "num-steps": "Steps",
         "num-lessons": "Lessons",
-        "unique-steps": "different moves",
         "lifetime-stats-title": "Woah! So much fun!",
         "lifetime-stats-subtitle": "Your lifetime stats:",
-        "learned-stats-title": "You have learned:",
         "fun-stats-title": "Come back every day for your daily dance vibe!",
         "average-bpm": "BPM",
         "slow": "Slow (<50)",
         "mid": "Normal (50-100)",
         "fast": "Fast (100-130)",
         "very-fast": "Ludicrous speed (>130)",
-        "today": "today",
-        "week": "this week",
-        "lifetime": "lifetime",
         "time-danced": "Danced for",
         "time-danced-2": "danced"
     },
@@ -375,7 +339,6 @@
         "button-create-guest": "Continue as guest",
         "button-cancel": "Go back",
         "button-select-image": "Select image",
-        "requires-login-title": "Who are you?",
         "requires-full-user-text": "Log in or create your free account now.",
         "new-device-text": "Are you new here?",
         "previous-login-name": "You have previously been logged in as: ",
@@ -383,8 +346,6 @@
         "guest-mode-text": "You are in guest mode.",
         "login-expired-text": "Your login has expired.",
         "login-failed": "Login failed :(",
-        "guest-login-failed": "Guest login failed",
-        "guest-login-failed-description": "The server is not responding.",
         "login-failed-peertube-down": "Bouncy Tube doesn't respond, maybe the video platform is down.",
         "waiting-for-login-info": "Checking your login info...",
         "waiting-for-set-username": "Setting up your user...",
@@ -399,20 +360,12 @@
             "create-description": "Show your skills! With a quick combination of steps.",
             "save-button": "Save combo",
             "cancel-button": "Cancel",
-            "delete-button": "Delete combo",
-            "add-timestamp-button": "Insert timestamp",
             "confirm-delete": "Permanently delete combo?",
             "form-name": "Combo name (optional)",
             "public-toggle": "Show publicly in my profile",
             "add-video-description": "Upload a video of your Combo."
         },
-        "consent": {
-            "title": "Enter leaderboard",
-            "text0": "To be shown on the leaderboard, we need to submit your personal dance statistics to the server. Videos are never uploaded.",
-            "question": "Do you want to send your statistics and have an entry on the public leaderboard?",
-            "yes": "Yes",
-            "no": "No"
-        },
+        "consent": {},
         "settings": {
             "title": "Settings",
             "consent-title": "Show my progress in public leaderboard",
@@ -447,8 +400,7 @@
         "skill": "Skill"
     },
     "coach": {
-        "select-coach-button": "Select this coach",
-        "courses-title": "Learn my style"
+        "select-coach-button": "Select this coach"
     },
     "music": {
         "by": "by"

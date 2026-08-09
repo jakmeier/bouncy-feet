@@ -1,0 +1,29 @@
+name: Frontend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'bouncy_frontend/**'
+      - '.github/workflows/frontend.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'bouncy_frontend/**'
+      - '.github/workflows/frontend.yml'
+
+jobs:
+  translations:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./bouncy_frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: bouncy_frontend/.nvmrc
+          cache: npm
+          cache-dependency-path: bouncy_frontend/package-lock.json
+      - run: npm ci
+      - run: npm run test:i18n

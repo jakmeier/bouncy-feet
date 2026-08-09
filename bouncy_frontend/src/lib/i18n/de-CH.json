@@ -14,10 +14,6 @@
         "reference": "QR-Referenz:"
     },
     "home": {
-        "title": "Bouncy Feet!",
-        "slogan-0": "Tanzen ist für alle!",
-        "slogan-1": "Ein Tänzchen am Tag vertreibt Kummer und Plag.",
-        "slogan-2": "Wonach ruft dein Körper? Finde den Tanzstil der zu deiner Stimmung passt!",
         "first-visit-0": "Hey hey! :)",
         "first-visit-question": "Kennen wir uns bereits?",
         "first-visit-button": "Ich bin zum ersten Mal hier",
@@ -39,20 +35,11 @@
         "help-0": "Die App braucht dringendst mehr Inhalte! Erklärte Schritte mit Videos, oder auch simple Warmup Übungen. Alles ist willkommen.",
         "help-1": "Willst du mir helfen? Melde dich bitte!",
         "help-2": "Ich freue mich sehr!",
-        "alpha-disclaimer": "Die Funktionen sind experimentell und unvollständig.",
         "go-to-github-title": "Für die Nerds",
         "go-to-github-0": "Programmiert wird das ganze 100% quelloffen, mit einer Kombination aus JavaScript und Rust.",
         "go-to-github-1": "Falls du es dir vorstellen kannst auch mit zu programmieren, schau doch mal auf GitHub vorbei.",
         "go-to-issues": "Wenns mal nicht funktioniert wies soll, melde Bugs doch gerne als GitHub Issue.",
-        "version-label": "Version",
-        "go-button": "Los gehts!",
         "more-button": "Mehr anzeigen",
-        "progress-title": "Dein Fortschritt",
-        "collection-button": "Schau dir Schritte an",
-        "courses-button": "Lerne Shuffle",
-        "continue-learning-button": "Lass uns tanzen!",
-        "change-teacher-button": "Andere Lehrer",
-        "tutorial-button": "Intro-Kurs",
         "nav": "Home",
         "users-title": "Tanzende",
         "more-users": "Zeige alle"
@@ -65,7 +52,8 @@
         "intro-done-title": "Super gemacht!",
         "intro-done-0": "Glückwunsch, du hast deinen erste Kurs mit Bouncy Feet geschafft!",
         "intro-done-1": "Jetzt kannst du dir einen Coach aussuchen, um deine Skills in die Richtung zu entwickeln, die du willst.",
-        "intro-done-2": "Und vergiss nicht, für deinen täglichen Vibe wieder vorbeizuschauen!"
+        "intro-done-2": "Und vergiss nicht, für deinen täglichen Vibe wieder vorbeizuschauen!",
+        "intro-0": "Willkommen bei Bouncy Feet!"
     },
     "club": {
         "my-clubs-title": "Mein Clubs",
@@ -86,7 +74,6 @@
         "update-button": "Club speichern",
         "upload-video-button": "Video hochladen",
         "upload-video-description": "Video öffentlich zum Club hinzufügen",
-        "upload-video-description-private": "Video für Clubmitglieder sichtbar hinzufügen",
         "select-user-title": "Wähle Tänzer/in",
         "select-combo-title": "Wähle Combo",
         "adding-combo-description": "Combo",
@@ -100,7 +87,6 @@
         "add-user-failed": "Das hat leider nicht geklappt :(",
         "admins-title": "Admins",
         "members-title": "Mitglieder",
-        "requires-login-description": "Dieser Bereich vom Club ist privat.",
         "form-title": "Name",
         "form-url": "Webseite / Social Link",
         "form-logo": "Logo",
@@ -111,12 +97,8 @@
         "title": "Kurse",
         "more-coming": "Mehr Kurse in Entwicklung",
         "course-overview": {
-            "title": "Kursüberblick",
             "start-lesson": "Los!",
-            "lesson": "Lektion mit",
-            "lessons-subtitle": "Abgeschlossene Lektionen",
-            "part": "Teil",
-            "parts": "Teilen"
+            "lessons-subtitle": "Abgeschlossene Lektionen"
         },
         "end": {
             "again-button": "Nochmals tanzen",
@@ -127,7 +109,6 @@
         },
         "lesson": {
             "title": "Lektion",
-            "steps-subtitle": "Schritte",
             "settings-subtitle": "Über die Lektion",
             "next-button": "Weiter",
             "start-button": "Übung beginnen",
@@ -135,15 +116,11 @@
             "back-button": "Zurück zur Übersicht",
             "done-button": "Fertig",
             "show-teachers-button": "Zu den Coaches",
-            "to-video-button": "Videoerklärung",
             "next-song-button": "Nächster Song",
             "done-text": "Lektion abgeschlossen",
             "audio-label": "Takt abspielen",
             "bpm-label": "Tempo",
-            "duration-label": "Zeit",
-            "num-beats-label": "Takte",
             "exercise-popup-title": "Übung beginnen",
-            "exercise-beat-description": "Du kannst entweder zu einem simplen Metronom tanzen, oder deine eigene Musik ausserhalb der Bouncy Feet App laufen lassen.",
             "exercise-start-description-0": "Stell dein Telefon genug weit weg, dass dein ganzer Körper sichtbar ist.",
             "exercise-start-description-1": "Dann steh ins Bild und der Spass kann beginnen!",
             "play-beat-button": "Spiel ein Takt für mich",
@@ -168,10 +145,7 @@
         "retry-button": "Nochmals versuchen",
         "back-button": "Zurück zu den Challenges"
     },
-    "leaderboard": {
-        "user-header": "Tänzer/in",
-        "steps-header": "Schritte"
-    },
+    "leaderboard": {},
     "collection": {
         "title": "Sammlung",
         "nav": "Sammlung",
@@ -208,7 +182,6 @@
         "delete-dance-button": "Tanz löschen",
         "delete-dance-confirmation": "Tanz wirklich löschen?",
         "edit-button": "Tanz bearbeiten",
-        "edit-copy-button": "Kopieren und bearbeiten",
         "pick-pose-prompt": "Wähle eine Pose",
         "pick-step-prompt": "Wähle einen Schritt",
         "saving-prompt": "Wie soll der Tanz gespeichert werden?",
@@ -221,8 +194,6 @@
         "cancel-delete-button": "Abbrechen",
         "confirm-delete-button": "Löschen",
         "confirm-leave": "Die Seite hat ungespeicherte Änderungen die verloren gehen. Seite trotzdem verlassen?",
-        "export-dances": "Alle Tänze exportieren",
-        "import-dances": "Tänze importieren",
         "pose": {
             "title": "Labor: Posen",
             "list": "Meine Posen",
@@ -307,9 +278,7 @@
         "warmup-line-neutral-0": "Wurdest du schön warm?",
         "preview-energy-title": "Energie",
         "preview-difficulty-title": "Schwierigkeit",
-        "preview-video-title": "Hilfe nötig?",
         "energy-level": "Energielevel",
-        "stop-camera": "Kamera stoppen",
         "stop-record": "Video stoppen",
         "learn-dance-prefix": "Lerne",
         "train-dance-prefix": "Übe",
@@ -347,19 +316,14 @@
         "num-dances": "Tänze",
         "num-steps": "Schritte",
         "num-lessons": "Lektionen",
-        "unique-steps": "verschiedene Schritte",
         "lifetime-stats-title": "Wow! So viel Spass!",
         "lifetime-stats-subtitle": "Das hast du schon abgeschlossen:",
-        "learned-stats-title": "Dabei hast du gelernt:",
         "fun-stats-title": "Komm jeden Tag zurück für deine täglichen Tanz-Vibe!",
         "average-bpm": "BPM",
         "slow": "Langsam (<50)",
         "mid": "Normal (50-100)",
         "fast": "Schnell (100-130)",
         "very-fast": "Übertrieben schnell (>130)",
-        "today": "heute",
-        "week": "diese Woche",
-        "lifetime": "zu Lebzeit",
         "time-danced": "Getanzt für",
         "time-danced-2": "getanzt"
     },
@@ -375,7 +339,6 @@
         "button-create-guest": "Weiter als Gast",
         "button-cancel": "Geh zurück",
         "button-select-image": "Bild wählen",
-        "requires-login-title": "Wer bist du?",
         "requires-full-user-text": "Logg dich ein oder erstelle jetzt ein gratis Konto.",
         "new-device-text": "Bist du neu hier?",
         "previous-login-name": "Du warst vorhin eingeloggt als: ",
@@ -383,8 +346,6 @@
         "guest-mode-text": "Du bist im Gastmodus.",
         "login-expired-text": "Dein Login ist abgelaufen.",
         "login-failed": "Login kaputt :(",
-        "guest-login-failed": "Gastlogin fehlgeschlagen",
-        "guest-login-failed-description": "Der Server will wohl gerade nicht.",
         "login-failed-peertube-down": "Bouncy Tube reagiert nicht, vielleicht ist die Videoplattform aus.",
         "waiting-for-login-info": "Prüfe deine Logindaten...",
         "waiting-for-set-username": "Richte deinen Nutzer ein...",
@@ -399,20 +360,12 @@
             "create-description": "Zeige was du kannst! Mit einer kurzen Schrittabfolge.",
             "save-button": "Combo speichern",
             "cancel-button": "Abbrechen",
-            "delete-button": "Combo löschen",
             "confirm-delete": "Combo permanent löschen?",
-            "add-timestamp-button": "Zeitmarke einfügen",
             "form-name": "Name für Combo (optional)",
             "public-toggle": "Öffentlich in meinem Profil anzeigen",
             "add-video-description": "Lade ein Video von deiner Combo hoch."
         },
-        "consent": {
-            "title": "Rangliste beitreten",
-            "text0": "Um auf der Rangliste zu erschienen, müssen wir deine tanzstatisken übermitteln. Videos werden nie hochgeladen.",
-            "question": "Willst du deine Statistiken übermitteln und auf der öffentlichen Rangliste erscheinen?",
-            "yes": "Ja",
-            "no": "Nein"
-        },
+        "consent": {},
         "settings": {
             "title": "Einstellungen",
             "consent-title": "Zeige mein Fortschritt in der öffentlichen Rangliste",
@@ -447,8 +400,7 @@
         "skill": "Fertigkeit"
     },
     "coach": {
-        "select-coach-button": "Wähle diesen Coach",
-        "courses-title": "Lerne meinen Style"
+        "select-coach-button": "Wähle diesen Coach"
     },
     "music": {
         "by": "von"
