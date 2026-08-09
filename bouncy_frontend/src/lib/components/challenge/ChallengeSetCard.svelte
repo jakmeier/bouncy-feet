@@ -154,7 +154,6 @@
     border-radius: 24px;
     color: var(--theme-neutral-white);
     background: var(--theme-neutral-black);
-    box-shadow: 0 16px 38px var(--theme-neutral-dark-transparent);
     transition:
       transform 180ms ease,
       box-shadow 180ms ease;
@@ -169,7 +168,6 @@
     place-items: center;
     min-height: 240px;
     overflow: hidden;
-    background: var(--theme-main);
   }
   .preview-video {
     position: absolute;

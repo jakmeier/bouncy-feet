@@ -129,6 +129,9 @@
     },
     "challenges": {
         "not-found": "Challenge not found",
+        "empty-title": "New challenges are warming up",
+        "empty-description": "Check back soon for your next dance quest.",
+        "sets-label": "Available challenge sets",
         "solution-video": "solution video",
         "start-description": "Complete every move in one uninterrupted, on-beat run.",
         "start-button": "Start challenge",

@@ -1,15 +1,12 @@
 <script>
   import { t } from '$lib/i18n.js';
-  import { versionString } from '$lib/stores/FeatureSelection';
   import { beatCounter } from '$lib/stores/Beat';
   import LightSection from '$lib/components/ui/sections/LightSection.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
   import LogoHeader from '$lib/components/ui/header/LogoHeader.svelte';
   import HelpUs from '$lib/components/info/HelpUs.svelte';
-  import LifetimeStats from './profile/LifetimeStats.svelte';
   import About from '$lib/components/info/About.svelte';
   import Section from '$lib/components/ui/sections/Section.svelte';
-  import BugReports from '$lib/components/info/BugReports.svelte';
   import Nerds from '$lib/components/info/Nerds.svelte';
   import Background from '$lib/components/ui/sections/Background.svelte';
   import { getContext } from 'svelte';
@@ -18,17 +15,19 @@
   import HomeNote from './HomeNote.svelte';
   import { goto } from '$app/navigation';
   import { asset } from '$app/paths';
-  import NightSection from '$lib/components/ui/sections/NightSection.svelte';
   import LimeSection from '$lib/components/ui/sections/LimeSection.svelte';
   import UserList from '$lib/components/user/UserList.svelte';
+  import ChallengeSetList from '$lib/components/challenge/ChallengeSetList.svelte';
+
   /**
    * @typedef {Object} Props
    * @property {any} featuredDances
    * @property {any} featuredSteps
+   * @property {import('$lib/instructor/bouncy_instructor').ChallengeSet[]} challengeSets
    */
 
   /** @type {Props} */
-  let {} = $props();
+  let { challengeSets } = $props();
 
   /** @type {LocalState}*/
   const localState = getContext('localState');
@@ -54,9 +53,9 @@
 
 <HomeNote />
 
-<!-- <LogoHeader title={$t('home.slogan-1')} /> -->
-
-<!-- TODO: maybe showcase something here -->
+<DarkSection>
+  <ChallengeSetList sets={challengeSets} />
+</DarkSection>
 
 <DarkSection arrow>
   <Personalities></Personalities>
@@ -76,20 +75,6 @@
 
 <!-- <NightSection arrow>TODO: Clubs</NightSection> -->
 
-<LimeSection>
-  <div class="wrapper">
-    <LifetimeStats></LifetimeStats>
-
-    <div class="section-end-button">
-      <a href="./coach/{localState.selectedCoach}">
-        <button>
-          {$t('home.continue-learning-button')}
-        </button>
-      </a>
-    </div>
-  </div>
-</LimeSection>
-
 <div class="about" style="margin-bottom: {-imageHeight / 2}px">
   <About></About>
 </div>
@@ -107,29 +92,12 @@
 <Nerds />
 
 <LightSection>
-  <BugReports />
-  <div class="small-space">
-    {$t('home.version-label')}:
-    {$versionString}
-  </div>
-
   <Footer />
 </LightSection>
 
 <style>
-  .small-space {
-    margin: 3rem 0px 1rem;
-  }
-
   .section-end-button {
     margin: 1rem 0;
-  }
-
-  .wrapper {
-    min-height: 100dvh;
-    /* display: flex; */
-    /* flex-direction: column; */
-    /* justify-content: center; */
   }
 
   .picture {

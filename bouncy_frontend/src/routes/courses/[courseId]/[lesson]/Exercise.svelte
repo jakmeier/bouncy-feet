@@ -105,7 +105,7 @@
 
   <Popup isOpen={popUpIsOpen} title={$t('courses.lesson.exercise-popup-title')}>
     <div>
-      {$t('courses.lesson.exercise-start-description')}
+      {$t('courses.lesson.exercise-start-description-0')}
     </div>
     <button onclick={closePopUp}>{$t('courses.lesson.own-music-button')}</button
     >

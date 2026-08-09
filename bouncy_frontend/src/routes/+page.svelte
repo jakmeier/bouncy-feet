@@ -39,5 +39,9 @@
 {#if !loading && userCtx.authState === USER_AUH_STATE.Anonymous}
   <FirstVisit />
 {:else}
-  <HomeFeed featuredDances={data.officialDances} {featuredSteps} />
+  <HomeFeed
+    featuredDances={data.officialDances}
+    {featuredSteps}
+    challengeSets={data.challengeSets}
+  />
 {/if}

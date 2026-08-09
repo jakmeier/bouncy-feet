@@ -129,6 +129,9 @@
     },
     "challenges": {
         "not-found": "Challenge nicht gefunden",
+        "empty-title": "Neue Challenges wärmen sich auf",
+        "empty-description": "Schau bald wieder vorbei für deine nächste Tanzquest.",
+        "sets-label": "Verfügbare Challenge-Sets",
         "solution-video": "Lösungsvideo",
         "start-description": "Führe jeden Move in einem durchgehenden Lauf im Takt aus.",
         "start-button": "Challenge starten",
