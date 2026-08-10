@@ -4,6 +4,8 @@ services:
     environment:
       CLIENT_URL: http://localhost:5173
       API_URL: http://localhost:3000
+      # Comma-separated explicit additional target origins; app origin is always allowed.
+      QR_TRUSTED_TARGET_ORIGINS: ""
       PEERTUBE_URL: http://peertube.localhost:9000
       OIDC_ISSUER: https://auth.bouncy-feet.ch/realms/bouncyfeet-dev
       OIDC_CLIENT_SECRET: XXXX
