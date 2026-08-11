@@ -100,13 +100,6 @@
             "start-lesson": "Los!",
             "lessons-subtitle": "Abgeschlossene Lektionen"
         },
-        "end": {
-            "again-button": "Nochmals tanzen",
-            "back-button": "Fertig",
-            "failed-hard": "Versuch es nochmals.",
-            "failed": "Beinahe 60% geschafft!",
-            "success": "Geschafft!"
-        },
         "lesson": {
             "title": "Lektion",
             "settings-subtitle": "Über die Lektion",
@@ -125,6 +118,15 @@
             "exercise-start-description-1": "Dann steh ins Bild und der Spass kann beginnen!",
             "play-beat-button": "Spiel ein Takt für mich",
             "own-music-button": "Ich habe meine eigene Musik"
+        }
+    },
+    "activity": {
+        "review": {
+            "again-button": "Nochmals tanzen",
+            "done-button": "Fertig",
+            "failed": "Versuch es nochmals.",
+            "failed-close": "Beinahe geschafft, versuch es nochmals!",
+            "success": "Geschafft!"
         }
     },
     "challenges": {

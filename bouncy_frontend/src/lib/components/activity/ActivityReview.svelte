@@ -7,7 +7,6 @@
   import DarkSection from '../ui/sections/DarkSection.svelte';
   import LogoHeader from '../ui/header/LogoHeader.svelte';
 
-  // TODO: Generalize the lesson-specific result copy and action labels.
   let {
     detection,
     videoUrl,
@@ -72,9 +71,9 @@
 
     <div class="buttons">
       <button onclick={onRestart}>
-        {$t('courses.end.again-button')}
+        {$t('activity.review.again-button')}
       </button>
-      <button onclick={onBack}> {$t('courses.end.back-button')}</button>
+      <button onclick={onBack}> {$t('activity.review.done-button')}</button>
     </div>
   {/if}
 </div>

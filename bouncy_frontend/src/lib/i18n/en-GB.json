@@ -100,13 +100,6 @@
             "start-lesson": "Go!",
             "lessons-subtitle": "Lessons done"
         },
-        "end": {
-            "again-button": "Dance again",
-            "back-button": "Done",
-            "failed-hard": "Try again",
-            "failed": "Almost 60%, let's try again!",
-            "success": "Success!"
-        },
         "lesson": {
             "title": "Lesson",
             "settings-subtitle": "About the lesson",
@@ -125,6 +118,15 @@
             "exercise-start-description-1": "Then stand in the camera image and the fun begins!",
             "play-beat-button": "Play a beat",
             "own-music-button": "I have my own music"
+        }
+    },
+    "activity": {
+        "review": {
+            "again-button": "Dance again",
+            "done-button": "Done",
+            "failed": "Try again",
+            "failed-close": "Almost there, try again!",
+            "success": "Success!"
         }
     },
     "challenges": {

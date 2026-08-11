@@ -16,10 +16,10 @@
   let didPass = $derived(passed ?? scoreRatio >= threshold);
   let text = $derived(
     didPass
-      ? 'courses.end.success'
+      ? 'activity.review.success'
       : scoreRatio > threshold * 0.73
-        ? 'courses.end.failed'
-        : 'courses.end.failed-hard'
+        ? 'activity.review.failed-close'
+        : 'activity.review.failed'
   );
   let scoreColor = $state('var(--theme-neutral-gray)');
   let borderWidth = '3px';
