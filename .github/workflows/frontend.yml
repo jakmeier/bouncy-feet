@@ -2,12 +2,12 @@ name: Frontend
 
 on:
   push:
-    branches: [main]
+    branches: [main, bf, bf-next]
     paths:
       - 'bouncy_frontend/**'
       - '.github/workflows/frontend.yml'
   pull_request:
-    branches: [main]
+    branches: [main, bf, bf-next]
     paths:
       - 'bouncy_frontend/**'
       - '.github/workflows/frontend.yml'
