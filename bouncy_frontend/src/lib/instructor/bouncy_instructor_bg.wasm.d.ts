@@ -197,6 +197,7 @@ export const challenge_challengeDurationMs: (a: number) => number;
 export const challenge_defaultSong: (a: number, b: number) => void;
 export const challenge_explanation: (a: number, b: number) => void;
 export const challenge_id: (a: number, b: number) => void;
+export const challenge_maxPoses: (a: number) => number;
 export const challenge_name: (a: number, b: number) => void;
 export const challenge_parts: (a: number, b: number) => void;
 export const challenge_prerequisites: (a: number, b: number) => void;

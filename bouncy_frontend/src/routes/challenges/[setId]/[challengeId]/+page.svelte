@@ -4,7 +4,7 @@
   import { dev } from '$lib/stores/FeatureSelection';
   import StandardPage from '$lib/components/ui/StandardPage.svelte';
   import LiveActivity from '$lib/components/activity/LiveActivity.svelte';
-  import VideoReview from '$lib/components/review/VideoReview.svelte';
+  import ActivityReview from '$lib/components/activity/ActivityReview.svelte';
   import { registerTracker, setBeatStart, setBpm } from '$lib/stores/Beat';
   import { songs } from '$lib/stores/Songs';
   import { completeChallenge } from '$lib/challengeProgress.js';
@@ -161,94 +161,87 @@
   });
 </script>
 
-<StandardPage backButton title={challenge.name}>
-  {#if !challenge}
-    <h1>{$t('challenges.not-found')}</h1>
-  {:else if !started}
-    <p>{challenge.explanation || ''}</p>
-    <p><strong>{challenge.bpm} {$t('challenges.bpm-unit')}</strong></p>
-    <!-- svelte-ignore a11y_media_has_caption -->
-    <video
-      controls
-      src={challenge.solutionVideo.path()}
-      aria-label={`${challenge.name} ${$t('challenges.solution-video')}`}
-    ></video>
-    <p>{$t('challenges.start-description')}</p>
-    {#if availableSongs.length > 1}
-      <label>
-        {$t('challenges.song-label')}
-        <select bind:value={selectedSongId}>
-          {#each availableSongs as song}
-            <option value={song.id}>{song.title} — {song.author}</option>
-          {/each}
-        </select>
-      </label>
-    {:else if availableSongs.length === 0}
-      <p>{$t('challenges.no-compatible-song')}</p>
-    {/if}
-    <LoginRequiredContent>
-      {#snippet guest({ apiUser })}
-        <button onclick={() => start(apiUser)} disabled={!selectedSongId}>
-          {$t('challenges.start-button')}
-        </button>
-      {/snippet}
-    </LoginRequiredContent>
-    {#if $dev}
-      <button
-        class="author-button"
-        onclick={() => goto(challengeAuthorHref(challenge))}
-        >{$t('challenges.edit-in-author-button')}</button
-      >
-    {/if}
-  {:else if !finished}
-    <div data-testid="challenge-live">
-      <LiveActivity
-        {onDone}
-        teacherVideo={challenge.solutionVideo.path()}
-        challengeDurationMs={challenge.challengeDurationMs}
-        requiredHits={challenge.requiredHits}
-      />
-    </div>
-  {:else}
-    <h1>
-      {$t(
-        succeeded
-          ? 'challenges.completed-title'
-          : 'challenges.not-completed-title'
-      )}
-    </h1>
-    <p>
-      {$t(
-        invalidChallengeSong
-          ? 'challenges.song-too-short'
-          : succeeded
-            ? savingCompletion
-              ? 'challenges.completion-saving'
-              : completionSaved
-                ? completionSyncPending
-                  ? 'challenges.completion-sync-pending'
-                  : 'challenges.completion-saved'
-                : 'challenges.completion-save-failed'
-            : 'challenges.retry-description'
-      )}
-    </p>
-    {#if detection && recordingStart !== undefined && recordingEnd !== undefined}
-      <VideoReview
-        reviewVideoSrc={reviewVideoSrc || ''}
-        detectedSteps={detection.steps()}
-        reviewHint="challenges.review-hint"
-        {recordingStart}
-        {recordingEnd}
-      />
+{#if finished && detection}
+  <ActivityReview
+    {detection}
+    videoUrl={reviewVideoSrc || ''}
+    maximum={challenge.maxPoses}
+    threshold={challenge.requiredHits / challenge.maxPoses}
+    passed={succeeded}
+    {recordingStart}
+    {recordingEnd}
+    onRestart={retry}
+    onBack={() => goto(`/challenges/${set.id}`)}
+  />
+{:else}
+  <StandardPage backButton title={challenge.name}>
+    {#if !challenge}
+      <h1>{$t('challenges.not-found')}</h1>
+    {:else if !started}
+      <p>{challenge.explanation || ''}</p>
+      <p><strong>{challenge.bpm} {$t('challenges.bpm-unit')}</strong></p>
+      <!-- svelte-ignore a11y_media_has_caption -->
+      <video
+        controls
+        src={challenge.solutionVideo.path()}
+        aria-label={`${challenge.name} ${$t('challenges.solution-video')}`}
+      ></video>
+      <p>{$t('challenges.start-description')}</p>
+      {#if availableSongs.length > 1}
+        <label>
+          {$t('challenges.song-label')}
+          <select bind:value={selectedSongId}>
+            {#each availableSongs as song}
+              <option value={song.id}>{song.title} — {song.author}</option>
+            {/each}
+          </select>
+        </label>
+      {:else if availableSongs.length === 0}
+        <p>{$t('challenges.no-compatible-song')}</p>
+      {/if}
+      <LoginRequiredContent>
+        {#snippet guest({ apiUser })}
+          <button onclick={() => start(apiUser)} disabled={!selectedSongId}>
+            {$t('challenges.start-button')}
+          </button>
+        {/snippet}
+      </LoginRequiredContent>
+      {#if $dev}
+        <button
+          class="author-button"
+          onclick={() => goto(challengeAuthorHref(challenge))}
+          >{$t('challenges.edit-in-author-button')}</button
+        >
+      {/if}
+    {:else if !finished}
+      <div data-testid="challenge-live">
+        <LiveActivity
+          {onDone}
+          teacherVideo={challenge.solutionVideo.path()}
+          challengeDurationMs={challenge.challengeDurationMs}
+          requiredHits={challenge.requiredHits}
+        />
+      </div>
     {:else}
+      <p>
+        {$t(
+          invalidChallengeSong
+            ? 'challenges.song-too-short'
+            : succeeded
+              ? savingCompletion
+                ? 'challenges.completion-saving'
+                : completionSaved
+                  ? completionSyncPending
+                    ? 'challenges.completion-sync-pending'
+                    : 'challenges.completion-saved'
+                  : 'challenges.completion-save-failed'
+              : 'challenges.retry-description'
+        )}
+      </p>
       <p>{$t('challenges.review-unavailable')}</p>
     {/if}
-    <button onclick={retry}>{$t('challenges.retry-button')}</button>
-    {#if !savingCompletion}
-      <a href={`/challenges/${set.id}`}>{$t('challenges.back-button')}</a>
-    {/if}
-  {/if}
-</StandardPage>
+  </StandardPage>
+{/if}
 
 <style>
   video {

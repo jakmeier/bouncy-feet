@@ -4,20 +4,23 @@
 
   /**
    * @typedef {Object} Props
-   * @property {number} hitRate
-   * @property {boolean} passed
+   * @property {number} score
+   * @property {number} maximum
+   * @property {number} [threshold]
+   * @property {boolean} [passed]
    */
 
-  let { hitRate, passed } = $props();
+  let { score, maximum, threshold = 0.6, passed = undefined } = $props();
 
+  let scoreRatio = $derived(maximum === 0 ? 0 : score / maximum);
+  let didPass = $derived(passed ?? scoreRatio >= threshold);
   let text = $derived(
-    hitRate >= 0.6
+    didPass
       ? 'courses.end.success'
-      : hitRate > 0.44
+      : scoreRatio > threshold * 0.73
         ? 'courses.end.failed'
         : 'courses.end.failed-hard'
   );
-  let displayedPercent = $derived((Number(hitRate || 0) * 100).toFixed(0));
   let scoreColor = $state('var(--theme-neutral-gray)');
   let borderWidth = '3px';
 
@@ -30,8 +33,8 @@
   });
 
   function setResult() {
-    scoreWidth = hitRate * 100;
-    if (passed) {
+    scoreWidth = scoreRatio * 100;
+    if (didPass) {
       scoreColor = 'var(--theme-main-alt)';
       // borderWidth = '5px';
     } else {
@@ -54,7 +57,7 @@
     <div class="score" style="width: {scoreWidth}%;"></div>
     <!-- <span class="material-symbols-outlined above-bar" translate="no"> star_half </span> -->
     <div class="above-bar">
-      {displayedPercent}%
+      {score} / {maximum}
     </div>
   </div>
 </div>

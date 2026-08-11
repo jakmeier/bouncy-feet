@@ -140,17 +140,12 @@
         "start-description": "Complete every move in one uninterrupted, on-beat run.",
         "start-button": "Start challenge",
         "edit-in-author-button": "Edit in challenge author",
-        "completed-title": "Challenge completed!",
-        "not-completed-title": "Not completed yet",
         "completion-saved": "Completed and saved.",
         "completion-saving": "Saving your results",
         "completion-sync-pending": "Completed and saved on this device. Sync is pending.",
         "completion-save-failed": "Challenge completed, but it could not be saved. Please try again.",
         "retry-description": "Complete every move on beat in one run, then try again.",
-        "review-hint": "Your recording stays on this device.",
-        "review-unavailable": "Review video is unavailable for this attempt.",
-        "retry-button": "Try again",
-        "back-button": "Back to challenges"
+        "review-unavailable": "Review video is unavailable for this attempt."
     },
     "leaderboard": {},
     "collection": {
@@ -295,6 +290,7 @@
         "train-hint": "Train the selected step while the app checks and counts. We recommend listening to your own music while doing so.",
         "general-hint": "Get ready! Find a spot with enough space to dance and then place the phone such that you can see the screen and the camera can see you.",
         "no-upload-hint": "Hint: The recording is evaluated on your device. It is never uploaded. Nobody can see you.",
+        "local-review-hint": "Evaluated on your device. Nobody can see you.",
         "download": "save",
         "bpm-tap-button": "Tap along with your music to match the beat",
         "bpm-fixed-button": "Pick the tempo below.",

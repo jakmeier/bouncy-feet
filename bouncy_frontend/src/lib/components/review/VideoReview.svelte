@@ -212,7 +212,7 @@ once per 250ms. -->
 <LightSection>
   <h2>{$t('record.review-title')}</h2>
   {#if reviewHint}
-    <span class=bubble>{$t(reviewHint)}</span>
+    <span class="bubble">{$t(reviewHint)}</span>
   {/if}
 
   <div class="upper">

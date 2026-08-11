@@ -3,19 +3,31 @@
   import LessonEnd from './LessonEnd.svelte';
   import VideoReview from '../review/VideoReview.svelte';
   import Background from '../ui/sections/Background.svelte';
-  import LessonEndResults from './LessonEndResults.svelte';
+  import ScoreResults from './ScoreResults.svelte';
   import DarkSection from '../ui/sections/DarkSection.svelte';
   import LogoHeader from '../ui/header/LogoHeader.svelte';
 
-  let { detection, videoUrl, recordingStart, recordingEnd, onRestart, onBack } =
-    $props();
+  // TODO: Generalize the lesson-specific result copy and action labels.
+  let {
+    detection,
+    videoUrl,
+    recordingStart,
+    recordingEnd,
+    onRestart,
+    onBack,
+    maximum = undefined,
+    threshold = 0.6,
+    passed = undefined,
+  } = $props();
 
   /** @type {import("bouncy_instructor").DetectedStep[] | undefined} */
   let detectedSteps = $derived(detection.steps());
-  let hitRate = $derived(
-    detection.poseMatches / (detection.poseMisses + detection.poseMatches)
+  let detectedPoses = $derived(detection.poseMisses + detection.poseMatches);
+  let maximumPoses = $derived(maximum ?? detectedPoses);
+  let scoreRatio = $derived(
+    maximumPoses === 0 ? 0 : detection.poseMatches / maximumPoses
   );
-  let passed = $derived(hitRate >= 0.6);
+  let didPass = $derived(passed ?? scoreRatio >= threshold);
 
   let showResults = $state(false);
 </script>
@@ -35,7 +47,12 @@
       <LogoHeader black />
 
       <div class="top-summary">
-        <LessonEndResults {hitRate} {passed}></LessonEndResults>
+        <ScoreResults
+          score={detection.poseMatches}
+          maximum={maximumPoses}
+          {threshold}
+          passed={didPass}
+        />
       </div>
     </DarkSection>
 
@@ -43,11 +60,10 @@
       <VideoReview
         reviewVideoSrc={videoUrl}
         {detectedSteps}
+        reviewHint="record.local-review-hint"
         {recordingStart}
         {recordingEnd}
       ></VideoReview>
-
-      <div class="hint">{$t('record.no-upload-hint')}</div>
     {:else}
       <div class="no-review">
         {$t('record.no-video-for-review')}
@@ -77,8 +93,5 @@
     display: flex;
     flex-direction: column;
     justify-content: space-around;
-  }
-  .hint {
-    margin-top: 2rem;
   }
 </style>

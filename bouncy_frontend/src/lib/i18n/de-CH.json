@@ -140,17 +140,12 @@
         "start-description": "Führe jeden Move in einem durchgehenden Lauf im Takt aus.",
         "start-button": "Challenge starten",
         "edit-in-author-button": "Challenge bearbeiten",
-        "completed-title": "Challenge geschafft!",
-        "not-completed-title": "Noch nicht geschafft",
         "completion-saved": "Geschafft und gespeichert.",
         "completion-saving": "Ergebnis wird gespeichert",
         "completion-sync-pending": "Geschafft und auf diesem Gerät gespeichert. Die Synchronisierung steht noch aus.",
         "completion-save-failed": "Die Challenge ist geschafft, leider gab es Probleme beim Speichern. Bitte versuche es nochmals.",
         "retry-description": "Führe jeden Move in einem Lauf im Takt aus und versuche es dann erneut.",
-        "review-hint": "Deine Aufnahme bleibt auf diesem Gerät.",
-        "review-unavailable": "Für diesen Versuch ist kein Review-Video verfügbar.",
-        "retry-button": "Nochmals versuchen",
-        "back-button": "Zurück zu den Challenges"
+        "review-unavailable": "Für diesen Versuch ist kein Review-Video verfügbar."
     },
     "leaderboard": {},
     "collection": {
@@ -295,6 +290,7 @@
         "train-hint": "Übe den gewählten Tanzschritt während die App kontrolliert und zählt. Wir empfehlen dazu deine eigene Musik zu hören.",
         "general-hint": "Mach dich bereit! Such dir eine freie Stelle zum Tanzen und stell dein Handy so vor dich dass du den Bildschirm sieht und die Kamera dich sieht.",
         "no-upload-hint": "Hinweis: Das aufgenommene Video wird auf deinem Gerät ausgewertet und wird niemals hochgeladen. Niemand sieht dich.",
+        "local-review-hint": "Auf deinem Gerät ausgewertet. Niemand kann dich sehen.",
         "download": "Speichern",
         "bpm-tap-button": "Tippe im Takt deiner Musik, um den Tracker zu synchronisieren",
         "bpm-fixed-button": "Wähle das Tempo unten.",

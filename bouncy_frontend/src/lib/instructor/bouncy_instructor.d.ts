@@ -222,14 +222,14 @@ export class Challenge {
   readonly allowedSongs: string[];
   readonly prerequisites: string[];
   /**
-   * Hits needed to complete the challenge. Misses are deliberately allowed.
+   * Hits needed to complete the challenge.
    */
   readonly requiredHits: number;
   readonly solutionVideo: VideoDef;
   readonly songTimestamp: number;
   /**
-   * Duration of the initial scoring window. It is at least the configured
-   * minimum and ends exactly at the end of a configured challenge repetition.
+   * Duration of the initial scoring window. It ends exactly at the end of a
+   * configured challenge repetition.
    */
   readonly challengeDurationMs: number;
   readonly solutionStartTimestamp: number;
@@ -237,6 +237,10 @@ export class Challenge {
   readonly bpm: number;
   readonly name: string;
   readonly parts: ChallengePart[];
+  /**
+   * Total score opportunities in the initial scoring window.
+   */
+  readonly maxPoses: number;
 }
 export class ChallengePart {
   private constructor();
@@ -1005,6 +1009,7 @@ export interface InitOutput {
   readonly challenge_defaultSong: (a: number, b: number) => void;
   readonly challenge_explanation: (a: number, b: number) => void;
   readonly challenge_id: (a: number, b: number) => void;
+  readonly challenge_maxPoses: (a: number) => number;
   readonly challenge_name: (a: number, b: number) => void;
   readonly challenge_parts: (a: number, b: number) => void;
   readonly challenge_prerequisites: (a: number, b: number) => void;

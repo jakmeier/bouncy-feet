@@ -138,6 +138,13 @@ impl Challenge {
         let (_, _, expected_poses) = self.attempt_shape();
         (expected_poses * REQUIRED_HIT_PERCENT).div_ceil(100)
     }
+
+    /// Total score opportunities in the initial scoring window.
+    #[wasm_bindgen(getter, js_name = maxPoses)]
+    pub fn max_poses(&self) -> u32 {
+        let (_, _, expected_poses) = self.attempt_shape();
+        expected_poses
+    }
 }
 impl Challenge {
     /// Returns the number of full pattern repetitions, the corresponding
