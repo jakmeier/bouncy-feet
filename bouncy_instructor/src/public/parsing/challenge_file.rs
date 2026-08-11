@@ -35,6 +35,12 @@ struct ChallengeDef {
     #[serde(default)]
     prerequisites: Vec<String>,
     bpm: u16,
+    #[serde(default)]
+    default_song: Option<String>,
+    #[serde(default)]
+    allowed_songs: Vec<String>,
+    #[serde(default)]
+    song_timestamp: Option<u64>,
     solution_video: Option<VideoDef>,
     solution_start_timestamp: Option<u32>,
     parts: Vec<Part>,
@@ -100,6 +106,21 @@ impl ChallengeFile {
                     ));
                 }
             }
+            let default_song = challenge
+                .default_song
+                .clone()
+                .or_else(|| challenge.allowed_songs.first().cloned());
+            let allowed_songs = if challenge.allowed_songs.is_empty() {
+                default_song.iter().cloned().collect()
+            } else {
+                challenge.allowed_songs
+            };
+            if default_song
+                .as_ref()
+                .is_some_and(|song| !allowed_songs.contains(song))
+            {
+                return Err(ParseFileError::InvalidChallengeValue("default_song"));
+            }
             let collection = challenge_collection(&poses, &steps, &challenge.parts)?;
             let mut parts = vec![];
             for p in challenge.parts {
@@ -124,6 +145,9 @@ impl ChallengeFile {
                     .transpose()?,
                 prerequisites: challenge.prerequisites,
                 bpm: challenge.bpm,
+                default_song,
+                allowed_songs,
+                song_timestamp: challenge.song_timestamp.map(|timestamp| timestamp as f64),
                 solution_video: video.into(),
                 solution_start_timestamp: challenge.solution_start_timestamp.unwrap() as f64,
                 parts,

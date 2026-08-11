@@ -240,6 +240,7 @@
         path={`${teacherVideo}`}
         controls={false}
         muted
+        loop
       ></Video>
     {/if}
   </div>

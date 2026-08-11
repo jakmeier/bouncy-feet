@@ -15,23 +15,35 @@
   import { dev } from '$lib/stores/FeatureSelection';
   import DevUtility from '$lib/components/dev/DevUtility.svelte';
   import LightBackground from '$lib/components/ui/sections/LightBackground.svelte';
+
+  /**
+   * @typedef {Object} ChallengeAttemptOutcome
+   * @property {boolean} succeeded
+   * @property {number | undefined} requiredHits
+   * @property {number} hits
+   * @property {number} elapsedMs
+   * @property {boolean} invalidChallengeSong
+   */
+
   /**
    * @typedef {Object} Props
-   * @property {(detection: DetectionResult, recordingStart: number, recordingEnd: number, videoUrl: string)=>void} [onDone]
+   * @property {(detection: DetectionResult, recordingStart: number, recordingEnd: number, videoUrl: string, outcome: ChallengeAttemptOutcome)=>void} [onDone]
    * @property {string} [teacherVideo]
+   * @property {number} [challengeDurationMs]
+   * @property {number} [requiredHits]
    */
 
   /** @type {Props} */
-  let { onDone, teacherVideo } = $props();
+  let { onDone, teacherVideo, challengeDurationMs, requiredHits } = $props();
 
   let detectionResult;
-  /** @type {string} */
-  let videoUrl = $state();
+  let videoUrl = $state('');
 
   /** @type {LiveRecording} */
   let liveRecording;
-  /** @type {Tracker | undefined} */
-  let { tracker } = getContext('tracker');
+  /** @type {{ tracker: Tracker }} */
+  const trackerContext = getContext('tracker');
+  const { tracker } = trackerContext;
   /** @type {import('svelte/store').Readable<DetectionState> | null} */
   let trackingState = tracker.detectionState;
 
@@ -63,9 +75,17 @@
   }
 
   /**
-   * @param {Blob | undefined} videoBlob
+   * @param {Blob | null | undefined} videoBlob
+   * @param {number} recordingStart
+   * @param {number} recordingEnd
+   * @param {ChallengeAttemptOutcome} outcome
    */
-  async function onRecordingStopped(videoBlob, recordingStart, recordingEnd) {
+  async function onRecordingStopped(
+    videoBlob,
+    recordingStart,
+    recordingEnd,
+    outcome
+  ) {
     tracker?.finishTracking();
     if (videoUrl) {
       URL.revokeObjectURL(videoUrl);
@@ -79,7 +99,7 @@
 
     detectionResult = tracker?.lastDetection;
     if (onDone) {
-      onDone(detectionResult, recordingStart, recordingEnd, videoUrl);
+      onDone(detectionResult, recordingStart, recordingEnd, videoUrl, outcome);
     }
   }
 
@@ -99,6 +119,8 @@
     onStop={onRecordingStopped}
     forceBeat={true}
     {teacherVideo}
+    {challengeDurationMs}
+    {requiredHits}
   ></LiveRecording>
 </div>
 

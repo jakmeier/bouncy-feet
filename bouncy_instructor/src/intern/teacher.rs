@@ -12,6 +12,12 @@ pub(crate) struct Teacher {
     total_subbeats: u32,
     body_shift: BodyShift,
     teacher_display_mode: TeacherDisplayMode,
+    /// Repeat the configured sequence instead of ending when its final pose is
+    /// reached. The original sequence still defines the score window.
+    loop_forever: bool,
+    /// Limit offline configured-sequence detection to the authored pattern,
+    /// even when the live teacher has repeated it for a longer attempt.
+    offline_step_limit: Option<usize>,
     // TODO: audio hints by the teacher
 }
 
@@ -51,6 +57,16 @@ impl Teacher {
         } else {
             self.teacher_display_mode = TeacherDisplayMode::Mirror;
         }
+    }
+
+    pub(crate) fn loop_forever(&mut self) {
+        assert!(!self.sections.is_empty(), "cannot loop an empty teacher");
+        self.loop_forever = true;
+    }
+
+    /// Keep offline solution-video verification scoped to the authored pattern.
+    pub(crate) fn set_offline_step_limit(&mut self, limit: usize) {
+        self.offline_step_limit = Some(limit);
     }
 
     /// A step to dance by the student.
@@ -111,6 +127,7 @@ impl Teacher {
     /// Full beat: only count 1,2,3,4 (used for bpm calculation)
     /// Sub beat: also count the "and" between
     pub(crate) fn step_at_subbeat(&self, subbeat: u32) -> Option<(&StepInfo, u32)> {
+        let subbeat = self.repeat_subbeat(subbeat);
         self.section_at_subbeat(subbeat)
             .and_then(Section::step)
             .map(|StepSection { step, pace, .. }| (step, pace.pose_at_subbeat(subbeat)))
@@ -122,7 +139,8 @@ impl Teacher {
     }
 
     pub(crate) fn cursor_at_subbeat(&self, subbeat: u32) -> DanceCursor {
-        let (section_index, remainder) = self.index_at_subbeat(subbeat);
+        let repeated_subbeat = self.repeat_subbeat(subbeat);
+        let (section_index, remainder) = self.index_at_subbeat(repeated_subbeat);
         let section = self.sections.get(section_index);
         let pose_index = section
             .and_then(|section| {
@@ -168,6 +186,7 @@ impl Teacher {
     }
 
     fn section_at_subbeat(&self, mut subbeat: u32) -> Option<&Section> {
+        subbeat = self.repeat_subbeat(subbeat);
         for section in &self.sections {
             if subbeat < section.subbeats() {
                 return Some(section);
@@ -179,7 +198,7 @@ impl Teacher {
 
     /// How far the body position has moved from the origin at a specific beat.
     pub(crate) fn pose_body_shift_at_subbeat(&self, subbeat: u32) -> Cartesian2d {
-        let pose = self.pose_nr_subbeat(subbeat);
+        let pose = self.pose_nr_subbeat(self.repeat_subbeat(subbeat));
         self.body_shift.after_pose(pose)
     }
 
@@ -225,7 +244,15 @@ impl Teacher {
 
     /// The teacher is done when there is no more to show or track.
     pub(crate) fn is_done(&self, subbeat: u32) -> bool {
-        subbeat >= self.tracked_subbeats()
+        !self.loop_forever && subbeat >= self.tracked_subbeats()
+    }
+
+    fn repeat_subbeat(&self, subbeat: u32) -> u32 {
+        if self.loop_forever && self.total_subbeats > 0 {
+            subbeat % self.total_subbeats
+        } else {
+            subbeat
+        }
     }
 
     fn update_tracked_subbeats(&mut self) {
@@ -272,6 +299,9 @@ impl Teacher {
                 ),
                 repetitions as usize,
             ));
+        }
+        if let Some(limit) = self.offline_step_limit {
+            result.truncate(limit);
         }
         (!result.is_empty()).then_some(result)
     }

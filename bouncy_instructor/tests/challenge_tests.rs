@@ -1,4 +1,4 @@
-use bouncy_instructor::{parse_challenge_str, Keypoints};
+use bouncy_instructor::{parse_challenge_str, Keypoints, MINIMUM_CHALLENGE_DURATION_MS};
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -15,12 +15,39 @@ fn jumping_jacks_solutions_match_their_configuration() {
 }
 
 #[test]
-fn challenge_tracker_exposes_expected_poses_not_subbeats() {
+fn challenge_tracker_repeats_to_a_full_initial_score_window() {
     let set = parse_challenge_str(CHALLENGE_RON, "en").unwrap();
+    let challenge = set.challenges().remove(0);
     let tracker = set.tracker(0).unwrap();
 
-    assert_eq!(tracker.expected_poses(), 8);
-    assert_eq!(tracker.tracked_subbeats(), 16);
+    assert_eq!(
+        challenge.default_song().as_deref(),
+        Some("105bpm_tropical_house")
+    );
+    assert_eq!(challenge.allowed_songs(), ["105bpm_tropical_house"]);
+    assert_eq!(challenge.song_timestamp(), 0.0);
+
+    // The score window is at least the configured minimum and ends on a
+    // subbeat boundary. These assertions deliberately follow the shared
+    // constant so a duration-policy change does not require fixture updates.
+    let duration_ms = challenge.challenge_duration_ms();
+    assert!(duration_ms >= MINIMUM_CHALLENGE_DURATION_MS);
+    assert_eq!(
+        duration_ms,
+        tracker.tracked_subbeats() * 30_000 / challenge.bpm() as u32
+    );
+    assert_eq!(
+        challenge.required_hits(),
+        (tracker.expected_poses() * 60).div_ceil(100)
+    );
+
+    // The teacher loops after that score window instead of completing.
+    assert_eq!(
+        tracker
+            .cursor_at_subbeat(tracker.tracked_subbeats() as i32, false)
+            .pose_index,
+        0
+    );
 }
 
 /// Replays every challenge fixture.

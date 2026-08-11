@@ -14,7 +14,7 @@
   // controller class and move all the HTML + CSS in a separate component
   // (LiveREcordingScreen). This separates at least the logic from the display.
 
-  import { getContext, onMount } from 'svelte';
+  import { getContext, onDestroy, onMount } from 'svelte';
   import { I, landmarksToKeypoints, PoseDetection } from '$lib/pose';
   import BackgroundTask from '../BackgroundTask.svelte';
   import {
@@ -42,6 +42,10 @@
     recordMediaPipeDelay,
   } from '$lib/stores/System';
   import MusicControl from './MusicControl.svelte';
+  import {
+    hasCompletedChallengeAttempt,
+    hasPlayableChallengeSong,
+  } from '$lib/challengeAttempt.js';
 
   export const startCamera = async () => {
     await screen.startCamera();
@@ -56,27 +60,43 @@
   };
   let stopped = $state(true);
   export const stop = async () => {
+    if (stopped) return;
     stopped = true;
     const blob = await screen.endRecording();
-    onStop(blob, recordingStart, recordingEnd);
+    onStop(blob, recordingStart, recordingEnd, attemptOutcome());
   };
+
+  /**
+   * @typedef {Object} ChallengeAttemptOutcome
+   * @property {boolean} succeeded
+   * @property {number | undefined} requiredHits
+   * @property {number} hits
+   * @property {number} elapsedMs
+   * @property {boolean} invalidChallengeSong
+   */
 
   /**
    * @typedef {Object} Props
    * @property {boolean} [cameraOn]
-   * @property {any} [onStop] - Function is called when the recording is stopped by the user with the stop
-button or by a explicit `stop` call from the parent component.
-The recording video blob is passed as as a parameter.
-   * @property {boolean} [forceBeat] - always evaluate the pose on beat and move on to the next pose, even when
-it does not match
+   * @property {(recording: Blob | null | undefined, recordingStart: number, recordingEnd: number, outcome: ChallengeAttemptOutcome) => void} [onStop]
+   * @property {boolean} [forceBeat] Always evaluate poses on beat and advance after misses.
    * @property {string} [teacherVideo]
+   * @property {number} [challengeDurationMs] Initial score-window duration.
+   * @property {number} [requiredHits] Hits needed to complete a challenge.
    */
 
   /** @type {Props} */
   let {
-    onStop = (/** @type {Blob | undefined} */ _recording) => {},
+    onStop = (
+      /** @type {Blob | null | undefined} */ _recording,
+      /** @type {number} */ _recordingStart,
+      /** @type {number} */ _recordingEnd,
+      /** @type {ChallengeAttemptOutcome} */ _outcome
+    ) => {},
     forceBeat = false,
     teacherVideo,
+    challengeDurationMs,
+    requiredHits,
   } = $props();
 
   /** @type {LiveRecordingScreen} */
@@ -87,8 +107,12 @@ it does not match
 
   let recordingStart = $state(0);
   let recordingEnd = $state(0);
+  /** @type {number | undefined} */
+  let liveTrackingStartedAt;
+  let invalidChallengeSong = false;
 
   const poseCtx = getContext('pose');
+  const music = getContext('music');
   let tracker = getContext('tracker').tracker;
   let detectionState = tracker.detectionState;
   tracker.enforceBeat(forceBeat);
@@ -130,17 +154,56 @@ it does not match
 
   let animationTime = $derived(Math.min($timeBetweenMoves / 3, 300));
 
+  function elapsedLiveTrackingMs() {
+    return liveTrackingStartedAt === undefined
+      ? 0
+      : performance.now() - liveTrackingStartedAt;
+  }
+
+  function attemptOutcome() {
+    const isChallenge =
+      challengeDurationMs !== undefined && requiredHits !== undefined;
+    return {
+      succeeded:
+        isChallenge &&
+        !invalidChallengeSong &&
+        hasCompletedChallengeAttempt({
+          elapsedMs: elapsedLiveTrackingMs(),
+          hits: tracker.lastDetection.poseMatches,
+          challengeDurationMs,
+          requiredHits,
+        }),
+      requiredHits,
+      hits: tracker.lastDetection.poseMatches,
+      elapsedMs: elapsedLiveTrackingMs(),
+      invalidChallengeSong,
+    };
+  }
+
+  function songEnded() {
+    // The audio track, not the short teacher-video clip, bounds an attempt.
+    stop();
+  }
+
   // this is called periodically in a background task
   function onFrame() {
     if (stopped) {
       return;
     }
 
-    const teacherView = tracker.currentView(performance.now());
+    const now = performance.now();
+    const teacherView = tracker.currentView(now);
     screen.updateView(teacherView, $detectionState);
 
     if ($detectionState === DetectionState.TrackingDone) {
       stop();
+    }
+
+    if (
+      liveTrackingStartedAt === undefined &&
+      $detectionState === DetectionState.LiveTracking
+    ) {
+      liveTrackingStartedAt = now;
     }
 
     if (
@@ -153,6 +216,25 @@ it does not match
 
     if (screen.isCameraOn() && dataListener) {
       processNextFrame(dataListener);
+    }
+
+    if (
+      recordingOn &&
+      challengeDurationMs !== undefined &&
+      requiredHits !== undefined
+    ) {
+      if (
+        music.trackDurationMs !== undefined &&
+        !hasPlayableChallengeSong(music.trackDurationMs, challengeDurationMs)
+      ) {
+        invalidChallengeSong = true;
+        console.error(
+          `Challenge song is too short (${music.trackDurationMs}ms); it must last at least ${challengeDurationMs}ms.`
+        );
+        stop();
+      } else if (attemptOutcome().succeeded) {
+        stop();
+      }
     }
     processAudioEffects();
     processTextEffects();
@@ -186,12 +268,11 @@ it does not match
   /** @param {PoseDetection} dataListener */
   function processNextFrame(dataListener) {
     const videoElement = screen.cameraVideoElement();
-    const videoAvailable = videoElement && videoElement.videoHeight > 0;
-    if (!videoAvailable) {
+    if (!videoElement || videoElement.videoHeight <= 0) {
       return;
     }
     const start = performance.now();
-    dataListener.trackFrame(videoElement);
+    dataListener.trackFrame(videoElement, undefined);
     const t = performance.now() - start;
     if (t > 50) console.debug(`trackFrame took ${t}ms`);
     recordTrackSyncDelay(t);
@@ -205,7 +286,7 @@ it does not match
         updateInstructor();
       }
       console.assert(
-        instructorSkeleton,
+        Boolean(instructorSkeleton),
         'tracker returned no next expected pose'
       );
     }
@@ -321,7 +402,10 @@ it does not match
     }
   }
 
+  /** @type {(() => void) | undefined} */
+  let unsubscribeTrackEnded;
   onMount(async () => {
+    unsubscribeTrackEnded = music.onTrackEnded(songEnded);
     await initAudioContext();
     dataListener = await poseCtx.newPoseDetection(onPoseDetection);
     loadSuccessSound();
@@ -349,6 +433,8 @@ it does not match
     setChannelGain('audio-guide', 2.0);
     stopped = false;
   });
+
+  onDestroy(() => unsubscribeTrackEnded?.());
 </script>
 
 <BackgroundTask {onFrame}></BackgroundTask>

@@ -12,10 +12,12 @@
   /**
    * @typedef {Object} Props
    * @property {Song} track
+   * @property {()=>void} [onEnded]
+   * @property {(durationMs: number)=>void} [onDuration]
    */
 
   /** @type {Props} */
-  let { track } = $props();
+  let { track, onEnded, onDuration } = $props();
 
   let musicContext = getContext('music');
   let isPlaying = $state(false);
@@ -62,9 +64,10 @@
 
   let mutedDueToVisibility = false;
   function visibilityHandler() {
-    // especially annoying on mobile if I don't do this
+    // Mute in the background without marking the source as stopped: a natural
+    // end must still finish a challenge attempt.
     if (document.hidden && isPlaying) {
-      stopMusic();
+      setChannelGain('music', 0.0);
       mutedDueToVisibility = true;
     } else if (!document.hidden && mutedDueToVisibility) {
       resumeMusic();
@@ -73,20 +76,34 @@
   }
 
   async function loadAndPlayTrack() {
-    if (track) {
+    const selectedTrack = track;
+    if (selectedTrack) {
       resetMusic();
-      await loadTrack(track.id);
-      startMusic();
-      $bpm = track.bpm;
+      const audioBuffer = await loadTrack(selectedTrack.id);
+      if (!audioBuffer || track !== selectedTrack) return;
+      onDuration?.(audioBuffer.duration * 1000);
+      startMusic(selectedTrack);
+      $bpm = selectedTrack.bpm;
     }
   }
 
-  function startMusic() {
+  /** @param {Song} selectedTrack */
+  function startMusic(selectedTrack = track) {
     if (musicNode) {
       resetMusic();
     }
     setChannelGain('music', musicContext.gain);
-    musicNode = scheduleAudioOnChannel(track.id, 0, 'music');
+    const source = scheduleAudioOnChannel(selectedTrack.id, 0, 'music');
+    musicNode = source;
+    source.onended = () => {
+      // Resetting/replacing a song disconnects an old source. Only the active,
+      // audible source ending naturally ends the challenge attempt.
+      if (musicNode !== source) return;
+      musicNode = null;
+      const endedNaturally = isPlaying;
+      isPlaying = false;
+      if (endedNaturally) onEnded?.();
+    };
   }
 
   function resetMusic() {

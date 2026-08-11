@@ -28,9 +28,13 @@
   });
 
   let gain = $state(1.0);
+  /** @type {number | undefined} */
+  let trackDurationMs = $state();
+  const trackEndedListeners = new Set();
 
   /** @param {string} newTrackId */
   async function setTrack(newTrackId) {
+    trackDurationMs = undefined;
     track = songs.get(newTrackId);
     titleSetter(track?.title || '-');
     authorSetter(track?.author || '-');
@@ -53,12 +57,28 @@
     gain = vol;
   }
 
+  /** @param {()=>void} listener */
+  function onTrackEnded(listener) {
+    trackEndedListeners.add(listener);
+    return () => trackEndedListeners.delete(listener);
+  }
+
+  /** @param {number} durationMs */
+  function trackDurationLoaded(durationMs) {
+    trackDurationMs = durationMs;
+  }
+
+  function trackEnded() {
+    for (const listener of trackEndedListeners) listener();
+  }
+
   setContext('music', {
     setTrack,
     resetTrack,
     stopTrack,
     resumeTrack,
     setVolume,
+    onTrackEnded,
     songTitle,
     songAuthor,
     get gain() {
@@ -66,6 +86,9 @@
     },
     get trackOn() {
       return audio?.trackIsOn();
+    },
+    get trackDurationMs() {
+      return trackDurationMs;
     },
   });
 
@@ -75,7 +98,12 @@
 </script>
 
 {#if track}
-  <TrackAudio bind:this={audio} {track} />
+  <TrackAudio
+    bind:this={audio}
+    {track}
+    onEnded={trackEnded}
+    onDuration={trackDurationLoaded}
+  />
 {/if}
 
 {@render children?.()}

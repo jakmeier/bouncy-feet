@@ -15,7 +15,9 @@ pub(crate) mod video_def;
 pub(crate) mod wrapper;
 
 use crate::intern::step::StepSource;
-pub use crate::public::challenge::{Challenge, ChallengePart, ChallengeSet};
+pub use crate::public::challenge::{
+    Challenge, ChallengePart, ChallengeSet, MINIMUM_CHALLENGE_DURATION_MS,
+};
 pub use crate::public::course::Course;
 pub use dance_info::DanceInfo;
 pub use keypoints::{Keypoints, Side as KeypointsSide};

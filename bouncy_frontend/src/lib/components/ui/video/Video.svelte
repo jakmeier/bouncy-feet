@@ -7,10 +7,11 @@
    * @property {string} path
    * @property {boolean} [controls=true]
    * @property {boolean} [muted=false]
+   * @property {boolean} [loop=false]
    */
 
   /** @type {Props} */
-  let { path, controls = true, muted = false } = $props();
+  let { path, controls = true, muted = false, loop = false } = $props();
   let videoExists = $state(false);
   let videoLoading = $state(true);
   /** @type {HTMLVideoElement} */
@@ -38,6 +39,7 @@
         webkit-playsinline
         defaultmuted={muted}
         {muted}
+        {loop}
       >
         <source
           src={path}

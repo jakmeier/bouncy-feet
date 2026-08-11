@@ -5,7 +5,8 @@
   import StandardPage from '$lib/components/ui/StandardPage.svelte';
   import LiveActivity from '$lib/components/activity/LiveActivity.svelte';
   import VideoReview from '$lib/components/review/VideoReview.svelte';
-  import { registerTracker, setBpm } from '$lib/stores/Beat';
+  import { registerTracker, setBeatStart, setBpm } from '$lib/stores/Beat';
+  import { songs } from '$lib/stores/Songs';
   import { completeChallenge } from '$lib/challengeProgress.js';
   import LoginRequiredContent from '$lib/components/profile/LoginRequiredContent.svelte';
   import { t } from '$lib/i18n';
@@ -31,6 +32,7 @@
   let savingCompletion = $state(false);
   let completionSaved = $state(false);
   let completionSyncPending = $state(false);
+  let invalidChallengeSong = $state(false);
   /** @type {import('$lib/instructor/bouncy_instructor').DetectionResult | undefined} */
   let detection = $state();
   /** @type {number | undefined} */
@@ -39,17 +41,38 @@
   let recordingEnd = $state();
   /** @type {string | undefined} */
   let reviewVideoSrc = $state();
+  const { setTrack } = getContext('music');
+  /** @type {string[]} */
+  const configuredSongIds = challenge?.allowedSongs?.length
+    ? challenge.allowedSongs
+    : challenge?.defaultSong
+      ? [challenge.defaultSong]
+      : [];
+  /** @type {Song[]} */
+  const availableSongs = [];
+  for (const songId of configuredSongIds) {
+    const song = songs.get(songId);
+    if (!song || song.bpm !== challenge?.bpm) continue;
+    availableSongs.push(song);
+  }
+  let selectedSongId = $state(
+    availableSongs.some((song) => song.id === challenge?.defaultSong)
+      ? challenge.defaultSong
+      : availableSongs[0]?.id
+  );
   let tracker = challenge ? set.tracker(challengeIndex) : undefined;
   // registerTracker establishes Svelte context, so it must run while this
   // component is being initialised (not later from the click handler).
   const unregisterTracker = tracker ? registerTracker(tracker) : undefined;
 
   /** @param {ApiUser} apiUser */
-  function start(apiUser) {
-    if (!tracker || !challenge) return;
+  async function start(apiUser) {
+    if (!tracker || !challenge || !selectedSongId) return;
     activityUser = apiUser;
+    await setTrack(selectedSongId);
     // Challenges own their tempo; don't inherit the last practice activity's BPM.
     setBpm(challenge.bpm);
+    setBeatStart(performance.now() + challenge.songTimestamp);
     started = true;
   }
 
@@ -58,12 +81,14 @@
    * @param {number} newRecordingStart
    * @param {number} newRecordingEnd
    * @param {string} newVideoUrl
+   * @param {{ succeeded: boolean, invalidChallengeSong: boolean }} outcome
    */
   async function onDone(
     newDetection,
     newRecordingStart,
     newRecordingEnd,
-    newVideoUrl
+    newVideoUrl,
+    outcome
   ) {
     detection = newDetection;
     recordingStart = newRecordingStart;
@@ -71,12 +96,10 @@
     reviewVideoSrc = newVideoUrl;
     finished = true;
 
-    // `poseMatches` counts poses, whereas `trackedSubbeats` counts timing
-    // intervals. Compare matches with the tracker-provided pose count instead.
-    succeeded =
-      Boolean(detection) &&
-      detection.poseMisses === 0 &&
-      detection.poseMatches >= tracker.expectedPoses;
+    // Challenges permit misses and can continue past their first pattern.
+    // LiveActivity owns the duration-and-hit-threshold decision.
+    succeeded = Boolean(detection) && outcome?.succeeded === true;
+    invalidChallengeSong = outcome?.invalidChallengeSong === true;
     if (succeeded && activityUser) {
       savingCompletion = true;
       try {
@@ -87,15 +110,18 @@
         );
         completionSaved = true;
         completionSyncPending = completion.syncPending;
-        activityUser.submitActivity(
-          `challenge/${set.id}/${challenge.id}`,
-          detection
-        );
       } catch (error) {
         console.error('Could not save challenge completion', error);
       } finally {
         savingCompletion = false;
       }
+    }
+    // Retain the complete score for both successful and song-ended attempts.
+    if (activityUser && detection) {
+      activityUser.submitActivity(
+        `challenge/${set.id}/${challenge.id}`,
+        detection
+      );
     }
   }
 
@@ -115,6 +141,7 @@
     savingCompletion = false;
     completionSaved = false;
     completionSyncPending = false;
+    invalidChallengeSong = false;
     started = false;
   }
 
@@ -139,7 +166,7 @@
     <h1>{$t('challenges.not-found')}</h1>
   {:else if !started}
     <p>{challenge.explanation || ''}</p>
-    <p><strong>{challenge.bpm} BPM</strong></p>
+    <p><strong>{challenge.bpm} {$t('challenges.bpm-unit')}</strong></p>
     <!-- svelte-ignore a11y_media_has_caption -->
     <video
       controls
@@ -147,9 +174,21 @@
       aria-label={`${challenge.name} ${$t('challenges.solution-video')}`}
     ></video>
     <p>{$t('challenges.start-description')}</p>
+    {#if availableSongs.length > 1}
+      <label>
+        {$t('challenges.song-label')}
+        <select bind:value={selectedSongId}>
+          {#each availableSongs as song}
+            <option value={song.id}>{song.title} — {song.author}</option>
+          {/each}
+        </select>
+      </label>
+    {:else if availableSongs.length === 0}
+      <p>{$t('challenges.no-compatible-song')}</p>
+    {/if}
     <LoginRequiredContent>
       {#snippet guest({ apiUser })}
-        <button onclick={() => start(apiUser)}>
+        <button onclick={() => start(apiUser)} disabled={!selectedSongId}>
           {$t('challenges.start-button')}
         </button>
       {/snippet}
@@ -163,7 +202,12 @@
     {/if}
   {:else if !finished}
     <div data-testid="challenge-live">
-      <LiveActivity {onDone} teacherVideo={challenge.solutionVideo.path()} />
+      <LiveActivity
+        {onDone}
+        teacherVideo={challenge.solutionVideo.path()}
+        challengeDurationMs={challenge.challengeDurationMs}
+        requiredHits={challenge.requiredHits}
+      />
     </div>
   {:else}
     <h1>
@@ -175,15 +219,17 @@
     </h1>
     <p>
       {$t(
-        succeeded
-          ? savingCompletion
-            ? 'challenges.completion-saving'
-            : completionSaved
-              ? completionSyncPending
-                ? 'challenges.completion-sync-pending'
-                : 'challenges.completion-saved'
-              : 'challenges.completion-save-failed'
-          : 'challenges.retry-description'
+        invalidChallengeSong
+          ? 'challenges.song-too-short'
+          : succeeded
+            ? savingCompletion
+              ? 'challenges.completion-saving'
+              : completionSaved
+                ? completionSyncPending
+                  ? 'challenges.completion-sync-pending'
+                  : 'challenges.completion-saved'
+                : 'challenges.completion-save-failed'
+            : 'challenges.retry-description'
       )}
     </p>
     {#if detection && recordingStart !== undefined && recordingEnd !== undefined}
@@ -208,9 +254,16 @@
   video {
     max-width: 100%;
   }
-  button {
+  button,
+  select {
     font: inherit;
+    min-height: 44px;
+  }
+  button {
     padding: 0.6rem 1rem;
+  }
+  select {
+    min-width: 44px;
   }
   .author-button {
     margin-left: 0.5rem;

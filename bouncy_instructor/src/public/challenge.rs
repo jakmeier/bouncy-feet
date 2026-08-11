@@ -7,6 +7,13 @@ use crate::{Tracker, VideoDef};
 use std::rc::Rc;
 use wasm_bindgen::prelude::wasm_bindgen;
 
+/// Challenges score at least this much dancing before they may finish.
+///
+/// Currently duplicated in bouncy_frontend/src/lib/challengeAttempt.js
+pub const MINIMUM_CHALLENGE_DURATION_MS: u32 = 20_000;
+const SUBBEAT_DURATION_NUMERATOR_MS: u32 = 30_000;
+const REQUIRED_HIT_PERCENT: u32 = 60;
+
 #[derive(Debug)]
 #[wasm_bindgen]
 pub struct ChallengeSet {
@@ -24,6 +31,9 @@ pub struct Challenge {
     pub(crate) explanation: Option<String>,
     pub(crate) prerequisites: Vec<String>,
     pub(crate) bpm: u16,
+    pub(crate) default_song: Option<String>,
+    pub(crate) allowed_songs: Vec<String>,
+    pub(crate) song_timestamp: Option<f64>,
     pub(crate) solution_video: VideoDef,
     pub(crate) solution_start_timestamp: f64,
     pub(crate) parts: Vec<ChallengePart>,
@@ -88,6 +98,18 @@ impl Challenge {
     pub fn bpm(&self) -> u16 {
         self.bpm
     }
+    #[wasm_bindgen(getter, js_name = defaultSong)]
+    pub fn default_song(&self) -> Option<String> {
+        self.default_song.clone()
+    }
+    #[wasm_bindgen(getter, js_name = allowedSongs)]
+    pub fn allowed_songs(&self) -> Vec<String> {
+        self.allowed_songs.clone()
+    }
+    #[wasm_bindgen(getter, js_name = songTimestamp)]
+    pub fn song_timestamp(&self) -> f64 {
+        self.song_timestamp.unwrap_or(0.0)
+    }
     #[wasm_bindgen(getter, js_name = solutionVideo)]
     pub fn solution_video(&self) -> VideoDef {
         self.solution_video.clone()
@@ -100,14 +122,65 @@ impl Challenge {
     pub fn parts(&self) -> Vec<ChallengePart> {
         self.parts.clone()
     }
+
+    /// Duration of the initial scoring window. It ends exactly at the end of a
+    /// configured challenge repetition.
+    #[wasm_bindgen(getter, js_name = challengeDurationMs)]
+    pub fn challenge_duration_ms(&self) -> u32 {
+        let (_, total_subbeats, _) = self.attempt_shape();
+        // A subbeat lasts 30_000 / BPM milliseconds.
+        total_subbeats * SUBBEAT_DURATION_NUMERATOR_MS / self.bpm as u32
+    }
+
+    /// Hits needed to complete the challenge.
+    #[wasm_bindgen(getter, js_name = requiredHits)]
+    pub fn required_hits(&self) -> u32 {
+        let (_, _, expected_poses) = self.attempt_shape();
+        (expected_poses * REQUIRED_HIT_PERCENT).div_ceil(100)
+    }
 }
 impl Challenge {
+    /// Returns the number of full pattern repetitions, the corresponding
+    /// subbeats, and score opportunities in the initial scoring window.
+    fn attempt_shape(&self) -> (u32, u32, u32) {
+        let db = &self.collection.tracker_view;
+        let (pattern_subbeats, pattern_poses) =
+            self.parts
+                .iter()
+                .fold((0_u32, 0_u32), |(subbeats, poses), part| {
+                    let poses_per_step = part.step_wrapper.info(db).num_poses() as u32;
+                    (
+                        subbeats + part.repeat * poses_per_step * part.pace.subbeats_per_pose(),
+                        poses + part.repeat * poses_per_step,
+                    )
+                });
+        assert!(pattern_subbeats > 0, "challenge must contain poses");
+        let minimum_subbeats = (MINIMUM_CHALLENGE_DURATION_MS * self.bpm as u32)
+            .div_ceil(SUBBEAT_DURATION_NUMERATOR_MS);
+        let repetitions = minimum_subbeats.div_ceil(pattern_subbeats);
+        (
+            repetitions,
+            repetitions * pattern_subbeats,
+            repetitions * pattern_poses,
+        )
+    }
+
     fn tracker(&self) -> Tracker {
         let db = Rc::clone(&self.collection.tracker_view);
+        let (repetitions, _, _) = self.attempt_shape();
+        let offline_step_limit = self.parts.iter().map(|part| part.repeat as usize).sum();
         let mut teacher = Teacher::default();
-        for p in &self.parts {
-            teacher.add_step(p.step_wrapper.info(&db), p.repeat, p.pace);
+        for _ in 0..repetitions {
+            for p in &self.parts {
+                teacher.add_step(p.step_wrapper.info(&db), p.repeat, p.pace);
+            }
         }
+        // Continue after the initial score window so dancers can recover from
+        // misses. The live activity stops this loop on a successful score or
+        // when the song/video ends. Offline solution-video tests still verify
+        // only the one authored pattern.
+        teacher.set_offline_step_limit(offline_step_limit);
+        teacher.loop_forever();
         let mut tracker = Tracker::new_from_teacher(db, teacher);
         tracker.set_bpm(self.bpm as f32);
         tracker.enforce_beat(true);
