@@ -239,6 +239,11 @@ impl Tracker {
         self.detector.bpm = bpm;
     }
 
+    #[wasm_bindgen(js_name = setMusicLeadInMs)]
+    pub fn set_music_lead_in_ms(&mut self, duration_ms: Timestamp) {
+        self.detector.music_lead_in_ms = duration_ms.max(0.0);
+    }
+
     #[wasm_bindgen(js_name = alignBeat)]
     pub fn align_beat(&mut self, first_beat: Timestamp) {
         self.detector.beat_alignment = Some(first_beat);
@@ -330,6 +335,12 @@ impl Tracker {
     #[wasm_bindgen(getter, js_name = expectedPoses)]
     pub fn expected_poses(&self) -> u32 {
         self.detector.teacher.expected_poses()
+    }
+
+    /// The current count-in target, if positioning has completed.
+    #[wasm_bindgen(getter, js_name = countInEndTimestamp)]
+    pub fn count_in_end_timestamp(&self) -> Option<Timestamp> {
+        self.detector.count_in_end
     }
 
     #[wasm_bindgen(js_name = nextSubbeat)]

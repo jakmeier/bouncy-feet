@@ -3,6 +3,7 @@ use crate::intern::content_collection::ContentCollection;
 use crate::intern::step_pace::StepPace;
 use crate::intern::teacher::Teacher;
 use crate::intern::tracker_dance_collection::TrackerDanceCollection;
+use crate::public::SongTimingOverride;
 use crate::wrapper::step_wrapper::StepWrapper;
 use crate::{parsing, Tracker, VideoDef};
 use std::rc::Rc;
@@ -30,6 +31,7 @@ pub struct Lesson {
     pub(crate) back_video: Option<VideoDef>,
     pub(crate) song: Option<String>,
     pub(crate) song_timestamp: Option<f64>,
+    pub(crate) song_timing: Option<SongTimingOverride>,
     pub energy: u8,
     pub difficulty: u8,
     pub(crate) parts: Vec<LessonPart>,
@@ -171,6 +173,11 @@ impl Lesson {
     #[wasm_bindgen(getter, js_name = "songTimestamp")]
     pub fn song_timestamp(&self) -> f64 {
         self.song_timestamp.unwrap_or(0.0)
+    }
+
+    #[wasm_bindgen(getter, js_name = "songTiming")]
+    pub fn song_timing(&self) -> Option<SongTimingOverride> {
+        self.song_timing.clone()
     }
 
     #[wasm_bindgen(getter)]

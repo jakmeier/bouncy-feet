@@ -6,6 +6,8 @@ use super::{ParseFileError, VersionCheck};
 use crate::intern::content_collection::ContentCollection;
 use crate::intern::step::StepSource;
 use crate::public::challenge::{Challenge, ChallengePart, ChallengeSet};
+use crate::public::song_timing::SongTimingOverrideError;
+use crate::public::SongTimingOverride;
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
 
@@ -41,6 +43,8 @@ struct ChallengeDef {
     allowed_songs: Vec<String>,
     #[serde(default)]
     song_timestamp: Option<u64>,
+    #[serde(default)]
+    song_timing_overrides: HashMap<String, SongTimingOverride>,
     solution_video: Option<VideoDef>,
     solution_start_timestamp: Option<u32>,
     parts: Vec<Part>,
@@ -121,6 +125,7 @@ impl ChallengeFile {
             {
                 return Err(ParseFileError::InvalidChallengeValue("default_song"));
             }
+            validate_timing_overrides(&challenge.song_timing_overrides, &allowed_songs)?;
             let collection = challenge_collection(&poses, &steps, &challenge.parts)?;
             let mut parts = vec![];
             for p in challenge.parts {
@@ -148,6 +153,7 @@ impl ChallengeFile {
                 default_song,
                 allowed_songs,
                 song_timestamp: challenge.song_timestamp.map(|timestamp| timestamp as f64),
+                song_timing_overrides: challenge.song_timing_overrides,
                 solution_video: video.into(),
                 solution_start_timestamp: challenge.solution_start_timestamp.unwrap() as f64,
                 parts,
@@ -166,6 +172,24 @@ impl ChallengeFile {
 }
 
 /// Only uses poses and steps for this specific challenge.
+fn validate_timing_overrides(
+    overrides: &HashMap<String, SongTimingOverride>,
+    allowed_songs: &[String],
+) -> Result<(), ParseFileError> {
+    for (song_id, timing) in overrides {
+        if !allowed_songs.contains(song_id) {
+            return Err(ParseFileError::UnknownChallengeTimingSong(song_id.clone()));
+        }
+        timing.validate().map_err(|error| match error {
+            SongTimingOverrideError::ConflictingCountInEnd => {
+                ParseFileError::ConflictingSongTimingCountInEnd
+            }
+            SongTimingOverrideError::EmptyDropId => ParseFileError::EmptySongTimingDropId,
+        })?;
+    }
+    Ok(())
+}
+
 fn challenge_collection(
     poses: &[Pose],
     steps: &[Step],
@@ -275,7 +299,20 @@ fn validate_graph(challenges: &[Challenge]) -> Result<(), ParseFileError> {
 
 #[cfg(test)]
 mod tests {
-    use super::ChallengeFile;
+    use super::{validate_timing_overrides, ChallengeFile};
+    use crate::public::parsing::ParseFileError;
+    use crate::public::SongTimingOverride;
+    use std::collections::HashMap;
+
+    #[test]
+    fn rejects_timing_overrides_for_disallowed_songs() {
+        let overrides = HashMap::from([("not-allowed".to_owned(), SongTimingOverride::default())]);
+        let error = validate_timing_overrides(&overrides, &["allowed".to_owned()]).unwrap_err();
+        assert!(matches!(
+            error,
+            ParseFileError::UnknownChallengeTimingSong(song) if song == "not-allowed"
+        ));
+    }
 
     #[test]
     fn challenge_tracker_collection_excludes_unrelated_steps_and_poses() {

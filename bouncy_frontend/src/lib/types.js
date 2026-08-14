@@ -157,11 +157,28 @@
  * @property {number} index
  * @property {number} weight
  * 
+ * @typedef {Object} SongDrop
+ * @property {string} id Stable ID used by course and challenge timing overrides.
+ * @property {number|null} timestampMs Position of the drop in the song timeline.
+ *
  * @typedef {Object} Song
  * @property {string} id
  * @property {number} bpm
- * @property {number} author
- * @property {number} title
+ * @property {string} author
+ * @property {string} title
+ * @property {SongDrop[]} drops Ordered musical drop markers. Every song has `first`.
+ * @property {number} [durationMs] Decoded duration, attached at runtime when available.
+ *
+ * @typedef {Object} SongTimingOverride
+ * @property {number} [playbackStartMs]
+ * @property {string} [countInEndDrop]
+ * @property {number} [countInEndMs]
+ *
+ * @typedef {Object} ResolvedSongTiming
+ * @property {number} playbackStartMs
+ * @property {number} countInEndMs
+ * @property {number} countInBeats
+ * @property {number} musicLeadInMs Music-only time before the spoken count-in.
  * 
  * @typedef {string} OnboardingState
  * 

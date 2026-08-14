@@ -17,7 +17,6 @@
       bpm: 105,
       default_song: "105bpm_tropical_house",
       allowed_songs: ["105bpm_tropical_house"],
-      song_timestamp: 0,
       solution_video: (
         path: "https://app.bouncy-feet.ch/media/videos/challenges/jumping_jacks/jj_00.mp4",
         beats: [2174, 2746, 3317, 3889, 4460, 5032, 5603, 6175],
@@ -34,7 +33,6 @@
       bpm: 105,
       default_song: "105bpm_tropical_house",
       allowed_songs: ["105bpm_tropical_house"],
-      song_timestamp: 0,
       solution_video: (
         path: "https://app.bouncy-feet.ch/media/videos/challenges/jumping_jacks/jj_01.mp4",
         beats: [2034, 2605, 3177, 3748, 4320, 4891, 5463, 6034],
@@ -51,7 +49,6 @@
       bpm: 105,
       default_song: "105bpm_tropical_house",
       allowed_songs: ["105bpm_tropical_house"],
-      song_timestamp: 0,
       solution_video: (
         path: "https://app.bouncy-feet.ch/media/videos/challenges/jumping_jacks/jj_02.mp4",
         beats: [4224, 4795, 5367, 5938, 6510, 7081, 7653, 8224],
@@ -74,7 +71,6 @@
       bpm: 105,
       default_song: "105bpm_tropical_house",
       allowed_songs: ["105bpm_tropical_house"],
-      song_timestamp: 0,
       solution_video: (
         path: "https://app.bouncy-feet.ch/media/videos/challenges/jumping_jacks/jj_03.mp4",
         beats: [1926, 2497, 3069, 3640, 4212, 4783, 5355, 5926, 6497, 7069, 7640, 8212, 8783, 9355, 9926, 10497],
@@ -92,7 +88,6 @@
       bpm: 105,
       default_song: "105bpm_tropical_house",
       allowed_songs: ["105bpm_tropical_house"],
-      song_timestamp: 0,
       solution_video: (
         path: "https://app.bouncy-feet.ch/media/videos/challenges/jumping_jacks/jj_04.mp4",
         beats: [3583, 4154, 4726, 5297, 5869, 6440, 7012, 7583],

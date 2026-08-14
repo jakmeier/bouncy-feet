@@ -3,7 +3,9 @@ use crate::intern::step_pace::StepPace;
 use crate::intern::teacher::Teacher;
 use crate::public::course::CourseError;
 use crate::public::wrapper::step_wrapper::StepWrapper;
+use crate::public::SongTimingOverride;
 use crate::{Tracker, VideoDef};
+use std::collections::HashMap;
 use std::rc::Rc;
 use wasm_bindgen::prelude::wasm_bindgen;
 
@@ -34,6 +36,7 @@ pub struct Challenge {
     pub(crate) default_song: Option<String>,
     pub(crate) allowed_songs: Vec<String>,
     pub(crate) song_timestamp: Option<f64>,
+    pub(crate) song_timing_overrides: HashMap<String, SongTimingOverride>,
     pub(crate) solution_video: VideoDef,
     pub(crate) solution_start_timestamp: f64,
     pub(crate) parts: Vec<ChallengePart>,
@@ -109,6 +112,10 @@ impl Challenge {
     #[wasm_bindgen(getter, js_name = songTimestamp)]
     pub fn song_timestamp(&self) -> f64 {
         self.song_timestamp.unwrap_or(0.0)
+    }
+    #[wasm_bindgen(js_name = songTimingFor)]
+    pub fn song_timing_for(&self, song_id: String) -> Option<SongTimingOverride> {
+        self.song_timing_overrides.get(&song_id).cloned()
     }
     #[wasm_bindgen(getter, js_name = solutionVideo)]
     pub fn solution_video(&self) -> VideoDef {

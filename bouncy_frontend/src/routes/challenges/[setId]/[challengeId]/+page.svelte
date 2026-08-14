@@ -5,8 +5,9 @@
   import StandardPage from '$lib/components/ui/StandardPage.svelte';
   import LiveActivity from '$lib/components/activity/LiveActivity.svelte';
   import ActivityReview from '$lib/components/activity/ActivityReview.svelte';
-  import { registerTracker, setBeatStart, setBpm } from '$lib/stores/Beat';
+  import { registerTracker, setBpm } from '$lib/stores/Beat';
   import { songs } from '$lib/stores/Songs';
+  import { resolveSongTiming } from '$lib/songTiming.js';
   import { completeChallenge } from '$lib/challengeProgress.js';
   import LoginRequiredContent from '$lib/components/profile/LoginRequiredContent.svelte';
   import { t } from '$lib/i18n';
@@ -41,7 +42,6 @@
   let recordingEnd = $state();
   /** @type {string | undefined} */
   let reviewVideoSrc = $state();
-  const { setTrack } = getContext('music');
   /** @type {string[]} */
   const configuredSongIds = challenge?.allowedSongs?.length
     ? challenge.allowedSongs
@@ -60,6 +60,17 @@
       ? challenge.defaultSong
       : availableSongs[0]?.id
   );
+  let selectedSong = $derived(
+    availableSongs.find((song) => song.id === selectedSongId)
+  );
+  let songTiming = $derived(
+    selectedSong
+      ? resolveSongTiming(
+          selectedSong,
+          challenge?.songTimingFor(selectedSong.id)
+        )
+      : undefined
+  );
   let tracker = challenge ? set.tracker(challengeIndex) : undefined;
   // registerTracker establishes Svelte context, so it must run while this
   // component is being initialised (not later from the click handler).
@@ -69,10 +80,8 @@
   async function start(apiUser) {
     if (!tracker || !challenge || !selectedSongId) return;
     activityUser = apiUser;
-    await setTrack(selectedSongId);
     // Challenges own their tempo; don't inherit the last practice activity's BPM.
     setBpm(challenge.bpm);
-    setBeatStart(performance.now() + challenge.songTimestamp);
     started = true;
   }
 
@@ -217,6 +226,8 @@
       <div data-testid="challenge-live">
         <LiveActivity
           {onDone}
+          songId={selectedSongId}
+          {songTiming}
           teacherVideo={challenge.solutionVideo.path()}
           challengeDurationMs={challenge.challengeDurationMs}
           requiredHits={challenge.requiredHits}

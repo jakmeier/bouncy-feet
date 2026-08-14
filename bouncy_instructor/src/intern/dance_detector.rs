@@ -111,6 +111,10 @@ pub(crate) struct DanceDetector {
     pub(crate) detection_state_start: Timestamp,
     /// The timestamp of the last skeleton evaluated, to avoid duplicated work on tick.
     pub(crate) last_evaluation: Timestamp,
+    /// Music-only time before the four-beat spoken count-in.
+    pub(crate) music_lead_in_ms: Timestamp,
+    /// Wall-clock target at which count-in ends and activity beat zero begins.
+    pub(crate) count_in_end: Option<Timestamp>,
     pub(crate) ui_events: UiEvents,
 }
 
@@ -121,6 +125,8 @@ pub enum DetectionState {
     Init = 1,
     /// Dance is positioning themselves, detecting the idle position.
     Positioning = 2,
+    /// Music is playing before the spoken count-in starts.
+    MusicLeadIn = 7,
     /// About to go over to live tracking, playing a countdown audio.
     CountDown = 3,
     /// Tracking current movements.
@@ -153,6 +159,8 @@ impl Default for DanceDetector {
             detection_state_store: Readable::new(DetectionState::Init),
             detection_state_start: 0.0,
             last_evaluation: -0.1,
+            music_lead_in_ms: 0.0,
+            count_in_end: None,
             ui_events: UiEvents::default(),
             on_beat_candidates: vec![],
             teacher: Default::default(),
@@ -191,6 +199,7 @@ impl DanceDetector {
         self.detected.pose_matches = 0;
         self.detected.pose_misses = 0;
         self.beat_zero = None;
+        self.count_in_end = None;
         self.transition_to_state(DetectionState::Init, self.detection_state_start);
     }
 
@@ -219,19 +228,29 @@ impl DanceDetector {
                     let error_details = positioning_pose.skeleton_error(skeleton);
                     // Be lenient on the accuracy for the entry gate.
                     if error_details.error_score() < 0.5 {
-                        self.transition_to_state(DetectionState::CountDown, now);
+                        let next_state = if self.music_lead_in_ms > 0.0 {
+                            DetectionState::MusicLeadIn
+                        } else {
+                            DetectionState::CountDown
+                        };
+                        self.transition_to_state(next_state, now);
                     }
                 }
             }
+            DetectionState::MusicLeadIn => {
+                // The spoken count itself remains exactly four beats. This
+                // separate phase lets the song establish its rhythm first.
+                if self
+                    .count_in_end
+                    .is_some_and(|target| now >= target - 8.0 * self.subbeat_time())
+                {
+                    self.transition_to_state(DetectionState::CountDown, now);
+                }
+            }
             DetectionState::CountDown => {
-                let time_between_poses = self.subbeat_time();
-                if now > self.detection_state_start + (time_between_poses * 15.0).floor() {
-                    let beat_zero = self.next_subbeat_timestamp(now);
-                    self.beat_zero = Some(beat_zero);
-                    // the change to the next state must happen BEFORE it
-                    // actually starts, to give time to the animation
-                    let actual_start = beat_zero + time_between_poses;
-                    self.transition_to_state(DetectionState::LiveTracking, actual_start);
+                if self.count_in_end.is_some_and(|target| now >= target) {
+                    self.beat_zero = self.count_in_end;
+                    self.transition_to_state(DetectionState::LiveTracking, now);
                 }
             }
             DetectionState::LiveTracking => {
@@ -405,7 +424,9 @@ impl DanceDetector {
 
     pub(crate) fn current_view(&mut self, t: Timestamp) -> TeacherView {
         match self.detection_state {
-            DetectionState::Init | DetectionState::Positioning => TeacherView::UserCameraOnly,
+            DetectionState::Init | DetectionState::Positioning | DetectionState::MusicLeadIn => {
+                TeacherView::UserCameraOnly
+            }
             DetectionState::CountDown
             | DetectionState::LiveTracking
             | DetectionState::InstructorDemo => {
@@ -461,8 +482,27 @@ impl DanceDetector {
         match state {
             DetectionState::Init => (),
             DetectionState::Positioning => (),
+            DetectionState::MusicLeadIn => {
+                // Four beats of music lead into the separate four-beat spoken
+                // count-in. The target is the beat-grid origin and activity
+                // sequence beat zero.
+                let target = t + self.music_lead_in_ms + 8.0 * self.subbeat_time();
+                self.count_in_end = Some(target);
+                self.beat_alignment = Some(target);
+                // Schedule the spoken cues now, while all four are safely in
+                // the future. Waiting for a camera frame at the count-in
+                // boundary can make "one" late and clamp it close to "two".
+                self.emit_countdown_audio_at(target);
+            }
             DetectionState::CountDown => {
-                self.emit_countdown_audio(t + self.start_countdown_delay())
+                // Direct transitions are retained for callers/tests that only
+                // need a spoken count-in and do not use the music lead-in.
+                if self.count_in_end.is_none() {
+                    let target = t + 8.0 * self.subbeat_time();
+                    self.count_in_end = Some(target);
+                    self.beat_alignment = Some(target);
+                    self.emit_countdown_audio_at(target);
+                }
             }
             DetectionState::LiveTracking => (),
             DetectionState::InstructorDemo => (),
@@ -486,10 +526,6 @@ impl DanceDetector {
         self.detected.cursor.subbeat
     }
 
-    fn start_countdown_delay(&self) -> Timestamp {
-        self.teacher.subbeats_before_tracking() as f64 * self.subbeat_time()
-    }
-
     /// Attention: This is not from the start of tracking but from the beat alignment
     fn timestamp_to_subbeat_from_zero(&self, t: Timestamp) -> u32 {
         let t0 = self.beat_zero.unwrap_or(
@@ -507,37 +543,20 @@ impl DanceDetector {
         t0 + subbeats * subbeat_duration
     }
 
-    pub(crate) fn emit_countdown_audio(&mut self, not_before: Timestamp) {
-        let beat = self.subbeat_time();
-        let next_beat = self.next_subbeat_timestamp(not_before);
-        // long enough to not clear too early
-        let text_dur = 8.0 * beat;
-
-        self.ui_events.add_audio(next_beat, "and".to_owned());
-
-        self.ui_events.add_audio(next_beat + beat, "one".to_owned());
-        self.ui_events
-            .add_text(next_beat + beat, "4".to_owned(), text_dur);
-
-        self.ui_events
-            .add_audio(next_beat + 5.0 * beat, "two".to_owned());
-        self.ui_events
-            .add_text(next_beat + 5.0 * beat, "3".to_owned(), text_dur);
-
-        self.ui_events
-            .add_audio(next_beat + 9.0 * beat, "one".to_owned());
-        self.ui_events
-            .add_text(next_beat + 9.0 * beat, "2".to_owned(), text_dur);
-
-        self.ui_events
-            .add_audio(next_beat + 11.0 * beat, "two".to_owned());
-        self.ui_events
-            .add_audio(next_beat + 13.0 * beat, "three".to_owned());
-        self.ui_events
-            .add_text(next_beat + 13.0 * beat, "1".to_owned(), beat);
-
-        self.ui_events
-            .add_audio(next_beat + 15.0 * beat, "four".to_owned());
+    pub(crate) fn emit_countdown_audio_at(&mut self, target: Timestamp) {
+        let musical_beat = 2.0 * self.subbeat_time();
+        let cues = [
+            ("one", "1", 4.0),
+            ("two", "2", 3.0),
+            ("three", "3", 2.0),
+            ("four", "4", 1.0),
+        ];
+        for (sound, text, beats_before_target) in cues {
+            let timestamp = target - beats_before_target * musical_beat;
+            self.ui_events.add_audio(timestamp, sound.to_owned());
+            self.ui_events
+                .add_text(timestamp, text.to_owned(), musical_beat);
+        }
     }
 
     /// For debugging pruposes, set the state directly.
@@ -577,6 +596,44 @@ mod tests {
         );
         assert!(positioning_side_pose().skeleton_error(&east).error_score() < 0.5);
         assert!(positioning_side_pose().skeleton_error(&west).error_score() < 0.5);
+    }
+
+    #[test]
+    fn music_lead_in_precedes_the_four_beat_countdown() {
+        let mut detector = DanceDetector::default();
+        detector.bpm = 120.0;
+        detector.music_lead_in_ms = 2_000.0;
+        detector.transition_to_state(DetectionState::MusicLeadIn, 1_000.0);
+
+        // At 120 BPM, a tracker subbeat is 250ms. Four music-lead beats plus
+        // four spoken-count beats put the drop four seconds after music starts.
+        let target = 5_000.0;
+        assert_eq!(detector.count_in_end, Some(target));
+        assert_eq!(detector.beat_alignment, Some(target));
+
+        let db = TrackerDanceCollection::default();
+        detector.tick(3_000.0, &db, &[]);
+        assert!(matches!(
+            detector.detection_state,
+            DetectionState::CountDown
+        ));
+        let mut cue_count = 0;
+        let mut four_timestamp = None;
+        while let Some(event) = detector.ui_events.next_audio() {
+            cue_count += 1;
+            if event.sound_id == "four" {
+                four_timestamp = Some(event.timestamp);
+            }
+        }
+        assert_eq!(cue_count, 4);
+        assert_eq!(four_timestamp, Some(target - 500.0));
+
+        detector.tick(target, &db, &[]);
+        assert_eq!(detector.beat_zero, Some(target));
+        assert!(matches!(
+            detector.detection_state,
+            DetectionState::LiveTracking
+        ));
     }
 
     /// Freestyle trackers can pass the entry gate without content poses in their DB.

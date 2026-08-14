@@ -2,7 +2,7 @@
   import TrackAudio from '$lib/components/audio/TrackAudio.svelte';
   import { setChannelGain } from '$lib/stores/Audio';
   import { songs } from '$lib/stores/Songs';
-  import { setContext } from 'svelte';
+  import { setContext, tick } from 'svelte';
   import { readable } from 'svelte/store';
   /**
    * @typedef {Object} Props
@@ -14,6 +14,7 @@
 
   /** @type {Song | undefined} */
   let track = $state(undefined);
+  let autoplayTrack = $state(true);
   /** @type {TrackAudio | undefined} */
   let audio = $state();
 
@@ -34,10 +35,38 @@
 
   /** @param {string} newTrackId */
   async function setTrack(newTrackId) {
+    autoplayTrack = true;
     trackDurationMs = undefined;
     track = songs.get(newTrackId);
     titleSetter(track?.title || '-');
     authorSetter(track?.author || '-');
+    await tick();
+  }
+
+  /**
+   * Load a track without starting it. The track component is retained so old
+   * preview callers can continue to use setTrack's autoplay behavior.
+   * @param {string} songId
+   * @returns {Promise<AudioBuffer | undefined>}
+   */
+  async function prepareTrack(songId) {
+    autoplayTrack = false;
+    trackDurationMs = undefined;
+    track = songs.get(songId);
+    titleSetter(track?.title || '-');
+    authorSetter(track?.author || '-');
+    await tick();
+    return audio?.prepareTrack();
+  }
+
+  /** @param {number} timestamp @param {number} [playbackStartMs] */
+  function startTrackAt(timestamp, playbackStartMs = 0) {
+    audio?.startTrackAt(timestamp, playbackStartMs);
+  }
+
+  /** @param {number} timestamp @param {number} [playbackStartMs] */
+  function resetTrackAt(timestamp, playbackStartMs = 0) {
+    audio?.resetTrackAt(timestamp, playbackStartMs);
   }
 
   function resetTrack() {
@@ -74,6 +103,9 @@
 
   setContext('music', {
     setTrack,
+    prepareTrack,
+    startTrackAt,
+    resetTrackAt,
     resetTrack,
     stopTrack,
     resumeTrack,
@@ -86,6 +118,9 @@
     },
     get trackOn() {
       return audio?.trackIsOn();
+    },
+    get trackStartTimestamp() {
+      return audio?.trackStartTimestamp();
     },
     get trackDurationMs() {
       return trackDurationMs;
@@ -101,6 +136,7 @@
   <TrackAudio
     bind:this={audio}
     {track}
+    autoplay={autoplayTrack}
     onEnded={trackEnded}
     onDuration={trackDurationLoaded}
   />

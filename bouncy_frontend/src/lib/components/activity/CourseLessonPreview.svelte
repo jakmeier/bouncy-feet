@@ -28,7 +28,7 @@
   const songList = songs.list();
 
   const trackId = course.lessons[lessonIndex].song || songList[0].id;
-  const trackTimestamp = course.lessons[lessonIndex].songTimestamp;
+  const trackTimingOverride = course.lessons[lessonIndex].songTiming;
 </script>
 
 <ActivityPreview
@@ -38,7 +38,7 @@
   {tracker}
   {video}
   {trackId}
-  {trackTimestamp}
+  {trackTimingOverride}
   {difficulty}
   {energy}
   {onBack}

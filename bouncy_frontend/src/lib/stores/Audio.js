@@ -92,23 +92,30 @@ export function playAudio(id) {
  * @param {string} id
  * @param {number} timestamp in ms as performance timestamp
  * @param {string} channel
+ * @param {number} [offsetSeconds] Offset into the decoded buffer.
  * @return {AudioBufferSourceNode}
  */
-export function scheduleAudioOnChannel(id, timestamp, channel) {
+export function scheduleAudioOnChannel(
+  id,
+  timestamp,
+  channel,
+  offsetSeconds = 0
+) {
   const delay = (timestamp - performance.now()) / 1000.0;
   // outputLatency is not supported in all browsers
   const outputLatency = audioContext.outputLatency || 0;
   const start = audioContext.currentTime + delay - outputLatency;
-  return scheduleAudioEx(id, start, channel);
+  return scheduleAudioEx(id, start, channel, offsetSeconds);
 }
 
 /**
  * @param {string} id
  * @param {number} audioTime in time of audio context
  * @param {string} channel
+ * @param {number} [offsetSeconds] Offset into the decoded buffer.
  * @return {AudioBufferSourceNode}
  */
-export function scheduleAudioEx(id, audioTime, channel) {
+export function scheduleAudioEx(id, audioTime, channel, offsetSeconds = 0) {
   if (!channels[channel]) {
     channels[channel] = new GainNode(audioContext, { gain: 1.0 });
   }
@@ -117,7 +124,10 @@ export function scheduleAudioEx(id, audioTime, channel) {
   const source = getAudio(id);
   if (source) {
     source.connect(channels[channel]);
-    source.start(Math.max(audioContext.currentTime, audioTime));
+    source.start(
+      Math.max(audioContext.currentTime, audioTime),
+      Math.max(0, offsetSeconds)
+    );
   } else {
     console.warn('no sound buffer for', id);
   }
@@ -138,6 +148,13 @@ export function scheduleAudio(id, timestamp) {
  * @param {string} channel
  */
 export function cleanupAudioNode(node, channel) {
+  // Sources scheduled in the future must be explicitly stopped, disconnecting
+  // alone leaves them running and can leak stale countdown cues into retries.
+  try {
+    if (node instanceof AudioBufferSourceNode) node.stop();
+  } catch {
+    // A source may already have ended or been stopped.
+  }
   if (channels[channel]) {
     node.disconnect(channels[channel]);
   }

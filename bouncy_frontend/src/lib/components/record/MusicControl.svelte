@@ -2,6 +2,7 @@
   import { run } from 'svelte/legacy';
 
   import { DetectionState } from '$lib/instructor/bouncy_instructor';
+  import { setBeatStart } from '$lib/stores/Beat';
   import { getContext, onDestroy } from 'svelte';
 
   /**
@@ -12,8 +13,12 @@
    *
    */
 
-  let { detectionState } = getContext('tracker').tracker;
-  let { resetTrack, stopTrack } = getContext('music');
+  const tracker = getContext('tracker').tracker;
+  let { detectionState } = tracker;
+  let { resetTrack, resetTrackAt, stopTrack } = getContext('music');
+
+  /** @type {{songTiming?: ResolvedSongTiming}} */
+  let { songTiming } = $props();
 
   /** @type {DetectionState} */
   let prevDetectionState = DetectionState.Init;
@@ -24,8 +29,23 @@
       if (newState === DetectionState.Positioning) {
         stopTrack();
       }
-      if (newState === DetectionState.CountDown) {
-        resetTrack();
+      if (
+        newState === DetectionState.MusicLeadIn ||
+        (newState === DetectionState.CountDown && !songTiming)
+      ) {
+        const target = tracker.countInEndTimestamp;
+        if (target !== undefined) {
+          setBeatStart(target);
+          if (songTiming) {
+            const playbackWallTime =
+              target - songTiming.countInEndMs + songTiming.playbackStartMs;
+            resetTrackAt(playbackWallTime, songTiming.playbackStartMs);
+          } else {
+            resetTrack();
+          }
+        } else {
+          resetTrack();
+        }
       }
       prevDetectionState = newState;
     }

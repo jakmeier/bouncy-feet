@@ -3,7 +3,8 @@
   import { getContext, onDestroy, onMount } from 'svelte';
   import Popup from '$lib/components/ui/Popup.svelte';
   import { writable } from 'svelte/store';
-  import { bpm, setBeatStart } from '$lib/stores/Beat';
+  import { bpm, setBeatStart, setBpm } from '$lib/stores/Beat';
+  import { resolveSongTiming } from '$lib/songTiming.js';
   import { songs } from '$lib/stores/Songs';
   import DarkSection from '$lib/components/ui/sections/DarkSection.svelte';
   import Footer from '$lib/components/ui/Footer.svelte';
@@ -23,7 +24,7 @@
    * @property {Tracker} tracker
    * @property {VideoDef} [video]
    * @property {string} [trackId]
-   * @property {number} [trackTimestamp]
+   * @property {SongTimingOverride} [trackTimingOverride]
    * @property {number} difficulty
    * @property {number} energy
    * @property {()=>void} onBack
@@ -37,13 +38,13 @@
     onDone,
     video,
     trackId,
-    trackTimestamp = 0,
+    trackTimingOverride,
     difficulty,
     energy,
     onBack,
   } = $props();
 
-  const { stopTrack, setTrack, resumeTrack, songTitle, songAuthor } =
+  const { stopTrack, prepareTrack, startTrackAt, songTitle, songAuthor } =
     getContext('music');
 
   /** @type {LocalState}*/
@@ -59,8 +60,10 @@
   function changeTrack(index) {
     const track = songList[index % songList.length];
     if (track) {
-      setTrack(track.id);
-      resumeTrack();
+      startPreviewTrack(
+        track,
+        track.id === trackId ? trackTimingOverride : undefined
+      );
     }
   }
 
@@ -73,10 +76,21 @@
     onDone();
   }
 
+  /** @param {Song} selectedTrack @param {SongTimingOverride} [override] */
+  async function startPreviewTrack(selectedTrack, override) {
+    const timing = resolveSongTiming(selectedTrack, override);
+    await prepareTrack(selectedTrack.id);
+    const playbackWallTime = performance.now();
+    startTrackAt(playbackWallTime, timing.playbackStartMs);
+    setBpm(selectedTrack.bpm);
+    setBeatStart(
+      playbackWallTime + timing.countInEndMs - timing.playbackStartMs
+    );
+  }
+
   onMount(() => {
-    setTrack(trackId || songList[0].id);
-    setBeatStart(performance.now() + trackTimestamp);
-    resumeTrack();
+    const initialTrack = songs.get(trackId || songList[0].id);
+    if (initialTrack) startPreviewTrack(initialTrack, trackTimingOverride);
   });
   onDestroy(() => {
     stopTrack();

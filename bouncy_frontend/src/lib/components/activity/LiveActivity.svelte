@@ -31,10 +31,19 @@
    * @property {string} [teacherVideo]
    * @property {number} [challengeDurationMs]
    * @property {number} [requiredHits]
+   * @property {string} [songId]
+   * @property {ResolvedSongTiming} [songTiming]
    */
 
   /** @type {Props} */
-  let { onDone, teacherVideo, challengeDurationMs, requiredHits } = $props();
+  let {
+    onDone,
+    teacherVideo,
+    challengeDurationMs,
+    requiredHits,
+    songId,
+    songTiming,
+  } = $props();
 
   let detectionResult;
   let videoUrl = $state('');
@@ -44,6 +53,7 @@
   /** @type {{ tracker: Tracker }} */
   const trackerContext = getContext('tracker');
   const { tracker } = trackerContext;
+  const music = getContext('music');
   /** @type {import('svelte/store').Readable<DetectionState> | null} */
   let trackingState = tracker.detectionState;
 
@@ -60,6 +70,7 @@
   }
 
   async function start() {
+    if (songId) await music.prepareTrack(songId);
     if (liveRecording) {
       await liveRecording.startCamera();
     }
@@ -119,6 +130,7 @@
     onStop={onRecordingStopped}
     forceBeat={true}
     {teacherVideo}
+    {songTiming}
     {challengeDurationMs}
     {requiredHits}
   ></LiveRecording>

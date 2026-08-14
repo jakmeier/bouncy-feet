@@ -305,18 +305,6 @@ impl Teacher {
         }
         (!result.is_empty()).then_some(result)
     }
-
-    /// number of subbeats to delay
-    pub(crate) fn subbeats_before_tracking(&self) -> u32 {
-        let mut delay = 0;
-        for section in &self.sections {
-            if section.is_tracked() {
-                break;
-            }
-            delay += section.subbeats();
-        }
-        delay
-    }
 }
 
 impl Section {

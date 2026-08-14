@@ -29,6 +29,7 @@
     loadAudio,
     scheduleAudio,
     scheduleAudioOnChannel,
+    cleanupAudioNode,
     setChannelGain,
     initAudioContext,
   } from '$lib/stores/Audio';
@@ -62,6 +63,7 @@
   export const stop = async () => {
     if (stopped) return;
     stopped = true;
+    cancelScheduledCountAudio();
     const blob = await screen.endRecording();
     onStop(blob, recordingStart, recordingEnd, attemptOutcome());
   };
@@ -83,6 +85,7 @@
    * @property {string} [teacherVideo]
    * @property {number} [challengeDurationMs] Initial score-window duration.
    * @property {number} [requiredHits] Hits needed to complete a challenge.
+   * @property {ResolvedSongTiming} [songTiming]
    */
 
   /** @type {Props} */
@@ -97,6 +100,7 @@
     teacherVideo,
     challengeDurationMs,
     requiredHits,
+    songTiming,
   } = $props();
 
   /** @type {LiveRecordingScreen} */
@@ -116,6 +120,9 @@
   let tracker = getContext('tracker').tracker;
   let detectionState = tracker.detectionState;
   tracker.enforceBeat(forceBeat);
+  $effect(() => {
+    tracker.setMusicLeadInMs(songTiming?.musicLeadInMs ?? 0);
+  });
   let progress = $state(0.0);
   /** @type {DanceCursor} */
   let nextTrackedPoseCursor = $state(new DanceCursor());
@@ -225,11 +232,14 @@
     ) {
       if (
         music.trackDurationMs !== undefined &&
-        !hasPlayableChallengeSong(music.trackDurationMs, challengeDurationMs)
+        !hasPlayableChallengeSong(
+          music.trackDurationMs - (songTiming?.countInEndMs || 0),
+          challengeDurationMs
+        )
       ) {
         invalidChallengeSong = true;
         console.error(
-          `Challenge song is too short (${music.trackDurationMs}ms); it must last at least ${challengeDurationMs}ms.`
+          `Challenge song is too short after count-in; it must have at least ${challengeDurationMs}ms remaining.`
         );
         stop();
       } else if (attemptOutcome().succeeded) {
@@ -240,13 +250,26 @@
     processTextEffects();
   }
 
+  /** @type {Set<AudioBufferSourceNode>} */
+  const scheduledCountAudio = new Set();
+
+  function cancelScheduledCountAudio() {
+    for (const source of scheduledCountAudio)
+      cleanupAudioNode(source, 'default');
+    scheduledCountAudio.clear();
+  }
+
   function processAudioEffects() {
     for (
       let audio = tracker.nextAudioEffect();
       audio !== undefined;
       audio = tracker.nextAudioEffect()
     ) {
-      scheduleAudio(audio.soundId, Number(audio.timestamp));
+      const source = scheduleAudio(audio.soundId, Number(audio.timestamp));
+      if (source) {
+        scheduledCountAudio.add(source);
+        source.onended = () => scheduledCountAudio.delete(source);
+      }
     }
   }
 
@@ -434,11 +457,14 @@
     stopped = false;
   });
 
-  onDestroy(() => unsubscribeTrackEnded?.());
+  onDestroy(() => {
+    cancelScheduledCountAudio();
+    unsubscribeTrackEnded?.();
+  });
 </script>
 
 <BackgroundTask {onFrame}></BackgroundTask>
-<MusicControl />
+<MusicControl {songTiming} />
 
 <LiveRecordingScreen
   bind:this={screen}

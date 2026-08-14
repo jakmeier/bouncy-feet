@@ -6,6 +6,8 @@
   import { DetectionResult } from '$lib/instructor/bouncy_instructor';
   import ActivityReview from './ActivityReview.svelte';
   import { registerTracker } from '$lib/stores/Beat';
+  import { resolveSongTiming } from '$lib/songTiming.js';
+  import { songs } from '$lib/stores/Songs';
 
   /**
    * @typedef {Object} Props
@@ -27,6 +29,12 @@
   let trackingDone = $state(false);
   let liveActivity = $state();
   let teacherVideo = $derived(course.lessons[lessonIndex].frontVideo?.path());
+  let lessonSong = $derived(songs.get(course.lessons[lessonIndex].song));
+  let songTiming = $derived(
+    lessonSong
+      ? resolveSongTiming(lessonSong, course.lessons[lessonIndex].songTiming)
+      : undefined
+  );
 
   let detection = $state();
   let videoUrl = $state();
@@ -110,6 +118,8 @@
   <LiveActivity
     bind:this={liveActivity}
     onDone={onRecordingStopped}
+    songId={lessonSong?.id}
+    {songTiming}
     {teacherVideo}
   ></LiveActivity>
 {:else if detection !== undefined}

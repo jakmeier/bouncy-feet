@@ -50,6 +50,12 @@ pub enum ParseFileError {
     MissingSolutionVideo(String),
     #[error("challenge `{0}` has missing or invalid solution-video beat alignment")]
     InvalidSolutionVideoAlignment(String),
+    #[error("song timing override specifies both count_in_end_drop and count_in_end_ms")]
+    ConflictingSongTimingCountInEnd,
+    #[error("song timing override has an empty count_in_end_drop")]
+    EmptySongTimingDropId,
+    #[error("challenge song timing override references disallowed song `{0}`")]
+    UnknownChallengeTimingSong(String),
 }
 
 impl From<ParseFileError> for JsValue {
@@ -213,6 +219,7 @@ mod tests {
           energy: 3,
           song: "105bpm_tropical_house",
           song_timestamp: 1500,
+          song_timing: (playback_start_ms: 2000, count_in_end_drop: "second"),
           explainer_video: "https://app.bouncy-feet.ch/media/videos/c3/combo_fast.mp4",
           front_video: "https://app.bouncy-feet.ch/media/videos/c3/combo_fast_front_view.mp4",
           back_video: (
@@ -377,6 +384,7 @@ mod tests {
                         back_video: None,
                         song: None,
                         song_timestamp: None,
+                        song_timing: None,
                         energy: 3,
                         difficulty: 2,
                         parts: [
@@ -478,6 +486,17 @@ mod tests {
                         ),
                         song_timestamp: Some(
                             1500.0,
+                        ),
+                        song_timing: Some(
+                            SongTimingOverride {
+                                playback_start_ms: Some(
+                                    2000,
+                                ),
+                                count_in_end_drop: Some(
+                                    "second",
+                                ),
+                                count_in_end_ms: None,
+                            },
                         ),
                         energy: 3,
                         difficulty: 2,

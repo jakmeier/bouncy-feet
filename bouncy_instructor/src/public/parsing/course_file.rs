@@ -2,7 +2,8 @@ use crate::intern::content_collection::ContentCollection;
 use crate::intern::step::StepSource;
 use crate::parsing::video_def::VideoDef;
 use crate::public::course::LessonPart;
-use crate::public::Course;
+use crate::public::song_timing::SongTimingOverrideError;
+use crate::public::{Course, SongTimingOverride};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -44,6 +45,8 @@ pub(crate) struct Lesson {
     song: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     song_timestamp: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    song_timing: Option<SongTimingOverride>,
     parts: Vec<Part>,
     energy: u8,
     difficulty: u8,
@@ -160,6 +163,16 @@ impl Lesson {
             })
             .transpose()?;
 
+        if let Some(timing) = &self.song_timing {
+            timing.validate().map_err(|error| match error {
+                SongTimingOverrideError::ConflictingCountInEnd => {
+                    ParseFileError::ConflictingSongTimingCountInEnd
+                }
+                SongTimingOverrideError::EmptyDropId => ParseFileError::EmptySongTimingDropId,
+            })?;
+        }
+        let song_timing = self.song_timing;
+
         let parts = self
             .parts
             .into_iter()
@@ -183,6 +196,7 @@ impl Lesson {
             back_video: self.back_video.map(From::from),
             song: self.song,
             song_timestamp: self.song_timestamp.map(|int| int as f64),
+            song_timing,
             difficulty: self.difficulty,
             energy: self.energy,
         })
