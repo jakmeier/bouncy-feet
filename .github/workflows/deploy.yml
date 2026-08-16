@@ -78,9 +78,9 @@ jobs:
 
       - name: Build and publish the backend OCI image
         env:
-          REGISTRY_HOST: ${{ secrets.REGISTRY_HOST }}
-          BACKEND_REPOSITORY: ${{ secrets.BACKEND_REPOSITORY }}
-          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+          REGISTRY_HOST: ${{ vars.REGISTRY_HOST }}
+          BACKEND_REPOSITORY: ${{ vars.BACKEND_REPOSITORY }}
+          REGISTRY_USERNAME: ${{ vars.REGISTRY_USERNAME }}
           REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
         run: |
           set -eu
@@ -117,7 +117,7 @@ jobs:
       - name: Configure deployment SSH key
         env:
           DEPLOY_KEY: ${{ secrets.DEV_DEPLOY_SSH_KEY }}
-          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEV_DEPLOY_KNOWN_HOSTS }}
+          DEPLOY_KNOWN_HOSTS: ${{ vars.DEV_DEPLOY_KNOWN_HOSTS }}
         run: |
           test -n "$DEPLOY_KEY"
           test -n "$DEPLOY_KNOWN_HOSTS"
@@ -128,8 +128,8 @@ jobs:
 
       - name: Deploy the test application release
         env:
-          DEPLOY_TARGET: ${{ secrets.DEV_DEPLOY_TARGET }}
-          DEPLOY_PORT: ${{ secrets.DEV_DEPLOY_PORT }}
+          DEPLOY_TARGET: ${{ vars.DEV_DEPLOY_TARGET }}
+          DEPLOY_PORT: ${{ vars.DEV_DEPLOY_PORT }}
         run: |
           set -eu
           test -n "$DEPLOY_TARGET"
@@ -208,9 +208,9 @@ jobs:
 
       - name: Build and publish the backend OCI image
         env:
-          REGISTRY_HOST: ${{ secrets.REGISTRY_HOST }}
-          BACKEND_REPOSITORY: ${{ secrets.BACKEND_REPOSITORY }}
-          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+          REGISTRY_HOST: ${{ vars.REGISTRY_HOST }}
+          BACKEND_REPOSITORY: ${{ vars.BACKEND_REPOSITORY }}
+          REGISTRY_USERNAME: ${{ vars.REGISTRY_USERNAME }}
           REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
         run: |
           set -eu
@@ -247,7 +247,7 @@ jobs:
       - name: Configure deployment SSH key
         env:
           DEPLOY_KEY: ${{ secrets.PROD_DEPLOY_SSH_KEY }}
-          DEPLOY_KNOWN_HOSTS: ${{ secrets.PROD_DEPLOY_KNOWN_HOSTS }}
+          DEPLOY_KNOWN_HOSTS: ${{ vars.PROD_DEPLOY_KNOWN_HOSTS }}
         run: |
           test -n "$DEPLOY_KEY"
           test -n "$DEPLOY_KNOWN_HOSTS"
@@ -258,8 +258,8 @@ jobs:
 
       - name: Deploy the production application release
         env:
-          DEPLOY_TARGET: ${{ secrets.PROD_DEPLOY_TARGET }}
-          DEPLOY_PORT: ${{ secrets.PROD_DEPLOY_PORT }}
+          DEPLOY_TARGET: ${{ vars.PROD_DEPLOY_TARGET }}
+          DEPLOY_PORT: ${{ vars.PROD_DEPLOY_PORT }}
         run: |
           set -eu
           test -n "$DEPLOY_TARGET"
