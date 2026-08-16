@@ -600,9 +600,11 @@ mod tests {
 
     #[test]
     fn music_lead_in_precedes_the_four_beat_countdown() {
-        let mut detector = DanceDetector::default();
-        detector.bpm = 120.0;
-        detector.music_lead_in_ms = 2_000.0;
+        let mut detector = DanceDetector {
+            bpm: 120.0,
+            music_lead_in_ms: 2_000.0,
+            ..Default::default()
+        };
         detector.transition_to_state(DetectionState::MusicLeadIn, 1_000.0);
 
         // At 120 BPM, a tracker subbeat is 250ms. Four music-lead beats plus
