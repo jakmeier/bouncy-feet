@@ -1,18 +1,10 @@
 version: "3.6"
 services:
   bouncy_backend:
-    image: jakmeier/bouncy-feet:bouncy_backend
-    environment:
-      CLIENT_URL: https://app.bouncy-feet.ch
-      API_URL: https://stats.bouncy-feet.ch
-      QR_TRUSTED_TARGET_ORIGINS: ""
-      PEERTUBE_URL: https://tube.bouncy-feet.ch
-      OIDC_ISSUER: https://auth.bouncy-feet.ch/realms/bouncyfeet
-      OIDC_CLIENT_SECRET: XXXX
-      OIDC_CLIENT_ID: bouncy-backend
-      DATABASE_URL: "postgres://USER:PW@postgres/bouncyfeet"
-      PEERTUBE_SYSTEM_USER: system
-      PEERTUBE_SYSTEM_USER_PASSWORD: XXX
+    # Set by the root-owned deployment helper; never use a mutable image tag here.
+    image: ${BACKEND_IMAGE:?BACKEND_IMAGE must be set}
+    env_file:
+      - /etc/bouncy-feet/production/backend.env
     ports:
       - 3002:3000
     restart: always
@@ -22,10 +14,8 @@ services:
     image: postgres:17.2
     volumes:
       - prod-pgdata:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: bouncyfeet
-      POSTGRES_USER: XXXX
-      POSTGRES_PASSWORD: XXXX
+    env_file:
+      - /etc/bouncy-feet/production/postgres.env
     ports:
       - 65432:5432
     networks:

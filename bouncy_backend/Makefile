@@ -1,11 +1,9 @@
-build-dev-container: Dockerfile
-	docker build --build-context parent=../ -t jakmeier/bouncy-feet:dev-api .
+# The CI workflow publishes immutable images to the Forgejo OCI registry.
+# This target is only for local testing; override IMAGE to use another registry.
+IMAGE ?= bouncy-feet-backend:local
 
-push-dev-container:
-	docker push jakmeier/bouncy-feet:dev-api
+build-container: Dockerfile
+	docker build --build-context parent=../ -t $(IMAGE) .
 
-build-prod-container: Dockerfile
-	docker build --build-context parent=../ -t jakmeier/bouncy-feet:bouncy_backend .
-
-push-prod-container:
-	docker push jakmeier/bouncy-feet:bouncy_backend
+push-container: build-container
+	docker push $(IMAGE)

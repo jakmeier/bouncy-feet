@@ -1,0 +1,7 @@
+.env
+.git
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+data/
+target/

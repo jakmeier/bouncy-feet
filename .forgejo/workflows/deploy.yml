@@ -1,0 +1,213 @@
+# Builds one frontend archive and one immutable backend OCI image from the same
+# commit. See doc/deployment.md for Forgejo secrets and target-server setup.
+name: Deploy application
+
+on:
+  push:
+    branches: [bf-next, bf]
+
+permissions:
+  contents: read
+
+jobs:
+  build-test:
+    if: github.ref == 'refs/heads/bf-next'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: bouncy_frontend/.nvmrc
+          cache: npm
+          cache-dependency-path: bouncy_frontend/package-lock.json
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Install wasm-pack
+        run: cargo install wasm-pack --version 0.13.1 --locked
+
+      - name: Build the instructor WASM
+        working-directory: bouncy_instructor
+        run: make
+
+      - name: Build the test frontend release
+        working-directory: bouncy_frontend
+        run: |
+          npm ci
+          npm run check
+          npm run build
+          npm prune --omit=dev
+          mkdir -p release/build
+          cp -a build/. release/build/
+          cp package.json package-lock.json release/build/
+          cp -a node_modules release/build/node_modules
+          printf '%s\n' "$GITHUB_SHA" > release/build/REVISION
+          tar -C release -czf ../frontend-release.tar.gz build
+
+      - name: Build and publish the backend OCI image
+        env:
+          REGISTRY_HOST: ${{ secrets.REGISTRY_HOST }}
+          BACKEND_REPOSITORY: ${{ secrets.BACKEND_REPOSITORY }}
+          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+          REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
+        run: |
+          set -eu
+          test -n "$REGISTRY_HOST"
+          test -n "$BACKEND_REPOSITORY"
+          test -n "$REGISTRY_USERNAME"
+          test -n "$REGISTRY_TOKEN"
+          image="$BACKEND_REPOSITORY:$GITHUB_SHA"
+          printf '%s' "$REGISTRY_TOKEN" | docker login "$REGISTRY_HOST" --username "$REGISTRY_USERNAME" --password-stdin
+          docker build --file bouncy_backend/Dockerfile --build-context parent=. --tag "$image" bouncy_backend
+          docker push "$image"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: frontend-test-${{ github.sha }}
+          path: bouncy_frontend/frontend-release.tar.gz
+          if-no-files-found: error
+          retention-days: 30
+
+  deploy-test:
+    needs: build-test
+    runs-on: ubuntu-latest
+    concurrency:
+      group: deploy-test-application
+      cancel-in-progress: false
+    environment:
+      name: test
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: frontend-test-${{ github.sha }}
+          path: artifact
+
+      - name: Configure deployment SSH key
+        env:
+          DEPLOY_KEY: ${{ secrets.DEV_DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEV_DEPLOY_KNOWN_HOSTS }}
+        run: |
+          test -n "$DEPLOY_KEY"
+          test -n "$DEPLOY_KNOWN_HOSTS"
+          install -d -m 700 "$HOME/.ssh"
+          printf '%s\n' "$DEPLOY_KEY" > "$HOME/.ssh/id_ed25519"
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/id_ed25519" "$HOME/.ssh/known_hosts"
+
+      - name: Deploy the test application release
+        env:
+          DEPLOY_TARGET: ${{ secrets.DEV_DEPLOY_TARGET }}
+          DEPLOY_PORT: ${{ secrets.DEV_DEPLOY_PORT }}
+        run: |
+          set -eu
+          test -n "$DEPLOY_TARGET"
+          test -n "$DEPLOY_PORT"
+          archive="/var/tmp/bouncy-feet-frontend-${GITHUB_SHA}.tar.gz"
+          scp -P "$DEPLOY_PORT" artifact/frontend-release.tar.gz "$DEPLOY_TARGET:$archive"
+          ssh -p "$DEPLOY_PORT" "$DEPLOY_TARGET" "sudo -n /usr/local/sbin/bf-deploy-release test '$GITHUB_SHA'"
+
+  build-production:
+    if: github.ref == 'refs/heads/bf'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: bouncy_frontend/.nvmrc
+          cache: npm
+          cache-dependency-path: bouncy_frontend/package-lock.json
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Install wasm-pack
+        run: cargo install wasm-pack --version 0.13.1 --locked
+
+      - name: Build the instructor WASM
+        working-directory: bouncy_instructor
+        run: make
+
+      - name: Build the production frontend release
+        working-directory: bouncy_frontend
+        run: |
+          npm ci
+          npm run check
+          npm run build-prod
+          npm prune --omit=dev
+          mkdir -p release/build
+          cp -a build/. release/build/
+          cp package.json package-lock.json release/build/
+          cp -a node_modules release/build/node_modules
+          printf '%s\n' "$GITHUB_SHA" > release/build/REVISION
+          tar -C release -czf ../frontend-release.tar.gz build
+
+      - name: Build and publish the backend OCI image
+        env:
+          REGISTRY_HOST: ${{ secrets.REGISTRY_HOST }}
+          BACKEND_REPOSITORY: ${{ secrets.BACKEND_REPOSITORY }}
+          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+          REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
+        run: |
+          set -eu
+          test -n "$REGISTRY_HOST"
+          test -n "$BACKEND_REPOSITORY"
+          test -n "$REGISTRY_USERNAME"
+          test -n "$REGISTRY_TOKEN"
+          image="$BACKEND_REPOSITORY:$GITHUB_SHA"
+          printf '%s' "$REGISTRY_TOKEN" | docker login "$REGISTRY_HOST" --username "$REGISTRY_USERNAME" --password-stdin
+          docker build --file bouncy_backend/Dockerfile --build-context parent=. --tag "$image" bouncy_backend
+          docker push "$image"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: frontend-production-${{ github.sha }}
+          path: bouncy_frontend/frontend-release.tar.gz
+          if-no-files-found: error
+          retention-days: 90
+
+  deploy-production:
+    needs: build-production
+    runs-on: ubuntu-latest
+    concurrency:
+      group: deploy-production-application
+      cancel-in-progress: false
+    environment:
+      name: production
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: frontend-production-${{ github.sha }}
+          path: artifact
+
+      - name: Configure deployment SSH key
+        env:
+          DEPLOY_KEY: ${{ secrets.PROD_DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.PROD_DEPLOY_KNOWN_HOSTS }}
+        run: |
+          test -n "$DEPLOY_KEY"
+          test -n "$DEPLOY_KNOWN_HOSTS"
+          install -d -m 700 "$HOME/.ssh"
+          printf '%s\n' "$DEPLOY_KEY" > "$HOME/.ssh/id_ed25519"
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/id_ed25519" "$HOME/.ssh/known_hosts"
+
+      - name: Deploy the production application release
+        env:
+          DEPLOY_TARGET: ${{ secrets.PROD_DEPLOY_TARGET }}
+          DEPLOY_PORT: ${{ secrets.PROD_DEPLOY_PORT }}
+        run: |
+          set -eu
+          test -n "$DEPLOY_TARGET"
+          test -n "$DEPLOY_PORT"
+          archive="/var/tmp/bouncy-feet-frontend-${GITHUB_SHA}.tar.gz"
+          scp -P "$DEPLOY_PORT" artifact/frontend-release.tar.gz "$DEPLOY_TARGET:$archive"
+          ssh -p "$DEPLOY_PORT" "$DEPLOY_TARGET" "sudo -n /usr/local/sbin/bf-deploy-release production '$GITHUB_SHA'"
