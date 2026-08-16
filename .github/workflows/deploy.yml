@@ -94,7 +94,8 @@ jobs:
           docker build --file bouncy_backend/Dockerfile --build-context parent=. --tag "$image" bouncy_backend
           docker push "$image"
 
-      - uses: forgejo/upload-artifact@v4.3.1
+      # Forgejo implements the legacy artifact service; v4 uses unsupported GHES APIs.
+      - uses: forgejo/upload-artifact@v3.1.3
         with:
           name: frontend-test-${{ github.sha }}
           path: bouncy_frontend/frontend-release.tar.gz
@@ -110,7 +111,7 @@ jobs:
     environment:
       name: test
     steps:
-      - uses: forgejo/download-artifact@v4.1.4
+      - uses: forgejo/download-artifact@v3.0.2
         with:
           name: frontend-test-${{ github.sha }}
           path: artifact
@@ -225,7 +226,8 @@ jobs:
           docker build --file bouncy_backend/Dockerfile --build-context parent=. --tag "$image" bouncy_backend
           docker push "$image"
 
-      - uses: forgejo/upload-artifact@v4.3.1
+      # Forgejo implements the legacy artifact service; v4 uses unsupported GHES APIs.
+      - uses: forgejo/upload-artifact@v3.1.3
         with:
           name: frontend-production-${{ github.sha }}
           path: bouncy_frontend/frontend-release.tar.gz
@@ -241,7 +243,7 @@ jobs:
     environment:
       name: production
     steps:
-      - uses: forgejo/download-artifact@v4.1.4
+      - uses: forgejo/download-artifact@v3.0.2
         with:
           name: frontend-production-${{ github.sha }}
           path: artifact
