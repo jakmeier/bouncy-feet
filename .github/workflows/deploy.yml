@@ -74,7 +74,7 @@ jobs:
           cp package.json package-lock.json release/build/
           cp -a node_modules release/build/node_modules
           printf '%s\n' "$GITHUB_SHA" > release/build/REVISION
-          tar -C release -czf ../frontend-release.tar.gz build
+          tar -czf frontend-release.tar.gz -C release build
 
       - name: Build and publish the backend OCI image
         env:
@@ -205,7 +205,7 @@ jobs:
           cp package.json package-lock.json release/build/
           cp -a node_modules release/build/node_modules
           printf '%s\n' "$GITHUB_SHA" > release/build/REVISION
-          tar -C release -czf ../frontend-release.tar.gz build
+          tar -czf frontend-release.tar.gz -C release build
 
       - name: Build and publish the backend OCI image
         env:
