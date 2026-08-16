@@ -8,8 +8,26 @@ on:
 
 jobs:
   build-test:
-    if: github.ref == 'refs/heads/bf-next'
+    # Deploy only from Forgejo.
+    # GitHub still runs the regular check workflows.
+    if: github.ref == 'refs/heads/bf-next' && github.server_url != 'https://github.com'
     runs-on: ubuntu-latest
+    env:
+      SQLX_OFFLINE: true
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v4
         with:
@@ -35,6 +53,25 @@ jobs:
       - name: Install wasm-pack
         run: cargo install wasm-pack --version 0.13.1 --locked
 
+      - name: Check the instructor
+        working-directory: bouncy_instructor
+        run: |
+          cargo clippy --all-targets --all-features
+          cargo test --verbose
+
+      - name: Check the backend
+        working-directory: bouncy_backend
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
+        run: |
+          cargo clippy --all-targets --all-features
+          cargo test --verbose
+
+      - name: Check Rust dependency policy
+        run: |
+          cargo install cargo-deny --locked
+          cargo deny check bans licenses sources
+
       - name: Build the instructor WASM
         working-directory: bouncy_instructor
         run: make
@@ -44,6 +81,7 @@ jobs:
         run: |
           npm ci
           npm run check
+          npm run test:i18n
           npm run build
           npm prune --omit=dev
           mkdir -p release/build
@@ -116,8 +154,25 @@ jobs:
           ssh -p "$DEPLOY_PORT" "$DEPLOY_TARGET" "sudo -n /usr/local/sbin/bf-deploy-release test '$GITHUB_SHA'"
 
   build-production:
-    if: github.ref == 'refs/heads/bf'
+    # Deploy only from Forgejo; GitHub still runs the regular check workflows.
+    if: github.ref == 'refs/heads/bf' && github.server_url != 'https://github.com'
     runs-on: ubuntu-latest
+    env:
+      SQLX_OFFLINE: true
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v4
         with:
@@ -143,6 +198,25 @@ jobs:
       - name: Install wasm-pack
         run: cargo install wasm-pack --version 0.13.1 --locked
 
+      - name: Check the instructor
+        working-directory: bouncy_instructor
+        run: |
+          cargo clippy --all-targets --all-features
+          cargo test --verbose
+
+      - name: Check the backend
+        working-directory: bouncy_backend
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
+        run: |
+          cargo clippy --all-targets --all-features
+          cargo test --verbose
+
+      - name: Check Rust dependency policy
+        run: |
+          cargo install cargo-deny --locked
+          cargo deny check bans licenses sources
+
       - name: Build the instructor WASM
         working-directory: bouncy_instructor
         run: make
@@ -152,6 +226,7 @@ jobs:
         run: |
           npm ci
           npm run check
+          npm run test:i18n
           npm run build-prod
           npm prune --omit=dev
           mkdir -p release/build
