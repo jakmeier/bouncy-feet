@@ -22,7 +22,10 @@
   /** @type {import("bouncy_instructor").DetectedStep[] | undefined} */
   let detectedSteps = $derived(detection.steps());
   let detectedPoses = $derived(detection.poseMisses + detection.poseMatches);
-  let maximumPoses = $derived(maximum ?? detectedPoses);
+  // Challenges may continue past their initial score window to let dancers
+  // recover from misses. Include those extra attempts in the denominator so a
+  // review never displays more hits than available poses.
+  let maximumPoses = $derived(Math.max(maximum ?? 0, detectedPoses));
   let scoreRatio = $derived(
     maximumPoses === 0 ? 0 : detection.poseMatches / maximumPoses
   );
