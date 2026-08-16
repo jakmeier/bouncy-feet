@@ -6,9 +6,6 @@ on:
   push:
     branches: [bf-next, bf]
 
-permissions:
-  contents: read
-
 jobs:
   build-test:
     if: github.ref == 'refs/heads/bf-next'
@@ -24,9 +21,16 @@ jobs:
           cache: npm
           cache-dependency-path: bouncy_frontend/package-lock.json
 
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: wasm32-unknown-unknown
+      - name: Set up Rust
+        run: |
+          if ! command -v rustup >/dev/null; then
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
+          fi
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+          export PATH="$HOME/.cargo/bin:$PATH"
+          rustup toolchain install 1.91.0 --profile minimal
+          rustup default 1.91.0
+          rustup target add wasm32-unknown-unknown
 
       - name: Install wasm-pack
         run: cargo install wasm-pack --version 0.13.1 --locked
@@ -125,9 +129,16 @@ jobs:
           cache: npm
           cache-dependency-path: bouncy_frontend/package-lock.json
 
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: wasm32-unknown-unknown
+      - name: Set up Rust
+        run: |
+          if ! command -v rustup >/dev/null; then
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
+          fi
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+          export PATH="$HOME/.cargo/bin:$PATH"
+          rustup toolchain install 1.91.0 --profile minimal
+          rustup default 1.91.0
+          rustup target add wasm32-unknown-unknown
 
       - name: Install wasm-pack
         run: cargo install wasm-pack --version 0.13.1 --locked
