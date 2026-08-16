@@ -36,17 +36,43 @@ All build and test workflows use `bouncy-feet-ci`. The image retains the
 access to a Docker daemon for the backend OCI build and push. Rebuild and
 retag the image whenever a pinned toolchain or preinstalled tool changes.
 
-## Forgejo secrets
+### Docker-in-Docker
 
-Set these repository secrets. A Forgejo access token is preferable to a user
-password.
+When the runner uses a separate `docker:dind` container, set its job-container
+network to `host` in `/data/runner-config.yml`:
 
-| Secret | Purpose |
+```yaml
+container:
+  network: host
+  docker_host: "-"
+```
+
+Here `host` is the host of the Docker daemon used by the runner: the DinD
+container's network namespace, not the physical Podman host. Therefore the
+deployment workflow connects to the DinD daemon at
+`tcp://127.0.0.1:2375`.
+
+`docker_host` configures the outer runner's Docker client and optionally mounts
+a Unix socket into jobs; it is not a job environment variable. The outer
+runner must use `tcp://forgejo-runner-dind:2375`, while `127.0.0.1` there would
+refer to the outer runner container and fail. Forgejo Runner cannot mount a
+TCP endpoint, so it changes a TCP `docker_host` value to `"-"` before creating
+the job. Keep `docker_host: "-"` and set `DOCKER_HOST` in the workflow for the
+Docker client that runs inside the job. DinD must listen on that address, for
+example with `dockerd -H tcp://0.0.0.0:2375 --tls=false`, and its TCP port must
+not be published outside the isolated runner network.
+
+## Forgejo variables and secrets
+
+Set the indicated repository Action variables and secrets. A Forgejo access
+token is preferable to a user password.
+
+| Setting | Purpose |
 | --- | --- |
-| `REGISTRY_HOST` | Registry hostname, for example `code.jakobmeier.ch` |
-| `BACKEND_REPOSITORY` | Full untagged image name, for example `code.jakobmeier.ch/bouncy-feet/bouncy-backend` |
-| `REGISTRY_USERNAME` | Account allowed to write that package |
-| `REGISTRY_TOKEN` | Token with package write access |
+| `REGISTRY_HOST` (Actions variable) | Registry hostname, for example `code.jakobmeier.ch` |
+| `BACKEND_REPOSITORY` (Actions variable) | Full untagged image name, for example `code.jakobmeier.ch/bouncy-feet/bouncy-backend` |
+| `REGISTRY_USERNAME` (Actions variable) | Account allowed to write that package |
+| `REGISTRY_TOKEN` (Actions secret) | Token with package write access |
 | `DEV_DEPLOY_SSH_KEY`, `DEV_DEPLOY_KNOWN_HOSTS`, `DEV_DEPLOY_TARGET`, `DEV_DEPLOY_PORT` | Test-host SSH access |
 | `PROD_DEPLOY_SSH_KEY`, `PROD_DEPLOY_KNOWN_HOSTS`, `PROD_DEPLOY_TARGET`, `PROD_DEPLOY_PORT` | Production-host SSH access |
 

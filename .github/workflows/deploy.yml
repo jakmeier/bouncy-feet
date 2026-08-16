@@ -78,6 +78,7 @@ jobs:
 
       - name: Build and publish the backend OCI image
         env:
+          DOCKER_HOST: tcp://127.0.0.1:2375
           REGISTRY_HOST: ${{ vars.REGISTRY_HOST }}
           BACKEND_REPOSITORY: ${{ vars.BACKEND_REPOSITORY }}
           REGISTRY_USERNAME: ${{ vars.REGISTRY_USERNAME }}
@@ -208,6 +209,7 @@ jobs:
 
       - name: Build and publish the backend OCI image
         env:
+          DOCKER_HOST: tcp://127.0.0.1:2375
           REGISTRY_HOST: ${{ vars.REGISTRY_HOST }}
           BACKEND_REPOSITORY: ${{ vars.BACKEND_REPOSITORY }}
           REGISTRY_USERNAME: ${{ vars.REGISTRY_USERNAME }}
