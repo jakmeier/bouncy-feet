@@ -46,6 +46,27 @@ struct AppState {
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+    match std::env::args().nth(1).as_deref() {
+        None | Some("serve") => run_server().await,
+        Some("migrate") => migrate_database().await,
+        Some(command) => {
+            anyhow::bail!("unknown command {command:?}; expected `serve` or `migrate`")
+        }
+    }
+}
+
+async fn migrate_database() -> anyhow::Result<()> {
+    tracing_subscriber::fmt().init();
+    let database_url = require_env("DATABASE_URL");
+    let pool = PgPool::connect(&database_url).await?;
+
+    tracing::info!("Starting DB migrations");
+    sqlx::migrate!("./db_migrations/").run(&pool).await?;
+    tracing::info!("DB migrations completed");
+    Ok(())
+}
+
+async fn run_server() -> anyhow::Result<()> {
     tracing_subscriber::fmt().init();
 
     let api_url = require_env("API_URL");
@@ -83,16 +104,6 @@ async fn main() -> anyhow::Result<()> {
     .unwrap();
 
     let pg_db_pool = PgPool::connect(&db_url).await?;
-
-    // TODO: better DB setup
-    {
-        println!("Starting DB migrations...");
-        sqlx::migrate!("./db_migrations/")
-            .run(&pg_db_pool)
-            .await
-            .unwrap();
-        println!("...DB migrations done");
-    }
 
     let http_client = reqwest::Client::new();
 
@@ -165,6 +176,7 @@ async fn main() -> anyhow::Result<()> {
     // bottom-to-top order for router
     let unauthenticated_app = Router::new()
         .route("/", get(root))
+        .route("/healthz", get(healthz))
         .route("/clubs", get(api_endoints::club::clubs))
         .route("/clubs/{club_id}", get(api_endoints::club::club))
         .route("/users", get(api_endoints::user::list_users))
@@ -328,6 +340,10 @@ async fn root() -> String {
         "Bouncy Feet stats API server running.\nPackage version: {}",
         env!("CARGO_PKG_VERSION")
     )
+}
+
+async fn healthz() -> StatusCode {
+    StatusCode::NO_CONTENT
 }
 
 /// Utility function for mapping any error into a `500 Internal Server Error`

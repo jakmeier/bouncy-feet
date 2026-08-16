@@ -4,6 +4,18 @@ Handles persistent storage and makes system user calls to PeerTube.
 
 ## Development
 
+## Database migrations
+
+Migrations are an explicit deployment step. Run them before starting a newly
+built backend:
+
+```bash
+docker compose run --rm bouncy_backend migrate
+```
+
+The server is started with `bouncy_backend serve` (or no argument). This keeps a
+failed migration from being hidden inside a service restart.
+
 ## Running tests locally
 
 To run all tests, you will need docker installed and run `docker compose up`
