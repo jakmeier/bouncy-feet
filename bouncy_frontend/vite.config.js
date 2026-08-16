@@ -19,7 +19,10 @@ export default defineConfig({
         // The PeerTube submodule does not commit this package's generated dist/ files.
         // Bundle its source directly so clean CI checkouts do not need a PeerTube build.
         alias: {
-            '@peertube/embed-api': fileURLToPath(new URL('../bouncy_tube/PeerTube/client/src/standalone/embed-player-api/player.ts', import.meta.url))
+            '@peertube/embed-api': fileURLToPath(new URL('../bouncy_tube/PeerTube/client/src/standalone/embed-player-api/player.ts', import.meta.url)),
+            // The aliased source lives outside this package, so its dependencies
+            // are not resolved from bouncy_frontend/node_modules automatically.
+            jschannel: fileURLToPath(new URL('./node_modules/jschannel/src/jschannel.js', import.meta.url))
         }
     },
     test: {

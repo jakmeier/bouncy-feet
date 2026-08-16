@@ -14,16 +14,18 @@ on:
 
 jobs:
   translations:
-    runs-on: ubuntu-latest
+    runs-on: bouncy-feet-ci
     defaults:
       run:
         working-directory: ./bouncy_frontend
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
         with:
-          node-version-file: bouncy_frontend/.nvmrc
-          cache: npm
-          cache-dependency-path: bouncy_frontend/package-lock.json
+          submodules: recursive
+      - uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('bouncy_frontend/package-lock.json') }}
+          restore-keys: npm-${{ runner.os }}-
       - run: npm ci
       - run: npm run test:i18n

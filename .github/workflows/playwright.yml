@@ -14,7 +14,7 @@ on:
 jobs:
   test-dev:
     if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
+    runs-on: bouncy-feet-ci
     defaults:
       run:
         working-directory: ./bouncy_frontend
@@ -23,24 +23,31 @@ jobs:
         with:
           # Test the same source revision that was deployed to dev.
           ref: ${{ inputs.deployed_sha }}
-      - uses: actions/setup-node@v4
+          submodules: recursive
+      - uses: actions/cache@v4
         with:
-          node-version: '20'
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('bouncy_frontend/package-lock.json') }}
+          restore-keys: npm-${{ runner.os }}-
       - run: npm ci
       - run: npx playwright install --with-deps
       - run: npm run test:e2e:dev
 
   test-prod:
     if: github.event_name == 'release'
-    runs-on: ubuntu-latest
+    runs-on: bouncy-feet-ci
     defaults:
       run:
         working-directory: ./bouncy_frontend
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          submodules: recursive
+      - uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('bouncy_frontend/package-lock.json') }}
+          restore-keys: npm-${{ runner.os }}-
       - run: npm ci
       - run: npx playwright install --with-deps
       - run: npm run test:e2e:prod

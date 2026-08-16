@@ -14,9 +14,7 @@ on:
       - '**/deny.toml'
 jobs:
   cargo-deny:
-    runs-on: ubuntu-latest
+    runs-on: bouncy-feet-ci
     steps:
     - uses: actions/checkout@v4
-    - uses: EmbarkStudios/cargo-deny-action@v2
-      with:
-        command: check bans licenses sources
+    - run: cargo deny check bans licenses sources

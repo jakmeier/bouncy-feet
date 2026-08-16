@@ -11,7 +11,7 @@ jobs:
     # Deploy only from Forgejo.
     # GitHub still runs the regular check workflows.
     if: github.ref == 'refs/heads/bf-next' && github.server_url != 'https://github.com'
-    runs-on: ubuntu-latest
+    runs-on: bouncy-feet-ci
     env:
       SQLX_OFFLINE: true
       RUSTFLAGS: "-Dwarnings"
@@ -34,27 +34,6 @@ jobs:
         with:
           submodules: recursive
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: bouncy_frontend/.nvmrc
-          cache: npm
-          cache-dependency-path: bouncy_frontend/package-lock.json
-
-      - name: Set up Rust
-        run: |
-          if ! command -v rustup >/dev/null; then
-            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
-          fi
-          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
-          export PATH="$HOME/.cargo/bin:$PATH"
-          rustup toolchain install 1.91.0 --profile minimal
-          rustup default 1.91.0
-          rustup target add wasm32-unknown-unknown
-          rustup component add clippy
-
-      - name: Install wasm-pack
-        run: cargo install wasm-pack --version 0.13.1 --locked
-
       - name: Check the instructor
         working-directory: bouncy_instructor
         run: |
@@ -70,13 +49,17 @@ jobs:
           cargo test --verbose
 
       - name: Check Rust dependency policy
-        run: |
-          env -u RUSTFLAGS cargo install cargo-deny --locked
-          cargo deny check bans licenses sources
+        run: cargo deny check bans licenses sources
 
       - name: Build the instructor WASM
         working-directory: bouncy_instructor
         run: make
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('bouncy_frontend/package-lock.json') }}
+          restore-keys: npm-${{ runner.os }}-
 
       - name: Build the test frontend release
         working-directory: bouncy_frontend
@@ -158,7 +141,7 @@ jobs:
   build-production:
     # Deploy only from Forgejo; GitHub still runs the regular check workflows.
     if: github.ref == 'refs/heads/bf' && github.server_url != 'https://github.com'
-    runs-on: ubuntu-latest
+    runs-on: bouncy-feet-ci
     env:
       SQLX_OFFLINE: true
       RUSTFLAGS: "-Dwarnings"
@@ -181,27 +164,6 @@ jobs:
         with:
           submodules: recursive
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: bouncy_frontend/.nvmrc
-          cache: npm
-          cache-dependency-path: bouncy_frontend/package-lock.json
-
-      - name: Set up Rust
-        run: |
-          if ! command -v rustup >/dev/null; then
-            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
-          fi
-          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
-          export PATH="$HOME/.cargo/bin:$PATH"
-          rustup toolchain install 1.91.0 --profile minimal
-          rustup default 1.91.0
-          rustup target add wasm32-unknown-unknown
-          rustup component add clippy
-
-      - name: Install wasm-pack
-        run: cargo install wasm-pack --version 0.13.1 --locked
-
       - name: Check the instructor
         working-directory: bouncy_instructor
         run: |
@@ -217,13 +179,17 @@ jobs:
           cargo test --verbose
 
       - name: Check Rust dependency policy
-        run: |
-          env -u RUSTFLAGS cargo install cargo-deny --locked
-          cargo deny check bans licenses sources
+        run: cargo deny check bans licenses sources
 
       - name: Build the instructor WASM
         working-directory: bouncy_instructor
         run: make
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('bouncy_frontend/package-lock.json') }}
+          restore-keys: npm-${{ runner.os }}-
 
       - name: Build the production frontend release
         working-directory: bouncy_frontend

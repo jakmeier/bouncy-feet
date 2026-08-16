@@ -8,10 +8,33 @@ and health-check the backend before switching the frontend release.
 
 ## Forgejo runner
 
-Use an amd64 Linux Forgejo runner with access to a Docker daemon. It needs Docker
-BuildKit, Node 22, Rust/cargo, and permission to build and push OCI images. The
-backend image must be built for the same architecture as the target hosts; the
-current deployment assumes amd64.
+Use an amd64 Linux Forgejo runner with access to a Docker daemon. The backend
+image must be built for the same architecture as the target hosts; the current
+deployment assumes amd64.
+
+The repository provides a runner image with Node 22.12.0, Rust 1.91.0, the
+`wasm32-unknown-unknown` target, Clippy, wasm-pack 0.13.1, and cargo-deny
+0.18.6. Its versioned Docker Hub tag is
+`docker.io/jakmeier/bouncy-feet:node-22.12.0-rust-1.91.0`. Build and push it
+with Podman (the default) using:
+
+```sh
+just ci-image-push
+```
+
+Use the following label in the Forgejo runner configuration; `docker://` is
+the Forgejo OCI-image transport name and is correct when the runner itself is
+operated with Podman:
+
+```yaml
+labels:
+  - "bouncy-feet-ci:docker://docker.io/jakmeier/bouncy-feet:node-22.12.0-rust-1.91.0"
+```
+
+All build and test workflows use `bouncy-feet-ci`. The image retains the
+`catthehacker/ubuntu:full-24.04` tooling, but the runner must still provide
+access to a Docker daemon for the backend OCI build and push. Rebuild and
+retag the image whenever a pinned toolchain or preinstalled tool changes.
 
 ## Forgejo secrets
 
