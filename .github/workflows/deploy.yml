@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SQLX_OFFLINE: true
+      RUSTFLAGS: "-Dwarnings"
     services:
       postgres:
         image: postgres:16
@@ -49,6 +50,7 @@ jobs:
           rustup toolchain install 1.91.0 --profile minimal
           rustup default 1.91.0
           rustup target add wasm32-unknown-unknown
+          rustup component add clippy
 
       - name: Install wasm-pack
         run: cargo install wasm-pack --version 0.13.1 --locked
@@ -69,7 +71,7 @@ jobs:
 
       - name: Check Rust dependency policy
         run: |
-          cargo install cargo-deny --locked
+          env -u RUSTFLAGS cargo install cargo-deny --locked
           cargo deny check bans licenses sources
 
       - name: Build the instructor WASM
@@ -159,6 +161,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SQLX_OFFLINE: true
+      RUSTFLAGS: "-Dwarnings"
     services:
       postgres:
         image: postgres:16
@@ -194,6 +197,7 @@ jobs:
           rustup toolchain install 1.91.0 --profile minimal
           rustup default 1.91.0
           rustup target add wasm32-unknown-unknown
+          rustup component add clippy
 
       - name: Install wasm-pack
         run: cargo install wasm-pack --version 0.13.1 --locked
@@ -214,7 +218,7 @@ jobs:
 
       - name: Check Rust dependency policy
         run: |
-          cargo install cargo-deny --locked
+          env -u RUSTFLAGS cargo install cargo-deny --locked
           cargo deny check bans licenses sources
 
       - name: Build the instructor WASM

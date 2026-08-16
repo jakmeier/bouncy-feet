@@ -4,6 +4,7 @@ CARGO_TARGET_DIR ?= ../target
 all:
 	wasm-pack build --target web
 	sort ./pkg/bouncy_instructor_bg.wasm.d.ts -o ./pkg/bouncy_instructor_bg.wasm.d.ts
+	mkdir -p ../bouncy_frontend/static/wasm
 	cp -r pkg/* ../bouncy_frontend/src/lib/instructor/
 	cp -r pkg/bouncy_instructor_bg.wasm ../bouncy_frontend/static/wasm/
 

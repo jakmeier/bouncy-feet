@@ -32,6 +32,21 @@ Use separate SSH keys for test and production. `*_DEPLOY_TARGET` is in
 the output of an unchecked `ssh-keyscan` in CI. Protect `bf`, and configure the
 Forgejo `production` environment to require approval.
 
+## Target-server prerequisites
+
+Each target needs Docker Engine with the Compose v2 plugin, `curl`, `sudo`, and
+`acl` (for `setfacl`). On Debian, after Docker itself is installed:
+
+```sh
+sudo apt update
+sudo apt install acl curl
+sudo docker compose version
+```
+
+The deployment helper also uses the standard `runuser` command supplied by
+Debian's `util-linux` package. Ensure the frontend systemd service names and
+backend host ports match its `test`/`production` cases before the first deploy.
+
 ## Server secrets and configuration
 
 Do **not** put runtime secrets in Forgejo or in the Compose files. On each
@@ -107,7 +122,7 @@ path; it does not need to modify the live symlink, systemd, Docker,
 `/etc/bouncy-feet`, or `/root/.docker`.
 
 ```sh
-sudo install -o root -g root -m 0750 scripts/server/bf-deploy-release \
+sudo install -o root -g root -m 0750 scripts/server/bf-deploy-release.sh \
   /usr/local/sbin/bf-deploy-release
 sudo setfacl -m u:deploy:--x /services /services/app-frontend \
   /services/app-frontend/releases
