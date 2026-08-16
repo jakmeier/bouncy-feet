@@ -94,7 +94,7 @@ jobs:
           docker build --file bouncy_backend/Dockerfile --build-context parent=. --tag "$image" bouncy_backend
           docker push "$image"
 
-      - uses: actions/upload-artifact@v4
+      - uses: forgejo/upload-artifact@v4.3.1
         with:
           name: frontend-test-${{ github.sha }}
           path: bouncy_frontend/frontend-release.tar.gz
@@ -110,7 +110,7 @@ jobs:
     environment:
       name: test
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: forgejo/download-artifact@v4.1.4
         with:
           name: frontend-test-${{ github.sha }}
           path: artifact
@@ -225,7 +225,7 @@ jobs:
           docker build --file bouncy_backend/Dockerfile --build-context parent=. --tag "$image" bouncy_backend
           docker push "$image"
 
-      - uses: actions/upload-artifact@v4
+      - uses: forgejo/upload-artifact@v4.3.1
         with:
           name: frontend-production-${{ github.sha }}
           path: bouncy_frontend/frontend-release.tar.gz
@@ -241,7 +241,7 @@ jobs:
     environment:
       name: production
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: forgejo/download-artifact@v4.1.4
         with:
           name: frontend-production-${{ github.sha }}
           path: artifact
