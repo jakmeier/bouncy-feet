@@ -82,6 +82,7 @@ jobs:
         working-directory: bouncy_frontend
         run: |
           npm ci
+          npm run sync
           npm run test:i18n
           npm run build
           npm prune --omit=dev
@@ -228,6 +229,7 @@ jobs:
         working-directory: bouncy_frontend
         run: |
           npm ci
+          npm run sync
           npm run test:i18n
           npm run build-prod
           npm prune --omit=dev
