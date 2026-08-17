@@ -23,7 +23,7 @@ function initSongsLibrary() {
   /** @type {Song[]} */
   let library = [
     song('105bpm_tropical_house', 'Aeris', 'Arise', {
-      drops: [{ id: 'first', timestampMs: 9_420 }],
+      drops: [{ id: 'first', timestampMs: 9_220 }],
     }),
     song('115bpm_house', 'Den Elbriggs', 'Glen Brides', {
       drops: [{ id: 'first', timestampMs: 19_059 }],

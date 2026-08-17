@@ -1,6 +1,8 @@
-// Music starts four beats before the spoken four-beat count-in.
-export const DEFAULT_PLAYBACK_LEAD_IN_BEATS = 8;
+// Music plays for 20 beats before the spoken four-beat count-in.
+export const DEFAULT_MUSIC_LEAD_IN_BEATS = 20;
 export const DEFAULT_COUNT_IN_BEATS = 4;
+export const DEFAULT_PLAYBACK_LEAD_IN_BEATS =
+  DEFAULT_MUSIC_LEAD_IN_BEATS + DEFAULT_COUNT_IN_BEATS;
 
 /**
  * @param {number} bpm
@@ -95,7 +97,7 @@ export function songPlaybackDelayMs(song, timing) {
   return Math.max(
     0,
     countInDurationMs(song.bpm, timing.countInBeats) -
-    (timing.countInEndMs - timing.playbackStartMs)
+      (timing.countInEndMs - timing.playbackStartMs)
   );
 }
 

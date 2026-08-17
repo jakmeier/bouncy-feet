@@ -3,7 +3,7 @@
   import {
     setChannelGain,
     cleanupAudioNode,
-    scheduleAudioOnChannel,
+    scheduleAudioTrackOnChannel,
     loadTrack,
     initAudioContext,
   } from '$lib/stores/Audio';
@@ -148,7 +148,7 @@
     }
     scheduledStartTimestamp = timestamp;
     setChannelGain('music', musicContext.gain);
-    const source = scheduleAudioOnChannel(
+    const source = scheduleAudioTrackOnChannel(
       selectedTrack.id,
       timestamp,
       'music',

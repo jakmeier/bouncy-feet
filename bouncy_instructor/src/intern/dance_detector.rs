@@ -546,10 +546,10 @@ impl DanceDetector {
     pub(crate) fn emit_countdown_audio_at(&mut self, target: Timestamp) {
         let musical_beat = 2.0 * self.subbeat_time();
         let cues = [
-            ("one", "1", 4.0),
-            ("two", "2", 3.0),
-            ("three", "3", 2.0),
-            ("four", "4", 1.0),
+            ("five", "5", 4.0),
+            ("six", "6", 3.0),
+            ("sev", "7", 2.0),
+            ("eight", "8", 1.0),
         ];
         for (sound, text, beats_before_target) in cues {
             let timestamp = target - beats_before_target * musical_beat;
@@ -557,6 +557,11 @@ impl DanceDetector {
             self.ui_events
                 .add_text(timestamp, text.to_owned(), musical_beat);
         }
+
+        // "se-ven" audio cue is split across its beat and following subbeat,
+        // with a single text cue.
+        let seven_subbeat = target - 2.0 * musical_beat + self.subbeat_time();
+        self.ui_events.add_audio(seven_subbeat, "ven".to_owned());
     }
 
     /// For debugging pruposes, set the state directly.
@@ -599,7 +604,7 @@ mod tests {
     }
 
     #[test]
-    fn music_lead_in_precedes_the_four_beat_countdown() {
+    fn music_lead_in_precedes_the_five_to_eight_countdown() {
         let mut detector = DanceDetector {
             bpm: 120.0,
             music_lead_in_ms: 2_000.0,
@@ -620,15 +625,20 @@ mod tests {
             DetectionState::CountDown
         ));
         let mut cue_count = 0;
-        let mut four_timestamp = None;
+        let mut eight_timestamp = None;
+        let mut ven_timestamp = None;
         while let Some(event) = detector.ui_events.next_audio() {
             cue_count += 1;
-            if event.sound_id == "four" {
-                four_timestamp = Some(event.timestamp);
+            if event.sound_id == "eight" {
+                eight_timestamp = Some(event.timestamp);
+            }
+            if event.sound_id == "ven" {
+                ven_timestamp = Some(event.timestamp);
             }
         }
-        assert_eq!(cue_count, 4);
-        assert_eq!(four_timestamp, Some(target - 500.0));
+        assert_eq!(cue_count, 5);
+        assert_eq!(eight_timestamp, Some(target - 500.0));
+        assert_eq!(ven_timestamp, Some(target - 750.0));
 
         detector.tick(target, &db, &[]);
         assert_eq!(detector.beat_zero, Some(target));

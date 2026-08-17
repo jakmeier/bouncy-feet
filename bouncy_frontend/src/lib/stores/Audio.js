@@ -2,6 +2,7 @@ import { writable } from 'svelte/store';
 import { asset } from '$app/paths';
 import { browser } from '$app/environment';
 import { audioDelay } from '$lib/stores/System';
+import { resolveAudioSchedule } from '$lib/audioTiming.js';
 
 /** @type {AudioContext} */
 let audioContext;
@@ -17,7 +18,7 @@ export async function initAudioContext() {
     return;
   }
   audioContext = new AudioContext();
-  audioDelay.set(audioContext.outputLatency);
+  audioDelay.set((audioContext.outputLatency || 0) * 1000);
   // @ts-ignore
   channels.default = new GainNode(audioContext, { gain: 1.0 });
   // @ts-ignore
@@ -101,11 +102,40 @@ export function scheduleAudioOnChannel(
   channel,
   offsetSeconds = 0
 ) {
-  const delay = (timestamp - performance.now()) / 1000.0;
-  // outputLatency is not supported in all browsers
-  const outputLatency = audioContext.outputLatency || 0;
-  const start = audioContext.currentTime + delay - outputLatency;
+  const { start } = audioSchedule(timestamp);
   return scheduleAudioEx(id, start, channel, offsetSeconds);
+}
+
+/**
+ * Schedule a continuous track while preserving its wall-clock timeline.
+ *
+ * A track commonly starts "now". In that case output-latency compensation
+ * asks Web Audio to start it in the past, which scheduleAudioEx must clamp to
+ * the current audio time. Advance the buffer offset by the clamped duration so
+ * future music beats still line up with sounds that could be pre-scheduled.
+ *
+ * @param {string} id
+ * @param {number} timestamp in ms as performance timestamp
+ * @param {string} channel
+ * @param {number} [offsetSeconds] Offset into the decoded buffer.
+ * @return {AudioBufferSourceNode}
+ */
+export function scheduleAudioTrackOnChannel(
+  id,
+  timestamp,
+  channel,
+  offsetSeconds = 0
+) {
+  const { start, clampedSeconds } = audioSchedule(timestamp);
+  return scheduleAudioEx(id, start, channel, offsetSeconds + clampedSeconds);
+}
+
+/** @param {number} timestamp */
+function audioSchedule(timestamp) {
+  const delay = (timestamp - performance.now()) / 1000.0;
+  // outputLatency is not supported in all browsers.
+  const outputLatency = audioContext.outputLatency || 0;
+  return resolveAudioSchedule(audioContext.currentTime, delay, outputLatency);
 }
 
 /**

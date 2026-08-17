@@ -435,10 +435,11 @@
     const promises = [
       loadAudio('mistake', `${base}/audio/one-shot-kick.mp3`),
       loadAudio('and', `${base}/audio/and_0.mp3`),
-      loadAudio('one', `${base}/audio/one.mp3`),
-      loadAudio('two', `${base}/audio/two.mp3`),
-      loadAudio('three', `${base}/audio/three.mp3`),
-      loadAudio('four', `${base}/audio/four.mp3`),
+      loadAudio('five', `${base}/audio/five.mp3`),
+      loadAudio('six', `${base}/audio/six.mp3`),
+      loadAudio('sev', `${base}/audio/sev.mp3`),
+      loadAudio('ven', `${base}/audio/ven.mp3`),
+      loadAudio('eight', `${base}/audio/eight.mp3`),
     ];
 
     if ($locale.startsWith('de')) {
