@@ -12,6 +12,7 @@ pub struct DetectedStep {
     pub start: Timestamp,
     pub end: Timestamp,
     pub error: f32,
+    pub(crate) correct: bool,
 }
 
 #[wasm_bindgen]
@@ -29,6 +30,12 @@ impl DetectedStep {
     #[wasm_bindgen(getter)]
     pub fn poses(&self) -> Vec<PoseApproximation> {
         self.poses.clone()
+    }
+
+    /// Whether every pose matched when this full step was detected.
+    #[wasm_bindgen(getter)]
+    pub fn correct(&self) -> bool {
+        self.correct
     }
 
     #[wasm_bindgen(getter)]

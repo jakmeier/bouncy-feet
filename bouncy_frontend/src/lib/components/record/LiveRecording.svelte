@@ -47,6 +47,7 @@
     hasCompletedChallengeAttempt,
     hasPlayableChallengeSong,
   } from '$lib/challengeAttempt.js';
+  import { detectionScore } from '$lib/activityScore.js';
 
   export const startCamera = async () => {
     await screen.startCamera();
@@ -85,6 +86,7 @@
    * @property {string} [teacherVideo]
    * @property {number} [challengeDurationMs] Initial score-window duration.
    * @property {number} [requiredHits] Hits needed to complete a challenge.
+   * @property {'poses' | 'steps'} [scoreMode]
    * @property {ResolvedSongTiming} [songTiming]
    */
 
@@ -100,6 +102,7 @@
     teacherVideo,
     challengeDurationMs,
     requiredHits,
+    scoreMode = 'poses',
     songTiming,
   } = $props();
 
@@ -107,6 +110,7 @@
   let screen;
 
   let lastPoseWasCorrect = $state(true);
+  let lastStepMatches = 0;
   let recordingOn = $state(false);
 
   let recordingStart = $state(0);
@@ -167,6 +171,10 @@
       : performance.now() - liveTrackingStartedAt;
   }
 
+  function scoreHits() {
+    return detectionScore(tracker.lastDetection, scoreMode).hits;
+  }
+
   function attemptOutcome() {
     const isChallenge =
       challengeDurationMs !== undefined && requiredHits !== undefined;
@@ -176,12 +184,12 @@
         !invalidChallengeSong &&
         hasCompletedChallengeAttempt({
           elapsedMs: elapsedLiveTrackingMs(),
-          hits: tracker.lastDetection.poseMatches,
+          hits: scoreHits(),
           challengeDurationMs,
           requiredHits,
         }),
       requiredHits,
-      hits: tracker.lastDetection.poseMatches,
+      hits: scoreHits(),
       elapsedMs: elapsedLiveTrackingMs(),
       invalidChallengeSong,
     };
@@ -398,7 +406,12 @@
     // confusing about when an error happens.
     let soundTimestamp = 0;
     if (detectionResult.failureReason === undefined) {
-      scheduleAudioOnChannel('success', soundTimestamp, 'live-feedback');
+      const completedCorrectStep =
+        detectionResult.stepMatches > lastStepMatches;
+      if (scoreMode === 'poses' || completedCorrectStep) {
+        scheduleAudioOnChannel('success', soundTimestamp, 'live-feedback');
+      }
+      lastStepMatches = detectionResult.stepMatches;
       lastPoseWasCorrect = true;
     } else {
       // scheduleAudioOnChannel('mistake', soundTimestamp, 'live-feedback');

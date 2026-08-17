@@ -17,6 +17,7 @@
   import { t } from '$lib/i18n';
   import LightSection from '../ui/sections/LightSection.svelte';
   import { selectMediaMimeType } from '$lib/media';
+  import { asset } from '$app/paths';
   import CornerMarker from '../ui/CornerMarker.svelte';
 
   /**
@@ -26,6 +27,7 @@
    * @property {number} recordingEnd
    * @property {import("bouncy_instructor").DetectedStep[]} [detectedSteps]
    * @property {string} [reviewHint]
+   * @property {'poses' | 'steps'} [mode]
    */
 
   /** @type {Props} */
@@ -35,6 +37,7 @@
     recordingEnd,
     detectedSteps = [],
     reviewHint = undefined,
+    mode = 'poses',
   } = $props();
 
   let videoSrcWidth = $state(0);
@@ -78,6 +81,31 @@
   );
 
   const numSubbeats = $derived(tracker.trackedSubbeats);
+  const expectedPoseCursors = $derived.by(() => {
+    const cursors = [];
+    for (let subbeat = 0; subbeat < numSubbeats; subbeat += 1) {
+      const cursor = tracker.cursorAtSubbeat(subbeat);
+      const previous =
+        subbeat > 0 ? tracker.cursorAtSubbeat(subbeat - 1) : undefined;
+      if (!previous || !cursor.isSamePose(previous)) cursors.push(cursor);
+    }
+    return cursors;
+  });
+  const stepReviewGroups = $derived.by(() => {
+    let cursorIndex = 0;
+    return detectedSteps.map((step) => ({
+      step,
+      poses: step.poses.map((pose) => ({
+        pose,
+        cursor: expectedPoseCursors[cursorIndex++],
+      })),
+    }));
+  });
+
+  /** @param {import('bouncy_instructor').DetectedStep} step */
+  function stepPassed(step) {
+    return step.correct;
+  }
 
   let prevTime = 0;
   function onFrame() {
@@ -274,35 +302,73 @@ once per 250ms. -->
     </div>
   </div>
 
-  <div class="poses-details" bind:this={poseCards} onscroll={onScrollPoseCards}>
-    {#each { length: numSubbeats } as _, subbeat}
-      {@const cursor = tracker.cursorAtSubbeat(subbeat)}
-      {@const prevCursor =
-        subbeat > 0 ? tracker.cursorAtSubbeat(subbeat - 1) : null}
-      {@const isNewPose = !prevCursor || !cursor.isSamePose(prevCursor)}
-      {#if isNewPose}
-        {@const pose = getPoseApproximation(cursor)}
-        {#if pose}
-          <!-- svelte-ignore a11y_click_events_have_key_events -->
-          <!-- svelte-ignore a11y_no_static_element_interactions -->
-          <div onclick={() => selectPose(cursor)}>
-            <PoseReview
-              {pose}
-              beatLabel={formatBeatLabel(subbeat)}
-              skeleton={tracker.poseSkeletonAt(cursor)}
-            ></PoseReview>
+  <div
+    class="poses-details"
+    class:step-mode={mode === 'steps'}
+    bind:this={poseCards}
+    onscroll={onScrollPoseCards}
+  >
+    {#if mode === 'steps'}
+      {#each stepReviewGroups as group}
+        <div class="step-review-group">
+          <div class="step-poses">
+            {#each group.poses as item}
+              <!-- svelte-ignore a11y_click_events_have_key_events -->
+              <!-- svelte-ignore a11y_no_static_element_interactions -->
+              <div onclick={() => item.cursor && selectPose(item.cursor)}>
+                <PoseReview
+                  pose={item.pose}
+                  beatLabel={item.cursor
+                    ? formatBeatLabel(item.cursor.subbeat)
+                    : ''}
+                  skeleton={item.cursor
+                    ? tracker.poseSkeletonAt(item.cursor)
+                    : undefined}
+                  compactResult
+                ></PoseReview>
+              </div>
+            {/each}
           </div>
-        {:else}
-          <div class="missing-pose-placeholder">
+          <div class="step-result">
+            <img
+              src={asset(
+                `/img/symbols/${stepPassed(group.step) ? 'bf_check.svg' : 'bf_cross.svg'}`
+              )}
+              alt={stepPassed(group.step) ? 'step passed' : 'step failed'}
+            />
+          </div>
+        </div>
+      {/each}
+    {:else}
+      {#each { length: numSubbeats } as _, subbeat}
+        {@const cursor = tracker.cursorAtSubbeat(subbeat)}
+        {@const prevCursor =
+          subbeat > 0 ? tracker.cursorAtSubbeat(subbeat - 1) : null}
+        {@const isNewPose = !prevCursor || !cursor.isSamePose(prevCursor)}
+        {#if isNewPose}
+          {@const pose = getPoseApproximation(cursor)}
+          {#if pose}
+            <!-- svelte-ignore a11y_click_events_have_key_events -->
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
+            <div onclick={() => selectPose(cursor)}>
+              <PoseReview
+                {pose}
+                beatLabel={formatBeatLabel(subbeat)}
+                skeleton={tracker.poseSkeletonAt(cursor)}
+              ></PoseReview>
+            </div>
+          {:else}
+            <div class="missing-pose-placeholder">
+              <div>·</div>
+            </div>
+          {/if}
+        {:else if subbeat % 2 === 0}
+          <div class="same-pose-placeholder">
             <div>·</div>
           </div>
         {/if}
-      {:else if subbeat % 2 === 0}
-        <div class="same-pose-placeholder">
-          <div>·</div>
-        </div>
-      {/if}
-    {/each}
+      {/each}
+    {/if}
   </div>
 
   {#if $dev}
@@ -345,6 +411,38 @@ once per 250ms. -->
     /* Use space all the way to the edge */
     margin-left: -1.5rem;
     margin-right: -1.5rem;
+  }
+
+  .step-mode {
+    align-items: stretch;
+    flex-flow: row nowrap;
+  }
+  .step-review-group {
+    display: grid;
+    flex: 0 0 auto;
+    grid-template-rows: auto 3.5rem;
+    width: max-content;
+  }
+  .step-poses {
+    display: flex;
+    flex-flow: row nowrap;
+    width: max-content;
+  }
+  .step-poses > div {
+    flex: 0 0 auto;
+  }
+  .step-result {
+    display: grid;
+    box-sizing: border-box;
+    place-items: center;
+    width: 100%;
+    background-color: var(--theme-main-light);
+    border-right: solid 2px var(--theme-neutral-white);
+  }
+  .step-result img {
+    display: block;
+    width: 2.25rem;
+    height: 2.25rem;
   }
 
   .missing-pose-placeholder,

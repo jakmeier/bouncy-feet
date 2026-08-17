@@ -11,6 +11,7 @@ impl DetectedStep {
             start: poses.first().map(|p| p.timestamp).unwrap_or(0.0),
             end: poses.last().map(|p| p.timestamp).unwrap_or(0.0),
             error: poses.iter().map(|p| p.error).sum::<f32>() / poses.len() as f32,
+            correct: false,
             poses,
         }
     }
@@ -19,6 +20,12 @@ impl DetectedStep {
         self.start = self.poses.first().map(|p| p.timestamp).unwrap_or(0.0);
         self.end = self.poses.last().map(|p| p.timestamp).unwrap_or(0.0);
         self.error = self.poses.iter().map(|p| p.error).sum::<f32>() / self.poses.len() as f32;
+    }
+
+    pub(crate) fn all_poses_match(&self, error_threshold: f32) -> bool {
+        self.poses.iter().all(|pose| {
+            pose.error < error_threshold && pose.error_details.z_order_errors.is_empty()
+        })
     }
 }
 
@@ -323,10 +330,27 @@ fn step_match_score(step: &DetectedStep, expected_dt: f64) -> f32 {
 // simple cases.
 #[cfg(test)]
 mod tests {
+    use crate::intern::pose_score::ErrorDetails;
     use crate::keypoints::Cartesian3d;
     use crate::{load_pose_str, load_step_str, Keypoints};
 
     use super::*;
+
+    #[test]
+    fn full_step_requires_every_pose_to_match() {
+        let pose = |error| PoseApproximation {
+            id: String::new(),
+            name: String::new(),
+            error,
+            timestamp: 0.0,
+            error_details: ErrorDetails::default(),
+        };
+        let correct = DetectedStep::new(String::new(), String::new(), vec![pose(0.01), pose(0.02)]);
+        let failed = DetectedStep::new(String::new(), String::new(), vec![pose(0.01), pose(0.08)]);
+
+        assert!(correct.all_poses_match(0.075));
+        assert!(!failed.all_poses_match(0.075));
+    }
 
     #[test]
     fn test_detect_dance_front() {

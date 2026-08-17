@@ -130,7 +130,8 @@
     if (activityUser && detection) {
       activityUser.submitActivity(
         `challenge/${set.id}/${challenge.id}`,
-        detection
+        detection,
+        'steps'
       );
     }
   }
@@ -175,8 +176,9 @@
   <ActivityReview
     {detection}
     videoUrl={reviewVideoSrc || ''}
-    maximum={challenge.maxPoses}
-    threshold={challenge.requiredHits / challenge.maxPoses}
+    maximum={challenge.maxSteps}
+    threshold={challenge.requiredSteps / challenge.maxSteps}
+    scoreMode="steps"
     passed={succeeded}
     {recordingStart}
     {recordingEnd}
@@ -229,7 +231,8 @@
           {songTiming}
           teacherVideo={challenge.solutionVideo.path()}
           challengeDurationMs={challenge.challengeDurationMs}
-          requiredHits={challenge.requiredHits}
+          requiredHits={challenge.requiredSteps}
+          scoreMode="steps"
         />
       </div>
     {:else}

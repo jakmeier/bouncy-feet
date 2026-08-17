@@ -277,7 +277,7 @@ impl Tracker {
         let mut start = 0;
         let end = self.timestamps.len();
 
-        let out = if let Some(configured) = self.detect_configured_steps(start, end) {
+        let mut out = if let Some(configured) = self.detect_configured_steps(start, end) {
             configured
         } else {
             let mut detected = vec![];
@@ -288,6 +288,12 @@ impl Tracker {
             }
             detected
         };
+        for step in &mut out {
+            step.correct = step.all_poses_match(self.detector.error_threshold);
+        }
+        let step_matches = out.iter().filter(|step| step.correct).count() as u32;
+        let step_misses = out.len() as u32 - step_matches;
+
         // TODO: dance detection is untested and unused at the moment
         let cursor = DanceCursor {
             // TODO: does not take pace into consideration
@@ -296,7 +302,10 @@ impl Tracker {
             step_index: out.len(),
             pose_index: 0,
         };
-        DetectionResult::new(out, cursor)
+        let mut detection = DetectionResult::new(out, cursor);
+        detection.step_matches = step_matches;
+        detection.step_misses = step_misses;
+        detection
     }
 
     #[wasm_bindgen(js_name = runDetection)]

@@ -12,6 +12,7 @@ import { ClientSession } from './ClientSession.svelte';
 import { API_ERROR, apiRequest, requestNewGuestSession } from '$lib/stats';
 import { KvSync } from "$lib/sync";
 import { DetectionResult } from '$lib/instructor/bouncy_instructor';
+import { detectionScore } from '$lib/activityScore.js';
 
 export class ApiUser {
     /**
@@ -292,13 +293,13 @@ export class ApiUser {
     /**
      * @param {string} activityId
      * @param {DetectionResult} detection
+     * @param {'poses' | 'steps'} [scoreMode]
      *
      * @returns {DanceSessionResult?}
      */
-    submitActivity(activityId, detection) {
+    submitActivity(activityId, detection, scoreMode = 'poses') {
         const limitedId = activityId.slice(0, 256);
-        const hits = detection.poseMatches;
-        const misses = detection.poseMisses;
+        const { hits, misses } = detectionScore(detection, scoreMode);
         const steps = detection.steps();
         const numSteps = steps.length;
         const duration =

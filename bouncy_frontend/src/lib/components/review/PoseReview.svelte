@@ -5,7 +5,7 @@
   } from '$lib/instructor/bouncy_instructor';
   import InstructorAvatar from '../avatar/InstructorAvatar.svelte';
   import { LEFT_RIGHT_COLORING } from '$lib/constants';
-  import { base } from '$app/paths';
+  import { asset } from '$app/paths';
   import { dev } from '$lib/stores/FeatureSelection';
   import BeatLabel from '../ui/BeatLabel.svelte';
 
@@ -15,14 +15,23 @@
    * @property {Skeleton} skeleton
    * @property {string} [beatLabel]
    * @property {number} [threshold]
+   * @property {boolean} [compactResult]
    */
 
   /** @type {Props} */
-  let { pose, skeleton, beatLabel = '0', threshold = 0.075 } = $props();
-  let passed = $derived(pose.error < threshold);
+  let {
+    pose,
+    skeleton,
+    beatLabel = '0',
+    threshold = 0.075,
+    compactResult = false,
+  } = $props();
+  let passed = $derived(
+    pose.error < threshold && pose.zOrderErrors().length === 0
+  );
 </script>
 
-<div class="pose" class:failed-pose={pose.error > threshold}>
+<div class="pose" class:failed-pose={!passed}>
   <BeatLabel>
     {beatLabel}
   </BeatLabel>
@@ -39,14 +48,14 @@
     </div>
   </div>
 
-  <div class="result">
+  <div class="result" class:compact={compactResult}>
     {#if passed}
-      <img src="{base}/img/symbols/bf_check.svg" alt="passed" />
+      <img src={asset('/img/symbols/bf_check.svg')} alt="passed" />
       {#if $dev}
         {pose.error.toFixed(2)}
       {/if}
     {:else}
-      <img src="{base}/img/symbols/bf_cross.svg" alt="F" />
+      <img src={asset('/img/symbols/bf_cross.svg')} alt="F" />
       {#if $dev}
         {pose.error.toFixed(2)}
       {/if}
@@ -76,7 +85,11 @@
     width: 1.5rem;
     margin: auto;
   }
+  .result.compact {
+    width: 0.9rem;
+  }
   .result img {
+    display: block;
     width: 100%;
   }
 </style>

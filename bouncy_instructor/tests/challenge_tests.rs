@@ -41,6 +41,14 @@ fn challenge_tracker_repeats_to_a_full_initial_score_window() {
         (tracker.expected_poses() * 60).div_ceil(100)
     );
 
+    let configured_steps: u32 = challenge.parts().iter().map(|part| part.repeat()).sum();
+    assert!(challenge.max_steps() >= configured_steps);
+    assert_eq!(challenge.max_steps() % configured_steps, 0);
+    assert_eq!(
+        challenge.required_steps(),
+        (challenge.max_steps() * 60).div_ceil(100)
+    );
+
     // The teacher loops after that score window instead of completing.
     assert_eq!(
         tracker

@@ -27,6 +27,11 @@ pub struct DetectionResult {
     pub pose_matches: u32,
     #[wasm_bindgen(js_name = poseMisses)]
     pub pose_misses: u32,
+    /// Fully correct step repetitions. A step only matches when every pose matches.
+    #[wasm_bindgen(js_name = stepMatches)]
+    pub step_matches: u32,
+    #[wasm_bindgen(js_name = stepMisses)]
+    pub step_misses: u32,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -97,6 +102,8 @@ impl DetectionResult {
             last_error: None,
             pose_matches: 0,
             pose_misses: 0,
+            step_matches: 0,
+            step_misses: 0,
         }
     }
 

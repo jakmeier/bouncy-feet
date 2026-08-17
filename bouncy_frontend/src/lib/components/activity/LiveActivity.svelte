@@ -31,6 +31,7 @@
    * @property {string} [teacherVideo]
    * @property {number} [challengeDurationMs]
    * @property {number} [requiredHits]
+   * @property {'poses' | 'steps'} [scoreMode]
    * @property {string} [songId]
    * @property {ResolvedSongTiming} [songTiming]
    */
@@ -41,6 +42,7 @@
     teacherVideo,
     challengeDurationMs,
     requiredHits,
+    scoreMode = 'poses',
     songId,
     songTiming,
   } = $props();
@@ -133,6 +135,7 @@
     {songTiming}
     {challengeDurationMs}
     {requiredHits}
+    {scoreMode}
   ></LiveRecording>
 </div>
 

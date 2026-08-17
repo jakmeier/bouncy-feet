@@ -146,11 +146,25 @@ impl Challenge {
         (expected_poses * REQUIRED_HIT_PERCENT).div_ceil(100)
     }
 
-    /// Total score opportunities in the initial scoring window.
+    /// Total pose opportunities in the initial scoring window.
     #[wasm_bindgen(getter, js_name = maxPoses)]
     pub fn max_poses(&self) -> u32 {
         let (_, _, expected_poses) = self.attempt_shape();
         expected_poses
+    }
+
+    /// Fully correct step repetitions needed to complete the challenge.
+    #[wasm_bindgen(getter, js_name = requiredSteps)]
+    pub fn required_steps(&self) -> u32 {
+        (self.max_steps() * REQUIRED_HIT_PERCENT).div_ceil(100)
+    }
+
+    /// Total full-step opportunities in the initial scoring window.
+    #[wasm_bindgen(getter, js_name = maxSteps)]
+    pub fn max_steps(&self) -> u32 {
+        let (repetitions, _, _) = self.attempt_shape();
+        let pattern_steps: u32 = self.parts.iter().map(|part| part.repeat).sum();
+        repetitions * pattern_steps
     }
 }
 impl Challenge {

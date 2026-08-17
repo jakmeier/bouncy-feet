@@ -198,6 +198,8 @@ impl DanceDetector {
         self.detected.failure_reason = None;
         self.detected.pose_matches = 0;
         self.detected.pose_misses = 0;
+        self.detected.step_matches = 0;
+        self.detected.step_misses = 0;
         self.beat_zero = None;
         self.count_in_end = None;
         self.transition_to_state(DetectionState::Init, self.detection_state_start);
@@ -467,7 +469,24 @@ impl DanceDetector {
 
         self.on_beat_candidates.clear();
         if let Some((target_step, _beat)) = &self.teacher.step_at_subbeat(prev_subbeat) {
+            let completed_steps = self.detected.steps.len();
             self.detected.match_step(target_step);
+            if self.detected.steps.len() > completed_steps {
+                let completed_step = self
+                    .detected
+                    .steps
+                    .last_mut()
+                    .expect("match_step added a completed step");
+                let step_is_correct = completed_step.all_poses_match(self.error_threshold);
+                // Store the decision made with this tracker's configured
+                // threshold so review UIs don't have to reproduce scoring.
+                completed_step.correct = step_is_correct;
+                if step_is_correct {
+                    self.detected.step_matches += 1;
+                } else {
+                    self.detected.step_misses += 1;
+                }
+            }
         }
 
         let new_cursor = self.teacher.cursor_at_subbeat(new_subbeat);

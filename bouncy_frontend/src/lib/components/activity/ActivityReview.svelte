@@ -6,6 +6,7 @@
   import ScoreResults from './ScoreResults.svelte';
   import DarkSection from '../ui/sections/DarkSection.svelte';
   import LogoHeader from '../ui/header/LogoHeader.svelte';
+  import { detectionScore } from '$lib/activityScore.js';
 
   let {
     detection,
@@ -17,17 +18,21 @@
     maximum = undefined,
     threshold = 0.6,
     passed = undefined,
+    scoreMode = 'poses',
   } = $props();
 
+  /** @type {'poses' | 'steps'} */
+  let scoringMode = $derived(scoreMode === 'steps' ? 'steps' : 'poses');
   /** @type {import("bouncy_instructor").DetectedStep[] | undefined} */
   let detectedSteps = $derived(detection.steps());
-  let detectedPoses = $derived(detection.poseMisses + detection.poseMatches);
-  let maximumPoses = $derived(Math.max(maximum ?? 0, detectedPoses));
-  let scoreRatio = $derived(
-    maximumPoses === 0 ? 0 : detection.poseMatches / maximumPoses
+  let scoreCounters = $derived(detectionScore(detection, scoringMode));
+  let detectedOpportunities = $derived(
+    scoreCounters.hits + scoreCounters.misses
   );
+  let score = $derived(scoreCounters.hits);
+  let maximumScore = $derived(Math.max(maximum ?? 0, detectedOpportunities));
+  let scoreRatio = $derived(maximumScore === 0 ? 0 : score / maximumScore);
   let didPass = $derived(passed ?? scoreRatio >= threshold);
-  let showsChallengeOutcome = $derived(passed !== undefined);
 
   let showResults = $state(false);
 </script>
@@ -47,18 +52,12 @@
       <LogoHeader black />
 
       <div class="top-summary">
-        {#if showsChallengeOutcome}
-          <h1>
-            {$t(didPass ? 'activity.review.success' : 'activity.review.failed')}
-          </h1>
-        {:else}
-          <ScoreResults
-            score={detection.poseMatches}
-            maximum={maximumPoses}
-            {threshold}
-            passed={didPass}
-          />
-        {/if}
+        <ScoreResults
+          {score}
+          maximum={maximumScore}
+          {threshold}
+          passed={didPass}
+        />
       </div>
     </DarkSection>
 
@@ -69,6 +68,7 @@
         reviewHint="record.local-review-hint"
         {recordingStart}
         {recordingEnd}
+        mode={scoringMode}
       ></VideoReview>
     {:else}
       <div class="no-review">
@@ -99,8 +99,5 @@
     display: flex;
     flex-direction: column;
     justify-content: space-around;
-  }
-  h1 {
-    color: var(--theme-main);
   }
 </style>

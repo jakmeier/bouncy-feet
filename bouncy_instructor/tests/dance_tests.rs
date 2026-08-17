@@ -91,6 +91,11 @@ fn assert_step_detected(
         !detection.steps().is_empty(),
         "expected {expected_step} but didn't detect any steps"
     );
+    assert_eq!(
+        detection.step_matches + detection.step_misses,
+        detection.steps().len() as u32,
+        "every full detected step must contribute exactly one score opportunity"
+    );
 
     let steps: Vec<_> = detection
         .steps()

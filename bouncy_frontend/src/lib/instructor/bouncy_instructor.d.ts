@@ -230,6 +230,10 @@ export class Challenge {
    * Hits needed to complete the challenge.
    */
   readonly requiredHits: number;
+  /**
+   * Fully correct step repetitions needed to complete the challenge.
+   */
+  readonly requiredSteps: number;
   readonly solutionVideo: VideoDef;
   readonly songTimestamp: number;
   /**
@@ -243,9 +247,13 @@ export class Challenge {
   readonly name: string;
   readonly parts: ChallengePart[];
   /**
-   * Total score opportunities in the initial scoring window.
+   * Total pose opportunities in the initial scoring window.
    */
   readonly maxPoses: number;
+  /**
+   * Total full-step opportunities in the initial scoring window.
+   */
+  readonly maxSteps: number;
 }
 export class ChallengePart {
   private constructor();
@@ -380,6 +388,10 @@ export class DetectedStep {
   readonly bpm: number;
   readonly name: string;
   readonly poses: PoseApproximation[];
+  /**
+   * Whether every pose matched when this full step was detected.
+   */
+  readonly correct: boolean;
 }
 /**
  * Result of a step or dance detection.
@@ -407,6 +419,11 @@ export class DetectionResult {
   set failureReason(value: DetectionFailureReason | null | undefined);
   poseMatches: number;
   poseMisses: number;
+  /**
+   * Fully correct step repetitions. A step only matches when every pose matches.
+   */
+  stepMatches: number;
+  stepMisses: number;
 }
 /**
  * Information of a recorded frame in RON format.
@@ -1072,6 +1089,7 @@ export interface InitOutput {
   readonly dancefilebuilder_overwriteDance: (a: number, b: number, c: number) => void;
   readonly dancefilebuilder_removeDance: (a: number, b: number, c: number, d: number) => void;
   readonly detectedstep_bpm: (a: number) => number;
+  readonly detectedstep_correct: (a: number) => number;
   readonly detectedstep_bpmWithSubbeatsPerMove: (a: number, b: number) => number;
   readonly detectedstep_id: (a: number, b: number) => void;
   readonly detectedstep_name: (a: number, b: number) => void;
@@ -1154,10 +1172,12 @@ export interface InitOutput {
   readonly challenge_explanation: (a: number, b: number) => void;
   readonly challenge_id: (a: number, b: number) => void;
   readonly challenge_maxPoses: (a: number) => number;
+  readonly challenge_maxSteps: (a: number) => number;
   readonly challenge_name: (a: number, b: number) => void;
   readonly challenge_parts: (a: number, b: number) => void;
   readonly challenge_prerequisites: (a: number, b: number) => void;
   readonly challenge_requiredHits: (a: number) => number;
+  readonly challenge_requiredSteps: (a: number) => number;
   readonly challenge_solutionStartTimestamp: (a: number) => number;
   readonly challenge_solutionVideo: (a: number) => number;
   readonly challenge_songTimestamp: (a: number) => number;
@@ -1286,6 +1306,8 @@ export interface InitOutput {
   readonly __wbg_get_detectionresult_failureReason: (a: number) => number;
   readonly __wbg_get_detectionresult_poseMatches: (a: number) => number;
   readonly __wbg_get_detectionresult_poseMisses: (a: number) => number;
+  readonly __wbg_get_detectionresult_stepMatches: (a: number) => number;
+  readonly __wbg_get_detectionresult_stepMisses: (a: number) => number;
   readonly __wbg_get_skeletons_front: (a: number) => number;
   readonly __wbg_get_skeletons_side: (a: number) => number;
   readonly __wbg_set_dancecursor_poseIndex: (a: number, b: number) => void;
@@ -1295,6 +1317,8 @@ export interface InitOutput {
   readonly __wbg_set_detectionresult_failureReason: (a: number, b: number) => void;
   readonly __wbg_set_detectionresult_poseMatches: (a: number, b: number) => void;
   readonly __wbg_set_detectionresult_poseMisses: (a: number, b: number) => void;
+  readonly __wbg_set_detectionresult_stepMatches: (a: number, b: number) => void;
+  readonly __wbg_set_detectionresult_stepMisses: (a: number, b: number) => void;
   readonly __wbg_set_skeletons_front: (a: number, b: number) => void;
   readonly __wbg_set_skeletons_side: (a: number, b: number) => void;
   readonly __wbg_skeletons_free: (a: number, b: number) => void;
