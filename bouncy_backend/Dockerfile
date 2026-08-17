@@ -17,4 +17,8 @@ RUN mkdir /app/data
 COPY --from=builder /app/target/release/bouncy_backend /usr/local/bin
 COPY ./db_migrations ./db_migrations
 EXPOSE 3000
-CMD ["/usr/local/bin/bouncy_backend"]
+# Keep the executable as the entrypoint so `docker compose run ... migrate`
+# passes `migrate` to the backend instead of trying to execute a binary named
+# `migrate`.
+ENTRYPOINT ["/usr/local/bin/bouncy_backend"]
+CMD ["serve"]

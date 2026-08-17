@@ -1,4 +1,3 @@
-version: "3.6"
 services:
   bouncy_backend:
     # Set by the root-owned deployment helper; never use a mutable image tag here.
