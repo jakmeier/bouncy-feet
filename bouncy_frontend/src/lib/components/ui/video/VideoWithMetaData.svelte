@@ -4,10 +4,11 @@
   /**
    * @typedef {Object} Props
    * @property {import("bouncy_instructor").VideoDef} video
+   * @property {string} [ariaLabel]
    */
 
   /** @type {Props} */
-  let { video } = $props();
+  let { video, ariaLabel } = $props();
 
   /** @type {number[]} */
   let beats = $derived(Array.from(video.beats()));
@@ -22,5 +23,5 @@
 </script>
 
 {#if video && !video.isEmpty()}
-  <VideoPlayer path={video.path()} {beats} {markers}></VideoPlayer>
+  <VideoPlayer path={video.path()} {beats} {markers} {ariaLabel}></VideoPlayer>
 {/if}

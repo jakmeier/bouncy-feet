@@ -21,7 +21,7 @@ export const pageTransition = $state({
     finishing: false,
     setId: /** @type {string | undefined} */ (undefined),
     phase:
-    /** @type {'fade-source' | 'enlarge-title' | 'expand' | 'settle' | 'finishing' | 'idle'} */ (
+    /** @type {'select-source' | 'fade-source' | 'enlarge-title' | 'expand' | 'settle' | 'finishing' | 'idle'} */ (
             'idle'
         ),
     surface: /** @type {TransitionSurface | null} */ (null),
@@ -36,6 +36,7 @@ export const pageTransition = $state({
 // now share the same state machine and root overlay.
 export const challengeTransition = pageTransition;
 
+const CHALLENGE_SELECTION_WAIT = 460;
 const CHALLENGE_EXPAND_WAIT = 460;
 const CHALLENGE_SETTLE_WAIT = 490;
 const CHALLENGE_FINISH_WAIT = 400;
@@ -73,10 +74,10 @@ function waitForDest(setId, timeout) {
 /**
  * @param {string} href
  * @param {string} setId
- * @param {{ surfaceNode: HTMLElement, titleNode: HTMLElement, progressNode: HTMLElement }} nodes
+ * @param {{ cardNode: HTMLElement, titleNode: HTMLElement }} nodes
  */
 export async function startChallengeTransition(href, setId, nodes) {
-    if (pageTransition.active) return;
+    if (pageTransition.active || pageTransition.phase !== 'idle') return;
     if (
         typeof window !== 'undefined' &&
         window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -85,13 +86,19 @@ export async function startChallengeTransition(href, setId, nodes) {
         return;
     }
 
-    const surfaceStyle = getComputedStyle(nodes.surfaceNode);
-    const titleStyle = getComputedStyle(nodes.titleNode);
+    // Let the source card's selection highlight settle before creating any
+    // shared-element clones. This avoids duplicate text during that phase.
     pageTransition.kind = 'challenge';
     pageTransition.setId = setId;
+    pageTransition.phase = 'select-source';
+    await tick();
+    await wait(CHALLENGE_SELECTION_WAIT);
+
+    const cardStyle = getComputedStyle(nodes.cardNode);
+    const titleStyle = getComputedStyle(nodes.titleNode);
     pageTransition.surface = {
-        ...rectOf(nodes.surfaceNode),
-        borderRadius: parseFloat(surfaceStyle.borderRadius) || 24,
+        ...rectOf(nodes.cardNode),
+        borderRadius: parseFloat(cardStyle.borderRadius) || 24,
     };
     pageTransition.title = {
         ...rectOf(nodes.titleNode),
@@ -100,17 +107,12 @@ export async function startChallengeTransition(href, setId, nodes) {
         fontWeight: titleStyle.fontWeight,
         text: (nodes.titleNode.textContent || '').trim(),
     };
-    pageTransition.progress = {
-        ...rectOf(nodes.progressNode),
-        html: nodes.progressNode.innerHTML,
-    };
     pageTransition.destReady = false;
     pageTransition.destTitle = null;
     pageTransition.destProgress = null;
     pageTransition.finishing = false;
     pageTransition.phase = 'expand';
     pageTransition.active = true;
-
     await tick();
     await wait(CHALLENGE_EXPAND_WAIT);
     goto(href);
@@ -152,7 +154,7 @@ export function publishChallengeDest(setId, titleNode, progressNode) {
  * @param {string} text
  */
 export async function startCoachTransition(href, titleNode, text) {
-    if (pageTransition.active) return;
+    if (pageTransition.active || pageTransition.phase !== 'idle') return;
     if (
         typeof window !== 'undefined' &&
         window.matchMedia('(prefers-reduced-motion: reduce)').matches

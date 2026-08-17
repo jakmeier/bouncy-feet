@@ -51,20 +51,10 @@
     <p>{challenge.explanation}</p>
   {/if}
   <div class="card-meta">
-    <div class="meta-bubbles">
-      <span class="bubble reward">
-        <img
-          src={asset('/img/symbols/bf_eye_black.svg')}
-          alt=""
-          class="currency"
-        />
-        0 / 100
-      </span>
-      <span class="bubble bpm">
-        <img src={asset('/img/symbols/bf_note.svg')} alt="" class="meta-icon" />
-        {challenge.bpm} BPM
-      </span>
-    </div>
+    <span class="bubble bpm">
+      <img src={asset('/img/symbols/bf_note.svg')} alt="" class="meta-icon" />
+      {challenge.bpm} BPM
+    </span>
     {#if state.completed}
       <strong>Done</strong>
     {:else if state.locked}
@@ -107,17 +97,13 @@
   }
 
   .card-topline,
-  .card-meta,
-  .meta-bubbles {
+  .card-meta {
     display: flex;
     align-items: center;
   }
   .card-topline,
   .card-meta {
     justify-content: space-between;
-  }
-  .meta-bubbles {
-    gap: 0.4rem;
   }
   .level-number {
     color: var(--theme-neutral-darker-gray);
@@ -163,7 +149,6 @@
     border-radius: 9999px;
     background: var(--theme-neutral-white);
   }
-  .currency,
   .meta-icon {
     height: 1rem;
     width: auto;
@@ -199,10 +184,6 @@
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-    }
-    .meta-bubbles {
-      flex-direction: column;
-      align-items: center;
     }
   }
 </style>

@@ -5,8 +5,6 @@
 
   let surfaceEl = $state();
   let titleEl = $state();
-  let progressEl = $state();
-
   const surfaceBase = $derived(
     t.surface
       ? `top:${t.surface.top}px;left:${t.surface.left}px;width:${t.surface.width}px;height:${t.surface.height}px;border-radius:${t.surface.borderRadius}px;`
@@ -17,16 +15,16 @@
       ? `top:${t.title.top}px;left:${t.title.left}px;width:${t.title.width}px;font-size:${t.title.fontSize}px;color:${t.destTitle ? t.destTitle.color : t.title.color};font-weight:${t.destTitle ? t.destTitle.fontWeight : t.title.fontWeight};`
       : null
   );
-  const progressBase = $derived(
-    t.progress
-      ? `top:${t.progress.top}px;left:${t.progress.left}px;width:${t.progress.width}px;`
-      : null
-  );
 
-  // Challenge phase 1: expand its card surface while retaining the source
-  // positions of the title and progress clones.
+  // Expand the final selected-card surface while retaining the source title.
   $effect(() => {
-    if (t.kind !== 'challenge' || !t.active || !t.surface || !surfaceEl) return;
+    if (
+      t.kind !== 'challenge' ||
+      t.phase !== 'expand' ||
+      !t.surface ||
+      !surfaceEl
+    )
+      return;
     const s = t.surface;
     surfaceEl.animate(
       [
@@ -46,6 +44,18 @@
         },
       ],
       { duration: 400, easing: 'ease-in', fill: 'forwards' }
+    );
+  });
+
+  // Square off the full-card border while the finished challenge overlay fades.
+  $effect(() => {
+    if (t.kind !== 'challenge' || t.phase !== 'finishing' || !surfaceEl) return;
+    surfaceEl.animate(
+      [
+        { borderRadius: getComputedStyle(surfaceEl).borderRadius },
+        { borderRadius: '0px' },
+      ],
+      { duration: 400, easing: 'ease-out', fill: 'forwards' }
     );
   });
 
@@ -73,20 +83,6 @@
           color: d.color,
           fontWeight: d.fontWeight,
         },
-      ],
-      { duration: 440, easing: 'ease', fill: 'forwards' }
-    );
-  });
-
-  $effect(() => {
-    if (t.kind !== 'challenge' || !t.destProgress || !t.progress || !progressEl)
-      return;
-    const s = t.progress;
-    const d = t.destProgress;
-    progressEl.animate(
-      [
-        { top: `${s.top}px`, left: `${s.left}px`, width: `${s.width}px` },
-        { top: `${d.top}px`, left: `${d.left}px`, width: `${d.width}px` },
       ],
       { duration: 440, easing: 'ease', fill: 'forwards' }
     );
@@ -176,13 +172,6 @@
     {#if titleBase}<div class="pt-title" bind:this={titleEl} style={titleBase}>
         {t.title?.text}
       </div>{/if}
-    {#if progressBase}<div
-        class="pt-progress"
-        bind:this={progressEl}
-        style={progressBase}
-      >
-        {@html t.progress?.html}
-      </div>{/if}
   </div>
 {/if}
 
@@ -205,6 +194,8 @@
     top: 0;
     left: 0;
     z-index: 1;
+    box-sizing: border-box;
+    border: 2px solid var(--theme-neutral-white);
     background: var(--theme-neutral-black);
   }
   .pt-title {
@@ -221,25 +212,5 @@
      source title does not jump vertically before its enlargement. */
   .pt-overlay.coach .pt-title {
     line-height: normal;
-  }
-  .pt-progress {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 3;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.3rem;
-    padding: 0.25rem 0.55rem;
-    border-radius: 999px;
-    background: var(--theme-neutral-light);
-    color: var(--theme-neutral-almost-black);
-    font-weight: 700;
-    white-space: nowrap;
-  }
-  .pt-progress :global(img) {
-    width: 1rem;
-    height: 1rem;
   }
 </style>

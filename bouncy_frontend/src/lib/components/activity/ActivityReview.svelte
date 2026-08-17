@@ -22,14 +22,12 @@
   /** @type {import("bouncy_instructor").DetectedStep[] | undefined} */
   let detectedSteps = $derived(detection.steps());
   let detectedPoses = $derived(detection.poseMisses + detection.poseMatches);
-  // Challenges may continue past their initial score window to let dancers
-  // recover from misses. Include those extra attempts in the denominator so a
-  // review never displays more hits than available poses.
   let maximumPoses = $derived(Math.max(maximum ?? 0, detectedPoses));
   let scoreRatio = $derived(
     maximumPoses === 0 ? 0 : detection.poseMatches / maximumPoses
   );
   let didPass = $derived(passed ?? scoreRatio >= threshold);
+  let showsChallengeOutcome = $derived(passed !== undefined);
 
   let showResults = $state(false);
 </script>
@@ -49,12 +47,18 @@
       <LogoHeader black />
 
       <div class="top-summary">
-        <ScoreResults
-          score={detection.poseMatches}
-          maximum={maximumPoses}
-          {threshold}
-          passed={didPass}
-        />
+        {#if showsChallengeOutcome}
+          <h1>
+            {$t(didPass ? 'activity.review.success' : 'activity.review.failed')}
+          </h1>
+        {:else}
+          <ScoreResults
+            score={detection.poseMatches}
+            maximum={maximumPoses}
+            {threshold}
+            passed={didPass}
+          />
+        {/if}
       </div>
     </DarkSection>
 
@@ -95,5 +99,8 @@
     display: flex;
     flex-direction: column;
     justify-content: space-around;
+  }
+  h1 {
+    color: var(--theme-main);
   }
 </style>

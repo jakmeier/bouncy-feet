@@ -9,7 +9,7 @@
     challengeProgressKey,
   } from '$lib/challengeProgress.js';
   import { publishChallengeDest } from '$lib/stores/UiState.svelte';
-  import { asset } from '$app/paths';
+  import { t } from '$lib/i18n';
 
   let { data } = $props();
   const { getSet } = getContext('challengeSets');
@@ -95,12 +95,16 @@
 
 <ApiUserLoader bind:apiUser={loadedApiUser} />
 
-<StandardPage black title={set ? set.name : '???'} backButton>
+<StandardPage
+  black
+  title={set ? set.name : $t('challenges.not-found')}
+  backButton
+>
   {#if !set}
     <div class="empty-state">
       <span class="material-symbols-outlined">explore_off</span>
-      <h1>Challenge set not found</h1>
-      <a class="text-link" href="/challenges">See all challenges</a>
+      <h1>{$t('challenges.not-found')}</h1>
+      <a class="text-link" href="/challenges">{$t('challenges.all-link')}</a>
     </div>
   {:else}
     <div class="challenge-page">
@@ -114,39 +118,38 @@
               <span class="material-symbols-outlined trophy">trophy</span>
             {:else}
               <strong>{completedCount}</strong>
-              <small>of {set.challenges.length}</small>
+              <small>{$t('challenges.of')} {set.challenges.length}</small>
             {/if}
           </div>
         </div>
-        <div class="rewards">
-          <span data-challenge-progress>
-            0 / 1000
-            <img
-              src={asset('/img/symbols/bf_eye_black.svg')}
-              alt=""
-              class="currency"
-            />
-          </span>
-          <span class="small"> 0 / 600 from challenges </span>
-          <span class="small"> 0 / 400 completion bonus </span>
-        </div>
+        <span class="progress-status" data-challenge-progress>
+          {#if stateSummary.won}
+            {$t('challenges.complete')}
+          {:else}
+            {completedCount}
+            {$t('challenges.of')}
+            {set.challenges.length}
+            {$t('challenges.passed')}
+          {/if}
+        </span>
       </header>
 
       {#if stateSummary.won}
         <div class="victory-banner">
           <span class="material-symbols-outlined">celebration</span>
           <div>
-            <strong>Journey complete!</strong><br />You conquered every level.
+            <strong>{$t('challenges.journey-complete-title')}</strong><br />
+            {$t('challenges.journey-complete-description')}
           </div>
         </div>
       {:else}
         <div class="progress-copy">
-          <span>Your journey</span>
-          <span>{progressPercent}% complete</span>
+          <span>{$t('challenges.journey-progress')}</span>
+          <span>{progressPercent}% {$t('challenges.complete')}</span>
         </div>
       {/if}
 
-      <section class="path" aria-label="Challenge path">
+      <section class="path" aria-label={$t('challenges.path-label')}>
         {#each levels as level, levelIndex}
           <div class="level" class:branch={level.length > 1}>
             {#each level as challenge}
@@ -217,36 +220,9 @@
     bottom: -70px;
   }
 
-  .rewards {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-  }
-
-  .rewards > span:first-child {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    align-self: stretch;
-    gap: 0.35rem;
-    margin-bottom: 0.6rem;
-    padding: 0.3rem 0.65rem;
-    border-radius: 999px;
-    background: var(--theme-neutral-light);
-    color: var(--theme-neutral-almost-black);
-    font-size: var(--font-normal);
-    font-weight: 800;
-  }
-
-  .small {
+  .progress-status {
     font-size: var(--font-small);
-  }
-
-  .currency {
-    position: relative;
-    z-index: 1;
-    width: 1rem;
-    height: 1rem;
+    font-weight: 700;
   }
 
   .progress-orbit {

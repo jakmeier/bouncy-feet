@@ -1,7 +1,10 @@
 <script>
   import { asset } from '$app/paths';
   import { onMount } from 'svelte';
-  import { startChallengeTransition } from '$lib/stores/UiState.svelte';
+  import {
+    pageTransition,
+    startChallengeTransition,
+  } from '$lib/stores/UiState.svelte';
 
   /**
    * @typedef {Object} Props
@@ -16,13 +19,8 @@
 
   /** @type {HTMLAnchorElement | undefined} */
   let cardEl = $state();
-  /** @type {HTMLDivElement | undefined} */
-  let copyEl = $state();
   /** @type {HTMLHeadingElement | undefined} */
   let titleEl = $state();
-  /** @type {HTMLDivElement | undefined} */
-  let progressEl = $state();
-
   /** @type {HTMLDivElement | undefined} */
   let art = $state();
   /** @type {HTMLVideoElement | undefined} */
@@ -90,17 +88,25 @@
     ) {
       return;
     }
-    if (!cardEl || !copyEl || !titleEl || !progressEl) return;
+    if (!cardEl || !titleEl) return;
     event.preventDefault();
     startChallengeTransition(href, set.id, {
-      surfaceNode: copyEl,
+      cardNode: cardEl,
       titleNode: titleEl,
-      progressNode: progressEl,
     });
   }
 </script>
 
-<a class="set-card" {href} onclick={handleClick} bind:this={cardEl}>
+<a
+  class="set-card"
+  class:selected={pageTransition.kind === 'challenge' &&
+    (pageTransition.phase === 'select-source' ||
+      pageTransition.phase === 'expand') &&
+    pageTransition.setId === set.id}
+  {href}
+  onclick={handleClick}
+  bind:this={cardEl}
+>
   <div class="art" aria-hidden="true" bind:this={art}>
     {#if activeVideo}
       <video
@@ -121,23 +127,12 @@
     <span class="beat beat-two"></span>
     <span class="number">0{index + 1}</span>
   </div>
-  <div class="card-copy" bind:this={copyEl}>
+  <div class="card-copy">
     <div class="label-row">
       <span>New</span>
       <span class="difficulty">Beginners</span>
     </div>
     <h2 bind:this={titleEl}>{set.name}</h2>
-    <div class="reward-line">
-      <span class="reward-label">Progress</span>
-      <div class="reward-row" bind:this={progressEl}>
-        0 / 1000
-        <img
-          src={asset('/img/symbols/bf_eye_black.svg')}
-          alt=""
-          class="currency"
-        />
-      </div>
-    </div>
     <div class="card-bottom">
       <span><b>{set.challenges.length}</b> levels</span>
       <span class="start">Open Challenge <span aria-hidden="true">→</span></span
@@ -153,15 +148,16 @@
     overflow: hidden;
     border-radius: 24px;
     color: var(--theme-neutral-white);
-    background: var(--theme-neutral-black);
-    transition:
-      transform 180ms ease,
-      box-shadow 180ms ease;
+    background: var(--theme-neutral-almost-black);
+    transition: background-color 460ms ease;
   }
-  .set-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 20px 44px var(--theme-neutral-dark-transparent);
+  .set-card.selected {
+    /* Exception to no border rule: used as animation, not as static element */
+    border: solid 2px var(--theme-neutral-white);
+    background-color: var(--theme-neutral-black);
+    margin: -2px;
   }
+
   .art {
     position: relative;
     display: grid;
@@ -283,31 +279,6 @@
   .start {
     color: var(--theme-main);
   }
-  .reward-line {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  .reward-label {
-    color: var(--theme-neutral-dark-gray);
-  }
-  .reward-row {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.35rem;
-    padding: 0.3rem 0.65rem;
-    border-radius: 999px;
-    background: var(--theme-neutral-light);
-    color: var(--theme-neutral-almost-black);
-    font-size: var(--font-normal);
-    font-weight: 800;
-  }
-  .currency {
-    width: 1rem;
-    height: 1rem;
-  }
-
   @media (max-width: 600px) {
     .set-card {
       grid-template-columns: 1fr;

@@ -3,6 +3,7 @@
   import { goto } from '$app/navigation';
   import { dev } from '$lib/stores/FeatureSelection';
   import StandardPage from '$lib/components/ui/StandardPage.svelte';
+  import VideoWithMetaData from '$lib/components/ui/video/VideoWithMetaData.svelte';
   import LiveActivity from '$lib/components/activity/LiveActivity.svelte';
   import ActivityReview from '$lib/components/activity/ActivityReview.svelte';
   import { registerTracker, setBpm } from '$lib/stores/Beat';
@@ -189,12 +190,10 @@
     {:else if !started}
       <p>{challenge.explanation || ''}</p>
       <p><strong>{challenge.bpm} {$t('challenges.bpm-unit')}</strong></p>
-      <!-- svelte-ignore a11y_media_has_caption -->
-      <video
-        controls
-        src={challenge.solutionVideo.path()}
-        aria-label={`${challenge.name} ${$t('challenges.solution-video')}`}
-      ></video>
+      <VideoWithMetaData
+        video={challenge.solutionVideo}
+        ariaLabel={`${challenge.name} ${$t('challenges.solution-video')}`}
+      />
       <p>{$t('challenges.start-description')}</p>
       {#if availableSongs.length > 1}
         <label>
@@ -255,9 +254,6 @@
 {/if}
 
 <style>
-  video {
-    max-width: 100%;
-  }
   button,
   select {
     font: inherit;

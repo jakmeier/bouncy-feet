@@ -22,9 +22,6 @@
         : 'activity.review.failed'
   );
   let scoreColor = $state('var(--theme-neutral-gray)');
-  let borderWidth = '3px';
-
-  let outerWidth = $state();
   let scoreWidth = $state(0);
 
   onMount(() => {
@@ -36,26 +33,17 @@
     scoreWidth = scoreRatio * 100;
     if (didPass) {
       scoreColor = 'var(--theme-main-alt)';
-      // borderWidth = '5px';
     } else {
       scoreColor = '#eb3b3b';
     }
   }
 </script>
 
-<div
-  class="outer"
-  bind:clientWidth={outerWidth}
-  style="--score-color: {scoreColor}"
->
+<div class="outer" style="--score-color: {scoreColor}">
   <h1>{$t(text)}</h1>
 
-  <div
-    class="result"
-    style="border-color: {scoreColor}; border-width: {borderWidth}"
-  >
+  <div class="result" style="border-color: {scoreColor}">
     <div class="score" style="width: {scoreWidth}%;"></div>
-    <!-- <span class="material-symbols-outlined above-bar" translate="no"> star_half </span> -->
     <div class="above-bar">
       {score} / {maximum}
     </div>

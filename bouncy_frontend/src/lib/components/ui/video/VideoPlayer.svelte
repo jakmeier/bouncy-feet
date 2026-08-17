@@ -12,10 +12,11 @@
    * @property {number[]} [beats] - Array of beat timestamps in ms
    * @property {Marker[]} [markers] - Array of markers to show on the timeline
    * @property {boolean} [muted]
+   * @property {string} [ariaLabel]
    */
 
   /** @type Props */
-  let { path, beats = [], markers = [], muted = false } = $props();
+  let { path, beats = [], markers = [], muted = false, ariaLabel } = $props();
 
   let videoElement = $state();
   let isPlaying = $state(false);
@@ -75,6 +76,7 @@
   <CornerMarker>
     <video
       bind:this={videoElement}
+      aria-label={ariaLabel}
       controls={false}
       preload="auto"
       playsinline
