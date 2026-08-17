@@ -93,17 +93,9 @@ for the core business logic (dance detection).
 
 ## Progress Status
 
-*Last update 22th of December 2025*
+Take a look at [CHANGELOG.md](./CHANGELOG.md) for the latest changes.
 
-- There is a huge backlog of features not yet deployed on app.bouncy-feet.ch that needs more testing before the next big release. Including:
-  - User account management
-  - Video upload
-  - Clubs of users to share videos in private groups
-  - More courses
-
-Stay tuned for an updated version coming soon.
-
-# Free and Open-Source Commitment
+## Free and Open-Source Commitment
 
 Bouncy Feet is developed according to Free and Open-Source principles. I found
 that my own opinions align well with those values, as I will elaborate a bit
@@ -158,20 +150,7 @@ If you want to help out with the dance content, or with translations, or
 something else, please drop me a message inbox@jakobmeier.ch and I am more than
 happy to discuss further. 
 
-If you would like to help out on the coding side, that is great! Just to be
-upfront about it, a lack of documentation might make it hard to get started.
-Sadly, there is a chicken and egg problem here, since keeping good documentation
-up to date is not worth my time until there is actual interest of contributors.
-
-However, if you are willing to push through a lack of documentation, I am happy
-to help you get started and create the necessary docs as we go. Even if you lack
-experience using Rust and/or Svelte, I can help you learn. Ideally, introduce
-yourself in an issue or email and let me know what you would like to work on and
-we take it from there.
-
-You may also have a look at
-[issues with contribution encouraged](https://github.com/jakmeier/bouncy-feet/issues?q=is%3Aissue+is%3Aopen+label%3A%22contribution+encouraged%22).
-These are typically long-term features which I know I want in the app eventually
-but I don't have the capacity to work on them right now. If you want to work on
-them, I will give my best to help you help me and make it a pleasant
-collaboration experience for both of us.
+If you would like to help out on the coding side, that is great! Development has
+moved from GitHub over to https://code.jakobmeier.ch/bouncy-feet/bouncy-feet,
+drop me an email at inbox@jakobmeier.ch to create you an account if you need
+one.
