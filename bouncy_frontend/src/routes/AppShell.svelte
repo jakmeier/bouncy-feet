@@ -44,11 +44,9 @@
 
 <div
   class="background"
-  style="--background-color: {$backgroundColor}; --color:{$fontColor}; padding: 0 {outerPadding};"
+  style="--background-color: {$backgroundColor}; --color:{$fontColor}; --nav-bar-height: {navBarHeight}px; padding: 0 {outerPadding};"
 >
-  <main
-    style="height: calc(100vh - {navBarHeight}px); max-width: calc(min(730px, 100vw) - 2 * {outerPadding});"
-  >
+  <main style="max-width: calc(min(730px, 100vw) - 2 * {outerPadding});">
     <LocalStateContext>
       <UserContext>
         <LocalCollectionContext>
@@ -83,6 +81,14 @@
 <style>
   .scroll-buffer {
     height: 100px;
+  }
+
+  main {
+    /* 100vh is the large viewport on iOS Safari, so it extends behind the
+       visible address bar. Keep it as a fallback, then prefer the dynamic
+       viewport. In an installed PWA 100dvh is simply the full app viewport. */
+    height: calc(100vh - var(--nav-bar-height));
+    height: calc(100dvh - var(--nav-bar-height));
   }
 
   .background {

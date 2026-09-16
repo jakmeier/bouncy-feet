@@ -4,6 +4,8 @@
    * @property {boolean} [isOn]
    * @property {boolean} [border]
    * @property {string} [name]
+   * @property {string} [ariaLabel]
+   * @property {boolean} [disabled]
    * @property {(newVal: boolean)=>void} [onInput]
    */
 
@@ -12,6 +14,8 @@
     isOn = $bindable(false),
     border = false,
     name,
+    ariaLabel,
+    disabled = false,
     onInput = () => {},
   } = $props();
 
@@ -24,6 +28,7 @@
   }
 
   function toggle() {
+    if (disabled) return;
     isOn = !isOn;
     onInput(isOn);
   }
@@ -35,7 +40,10 @@
   onkeydown={handleKeydown}
   role="switch"
   aria-checked={isOn}
-  tabindex="0"
+  aria-label={ariaLabel}
+  aria-disabled={disabled}
+  class:disabled
+  tabindex={disabled ? -1 : 0}
   id={name}
 >
   <div class="toggle-circle"></div>
@@ -46,10 +54,21 @@
     position: relative;
     width: 80px;
     height: 40px;
+    flex-shrink: 0;
     background-color: var(--theme-neutral-dark);
     border-radius: 40px;
     cursor: pointer;
     transition: background-color 0.3s;
+  }
+
+  .toggle.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .toggle:focus-visible {
+    outline: 3px solid var(--theme-accent);
+    outline-offset: 3px;
   }
 
   .toggle.on {

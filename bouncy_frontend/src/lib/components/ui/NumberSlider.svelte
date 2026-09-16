@@ -6,10 +6,11 @@
    * @property {number} max
    * @property {number} [decimals]
    * @property {string} [name]
-   * @property {any} [onChange]
+   * @property {(value: number) => void} [onChange]
    * @property {string} [thumbColor]
    * @property {string} [backgroundColor]
    * @property {string} [unitLabel]
+   * @property {string} [ariaLabel]
    */
 
   /** @type {Props} */
@@ -19,57 +20,68 @@
     max,
     decimals = 0,
     name = '',
-    onChange = (angle) => {},
+    onChange = () => {},
     thumbColor = 'var(--theme-main)',
     backgroundColor = 'var(--theme-neutral-white)',
     unitLabel,
+    ariaLabel = 'Slider',
   } = $props();
 
   let isDragging = false;
-  /** @type {HTMLDivElement} */
-  let slider = $state();
-  /** @type {HTMLDivElement} */
-  let thumb = $state();
+  /** @type {HTMLDivElement | null} */
+  let slider = $state(null);
+  /** @type {HTMLDivElement | null} */
+  let thumb = $state(null);
 
+  /** @param {Event} event */
   function handleInput(event) {
-    value = event.target.value;
+    value = Number(/** @type {HTMLInputElement} */ (event.currentTarget).value);
   }
 
+  /** @param {{clientX: number}} event */
   function handleSliderChange(event) {
     if (!slider) return;
     const rect = slider.getBoundingClientRect();
     const frac = (event.clientX - rect.left) / rect.width;
     const exactNewValue = frac * (max - min) + min;
-    const newValue = Number(
-      Math.round(exactNewValue + 'e' + decimals) + 'e-' + decimals
-    );
+    const decimalFactor = 10 ** decimals;
+    const newValue = Math.round(exactNewValue * decimalFactor) / decimalFactor;
     value = Math.max(min, Math.min(newValue, max));
     onChange(value);
   }
 
+  /** @param {PointerEvent} event */
   function startDragging(event) {
     isDragging = true;
+    const target = /** @type {HTMLElement} */ (event.currentTarget);
+    target.setPointerCapture(event.pointerId);
     handleSliderChange(event);
-    window.addEventListener('mousemove', handleDragging);
-    window.addEventListener('mouseup', stopDragging);
   }
 
-  function stopDragging() {
+  /** @param {PointerEvent} event */
+  function stopDragging(event) {
     isDragging = false;
-    window.removeEventListener('mousemove', handleDragging);
-    window.removeEventListener('mouseup', stopDragging);
+    const target = /** @type {HTMLElement} */ (event.currentTarget);
+    if (target.hasPointerCapture(event.pointerId)) {
+      target.releasePointerCapture(event.pointerId);
+    }
   }
 
+  /** @param {PointerEvent} event */
   function handleDragging(event) {
     if (!isDragging) return;
     handleSliderChange(event);
   }
 
+  /** @param {KeyboardEvent} event */
   function handleKeydown(event) {
+    if (event.key.startsWith('Arrow')) event.preventDefault();
     if (event.key === 'ArrowRight' || event.key === 'ArrowUp') {
       value = Math.min(value + 1, max);
+      onChange(value);
     } else if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') {
       value = Math.max(value - 1, min);
+      onChange(value);
     }
   }
 
@@ -106,7 +118,7 @@
         aria-valuenow={value}
         aria-valuemin={min}
         aria-valuemax={max}
-        aria-label="Angle"
+        aria-label={ariaLabel}
       />
     {/if}
   </div>
@@ -118,9 +130,11 @@
     aria-valuenow={value}
     aria-valuemin={min}
     aria-valuemax={max}
-    aria-label="Angle slider"
-    onclick={handleSliderChange}
-    onmousedown={startDragging}
+    aria-label={ariaLabel}
+    onpointerdown={startDragging}
+    onpointermove={handleDragging}
+    onpointerup={stopDragging}
+    onpointercancel={stopDragging}
     onkeydown={handleKeydown}
     style="background-color: {backgroundColor}"
   >
@@ -161,6 +175,11 @@
     border-radius: 4px;
     margin-top: 10px;
     outline: none;
+    touch-action: none;
+  }
+  .slider:focus-visible {
+    outline: 3px solid var(--theme-accent);
+    outline-offset: 3px;
   }
   .slider-thumb {
     position: absolute;

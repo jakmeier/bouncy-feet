@@ -1,8 +1,9 @@
 name: Rust
 
 on:
+  # Pushes to bf/bf-next are checked by the deployment workflow.
   push:
-    branches: [main, bf, bf-next]
+    branches: [main]
   pull_request:
     branches: [main, bf, bf-next]
 

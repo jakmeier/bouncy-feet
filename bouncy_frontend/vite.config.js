@@ -10,7 +10,7 @@ export default defineConfig({
             strategies: 'generateSW',
             workbox: {
                 // Precache app shell + hashed assets
-                globPatterns: ['**/*.{js,css,html,wasm}'],
+                globPatterns: ['**/*.{js,css,html,wasm,mp3}'],
                 maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MiB
             },
         })

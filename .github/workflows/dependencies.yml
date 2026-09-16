@@ -6,8 +6,9 @@ on:
       - '**/Cargo.lock'
       - '**/Cargo.toml'
       - '**/deny.toml'
+  # Pushes to bf/bf-next are checked by the deployment workflow.
   push:
-    branches: [main, bf, bf-next]
+    branches: [main]
     paths:
       - '**/Cargo.lock'
       - '**/Cargo.toml'
